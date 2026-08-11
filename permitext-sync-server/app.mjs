@@ -142,6 +142,25 @@ import {
   structuredRichSources,
   visualSourceReferences
 } from "./evidence-discovery.mjs";
+import {
+  assembleResearchEvidence,
+  researchEvidenceAssemblyLimits,
+  researchEvidenceAssemblyVersion
+} from "./research-evidence-assembly.mjs";
+import {
+  normalizeResearchWebSources,
+  researchSourcePolicyVersion,
+  researchSourcePolicyConfiguration,
+  sanitizeResearchWebQuery,
+  shouldUseResearchWebSupport
+} from "./research-source-policy.mjs";
+import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
+import {
+  evaluateResearchRequiredClaimCoverage,
+  requiredResearchClaimsFromEvidence,
+  researchRequiredClaimCoverageVersion,
+  researchRequiredClaimRevisionIssues
+} from "./research-required-claim-coverage.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
 import {
@@ -368,6 +387,8 @@ const allowedMutationKinds = new Set([
 ]);
 const allowedCodeVersionClearScopes = new Set(["bookmarks", "notes", "tags", "folders"]);
 
+const maximumResearchSupportedPoints = 12;
+
 const researchInterpretationSchema = {
   type: "object",
   additionalProperties: false,
@@ -376,7 +397,7 @@ const researchInterpretationSchema = {
     supportedPoints: {
       type: "array",
       minItems: 1,
-      maxItems: 8,
+      maxItems: maximumResearchSupportedPoints,
       items: {
         type: "object",
         additionalProperties: false,
@@ -392,8 +413,21 @@ const researchInterpretationSchema = {
     explanation: { type: "string" },
     assumptions: { type: "array", items: { type: "string" } },
     missingFacts: { type: "array", items: { type: "string" } },
+    followUpQuestions: { type: "array", maxItems: 8, items: { type: "string" } },
     evidenceLimitations: { type: "array", items: { type: "string" } },
     additionalEvidenceNeeded: { type: "array", items: { type: "string" } },
+    supportingSourceUses: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          sourceID: { type: "string" },
+          claim: { type: "string" }
+        },
+        required: ["sourceID", "claim"]
+      }
+    },
     citations: {
       type: "array",
       minItems: 1,
@@ -415,13 +449,15 @@ const researchInterpretationSchema = {
     "explanation",
     "assumptions",
     "missingFacts",
+    "followUpQuestions",
     "evidenceLimitations",
     "additionalEvidenceNeeded",
+    "supportingSourceUses",
     "citations"
   ]
 };
 
-function researchInterpretationSchemaForEvidence(evidence) {
+function researchInterpretationSchemaForEvidence(evidence, supportingSources = []) {
   const schema = structuredClone(researchInterpretationSchema);
   const sectionIDs = Array.from(new Set(evidence.map((item) => String(item.sectionID))));
   const sourceIDs = Array.from(new Set(
@@ -431,7 +467,92 @@ function researchInterpretationSchemaForEvidence(evidence) {
   schema.properties.supportedPoints.items.properties.sourceIDs.items.enum = sourceIDs;
   schema.properties.citations.items.properties.sectionID.enum = sectionIDs;
   schema.properties.citations.items.properties.sourceIDs.items.enum = sourceIDs;
+  const supportingSourceIDs = supportingSources
+    .map((source) => String(source.id || ""))
+    .filter(Boolean);
+  if (supportingSourceIDs.length) {
+    schema.properties.supportingSourceUses.items.properties.sourceID.enum = supportingSourceIDs;
+  }
   return schema;
+}
+
+export function normalizeResearchInterpretationEvidenceBindings(value, evidence) {
+  if (!value || typeof value !== "object") return value;
+  const sourceSectionIDs = new Map((evidence || []).map((source) => [
+    String(source?.sourceID || `section-${source?.sectionID || ""}`),
+    String(source?.sectionID || "")
+  ]));
+  const normalizeBinding = (item) => {
+    if (!item || typeof item !== "object" || !Array.isArray(item.sourceIDs)) return item;
+    const sourceIDs = Array.from(new Set(
+      item.sourceIDs.map((sourceID) => String(sourceID || "").trim()).filter(Boolean)
+    ));
+    if (!sourceIDs.length) return item;
+    if (sourceIDs.some((sourceID) => !sourceSectionIDs.has(sourceID))) return item;
+    const sectionIDs = Array.from(new Set(sourceIDs.map((sourceID) => sourceSectionIDs.get(sourceID))));
+    const declaredSectionID = String(item.sectionID || "").trim();
+    return {
+      ...item,
+      sectionID: sectionIDs.includes(declaredSectionID) ? declaredSectionID : sectionIDs[0],
+      sourceIDs
+    };
+  };
+  const normalizedSupportedPoints = Array.isArray(value.supportedPoints)
+    ? value.supportedPoints.map(normalizeBinding)
+    : value.supportedPoints;
+  const normalizedCitations = Array.isArray(value.citations)
+    ? value.citations.flatMap((citation) => {
+        const normalized = normalizeBinding(citation);
+        if (!normalized || !Array.isArray(normalized.sourceIDs)) return [normalized];
+        if (normalized.sourceIDs.some((sourceID) => !sourceSectionIDs.has(sourceID))) return [normalized];
+        const sourceIDsBySection = new Map();
+        for (const sourceID of normalized.sourceIDs) {
+          const sectionID = sourceSectionIDs.get(sourceID);
+          sourceIDsBySection.set(sectionID, [...(sourceIDsBySection.get(sectionID) || []), sourceID]);
+        }
+        return Array.from(sourceIDsBySection, ([sectionID, sourceIDs]) => ({
+          ...normalized,
+          sectionID,
+          sourceIDs
+        }));
+      })
+    : value.citations;
+  if (Array.isArray(normalizedCitations) && Array.isArray(normalizedSupportedPoints)) {
+    const citedSourceIDs = new Set(normalizedCitations.flatMap((citation) => citation?.sourceIDs || []));
+    for (const point of normalizedSupportedPoints) {
+      if (!point || !Array.isArray(point.sourceIDs)) continue;
+      const missingSourceIDs = point.sourceIDs.filter((sourceID) =>
+        sourceSectionIDs.has(sourceID) && !citedSourceIDs.has(sourceID)
+      );
+      const sourceIDsBySection = new Map();
+      for (const sourceID of missingSourceIDs) {
+        const sectionID = sourceSectionIDs.get(sourceID);
+        sourceIDsBySection.set(sectionID, [...(sourceIDsBySection.get(sectionID) || []), sourceID]);
+        citedSourceIDs.add(sourceID);
+      }
+      for (const [sectionID, sourceIDs] of sourceIDsBySection) {
+        normalizedCitations.push({
+          sectionID,
+          sourceIDs,
+          relevance: `Evidence supporting ${String(point.heading || "this point").trim() || "this point"}.`
+        });
+      }
+    }
+  }
+  const seenCitationBindings = new Set();
+  return {
+    ...value,
+    supportedPoints: normalizedSupportedPoints,
+    citations: Array.isArray(normalizedCitations)
+      ? normalizedCitations.filter((citation) => {
+          if (!citation || !Array.isArray(citation.sourceIDs)) return true;
+          const key = `${citation.sectionID}:${citation.sourceIDs.slice().sort().join(",")}`;
+          if (seenCitationBindings.has(key)) return false;
+          seenCitationBindings.add(key);
+          return true;
+        })
+      : normalizedCitations
+  };
 }
 
 function safeJSON(value, fallback) {
@@ -2790,6 +2911,7 @@ async function createPostgresStoreAdapter() {
                 'title', conversation->>'title',
                 'createdAt', conversation->>'createdAt',
                 'updatedAt', conversation->>'updatedAt',
+                'historyHiddenAt', conversation->>'historyHiddenAt',
                 'primaryProjectID', conversation->>'primaryProjectID',
                 'starterQuestion', conversation->>'starterQuestion',
                 'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
@@ -2815,6 +2937,7 @@ async function createPostgresStoreAdapter() {
                 'title', conversation->>'title',
                 'createdAt', conversation->>'createdAt',
                 'updatedAt', conversation->>'updatedAt',
+                'historyHiddenAt', conversation->>'historyHiddenAt',
                 'primaryProjectID', conversation->>'primaryProjectID',
                 'starterQuestion', conversation->>'starterQuestion',
                 'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
@@ -5623,11 +5746,17 @@ function researchPrompt(question, evidence, options = {}) {
       `TITLE: ${section.title}`,
       `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
       `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
-      `EXACT SELECTED PASSAGE: ${section.text}`
-    ];
+      `EVIDENCE_ORIGIN: ${section.origin || "user_pinned"}`,
+      `EVIDENCE_FUNCTION: ${section.evidencePriority?.primaryFunction || "candidate"}`,
+      `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
+      section.evidencePriority?.claimCoverageReason
+        ? `REQUIRED_CLAIM_REASON: ${section.evidencePriority.claimCoverageReason}`
+        : "",
+      `ENACTED_TEXT: ${section.text}`
+    ].filter(Boolean);
     if (section.richSourceID && section.richSourceGrids) {
       lines.push(
-        `STRUCTURED_OFFICIAL_SOURCE: ${section.richSourceReference || section.richSourceID}`,
+        `STRUCTURED_OFFICIAL_SOURCE: ${section.richSourceCanonicalReference || section.richSourceReference || section.richSourceID}`,
         `STRUCTURED_SOURCE_CONTENT_HASH: ${section.richSourceContentHash}`,
         `STRUCTURED_TABLE_GRIDS_JSON: ${JSON.stringify(section.richSourceGrids)}`
       );
@@ -5656,14 +5785,324 @@ function researchPrompt(question, evidence, options = {}) {
   const projectFacts = (options.projectContextFacts || [])
     .map((fact, index) => `${index + 1}. ${fact}`)
     .join("\n");
+  const supportingWebContext = options.webSupport?.sources?.length
+    ? [
+        "SUPPORTING WEB CONTEXT — NONCONTROLLING",
+        "This material may explain or contextualize the enacted text. It cannot create or override a governing requirement.",
+        options.webSupport.summary || "",
+        ...options.webSupport.sources.map((source) => [
+          `WEB_SOURCE_ID: ${source.id}`,
+          `SOURCE_CLASS: ${source.authorityClass}`,
+          `TITLE: ${source.title}`,
+          `PUBLISHER: ${source.publisher}`,
+          `URL: ${source.url}`
+        ].join("\n"))
+      ].filter(Boolean).join("\n\n")
+    : "";
+  const revisionFeedback = Array.isArray(options.revisionFeedback) && options.revisionFeedback.length
+    ? `VERIFIER FEEDBACK FOR ONE BOUNDED REVISION\n${options.revisionFeedback
+        .map((issue, index) => `${index + 1}. ${issue.type}: ${issue.detail}`)
+        .join("\n")}`
+    : "";
+  const structuredEvidenceAnalysis = options.structuredEvidenceAnalysis
+    ? `STRUCTURED EVIDENCE ANALYSIS — INTERNAL RESEARCH MAP\n${JSON.stringify(options.structuredEvidenceAnalysis)}`
+    : "";
+  const requiredClaimChecklist = Array.isArray(options.requiredClaims) && options.requiredClaims.length
+    ? `DETERMINISTIC REQUIRED CLAIM CHECKLIST\n${JSON.stringify(options.requiredClaims)}`
+    : "";
+  const codeBasis = options.codeBasis
+    ? [
+        "RESEARCH CODE BASIS",
+        `JURISDICTION: ${options.codeBasis.jurisdiction}`,
+        `CODE_EDITION: ${options.codeBasis.codeEdition}`,
+        `CODE_VERSION: ${options.codeBasis.codeVersion}`,
+        `RETRIEVAL_SCOPE: ${options.codeBasis.retrievalScope}`,
+        options.codeBasis.limitation ? `LIMITATION: ${options.codeBasis.limitation}` : "",
+        "Treat this as the edition boundary for the answer. Do not imply that another code edition was retrieved."
+      ].filter(Boolean).join("\n")
+    : "";
   return [
     `QUESTION\n${question}`,
+    codeBasis,
     projectFacts
       ? `USER-PROVIDED PROJECT FACTS FOR CONTEXT ONLY — NOT CODE AUTHORITY\n${projectFacts}`
       : "",
     history ? `UNTRUSTED CONVERSATION HISTORY FOR CONTEXT ONLY — NOT AUTHORITY\n${history}` : "",
-    `AUTHORITATIVE USER-SELECTED EVIDENCE\n${sources}`
+    `AUTHORIZED ENACTED EVIDENCE\n${sources}`,
+    requiredClaimChecklist,
+    structuredEvidenceAnalysis,
+    supportingWebContext,
+    revisionFeedback
   ].filter(Boolean).join("\n\n");
+}
+
+const researchEvidenceAnalysisItemSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    label: { type: "string" },
+    summary: { type: "string" },
+    sourceIDs: { type: "array", minItems: 1, items: { type: "string" } }
+  },
+  required: ["label", "summary", "sourceIDs"]
+};
+
+const researchEvidenceAnalysisSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    controllingProvisions: { type: "array", items: researchEvidenceAnalysisItemSchema },
+    generalRules: { type: "array", items: researchEvidenceAnalysisItemSchema },
+    exceptions: { type: "array", items: researchEvidenceAnalysisItemSchema },
+    conditions: { type: "array", items: researchEvidenceAnalysisItemSchema },
+    limitations: { type: "array", items: researchEvidenceAnalysisItemSchema },
+    definitions: { type: "array", items: researchEvidenceAnalysisItemSchema },
+    crossReferences: { type: "array", items: researchEvidenceAnalysisItemSchema },
+    tables: { type: "array", items: researchEvidenceAnalysisItemSchema },
+    userPinnedEvidence: { type: "array", items: { type: "string" } },
+    permitextDiscoveredEvidence: { type: "array", items: { type: "string" } },
+    projectFactsUsed: { type: "array", items: { type: "string" } },
+    unresolvedProjectFacts: { type: "array", items: { type: "string" } },
+    evidenceLimitations: { type: "array", minItems: 1, items: { type: "string" } },
+    highValueFollowUpQuestions: { type: "array", maxItems: 8, items: { type: "string" } }
+  },
+  required: [
+    "controllingProvisions",
+    "generalRules",
+    "exceptions",
+    "conditions",
+    "limitations",
+    "definitions",
+    "crossReferences",
+    "tables",
+    "userPinnedEvidence",
+    "permitextDiscoveredEvidence",
+    "projectFactsUsed",
+    "unresolvedProjectFacts",
+    "evidenceLimitations",
+    "highValueFollowUpQuestions"
+  ]
+};
+
+const researchEvidenceAnalysisCollections = [
+  "controllingProvisions",
+  "generalRules",
+  "exceptions",
+  "conditions",
+  "limitations",
+  "definitions",
+  "crossReferences",
+  "tables"
+];
+
+export function validateResearchEvidenceAnalysis(value, evidence, projectFacts = []) {
+  const sourceIDs = new Set(evidence.map((source) => String(source.sourceID || "")).filter(Boolean));
+  const factSet = new Set(projectFacts.map((fact) => String(fact).trim()).filter(Boolean));
+  if (!value || typeof value !== "object") {
+    const error = new Error("The Research evidence analysis was invalid.");
+    error.code = "INVALID_RESEARCH_EVIDENCE_ANALYSIS";
+    throw error;
+  }
+  const cleanText = (text, maximum = 1_500) => String(text || "").replace(/\s+/g, " ").trim().slice(0, maximum);
+  const result = {};
+  for (const collection of researchEvidenceAnalysisCollections) {
+    if (!Array.isArray(value[collection])) {
+      const error = new Error("The Research evidence analysis omitted a required collection.");
+      error.code = "INVALID_RESEARCH_EVIDENCE_ANALYSIS";
+      throw error;
+    }
+    result[collection] = value[collection].slice(0, 20).map((item) => {
+      const ids = Array.isArray(item?.sourceIDs)
+        ? Array.from(new Set(item.sourceIDs.map((id) => String(id || "").trim()).filter(Boolean)))
+        : [];
+      const label = cleanText(item?.label, 240);
+      const summary = cleanText(item?.summary);
+      if (!label || !summary || !ids.length || ids.some((id) => !sourceIDs.has(id))) {
+        const error = new Error("The Research evidence analysis referenced evidence outside the assembled package.");
+        error.code = "INVALID_RESEARCH_EVIDENCE_ANALYSIS";
+        throw error;
+      }
+      return { label, summary, sourceIDs: ids };
+    });
+  }
+  const normalizedIDs = (items, origin) => {
+    if (!Array.isArray(items)) return null;
+    const ids = Array.from(new Set(items.map((id) => String(id || "").trim()).filter(Boolean)));
+    if (ids.some((id) => !sourceIDs.has(id))) return null;
+    return ids.filter((id) => evidence.find((source) => source.sourceID === id)?.origin === origin);
+  };
+  const userPinnedEvidence = normalizedIDs(value.userPinnedEvidence, "user_pinned");
+  const discoveredIDs = Array.isArray(value.permitextDiscoveredEvidence)
+    ? Array.from(new Set(value.permitextDiscoveredEvidence.map((id) => String(id || "").trim()).filter(Boolean)))
+    : null;
+  if (
+    !userPinnedEvidence || !discoveredIDs ||
+    discoveredIDs.some((id) => !sourceIDs.has(id) || evidence.find((source) => source.sourceID === id)?.origin === "user_pinned") ||
+    !Array.isArray(value.projectFactsUsed) || !Array.isArray(value.unresolvedProjectFacts) ||
+    !Array.isArray(value.evidenceLimitations) || !value.evidenceLimitations.length ||
+    !Array.isArray(value.highValueFollowUpQuestions)
+  ) {
+    const error = new Error("The Research evidence analysis returned inconsistent evidence or uncertainty fields.");
+    error.code = "INVALID_RESEARCH_EVIDENCE_ANALYSIS";
+    throw error;
+  }
+  const projectFactsUsed = value.projectFactsUsed.map((fact) => cleanText(fact)).filter(Boolean);
+  if (projectFactsUsed.some((fact) => !factSet.has(fact))) {
+    const error = new Error("The Research evidence analysis invented a Project fact.");
+    error.code = "INVALID_RESEARCH_EVIDENCE_ANALYSIS";
+    throw error;
+  }
+  return {
+    schemaVersion: 1,
+    ...result,
+    userPinnedEvidence,
+    permitextDiscoveredEvidence: discoveredIDs,
+    projectFactsUsed,
+    unresolvedProjectFacts: value.unresolvedProjectFacts.map((item) => cleanText(item)).filter(Boolean),
+    evidenceLimitations: value.evidenceLimitations.map((item) => cleanText(item)).filter(Boolean),
+    highValueFollowUpQuestions: value.highValueFollowUpQuestions
+      .map((item) => cleanText(item))
+      .filter(Boolean)
+      .slice(0, 8)
+  };
+}
+
+function mockResearchEvidenceAnalysis(evidence, projectFacts = [], retrievalLimitations = []) {
+  const items = evidence.slice(0, 12).map((source) => ({
+    label: `${source.codePrefix || "Code"} ${source.sectionNumber || source.sectionID}`.trim(),
+    summary: `This enacted provision is part of the bounded evidence package for the question.`,
+    sourceIDs: [source.sourceID]
+  }));
+  return {
+    schemaVersion: 1,
+    controllingProvisions: items.slice(0, 1),
+    generalRules: items.slice(0, 1),
+    exceptions: [],
+    conditions: items.slice(1),
+    limitations: [],
+    definitions: [],
+    crossReferences: evidence.filter((source) => source.origin === "permitext_cross_reference").map((source) => ({
+      label: `${source.codePrefix || "Code"} ${source.sectionNumber || source.sectionID}`.trim(),
+      summary: "Direct cross-reference reviewed with the primary evidence.",
+      sourceIDs: [source.sourceID]
+    })),
+    tables: [],
+    userPinnedEvidence: evidence.filter((source) => source.origin === "user_pinned").map((source) => source.sourceID),
+    permitextDiscoveredEvidence: evidence.filter((source) => source.origin !== "user_pinned").map((source) => source.sourceID),
+    projectFactsUsed: [...projectFacts],
+    unresolvedProjectFacts: ["Confirm the project facts material to the cited conditions."],
+    evidenceLimitations: retrievalLimitations.length
+      ? retrievalLimitations.map((item) => item.text || String(item))
+      : ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
+    highValueFollowUpQuestions: ["Which project fact controls whether the cited condition applies?"]
+  };
+}
+
+async function openAIResearchEvidenceAnalysis(question, evidence, userID, options = {}) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    const error = new Error("Research AI is not configured.");
+    error.code = "RESEARCH_NOT_CONFIGURED";
+    throw error;
+  }
+  const configuration = researchModelConfiguration();
+  const schema = structuredClone(researchEvidenceAnalysisSchema);
+  const sourceIDs = evidence.map((source) => source.sourceID);
+  for (const collection of researchEvidenceAnalysisCollections) {
+    schema.properties[collection].items.properties.sourceIDs.items.enum = sourceIDs;
+  }
+  schema.properties.userPinnedEvidence.items.enum = sourceIDs;
+  schema.properties.permitextDiscoveredEvidence.items.enum = sourceIDs;
+  const exactProjectFacts = (options.projectContextFacts || [])
+    .map((fact) => String(fact || "").trim())
+    .filter(Boolean);
+  if (exactProjectFacts.length) {
+    schema.properties.projectFactsUsed.items.enum = exactProjectFacts;
+  } else {
+    schema.properties.projectFactsUsed.maxItems = 0;
+  }
+  const requestBody = {
+    model: configuration.model,
+    store: false,
+    reasoning: { effort: "low" },
+    max_output_tokens: 6_000,
+    safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
+    instructions: [
+      "Organize the supplied enacted evidence into a compact internal legal-research map before a separate model writes the user-facing answer.",
+      "Retrieval relevance does not establish legal applicability. Identify controlling provisions only when the supplied text supports that role.",
+      "Separate general rules, exceptions, conditions, limitations, definitions, cross-references, tables, known project facts, unresolved project facts, and evidence limitations.",
+      "Make the strongest supported distinctions, including contradictions in the user's premise and requirements attributed to the wrong exception.",
+      "Use only exact supplied project facts in projectFactsUsed. Do not turn missing facts into assumptions.",
+      "Ask only the minimum high-value follow-up questions that could materially change the project conclusion.",
+      "Always state the bounded-corpus limitation. Include any retrieval limitations supplied in the request.",
+      "Every passage marked REQUIRED_CLAIM_COVERAGE must appear in at least one material evidence-map item. Never say a rule is absent when its required passage supplies that rule."
+    ].join(" "),
+    input: [
+      researchPrompt(question, evidence, {
+        messages: options.messages,
+        projectContextFacts: options.projectContextFacts,
+        codeBasis: options.codeBasis,
+        requiredClaims: options.requiredClaims
+      }),
+      options.retrievalLimitations?.length
+        ? `DETERMINISTIC RETRIEVAL LIMITATIONS\n${JSON.stringify(options.retrievalLimitations)}`
+        : ""
+    ].filter(Boolean).join("\n\n"),
+    text: {
+      format: {
+        type: "json_schema",
+        name: "permitext_research_evidence_analysis",
+        strict: true,
+        schema
+      }
+    }
+  };
+  let response;
+  try {
+    reserveResearchEvaluationSpend(requestBody);
+    response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(requestBody),
+      // Terra can spend more than 35 seconds organizing a dense, multi-branch
+      // evidence package even when retrieval itself is compact. Keep this
+      // bounded, but allow the structured analysis call to finish.
+      signal: AbortSignal.timeout(60_000)
+    });
+  } catch (error) {
+    const providerError = new Error("The Research evidence-analysis request failed.");
+    providerError.code = "RESEARCH_PROVIDER_ERROR";
+    providerError.cause = error;
+    providerError.providerCause = String(error?.name || error?.code || "network-error").slice(0, 120);
+    throw providerError;
+  }
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error("The Research evidence-analysis request failed.");
+    error.code = "RESEARCH_PROVIDER_ERROR";
+    error.status = response.status;
+    throw error;
+  }
+  let value;
+  try {
+    value = JSON.parse(outputTextFromResponse(payload));
+  } catch (error) {
+    if (error.code === "RESEARCH_REFUSAL") throw error;
+    const invalid = new Error("The Research evidence-analysis model returned invalid structured output.");
+    invalid.code = "INVALID_RESEARCH_EVIDENCE_ANALYSIS";
+    invalid.providerStatus = payload?.status || null;
+    invalid.incompleteReason = payload?.incomplete_details?.reason || null;
+    invalid.providerUsage = researchUsageFromProviderPayload(payload);
+    throw invalid;
+  }
+  return {
+    analysis: validateResearchEvidenceAnalysis(value, evidence, options.projectContextFacts || []),
+    model: payload.model || configuration.model,
+    usage: researchUsageFromProviderPayload(payload)
+  };
 }
 
 export function researchInputForEvidence(question, evidence, options = {}) {
@@ -5718,36 +6157,38 @@ export function researchInputForEvidence(question, evidence, options = {}) {
 
 function mockResearchInterpretation(question, evidence, options = {}) {
   const subject = evidence.length === 1
-    ? `the selected provision, ${evidence[0].sectionNumber || evidence[0].title}`
-    : `the ${evidence.length} selected provisions`;
+    ? `the enacted provision, ${evidence[0].sectionNumber || evidence[0].title}`
+    : `the ${evidence.length} enacted provisions Permitext assembled`;
   const conversational = options.responseStyle === "conversational";
   const acceptsConditionalYes = /^(?:can|could|does|is|are|may|must|should|will|would)\b/i
     .test(String(question || "").trim());
   return {
     conclusion: conversational
       ? acceptsConditionalYes
-        ? "Potentially, yes—but only if the conditions in the selected provisions are satisfied by the project."
-        : "The selected provisions provide a conditional answer, but the remaining project facts must be confirmed before relying on it."
+        ? "Potentially, yes—but only if the conditions in the assembled enacted provisions are satisfied by the project."
+        : "The assembled enacted provisions provide a conditional answer, but the remaining project facts must be confirmed before relying on it."
       : `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`,
-    supportedPoints: evidence.slice(0, 8).map((section) => ({
+    supportedPoints: evidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
         ? `This provision supplies one of the rules that controls the answer to “${question}”.`
-        : `The selected passage from ${section.sectionNumber || section.title} is part of the evidence authorized for this Research.`,
+        : `The enacted text from ${section.sectionNumber || section.title} is part of the evidence authorized for this Research.`,
       sectionID: section.sectionID,
       sourceIDs: [section.sourceID || `section-${section.sectionID}`]
     })),
     explanation: conversational
-      ? `The selected text gives a governing starting point, but it is not a blanket approval. Read ${subject} together, then confirm the project facts that control the cited conditions before relying on the result.`
-      : "The selected code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.",
-    assumptions: ["Only the selected 2022 New York City Construction Code provisions were considered."],
+      ? `The enacted text gives a governing starting point, but it is not a blanket approval. Read ${subject} together, then confirm the project facts that control the cited conditions before relying on the result.`
+      : "The assembled enacted code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.",
+    assumptions: ["Only the enacted 2022 New York City Construction Code provisions assembled for this answer were treated as governing authority."],
     missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
-    evidenceLimitations: ["No code sections or agency documents beyond the passages selected by the user were treated as authority."],
-    additionalEvidenceNeeded: ["Attach any other applicable code section or agency document before relying on requirements not stated in the selected passages."],
+    followUpQuestions: ["What project fact would determine whether the cited conditions apply?"],
+    evidenceLimitations: ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
+    additionalEvidenceNeeded: ["Confirm any referenced standard, agency rule, figure, or other authority outside the current enacted corpus before final reliance."],
+    supportingSourceUses: [],
     citations: evidence.map((section) => ({
       sectionID: section.sectionID,
       sourceIDs: [section.sourceID || `section-${section.sectionID}`],
-      relevance: `Selected evidence from ${section.sectionNumber || section.title}.`
+      relevance: `Enacted evidence from ${section.sectionNumber || section.title}.`
     }))
   };
 }
@@ -5768,7 +6209,141 @@ function outputTextFromResponse(response) {
   throw error;
 }
 
-export function validateResearchInterpretation(value, evidence) {
+function researchUsageFromProviderPayload(payload) {
+  return {
+    inputTokens: Number(payload?.usage?.input_tokens || 0),
+    cachedInputTokens: Number(payload?.usage?.input_tokens_details?.cached_tokens || 0),
+    outputTokens: Number(payload?.usage?.output_tokens || 0),
+    totalTokens: Number(payload?.usage?.total_tokens || 0)
+  };
+}
+
+function combinedResearchUsage(...entries) {
+  return entries.filter(Boolean).reduce((total, entry) => ({
+    inputTokens: total.inputTokens + Number(entry.inputTokens || 0),
+    cachedInputTokens: total.cachedInputTokens + Number(entry.cachedInputTokens || 0),
+    outputTokens: total.outputTokens + Number(entry.outputTokens || 0),
+    totalTokens: total.totalTokens + Number(entry.totalTokens || 0)
+  }), { inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, totalTokens: 0 });
+}
+
+function webSourcesFromProviderPayload(payload) {
+  const sources = [];
+  for (const item of payload?.output || []) {
+    for (const source of item?.action?.sources || []) {
+      sources.push({
+        url: source?.url,
+        title: source?.title,
+        publisher: source?.publisher
+      });
+    }
+    for (const content of item?.content || []) {
+      for (const annotation of content?.annotations || []) {
+        const citation = annotation?.url_citation || annotation;
+        if (annotation?.type !== "url_citation" && !annotation?.url_citation) continue;
+        sources.push({
+          url: citation?.url,
+          title: citation?.title
+        });
+      }
+    }
+  }
+  return sources;
+}
+
+async function openAIResearchWebSupport(question, userID, options = {}) {
+  const policyConfiguration = researchSourcePolicyConfiguration();
+  if (!policyConfiguration.webSupportEnabled) {
+    return { summary: "", sources: [], usage: combinedResearchUsage(), searched: false };
+  }
+  const sanitizedQuery = sanitizeResearchWebQuery(options.retrievalQuery || question);
+  if (!sanitizedQuery) {
+    return { summary: "", sources: [], usage: combinedResearchUsage(), searched: false };
+  }
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return { summary: "", sources: [], usage: combinedResearchUsage(), searched: false };
+  }
+  const configuration = researchModelConfiguration();
+  const allowedDomains = policyConfiguration.officialDomains;
+  const requestBody = {
+    model: configuration.model,
+    store: false,
+    reasoning: { effort: "low" },
+    max_output_tokens: 700,
+    safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
+    tools: [{
+      type: "web_search",
+      filters: { allowed_domains: allowedDomains }
+    }],
+    tool_choice: "auto",
+    include: ["web_search_call.action.sources"],
+    instructions: [
+      "Find concise supporting information from the allowed official websites for a building-code research answer.",
+      "The enacted Permitext corpus remains the primary legal authority.",
+      "Do not make a project compliance determination and do not treat guidance as enacted law.",
+      "Return only useful explanatory, administrative, effective-date, or technical context with inline web citations.",
+      "If no official supporting material is useful, say that briefly."
+    ].join(" "),
+    input: sanitizedQuery
+  };
+  let response;
+  try {
+    reserveResearchEvaluationSpend(requestBody);
+    response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(30_000)
+    });
+  } catch {
+    return {
+      summary: "",
+      sources: [],
+      usage: combinedResearchUsage(),
+      searched: true,
+      limitation: "Permitext could not reach the approved supporting web sources for this answer."
+    };
+  }
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    return {
+      summary: "",
+      sources: [],
+      usage: researchUsageFromProviderPayload(payload),
+      searched: true,
+      limitation: "Permitext could not retrieve approved supporting web material for this answer."
+    };
+  }
+  let summary = "";
+  try {
+    summary = outputTextFromResponse(payload);
+  } catch {
+    summary = "";
+  }
+  return {
+    summary,
+    sources: normalizeResearchWebSources(webSourcesFromProviderPayload(payload), {
+      officialDomains: allowedDomains
+    }).filter((source) => source.sourceClassification === "official_guidance")
+      .map((source) => ({
+        ...source,
+        id: `web-source-${createHash("sha256").update(source.url).digest("hex").slice(0, 24)}`,
+        authorityClass: source.sourceClassification,
+        role: source.sourceRole,
+        retrievedAt: new Date().toISOString()
+      })),
+    usage: researchUsageFromProviderPayload(payload),
+    searched: true,
+    sanitizedQuery,
+    sourcePolicyVersion: researchSourcePolicyVersion
+  };
+}
+
+export function validateResearchInterpretation(value, evidence, supportingSources = []) {
   const allowedSections = new Map();
   const allowedSources = new Map();
   for (const section of evidence) {
@@ -5779,18 +6354,20 @@ export function validateResearchInterpretation(value, evidence) {
       typeof value.conclusion !== "string" || !value.conclusion.trim() ||
       !Array.isArray(value.supportedPoints) ||
       value.supportedPoints.length === 0 ||
-      value.supportedPoints.length > 8 ||
+      value.supportedPoints.length > maximumResearchSupportedPoints ||
       typeof value.explanation !== "string" || !value.explanation.trim() ||
       !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
       !Array.isArray(value.missingFacts) || !value.missingFacts.every((item) => typeof item === "string") ||
+      !Array.isArray(value.followUpQuestions) || !value.followUpQuestions.every((item) => typeof item === "string") ||
       !Array.isArray(value.evidenceLimitations) || !value.evidenceLimitations.every((item) => typeof item === "string") ||
       !Array.isArray(value.additionalEvidenceNeeded) || !value.additionalEvidenceNeeded.every((item) => typeof item === "string") ||
+      !Array.isArray(value.supportingSourceUses) ||
       !Array.isArray(value.citations) || value.citations.length === 0) {
     const error = new Error("The model returned an invalid interpretation.");
     error.code = "INVALID_RESEARCH_RESPONSE";
     throw error;
   }
-  const supportedPoints = value.supportedPoints.map((point) => {
+  const supportedPoints = value.supportedPoints.map((point, pointIndex) => {
     const heading = String(point?.heading || "").trim();
     const explanation = String(point?.explanation || "").trim();
     const sectionID = String(point?.sectionID || "").trim();
@@ -5803,16 +6380,30 @@ export function validateResearchInterpretation(value, evidence) {
       !allowedSections.has(sectionID) ||
       !sourceIDs.length ||
       new Set(sourceIDs).size !== sourceIDs.length ||
-      sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID !== sectionID)
+      sourceIDs.some((sourceID) => !allowedSources.has(sourceID)) ||
+      !sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID === sectionID)
     ) {
       const error = new Error("The model tied an explanation to evidence outside the selected code sections.");
       error.code = "INVALID_RESEARCH_CITATION";
+      error.bindingIssue = {
+        collection: "supportedPoints",
+        index: pointIndex,
+        headingPresent: Boolean(heading),
+        explanationPresent: Boolean(explanation),
+        declaredSectionID: sectionID || null,
+        declaredSectionKnown: allowedSections.has(sectionID),
+        sourceIDCount: sourceIDs.length,
+        duplicateSourceIDs: new Set(sourceIDs).size !== sourceIDs.length,
+        sourceSectionIDs: Array.from(new Set(
+          sourceIDs.map((sourceID) => allowedSources.get(sourceID)?.sectionID || "unknown")
+        ))
+      };
       throw error;
     }
     return { heading, explanation, sectionID, sourceIDs };
   });
   if (!value.evidenceLimitations.some((item) => item.trim())) {
-    const error = new Error("The model omitted the required selected-evidence limitation.");
+    const error = new Error("The model omitted the required evidence limitation.");
     error.code = "INVALID_RESEARCH_RESPONSE";
     throw error;
   }
@@ -5867,11 +6458,8 @@ export function validateResearchInterpretation(value, evidence) {
     throw error;
   }
   for (const point of supportedPoints) {
-    const supportingCitation = citations.find((citation) =>
-      String(citation.sectionID) === point.sectionID &&
-      point.sourceIDs.every((sourceID) => citation.sourceIDs.includes(sourceID))
-    );
-    if (!supportingCitation) {
+    const citedSourceIDs = new Set(citations.flatMap((citation) => citation.sourceIDs));
+    if (!point.sourceIDs.every((sourceID) => citedSourceIDs.has(sourceID))) {
       const error = new Error("A numbered Research point was not covered by the cited selected evidence.");
       error.code = "INVALID_RESEARCH_CITATION";
       throw error;
@@ -5893,8 +6481,22 @@ export function validateResearchInterpretation(value, evidence) {
   const cleanList = (items) => items.map(cleanNarrative).filter(Boolean);
   const assumptions = cleanList(value.assumptions);
   const missingFacts = cleanList(value.missingFacts);
+  const followUpQuestions = cleanList(value.followUpQuestions).slice(0, 8);
   const evidenceLimitations = cleanList(value.evidenceLimitations);
   const additionalEvidenceNeeded = cleanList(value.additionalEvidenceNeeded);
+  const allowedSupportingSources = new Map(
+    supportingSources.map((source) => [String(source.id || ""), source]).filter(([id]) => id)
+  );
+  const supportingSourceUses = value.supportingSourceUses.map((use) => {
+    const sourceID = String(use?.sourceID || "").trim();
+    const claim = cleanNarrative(use?.claim);
+    if (!sourceID || !claim || !allowedSupportingSources.has(sourceID)) {
+      const error = new Error("The model cited supporting material outside the retrieved web sources.");
+      error.code = "INVALID_RESEARCH_WEB_CITATION";
+      throw error;
+    }
+    return { sourceID, claim };
+  });
   const cleanedCitations = citations.map((citation) => ({
     ...citation,
     relevance: cleanNarrative(citation.relevance)
@@ -5924,8 +6526,14 @@ export function validateResearchInterpretation(value, evidence) {
     explanation,
     assumptions,
     missingFacts,
+    followUpQuestions,
     evidenceLimitations,
     additionalEvidenceNeeded,
+    supportingSourceUses,
+    supportingSources: supportingSourceUses.map((use) => ({
+      ...allowedSupportingSources.get(use.sourceID),
+      claim: use.claim
+    })),
     citations: cleanedCitations
   };
 }
@@ -5942,7 +6550,8 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   const configuration = conversational
     ? {
         ...baseConfiguration,
-        promptVersion: `${baseConfiguration.promptVersion}:conversational-v1`
+        promptVersion: `${baseConfiguration.promptVersion}:conversational-v2`,
+        evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
       }
     : baseConfiguration;
   const model = configuration.model;
@@ -5951,41 +6560,49 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     sourceID: section.sourceID || `section-${section.sectionID}`,
     codeVersion: section.codeVersion || defaultSyncCodeVersion
   }));
+  const supportingSources = options.webSupport?.sources || [];
   let response;
   try {
     const requestBody = {
       model,
       store: false,
-      reasoning: { effort: configuration.reasoningEffort },
-      max_output_tokens: 1_500,
+      reasoning: { effort: conversational ? "low" : configuration.reasoningEffort },
+      max_output_tokens: conversational ? 3_000 : 1_500,
       safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
       instructions: [
         "You are a building-code research assistant, not an authority having jurisdiction.",
-        "Interpret only the selected official code evidence supplied in the request.",
+        "Make governing code conclusions only from the authorized enacted evidence supplied in the request.",
+        "Evidence marked user_pinned must be considered, but Permitext-discovered enacted evidence may identify a different controlling provision.",
+        "Supporting web context may explain or contextualize an answer but is noncontrolling and must never create or override an enacted requirement.",
         "When a selected source includes attached official visual evidence, examine only the attached images and identify the exact visual source used through its PASSAGE_ID; never infer what an unselected map or image shows.",
         "Treat maps and figures as evidence that can be misread. State any illegible label, uncertain boundary, missing lot location, or other visual ambiguity explicitly instead of guessing.",
-        "Do not use outside knowledge as legal authority and do not invent requirements.",
+        "Do not use pretrained or uncited outside knowledge as legal authority and do not invent requirements.",
         "Treat user-provided Project facts as unverified context, never as code authority or cited evidence.",
+        "Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence.",
         "Write the conclusion as a concise professional answer of one to three sentences.",
         conversational
           ? "For this ordinary Research conversation, write conclusion and explanation so they read consecutively as one natural response. Lead with the clearest supported answer, such as Yes, No, or Potentially, then explain why in direct plain language. Avoid report boilerplate, process narration, repeated question text, and phrases such as a project-specific answer requires reading. Keep the tone professional but conversational."
           : "Use the formal governed-analysis tone for conclusion and explanation.",
         "Do not print SECTION_ID or PASSAGE_ID markers in the conclusion, supported-point prose, or practical explanation; those identifiers belong only in the structured mapping fields.",
-        "Break the material rules established by the selected evidence into ordered supportedPoints. Give each point a short plain-language heading, a complete explanation, and the exact supplied sectionID and sourceIDs that support it.",
-        "Do not add an example, consequence, code category, or practical requirement unless the selected evidence or user-provided Project facts establish it. Clearly identify any illustration as hypothetical, and never use a hypothetical to introduce an unselected legal premise.",
+        "Break the material rules established by the assembled enacted evidence into ordered supportedPoints. Give each point a short plain-language heading, a complete explanation, and the exact supplied sectionID and sourceIDs that support it.",
+        "Do not add an example, consequence, code category, or practical requirement unless the assembled evidence or user-provided Project facts establish it. Clearly identify any illustration as hypothetical, and never use a hypothetical to introduce an unsupported legal premise.",
         "Use explanation for the practical application of the supported points to the question and user-provided Project facts. Do not merely repeat the numbered points.",
-        "Separate the supported answer, missing project facts, limitations of the selected evidence, and additional evidence needed.",
+        "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
+        "Every passage marked REQUIRED_CLAIM_COVERAGE must be addressed in at least one supportedPoint and cited with that exact PASSAGE_ID. Combine closely related passages in one coherent supportedPoint when needed; do not satisfy this by adding an orphan citation without explaining the rule.",
+        "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
           "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
           "Facts stated by the user may support a conditional answer, but restate any fact material to an exception or numerical threshold as a project fact to verify before final reliance.",
           "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
-          "Use selected document structure such as exception headings when it is supplied. If an exception and its conditions are selected, state the conditional result instead of demanding unselected text merely to acknowledge that conditional rule.",
+          "Use the assembled document structure, including exception headings, when it is supplied. If an exception and its conditions are present, state the conditional result instead of demanding additional text merely to acknowledge that conditional rule.",
           "When a category, table row, shared-facility condition, or calculation input is needed but not established, name that missing item specifically rather than asking only for generic project information.",
-          "When selected evidence supplies a calculation procedure, briefly explain every material step and exception in that procedure even when missing inputs prevent a final numeric result.",
-          "Do not merely say that a table or category must be checked. Identify the project-specific use category that must be selected from actual use and explain what the selected evidence already establishes.",
-          "For plumbing-fixture questions, when a final count could depend on facilities serving more than one space, ask whether existing or shared facilities are proposed to serve the space and request selected provisions governing that sharing. Do not assume those facilities qualify.",
-          "If the question attributes a requirement to an agency, funding program, or other authority not represented in the selected evidence, explicitly request that authority's applicable design standard, funding or program requirements, or official guidance. Do not substitute additional Building Code text for the missing outside authority.",
-          "If the question cannot be answered from the selected evidence, say so directly.",
-        "Every major conclusion and every supportedPoint must be covered by citations using the supplied SECTION_ID and PASSAGE_ID values."
+          "When assembled evidence supplies a calculation procedure, briefly explain every material step and exception in that procedure even when missing inputs prevent a final numeric result.",
+          "Do not merely say that a table or category must be checked. Identify the project-specific use category that must be selected from actual use and explain what the assembled evidence already establishes.",
+          "For plumbing-fixture questions, when a final count could depend on facilities serving more than one space, ask whether existing or shared facilities are proposed to serve the space and identify any missing provisions governing that sharing. Do not assume those facilities qualify.",
+          "If the question attributes a requirement to an agency, funding program, or other authority not represented in the assembled evidence, explicitly request that authority's applicable design standard, funding or program requirements, or official guidance. Do not substitute additional Building Code text for the missing outside authority.",
+          "If the question cannot be answered from the assembled enacted evidence, say so directly.",
+        "Generate only the minimum high-value followUpQuestions needed to materially advance the answer; do not ask for facts that cannot change the result.",
+        "Every major code conclusion and every supportedPoint must be covered by enacted citations using the supplied SECTION_ID and PASSAGE_ID values.",
+        "Return supportingSourceUses only for claims actually supported by a supplied WEB_SOURCE_ID. Keep it empty when no web source materially improves the answer."
       ].join(" "),
       input: researchInputForEvidence(question, passageEvidence, options),
       text: {
@@ -5993,7 +6610,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           type: "json_schema",
           name: "permitext_code_interpretation",
           strict: true,
-          schema: researchInterpretationSchemaForEvidence(passageEvidence)
+          schema: researchInterpretationSchemaForEvidence(passageEvidence, supportingSources)
         }
       }
     };
@@ -6030,16 +6647,174 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     throw invalidResponse;
   }
   return {
-    interpretation: validateResearchInterpretation(value, passageEvidence),
+    interpretation: validateResearchInterpretation(
+      normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
+      passageEvidence,
+      supportingSources
+    ),
     requestedModel: model,
     model: payload.model || model,
     configuration,
-    usage: {
-      inputTokens: payload.usage?.input_tokens || 0,
-      cachedInputTokens: payload.usage?.input_tokens_details?.cached_tokens || 0,
-      outputTokens: payload.usage?.output_tokens || 0,
-      totalTokens: payload.usage?.total_tokens || 0
+    usage: researchUsageFromProviderPayload(payload)
+  };
+}
+
+const researchVerificationIssueTypes = new Set([
+  "misstated_provision",
+  "wrong_attribution",
+  "missed_material_conclusion",
+  "unsupported_requirement",
+  "fact_evidence_confusion",
+  "false_evidence_limitation",
+  "overstated_compliance",
+  "missed_premise_contradiction",
+  "incorrect_citation",
+  "weakest_supported_conclusion"
+]);
+const maximumResearchVerificationAttempts = 3;
+
+const researchVerificationSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    pass: { type: "boolean" },
+    issues: {
+      type: "array",
+      maxItems: 12,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          type: { type: "string", enum: Array.from(researchVerificationIssueTypes) },
+          detail: { type: "string" }
+        },
+        required: ["type", "detail"]
+      }
     }
+  },
+  required: ["pass", "issues"]
+};
+
+function validateResearchVerification(value) {
+  if (!value || typeof value !== "object" || typeof value.pass !== "boolean" || !Array.isArray(value.issues)) {
+    const error = new Error("The Research verifier returned an invalid result.");
+    error.code = "INVALID_RESEARCH_VERIFICATION";
+    throw error;
+  }
+  const issues = value.issues.map((issue) => ({
+    type: String(issue?.type || "").trim(),
+    detail: String(issue?.detail || "").replace(/\s+/g, " ").trim().slice(0, 1_500)
+  }));
+  if (
+    issues.length > 12 ||
+    issues.some((issue) => !researchVerificationIssueTypes.has(issue.type) || !issue.detail) ||
+    (value.pass && issues.length) ||
+    (!value.pass && !issues.length)
+  ) {
+    const error = new Error("The Research verifier returned inconsistent issues.");
+    error.code = "INVALID_RESEARCH_VERIFICATION";
+    throw error;
+  }
+  return { pass: value.pass, issues };
+}
+
+async function openAIResearchVerification(question, evidence, interpretation, userID, options = {}) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    const error = new Error("Research AI is not configured.");
+    error.code = "RESEARCH_NOT_CONFIGURED";
+    throw error;
+  }
+  const configuration = researchModelConfiguration();
+  const evidenceText = evidence.map((source) => [
+    `PASSAGE_ID: ${source.sourceID}`,
+    `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
+    `TEXT: ${source.text}`
+  ].join("\n")).join("\n\n---\n\n");
+  const requestBody = {
+    model: configuration.model,
+    store: false,
+    reasoning: { effort: "low" },
+    max_output_tokens: 2_000,
+    safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
+    instructions: [
+      "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
+      "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
+      "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
+      "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",
+      "Do not demand a final yes-or-no result when project facts genuinely remain unresolved.",
+      "Return a compact structured result."
+    ].join(" "),
+    input: [
+      `QUESTION\n${question}`,
+      options.codeBasis
+        ? `RESEARCH CODE BASIS — DO NOT CLAIM ANOTHER EDITION WAS RETRIEVED\n${JSON.stringify(options.codeBasis)}`
+        : "",
+      options.projectContextFacts?.length
+        ? `PROJECT FACTS\n${options.projectContextFacts.join("\n")}`
+        : "",
+      `AUTHORIZED ENACTED EVIDENCE\n${evidenceText}`,
+      options.requiredClaims?.length
+        ? `DETERMINISTIC REQUIRED CLAIM CHECKLIST\n${JSON.stringify(options.requiredClaims)}`
+        : "",
+      options.webSupport?.sources?.length
+        ? `NONCONTROLLING SUPPORTING WEB MATERIAL\n${JSON.stringify({
+            summary: options.webSupport.summary,
+            sources: options.webSupport.sources
+          })}`
+        : "",
+      `PROPOSED ANSWER JSON\n${JSON.stringify(interpretation)}`
+    ].filter(Boolean).join("\n\n"),
+    text: {
+      format: {
+        type: "json_schema",
+        name: "permitext_research_verification",
+        strict: true,
+        schema: researchVerificationSchema
+      }
+    }
+  };
+  let response;
+  try {
+    reserveResearchEvaluationSpend(requestBody);
+    response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(30_000)
+    });
+  } catch (error) {
+    const providerError = new Error("The Research verifier request failed.");
+    providerError.code = "RESEARCH_VERIFIER_ERROR";
+    providerError.cause = error;
+    throw providerError;
+  }
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error("The Research verifier request failed.");
+    error.code = "RESEARCH_VERIFIER_ERROR";
+    error.status = response.status;
+    throw error;
+  }
+  let value;
+  try {
+    value = JSON.parse(outputTextFromResponse(payload));
+  } catch (error) {
+    if (error.code === "RESEARCH_REFUSAL") throw error;
+    const invalid = new Error("The Research verifier returned invalid structured output.");
+    invalid.code = "INVALID_RESEARCH_VERIFICATION";
+    invalid.providerStatus = payload?.status || null;
+    invalid.incompleteReason = payload?.incomplete_details?.reason || null;
+    invalid.providerUsage = researchUsageFromProviderPayload(payload);
+    throw invalid;
+  }
+  return {
+    result: validateResearchVerification(value),
+    model: payload.model || configuration.model,
+    usage: researchUsageFromProviderPayload(payload)
   };
 }
 
@@ -6115,9 +6890,11 @@ export function projectResearchConversationForList(conversation) {
     title: conversation.title,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
+    historyHiddenAt: conversation.historyHiddenAt || null,
     primaryProjectID: conversation.primaryProjectID || null,
     starterQuestion: conversation.starterQuestion || null,
     projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
+    codeBasis: conversation.codeBasis || null,
     sourceStatus: conversation.sourceStatus || "current",
     sources: selectionSources,
     messageCount
@@ -6136,6 +6913,7 @@ function researchConversationSummary(conversation, projectLink = null) {
     title: conversation.title,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
+    historyHiddenAt: conversation.historyHiddenAt || null,
     sourceCount: selectionSources.length,
     sourceSectionIDs: Array.from(new Set(
       selectionSources
@@ -6148,6 +6926,7 @@ function researchConversationSummary(conversation, projectLink = null) {
     codeDecisionLinkVersion: projectLink ? Number(projectLink.version || 1) : null,
     starterQuestion: String(conversation.starterQuestion || "").trim() || null,
     projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
+    codeBasis: conversation.codeBasis || null,
     sourceStatus: conversation.sourceStatus || "current"
   };
 }
@@ -6689,6 +7468,78 @@ function selectedResearchEvidence(conversation, currentEvidence) {
     .filter(Boolean);
 }
 
+function researchAssemblyCrossReferences(evidence, catalog) {
+  const references = [];
+  for (const phrase of inlineCodeReferencePhrases(evidence.text || evidence.canonicalText || "")) {
+    const codePrefix = String(phrase.codePrefix || evidence.codePrefix || "").toUpperCase();
+    for (const reference of phrase.references || []) {
+      const sectionNumber = String(reference.sectionNumber || "").replace(/\.$/, "").toUpperCase();
+      const summary = catalog.find((item) =>
+        String(item.codePrefix || "").toUpperCase() === codePrefix &&
+        String(item.sectionNumber || "").replace(/\.$/, "").toUpperCase() === sectionNumber
+      );
+      references.push({
+        sectionID: String(summary?.id || ""),
+        codePrefix,
+        sectionNumber,
+        referenceKind: String(reference.kind || phrase.kind || "section")
+      });
+    }
+  }
+  return references;
+}
+
+async function resolveResearchAssemblySection(request, catalog) {
+  const requestedID = String(request?.sectionID || "").trim();
+  const requestedPrefix = String(request?.codePrefix || "").trim().toUpperCase();
+  const requestedNumber = String(request?.sectionNumber || "").trim().replace(/\.$/, "").toUpperCase();
+  const summary = catalog.find((item) => String(item.id) === requestedID || String(item.webSectionID || "") === requestedID) ||
+    catalog.find((item) =>
+      String(item.codePrefix || "").toUpperCase() === requestedPrefix &&
+      String(item.sectionNumber || "").replace(/\.$/, "").toUpperCase() === requestedNumber
+    );
+  if (!summary) return null;
+  const [evidence] = await researchEvidenceForSectionIDs([summary.id], { skipUnavailable: false });
+  if (!evidence) return null;
+  return {
+    ...evidence,
+    jurisdiction: "New York City",
+    codeEdition: defaultResearchCodeEdition,
+    codeVersion: defaultSyncCodeVersion,
+    crossReferences: researchAssemblyCrossReferences(evidence, catalog)
+  };
+}
+
+async function assembledResearchEvidenceForTurn({
+  question,
+  messages,
+  pinnedEvidence,
+  projectFacts
+}) {
+  const [catalog, invertedIndex] = await Promise.all([
+    sectionCatalog(),
+    shippedSearchIndex()
+  ]);
+  return assembleResearchEvidence({
+    question,
+    previousMessages: messages,
+    projectFacts,
+    pinnedEvidence,
+    limits: researchEvidenceAssemblyLimits,
+    discover: ({ question: retrievalQuestion, limit }) => discoverRelevantEvidence({
+      question: retrievalQuestion,
+      catalog,
+      invertedIndex,
+      readSectionBody: (section) => sectionBody(section.webSectionID || section.id, {
+        allowMissing: true,
+        canonicalSectionID: section.id
+      }),
+      limit
+    }),
+    resolveSection: (request) => resolveResearchAssemblySection(request, catalog)
+  });
+}
+
 async function researchConversationForClient(conversation, options = {}) {
   let clientConversation = conversation;
   if (options.checkSources) {
@@ -6784,6 +7635,7 @@ function researchProjectInformation(projectID, project) {
   if (!projectID || !project) return null;
   const address = String(project.address || "").trim();
   const description = String(project.description || "").trim();
+  const codeVersion = String(project.codeVersion || "").trim() || null;
   const facts = [];
   if (address) facts.push(`Project address: ${normalizedResearchText(address, 1_000)}`);
   if (description) facts.push(`Project description: ${normalizedResearchText(description, 4_000)}`);
@@ -6791,10 +7643,22 @@ function researchProjectInformation(projectID, project) {
     projectID,
     address,
     description,
+    codeVersion,
+    canonicalCodeVersion: codeVersion ? canonicalCodeVersion(codeVersion) : null,
     facts,
     source: "project-record",
     updatedAt: project.updatedAt || null
   };
+}
+
+function researchCodeBasis(projectID, projectInformation = null, resolvedAt = new Date().toISOString()) {
+  return resolveResearchCodeBasis({
+    projectID,
+    projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
+    availableCodeVersion: defaultSyncCodeVersion,
+    availableCodeEdition: defaultResearchCodeEdition,
+    resolvedAt
+  });
 }
 
 async function currentResearchProjectInformation(userID, projectID) {
@@ -7247,7 +8111,18 @@ async function projectFoundationStateForStorageOwner(
       envelope: { ...artifact.envelope, updatedAt }
     };
   });
-  const answers = (await listStoredResearchAnswers(storageOwnerUserID, scopeOptions))
+  const linkedResearchAnswerIDs = new Set(
+    links
+      .filter((link) => !link.deletedAt && link.targetKind === "researchAnswer")
+      .map((link) => String(link.targetID || ""))
+      .filter(Boolean)
+  );
+  const answers = (await listStoredResearchAnswers(storageOwnerUserID))
+    .filter((answer) =>
+      !scopedProjectID ||
+      answer.projectID === scopedProjectID ||
+      linkedResearchAnswerIDs.has(String(answer.id))
+    )
     .map((answer) => ({
       id: answer.id,
       conversationID: answer.conversationID,
@@ -8678,8 +9553,13 @@ async function reviewTargetInProject(storageOwnerUserID, projectID, targetKind, 
     } : null;
   }
   if (targetKind === "researchAnswer") {
+    const answerLink = (await listStoredProjectLinks(storageOwnerUserID, {
+      projectID,
+      targetKind: "researchAnswer"
+    })).find((link) => !link.deletedAt && link.targetID === normalizedTargetID);
     const answer = (await listStoredResearchAnswers(storageOwnerUserID)).find((candidate) =>
-      candidate.id === normalizedTargetID && candidate.projectID === projectID
+      candidate.id === normalizedTargetID &&
+      (candidate.projectID === projectID || Boolean(answerLink))
     );
     return answer ? {
       target: answer,
@@ -11068,6 +11948,7 @@ async function handleResearchConversationList(request, response) {
     .map((link) => [link.targetID, link]));
   sendJSON(response, 200, {
     conversations: conversations
+      .filter((conversation) => !conversation.historyHiddenAt)
       .sort((left, right) =>
         String(right.createdAt).localeCompare(String(left.createdAt)) ||
         String(left.id).localeCompare(String(right.id))
@@ -11425,7 +12306,10 @@ async function handleResearchConversationAssignProject(request, response) {
     });
     return;
   }
-  if (targetProjectID && !await requireResearchProject(context, response, targetProjectID)) return;
+  const targetProject = targetProjectID
+    ? await requireResearchProject(context, response, targetProjectID)
+    : null;
+  if (targetProjectID && !targetProject) return;
   const now = new Date().toISOString();
   if (currentProjectID) {
     let removedLink;
@@ -11465,6 +12349,12 @@ async function handleResearchConversationAssignProject(request, response) {
     );
   }
   conversation.primaryProjectID = targetProjectID;
+  conversation.codeVersion = defaultSyncCodeVersion;
+  conversation.codeBasis = researchCodeBasis(
+    targetProjectID,
+    targetProjectID ? researchProjectInformation(targetProjectID, targetProject) : null,
+    now
+  );
   conversation.projectContext = targetProjectID ? {
     projectID: targetProjectID,
     facts: [],
@@ -11545,7 +12435,8 @@ async function handleResearchConversationReuseEvidence(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  if (!await requireResearchProject(context, response, projectID)) return;
+  const project = await requireResearchProject(context, response, projectID);
+  if (!project) return;
   const answerID = String(context.body.answerID || "").trim();
   const answer = (await listStoredResearchAnswers(context.userID))
     .find((item) => item.id === answerID);
@@ -11559,20 +12450,44 @@ async function handleResearchConversationReuseEvidence(request, response) {
   }
   const sources = [];
   const relatedSectionIDs = new Set();
+  const answerEvidence = Array.isArray(answer.evidence) ? answer.evidence : [];
+  const pinnedEvidence = answerEvidence.filter((snapshot) =>
+    snapshot?.provenance?.origin === "user_pinned"
+  );
+  const reusableEvidence = pinnedEvidence.length ? pinnedEvidence : answerEvidence;
+  let unavailableAutomaticEvidenceCount = 0;
   try {
-    for (const snapshot of answer.evidence || []) {
+    for (const snapshot of reusableEvidence) {
       const visualSourceIDs = (snapshot.visualSources || []).map((source) => source.id);
-      const resolved = await researchSourcesForSelection(
-        snapshot.sectionID,
-        snapshot.passageText,
-        {
-          richSourceIDs: snapshot.structuredSource?.id
-            ? [snapshot.structuredSource.id]
-            : [],
-          visualSourceIDs,
-          visualReviewConfirmed: visualSourceIDs.length > 0
+      let resolved;
+      try {
+        resolved = await researchSourcesForSelection(
+          snapshot.sectionID,
+          snapshot.provenance?.userSelectedText || snapshot.passageText,
+          {
+            richSourceIDs: snapshot.structuredSource?.id
+              ? [snapshot.structuredSource.id]
+              : [],
+            visualSourceIDs,
+            visualReviewConfirmed: visualSourceIDs.length > 0
+          }
+        );
+      } catch (error) {
+        if (
+          !pinnedEvidence.length &&
+          [
+            "INVALID_RESEARCH_SELECTION",
+            "INVALID_RESEARCH_SECTION",
+            "INVALID_RESEARCH_RICH_SOURCE",
+            "INVALID_RESEARCH_VISUAL_SOURCE",
+            "RESEARCH_VISUAL_REVIEW_REQUIRED"
+          ].includes(error.code)
+        ) {
+          unavailableAutomaticEvidenceCount += 1;
+          continue;
         }
-      );
+        throw error;
+      }
       resolved.forEach((source) => {
         if (source.kind === "selection") {
           sources.push({
@@ -11608,12 +12523,14 @@ async function handleResearchConversationReuseEvidence(request, response) {
     return;
   }
   const now = new Date().toISOString();
+  const projectInformation = researchProjectInformation(projectID, project);
   const conversation = {
     id: randomUUID(),
     title: defaultResearchConversationTitle(now),
     createdAt: now,
     updatedAt: now,
     codeVersion: defaultSyncCodeVersion,
+    codeBasis: researchCodeBasis(projectID, projectInformation, now),
     evidenceSetVersion: 1,
     primaryProjectID: projectID,
     projectContext: {
@@ -11627,7 +12544,9 @@ async function handleResearchConversationReuseEvidence(request, response) {
     origin: {
       kind: "reusedEvidence",
       answerID: answer.id,
-      sourceConversationID: answer.conversationID
+      sourceConversationID: answer.conversationID,
+      reusedEvidenceCount: reusableEvidence.length - unavailableAutomaticEvidenceCount,
+      unavailableAutomaticEvidenceCount
     },
     sources,
     messages: []
@@ -11653,10 +12572,16 @@ async function handleResearchConversationCreate(request, response) {
       return;
     }
     const projectID = String(context.body.projectID || "").trim() || null;
-    if (projectID && !await requireResearchProject(context, response, projectID)) return;
-    const selections = requestedResearchSelections(context.body);
+    const project = projectID ? await requireResearchProject(context, response, projectID) : null;
+    if (projectID && !project) return;
+    const hasSelectionPayload = context.body.selections !== undefined ||
+      String(context.body.sectionID || "").trim() ||
+      String(context.body.selectedText || "").trim();
+    const selections = hasSelectionPayload ? requestedResearchSelections(context.body) : [];
     await validateResearchSavedSelections(context.userID, selections);
-    const resolved = await researchSourcesForSelections(selections);
+    const resolved = selections.length
+      ? await researchSourcesForSelections(selections)
+      : { sources: [], addedSelections: [] };
     if (resolved.addedSelections.length > 24) {
       sendError(response, 409, "This conversation would exceed the maximum of 24 selected passages.");
       return;
@@ -11664,12 +12589,14 @@ async function handleResearchConversationCreate(request, response) {
     assertResearchConversationVisualLimits(resolved.sources);
     const sources = resolved.sources;
     const now = new Date().toISOString();
+    const projectInformation = projectID ? researchProjectInformation(projectID, project) : null;
     const conversation = {
       id: randomUUID(),
       title: defaultResearchConversationTitle(now),
       createdAt: now,
       updatedAt: now,
       codeVersion: defaultSyncCodeVersion,
+      codeBasis: researchCodeBasis(projectID, projectInformation, now),
       evidenceSetVersion: 1,
       primaryProjectID: projectID,
       projectContext: projectID ? {
@@ -11679,7 +12606,7 @@ async function handleResearchConversationCreate(request, response) {
         updatedAt: now
       } : null,
       projectContextReviewRequired: false,
-      origin: researchOriginForSelections(selections),
+      origin: selections.length ? researchOriginForSelections(selections) : { kind: "chat" },
       sourceStatus: "current",
       sources,
       messages: []
@@ -12374,13 +13301,6 @@ async function handleResearchConversationMessage(request, response) {
     });
     return;
   }
-  if (!(conversation.sources || []).some((source) => source.kind === "selection")) {
-    sendJSON(response, 422, {
-      error: "Select at least one enacted-code passage before asking Permitext to analyze it.",
-      code: "RESEARCH_EVIDENCE_REQUIRED"
-    });
-    return;
-  }
   let researchReservationID = null;
   let researchReservationCreatedAt = null;
   let researchReservationCompleted = false;
@@ -12396,6 +13316,55 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
+    const selections = (conversation.sources || []).filter((source) => source.kind === "selection");
+    const projectLink = await researchConversationProjectLink(context.userID, conversation);
+    const decisionLink = researchCodeDecisionLink(projectLink);
+    if (decisionLink && selections.length === 0) {
+      sendJSON(response, 422, {
+        error: "Add approved enacted evidence before using Research from a Code Decision.",
+        code: "RESEARCH_EVIDENCE_REQUIRED"
+      });
+      return;
+    }
+    const pinnedEvidence = selectedResearchEvidence(conversation, current.evidence);
+    const projectInformation = await currentResearchProjectInformation(
+      context.userID,
+      conversation.primaryProjectID
+    );
+    const answerCodeBasis = researchCodeBasis(
+      conversation.primaryProjectID,
+      projectInformation,
+      new Date().toISOString()
+    );
+    const manualProjectFacts = conversation.projectContext?.facts || [];
+    const combinedProjectFacts = combinedResearchProjectFacts(
+      projectInformation,
+      manualProjectFacts
+    );
+    const evidencePackage = await assembledResearchEvidenceForTurn({
+      question,
+      messages: conversation.messages || [],
+      pinnedEvidence,
+      projectFacts: combinedProjectFacts
+    });
+    const turnRetrievalLimitations = [
+      ...(evidencePackage.limitations || []),
+      ...(answerCodeBasis.limitation ? [{ code: "RESEARCH_CODE_VERSION_FALLBACK", text: answerCodeBasis.limitation }] : [])
+    ];
+    const assembledEvidence = evidencePackage.sources || [];
+    if (!assembledEvidence.length) {
+      sendJSON(response, 422, {
+        error: "Permitext could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation.",
+        code: "RESEARCH_EVIDENCE_NOT_FOUND",
+        retrieval: {
+          assemblyVersion: evidencePackage.assemblyVersion,
+          limitations: evidencePackage.limitations,
+          discovery: evidencePackage.discovery
+        }
+      });
+      return;
+    }
+    const requiredClaims = requiredResearchClaimsFromEvidence(assembledEvidence);
     const mockMode = researchMockMode();
     const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
     const requestLimit = monthlyResearchRequestLimit();
@@ -12419,21 +13388,8 @@ async function handleResearchConversationMessage(request, response) {
         return;
       }
     }
-    const selections = conversation.sources.filter((source) => source.kind === "selection");
-    const selectedEvidence = selectedResearchEvidence(conversation, current.evidence);
-    const projectInformation = await currentResearchProjectInformation(
-      context.userID,
-      conversation.primaryProjectID
-    );
-    const manualProjectFacts = conversation.projectContext?.facts || [];
-    const combinedProjectFacts = combinedResearchProjectFacts(
-      projectInformation,
-      manualProjectFacts
-    );
     const projectContextCapturedAt = new Date().toISOString();
     let decisionContextSnapshot = null;
-    const projectLink = await researchConversationProjectLink(context.userID, conversation);
-    const decisionLink = researchCodeDecisionLink(projectLink);
     if (decisionLink && conversation.primaryProjectID) {
       const projectAccess = await projectAccessForUser(context.userID, conversation.primaryProjectID);
       const linkedQuestion = projectAccess
@@ -12459,24 +13415,153 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const result = mockMode
+    const webSupportRequested = shouldUseResearchWebSupport({
+      question,
+      outsideLibraryRequired: Boolean(evidencePackage.discovery?.outsideCurrentLibrary?.length)
+    });
+    const webSupport = !mockMode && webSupportRequested
+      ? await openAIResearchWebSupport(question, context.userID, {
+          retrievalQuery: question
+        })
+      : {
+          summary: "",
+          sources: [],
+          usage: combinedResearchUsage(),
+          searched: false,
+          sourcePolicyVersion: researchSourcePolicyVersion
+        };
+    const evidenceAnalysisResult = mockMode
       ? {
-          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, selectedEvidence, {
+          analysis: mockResearchEvidenceAnalysis(
+            assembledEvidence,
+            combinedProjectFacts,
+            turnRetrievalLimitations
+          ),
+          model: "permitext-mock",
+          usage: combinedResearchUsage()
+        }
+      : await openAIResearchEvidenceAnalysis(question, assembledEvidence, context.userID, {
+          messages: conversation.messages,
+          projectContextFacts: combinedProjectFacts,
+          retrievalLimitations: turnRetrievalLimitations,
+          codeBasis: answerCodeBasis,
+          requiredClaims
+        });
+    let result = mockMode
+      ? {
+          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, assembledEvidence, {
             responseStyle: "conversational"
-          }), selectedEvidence),
+          }), assembledEvidence, webSupport.sources),
           model: "permitext-mock",
           configuration: {
             ...researchModelConfiguration(),
-            promptVersion: `${researchModelConfiguration().promptVersion}:conversational-v1`
+            promptVersion: `${researchModelConfiguration().promptVersion}:conversational-v2`,
+            evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
           },
-          usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+          usage: combinedResearchUsage()
         }
-        : await openAIResearchInterpretation(question, selectedEvidence, context.userID, {
+      : await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
           selections,
           messages: conversation.messages,
           projectContextFacts: combinedProjectFacts,
-          responseStyle: "conversational"
+          responseStyle: "conversational",
+          structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+          webSupport,
+          codeBasis: answerCodeBasis,
+          requiredClaims
         });
+    let verificationAttempts = [];
+    let verifierUsage = combinedResearchUsage();
+    let answerGenerationUsage = result.usage;
+    let requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
+      requiredClaims,
+      evidence: assembledEvidence,
+      answer: result.interpretation
+    });
+    if (mockMode) {
+      verificationAttempts = [{
+        pass: requiredClaimCoverage.pass,
+        issues: requiredClaimCoverage.pass
+          ? []
+          : researchRequiredClaimRevisionIssues(requiredClaimCoverage),
+        model: requiredClaimCoverage.pass
+          ? "permitext-mock"
+          : "permitext-deterministic-required-claim-gate"
+      }];
+      if (!requiredClaimCoverage.pass) {
+        const error = new Error("The mock Research answer omitted required material enacted evidence.");
+        error.code = "RESEARCH_VERIFICATION_FAILED";
+        error.verificationAttempts = verificationAttempts;
+        throw error;
+      }
+    } else {
+      for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
+        if (attempt > 0) {
+          const revised = await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
+            selections,
+            messages: conversation.messages,
+            projectContextFacts: combinedProjectFacts,
+            responseStyle: "conversational",
+            structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+            webSupport,
+            codeBasis: answerCodeBasis,
+            requiredClaims,
+            revisionFeedback: verificationAttempts.at(-1).issues
+          });
+          answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
+          result = revised;
+        }
+        requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
+          requiredClaims,
+          evidence: assembledEvidence,
+          answer: result.interpretation
+        });
+        if (!requiredClaimCoverage.pass) {
+          verificationAttempts.push({
+            pass: false,
+            issues: researchRequiredClaimRevisionIssues(requiredClaimCoverage),
+            model: "permitext-deterministic-required-claim-gate"
+          });
+          if (attempt === maximumResearchVerificationAttempts - 1) {
+            const error = new Error("The answer omitted required material enacted evidence after two bounded revisions.");
+            error.code = "RESEARCH_VERIFICATION_FAILED";
+            error.verificationAttempts = verificationAttempts;
+            throw error;
+          }
+          continue;
+        }
+        const verification = await openAIResearchVerification(
+          question,
+          assembledEvidence,
+          result.interpretation,
+          context.userID,
+          {
+            projectContextFacts: combinedProjectFacts,
+            webSupport,
+            codeBasis: answerCodeBasis,
+            requiredClaims
+          }
+        );
+        verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
+        verificationAttempts.push({
+          ...verification.result,
+          model: verification.model
+        });
+        if (verification.result.pass) break;
+        if (attempt === maximumResearchVerificationAttempts - 1) {
+          const error = new Error("The answer did not pass verification after two bounded revisions.");
+          error.code = "RESEARCH_VERIFICATION_FAILED";
+          error.verificationAttempts = verificationAttempts;
+          throw error;
+        }
+      }
+    }
+    result.usage = combinedResearchUsage(
+      webSupport.usage,
+      evidenceAnalysisResult.usage,
+      answerGenerationUsage,
+      verifierUsage
+    );
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
     const disclaimer = "AI-generated research assistance, not an official code determination.";
@@ -12491,18 +13576,59 @@ async function handleResearchConversationMessage(request, response) {
         requestedModel: result.requestedModel || result.model,
         promptVersion: result.configuration.promptVersion,
         evidenceVersion: result.configuration.evidenceVersion,
-        codeEdition: defaultResearchCodeEdition,
-        codeVersion: conversation.codeVersion,
+        codeEdition: answerCodeBasis.codeEdition,
+        codeVersion: answerCodeBasis.codeVersion,
+        codeBasis: answerCodeBasis,
         ...result.interpretation,
-        evidenceSectionIDs: Array.from(new Set(selectedEvidence.map((section) => section.sectionID))),
-        evidenceSourceIDs: selectedEvidence.map((section) => section.sourceID),
+        followUpQuestions: result.interpretation.followUpQuestions?.length
+          ? result.interpretation.followUpQuestions
+          : evidenceAnalysisResult.analysis.highValueFollowUpQuestions,
+        evidenceSectionIDs: Array.from(new Set(assembledEvidence.map((section) => section.sectionID))),
+        evidenceSourceIDs: assembledEvidence.map((section) => section.sourceID),
+        sourceSummary: {
+          enactedProvisionCount: new Set(assembledEvidence.map((section) => section.sectionID)).size,
+          userPinnedCount: assembledEvidence.filter((section) => section.origin === "user_pinned").length,
+          permitextDiscoveredCount: assembledEvidence.filter((section) => section.origin === "permitext_discovered").length,
+          crossReferenceCount: assembledEvidence.filter((section) => section.origin === "permitext_cross_reference").length,
+          supportingWebSourceCount: result.interpretation.supportingSources?.length || 0,
+          unresolvedProjectFactCount: result.interpretation.missingFacts?.length || 0,
+          requiredClaimCount: requiredClaimCoverage.requiredClaimCount
+        },
+        structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+        requiredClaimCoverage,
+        retrieval: {
+          schemaVersion: evidencePackage.schemaVersion,
+          assemblyVersion: evidencePackage.assemblyVersion,
+          retrievalQuery: evidencePackage.retrievalQuery,
+          previousTopicApplied: evidencePackage.previousTopicApplied,
+          projectFactsApplied: evidencePackage.projectFactsApplied,
+          sourceMode: evidencePackage.sourceMode,
+          sourceScope: evidencePackage.sourceScope,
+          limits: evidencePackage.limits,
+          usage: evidencePackage.usage,
+          limitations: turnRetrievalLimitations,
+          discovery: evidencePackage.discovery,
+          sourcePolicyVersion: researchSourcePolicyVersion,
+          codeBasis: answerCodeBasis,
+          webSupportRequested,
+          webSupportSearched: Boolean(webSupport.searched),
+          webQuery: webSupport.sanitizedQuery || null,
+          webLimitation: webSupport.limitation || null
+        },
+        verification: {
+          status: "passed",
+          pass: true,
+          attempts: verificationAttempts.length,
+          regenerated: verificationAttempts.length > 1,
+          history: verificationAttempts
+        },
         usage: result.usage,
         estimatedCostUSD: estimatedCost.estimatedUSD,
         pricingVersion: estimatedCost.pricingVersion,
         disclaimer
       }
     };
-    const evidenceSnapshots = selectedEvidence.map((source) => immutableEvidenceSnapshot({
+    const evidenceSnapshots = assembledEvidence.map((source) => immutableEvidenceSnapshot({
       source,
       approvedAt: now,
       evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
@@ -12521,7 +13647,9 @@ async function handleResearchConversationMessage(request, response) {
         model: assistantMessage.answer.model,
         researchSystemVersion: [
           assistantMessage.answer.promptVersion,
-          assistantMessage.answer.evidenceVersion
+          assistantMessage.answer.evidenceVersion,
+          researchSourcePolicyVersion,
+          researchRequiredClaimCoverageVersion
         ].filter(Boolean).join(":"),
         createdAt: now
       }),
@@ -12534,8 +13662,11 @@ async function handleResearchConversationMessage(request, response) {
       },
       ...(decisionContextSnapshot ? { decisionContextSnapshot } : {})
     };
+    conversation.codeVersion = answerCodeBasis.codeVersion;
+    conversation.codeBasis = answerCodeBasis;
     conversation.messages.push(userMessage, assistantMessage);
     conversation.updatedAt = now;
+    delete conversation.historyHiddenAt;
     conversation.sourceStatus = "current";
     const activityEvents = conversation.primaryProjectID
       ? [
@@ -12588,8 +13719,8 @@ async function handleResearchConversationMessage(request, response) {
       mode: mockMode ? "mock" : "openai",
       model: result.model,
       conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
-      evidenceSections: new Set(selectedEvidence.map((section) => section.sectionID)).size,
-      evidencePassages: selectedEvidence.length,
+      evidenceSections: new Set(assembledEvidence.map((section) => section.sectionID)).size,
+      evidencePassages: assembledEvidence.length,
       totalTokens: result.usage.totalTokens
     }));
     sendJSON(response, 200, {
@@ -12627,7 +13758,32 @@ async function handleResearchConversationMessage(request, response) {
       sendError(response, 422, error.message);
       return;
     }
-    if (["INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_CITATION", "RESEARCH_PROVIDER_ERROR", "TimeoutError"].includes(error.code || error.name)) {
+    if ([
+      "INVALID_RESEARCH_RESPONSE",
+      "INVALID_RESEARCH_CITATION",
+      "INVALID_RESEARCH_WEB_CITATION",
+      "INVALID_RESEARCH_EVIDENCE_ANALYSIS",
+      "INVALID_RESEARCH_VERIFICATION",
+      "RESEARCH_VERIFIER_ERROR",
+      "RESEARCH_VERIFICATION_FAILED",
+      "RESEARCH_PROVIDER_ERROR",
+      "TimeoutError"
+    ].includes(error.code || error.name)) {
+      console.warn(JSON.stringify({
+        event: "research_conversation_failure",
+        user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
+        conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
+        code: error.code || error.name,
+        message: String(error.message || "").slice(0, 500),
+        verificationAttempts: Array.isArray(error.verificationAttempts)
+          ? error.verificationAttempts.map((attempt) => ({ pass: attempt.pass, issues: attempt.issues }))
+          : [],
+        providerStatus: error.providerStatus || null,
+        incompleteReason: error.incompleteReason || null,
+        providerUsage: error.providerUsage || null,
+        bindingIssue: error.bindingIssue || null,
+        providerCause: error.providerCause || null
+      }));
       sendError(response, 502, "The research model could not return a verified, cited answer.");
       return;
     }
@@ -12673,6 +13829,29 @@ async function handleResearchConversationDelete(request, response) {
     return;
   }
   sendJSON(response, 200, { deleted: true });
+}
+
+async function handleResearchConversationClearHistory(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversations = await listStoredResearchConversations(context.userID);
+  const now = new Date().toISOString();
+  let hiddenProjectConversationCount = 0;
+  let deletedConversationCount = 0;
+  for (const conversation of conversations) {
+    if (conversation?.primaryProjectID) {
+      await saveStoredResearchConversation(context.userID, { ...conversation, historyHiddenAt: now });
+      hiddenProjectConversationCount += 1;
+    } else if (await deleteStoredResearchConversation(context.userID, conversation.id)) {
+      deletedConversationCount += 1;
+    }
+  }
+  sendJSON(response, 200, {
+    cleared: true,
+    hiddenProjectConversationCount,
+    deletedConversationCount,
+    totalCount: conversations.length
+  });
 }
 
 async function handleResearchEvidenceDiscover(request, response) {
@@ -21236,6 +22415,7 @@ const handlers = {
   "research/conversations/project-context": handleResearchConversationProjectContext,
   "research/conversations/reuse-evidence": handleResearchConversationReuseEvidence,
   "research/conversations/delete": handleResearchConversationDelete,
+  "research/conversations/clear-history": handleResearchConversationClearHistory,
   "research/answers/list": handleResearchAnswerList,
   "research/answers/get": handleResearchAnswerGet,
   "research/usage": handleResearchUsage,

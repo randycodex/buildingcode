@@ -2,10 +2,17 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { projectResearchConversationForList } from "../app.mjs";
+import {
+  projectResearchConversationForList,
+  validateResearchEvidenceAnalysis
+} from "../app.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const appSource = await readFile(join(root, "../app.mjs"), "utf8");
+const [appSource, clientSource, stylesSource] = await Promise.all([
+  readFile(join(root, "../app.mjs"), "utf8"),
+  readFile(join(root, "../public/app.js"), "utf8"),
+  readFile(join(root, "../public/styles.css"), "utf8")
+]);
 
 const hugeVisual = "data:image/png;base64," + "A".repeat(50_000);
 const conversation = {
@@ -74,5 +81,48 @@ assert.match(
   /jsonb_array_length\(COALESCE\(conversation->'messages'/,
   "Postgres summary listing does not project messageCount without loading full messages."
 );
+assert.match(
+  clientSource,
+  /clearChatsButton\.textContent = "Clear"/,
+  "Research history does not expose a clear action beside New chat."
+);
+assert.match(
+  clientSource,
+  /Clear Research history\?/,
+  "Research history clearing is missing an explicit confirmation."
+);
+assert.match(
+  clientSource,
+  /\/research\/conversations\/clear-history/,
+  "Research history clearing does not use the safe bulk history endpoint."
+);
+assert.match(
+  clientSource,
+  /Saved Research answers and governed Code Decision records will remain/,
+  "Research history clearing does not disclose the preserved evidence boundary."
+);
+assert.match(
+  stylesSource,
+  /\.research-clear-chats-button/,
+  "Research history clear control has no dedicated header styling."
+);
+assert.match(appSource, /conversation\?\.primaryProjectID[\s\S]*historyHiddenAt/, "Project conversations are not preserved when history is cleared.");
+assert.match(appSource, /filter\(\(conversation\) => !conversation\.historyHiddenAt\)/, "Hidden Project conversations still appear in the main history.");
+assert.match(clientSource, /research-back-button[\s\S]*showNewResearchChat/, "Research does not provide a Back control.");
+assert.match(clientSource, /unansweredConversations[\s\S]*No completed answer yet\./, "Empty Project conversations cannot be reopened from Project Research history.");
+
+const analysisFixture = {
+  controllingProvisions: [], generalRules: [], exceptions: [], conditions: [], limitations: [],
+  definitions: [], crossReferences: [], tables: [], userPinnedEvidence: [], permitextDiscoveredEvidence: [],
+  projectFactsUsed: [], unresolvedProjectFacts: [], evidenceLimitations: ["Bounded corpus."], highValueFollowUpQuestions: []
+};
+assert.doesNotThrow(
+  () => validateResearchEvidenceAnalysis(analysisFixture, [], []),
+  "Question facts should not be misclassified as invented Project-folder facts."
+);
+assert.match(appSource, /projectFactsUsed\.maxItems = 0/, "The evidence-analysis schema does not forbid invented Project facts when no Project facts exist.");
+assert.match(appSource, /max_output_tokens: 6_000,/, "The evidence-analysis model can still be cut off before returning its structured legal-research map.");
+assert.match(appSource, /max_output_tokens: 2_000,/, "The Research verifier can still be cut off before returning its structured result.");
+assert.match(appSource, /maximumResearchVerificationAttempts = 3/, "Research does not preserve two bounded correction opportunities behind the verifier gate.");
 
 console.log("permitext research list summary contract passed");

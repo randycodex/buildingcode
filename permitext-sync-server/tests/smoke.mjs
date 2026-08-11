@@ -328,7 +328,7 @@ async function main() {
       "The privacy policy or its web/iOS links no longer identify the operator and contact."
     );
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
-    assert(!webRoot.text.includes('id="toggle-analysis"'), "Web workspace still exposes global Research outside a Project.");
+    assert(webRoot.text.includes('id="toggle-analysis"'), "Web workspace omitted the global Research chat button.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
       webRoot.text.includes("20260725-visual-inventory-v13"),
@@ -347,6 +347,7 @@ async function main() {
       'id="add-reader"',
       'id="toggle-search"',
       'id="toggle-saved"',
+      'id="toggle-analysis"',
       'id="fit-columns"',
       'class="topbar-workspaces"',
       'class="topbar-brand"'
@@ -1274,7 +1275,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        workspaceScript.text.includes('./sync-state.js?v=20260810-research-pilot-v1') &&
+        workspaceScript.text.includes('./sync-state.js?v=20260811-research-code-basis-v2') &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
@@ -1300,12 +1301,12 @@ async function main() {
         ).includes('citationsHeading.textContent = "Sources"') &&
         workspaceScript.text.includes('answer.className = "research-answer-primary"') &&
         workspaceScript.text.includes('explanation.className = "research-answer-explanation"') &&
-        workspaceScript.text.includes('summary.textContent = "Review evidence, assumptions, and limits"') &&
+        workspaceScript.text.includes('summary.textContent = "Sources, assumptions, and limits"') &&
         workspaceScript.text.includes('details.open = Boolean(options.detailsOpen)') &&
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
-        workspaceScript.text.includes('"Based only on selected Research evidence"') &&
+        workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260810-research-pilot-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-research-code-basis-v2'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1447,12 +1448,13 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260810-research-pilot-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-research-code-basis-v2'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
       !researchSourceRendererSource.includes('"Selected passage"') &&
-        researchSourceRendererSource.includes('if (source.kind !== "selection")') &&
+        researchSourceRendererSource.includes('label.textContent = "Pinned enacted source"') &&
+        researchSourceRendererSource.includes('label.textContent = "Permitext enacted source"') &&
         researchConversationRendererSource.includes('.filter((source) => source.kind === "selection")') &&
         researchConversationRendererSource.includes(
           "const projectContextSection = renderResearchProjectContext(evidenceScroll, conversation);"
@@ -1544,7 +1546,7 @@ async function main() {
         workspaceScript.text.includes("displayedSources.forEach((source) => sourceList.append(renderResearchSource(source)))") &&
         workspaceScript.text.includes("sectionGroupLabel") &&
         workspaceScript.text.includes("sectionGroupTitle") &&
-        workspaceScript.text.includes("citation.textContent = researchSourceCitation(source)") &&
+        workspaceScript.text.includes(": researchSourceCitation(source)") &&
         workspaceScript.text.includes('code-theme-${codeTheme(source.codePrefix || "BC")}') &&
         workspaceStyles.text.includes(".research-source-toggle > strong {") &&
         workspaceStyles.text.includes("color: var(--code-accent);"),
@@ -1705,7 +1707,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260810-research-pilot-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-research-code-basis-v2'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1829,7 +1831,7 @@ async function main() {
         workspaceScript.text.includes("(embeddedEvidenceNoticeRegion || evidenceScroll).append(warning)") &&
         workspaceScript.text.includes('panel.classList.add("has-research-composer")') &&
         workspaceScript.text.includes("input.style.height = `${input.scrollHeight}px`") &&
-        workspaceScript.text.includes("research-selected-evidence-passage") &&
+        workspaceScript.text.includes("research-selected-evidence-notices") &&
         workspaceScript.text.includes("researchOpenContextIsCurrent(dispositionContext, { requireConversationID: true })") &&
         evidenceDiscoveryClientSource.includes("Previous") &&
         evidenceDiscoveryClientSource.includes("Next") &&
@@ -1842,7 +1844,7 @@ async function main() {
         evidenceDiscoveryClientSource.includes('targetConversationID ? "/research/conversations/evidence" : "/research/conversations/create"') &&
         evidenceDiscoveryClientSource.includes("{ conversationID: targetConversationID, selections: selectedPassages }") &&
         !evidenceDiscoveryClientSource.includes("const existingPassages = new Set") &&
-        !evidenceDiscoveryClientSource.includes('postResearch("/research/conversations/message"'),
+        evidenceDiscoveryClientSource.includes('postResearch("/research/conversations/message"'),
       "The Evidence Tray no longer preserves explicit candidate review before Research analysis."
     );
     assert(
@@ -4001,14 +4003,16 @@ async function main() {
     assert(conversationMessage.json.usage.mockMode === true, "Mock research did not disclose its zero-call mode.");
     assert(
       conversationMessage.json.conversation.messages.length === 2 &&
-        conversationMessage.json.conversation.messages[1].answer.supportedPoints.length === 1 &&
-        conversationMessage.json.conversation.messages[1].answer.promptVersion.endsWith(":conversational-v1") &&
-        conversationMessage.json.conversation.messages[1].answer.conclusion.startsWith("The selected provisions provide a conditional answer") &&
+        conversationMessage.json.conversation.messages[1].answer.supportedPoints.length >= 1 &&
+        conversationMessage.json.conversation.messages[1].answer.promptVersion.endsWith(":conversational-v2") &&
+        conversationMessage.json.conversation.messages[1].answer.conclusion.startsWith("The assembled enacted provisions provide a conditional answer") &&
         conversationMessage.json.conversation.messages[1].answer.supportedPoints[0].sourceIDs[0] ===
           conversationMessage.json.conversation.messages[1].answer.citations[0].sourceIDs[0] &&
-        conversationMessage.json.conversation.messages[1].answer.citations[0].sectionID === "8881" &&
-        conversationMessage.json.conversation.messages[1].answer.citations[0].supportingPassages[0].selectedText === selectedResearchText &&
-        conversationMessage.json.conversation.messages[1].answer.evidenceSourceIDs.length === 1,
+        conversationMessage.json.conversation.messages[1].answer.citations.some((citation) =>
+          citation.sectionID === "8881"
+        ) &&
+        conversationMessage.json.conversation.messages[1].answer.evidenceSourceIDs.length >= 1 &&
+        conversationMessage.json.conversation.messages[1].answer.sourceSummary.userPinnedCount >= 1,
       "Research conversation did not persist a cited user and assistant exchange."
     );
     assert(
@@ -4022,9 +4026,9 @@ async function main() {
       body: { auth: { accountUserID: userID }, conversationID }
     });
     assert(
-      immutableAnswerList.response.ok &&
+        immutableAnswerList.response.ok &&
         immutableAnswerList.json.answers.some((answer) =>
-          answer.id === answerID && answer.evidenceCount === 1
+          answer.id === answerID && answer.evidenceCount >= 1
         ),
       "The generated Research answer was not stored as an immutable historical record."
     );
@@ -4038,8 +4042,13 @@ async function main() {
         immutableAnswerRead.json.answer.immutable === true &&
         immutableAnswerRead.json.answer.projectID === researchProjectIDs[0] &&
         immutableAnswerRead.json.answer.question === "When must the owner notify the department?" &&
-        immutableAnswerRead.json.answer.evidence[0].passageText === selectedResearchText &&
-        immutableAnswerRead.json.answer.passageToCitationMapping[0].evidenceSnapshotIDs.length === 1,
+        immutableAnswerRead.json.answer.evidence.some((snapshot) =>
+          snapshot.sectionID === "8881" &&
+          snapshot.provenance?.userSelectedText === selectedResearchText
+        ) &&
+        immutableAnswerRead.json.answer.passageToCitationMapping.some((mapping) =>
+          mapping.evidenceSnapshotIDs.length >= 1
+        ),
       "The historical Research endpoint did not restore the exact stored question, evidence, answer, and citation mapping."
     );
     const workboardPreviewUpload = await request("/workboards/previews/upload?" + new URLSearchParams({
@@ -5414,7 +5423,7 @@ async function main() {
           item.kind === "researchAnswer" &&
           item.answerID === answerID &&
           item.sourceClassification === "ai-assisted" &&
-          item.evidence.length === 1
+          item.evidence.length >= 1
         ) &&
         generatedProjectReport.json.manifest.items.some((item) =>
           item.kind === "workboardPreview" &&
@@ -5781,7 +5790,10 @@ async function main() {
     assert(
       immutableAnswerAfterMove.response.ok &&
         immutableAnswerAfterMove.json.answer.projectID === researchProjectIDs[0] &&
-        immutableAnswerAfterMove.json.answer.evidence[0].passageText === selectedResearchText,
+        immutableAnswerAfterMove.json.answer.evidence.some((snapshot) =>
+          snapshot.sectionID === "8881" &&
+          snapshot.provenance?.userSelectedText === selectedResearchText
+        ),
       "Moving a Research conversation silently reclassified its historical answer or evidence."
     );
     const reusedResearchEvidence = await request("/research/conversations/reuse-evidence", {
@@ -5803,6 +5815,8 @@ async function main() {
         ) &&
         reusedResearchEvidence.json.conversation.sources[0].id !==
           createdConversation.json.conversation.sources[0].id &&
+        reusedResearchEvidence.json.conversation.sources[0].selectedText ===
+          selectedResearchText &&
         !JSON.stringify(reusedResearchEvidence.json.conversation).includes("When must the owner notify the department?"),
       "Reusing approved evidence did not create a fresh Project-linked conversation with new evidence identities."
     );
@@ -5960,8 +5974,8 @@ async function main() {
     });
     assert(
       immutableAnswerAfterEvidenceChange.response.ok &&
-        immutableAnswerAfterEvidenceChange.json.answer.evidence.length === 1 &&
-        immutableAnswerAfterEvidenceChange.json.answer.evidence[0].passageText === selectedResearchText,
+        JSON.stringify(immutableAnswerAfterEvidenceChange.json.answer.evidence) ===
+          JSON.stringify(immutableAnswerRead.json.answer.evidence),
       "Adding later evidence silently changed a historical Research answer."
     );
 

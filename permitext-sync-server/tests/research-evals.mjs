@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { approvedEvaluationCases, validateEvaluationDataset } from "../evals/evaluation-schema.mjs";
 import {
+  normalizeResearchInterpretationEvidenceBindings,
   researchInputForEvidence,
   validateResearchInterpretation
 } from "../app.mjs";
@@ -1305,28 +1306,52 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
 async function runMockConversationCases(baseURL, checkedCases) {
   const account = await signInEvalUser(baseURL);
   await verifyResearchWorkflowContracts(baseURL, account, checkedCases);
+  const emptyChat = await jsonRequest(baseURL, "/research/conversations/create", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: { auth: { accountUserID: account.appUserID } }
+  });
+  assert(
+    emptyChat.conversation?.origin?.kind === "chat" &&
+      emptyChat.conversation?.sources?.length === 0,
+    "Research did not create an immediate empty chat without manually selected evidence."
+  );
+  const automaticTurn = await askEvaluationQuestion(
+    baseURL,
+    account,
+    emptyChat.conversation.id,
+    "What does NYC BC 1019.3 establish about open exit access stairs?"
+  );
+  assert(
+    automaticTurn.answer.sourceSummary?.userPinnedCount === 0 &&
+      automaticTurn.answer.sourceSummary?.permitextDiscoveredCount > 0 &&
+      automaticTurn.answer.evidenceSourceIDs?.length > 0 &&
+      automaticTurn.answer.citations?.length > 0 &&
+      automaticTurn.answer.verification?.pass === true,
+    "Research did not answer an unpinned chat question from automatically discovered enacted evidence."
+  );
   for (const testCase of checkedCases) {
     const conversationID = await createEvaluationConversation(baseURL, account, testCase);
     const { answer, conversation } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
     assert(answer.mode === "mock" && answer.model === "permitext-mock", `${testCase.id} unexpectedly called a live model during preflight.`);
-    const expectedPassageCount = selectedPassages(testCase).length;
-    const relatedSourceIDs = new Set(
-      conversation.sources
-        .filter((source) => source.kind === "related")
-        .map((source) => source.id)
-    );
+    const selectedSourceIDs = conversation.sources
+      .filter((source) => source.kind === "selection")
+      .map((source) => source.id);
     assert(
-      answer.evidenceSourceIDs?.length === expectedPassageCount &&
-        answer.evidenceSourceIDs.every((sourceID) => !relatedSourceIDs.has(sourceID)) &&
+      selectedSourceIDs.every((sourceID) => answer.evidenceSourceIDs?.includes(sourceID)) &&
+        answer.evidenceSourceIDs?.length >= selectedSourceIDs.length &&
         (answer.citations || []).every((citation) =>
           (citation.sourceIDs || []).every((sourceID) =>
-            answer.evidenceSourceIDs.includes(sourceID) && !relatedSourceIDs.has(sourceID)
+            answer.evidenceSourceIDs.includes(sourceID)
           )
-        ),
-      `${testCase.id} allowed a related or unselected source into verified answer evidence.`
+        ) &&
+        answer.retrieval?.assemblyVersion &&
+        answer.verification?.pass === true &&
+        answer.sourceSummary?.enactedProvisionCount >= 1,
+      `${testCase.id} did not preserve pinned evidence inside the verified automatic evidence package.`
     );
   }
-  console.log(`Verified the legacy and multi-selection Research contracts, current Project context, and ${checkedCases.length}/${checkedCases.length} cases through Permitext's conversation flow in mock mode.`);
+  console.log(`Verified legacy pinned-evidence compatibility, automatic enacted-corpus assembly, current Project context, and ${checkedCases.length}/${checkedCases.length} cases through Permitext's conversation flow in mock mode.`);
 }
 
 async function currentGitCommit() {
@@ -1988,8 +2013,8 @@ async function runSelfTest(dataset, datasetText) {
     }]
   );
   assert(
-    numberedListInput.includes(`EXACT SELECTED PASSAGE: ${numberedListPassage}`),
-    "Research model input collapsed a selected numbered list instead of preserving readable line breaks."
+    numberedListInput.includes(`ENACTED_TEXT: ${numberedListPassage}`),
+    "Research model input collapsed an enacted numbered list instead of preserving readable line breaks."
   );
   const [workspaceScript, workspaceStyles] = await Promise.all([
     readFile(join(serverRoot, "public", "app.js"), "utf8"),
@@ -2313,8 +2338,10 @@ async function runSelfTest(dataset, datasetText) {
     explanation: "Explanation.",
     assumptions: [],
     missingFacts: [],
+    followUpQuestions: [],
     evidenceLimitations: ["Only the selected passages were treated as authority."],
     additionalEvidenceNeeded: [],
+    supportingSourceUses: [],
     citations: [{ sectionID: "101", sourceIDs: ["source-a"], relevance: "Relevant." }]
   };
   const validatedInterpretation = validateResearchInterpretation({
@@ -2338,11 +2365,49 @@ async function runSelfTest(dataset, datasetText) {
       validatedInterpretation.citations[0].relevance === "Relevant.",
     "Production Research validation exposed internal evidence identifiers in user-facing prose."
   );
+  const normalizedBindings = normalizeResearchInterpretationEvidenceBindings({
+    ...interpretation,
+    supportedPoints: interpretation.supportedPoints.map((point) => ({
+      ...point,
+      sectionID: "202",
+      sourceIDs: ["source-a", "source-a"]
+    })),
+    citations: interpretation.citations.map((citation) => ({
+      ...citation,
+      sectionID: "202"
+    }))
+  }, validationEvidence);
+  const normalizedInterpretation = validateResearchInterpretation(normalizedBindings, validationEvidence);
+  assert(
+    normalizedInterpretation.supportedPoints[0].sectionID === "101" &&
+      normalizedInterpretation.supportedPoints[0].sourceIDs.length === 1 &&
+      normalizedInterpretation.citations[0].sectionID === "101",
+    "Production Research did not normalize harmless duplicate passage IDs and canonicalize the redundant section ID."
+  );
+  const mixedBinding = normalizeResearchInterpretationEvidenceBindings({
+    ...interpretation,
+    supportedPoints: [{
+      ...interpretation.supportedPoints[0],
+      sourceIDs: ["source-a", "source-b"]
+    }],
+    citations: [{
+      sectionID: "101",
+      sourceIDs: ["source-a"],
+      relevance: "The synthesized point relies on enacted evidence."
+    }]
+  }, validationEvidence);
+  const validatedMixedBinding = validateResearchInterpretation(mixedBinding, validationEvidence);
+  assert(
+    validatedMixedBinding.supportedPoints[0].sourceIDs.length === 2 &&
+      validatedMixedBinding.citations.length === 2 &&
+      validatedMixedBinding.citations.every((citation) => citation.sourceIDs.length === 1),
+    "Production Research did not preserve a multi-section synthesized point with section-specific citations."
+  );
   let excessiveSupportedPointsRejected = false;
   try {
     validateResearchInterpretation({
       ...interpretation,
-      supportedPoints: Array.from({ length: 9 }, () => interpretation.supportedPoints[0])
+      supportedPoints: Array.from({ length: 13 }, () => interpretation.supportedPoints[0])
     }, validationEvidence);
   } catch (error) {
     excessiveSupportedPointsRejected = error.code === "INVALID_RESEARCH_RESPONSE";

@@ -538,6 +538,25 @@ export function immutableEvidenceSnapshot({
     evidenceSetVersion: boundedVersion(evidenceSetVersion, "evidence set version"),
     sourceLibraryVersion: libraryVersion
   };
+  const provenance = {
+    origin: String(source?.origin || "user_pinned").trim(),
+    authorityClass: String(source?.authorityClass || "enacted").trim(),
+    relationship: String(source?.relationship || "").trim() || null,
+    retrievalReason: String(source?.retrievalReason || "").trim() || null,
+    retrievalRank: source?.retrievalRank !== null && source?.retrievalRank !== "" &&
+      Number.isFinite(Number(source?.retrievalRank)) ? Number(source.retrievalRank) : null,
+    retrievalScore: source?.retrievalScore !== null && source?.retrievalScore !== "" &&
+      Number.isFinite(Number(source?.retrievalScore)) ? Number(source.retrievalScore) : null,
+    retrievalVersion: String(source?.retrievalVersion || "").trim() || null,
+    retrievalDepth: Number.isFinite(Number(source?.retrievalDepth)) ? Number(source.retrievalDepth) : null,
+    retrievedAt: optionalISO(source?.retrievedAt, "evidence retrieval date")
+  };
+  const userSelectedText = String(source?.userSelectedText || "").trim();
+  if (userSelectedText) {
+    provenance.userSelectedText = userSelectedText;
+    provenance.userSelectedTextHash = createHash("sha256").update(userSelectedText).digest("hex");
+  }
+  snapshot.provenance = provenance;
   const structuredSource = immutableStructuredEvidenceSource(source, passageText);
   if (structuredSource) snapshot.structuredSource = structuredSource;
   const visualSources = immutableVisualEvidenceSources(source);
@@ -594,12 +613,32 @@ export function immutableResearchAnswer({
     evidence,
     evidenceSetVersion: Math.max(...evidence.map((item) => item.evidenceSetVersion)),
     answer,
+    codeBasis: answer?.codeBasis && typeof answer.codeBasis === "object"
+      ? structuredClone(answer.codeBasis)
+      : null,
     assumptions: Array.isArray(answer?.assumptions) ? answer.assumptions : [],
     missingFacts: Array.isArray(answer?.missingFacts) ? answer.missingFacts : [],
+    followUpQuestions: Array.isArray(answer?.followUpQuestions) ? answer.followUpQuestions : [],
     limitations: Array.isArray(answer?.evidenceLimitations) ? answer.evidenceLimitations : [],
     additionalEvidenceNeeded: Array.isArray(answer?.additionalEvidenceNeeded)
       ? answer.additionalEvidenceNeeded
       : [],
+    sourceSummary: answer?.sourceSummary && typeof answer.sourceSummary === "object"
+      ? structuredClone(answer.sourceSummary)
+      : null,
+    supportingSources: Array.isArray(answer?.supportingSources)
+      ? structuredClone(answer.supportingSources)
+      : [],
+    retrieval: answer?.retrieval && typeof answer.retrieval === "object"
+      ? structuredClone(answer.retrieval)
+      : null,
+    verification: answer?.verification && typeof answer.verification === "object"
+      ? structuredClone(answer.verification)
+      : null,
+    structuredEvidenceAnalysis: answer?.structuredEvidenceAnalysis &&
+      typeof answer.structuredEvidenceAnalysis === "object"
+      ? structuredClone(answer.structuredEvidenceAnalysis)
+      : null,
     citations,
     passageToCitationMapping: mapping,
     model: requiredText(model, "research model", 256),

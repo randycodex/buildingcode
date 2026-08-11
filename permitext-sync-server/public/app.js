@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260810-research-pilot-v1";
+} from "./sync-state.js?v=20260811-research-code-basis-v2";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260810-research-pilot-v1";
+} from "./offline-storage.js?v=20260811-research-code-basis-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260810-research-pilot-v1";
+} from "./workspace-state.js?v=20260811-research-code-basis-v2";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -213,6 +213,7 @@ const defaultToolbarButtonIDs = Object.freeze([
   "add-reader",
   "toggle-search",
   "toggle-saved",
+  "toggle-analysis",
   "toggle-workboard",
   "toggle-settings",
   "fit-columns",
@@ -246,7 +247,18 @@ const addReaderButton = document.querySelector("#add-reader");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
-const toggleAnalysisButton = document.querySelector("#toggle-analysis");
+const toggleAnalysisButton = document.querySelector("#toggle-analysis") || (() => {
+  const button = document.createElement("button");
+  button.className = "toolbar-button";
+  button.id = "toggle-analysis";
+  button.type = "button";
+  button.textContent = "Research";
+  button.setAttribute("aria-label", "Research");
+  button.setAttribute("title", "Research");
+  button.setAttribute("aria-pressed", "false");
+  topbarActions?.append(button);
+  return button;
+})();
 const toggleWorkboardButton = document.querySelector("#toggle-workboard");
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
@@ -13350,7 +13362,7 @@ function appendResearchSupportedPoints(container, points) {
   if (!points?.length) return;
   const heading = document.createElement("h4");
   heading.className = "research-result-subheading";
-  heading.textContent = "What the selected evidence establishes";
+  heading.textContent = "What the cited evidence establishes";
   const list = document.createElement("ol");
   list.className = "research-supported-points";
   points.forEach((point) => {
@@ -13579,12 +13591,57 @@ function renderResearchInterpretation(container, result, options = {}) {
   explanation.textContent = researchDisplayText(result.explanation);
   card.append(answer, explanation);
 
+  const codeBasis = result.codeBasis || null;
+  const codeBasisText = String(
+    codeBasis?.disclosure ||
+    (result.codeEdition ? `Code basis: ${result.codeEdition}` : "")
+  ).trim();
+  if (codeBasisText) {
+    const codeDisclosure = document.createElement("p");
+    codeDisclosure.className = "research-answer-code-basis";
+    codeDisclosure.textContent = codeBasisText;
+    if (codeBasis?.limitation) codeDisclosure.title = codeBasis.limitation;
+    card.append(codeDisclosure);
+  }
+
+  if (result.citations?.length) {
+    const citationRow = document.createElement("nav");
+    citationRow.className = "research-answer-citation-chips";
+    citationRow.setAttribute("aria-label", "Sources cited in this answer");
+    result.citations.forEach((citation) => {
+      const citationButton = document.createElement("button");
+      citationButton.type = "button";
+      citationButton.textContent = [
+        citation.codePrefix,
+        citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
+      ].filter(Boolean).join(" ");
+      citationButton.addEventListener("click", () => {
+        const sourceDetails = container.querySelector(".research-answer-source-text");
+        if (!sourceDetails) return;
+        sourceDetails.open = true;
+        sourceDetails.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
+      citationRow.append(citationButton);
+    });
+    card.append(citationRow);
+  }
+
   const missingFactCount = result.missingFacts?.length || 0;
   const evidenceLimitCount = result.evidenceLimitations?.length || 0;
+  const sourceSummary = result.sourceSummary || {};
+  const enactedCount = Number(sourceSummary.enactedProvisionCount || 0);
+  const sourceScope = enactedCount
+    ? [
+        `Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`,
+        sourceSummary.userPinnedCount ? `${sourceSummary.userPinnedCount} pinned by you` : "",
+        sourceSummary.permitextDiscoveredCount ? `${sourceSummary.permitextDiscoveredCount} identified by Permitext` : "",
+        sourceSummary.crossReferenceCount ? `${sourceSummary.crossReferenceCount} cross-references reviewed` : ""
+      ].filter(Boolean).join(" · ")
+    : "Grounded in the cited Research sources";
   const boundary = document.createElement("p");
   boundary.className = "research-answer-boundary";
   boundary.textContent = [
-    "Based only on selected Research evidence",
+    sourceScope,
     missingFactCount ? `${missingFactCount} project ${missingFactCount === 1 ? "fact remains" : "facts remain"} unresolved` : "No unresolved project facts identified",
     evidenceLimitCount ? `${evidenceLimitCount} evidence ${evidenceLimitCount === 1 ? "limit" : "limits"}` : "No additional evidence limits identified"
   ].join(" · ");
@@ -13594,17 +13651,26 @@ function renderResearchInterpretation(container, result, options = {}) {
   details.className = "research-answer-details";
   details.open = Boolean(options.detailsOpen);
   const summary = document.createElement("summary");
-  summary.textContent = "Review evidence, assumptions, and limits";
+  summary.textContent = "Sources, assumptions, and limits";
   const detailsBody = document.createElement("section");
   detailsBody.className = "research-answer-details-body";
   appendResearchSupportedPoints(detailsBody, result.supportedPoints);
   appendResearchList(detailsBody, "Assumptions used", result.assumptions);
   appendResearchUnresolved(detailsBody, result);
+  appendResearchList(detailsBody, "Questions that would materially advance this answer", result.followUpQuestions);
   appendResearchList(detailsBody, "Related evidence to add", result.additionalEvidenceNeeded);
+  appendResearchList(
+    detailsBody,
+    "Supporting context — noncontrolling",
+    (result.supportingSources || []).map((source) => [
+      source.title || source.publisher || "Supporting source",
+      source.claim
+    ].filter(Boolean).join(": "))
+  );
   if (result.citations?.length) {
     const citationsHeading = document.createElement("h4");
     citationsHeading.className = "research-result-subheading";
-    citationsHeading.textContent = "Cited selected evidence";
+    citationsHeading.textContent = "Cited sources";
     const citations = document.createElement("ul");
     citations.className = "research-result-list research-answer-citations";
     result.citations.forEach((citation) => {
@@ -14091,6 +14157,39 @@ async function deleteResearchConversationFromList(conversation, button) {
   } catch (error) {
     button.disabled = false;
     await showWebNotice("Conversation not deleted", error.message);
+  }
+}
+
+async function clearResearchConversationHistory(button) {
+  const conversations = [...researchConversationList];
+  if (!conversations.length) return;
+  const confirmed = await confirmWebWarning(
+    "Clear Research history?",
+    `${conversations.length} ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from this list. Unassigned chats will be deleted. Chats attached to Projects will remain available from their Projects. Saved Research answers and governed Code Decision records will remain.`,
+    { confirmLabel: "Clear all" }
+  );
+  if (!confirmed) return;
+
+  button.disabled = true;
+  button.textContent = "Clearing…";
+  try {
+    await postResearch("/research/conversations/clear-history", {});
+    const clearedIDs = new Set(conversations.map((conversation) => conversation.id));
+    if (clearedIDs.has(String(state.researchConversationID || ""))) {
+      researchOpenGeneration += 1;
+      state.researchConversationID = "";
+      activeResearchConversation = null;
+    }
+    if (state.researchEvidenceSplitRatios) {
+      clearedIDs.forEach((conversationID) => delete state.researchEvidenceSplitRatios[conversationID]);
+    }
+    await refreshResearchConversationList();
+    saveWorkspaceState();
+    await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "Clear";
+    await showWebNotice("Research history not cleared", error.message);
   }
 }
 
@@ -14870,6 +14969,123 @@ function renderEvidenceDiscovery(container) {
   renderResults();
 }
 
+function bindResearchSendShortcut(input, form) {
+  input.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+    event.preventDefault();
+    form.requestSubmit();
+  });
+}
+
+async function showNewResearchChat() {
+  researchOpenGeneration += 1;
+  state.researchConversationID = "";
+  activeResearchConversation = null;
+  researchQuestionDraft = "";
+  Object.keys(state.paneWeights)
+    .filter((id) => id.startsWith("research:conversation:"))
+    .forEach((id) => delete state.paneWeights[id]);
+  state.paneOrder = (state.paneOrder || []).filter((id) => !id.startsWith("research:conversation:"));
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+  requestAnimationFrame(() => {
+    track.querySelector('.workspace-panel[data-pane-id="utility:analysis"] .research-question-input:not(:disabled)')
+      ?.focus({ preventScroll: true });
+  });
+}
+
+function renderNewResearchComposer(container, researchEnabled) {
+  const section = document.createElement("section");
+  section.className = "research-chat-start";
+  const heading = document.createElement("h3");
+  heading.textContent = "What would you like to research?";
+  const copy = document.createElement("p");
+  copy.textContent = "Ask naturally. Permitext will research the applicable enacted text and cite the sources used in its answer.";
+  const form = document.createElement("form");
+  form.className = "research-composer research-start-composer";
+  const projectField = document.createElement("label");
+  projectField.className = "research-start-project";
+  const projectLabel = document.createElement("span");
+  projectLabel.textContent = "Project context (optional)";
+  const projectSelect = createResearchProjectSelect({
+    value: preferredResearchProjectID(),
+    unassignedLabel: "No Project context",
+    ariaLabel: "Project context for this Research chat"
+  });
+  projectField.append(projectLabel, projectSelect);
+  const composerBox = document.createElement("div");
+  composerBox.className = "research-composer-box";
+  const input = document.createElement("textarea");
+  input.className = "research-question-input";
+  input.rows = 2;
+  input.maxLength = 2000;
+  input.placeholder = "Ask a building-code question…";
+  input.value = researchQuestionDraft;
+  const sendButton = document.createElement("button");
+  sendButton.className = "ghost-button research-send-button";
+  sendButton.type = "submit";
+  sendButton.textContent = "Send";
+  const status = document.createElement("p");
+  status.className = "research-composer-status";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  const updateSendState = () => {
+    sendButton.disabled = !researchEnabled || input.disabled || input.value.trim().length < 3;
+  };
+  input.addEventListener("input", () => {
+    researchQuestionDraft = input.value;
+    updateSendState();
+  });
+  bindResearchSendShortcut(input, form);
+  if (!researchEnabled) {
+    input.disabled = true;
+    projectSelect.disabled = true;
+    input.placeholder = "Research Add-On required to start a new chat…";
+  }
+  updateSendState();
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const question = input.value.replace(/\s+/g, " ").trim();
+    if (question.length < 3 || sendButton.disabled) return;
+    input.disabled = true;
+    projectSelect.disabled = true;
+    sendButton.disabled = true;
+    status.textContent = "Researching applicable enacted text…";
+    let conversationID = "";
+    try {
+      const created = await postResearch("/research/conversations/create", {
+        projectID: projectSelect.value
+      });
+      const conversation = created.conversation;
+      conversationID = String(conversation?.id || "").trim();
+      if (!conversationID) throw new Error("Research did not return a new conversation.");
+      activeResearchConversation = conversation;
+      state.researchConversationID = conversationID;
+      const result = await postResearch("/research/conversations/message", { conversationID, question });
+      activeResearchConversation = result.conversation;
+      researchQuestionDraft = "";
+      await refreshResearchConversationList();
+      await openResearchConversation(conversationID, { refreshList: true });
+    } catch (error) {
+      researchQuestionDraft = question;
+      if (conversationID) {
+        await refreshResearchConversationList().catch(() => {});
+        await openResearchConversation(conversationID, { refreshList: false });
+        await showWebNotice("Question not sent", error.message || "Permitext could not answer this question.");
+        return;
+      }
+      status.textContent = error.message || "Permitext could not start this Research chat.";
+      input.disabled = false;
+      projectSelect.disabled = false;
+      updateSendState();
+    }
+  });
+  composerBox.append(input, sendButton);
+  form.append(projectField, composerBox, status);
+  section.append(heading, copy, form);
+  container.append(section);
+}
+
 async function renderResearch(paneID = "utility:analysis") {
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-list-panel");
@@ -14877,6 +15093,25 @@ async function renderResearch(paneID = "utility:analysis") {
   panel.classList.toggle("is-project-scoped", projectScopedResearch);
   applyProjectDerivedPaneTheme(panel, preferredResearchProjectID());
   panel.querySelector(".utility-close")?.addEventListener("click", closeResearchWorkspace);
+  const panelActions = panel.querySelector(".panel-actions");
+  const newChatButton = document.createElement("button");
+  newChatButton.className = "ghost-button research-new-chat-button";
+  newChatButton.type = "button";
+  newChatButton.textContent = "New chat";
+  newChatButton.addEventListener("click", () => void showNewResearchChat());
+  const backButton = document.createElement("button");
+  backButton.className = "ghost-button research-back-button";
+  backButton.type = "button";
+  backButton.textContent = "Back";
+  backButton.hidden = !state.researchConversationID;
+  backButton.addEventListener("click", () => void showNewResearchChat());
+  const clearChatsButton = document.createElement("button");
+  clearChatsButton.className = "ghost-button research-clear-chats-button";
+  clearChatsButton.type = "button";
+  clearChatsButton.textContent = "Clear";
+  clearChatsButton.hidden = true;
+  clearChatsButton.addEventListener("click", () => void clearResearchConversationHistory(clearChatsButton));
+  panelActions?.prepend(backButton, newChatButton, clearChatsButton);
   const content = panel.querySelector(".analysis-content");
 
   const trustNotice = document.createElement("aside");
@@ -14885,7 +15120,7 @@ async function renderResearch(paneID = "utility:analysis") {
   const trustHeading = document.createElement("strong");
   trustHeading.textContent = "AI-assisted research — not an official interpretation";
   const trustCopy = document.createElement("p");
-  trustCopy.textContent = "Select enacted text, then choose Start Research. No AI request is made until you ask a question and choose Analyze; private notes are excluded.";
+  trustCopy.textContent = "Permitext grounds code conclusions in applicable enacted text and cites the sources used. Supporting sources are identified separately; private notes are excluded.";
   trustNotice.append(trustHeading, trustCopy);
   const appendTrustNotice = () => {
     if (!projectScopedResearch) content.append(trustNotice);
@@ -14911,6 +15146,7 @@ async function renderResearch(paneID = "utility:analysis") {
 
   try {
     await refreshResearchConversationList();
+    clearChatsButton.hidden = researchConversationList.length === 0;
   } catch (error) {
     const status = document.createElement("p");
     status.className = "research-list-status is-error";
@@ -15021,11 +15257,11 @@ async function renderResearch(paneID = "utility:analysis") {
     content.append(usage);
   }
 
-  renderEvidenceDiscovery(content);
-
   if (state.researchConversationID) {
     const conversation = await renderResearchConversation(state.researchConversationID, { embedded: true });
     content.append(conversation);
+    const conversationTitle = activeResearchConversation?.title;
+    if (conversationTitle) panel.querySelector(".panel-title").textContent = conversationTitle;
     const dockedComposer = conversation.querySelector(".research-composer");
     if (dockedComposer) {
       panel.classList.add("has-research-composer");
@@ -15035,10 +15271,12 @@ async function renderResearch(paneID = "utility:analysis") {
     return panel;
   }
 
+  renderNewResearchComposer(content, researchEnabled);
+
   if (!researchConversationList.length) {
     const empty = document.createElement("div");
     empty.className = "research-conversation-empty";
-    empty.textContent = "No research conversations yet.";
+    empty.textContent = "Your previous chats will appear here.";
     content.append(empty);
     appendTrustNotice();
     return panel;
@@ -15046,6 +15284,10 @@ async function renderResearch(paneID = "utility:analysis") {
 
   const list = document.createElement("section");
   list.className = "research-conversation-list";
+  const listHeading = document.createElement("h3");
+  listHeading.className = "research-conversation-list-heading";
+  listHeading.textContent = "Previous chats";
+  content.append(listHeading);
   researchConversationList.forEach((initialConversation) => {
     let conversation = initialConversation;
     const row = document.createElement("article");
@@ -15064,7 +15306,7 @@ async function renderResearch(paneID = "utility:analysis") {
       );
       meta.textContent = [
         `${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"}`,
-        `${conversation.sourceCount} ${conversation.sourceCount === 1 ? "passage" : "passages"}`,
+        `${conversation.sourceCount} ${conversation.sourceCount === 1 ? "source" : "sources"}`,
         linkedQuestion ? `Linked to ${linkedQuestion.displayID || "Code Decision"}` : "",
         researchRelativeDate(conversation.updatedAt)
       ].filter(Boolean).join(" · ");
@@ -15428,14 +15670,20 @@ function setResearchSourceCardExpanded(card, expanded, options = {}) {
 }
 
 function renderResearchSource(source) {
+  const sourceKind = String(
+    source.kind || source.sourceClassification || source.authorityClass || "related"
+  ).trim();
   const card = document.createElement("article");
-  card.className = `research-source-card is-${source.kind || "related"} code-theme-${codeTheme(source.codePrefix || "BC")}`;
+  card.className = `research-source-card is-${sourceKind} code-theme-${codeTheme(source.codePrefix || "BC")}`;
   const toggle = document.createElement("button");
   toggle.type = "button";
   toggle.className = "research-source-toggle";
   toggle.setAttribute("aria-expanded", "true");
   const citation = document.createElement("strong");
-  citation.textContent = researchSourceCitation(source);
+  const supportingSource = ["official_guidance", "technical_source", "secondary_source", "web"].includes(sourceKind);
+  citation.textContent = supportingSource
+    ? String(source.title || source.publisher || source.sourceURL || source.url || "Supporting source")
+    : researchSourceCitation(source);
   const disclosure = document.createElement("span");
   disclosure.className = "research-source-disclosure";
   disclosure.setAttribute("aria-hidden", "true");
@@ -15447,17 +15695,56 @@ function renderResearchSource(source) {
     const expanded = toggle.getAttribute("aria-expanded") === "true";
     setResearchSourceCardExpanded(card, !expanded);
   });
-  if (source.kind !== "selection") {
+  if (sourceKind === "related") {
     const label = document.createElement("p");
     label.className = "section-label";
     label.textContent = "Suggested related section — not included in analysis";
     const relationship = document.createElement("p");
     relationship.textContent = "Suggested because it is explicitly referenced by this enacted section. Open it and select the relevant passage to include it in analysis.";
     body.append(label, relationship);
+  } else if (["enacted_permitext_discovered", "permitext_discovered", "permitext_cross_reference"].includes(sourceKind)) {
+    const label = document.createElement("p");
+    label.className = "section-label";
+    label.textContent = "Permitext enacted source";
+    body.append(label);
+  } else if (["enacted_user_pinned", "user_pinned"].includes(sourceKind)) {
+    const label = document.createElement("p");
+    label.className = "section-label";
+    label.textContent = "Pinned enacted source";
+    body.append(label);
+  } else if (supportingSource) {
+    const sourceRoleLabels = {
+      official_guidance: "Official guidance — supporting context",
+      technical_source: "Technical source — supporting context",
+      secondary_source: "Secondary source — noncontrolling context",
+      web: "Web source — supporting context"
+    };
+    const label = document.createElement("p");
+    label.className = "section-label";
+    label.textContent = sourceRoleLabels[sourceKind] || sourceRoleLabels.web;
+    body.append(label);
   }
-  if (source.selectedText) {
+  const userSelectedText = String(source.userSelectedText || "").trim();
+  if (userSelectedText) {
+    const pinnedLabel = document.createElement("p");
+    pinnedLabel.className = "section-label";
+    pinnedLabel.textContent = "Exact text pinned by you";
+    const pinnedQuote = document.createElement("blockquote");
+    pinnedQuote.textContent = userSelectedText;
+    body.append(pinnedLabel, pinnedQuote);
+  }
+  const sourceText = source.selectedText || source.passageText || source.excerpt || source.snippet || "";
+  if (sourceText) {
+    const normalizedPinnedText = userSelectedText.replace(/\s+/g, " ").trim();
+    const normalizedSourceText = String(sourceText).replace(/\s+/g, " ").trim();
+    if (normalizedPinnedText && normalizedPinnedText !== normalizedSourceText) {
+      const contextLabel = document.createElement("p");
+      contextLabel.className = "section-label";
+      contextLabel.textContent = "Complete enacted context used";
+      body.append(contextLabel);
+    }
     const quote = document.createElement("blockquote");
-    quote.textContent = source.selectedText;
+    quote.textContent = sourceText;
     body.append(quote);
   }
   const visualEvidence = renderResearchVisualEvidence(source.visualSources);
@@ -15474,10 +15761,10 @@ function researchDisplaySources(sources = []) {
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
   sources.forEach((source) => {
-    const sourceText = comparableText(source.selectedText);
+    const sourceText = comparableText(source.selectedText || source.passageText || source.excerpt || source.snippet);
     const redundantIndex = displayed.findIndex((current) => {
       if (String(current.sectionID || "") !== String(source.sectionID || "")) return false;
-      const currentText = comparableText(current.selectedText);
+      const currentText = comparableText(current.selectedText || current.passageText || current.excerpt || current.snippet);
       return Boolean(sourceText && currentText) &&
         (sourceText.includes(currentText) || currentText.includes(sourceText));
     });
@@ -15486,13 +15773,200 @@ function researchDisplaySources(sources = []) {
       return;
     }
     const current = displayed[redundantIndex];
-    const currentText = comparableText(current.selectedText);
+    const currentText = comparableText(current.selectedText || current.passageText || current.excerpt || current.snippet);
     if (
       sourceText.length > currentText.length ||
       (source.richSourceID && !current.richSourceID)
     ) displayed[redundantIndex] = source;
   });
   return displayed;
+}
+
+function researchSourcesForAnswer(conversation, message) {
+  const answer = message?.answer || {};
+  const answerSources = [
+    ...(Array.isArray(message?.sources) ? message.sources : []),
+    ...(Array.isArray(answer.sources) ? answer.sources : []),
+    ...(Array.isArray(answer.supportingSources) ? answer.supportingSources : [])
+  ];
+  const conversationSources = Array.isArray(conversation?.sources) ? conversation.sources : [];
+  const available = researchDisplaySources(conversationSources);
+  const sourceIDs = new Set([
+    ...(answer.evidenceSourceIDs || []),
+    ...(answer.sourceIDs || [])
+  ].map(String));
+  const citedSections = new Set((answer.citations || []).flatMap((citation) => [
+    citation.sectionID,
+    citation.sectionNumber
+  ]).filter(Boolean).map(String));
+  const matchedConversationSources = available.filter((source) =>
+    sourceIDs.has(String(source.id || "")) ||
+    sourceIDs.has(String(source.sourceID || "")) ||
+    citedSections.has(String(source.sectionID || "")) ||
+    citedSections.has(String(source.sectionNumber || ""))
+  );
+  const fallbackConversationSources = sourceIDs.size || citedSections.size ? [] : available;
+  return researchDisplaySources([
+    ...answerSources,
+    ...(matchedConversationSources.length ? matchedConversationSources : fallbackConversationSources)
+  ]);
+}
+
+function renderResearchAnswerSources(conversation, message) {
+  const answerSources = researchSourcesForAnswer(conversation, message);
+  if (!answerSources.length && !message?.id) return null;
+  const details = document.createElement("details");
+  details.className = "research-answer-source-text";
+  const summary = document.createElement("summary");
+  const sourceCount = Math.max(
+    answerSources.length,
+    message?.answer?.evidenceSourceIDs?.length || 0,
+    message?.answer?.citations?.length || 0
+  );
+  summary.textContent = sourceCount
+    ? `${sourceCount} ${sourceCount === 1 ? "source" : "sources"} used`
+    : "Sources used";
+  const list = document.createElement("section");
+  list.className = "research-answer-source-list";
+  const renderSources = (sources) => {
+    clear(list);
+    sources.forEach((source) => {
+      const card = renderResearchSource(source);
+      setResearchSourceCardExpanded(card, false, { instant: true });
+      const body = card.querySelector(".research-source-body");
+      const sourceURL = String(source.sourceURL || source.url || "").trim();
+      if (source.sectionID) {
+        const openButton = document.createElement("button");
+        openButton.type = "button";
+        openButton.className = "ghost-button research-answer-open-source";
+        openButton.textContent = "Open source";
+        openButton.addEventListener("click", () => openSectionDetailForExistingSearch(source, {
+          anchorPaneID: "utility:analysis"
+        }));
+        body?.append(openButton);
+      } else if (sourceURL) {
+        const openLink = document.createElement("a");
+        openLink.className = "research-answer-open-source";
+        openLink.href = sourceURL;
+        openLink.target = "_blank";
+        openLink.rel = "noopener noreferrer";
+        openLink.textContent = "Open supporting source";
+        body?.append(openLink);
+      }
+      list.append(card);
+    });
+  };
+  renderSources(answerSources);
+  let loaded = false;
+  details.addEventListener("toggle", async () => {
+    if (!details.open || loaded || !message?.id) return;
+    loaded = true;
+    const loading = document.createElement("p");
+    loading.className = "research-list-status";
+    loading.textContent = "Loading the exact saved sources…";
+    list.append(loading);
+    try {
+      const payload = await postResearch("/research/answers/get", { answerID: message.id });
+      const answerRecord = payload.answer || {};
+      const enactedSources = (answerRecord.evidence || []).map((source) => ({
+        ...source,
+        id: source.sourceID || source.id,
+        kind: source.provenance?.origin || source.origin || "enacted_permitext_discovered",
+        relationship: source.provenance?.relationship || source.relationship,
+        userSelectedText: source.provenance?.userSelectedText || "",
+        codePrefix: source.codeBook || source.codePrefix,
+        codeVersion: source.sourceLibraryVersion || source.codeVersion,
+        selectedText: source.passageText || source.selectedText
+      }));
+      const supportingSources = answerRecord.answer?.supportingSources || answerRecord.supportingSources || [];
+      const exactSources = researchDisplaySources([...enactedSources, ...supportingSources]);
+      if (exactSources.length) {
+        renderSources(exactSources);
+        summary.textContent = `${exactSources.length} ${exactSources.length === 1 ? "source" : "sources"} used`;
+      } else {
+        renderSources(answerSources);
+        if (!answerSources.length) list.textContent = "The exact source record is unavailable.";
+      }
+    } catch (error) {
+      loaded = false;
+      renderSources(answerSources);
+      const failure = document.createElement("p");
+      failure.className = "research-list-status is-error";
+      failure.textContent = error.message || "The exact source record could not be loaded.";
+      list.append(failure);
+    }
+  });
+  details.append(summary, list);
+  return details;
+}
+
+function researchSaveProjectOptions(conversation) {
+  const projects = activeFolderRecords(currentContentSummary().projects || []).filter(folderIsProject);
+  const preferredID = String(conversation?.primaryProjectID || preferredResearchProjectID(conversation) || "");
+  return {
+    projects,
+    preferredID: projects.some((project) => researchProjectID(project) === preferredID) ? preferredID : ""
+  };
+}
+
+function renderResearchAnswerSave(conversation, message) {
+  const controls = document.createElement("div");
+  controls.className = "research-answer-save";
+  const { projects, preferredID } = researchSaveProjectOptions(conversation);
+  const projectSelect = document.createElement("select");
+  projectSelect.className = "research-answer-save-project";
+  projectSelect.setAttribute("aria-label", "Project for saved Research answer");
+  if (!projects.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Create a Project to save";
+    projectSelect.append(option);
+  } else {
+    projects.forEach((project) => {
+      const option = document.createElement("option");
+      option.value = researchProjectID(project);
+      option.textContent = readableProjectName(project);
+      projectSelect.append(option);
+    });
+    projectSelect.value = preferredID || researchProjectID(projects[0]);
+  }
+  const saveButton = document.createElement("button");
+  saveButton.type = "button";
+  saveButton.className = "ghost-button research-answer-save-button";
+  saveButton.textContent = "Save to Project";
+  saveButton.disabled = !message?.id || !projects.length || !isProAccount();
+  if (!projects.length) saveButton.title = "Create a Project before saving this answer";
+  else if (!isProAccount()) saveButton.title = "Saving Research to a Project requires Pro";
+  const status = document.createElement("span");
+  status.className = "research-answer-save-status";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  saveButton.addEventListener("click", async () => {
+    const projectID = projectSelect.value;
+    if (!projectID || !message?.id) return;
+    saveButton.disabled = true;
+    projectSelect.disabled = true;
+    status.textContent = "Saving…";
+    try {
+      await postResearch("/projects/foundation/link", {
+        projectID,
+        targetKind: "researchAnswer",
+        targetID: message.id
+      });
+      saveButton.textContent = "Saved";
+      saveButton.setAttribute("aria-pressed", "true");
+      status.textContent = `Saved to ${researchProjectName(projectID)}`;
+      const project = activeFolderRecords(currentContentSummary().projects || [])
+        .find((item) => researchProjectID(item) === String(projectID));
+      if (project) await refreshProjectMembershipPanes(project);
+    } catch (error) {
+      status.textContent = error.message || "This answer could not be saved.";
+      saveButton.disabled = false;
+      projectSelect.disabled = false;
+    }
+  });
+  controls.append(projectSelect, saveButton, status);
+  return controls;
 }
 
 function appendHistoricalResearchList(container, title, items = []) {
@@ -15956,43 +16430,12 @@ async function renderResearchConversation(conversationID, options = {}) {
 
   const dialoguePane = document.createElement("section");
   dialoguePane.className = "research-dialogue-pane";
-  let embeddedEvidenceDrawer = null;
   let embeddedEvidenceNoticeRegion = null;
   if (embedded) {
-    const selectedEvidence = document.createElement("details");
-    selectedEvidence.className = "research-selected-evidence-drawer";
-    const selectedEvidenceSummary = document.createElement("summary");
-    selectedEvidenceSummary.textContent = `Selected evidence (${displayedSources.length})`;
     const selectedEvidenceNotices = document.createElement("section");
     selectedEvidenceNotices.className = "research-selected-evidence-notices";
-    const selectedEvidenceList = document.createElement("ul");
-    selectedEvidenceList.className = "research-selected-evidence-list";
-    displayedSources.forEach((source) => {
-      const item = document.createElement("li");
-      const openSource = document.createElement("button");
-      openSource.type = "button";
-      openSource.className = "research-selected-evidence-open";
-      const citation = document.createElement("strong");
-      citation.textContent = `${source.codePrefix || "BC"} § ${source.sectionNumber || source.sectionID}`;
-      const title = document.createElement("span");
-      title.textContent = source.title || "Enacted provision";
-      openSource.append(citation, title);
-      openSource.addEventListener("click", () => openSectionDetailForExistingSearch(source, {
-        anchorPaneID: "utility:analysis"
-      }));
-      item.append(openSource);
-      if (source.selectedText) {
-        const selectedPassage = document.createElement("blockquote");
-        selectedPassage.className = "research-selected-evidence-passage";
-        selectedPassage.textContent = source.selectedText;
-        item.append(selectedPassage);
-      }
-      selectedEvidenceList.append(item);
-    });
-    selectedEvidence.append(selectedEvidenceSummary, selectedEvidenceList);
-    embeddedEvidenceDrawer = selectedEvidence;
     embeddedEvidenceNoticeRegion = selectedEvidenceNotices;
-    content.append(selectedEvidenceNotices, selectedEvidence, dialoguePane);
+    content.append(selectedEvidenceNotices, dialoguePane);
   } else {
     content.append(evidencePane, divider, dialoguePane);
   }
@@ -16085,6 +16528,9 @@ async function renderResearchConversation(conversationID, options = {}) {
     const bubble = document.createElement("article");
     bubble.className = "research-message is-assistant";
     renderResearchInterpretation(bubble, message.answer, { message, conversationID });
+    const answerSources = renderResearchAnswerSources(conversation, message);
+    if (answerSources) bubble.append(answerSources);
+    bubble.append(renderResearchAnswerSave(conversation, message));
     thread.append(bubble);
   });
   dialoguePane.append(thread);
@@ -16099,24 +16545,22 @@ async function renderResearchConversation(conversationID, options = {}) {
     ? conversation.starterQuestion || ""
     : "";
   input.placeholder = starterAnalysisQuestion
-    ? "Ask a follow-up, or analyze the Research question…"
-    : "Ask about the attached enacted text…";
+    ? "Ask a follow-up, or send the Research question…"
+    : "Ask a building-code question…";
   input.value = researchQuestionDraft && researchQuestionDraft !== starterAnalysisQuestion
     ? researchQuestionDraft
     : "";
   const sendButton = document.createElement("button");
   sendButton.className = "ghost-button research-send-button";
   sendButton.type = "submit";
-  sendButton.textContent = "Analyze";
+  sendButton.textContent = "Send";
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const projectContextBlocked = Boolean(conversation.projectContextReviewRequired);
-  const evidenceRequired = selectedSources.length === 0;
   const researchEnabled = hasCapability("research");
   sendButton.disabled = !researchEnabled ||
     conversation.sourceStatus === "changed" ||
     projectContextBlocked ||
-    evidenceRequired ||
     (input.value.trim() || starterAnalysisQuestion).length < 3;
   if (!researchEnabled) {
     input.disabled = true;
@@ -16125,7 +16569,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const status = document.createElement("p");
   status.className = "research-composer-status";
   if (conversation.sourceStatus === "changed") {
-    status.textContent = "The enacted source changed. Refresh the selected evidence above before analyzing.";
+    status.textContent = "A pinned enacted source changed. Refresh it above before continuing this chat.";
   } else if (projectContextBlocked) {
     status.textContent = "Review the Project context in the Project column before analyzing.";
   }
@@ -16139,16 +16583,16 @@ async function renderResearchConversation(conversationID, options = {}) {
     sendButton.disabled = !researchEnabled ||
       conversation.sourceStatus === "changed" ||
       projectContextBlocked ||
-      evidenceRequired ||
       (input.value.trim() || starterAnalysisQuestion).length < 3;
   });
+  bindResearchSendShortcut(input, composer);
   composer.addEventListener("submit", async (event) => {
     event.preventDefault();
     const question = input.value.trim() || starterAnalysisQuestion;
     if (question.length < 3 || sendButton.disabled) return;
     input.disabled = true;
     sendButton.disabled = true;
-    status.textContent = "Reviewing the attached enacted text…";
+    status.textContent = "Researching applicable enacted text…";
     try {
       const result = await postResearch("/research/conversations/message", { conversationID, question });
       activeResearchConversation = result.conversation;
@@ -16264,8 +16708,8 @@ async function saveResearchSelection(mode, button, status) {
     await presentPlanLimitNotice(
       "Research Add-On required",
       isProAccount()
-        ? "Add Research to start conversations and analyze selected enacted text."
-        : "Upgrade to Pro first, then add Research to analyze selected enacted text."
+        ? "Add Research to start cited conversations grounded in enacted text."
+        : "Upgrade to Pro first, then add Research for cited enacted-code conversations."
     );
     return;
   }
@@ -16316,7 +16760,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   const menu = document.createElement("div");
   menu.className = "research-selection-menu";
   menu.setAttribute("role", "toolbar");
-  menu.setAttribute("aria-label", "Start Research with selected enacted text");
+  menu.setAttribute("aria-label", "Add selected enacted text to Research");
   menu.addEventListener("pointerdown", (event) => {
     if (event.target.closest?.("select, option")) {
       researchSelectionMenuInteracting = true;
@@ -18958,6 +19402,12 @@ function appendProjectResearchContextEditor(content, identity, initialConversati
 }
 
 function appendProjectResearchHistory(content, identity, foundation) {
+  const answers = [...(foundation?.researchAnswers || [])]
+    .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
+  const answeredConversationIDs = new Set(answers.map((answer) => answer.conversationID).filter(Boolean));
+  const unansweredConversations = [...(foundation?.researchConversations || [])]
+    .filter((conversation) => !answeredConversationIDs.has(conversation.id))
+    .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
   const section = document.createElement("section");
   section.className = "project-studio-section project-studio-research";
   const heading = document.createElement("div");
@@ -18970,32 +19420,21 @@ function appendProjectResearchHistory(content, identity, foundation) {
   const headingActions = document.createElement("div");
   headingActions.className = "project-section-heading-actions";
   headingActions.append(projectSectionCount(
-    foundation?.researchAnswers?.length || 0,
-    "Research answers"
+    answers.length + unansweredConversations.length,
+    "Research history entries"
   ));
-  const openResearch = document.createElement("button");
-  openResearch.type = "button";
-  openResearch.textContent = identity.sharedOnly ? "Read-only history" : "Open Research";
-  openResearch.disabled = identity.sharedOnly;
-  if (!identity.sharedOnly) {
-    openResearch.addEventListener("click", () => {
-      void focusProjectResearch(identity);
-    });
-  }
   const toggle = document.createElement("button");
   toggle.className = "project-section-toggle-chevron";
   toggle.type = "button";
   toggle.setAttribute("aria-label", "Expand Research history");
   toggle.setAttribute("aria-expanded", "false");
   toggle.innerHTML = researchChevronIconsSVG();
-  headingActions.append(openResearch, toggle);
+  headingActions.append(toggle);
   heading.append(title, headingActions);
   const body = document.createElement("div");
   body.className = "project-studio-collapsible-body project-research-history-body";
   section.append(heading, body);
 
-  const answers = [...(foundation?.researchAnswers || [])]
-    .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
   if (answers.length) {
     answers.slice(0, 8).forEach((answer) => {
       const card = document.createElement(identity.sharedOnly ? "article" : "button");
@@ -19021,6 +19460,23 @@ function appendProjectResearchHistory(content, identity, foundation) {
       body.append(card);
     });
   }
+  unansweredConversations.slice(0, Math.max(0, 8 - answers.length)).forEach((conversation) => {
+    const card = document.createElement(identity.sharedOnly ? "article" : "button");
+    card.className = "project-research-history-card";
+    card.dataset.researchConversationId = conversation.id;
+    if (!identity.sharedOnly) card.type = "button";
+    const question = document.createElement("strong");
+    question.textContent = conversation.title || conversation.starterQuestion || "Research conversation";
+    const status = document.createElement("p");
+    status.textContent = "No completed answer yet.";
+    const meta = document.createElement("span");
+    meta.textContent = researchRelativeDate(conversation.updatedAt || conversation.createdAt);
+    card.append(question, status, meta);
+    if (!identity.sharedOnly) {
+      card.addEventListener("click", () => void openResearchConversation(conversation.id));
+    }
+    body.append(card);
+  });
   wireProjectSectionMotion(section, body, [title, toggle], "Research history", false);
   content.append(section);
 }
@@ -21629,6 +22085,56 @@ function appendSavedProjectSummaryField(container, label, value, options = {}) {
   container.append(field);
 }
 
+async function appendSavedProjectResearchAnswers(container, identity) {
+  if (!activeAccount()) return;
+  const projectID = projectDetailKey(identity);
+  let foundation;
+  try {
+    foundation = identity.sharedOrganizationID
+      ? await postResearch("/organizations/projects/snapshot", { projectID })
+          .then((payload) => payload.project)
+      : await postResearch("/projects/foundation/state", { projectID });
+  } catch {
+    return;
+  }
+  const answers = [...notebookResearchAnswers(foundation)]
+    .sort((left, right) => String(right.createdAt || "").localeCompare(String(left.createdAt || "")));
+  if (!answers.length) return;
+
+  const section = document.createElement("section");
+  section.className = "project-studio-section saved-project-research-answers";
+  const heading = document.createElement("div");
+  heading.className = "project-studio-section-heading";
+  const title = document.createElement("p");
+  title.className = "section-label";
+  title.textContent = "Research answers";
+  heading.append(title, projectSectionCount(answers.length, "saved Research answers"));
+  section.append(heading);
+
+  answers.slice(0, 12).forEach((answer) => {
+    const card = document.createElement("button");
+    card.className = "project-research-history-card";
+    card.type = "button";
+    card.dataset.researchAnswerId = answer.id;
+    const question = document.createElement("strong");
+    question.textContent = answer.question || "Research answer";
+    const conclusion = document.createElement("p");
+    conclusion.textContent = answer.conclusion || "Open the cited answer and its immutable source record.";
+    const sourceCount = Number(answer.evidenceCount || answer.evidence?.length || 0);
+    const meta = document.createElement("span");
+    meta.textContent = [
+      `${sourceCount} cited ${sourceCount === 1 ? "source" : "sources"}`,
+      researchRelativeDate(answer.createdAt)
+    ].filter(Boolean).join(" · ");
+    card.append(question, conclusion, meta);
+    card.addEventListener("click", () => {
+      if (answer.conversationID) void openResearchConversation(answer.conversationID);
+    });
+    section.append(card);
+  });
+  container.append(section);
+}
+
 async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
   const previousContext = panel.querySelector(".saved-folder-context");
   const inlineFilters = panel.querySelector(".saved-inline-filters");
@@ -21673,11 +22179,10 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     controls.className = "saved-folder-controls saved-project-tool-controls";
     controls.setAttribute("aria-label", `${identity.name} tools`);
     [
-      ["Research", "project-code-decisions-button", projectHasOpenCodeDecisions, openProjectCodeDecisions, closeProjectCodeDecisions],
       ["Notebook", "project-notebook-button", projectHasOpenNotebook, openProjectNotebook, closeProjectNotebook],
       ["Report Draft", "project-report-draft-button", projectHasOpenReportDraft, openProjectReportDraft, closeProjectReportDraft],
       ["Coordination", "project-coordination-button", projectHasOpenCoordination, openProjectCoordination, closeProjectCoordination]
-    ].filter(([label]) => label !== "Research" || codeQuestionWorkspaceEnabled()).forEach(([label, className, isOpen, openTool, closeTool]) => {
+    ].forEach(([label, className, isOpen, openTool, closeTool]) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = className;
@@ -21714,6 +22219,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       savedContent
     );
     context.append(savedSection);
+    await appendSavedProjectResearchAnswers(context, identity);
 
   } else {
     const controls = document.createElement("div");
@@ -22050,7 +22556,8 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         )
       })
     : null;
-  panel.querySelector(".saved-evidence-select-toggle").hidden = !selectionController;
+  const savedEvidenceSelectToggle = panel.querySelector(".saved-evidence-select-toggle");
+  if (savedEvidenceSelectToggle) savedEvidenceSelectToggle.hidden = !selectionController;
   let allSavedLimit = savedItemsPageSize;
   let previousViewSignature = "";
   let viewGeneration = 0;
@@ -24782,7 +25289,7 @@ function renderSettings() {
     if (!isProAccount()) {
       void presentPlanLimitNotice(
         "Research requires Pro",
-        "Upgrade to Pro first, then add selected-evidence Research."
+        "Upgrade to Pro first, then add cited enacted-code Research."
       );
       return;
     }
@@ -29040,6 +29547,7 @@ async function focusUtility(key, selector = "") {
 function workspaceCommandDefinitions() {
   return [
     { label: "Open Search", hint: "Find sections across all codes", run: () => focusUtility("search", ".search-input") },
+    { label: "Open Research", hint: "Ask a cited building-code question", run: () => focusUtility("analysis", ".research-question-input") },
     ...(isProAccount() || state.readers.length < 2
       ? [{ label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
       : []),
@@ -29184,6 +29692,12 @@ function bindImmediateUtilityControls() {
     toggleWorkboardButton.addEventListener("pointerenter", () => void loadWorkboardModule().catch(() => {}), { once: true });
     toggleWorkboardButton.addEventListener("focus", () => void loadWorkboardModule().catch(() => {}), { once: true });
     toggleWorkboardButton.addEventListener("click", () => void toggleGenericWorkboard());
+  }
+  if (toggleAnalysisButton?.dataset.coldStartBound !== "true") {
+    toggleAnalysisButton.dataset.coldStartBound = "true";
+    toggleAnalysisButton.addEventListener("click", () => {
+      void focusUtility("analysis", ".research-question-input");
+    });
   }
   if (toggleSavedButton.dataset.coldStartBound === "true") return;
   toggleSavedButton.dataset.coldStartBound = "true";

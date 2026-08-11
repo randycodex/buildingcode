@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v10";
+export const evidenceDiscoveryVersion = "20260811-hybrid-candidates-v14";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -65,6 +65,75 @@ const conceptExpansions = [
 
 const topicRoutes = [
   {
+    pattern: /\bexterior\s+wall\b.*\b(?:lot\s+line|fire[- ]separation\s+distance|unprotected\s+(?:window|opening)|fire[- ]resistance\s+rating)\b/i,
+    label: "exterior-wall rating and opening-area provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "602.1" },
+      { codePrefix: "BC", sectionPrefix: "705.8" },
+      { codePrefix: "BC", sectionPrefix: "705.8.1" }
+    ]
+  },
+  {
+    pattern: /\b(?:atrium|open\s+volume)\b.*\b(?:floors?|stories|shaft\s+openings?|smoke\s+control|separation)\b/i,
+    label: "atrium classification and protection provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "202" },
+      { codePrefix: "BC", sectionPrefix: "712.1.7" },
+      { codePrefix: "BC", sectionPrefix: "404.3" },
+      { codePrefix: "BC", sectionPrefix: "404.5" },
+      { codePrefix: "BC", sectionPrefix: "404.6" }
+    ]
+  },
+  {
+    pattern: /\b(?:pipe|penetration)\b.*\bshaft\s+enclosure\b|\bshaft\s+enclosure\b.*\b(?:pipe|penetration)\b/i,
+    label: "shaft-enclosure penetration provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "713.8" },
+      { codePrefix: "BC", sectionPrefix: "713.8.1" },
+      { codePrefix: "BC", sectionPrefix: "714.3" },
+      { codePrefix: "BC", sectionPrefix: "714.3.1" }
+    ]
+  },
+  {
+    pattern: /\b(?:interior|major)\s+alteration\b.*\b(?:sprinkler|sprinklers)\b|\b(?:sprinkler|sprinklers)\b.*\b(?:altered\s+area|alteration|entire\s+building)\b/i,
+    label: "existing-building alteration sprinkler triggers",
+    targets: [{ codePrefix: "BC", sectionPrefix: "901.9.4", includeDescendants: true }]
+  },
+  {
+    pattern: /\bstandpipe\b.*\b(?:require|trigger|type|class)\b|\bwhat\s+type\s+of\s+standpipe\b/i,
+    label: "standpipe installation triggers and classes",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "905.3" },
+      { codePrefix: "BC", sectionPrefix: "905.3.1" }
+    ]
+  },
+  {
+    pattern: /\bhigh[- ]rise\b.*\b(?:emergency|standby)\s+power\b|\b(?:emergency|standby)\s+power\b.*\bhigh[- ]rise\b/i,
+    label: "high-rise emergency and standby power provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "403.4.8", includeDescendants: true },
+      { codePrefix: "BC", sectionPrefix: "2702.1" }
+    ]
+  },
+  {
+    pattern: /\b(?:number\s+of\s+stories|five[- ]story|multi[- ]story)\b.*\belevator\b|\belevator\b.*\b(?:required|number\s+of\s+stories)\b/i,
+    label: "accessible-story elevator exceptions",
+    targets: [{ codePrefix: "BC", sectionPrefix: "1104.4" }]
+  },
+  {
+    pattern: /\b(?:community|meeting|assembly)\s+room\b.*\b(?:live\s+load|structural)\b|\blive\s+load\b.*\b(?:community|meeting|assembly)\s+room\b/i,
+    label: "assembly-area structural live loads",
+    targets: [{ codePrefix: "BC", sectionPrefix: "1607.1" }]
+  },
+  {
+    pattern: /\b(?:file|dense)\s+storage\b.*\b(?:structural|live\s+load|columns?|beams?)\b|\bstructural\s+evaluation\b.*\bstorage\b/i,
+    label: "storage conversion structural loads",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1604.2" },
+      { codePrefix: "BC", sectionPrefix: "1607.1" }
+    ]
+  },
+  {
     pattern: /\bscissor\s+stair|stairs?\s+sharing\s+(?:a\s+)?common|two\s+(?:separate\s+)?exits?\b/i,
     label: "scissor-stair and separate-exit provisions",
     targets: [{ codePrefix: "BC", sectionPrefix: "1007.1.1" }]
@@ -75,11 +144,52 @@ const topicRoutes = [
     targets: [{ codePrefix: "BC", sectionPrefix: "1006.3.2" }]
   },
   {
-    pattern: /\bmultipurpose\b|accessory\s+(?:assembly|occupancy)|fewer\s+than\s+75/i,
+    pattern: /\b(?:multipurpose|community)\s+(?:room|hall)\b|accessory\s+assembly|fewer\s+than\s+75/i,
     label: "accessory-assembly classification and occupant-load provisions",
     targets: [
+      { codePrefix: "BC", sectionPrefix: "302.1" },
       { codePrefix: "BC", sectionPrefix: "303.1.3" },
+      { codePrefix: "BC", sectionPrefix: "303.4" },
       { codePrefix: "BC", sectionPrefix: "1004.1.3" }
+    ]
+  },
+  {
+    pattern: /\b(?:architect(?:ural|s)?|engineer(?:ing|s)?|professional[- ]services?)\s+office\b|\boffice\b.*\b(?:occupancy\s+group|classif(?:y|ied|ication)|professional[- ]services?)\b|\b(?:occupancy\s+group|classif(?:y|ied|ication))\b.*\boffice\b/i,
+    label: "office and professional-services occupancy classification provisions",
+    targets: [{ codePrefix: "BC", sectionPrefix: "304.1" }]
+  },
+  {
+    pattern: /\b(?:multiple|mixed)[- ]occupanc|\b(?:residential|apartments?|group\s+r)\b.*\b(?:commercial|retail|mercantile|group\s+m)\b|\b(?:commercial|retail|mercantile|group\s+m)\b.*\b(?:residential|apartments?|group\s+r)\b|\baccessory\s+(?:management\s+)?office\b/i,
+    label: "multiple, mixed, and accessory occupancy provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "302.1" },
+      { codePrefix: "BC", sectionPrefix: "304.1" },
+      { codePrefix: "BC", sectionPrefix: "309.1" },
+      { codePrefix: "BC", sectionPrefix: "310.4" },
+      { codePrefix: "BC", sectionPrefix: "508.1" },
+      { codePrefix: "BC", sectionPrefix: "508.2" },
+      { codePrefix: "BC", sectionPrefix: "508.2.3" },
+      { codePrefix: "BC", sectionPrefix: "508.3" },
+      { codePrefix: "BC", sectionPrefix: "508.4" }
+    ]
+  },
+  {
+    pattern: /\baccessory\s+occupanc|\b(?:office|room|space)\b.*\baccessory\b.*\b(?:principal|primary|residential)\b/i,
+    label: "accessory-occupancy classification and area provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "304.1" },
+      { codePrefix: "BC", sectionPrefix: "508.2" },
+      { codePrefix: "BC", sectionPrefix: "508.2.3" },
+      { codePrefix: "BC", sectionPrefix: "508.2.4" }
+    ]
+  },
+  {
+    pattern: /\bincidental\s+uses?\b|\btreat(?:ed|ing)?\b.*\bincidental\b/i,
+    label: "incidental-use classification, area, and protection provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "509.1" },
+      { codePrefix: "BC", sectionPrefix: "509.3" },
+      { codePrefix: "BC", sectionPrefix: "509.4" }
     ]
   },
   {
@@ -105,6 +215,113 @@ const topicRoutes = [
     targets: [
       { codePrefix: "BC", sectionPrefix: "1004.1", includeDescendants: true },
       { codePrefix: "BC", sectionPrefix: "1004.3" }
+    ]
+  },
+  {
+    pattern: /\bminimum\s+number\s+of\s+(?:exits?|exit\s+access\s+doorways?)|\b(?:exits?|exit\s+access\s+doorways?)\s+required\b|\brequires?\s+(?:at\s+least\s+)?(?:one|two|three|four|\d+)\s+exits?\b/i,
+    label: "number of exits from rooms and spaces",
+    targets: [{ codePrefix: "BC", sectionPrefix: "1006.2.1" }]
+  },
+  {
+    pattern: /\bcommon\s+path(?:\s+of\s+egress\s+travel)?\b/i,
+    label: "common-path definition and limits",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "202" },
+      { codePrefix: "BC", sectionPrefix: "1006.2.1" }
+    ]
+  },
+  {
+    pattern: /\bexit[- ]access[- ]travel[- ]distance\b|\btravel\s+distance\b.*\b(?:remote|exit)\b|\bremote\s+(?:occupiable\s+)?point\b.*\bexit\b/i,
+    label: "exit-access travel-distance limits and measurement",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1017.1" },
+      { codePrefix: "BC", sectionPrefix: "1017.2" },
+      { codePrefix: "BC", sectionPrefix: "1017.3" }
+    ]
+  },
+  {
+    pattern: /\bdead[- ]end(?:ed)?\s+(?:condition|corridor|length)?\b/i,
+    label: "dead-end corridor limits and exceptions",
+    targets: [{ codePrefix: "BC", sectionPrefix: "1020.4" }]
+  },
+  {
+    pattern: /\b(?:egress\s+)?door\b.*\bclear\s+width\b|\bclear\s+width\b.*\b(?:egress\s+)?door\b|\bdoor\s+width\b.*\boccupants?\b/i,
+    label: "egress-door clear width and capacity",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1010.1.1.1" },
+      { codePrefix: "BC", sectionPrefix: "1005.3.2" }
+    ]
+  },
+  {
+    pattern: /\bdoor\b.*\bswings?\b|\bswings?\b.*\bdirection\s+of\s+egress\b|\bdirection\s+of\s+egress\s+travel\b/i,
+    label: "egress-door direction of swing",
+    targets: [{ codePrefix: "BC", sectionPrefix: "1010.1.2.2" }]
+  },
+  {
+    pattern: /\bcorridor\b.*\bfire[- ]resistance(?:[- ]rated)?\b|\bfire[- ]resistance\s+rating\b.*\bcorridor\b/i,
+    label: "corridor construction and fire-resistance ratings",
+    targets: [{ codePrefix: "BC", sectionPrefix: "1020.1" }]
+  },
+  {
+    pattern: /\bshaft(?:\s+enclosure)?\b.*\bfire[- ]resistance\s+rating\b|\bfire[- ]resistance\s+rating\b.*\bshaft(?:\s+enclosure)?\b/i,
+    label: "shaft-enclosure fire-resistance ratings",
+    targets: [{ codePrefix: "BC", sectionPrefix: "713.4" }]
+  },
+  {
+    pattern: /\bfire\s+barrier\b.*\bdoor\b|\bdoor\b.*\bfire\s+barrier\b|\bopening[- ]protective\b.*\brating\b/i,
+    label: "fire-door opening-protective ratings",
+    targets: [{ codePrefix: "BC", sectionPrefix: "716.5" }]
+  },
+  {
+    pattern: /\btype\s+i{1,3}[ab]?\b|\bconstruction\s+type\b.*\b(?:structural\s+frame|exterior\s+walls?|floor|roof)\b/i,
+    label: "construction-type and building-element ratings",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "602.2" },
+      { codePrefix: "BC", sectionPrefix: "601.1" },
+      { codePrefix: "BC", sectionPrefix: "602.1" }
+    ]
+  },
+  {
+    pattern: /\ballowable\b.*\b(?:stories|height)\b|\bpermits?\b.*\bnumber\s+of\s+stories\b|\bnumber\s+of\s+stories\b.*\bpermit(?:s|ted)?\b|\b(?:stories|height)\b.*\ballowable\b/i,
+    label: "allowable building height and stories",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "504.3" },
+      { codePrefix: "BC", sectionPrefix: "504.4" }
+    ]
+  },
+  {
+    pattern: /\bstory\s+above\s+grade\s+plane\b|\bgrade\s+plane\b.*\bstor(?:y|ies)\b|\bhigh[- ]rise\s+building\b|\bhighest\s+occupied\s+floor\b.*\bfire\s+department\b/i,
+    label: "grade-plane, story, and high-rise definitions",
+    targets: [{ codePrefix: "BC", sectionPrefix: "202" }]
+  },
+  {
+    pattern: /\baccessible\s+route\b.*\b(?:entrance|room|space|connect)\b|\b(?:entrance|room|space)\b.*\baccessible\s+route\b/i,
+    label: "accessible-route scoping",
+    targets: [{ codePrefix: "BC", sectionPrefix: "1104.3" }]
+  },
+  {
+    pattern: /\b(?:accessible|type\s+b\+?nyc|type\s+b)\s+units?\b|\bcategories\s+of\s+accessible\s+units?\b/i,
+    label: "residential accessible-unit scoping",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1107.6" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.1" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.1.1" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.1.2" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.2" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.2.1" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.2.2" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.3" },
+      { codePrefix: "BC", sectionPrefix: "1107.7" },
+      { codePrefix: "BC", sectionPrefix: "1107.7.4" }
+    ]
+  },
+  {
+    pattern: /\bmaneuvering\s+clearance\b.*\bdoor\b|\bdoor\s+configuration\b.*\baccessible\b|\bbathroom\b.*\baccessib(?:le|ility)\b/i,
+    label: "accessible door and bathroom design scope",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1101.2" },
+      { codePrefix: "BC", sectionPrefix: "1107.2.1" },
+      { codePrefix: "BC", sectionPrefix: "1107.2.2" }
     ]
   },
   {
@@ -136,9 +353,166 @@ const topicRoutes = [
     ]
   },
   {
+    pattern: /\bflood\s+hazard\s+area\b|\bdesign\s+flood\s+elevation\b|\bbelow\b.*\bflood\s+elevation\b|\bfloodproof(?:ed|ing)?\b/i,
+    label: "flood-hazard construction and protected-equipment provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "G301.1" },
+      { codePrefix: "BC", sectionPrefix: "G301.2" },
+      { codePrefix: "BC", sectionPrefix: "G304.1" },
+      { codePrefix: "BC", sectionPrefix: "G304.2" },
+      { codePrefix: "BC", sectionPrefix: "G304.3" },
+      { codePrefix: "BC", sectionPrefix: "G304.4" },
+      { codePrefix: "BC", sectionPrefix: "G501.1" }
+    ]
+  },
+  {
+    pattern: /\bsmoke\s+separation\b|\bsmoke\s+barrier\b|\bsmoke\s+partition\b/i,
+    label: "smoke-barrier and smoke-partition provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "709.1" },
+      { codePrefix: "BC", sectionPrefix: "709.3" },
+      { codePrefix: "BC", sectionPrefix: "710.1" },
+      { codePrefix: "BC", sectionPrefix: "710.3" }
+    ]
+  },
+  {
+    pattern: /\bhorizontal\s+assembl(?:y|ies)\b.*\bsupport|\bsupport(?:ed|ing)?\b.*\bhorizontal\s+assembl(?:y|ies)\b/i,
+    label: "horizontal-assembly supporting-construction provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "711.2.3" },
+      { codePrefix: "BC", sectionPrefix: "711.2.4" }
+    ]
+  },
+  {
+    pattern: /\bfireblocking\b.*\b(?:combustible\s+)?(?:exterior|concealed)\s+wall\b|\bcombustible\s+exterior\s+wall\b.*\bfireblocking\b/i,
+    label: "combustible exterior-wall fireblocking provisions",
+    targets: [{ codePrefix: "BC", sectionPrefix: "718.2.6", includeDescendants: true }]
+  },
+  {
+    pattern: /\bmezzanine\b/i,
+    label: "mezzanine definition and area-limit provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "202" },
+      { codePrefix: "BC", sectionPrefix: "505.2", includeDescendants: true }
+    ]
+  },
+  {
+    pattern: /\bequipment\s+platform\b/i,
+    label: "equipment-platform definition and area-limit provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "202" },
+      { codePrefix: "BC", sectionPrefix: "505.3", includeDescendants: true }
+    ]
+  },
+  {
+    pattern: /\b(?:rooftop|roof)\b.*\b(?:penthouse|bulkhead)\b|\b(?:penthouse|bulkhead)\b.*\b(?:rooftop|roof)\b/i,
+    label: "rooftop penthouse and bulkhead provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "202" },
+      { codePrefix: "BC", sectionPrefix: "1510.2", includeDescendants: true }
+    ]
+  },
+  {
     pattern: /\benclosed\s+(?:parking\s+)?garage|intermittent\s+(?:mechanical\s+)?ventilation|carbon\s+monoxide.*nitrogen\s+dioxide/i,
     label: "enclosed-parking-garage ventilation controls",
-    targets: [{ codePrefix: "MC", sectionPrefix: "404.1" }]
+    targets: [
+      { codePrefix: "MC", sectionPrefix: "404.1" },
+      { codePrefix: "MC", sectionPrefix: "404.2" }
+    ]
+  },
+  {
+    pattern: /\bguard(?:s|rail|rails)?\b.*\b(?:roof|terrace|height|openings?|horizontal|load)|\b(?:roof|terrace)\b.*\bguard(?:s|rail|rails)?\b/i,
+    label: "guard height, openings, and structural-load provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1015.3" },
+      { codePrefix: "BC", sectionPrefix: "1015.4" },
+      { codePrefix: "BC", sectionPrefix: "1607.8.1" }
+    ]
+  },
+  {
+    pattern: /\bhandrails?\b.*\b(?:both\s+sides|continu(?:ous|ity)|landing|stop|terminate|extension)|\b(?:both\s+sides|landing)\b.*\bhandrails?\b/i,
+    label: "stair handrail side, continuity, and extension provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1011.11" },
+      { codePrefix: "BC", sectionPrefix: "1014.4" },
+      { codePrefix: "BC", sectionPrefix: "1014.6" }
+    ]
+  },
+  {
+    pattern: /\boccupied\s+roof\b|\broof\s+(?:terrace|deck)\b.*\b(?:story|stories|height)\b|\b(?:story|stories)\b.*\broof\s+(?:terrace|deck)\b/i,
+    label: "occupied-roof, rooftop-structure, and story provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "202" },
+      { codePrefix: "BC", sectionPrefix: "504.3" },
+      { codePrefix: "BC", sectionPrefix: "1510.2" }
+    ]
+  },
+  {
+    pattern: /\b(?:interior|residential)\s+bathroom\b.*\b(?:window|ventilat|exhaust|terminate|discharge)|\bbathroom\b.*\b(?:no\s+(?:exterior\s+)?window|mechanical\s+exhaust)\b/i,
+    label: "bathroom ventilation, exhaust-rate, and discharge provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1203.5.1.3" },
+      { codePrefix: "BC", sectionPrefix: "1203.5.2" },
+      { codePrefix: "MC", sectionPrefix: "403.3" },
+      { codePrefix: "MC", sectionPrefix: "403.3.1.1" },
+      { codePrefix: "MC", sectionPrefix: "501.3" },
+      { codePrefix: "MC", sectionPrefix: "501.3.1" }
+    ]
+  },
+  {
+    pattern: /\b(?:gas[- ]fired|fuel[- ]burning)\s+appliance\b.*\bcombustion\s+air\b|\bcombustion\s+air\b.*\b(?:gas[- ]fired|mechanical\s+room|appliance)\b/i,
+    label: "fuel-gas appliance combustion-air provisions",
+    targets: [
+      { codePrefix: "FGC", sectionPrefix: "304.1" },
+      { codePrefix: "FGC", sectionPrefix: "304.5" }
+    ]
+  },
+  {
+    pattern: /\bmixed[- ]use\b.*\b(?:fixtures?|water\s+closets?|lavator(?:y|ies)|required\s+number)\b|\b(?:restaurant|retail|office)\b.*\b(?:fixtures?|water\s+closets?|lavator(?:y|ies))\b.*\b(?:calculat|number|required)|\b(?:water\s+closets?|lavator(?:y|ies))\b.*\b(?:restaurant|retail|office|mixed[- ]use)\b/i,
+    label: "mixed-use plumbing-fixture calculation provisions",
+    targets: [
+      { codePrefix: "PC", sectionPrefix: "403.1" },
+      { codePrefix: "PC", sectionPrefix: "403.1.1" },
+      { codePrefix: "PC", sectionPrefix: "403.3" },
+      { codePrefix: "BC", sectionPrefix: "1004.1.2" },
+      { codePrefix: "BC", sectionPrefix: "1004.1.3" }
+    ]
+  },
+  {
+    pattern: /\bsingle[- ]occupant\b.*\b(?:all[- ]gender|any\s+sex|toilet|fixture)|\ball[- ]gender\b.*\b(?:toilet|fixture)\b/i,
+    label: "single-occupant toilet-room fixture-count provisions",
+    targets: [
+      { codePrefix: "PC", sectionPrefix: "403.1" },
+      { codePrefix: "PC", sectionPrefix: "403.1.3" },
+      { codePrefix: "PC", sectionPrefix: "403.2.2" }
+    ]
+  },
+  {
+    pattern: /\b(?:bottled\s+water|bottle[- ]filling|refrigerator\s+(?:water\s+)?dispenser|water\s+cooler)\b.*\b(?:drinking\s+fountains?|substitut)|\bdrinking\s+fountains?\b.*\b(?:bottled\s+water|dispenser|cooler|substitut)\b/i,
+    label: "drinking-fountain and bottle-filling substitution provisions",
+    targets: [
+      { codePrefix: "PC", sectionPrefix: "403.1" },
+      { codePrefix: "PC", sectionPrefix: "410.1" },
+      { codePrefix: "PC", sectionPrefix: "410.2" },
+      { codePrefix: "PC", sectionPrefix: "410.3" }
+    ]
+  },
+  {
+    pattern: /\brainscreen\b.*\b(?:special\s+inspection|inspect)|\b(?:exterior\s+wall|cladding|veneer)\b.*\bspecial\s+inspection\b/i,
+    label: "exterior-wall special-inspection provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1704.1" },
+      { codePrefix: "BC", sectionPrefix: "1705.16" },
+      { codePrefix: "BC", sectionPrefix: "1705.20" }
+    ]
+  },
+  {
+    pattern: /\b(?:electric[- ]vehicle|EVSE|level\s+2\s+charging|charging\s+stations?)\b.*\b(?:garage|parking\s+(?:spaces?|lot))\b|\b(?:garage|parking\s+(?:spaces?|lot))\b.*\b(?:electric[- ]vehicle|EVSE|charging)\b/i,
+    label: "parking-facility electric-vehicle infrastructure provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "406.4.10" },
+      { codePrefix: "BC", sectionPrefix: "406.9.8" }
+    ]
   },
   {
     pattern: /\b(?:more\s+than\s+)?110\s*percent|floor\s+surface\s+area|prior[- ]code.*(?:enlargement|increase)|increase.*prior[- ]code/i,

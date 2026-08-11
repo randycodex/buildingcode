@@ -44,6 +44,18 @@ const catalog = [{
   chapterNumber: "4",
   sectionNumber: "403.9",
   title: "Fixture schedule without published table"
+}, {
+  id: "7",
+  codePrefix: "BC",
+  chapterNumber: "3",
+  sectionNumber: "304.1",
+  title: "Business Group B"
+}, {
+  id: "8", codePrefix: "BC", chapterNumber: "3", sectionNumber: "303.4", title: "Assembly Group A-3"
+}, {
+  id: "9", codePrefix: "BC", chapterNumber: "3", sectionNumber: "302.1", title: "Occupancy classification"
+}, {
+  id: "10", codePrefix: "BC", chapterNumber: "5", sectionNumber: "508.2", title: "Accessory occupancies"
 }];
 
 const invertedIndex = new Map([
@@ -63,6 +75,10 @@ const invertedIndex = new Map([
   ["floor", ["5"]],
   ["surface", ["5"]],
   ["schedule", ["6"]]
+  ,["office", ["2", "7"]]
+  ,["architects", ["7"]]
+  ,["community", ["8"]]
+  ,["multiple", ["9", "10"]]
 ]);
 
 const bodies = new Map([
@@ -105,7 +121,40 @@ const bodies = new Map([
       plainText: "The fixture schedule shall use the values in Table 403.1, which is not included in this source."
     }]
   }]
+  ,["7", {
+    blocks: [{
+      id: "business-office-rule",
+      plainText: "Business Group B occupancy includes office and professional services, including architects and engineers."
+    }]
+  }]
+  ,["8", { blocks: [{ id: "community-hall", plainText: "Assembly Group A-3 includes community halls and recreation or social activities." }] }]
+  ,["9", { blocks: [{ id: "multiple-occupancy", plainText: "Structures or portions shall be classified in one or more occupancy groups; multiple occupancies shall comply with Section 508." }] }]
+  ,["10", { blocks: [{ id: "accessory-classification", plainText: "Accessory occupancies are ancillary to the main occupancy and shall comply with Section 508.2." }] }]
 ]);
+
+const officeClassification = await discoverRelevantEvidence({
+  question: "A 1,200 sf space is used as a small architectural office with 12 employees. What occupancy group should it be classified as?",
+  catalog,
+  invertedIndex,
+  readSectionBody: async (section) => bodies.get(section.id),
+  limit: 12
+});
+assert.equal(officeClassification.candidates[0].sectionID, "7", "Office classification must route directly to BC 304.1.");
+
+const communityRoom = await discoverRelevantEvidence({
+  question: "A community room in a residential building is used for meetings, parties, classes, and events. How should it be classified?",
+  catalog, invertedIndex, readSectionBody: async (section) => bodies.get(section.id), limit: 12
+});
+assert(communityRoom.candidates.some((candidate) => candidate.sectionID === "8"), "Community-room retrieval must include BC 303.4.");
+assert(communityRoom.candidates.some((candidate) => candidate.sectionID === "9"), "Multipurpose-room retrieval must include BC 302.1.");
+
+const mixedOccupancies = await discoverRelevantEvidence({
+  question: "A building contains residential apartments, ground-floor retail, and an accessory management office. How should the different occupancies be treated?",
+  catalog, invertedIndex, readSectionBody: async (section) => bodies.get(section.id), limit: 12
+});
+for (const expectedID of ["9", "7", "10"]) {
+  assert(mixedOccupancies.candidates.some((candidate) => candidate.sectionID === expectedID), `Mixed-occupancy retrieval is missing ${expectedID}.`);
+}
 
 const discovery = await discoverRelevantEvidence({
   question: "Can a Group R-2 scissor stair be counted as two exits?",
