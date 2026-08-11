@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260810-research-chat-v3";
+} from "./sync-state.js?v=20260811-research-clear-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260810-research-chat-v3";
+} from "./offline-storage.js?v=20260811-research-clear-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260810-research-chat-v3";
+} from "./workspace-state.js?v=20260811-research-clear-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -14147,6 +14147,39 @@ async function deleteResearchConversationFromList(conversation, button) {
   }
 }
 
+async function clearResearchConversationHistory(button) {
+  const conversations = [...researchConversationList];
+  if (!conversations.length) return;
+  const confirmed = await confirmWebWarning(
+    "Clear Research history?",
+    `${conversations.length} ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from this list. Unassigned chats will be deleted. Chats attached to Projects will remain available from their Projects. Saved Research answers and governed Code Decision records will remain.`,
+    { confirmLabel: "Clear all" }
+  );
+  if (!confirmed) return;
+
+  button.disabled = true;
+  button.textContent = "Clearing…";
+  try {
+    await postResearch("/research/conversations/clear-history", {});
+    const clearedIDs = new Set(conversations.map((conversation) => conversation.id));
+    if (clearedIDs.has(String(state.researchConversationID || ""))) {
+      researchOpenGeneration += 1;
+      state.researchConversationID = "";
+      activeResearchConversation = null;
+    }
+    if (state.researchEvidenceSplitRatios) {
+      clearedIDs.forEach((conversationID) => delete state.researchEvidenceSplitRatios[conversationID]);
+    }
+    await refreshResearchConversationList();
+    saveWorkspaceState();
+    await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "Clear";
+    await showWebNotice("Research history not cleared", error.message);
+  }
+}
+
 function evidenceCandidateCitation(candidate) {
   return `${candidate.codePrefix || "BC"} § ${candidate.sectionNumber || candidate.sectionID}`;
 }
@@ -15053,7 +15086,19 @@ async function renderResearch(paneID = "utility:analysis") {
   newChatButton.type = "button";
   newChatButton.textContent = "New chat";
   newChatButton.addEventListener("click", () => void showNewResearchChat());
-  panelActions?.prepend(newChatButton);
+  const backButton = document.createElement("button");
+  backButton.className = "ghost-button research-back-button";
+  backButton.type = "button";
+  backButton.textContent = "Back";
+  backButton.hidden = !state.researchConversationID;
+  backButton.addEventListener("click", () => void showNewResearchChat());
+  const clearChatsButton = document.createElement("button");
+  clearChatsButton.className = "ghost-button research-clear-chats-button";
+  clearChatsButton.type = "button";
+  clearChatsButton.textContent = "Clear";
+  clearChatsButton.hidden = true;
+  clearChatsButton.addEventListener("click", () => void clearResearchConversationHistory(clearChatsButton));
+  panelActions?.prepend(backButton, newChatButton, clearChatsButton);
   const content = panel.querySelector(".analysis-content");
 
   const trustNotice = document.createElement("aside");
@@ -15088,6 +15133,7 @@ async function renderResearch(paneID = "utility:analysis") {
 
   try {
     await refreshResearchConversationList();
+    clearChatsButton.hidden = researchConversationList.length === 0;
   } catch (error) {
     const status = document.createElement("p");
     status.className = "research-list-status is-error";

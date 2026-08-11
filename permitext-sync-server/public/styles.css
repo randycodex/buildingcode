@@ -5957,6 +5957,20 @@ mark {
   white-space: nowrap;
 }
 
+.research-clear-chats-button {
+  min-height: 32px;
+  padding-inline: var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.research-clear-chats-button:hover,
+.research-clear-chats-button:focus-visible {
+  color: var(--danger);
+}
+
 .research-conversation-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

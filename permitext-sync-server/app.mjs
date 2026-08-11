@@ -2823,6 +2823,7 @@ async function createPostgresStoreAdapter() {
                 'title', conversation->>'title',
                 'createdAt', conversation->>'createdAt',
                 'updatedAt', conversation->>'updatedAt',
+                'historyHiddenAt', conversation->>'historyHiddenAt',
                 'primaryProjectID', conversation->>'primaryProjectID',
                 'starterQuestion', conversation->>'starterQuestion',
                 'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
@@ -2848,6 +2849,7 @@ async function createPostgresStoreAdapter() {
                 'title', conversation->>'title',
                 'createdAt', conversation->>'createdAt',
                 'updatedAt', conversation->>'updatedAt',
+                'historyHiddenAt', conversation->>'historyHiddenAt',
                 'primaryProjectID', conversation->>'primaryProjectID',
                 'starterQuestion', conversation->>'starterQuestion',
                 'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
@@ -6734,6 +6736,7 @@ export function projectResearchConversationForList(conversation) {
     title: conversation.title,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
+    historyHiddenAt: conversation.historyHiddenAt || null,
     primaryProjectID: conversation.primaryProjectID || null,
     starterQuestion: conversation.starterQuestion || null,
     projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
@@ -6755,6 +6758,7 @@ function researchConversationSummary(conversation, projectLink = null) {
     title: conversation.title,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
+    historyHiddenAt: conversation.historyHiddenAt || null,
     sourceCount: selectionSources.length,
     sourceSectionIDs: Array.from(new Set(
       selectionSources
@@ -11775,6 +11779,7 @@ async function handleResearchConversationList(request, response) {
     .map((link) => [link.targetID, link]));
   sendJSON(response, 200, {
     conversations: conversations
+      .filter((conversation) => !conversation.historyHiddenAt)
       .sort((left, right) =>
         String(right.createdAt).localeCompare(String(left.createdAt)) ||
         String(left.id).localeCompare(String(right.id))
@@ -13394,6 +13399,7 @@ async function handleResearchConversationMessage(request, response) {
     };
     conversation.messages.push(userMessage, assistantMessage);
     conversation.updatedAt = now;
+    delete conversation.historyHiddenAt;
     conversation.sourceStatus = "current";
     const activityEvents = conversation.primaryProjectID
       ? [
@@ -13541,6 +13547,29 @@ async function handleResearchConversationDelete(request, response) {
     return;
   }
   sendJSON(response, 200, { deleted: true });
+}
+
+async function handleResearchConversationClearHistory(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversations = await listStoredResearchConversations(context.userID);
+  const now = new Date().toISOString();
+  let hiddenProjectConversationCount = 0;
+  let deletedConversationCount = 0;
+  for (const conversation of conversations) {
+    if (conversation?.primaryProjectID) {
+      await saveStoredResearchConversation(context.userID, { ...conversation, historyHiddenAt: now });
+      hiddenProjectConversationCount += 1;
+    } else if (await deleteStoredResearchConversation(context.userID, conversation.id)) {
+      deletedConversationCount += 1;
+    }
+  }
+  sendJSON(response, 200, {
+    cleared: true,
+    hiddenProjectConversationCount,
+    deletedConversationCount,
+    totalCount: conversations.length
+  });
 }
 
 async function handleResearchEvidenceDiscover(request, response) {
@@ -22104,6 +22133,7 @@ const handlers = {
   "research/conversations/project-context": handleResearchConversationProjectContext,
   "research/conversations/reuse-evidence": handleResearchConversationReuseEvidence,
   "research/conversations/delete": handleResearchConversationDelete,
+  "research/conversations/clear-history": handleResearchConversationClearHistory,
   "research/answers/list": handleResearchAnswerList,
   "research/answers/get": handleResearchAnswerGet,
   "research/usage": handleResearchUsage,
