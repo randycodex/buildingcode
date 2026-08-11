@@ -4997,6 +4997,30 @@ mark {
   font-weight: 400;
 }
 
+.research-answer-citation-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.research-answer-citation-chips button {
+  min-height: 28px;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  cursor: pointer;
+}
+
+.research-answer-citation-chips button:hover,
+.research-answer-citation-chips button:focus-visible {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
 .research-answer-boundary {
   margin: 0;
   color: var(--text-secondary);
@@ -5885,10 +5909,52 @@ mark {
   display: grid;
 }
 
-/* Keep account-wide saved Research history out of the active working surface. */
-.utility-panel .research-conversation-list,
-.utility-panel .research-conversation-empty {
-  display: none;
+.research-conversation-list-heading {
+  margin: var(--space-5) 0 var(--space-1);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.research-chat-start {
+  display: grid;
+  gap: var(--space-2);
+  padding: clamp(var(--space-4), 5vh, var(--space-7)) 0 var(--space-3);
+}
+
+.research-chat-start > h3,
+.research-chat-start > p {
+  margin: 0;
+}
+
+.research-chat-start > h3 {
+  font-size: 1.15rem;
+}
+
+.research-chat-start > p {
+  max-width: 48ch;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.research-start-composer {
+  padding-bottom: var(--space-3);
+}
+
+.research-start-project {
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+}
+
+.research-new-chat-button {
+  min-height: 32px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .research-conversation-row {
@@ -6109,7 +6175,7 @@ mark {
 
 .research-conversation-embedded .research-conversation-content {
   display: grid;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: var(--space-3);
   min-height: 0;
   padding-top: var(--space-3);
@@ -6117,7 +6183,7 @@ mark {
 }
 
 .research-conversation-embedded .research-dialogue-pane {
-  grid-row: 3;
+  grid-row: 2;
   grid-template-rows: auto;
   overflow: visible;
 }
@@ -6620,6 +6686,69 @@ body.is-resizing-research-evidence * {
 .research-message.is-assistant {
   display: grid;
   gap: var(--space-3);
+}
+
+.research-answer-source-text {
+  margin: 0 var(--space-4);
+  color: var(--text-secondary);
+}
+
+.research-answer-source-text > summary {
+  width: fit-content;
+  cursor: pointer;
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+}
+
+.research-answer-source-list {
+  display: grid;
+  padding-top: var(--space-2);
+}
+
+.research-answer-source-list .research-source-card {
+  padding-block: var(--space-2);
+}
+
+.research-answer-open-source {
+  width: fit-content;
+  justify-self: start;
+  color: var(--text-primary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  font-weight: 650;
+}
+
+.research-answer-save {
+  display: grid;
+  grid-template-columns: minmax(0, auto) auto minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0 var(--space-4);
+}
+
+.research-answer-save-project {
+  min-width: 0;
+  max-width: 220px;
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+}
+
+.research-answer-save-button {
+  min-height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.research-answer-save-status {
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  overflow-wrap: anywhere;
 }
 
 .research-historical-details {
@@ -8399,7 +8528,7 @@ body.is-resizing-research-evidence * {
 
 .saved-folder-context.is-project .saved-project-tool-controls {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   width: 100%;
   padding-top: var(--space-3);
 }

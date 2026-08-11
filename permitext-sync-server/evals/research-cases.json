@@ -2093,6 +2093,89 @@
       ]
     },
     {
+      "id": "nyc-bc-1019-3-exception-attribution",
+      "title": "BC 1019.3 draft-curtain premise belongs to Exception 4, not Exception 2",
+      "status": "approved",
+      "difficulty": "advanced",
+      "topics": [
+        "means of egress",
+        "exit access stairways",
+        "exception attribution",
+        "draft curtain"
+      ],
+      "codeEdition": "2022 New York City Construction Codes",
+      "jurisdiction": "New York City, New York",
+      "projectContext": {
+        "proposal": "Open exit access stair represented as relying on BC 1019.3 Exception 2 with a draft curtain",
+        "unknowns": [
+          "occupancy",
+          "sprinkler system",
+          "stories connected",
+          "independent exits",
+          "openness to other stories",
+          "remoteness"
+        ]
+      },
+      "selectedEvidence": [
+        {
+          "sectionID": "2412",
+          "reference": "BC 1019.3",
+          "codePrefix": "BC",
+          "sectionNumber": "1019.3",
+          "exactPassages": [
+            "In other than Group H, I-2 and I-3 occupancies, exit access stairways or ramps shall be enclosed with a shaft enclosure constructed in accordance with Section 713.",
+            "2. In buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, exit access stairways and ramps that serve between only the first and second stories above grade, provided the first and second stories have access to the minimum number of approved independent exits as required by Section 1006, and in no case be less than two means of egress. Such interconnected stories shall not be open to other stories. Unenclosed exit access stairways and ramps shall be remotely located in accordance with Section 1007.",
+            "4. Exit access stairways and ramps in buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, where the area of the vertical opening between stories does not exceed twice the horizontal projected area of the stairway or ramp and the opening is protected by a draft curtain and closely spaced sprinklers in accordance with NFPA 13 as modified by Appendix Q. In other than Group B and M occupancies, this provision is limited to openings that do not connect more than four stories."
+          ]
+        }
+      ],
+      "question": "Per NYC BC 1019.3, Exception 2, are we permitted to have the open stair as shown, provided that the required draft curtain is installed?",
+      "expectedConclusion": "Potentially, but not on the basis stated. BC 1019.3 establishes a general enclosure rule. Exception 2 is a distinct potential pathway for an unenclosed exit access stair between only the first and second stories above grade in a building sprinklered throughout under Section 903.3.1.1, subject to its independent-exit, separation-from-other-stories, and remoteness conditions. Exception 2 does not contain a draft-curtain requirement. The draft curtain and closely spaced sprinklers appear in Exception 4, which is a different compliance pathway with different conditions. Permitext cannot confirm the project's compliance until the occupancy and the material facts for the selected pathway are established.",
+      "expectedUncertainty": {
+        "level": "conditional",
+        "description": "The answer must decisively correct the wrong exception attribution and identify the two distinct pathways before conditioning project compliance on missing facts."
+      },
+      "sourceType": "deliberately constructed edge case",
+      "sourceReference": "Regression scenario and required behaviors supplied by the Permitext owner from canonical enacted BC 1019.3.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-10T00:00:00.000Z",
+      "notes": "The canonical section contains the general rule and all eight exceptions. This regression fails if the answer only requests more information or attributes the draft-curtain condition to Exception 2.",
+      "requiredConcepts": [
+        "Recognize the general enclosure rule in BC 1019.3.",
+        "Recognize Exception 2 as a potential unenclosed-stair pathway.",
+        "State that Exception 2 does not require a draft curtain.",
+        "State that the draft-curtain and closely spaced sprinkler condition appears in Exception 4.",
+        "Explain that Exceptions 2 and 4 are distinct compliance pathways with different conditions.",
+        "State the strongest supported correction before discussing uncertainty.",
+        "Avoid confirming project compliance without the material project facts."
+      ],
+      "missingFacts": [
+        "Confirm that the occupancy is outside Groups H, I-2, and I-3.",
+        "Confirm that the building is sprinklered throughout in accordance with Section 903.3.1.1.",
+        "Confirm whether the stair connects only the first and second stories above grade if relying on Exception 2.",
+        "Confirm the required independent exits from both interconnected stories if relying on Exception 2.",
+        "Confirm that the interconnected stories are not open to other stories if relying on Exception 2.",
+        "Confirm remoteness under Section 1007 if relying on Exception 2."
+      ],
+      "forbiddenClaims": [
+        "Exception 2 requires a draft curtain.",
+        "Installing a draft curtain by itself satisfies Exception 2.",
+        "Exceptions 2 and 4 are one combined compliance pathway.",
+        "The open stair is compliant on the stated facts.",
+        "The supplied BC 1019.3 evidence is missing the draft-curtain provision.",
+        "Only state that more information is required without first correcting the exception attribution."
+      ],
+      "requiredCitations": [
+        "BC 1019.3"
+      ],
+      "requiredCitationClaims": [
+        {
+          "reference": "BC 1019.3",
+          "requiredClaim": "The general enclosure rule, the distinct Exception 2 pathway, and the separate draft-curtain condition in Exception 4."
+        }
+      ]
+    },
+    {
       "id": "nyc-025-pre-1938-partial-certificate-of-occupancy",
       "title": "A pre-1938 partial Certificate of Occupancy requires every listed condition",
       "status": "draft",

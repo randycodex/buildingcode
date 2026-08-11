@@ -335,12 +335,12 @@ const researchInterpretationSource = workspaceScript.slice(
 );
 assert.match(researchInterpretationSource, /research-answer-primary/);
 assert.match(researchInterpretationSource, /research-answer-explanation/);
-assert.match(researchInterpretationSource, /Review evidence, assumptions, and limits/);
+assert.match(researchInterpretationSource, /Sources, assumptions, and limits/);
 assert.match(researchInterpretationSource, /appendResearchSupportedPoints\(detailsBody/);
 assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Assumptions used"/);
 assert.match(researchInterpretationSource, /appendResearchUnresolved\(detailsBody/);
 assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Related evidence to add"/);
-assert.match(researchInterpretationSource, /Based only on selected Research evidence/);
+assert.match(researchInterpretationSource, /Based on.*enacted/);
 assert.match(researchInterpretationSource, /details\.open = Boolean\(options\.detailsOpen\)[\s\S]*?card\.append\(details\);[\s\S]*?container\.append\(card\)/);
 assert.match(workspaceScript, /renderResearchInterpretation\(bubble, message\.answer, \{ message, conversationID \}\)/);
 assert.doesNotMatch(researchInterpretationSource, /research-disclaimer|result\.disclaimer/);
@@ -365,9 +365,9 @@ assert.doesNotMatch(workspaceScript, /function renderCodeDecisionContextBar/);
 assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ensureCodeQuestionShellForProject\(project\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260810-research-pilot-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v567/);
-assert.match(serviceWorker, /styles\.css\?v=20260810-research-pilot-v1/);
+assert.match(workspaceHTML, /styles\.css\?v=20260810-research-chat-v3/);
+assert.match(serviceWorker, /permitext-pro-shell-v569/);
+assert.match(serviceWorker, /styles\.css\?v=20260810-research-chat-v3/);
 assert.match(workspaceScript, /research-feedback-compact/);
 assert.match(workspaceScript, /research-feedback-details/);
 assert.match(workspaceScript, /void saveFeedback\("helpful"/);
@@ -421,13 +421,13 @@ assert.match(workspaceScript, /const resizeQuestionEntry = \(\) => \{[\s\S]*?que
 assert.doesNotMatch(codeDecisionIndexSource, /requestAnimationFrame\(resizeQuestionEntry\)/);
 assert.match(workspaceStyles, /\.code-question-index-search \{[\s\S]*?min-height: 78px;[\s\S]*?resize: none;[\s\S]*?overflow-y: hidden;/);
 assert.match(workspaceStyles, /\.code-question-entry-box:has\(\.code-question-index-search:focus-visible\)/);
-assert.match(workspaceScript, /Selected evidence \(\$\{displayedSources\.length\}\)/);
+assert.doesNotMatch(workspaceScript, /Selected evidence \(\$\{displayedSources\.length\}\)/);
 assert.doesNotMatch(workspaceScript, /Selected for exploratory Research/);
 assert.doesNotMatch(workspaceScript, /Find and select at least one enacted-code passage before bounded Research analysis\./);
-assert.match(workspaceScript, /research-selected-evidence-open/);
+assert.match(workspaceScript, /research-answer-source-text/);
 assert.match(workspaceScript, /\(embeddedEvidenceNoticeRegion \|\| evidenceScroll\)\.append\(warning\)/);
-assert.match(workspaceScript, /research-selected-evidence-passage/);
-assert.match(workspaceScript, /The enacted source changed\. Refresh the selected evidence above before analyzing\./);
+assert.match(workspaceScript, /research-selected-evidence-notices/);
+assert.match(workspaceScript, /A pinned enacted source changed\. Refresh it above before continuing this chat\./);
 assert.match(workspaceScript, /researchOpenContextIsCurrent\(dispositionContext, \{ requireConversationID: true \}\)/);
 assert.match(workspaceScript, /if \(key === "analysis" && state\.utilities\.analysis\) \{\s*await closeResearchWorkspace\(\);/);
 const postgresDispositionStart = serverSource.lastIndexOf("async updateResearchCandidateDisposition");
@@ -447,7 +447,7 @@ assert.match(workspaceScript, /parsed\.paneRole === "question-index"[\s\S]*?clos
 assert.match(workspaceScript, /async function closeProjectCodeDecisions[\s\S]*?if \(state\.utilities\.analysis\) \{[\s\S]*?await closeResearchWorkspace\(\);[\s\S]*?return true/);
 assert.match(workspaceScript, /function renderEvidenceCandidateExcerpt[\s\S]*?candidateExcerptTextMap\(source\)[\s\S]*?range\.cloneContents\(\)/);
 assert.match(workspaceStyles, /\.evidence-candidate-card blockquote \.section-block \{[\s\S]*?white-space: normal;/);
-assert.match(workspaceStyles, /\.utility-panel \.research-conversation-list,[\s\S]*?\.utility-panel \.research-conversation-empty \{\s*display: none;/);
+assert.doesNotMatch(workspaceStyles, /\.utility-panel \.research-conversation-list,[\s\S]*?\.utility-panel \.research-conversation-empty \{\s*display: none;/);
 for (const source of [workspaceScript, serviceWorker, offlineStorage]) {
   assert.match(source, /code-question-client-state\.js\?v=20260809-session-stability-v3/);
 }
