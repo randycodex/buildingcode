@@ -35,7 +35,7 @@
     "eval:research:list": "node tests/research-evals.mjs --list",
     "test:research-chat": "node --check research-evidence-assembly.mjs && node tests/research-evidence-assembly-contract.mjs && node --check research-source-policy.mjs && node tests/research-source-policy-contract.mjs && node --check research-code-basis.mjs && node tests/research-code-basis-contract.mjs",
     "eval:retrieval": "node tests/evidence-retrieval-evals.mjs",
-    "eval:benchmark": "node tests/research-benchmark-v2-contract.mjs && node tests/research-benchmark-retrieval-contract.mjs",
+    "eval:benchmark": "node tests/research-benchmark-v2-contract.mjs && node tests/research-benchmark-distinct-contract.mjs && node tests/evidence-discovery-distinct-routes-contract.mjs && node tests/evidence-discovery-distinct-topic-routes-contract.mjs && node tests/research-benchmark-retrieval-contract.mjs && node tests/research-benchmark-distinct-retrieval-contract.mjs",
     "eval:retrieval:review": "node evals/generate-evidence-retrieval-review-packet.mjs --write",
     "eval:zoning:review": "node evals/generate-zoning-review-packet.mjs --write",
     "verify:content": "node tests/content-integrity.mjs",

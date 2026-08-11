@@ -32,7 +32,11 @@ function citationItem(item) {
     : { role: "unclassified", qualifier: null, authority: item };
 }
 
-export function parseResearchBenchmarkMarkdown(markdown) {
+export function parseResearchBenchmarkMarkdown(markdown, options = {}) {
+  const idPrefix = String(options.idPrefix || "benchmark");
+  const sharedRubricNumber = options.sharedRubricNumber === undefined
+    ? 40
+    : options.sharedRubricNumber;
   const source = String(markdown || "").replaceAll("**Citation expectations:**", "**Expected citations:**");
   const parts = source.split(/^## Test\s+(\d+)\s*$/m);
   const cases = [];
@@ -43,7 +47,7 @@ export function parseResearchBenchmarkMarkdown(markdown) {
     const regressionStatus = field(block, "Regression status", ["Q"]);
     const question = field(block, "Q", ["Ideal answer"]);
     cases.push({
-      id: `benchmark-${String(number).padStart(2, "0")}`,
+      id: `${idPrefix}-${String(number).padStart(2, "0")}`,
       number,
       fixture,
       regressionStatus,
@@ -56,28 +60,36 @@ export function parseResearchBenchmarkMarkdown(markdown) {
         .map(citationItem),
       importantQualifications: field(block, "Important qualifications", ["Claims Permitext must avoid"]),
       forbiddenClaims: bulletItems(field(block, "Claims Permitext must avoid", [])),
-      evaluationKind: number === 40 ? "shared-synthesis-rubric" : "research-case"
+      evaluationKind: number === sharedRubricNumber ? "shared-synthesis-rubric" : "research-case"
     });
   }
   return {
     schemaVersion: 1,
-    benchmarkVersion: "20260811-corrected-v2",
-    corpus: "2022 New York City Construction Codes",
+    benchmarkVersion: String(options.benchmarkVersion || "20260811-corrected-v2"),
+    corpus: String(options.corpus || "2022 New York City Construction Codes"),
     status: "draft-human-review",
     cases
   };
 }
 
-export function validateResearchBenchmark(dataset) {
+export function validateResearchBenchmark(dataset, options = {}) {
+  const expectedCaseCount = Number(options.expectedCaseCount || 40);
+  const firstNumber = Number(options.firstNumber || 1);
+  const idPrefix = String(options.idPrefix || "benchmark");
+  const fixtureRange = options.fixtureRange === undefined ? [28, 39] : options.fixtureRange;
+  const sharedRubricNumber = options.sharedRubricNumber === undefined
+    ? 40
+    : options.sharedRubricNumber;
   if (dataset?.schemaVersion !== 1) throw new Error("Research benchmark schemaVersion must be 1.");
-  if (!Array.isArray(dataset.cases) || dataset.cases.length !== 40) {
-    throw new Error("Research benchmark must contain exactly 40 cases.");
+  if (!Array.isArray(dataset.cases) || dataset.cases.length !== expectedCaseCount) {
+    throw new Error(`Research benchmark must contain exactly ${expectedCaseCount} cases.`);
   }
   const ids = new Set();
   for (const [index, testCase] of dataset.cases.entries()) {
-    const expectedNumber = index + 1;
-    if (testCase.number !== expectedNumber || testCase.id !== `benchmark-${String(expectedNumber).padStart(2, "0")}`) {
-      throw new Error(`Research benchmark cases must be numbered consecutively from 1 through 40; found ${testCase.id} at position ${expectedNumber}.`);
+    const expectedNumber = firstNumber + index;
+    if (testCase.number !== expectedNumber || testCase.id !== `${idPrefix}-${String(expectedNumber).padStart(2, "0")}`) {
+      const lastNumber = firstNumber + expectedCaseCount - 1;
+      throw new Error(`Research benchmark cases must be numbered consecutively from ${firstNumber} through ${lastNumber}; found ${testCase.id} at position ${expectedNumber}.`);
     }
     if (ids.has(testCase.id)) throw new Error(`Duplicate benchmark case ${testCase.id}.`);
     ids.add(testCase.id);
@@ -93,10 +105,10 @@ export function validateResearchBenchmark(dataset) {
       throw new Error(`${testCase.id} has an unclassified citation expectation.`);
     }
     if (!testCase.forbiddenClaims.length) throw new Error(`${testCase.id} has no forbidden claims.`);
-    if (testCase.number >= 28 && testCase.number <= 39 && !testCase.fixture) {
+    if (Array.isArray(fixtureRange) && testCase.number >= fixtureRange[0] && testCase.number <= fixtureRange[1] && !testCase.fixture) {
       throw new Error(`${testCase.id} is missing its regression fixture.`);
     }
-    if (testCase.number === 40 && !testCase.regressionStatus) {
+    if (sharedRubricNumber !== null && testCase.number === sharedRubricNumber && !testCase.regressionStatus) {
       throw new Error(`${testCase.id} is missing its shared-rubric status.`);
     }
     if (!String(testCase.evaluationInput || "").includes(testCase.question)) {
