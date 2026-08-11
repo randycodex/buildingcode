@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260811-research-code-basis-v2"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260811-research-relevance-v1"));
 assert(shellPrecacheURLs.includes("/web/styles.css?v=20260811-research-code-basis-v2"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260811-research-code-basis-v2"));
@@ -221,7 +221,7 @@ listeners.get("activate")({
   }
 });
 await activationCompletion;
-assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v573"));
+assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v574"));
 
 function navigationResponse(path) {
   let response;

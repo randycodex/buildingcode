@@ -5748,6 +5748,7 @@ function researchPrompt(question, evidence, options = {}) {
       `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
       `EVIDENCE_ORIGIN: ${section.origin || "user_pinned"}`,
       `EVIDENCE_FUNCTION: ${section.evidencePriority?.primaryFunction || "candidate"}`,
+      `EVIDENCE_ROLE: ${section.evidencePriority?.evidenceRole || "supporting"}`,
       `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
       section.evidencePriority?.claimCoverageReason
         ? `REQUIRED_CLAIM_REASON: ${section.evidencePriority.claimCoverageReason}`
@@ -6030,6 +6031,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     instructions: [
       "Organize the supplied enacted evidence into a compact internal legal-research map before a separate model writes the user-facing answer.",
       "Retrieval relevance does not establish legal applicability. Identify controlling provisions only when the supplied text supports that role.",
+      "Treat evidence labeled contextual only as the subject of a relevance comparison. Do not place it among controlling provisions or general rules, and do not treat evidence labeled irrelevant as answer support.",
       "Separate general rules, exceptions, conditions, limitations, definitions, cross-references, tables, known project facts, unresolved project facts, and evidence limitations.",
       "Make the strongest supported distinctions, including contradictions in the user's premise and requirements attributed to the wrong exception.",
       "Use only exact supplied project facts in projectFactsUsed. Do not turn missing facts into assumptions.",
@@ -6156,9 +6158,13 @@ export function researchInputForEvidence(question, evidence, options = {}) {
 }
 
 function mockResearchInterpretation(question, evidence, options = {}) {
-  const subject = evidence.length === 1
-    ? `the enacted provision, ${evidence[0].sectionNumber || evidence[0].title}`
-    : `the ${evidence.length} enacted provisions Permitext assembled`;
+  const materialEvidence = evidence.filter((section) =>
+    !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole)
+  );
+  const answerEvidence = materialEvidence.length ? materialEvidence : evidence;
+  const subject = answerEvidence.length === 1
+    ? `the enacted provision, ${answerEvidence[0].sectionNumber || answerEvidence[0].title}`
+    : `the ${answerEvidence.length} enacted provisions Permitext assembled`;
   const conversational = options.responseStyle === "conversational";
   const acceptsConditionalYes = /^(?:can|could|does|is|are|may|must|should|will|would)\b/i
     .test(String(question || "").trim());
@@ -6168,7 +6174,7 @@ function mockResearchInterpretation(question, evidence, options = {}) {
         ? "Potentially, yes—but only if the conditions in the assembled enacted provisions are satisfied by the project."
         : "The assembled enacted provisions provide a conditional answer, but the remaining project facts must be confirmed before relying on it."
       : `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`,
-    supportedPoints: evidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
+    supportedPoints: answerEvidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
         ? `This provision supplies one of the rules that controls the answer to “${question}”.`
@@ -6185,7 +6191,7 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     evidenceLimitations: ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
     additionalEvidenceNeeded: ["Confirm any referenced standard, agency rule, figure, or other authority outside the current enacted corpus before final reliance."],
     supportingSourceUses: [],
-    citations: evidence.map((section) => ({
+    citations: answerEvidence.map((section) => ({
       sectionID: section.sectionID,
       sourceIDs: [section.sourceID || `section-${section.sectionID}`],
       relevance: `Enacted evidence from ${section.sectionNumber || section.title}.`
@@ -6381,6 +6387,9 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       !sourceIDs.length ||
       new Set(sourceIDs).size !== sourceIDs.length ||
       sourceIDs.some((sourceID) => !allowedSources.has(sourceID)) ||
+      sourceIDs.some((sourceID) =>
+        allowedSources.get(sourceID)?.evidencePriority?.evidenceRole === "irrelevant"
+      ) ||
       !sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID === sectionID)
     ) {
       const error = new Error("The model tied an explanation to evidence outside the selected code sections.");
@@ -6400,7 +6409,21 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       };
       throw error;
     }
-    return { heading, explanation, sectionID, sourceIDs };
+    const evidenceRoles = Array.from(new Set(sourceIDs.map((sourceID) =>
+      allowedSources.get(sourceID)?.evidencePriority?.evidenceRole || "supporting"
+    )));
+    const pointEvidenceRole = evidenceRoles.includes("governing")
+      ? "governing"
+      : evidenceRoles.includes("contextual")
+        ? "contextual"
+        : "supporting";
+    return {
+      heading,
+      explanation,
+      sectionID,
+      sourceIDs,
+      evidenceRole: pointEvidenceRole
+    };
   });
   if (!value.evidenceLimitations.some((item) => item.trim())) {
     const error = new Error("The model omitted the required evidence limitation.");
@@ -6415,9 +6438,14 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       ? citation.sourceIDs.map((item) => String(item || "").trim()).filter(Boolean)
       : [];
     const relevance = String(citation?.relevance || "").trim();
+    const evidenceRoles = Array.from(new Set(sourceIDs.map((sourceID) =>
+      allowedSources.get(sourceID)?.evidencePriority?.evidenceRole || "supporting"
+    )));
     if (!allowedSections.has(sectionID) || !sourceIDs.length ||
         new Set(sourceIDs).size !== sourceIDs.length ||
-        sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID !== sectionID) || !relevance) {
+        sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID !== sectionID) ||
+        evidenceRoles.includes("irrelevant") ||
+        !relevance) {
       const error = new Error("The model cited evidence outside the selected code sections.");
       error.code = "INVALID_RESEARCH_CITATION";
       throw error;
@@ -6449,6 +6477,11 @@ export function validateResearchInterpretation(value, evidence, supportingSource
           contentHash: visualSource.contentHash
         }))
       })),
+      evidenceRole: evidenceRoles.includes("governing")
+        ? "governing"
+        : evidenceRoles.includes("contextual")
+          ? "contextual"
+          : "supporting",
       relevance
     });
   }
@@ -6579,6 +6612,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Do not use pretrained or uncited outside knowledge as legal authority and do not invent requirements.",
         "Treat user-provided Project facts as unverified context, never as code authority or cited evidence.",
         "Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence.",
+        "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
         "Write the conclusion as a concise professional answer of one to three sentences.",
         conversational
           ? "For this ordinary Research conversation, write conclusion and explanation so they read consecutively as one natural response. Lead with the clearest supported answer, such as Yes, No, or Potentially, then explain why in direct plain language. Avoid report boilerplate, process narration, repeated question text, and phrases such as a project-specific answer requires reading. Keep the tone professional but conversational."
@@ -6729,6 +6763,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
   const evidenceText = evidence.map((source) => [
     `PASSAGE_ID: ${source.sourceID}`,
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
+    `EVIDENCE_ROLE: ${source.evidencePriority?.evidenceRole || "supporting"}`,
     `TEXT: ${source.text}`
   ].join("\n")).join("\n\n---\n\n");
   const requestBody = {
@@ -6740,6 +6775,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     instructions: [
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
+      "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
       "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",
       "Do not demand a final yes-or-no result when project facts genuinely remain unresolved.",
@@ -7526,8 +7562,9 @@ async function assembledResearchEvidenceForTurn({
     projectFacts,
     pinnedEvidence,
     limits: researchEvidenceAssemblyLimits,
-    discover: ({ question: retrievalQuestion, limit }) => discoverRelevantEvidence({
+    discover: ({ question: retrievalQuestion, limit, retrievalContext }) => discoverRelevantEvidence({
       question: retrievalQuestion,
+      retrievalContext,
       catalog,
       invertedIndex,
       readSectionBody: (section) => sectionBody(section.webSectionID || section.id, {
@@ -13565,6 +13602,12 @@ async function handleResearchConversationMessage(request, response) {
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
     const disclaimer = "AI-generated research assistance, not an official code determination.";
+    const materialAssembledEvidence = assembledEvidence.filter((section) =>
+      !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole)
+    );
+    const contextualAssembledEvidence = assembledEvidence.filter((section) =>
+      section?.evidencePriority?.evidenceRole === "contextual"
+    );
     const userMessage = { id: randomUUID(), role: "user", question, createdAt: now };
     const assistantMessage = {
       id: randomUUID(),
@@ -13586,10 +13629,11 @@ async function handleResearchConversationMessage(request, response) {
         evidenceSectionIDs: Array.from(new Set(assembledEvidence.map((section) => section.sectionID))),
         evidenceSourceIDs: assembledEvidence.map((section) => section.sourceID),
         sourceSummary: {
-          enactedProvisionCount: new Set(assembledEvidence.map((section) => section.sectionID)).size,
-          userPinnedCount: assembledEvidence.filter((section) => section.origin === "user_pinned").length,
-          permitextDiscoveredCount: assembledEvidence.filter((section) => section.origin === "permitext_discovered").length,
-          crossReferenceCount: assembledEvidence.filter((section) => section.origin === "permitext_cross_reference").length,
+          enactedProvisionCount: new Set(materialAssembledEvidence.map((section) => section.sectionID)).size,
+          contextualProvisionCount: new Set(contextualAssembledEvidence.map((section) => section.sectionID)).size,
+          userPinnedCount: materialAssembledEvidence.filter((section) => section.origin === "user_pinned").length,
+          permitextDiscoveredCount: materialAssembledEvidence.filter((section) => section.origin === "permitext_discovered").length,
+          crossReferenceCount: materialAssembledEvidence.filter((section) => section.origin === "permitext_cross_reference").length,
           supportingWebSourceCount: result.interpretation.supportingSources?.length || 0,
           unresolvedProjectFactCount: result.interpretation.missingFacts?.length || 0,
           requiredClaimCount: requiredClaimCoverage.requiredClaimCount

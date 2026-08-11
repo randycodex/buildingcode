@@ -94,6 +94,31 @@ assert.equal(
 );
 assert.equal(supportingCrossReference.claimCoverageRequired, false);
 
+const contextualReference = researchEvidencePriorityMetadata(candidate(
+  "101.1",
+  "This code shall be known as the New York City Building Code.",
+  { exactReference: true, contextualReference: true }
+));
+assert.equal(contextualReference.primaryFunction, researchEvidenceFunctions.contextual);
+assert.equal(contextualReference.evidenceRole, "contextual");
+assert.equal(contextualReference.claimCoverageRequired, false);
+
+const ordinaryCandidate = researchEvidencePriorityMetadata(candidate(
+  "999.9",
+  "A provision retrieved for an ordinary open-ended question."
+));
+assert.equal(
+  ordinaryCandidate.evidenceRole,
+  "supporting",
+  "A generic candidate must not be rejected outside a relevance-comparison turn."
+);
+const rejectedComparisonCandidate = researchEvidencePriorityMetadata(candidate(
+  "999.9",
+  "A same-term provision outside the governing topic.",
+  { relevanceComparison: true }
+));
+assert.equal(rejectedComparisonCandidate.evidenceRole, "irrelevant");
+
 const explicitRootPrioritization = prioritizeResearchEvidence([
   candidate("1107.6.2.2", "Type B units. Exception: reductions may apply."),
   candidate("999.9", "A high-scoring but unrelated lexical result.")

@@ -1306,7 +1306,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-research-code-basis-v2'),
+        webRoot.text.includes('/web/app.js?v=20260811-research-relevance-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1454,7 +1454,8 @@ async function main() {
     assert(
       !researchSourceRendererSource.includes('"Selected passage"') &&
         researchSourceRendererSource.includes('label.textContent = "Pinned enacted source"') &&
-        researchSourceRendererSource.includes('label.textContent = "Permitext enacted source"') &&
+        researchSourceRendererSource.includes('"Contextual enacted source — does not govern this answer"') &&
+        researchSourceRendererSource.includes(': "Permitext enacted source"') &&
         researchConversationRendererSource.includes('.filter((source) => source.kind === "selection")') &&
         researchConversationRendererSource.includes(
           "const projectContextSection = renderResearchProjectContext(evidenceScroll, conversation);"

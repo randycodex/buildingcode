@@ -1,4 +1,4 @@
-export const researchEvidencePriorityVersion = "20260811-deterministic-legal-function-v1";
+export const researchEvidencePriorityVersion = "20260811-deterministic-legal-function-v2";
 
 export const researchEvidenceFunctions = Object.freeze({
   controllingRule: "controlling_rule",
@@ -6,6 +6,7 @@ export const researchEvidenceFunctions = Object.freeze({
   calculationTable: "calculation_table",
   definition: "definition",
   supportingCrossReference: "supporting_cross_reference",
+  contextual: "contextual",
   candidate: "candidate"
 });
 
@@ -110,6 +111,7 @@ function primaryFunction(roles) {
     researchEvidenceFunctions.calculationTable,
     researchEvidenceFunctions.definition,
     researchEvidenceFunctions.supportingCrossReference,
+    researchEvidenceFunctions.contextual,
     researchEvidenceFunctions.candidate
   ].find((role) => roles.includes(role));
 }
@@ -121,9 +123,10 @@ function materialityRank({
   exception,
   calculationTable,
   definition,
-  crossReference
+  crossReference,
+  contextual
 }) {
-  if (pinned || exactReference) return 0;
+  if (pinned || (exactReference && !contextual)) return 0;
   if (rootDepth === 0) return 1;
   if (rootDepth === 1) return 2;
   if (rootDepth !== null && exception) return 3;
@@ -131,7 +134,8 @@ function materialityRank({
   if (rootDepth !== null) return 5;
   if (definition) return 6;
   if (crossReference) return 7;
-  return 8;
+  if (contextual) return 8;
+  return 9;
 }
 
 export function researchEvidencePriorityMetadata(value, options = {}) {
@@ -139,7 +143,9 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
   const controllingRoot = closestControllingRoot(value, controllingRoots);
   const text = sourceText(value);
   const pinned = isPinned(value);
-  const exactReference = value?.signals?.exactReference === true;
+  const contextual = value?.signals?.contextualReference === true;
+  const relevanceComparison = value?.signals?.relevanceComparison === true;
+  const exactReference = value?.signals?.exactReference === true && !contextual;
   const crossReference = isCrossReference(value);
   const definition = isDefinition(value, text);
   const exception = isException(value, text);
@@ -152,6 +158,7 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
   if (calculationTable) roles.push(researchEvidenceFunctions.calculationTable);
   if (definition) roles.push(researchEvidenceFunctions.definition);
   if (crossReference) roles.push(researchEvidenceFunctions.supportingCrossReference);
+  if (contextual) roles.push(researchEvidenceFunctions.contextual);
   if (!roles.length) roles.push(researchEvidenceFunctions.candidate);
   const rootDepth = controllingRoot?.depth ?? null;
   return {
@@ -165,8 +172,16 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
       exception,
       calculationTable,
       definition,
-      crossReference
+      crossReference,
+      contextual
     }),
+    evidenceRole: controlling
+      ? "governing"
+      : contextual
+        ? "contextual"
+        : (definition || crossReference || exception || calculationTable || !relevanceComparison)
+          ? "supporting"
+          : "irrelevant",
     controllingRoot: controllingRoot
       ? `${controllingRoot.codePrefix} ${controllingRoot.sectionNumber}`
       : null,
@@ -191,7 +206,8 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
       ...(exception ? ["exception or permitted reduction"] : []),
       ...(calculationTable ? ["calculation or table provision"] : []),
       ...(definition ? ["definition provision"] : []),
-      ...(crossReference ? ["supporting cross-reference"] : [])
+      ...(crossReference ? ["supporting cross-reference"] : []),
+      ...(contextual ? ["contextual reference being compared with the governing topic"] : [])
     ]
   };
 }

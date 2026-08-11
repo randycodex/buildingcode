@@ -666,12 +666,24 @@ function queryTermWeights(question) {
 
 function codeReferences(question) {
   const references = [];
+  const seen = new Set();
+  const add = (codePrefix, sectionNumber) => {
+    const reference = {
+      codePrefix: String(codePrefix || "").toUpperCase(),
+      sectionNumber: String(sectionNumber || "")
+    };
+    const key = `${reference.codePrefix}:${reference.sectionNumber}`;
+    if (!reference.codePrefix || !reference.sectionNumber || seen.has(key)) return;
+    seen.add(key);
+    references.push(reference);
+  };
   const pattern = /\b(AC|BC|EBC|FC|MC|PC)\s*(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)+)\b/gi;
   for (const match of String(question || "").matchAll(pattern)) {
-    references.push({
-      codePrefix: match[1].toUpperCase(),
-      sectionNumber: match[2]
-    });
+    add(match[1], match[2]);
+  }
+  const headingPattern = /\bSECTION\s+(AC|BC|EBC|FC|MC|PC)\s+[A-Z]?\d+(?:-\d+)?\s*:[^\n]{0,120}?\b([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)+)\b/gi;
+  for (const match of String(question || "").matchAll(headingPattern)) {
+    add(match[1], match[2]);
   }
   return references;
 }
@@ -971,6 +983,7 @@ export function validateEvidenceDiscoveryQuestion(value) {
 
 export async function discoverRelevantEvidence({
   question,
+  retrievalContext = null,
   catalog,
   invertedIndex,
   readSectionBody,
@@ -983,6 +996,17 @@ export async function discoverRelevantEvidence({
   const terms = queryTermWeights(normalizedQuestion);
   const bigrams = queryBigrams(normalizedQuestion);
   const references = codeReferences(normalizedQuestion);
+  const relevanceComparison = retrievalContext?.relevanceComparison === true;
+  const comparisonReferenceKeys = new Set(
+    relevanceComparison
+      ? codeReferences([
+          retrievalContext?.currentQuestion,
+          retrievalContext?.immediateContext
+        ].filter(Boolean).join("\n")).map((reference) =>
+          `${reference.codePrefix}:${reference.sectionNumber}`
+        )
+      : []
+  );
   const catalogByID = new Map(sections.map((section) => [comparableSectionID(section.id), section]));
   const scores = new Map();
   const matchedTermsByID = new Map();
@@ -1066,6 +1090,14 @@ export async function discoverRelevantEvidence({
     const phraseMatches = bigrams.filter((bigram) => normalizedFullText.includes(bigram)).length;
     const exactReference = exactReferenceIDs.has(entry.id);
     const routeMatch = routesByID.get(entry.id);
+    const contextualReference = Boolean(
+      relevanceComparison &&
+      exactReference &&
+      !routeMatch &&
+      comparisonReferenceKeys.has(
+        `${String(section.codePrefix || "").toUpperCase()}:${String(section.sectionNumber || "")}`
+      )
+    );
     const passage = bestPassage(body, terms, bigrams);
     if (!passage) continue;
     const richSources = structuredRichSources(body);
@@ -1104,6 +1136,7 @@ export async function discoverRelevantEvidence({
       score: finalScore,
       coverage,
       exactReference,
+      contextualReference,
       exactTopicRouteTarget: Boolean(routeMatch?.exactTarget),
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
@@ -1115,8 +1148,10 @@ export async function discoverRelevantEvidence({
   }
 
   detailed.sort((left, right) =>
-    Number(right.exactReference) - Number(left.exactReference) ||
     Number(right.exactTopicRouteTarget) - Number(left.exactTopicRouteTarget) ||
+    Number(right.exactReference && !right.contextualReference) -
+      Number(left.exactReference && !left.contextualReference) ||
+    Number(right.contextualReference) - Number(left.contextualReference) ||
     right.score - left.score ||
     right.coverage - left.coverage ||
     String(left.section.sectionNumber || "").localeCompare(
@@ -1186,6 +1221,8 @@ export async function discoverRelevantEvidence({
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
         exactReference: item.exactReference,
+        contextualReference: item.contextualReference,
+        relevanceComparison,
         requiresAdditionalSourceReview: item.sourceReviewRequirements.length > 0,
         containsVisualSource: item.sourceReviewRequirements.some((requirement) => requirement.kind === "visual-source"),
         referencesTable: /\bTable\s+[A-Z]?\d/i.test(item.passage.text),

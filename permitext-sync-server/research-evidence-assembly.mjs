@@ -4,7 +4,7 @@ import {
 } from "./research-evidence-priority.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v6";
+export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v8";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -87,6 +87,16 @@ function previousConversationTopic(messages) {
   return "";
 }
 
+function conversationRootTopic(messages) {
+  const entries = Array.isArray(messages) ? messages : [];
+  for (const entry of entries) {
+    if (entry && typeof entry === "object" && entry.role && entry.role !== "user") continue;
+    const text = messageText(entry);
+    if (text) return text;
+  }
+  return "";
+}
+
 function isContextDependentFollowUp(question) {
   const normalized = compactText(question);
   if (!normalized) return false;
@@ -96,6 +106,12 @@ function isContextDependentFollowUp(question) {
     /\b(?:it|its|that|this|those|these|them|they|same|above|previous|earlier|remaining|further)\b/i.test(normalized) ||
     /\b(?:more detail|more details|explain more|what about)\b/i.test(normalized)
   );
+}
+
+function isEvidenceRelevanceFollowUp(question) {
+  const normalized = compactText(question);
+  return /\b(?:related|relevant|responsive|contribute|support|apply|applicable)\b/i.test(normalized) &&
+    /\b(?:main|original|first|prior|previous|earlier|question|answer|issue|topic)\b/i.test(normalized);
 }
 
 export function researchEvidenceRetrievalQuery({
@@ -111,14 +127,19 @@ export function researchEvidenceRetrievalQuery({
   if (normalizedQuestion.length > 2_000) {
     throw new Error("Research questions may contain no more than 2,000 characters.");
   }
-  const topic = compactText(previousTopic) || previousConversationTopic(previousMessages);
+  const explicitTopic = compactText(previousTopic);
+  const rootTopic = explicitTopic || conversationRootTopic(previousMessages);
+  const immediateTopic = previousConversationTopic(previousMessages);
+  const topic = rootTopic || immediateTopic;
   const factContext = Array.isArray(projectFacts)
     ? projectFacts.map((fact) => compactText(fact)).filter(Boolean).slice(0, 30).join("; ").slice(0, 4_000)
     : "";
   const maximumQueryCharacters = 2_000;
   let retrievalQuery = normalizedQuestion;
   let previousTopicApplied = false;
-  if (topic && isContextDependentFollowUp(normalizedQuestion)) {
+  const relevanceComparison = isEvidenceRelevanceFollowUp(normalizedQuestion);
+  const contextDependentFollowUp = isContextDependentFollowUp(normalizedQuestion) || relevanceComparison;
+  if (topic && contextDependentFollowUp) {
     const followUpPrefix = "Follow-up: ";
     const topicPrefix = "\nPrevious topic: ";
     const availableTopicCharacters = maximumQueryCharacters -
@@ -126,6 +147,17 @@ export function researchEvidenceRetrievalQuery({
     if (availableTopicCharacters > 0) {
       retrievalQuery = `${followUpPrefix}${normalizedQuestion}${topicPrefix}${topic.slice(0, availableTopicCharacters)}`;
       previousTopicApplied = true;
+    }
+    if (
+      immediateTopic &&
+      compactText(immediateTopic) !== compactText(topic) &&
+      retrievalQuery.length < maximumQueryCharacters
+    ) {
+      const immediatePrefix = "\nImmediate context: ";
+      const availableImmediateCharacters = maximumQueryCharacters - retrievalQuery.length - immediatePrefix.length;
+      if (availableImmediateCharacters > 0) {
+        retrievalQuery += `${immediatePrefix}${immediateTopic.slice(0, availableImmediateCharacters)}`;
+      }
     }
   }
   let projectFactsApplied = false;
@@ -141,7 +173,11 @@ export function researchEvidenceRetrievalQuery({
     question: normalizedQuestion,
     retrievalQuery: retrievalQuery.trim(),
     previousTopicApplied,
-    projectFactsApplied
+    projectFactsApplied,
+    contextDependentFollowUp,
+    relevanceComparison,
+    conversationTopic: topic,
+    immediateContext: immediateTopic
   };
 }
 
@@ -310,7 +346,7 @@ function inlineCrossReferences(text, fallbackCodePrefix) {
   return references;
 }
 
-function normalizedCrossReferences(source) {
+function normalizedCrossReferences(source, { inlineOnly = false } = {}) {
   const structured = (source.crossReferences || []).map((reference) => {
     if (typeof reference === "string") {
       const parsed = inlineCrossReferences(reference, source.codePrefix);
@@ -326,7 +362,10 @@ function normalizedCrossReferences(source) {
       referenceKind: compactText(reference?.referenceKind || reference?.kind || "section")
     };
   });
-  return [...structured, ...inlineCrossReferences(source.text, source.codePrefix)]
+  return [
+    ...(inlineOnly ? [] : structured),
+    ...inlineCrossReferences(source.text, source.codePrefix)
+  ]
     .filter((reference) => sectionIdentity(reference));
 }
 
@@ -435,11 +474,28 @@ export async function assembleResearchEvidence({
   const limits = appliedLimits(requestedLimits);
   const discovery = await discover({
     question: query.retrievalQuery,
+    limit: limits.maximumCandidates,
+    retrievalContext: {
+      currentQuestion: query.question,
+      conversationTopic: query.conversationTopic,
+      immediateContext: query.immediateContext,
+      contextDependentFollowUp: query.contextDependentFollowUp,
+      relevanceComparison: query.relevanceComparison
+    }
+  });
+  const prioritizedCandidates = prioritizeResearchEvidence(candidateValues(discovery), {
     limit: limits.maximumCandidates
   });
-  const candidates = prioritizeResearchEvidence(candidateValues(discovery), {
-    limit: limits.maximumCandidates
-  });
+  const routedTopicPresent = prioritizedCandidates.some((candidate) =>
+    candidate?.signals?.exactTopicRouteTarget === true
+  );
+  const candidates = query.relevanceComparison && routedTopicPresent
+    ? prioritizedCandidates.filter((candidate) =>
+        ["governing", "contextual"].includes(candidate?.evidencePriority?.evidenceRole) ||
+        candidate?.evidencePriority?.primaryFunction === "definition"
+      )
+    : prioritizedCandidates;
+  const nonMaterialCandidateCount = prioritizedCandidates.length - candidates.length;
   const sources = [];
   const canonicalForExpansion = [];
   const includedSectionIdentities = new Set();
@@ -529,7 +585,11 @@ export async function assembleResearchEvidence({
     characterCount += record.text.length;
     const identity = sectionIdentity(record);
     if (identity) includedSectionIdentities.add(identity);
-    if (entry.resolved) canonicalForExpansion.push(entry.value);
+    if (entry.resolved) {
+      canonicalForExpansion.push(query.relevanceComparison
+        ? { ...entry.value, text: record.text, canonicalText: record.text, crossReferences: [] }
+        : entry.value);
+    }
   }
 
   let discoveredCount = 0;
@@ -581,7 +641,9 @@ export async function assembleResearchEvidence({
     if (!record.text) break;
     sources.push(record);
     if (targeted.excerpt) targetedDefinitionCount += 1;
-    canonicalForExpansion.push(resolved);
+    canonicalForExpansion.push(query.relevanceComparison
+      ? { ...resolved, text: record.text, canonicalText: record.text, crossReferences: [] }
+      : resolved);
     includedSectionIdentities.add(sectionIdentity(resolved));
     characterCount += record.text.length;
     discoveredCount += 1;
@@ -640,7 +702,9 @@ export async function assembleResearchEvidence({
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
   for (const source of canonicalForExpansion) {
-    for (const reference of normalizedCrossReferences(source)) {
+    for (const reference of normalizedCrossReferences(source, {
+      inlineOnly: query.relevanceComparison
+    })) {
       const identity = sectionIdentity(reference);
       if (
         !identity ||
@@ -785,7 +849,8 @@ export async function assembleResearchEvidence({
       targetedDefinitionCount,
       crossReferenceCount,
       characterCount,
-      resolverFailureCount
+      resolverFailureCount,
+      nonMaterialCandidateCount
     },
     limitations,
     discovery: {

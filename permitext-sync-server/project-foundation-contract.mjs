@@ -551,6 +551,10 @@ export function immutableEvidenceSnapshot({
     retrievalDepth: Number.isFinite(Number(source?.retrievalDepth)) ? Number(source.retrievalDepth) : null,
     retrievedAt: optionalISO(source?.retrievedAt, "evidence retrieval date")
   };
+  const evidenceRole = String(source?.evidencePriority?.evidenceRole || "").trim();
+  const evidenceFunction = String(source?.evidencePriority?.primaryFunction || "").trim();
+  if (evidenceRole) provenance.evidenceRole = evidenceRole;
+  if (evidenceFunction) provenance.evidenceFunction = evidenceFunction;
   const userSelectedText = String(source?.userSelectedText || "").trim();
   if (userSelectedText) {
     provenance.userSelectedText = userSelectedText;

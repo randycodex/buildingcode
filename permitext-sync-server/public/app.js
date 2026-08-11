@@ -13368,7 +13368,10 @@ function appendResearchSupportedPoints(container, points) {
   points.forEach((point) => {
     const row = document.createElement("li");
     const title = document.createElement("strong");
-    title.textContent = researchDisplayText(point.heading);
+    title.textContent = [
+      point.evidenceRole === "contextual" ? "Context —" : "",
+      researchDisplayText(point.heading)
+    ].filter(Boolean).join(" ");
     row.append(title);
     list.append(row);
   });
@@ -13612,6 +13615,7 @@ function renderResearchInterpretation(container, result, options = {}) {
       const citationButton = document.createElement("button");
       citationButton.type = "button";
       citationButton.textContent = [
+        citation.evidenceRole === "contextual" ? "Context" : "",
         citation.codePrefix,
         citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
       ].filter(Boolean).join(" ");
@@ -13630,6 +13634,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   const evidenceLimitCount = result.evidenceLimitations?.length || 0;
   const sourceSummary = result.sourceSummary || {};
   const enactedCount = Number(sourceSummary.enactedProvisionCount || 0);
+  const contextualCount = Number(sourceSummary.contextualProvisionCount || 0);
   const sourceScope = enactedCount
     ? [
         `Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`,
@@ -13642,9 +13647,12 @@ function renderResearchInterpretation(container, result, options = {}) {
   boundary.className = "research-answer-boundary";
   boundary.textContent = [
     sourceScope,
+    contextualCount
+      ? `${contextualCount} contextual ${contextualCount === 1 ? "provision" : "provisions"} reviewed separately`
+      : "",
     missingFactCount ? `${missingFactCount} project ${missingFactCount === 1 ? "fact remains" : "facts remain"} unresolved` : "No unresolved project facts identified",
     evidenceLimitCount ? `${evidenceLimitCount} evidence ${evidenceLimitCount === 1 ? "limit" : "limits"}` : "No additional evidence limits identified"
-  ].join(" · ");
+  ].filter(Boolean).join(" · ");
   card.append(boundary);
 
   const details = document.createElement("details");
@@ -13676,6 +13684,7 @@ function renderResearchInterpretation(container, result, options = {}) {
     result.citations.forEach((citation) => {
       const row = document.createElement("li");
       row.textContent = [
+        citation.evidenceRole === "contextual" ? "Context —" : "",
         citation.codePrefix,
         citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
       ].filter(Boolean).join(" ");
@@ -15705,7 +15714,10 @@ function renderResearchSource(source) {
   } else if (["enacted_permitext_discovered", "permitext_discovered", "permitext_cross_reference"].includes(sourceKind)) {
     const label = document.createElement("p");
     label.className = "section-label";
-    label.textContent = "Permitext enacted source";
+    label.textContent = source.evidencePriority?.evidenceRole === "contextual" ||
+      source.provenance?.evidenceRole === "contextual"
+      ? "Contextual enacted source — does not govern this answer"
+      : "Permitext enacted source";
     body.append(label);
   } else if (["enacted_user_pinned", "user_pinned"].includes(sourceKind)) {
     const label = document.createElement("p");
@@ -15876,6 +15888,12 @@ function renderResearchAnswerSources(conversation, message) {
         userSelectedText: source.provenance?.userSelectedText || "",
         codePrefix: source.codeBook || source.codePrefix,
         codeVersion: source.sourceLibraryVersion || source.codeVersion,
+        evidencePriority: source.provenance?.evidenceRole
+          ? {
+              evidenceRole: source.provenance.evidenceRole,
+              primaryFunction: source.provenance.evidenceFunction || null
+            }
+          : null,
         selectedText: source.passageText || source.selectedText
       }));
       const supportingSources = answerRecord.answer?.supportingSources || answerRecord.supportingSources || [];
