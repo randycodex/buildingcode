@@ -106,5 +106,6 @@ assert.match(
 assert.match(appSource, /conversation\?\.primaryProjectID[\s\S]*historyHiddenAt/, "Project conversations are not preserved when history is cleared.");
 assert.match(appSource, /filter\(\(conversation\) => !conversation\.historyHiddenAt\)/, "Hidden Project conversations still appear in the main history.");
 assert.match(clientSource, /research-back-button[\s\S]*showNewResearchChat/, "Research does not provide a Back control.");
+assert.match(clientSource, /unansweredConversations[\s\S]*No completed answer yet\./, "Empty Project conversations cannot be reopened from Project Research history.");
 
 console.log("permitext research list summary contract passed");

@@ -19389,6 +19389,12 @@ function appendProjectResearchContextEditor(content, identity, initialConversati
 }
 
 function appendProjectResearchHistory(content, identity, foundation) {
+  const answers = [...(foundation?.researchAnswers || [])]
+    .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
+  const answeredConversationIDs = new Set(answers.map((answer) => answer.conversationID).filter(Boolean));
+  const unansweredConversations = [...(foundation?.researchConversations || [])]
+    .filter((conversation) => !answeredConversationIDs.has(conversation.id))
+    .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
   const section = document.createElement("section");
   section.className = "project-studio-section project-studio-research";
   const heading = document.createElement("div");
@@ -19401,8 +19407,8 @@ function appendProjectResearchHistory(content, identity, foundation) {
   const headingActions = document.createElement("div");
   headingActions.className = "project-section-heading-actions";
   headingActions.append(projectSectionCount(
-    foundation?.researchAnswers?.length || 0,
-    "Research answers"
+    answers.length + unansweredConversations.length,
+    "Research history entries"
   ));
   const toggle = document.createElement("button");
   toggle.className = "project-section-toggle-chevron";
@@ -19416,8 +19422,6 @@ function appendProjectResearchHistory(content, identity, foundation) {
   body.className = "project-studio-collapsible-body project-research-history-body";
   section.append(heading, body);
 
-  const answers = [...(foundation?.researchAnswers || [])]
-    .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
   if (answers.length) {
     answers.slice(0, 8).forEach((answer) => {
       const card = document.createElement(identity.sharedOnly ? "article" : "button");
@@ -19443,6 +19447,23 @@ function appendProjectResearchHistory(content, identity, foundation) {
       body.append(card);
     });
   }
+  unansweredConversations.slice(0, Math.max(0, 8 - answers.length)).forEach((conversation) => {
+    const card = document.createElement(identity.sharedOnly ? "article" : "button");
+    card.className = "project-research-history-card";
+    card.dataset.researchConversationId = conversation.id;
+    if (!identity.sharedOnly) card.type = "button";
+    const question = document.createElement("strong");
+    question.textContent = conversation.title || conversation.starterQuestion || "Research conversation";
+    const status = document.createElement("p");
+    status.textContent = "No completed answer yet.";
+    const meta = document.createElement("span");
+    meta.textContent = researchRelativeDate(conversation.updatedAt || conversation.createdAt);
+    card.append(question, status, meta);
+    if (!identity.sharedOnly) {
+      card.addEventListener("click", () => void openResearchConversation(conversation.id));
+    }
+    body.append(card);
+  });
   wireProjectSectionMotion(section, body, [title, toggle], "Research history", false);
   content.append(section);
 }
