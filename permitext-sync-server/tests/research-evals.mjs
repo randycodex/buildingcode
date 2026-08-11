@@ -1330,6 +1330,37 @@ async function runMockConversationCases(baseURL, checkedCases) {
       automaticTurn.answer.verification?.pass === true,
     "Research did not answer an unpinned chat question from automatically discovered enacted evidence."
   );
+  const factChat = await jsonRequest(baseURL, "/research/conversations/create", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: { auth: { accountUserID: account.appUserID } }
+  });
+  const officeQuestion =
+    "A 1,200 sf space is used as a small architectural office with 12 employees. Under BC 304.1, what occupancy group applies, and why?";
+  await askEvaluationQuestion(baseURL, account, factChat.conversation.id, officeQuestion);
+  const factFollowUp = await askEvaluationQuestion(
+    baseURL,
+    account,
+    factChat.conversation.id,
+    "Why do the 1,200 sf area and 12 employees not change that classification under the cited provision?"
+  );
+  const persistedFacts = factFollowUp.conversation.topicContext?.factTopics
+    ?.find((topic) => topic.rootTopic === officeQuestion)
+    ?.establishedFacts || [];
+  assert(
+    JSON.stringify(Object.fromEntries(persistedFacts.map((fact) => [fact.key, fact.value]))) ===
+      JSON.stringify({
+        area_square_feet: "1,200",
+        employee_count: "12",
+        use: "a small architectural office"
+      }),
+    "Research did not carry exact user-established office facts into the active-topic follow-up."
+  );
+  assert(
+    factFollowUp.answer.conversationFacts?.establishedFacts
+      ?.find((fact) => fact.key === "use")?.value === "a small architectural office",
+    "The immutable answer did not preserve the active-topic fact snapshot."
+  );
   for (const testCase of checkedCases) {
     const conversationID = await createEvaluationConversation(baseURL, account, testCase);
     const { answer, conversation } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);

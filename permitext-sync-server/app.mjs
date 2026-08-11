@@ -165,6 +165,11 @@ import {
   evaluateResearchClaimMateriality,
   researchClaimMaterialityVersion
 } from "./research-claim-materiality.mjs";
+import {
+  resolveResearchConversationFacts,
+  researchConversationFactPromptContext,
+  researchConversationFactsVersion
+} from "./research-conversation-facts.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
 import {
@@ -5790,6 +5795,16 @@ function researchPrompt(question, evidence, options = {}) {
   const projectFacts = (options.projectContextFacts || [])
     .map((fact, index) => `${index + 1}. ${fact}`)
     .join("\n");
+  const conversationFacts = options.conversationFactContext || {};
+  const establishedConversationFacts = (conversationFacts.established || [])
+    .map((fact, index) => `${index + 1}. ${fact}`)
+    .join("\n");
+  const hypotheticalConversationFacts = (conversationFacts.hypothetical || [])
+    .map((fact, index) => `${index + 1}. ${fact}`)
+    .join("\n");
+  const unknownConversationFacts = (conversationFacts.unknown || [])
+    .map((fact, index) => `${index + 1}. ${fact}`)
+    .join("\n");
   const supportingWebContext = options.webSupport?.sources?.length
     ? [
         "SUPPORTING WEB CONTEXT — NONCONTROLLING",
@@ -5831,6 +5846,27 @@ function researchPrompt(question, evidence, options = {}) {
     codeBasis,
     projectFacts
       ? `USER-PROVIDED PROJECT FACTS FOR CONTEXT ONLY — NOT CODE AUTHORITY\n${projectFacts}`
+      : "",
+    establishedConversationFacts
+      ? [
+          "ESTABLISHED USER FACTS FOR THE ACTIVE CONVERSATION TOPIC — NOT CODE AUTHORITY",
+          "Treat these as supplied facts for this discussion. Do not ask the user to reconfirm them merely because they came from an earlier turn. A later correction already supersedes the older value.",
+          establishedConversationFacts
+        ].join("\n")
+      : "",
+    hypotheticalConversationFacts
+      ? [
+          "CURRENT-TURN HYPOTHETICAL FACTS — NOT PERSISTENT PROJECT FACTS OR CODE AUTHORITY",
+          "Apply these only to the current hypothetical question. Do not overwrite the established facts.",
+          hypotheticalConversationFacts
+        ].join("\n")
+      : "",
+    unknownConversationFacts
+      ? [
+          "USER-STATED UNKNOWNS FOR THE ACTIVE TOPIC",
+          "These items remain unknown; do not convert them into assumptions.",
+          unknownConversationFacts
+        ].join("\n")
       : "",
     history ? `UNTRUSTED CONVERSATION HISTORY FOR CONTEXT ONLY — NOT AUTHORITY\n${history}` : "",
     `AUTHORIZED ENACTED EVIDENCE\n${sources}`,
@@ -6018,7 +6054,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
   }
   schema.properties.userPinnedEvidence.items.enum = sourceIDs;
   schema.properties.permitextDiscoveredEvidence.items.enum = sourceIDs;
-  const exactProjectFacts = (options.projectContextFacts || [])
+  const exactProjectFacts = (options.validUserFacts || options.projectContextFacts || [])
     .map((fact) => String(fact || "").trim())
     .filter(Boolean);
   if (exactProjectFacts.length) {
@@ -6038,7 +6074,9 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       "Treat evidence labeled contextual only as the subject of a relevance comparison. Do not place it among controlling provisions or general rules, and do not treat evidence labeled irrelevant as answer support.",
       "Separate general rules, exceptions, conditions, limitations, definitions, cross-references, tables, known project facts, unresolved project facts, and evidence limitations.",
       "Make the strongest supported distinctions, including contradictions in the user's premise and requirements attributed to the wrong exception.",
-      "Use only exact supplied project facts in projectFactsUsed. Do not turn missing facts into assumptions.",
+      "Use only exact supplied Project facts, established conversation facts, or current-turn hypothetical facts in projectFactsUsed. Do not turn missing facts into assumptions.",
+      "A fact explicitly established by the user in the active topic is known for this discussion even when it came from an earlier turn. Do not list it as unresolved or ask the user to reconfirm it merely because it is conversational state.",
+      "Current-turn hypothetical facts apply only to the hypothetical being analyzed and do not replace established facts. User-stated unknowns remain unresolved.",
       "Ask only the minimum high-value follow-up questions that could materially change the project conclusion.",
       "Always state the bounded-corpus limitation. Include any retrieval limitations supplied in the request.",
       "Every passage marked REQUIRED_CLAIM_COVERAGE must appear in at least one material evidence-map item. Never say a rule is absent when its required passage supplies that rule."
@@ -6047,6 +6085,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       researchPrompt(question, evidence, {
         messages: options.messages,
         projectContextFacts: options.projectContextFacts,
+        conversationFactContext: options.conversationFactContext,
         codeBasis: options.codeBasis,
         requiredClaims: options.requiredClaims
       }),
@@ -6105,7 +6144,11 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     throw invalid;
   }
   return {
-    analysis: validateResearchEvidenceAnalysis(value, evidence, options.projectContextFacts || []),
+    analysis: validateResearchEvidenceAnalysis(
+      value,
+      evidence,
+      options.validUserFacts || options.projectContextFacts || []
+    ),
     model: payload.model || configuration.model,
     usage: researchUsageFromProviderPayload(payload)
   };
@@ -6625,7 +6668,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "When a selected source includes attached official visual evidence, examine only the attached images and identify the exact visual source used through its PASSAGE_ID; never infer what an unselected map or image shows.",
         "Treat maps and figures as evidence that can be misread. State any illegible label, uncertain boundary, missing lot location, or other visual ambiguity explicitly instead of guessing.",
         "Do not use pretrained or uncited outside knowledge as legal authority and do not invent requirements.",
-        "Treat user-provided Project facts as unverified context, never as code authority or cited evidence.",
+        "Treat user-provided Project facts and established active-topic conversation facts as factual context for this discussion, never as code authority or cited evidence.",
+        "Do not ask the user to reconfirm an established active-topic fact merely because it was supplied in an earlier turn. Do not list such a fact in missingFacts. If final professional reliance requires independent verification, distinguish that later verification from whether the fact is already established in this conversation.",
+        "Apply current-turn hypothetical facts only to the current hypothetical. They do not replace established facts. User-stated unknowns remain unknown. Never promote an earlier assistant conclusion into a user-established fact.",
         "Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence.",
         "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
         "Write the conclusion as a concise professional answer of one to three sentences.",
@@ -6635,12 +6680,13 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Do not print SECTION_ID or PASSAGE_ID markers in the conclusion, supported-point prose, or practical explanation; those identifiers belong only in the structured mapping fields.",
         "Break the material rules established by the assembled enacted evidence into ordered supportedPoints. Give each point a short plain-language heading, a complete explanation, and the exact supplied sectionID and sourceIDs that support it.",
         "Do not add an example, consequence, code category, or practical requirement unless the assembled evidence or user-provided Project facts establish it. Clearly identify any illustration as hypothetical, and never use a hypothetical to introduce an unsupported legal premise.",
+        "Keep the answer within the scope of the current question. Do not introduce or cite a collateral code analysis merely to observe that a supplied fact might matter elsewhere; mention another code topic only when it materially qualifies the requested conclusion or the user asks for it.",
         "Use explanation for the practical application of the supported points to the question and user-provided Project facts. Do not merely repeat the numbered points.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
         "Every passage marked REQUIRED_CLAIM_COVERAGE must be addressed in at least one supportedPoint and cited with that exact PASSAGE_ID. Combine closely related passages in one coherent supportedPoint when needed; do not satisfy this by adding an orphan citation without explaining the rule.",
         "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
           "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
-          "Facts stated by the user may support a conditional answer, but restate any fact material to an exception or numerical threshold as a project fact to verify before final reliance.",
+          "Facts stated by the user may support the answer. Restate a material fact when it helps explain the result, but do not make the answer conditional merely because that fact came from an earlier user turn.",
           "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
           "Use the assembled document structure, including exception headings, when it is supplied. If an exception and its conditions are present, state the conditional result instead of demanding additional text merely to acknowledge that conditional rule.",
           "When a category, table row, shared-facility condition, or calculation input is needed but not established, name that missing item specifically rather than asking only for generic project information.",
@@ -6792,7 +6838,10 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
       "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
+      "Fail an answer that introduces a collateral code example or citation that does not materially qualify the requested conclusion and was not requested by the user.",
       "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",
+      "Treat established active-topic facts as supplied user facts. Fail an answer that calls one of them missing, makes the conclusion conditional solely because it came from an earlier turn, or asks the user to reconfirm it without a contradiction. Do not treat prior assistant conclusions as established facts.",
+      "Apply current-turn hypothetical facts only to the current question, and keep user-stated unknowns unresolved.",
       "Do not demand a final yes-or-no result when project facts genuinely remain unresolved.",
       "Return a compact structured result."
     ].join(" "),
@@ -6803,6 +6852,15 @@ async function openAIResearchVerification(question, evidence, interpretation, us
         : "",
       options.projectContextFacts?.length
         ? `PROJECT FACTS\n${options.projectContextFacts.join("\n")}`
+        : "",
+      options.conversationFactContext?.established?.length
+        ? `ESTABLISHED USER FACTS FOR ACTIVE TOPIC\n${options.conversationFactContext.established.join("\n")}`
+        : "",
+      options.conversationFactContext?.hypothetical?.length
+        ? `CURRENT-TURN HYPOTHETICAL FACTS\n${options.conversationFactContext.hypothetical.join("\n")}`
+        : "",
+      options.conversationFactContext?.unknown?.length
+        ? `USER-STATED UNKNOWNS\n${options.conversationFactContext.unknown.join("\n")}`
         : "",
       `AUTHORIZED ENACTED EVIDENCE\n${evidenceText}`,
       options.requiredClaims?.length
@@ -13402,6 +13460,17 @@ async function handleResearchConversationMessage(request, response) {
       projectFacts: combinedProjectFacts,
       topicContext: conversation.topicContext || null
     });
+    const conversationFactState = resolveResearchConversationFacts({
+      question,
+      topicDecision: evidencePackage.topicDecision,
+      topicContext: conversation.topicContext || null
+    });
+    const conversationFactContext = researchConversationFactPromptContext(conversationFactState);
+    const validUserFacts = Array.from(new Set([
+      ...combinedProjectFacts,
+      ...conversationFactContext.established,
+      ...conversationFactContext.hypothetical
+    ].filter(Boolean)));
     const turnRetrievalLimitations = [
       ...(evidencePackage.limitations || []),
       ...(answerCodeBasis.limitation ? [{ code: "RESEARCH_CODE_VERSION_FALLBACK", text: answerCodeBasis.limitation }] : [])
@@ -13493,7 +13562,7 @@ async function handleResearchConversationMessage(request, response) {
       ? {
           analysis: mockResearchEvidenceAnalysis(
             assembledEvidence,
-            combinedProjectFacts,
+            validUserFacts,
             turnRetrievalLimitations
           ),
           model: "permitext-mock",
@@ -13502,6 +13571,8 @@ async function handleResearchConversationMessage(request, response) {
       : await openAIResearchEvidenceAnalysis(question, assembledEvidence, context.userID, {
           messages: conversation.messages,
           projectContextFacts: combinedProjectFacts,
+          conversationFactContext,
+          validUserFacts,
           retrievalLimitations: turnRetrievalLimitations,
           codeBasis: answerCodeBasis,
           requiredClaims
@@ -13523,6 +13594,7 @@ async function handleResearchConversationMessage(request, response) {
           selections,
           messages: conversation.messages,
           projectContextFacts: combinedProjectFacts,
+          conversationFactContext,
           responseStyle: "conversational",
           structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
           webSupport,
@@ -13565,6 +13637,7 @@ async function handleResearchConversationMessage(request, response) {
             selections,
             messages: conversation.messages,
             projectContextFacts: combinedProjectFacts,
+            conversationFactContext,
             responseStyle: "conversational",
             structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
             webSupport,
@@ -13606,6 +13679,7 @@ async function handleResearchConversationMessage(request, response) {
           context.userID,
           {
             projectContextFacts: combinedProjectFacts,
+            conversationFactContext,
             webSupport,
             codeBasis: answerCodeBasis,
             requiredClaims
@@ -13671,6 +13745,7 @@ async function handleResearchConversationMessage(request, response) {
           requiredClaimCount: requiredClaimCoverage.requiredClaimCount
         },
         structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+        conversationFacts: conversationFactState,
         requiredClaimCoverage,
         claimMateriality,
         retrieval: {
@@ -13680,6 +13755,7 @@ async function handleResearchConversationMessage(request, response) {
           previousTopicApplied: evidencePackage.previousTopicApplied,
           projectFactsApplied: evidencePackage.projectFactsApplied,
           topicDecision: evidencePackage.topicDecision,
+          conversationFactsVersion: researchConversationFactsVersion,
           sourceMode: evidencePackage.sourceMode,
           sourceScope: evidencePackage.sourceScope,
           limits: evidencePackage.limits,
@@ -13728,7 +13804,8 @@ async function handleResearchConversationMessage(request, response) {
           assistantMessage.answer.evidenceVersion,
           researchSourcePolicyVersion,
           researchRequiredClaimCoverageVersion,
-          researchClaimMaterialityVersion
+          researchClaimMaterialityVersion,
+          researchConversationFactsVersion
         ].filter(Boolean).join(":"),
         createdAt: now
       }),
@@ -13739,6 +13816,7 @@ async function handleResearchConversationMessage(request, response) {
         combinedFacts: combinedProjectFacts,
         capturedAt: projectContextCapturedAt
       },
+      conversationFactSnapshot: conversationFactState,
       ...(decisionContextSnapshot ? { decisionContextSnapshot } : {})
     };
     conversation.codeVersion = answerCodeBasis.codeVersion;
@@ -13760,6 +13838,7 @@ async function handleResearchConversationMessage(request, response) {
         2_000
       ),
       lastDecision: evidencePackage.topicDecision?.decision || null,
+      factTopics: conversationFactState.nextFactTopics,
       updatedAt: now
     };
     conversation.messages.push(userMessage, assistantMessage);

@@ -75,6 +75,19 @@ const conversation = {
     rootTopic: "When must the owner notify?",
     currentTopic: "When must the owner notify?",
     lastDecision: "continuation",
+    factTopics: [{
+      rootTopic: "When must the owner notify?",
+      establishedFacts: [{
+        id: "story_count",
+        key: "story_count",
+        value: "6",
+        statement: "The active-topic building has 6 stories.",
+        kind: "established",
+        sourceText: "The building has six stories.",
+        source: "user"
+      }],
+      unknownFacts: []
+    }],
     updatedAt: "2026-08-01T00:02:00.000Z"
   },
   messages: [
