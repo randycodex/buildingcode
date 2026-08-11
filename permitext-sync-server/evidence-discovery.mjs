@@ -789,7 +789,21 @@ export function visualSourceReferences(body) {
 
 export function structuredRichSources(body) {
   const sources = [];
-  for (const block of body?.blocks || []) {
+  const blocks = Array.isArray(body?.blocks) ? body.blocks : [];
+  const continuationHTML = (blockIndex) => {
+    const fragments = [];
+    for (let index = blockIndex + 1; index < blocks.length && fragments.length < 8; index += 1) {
+      const block = blocks[index] || {};
+      const html = String(block.html || "");
+      const text = plainTextFromPublishedHTML(html || block.plainText || "");
+      const isTableNote = /^(?:For SI\b|Footnotes?\b|[a-z]\.)/i.test(text) ||
+        /class=["'][^"']*\bSmall\b/i.test(html);
+      if (!isTableNote) break;
+      fragments.push(html || String(block.plainText || ""));
+    }
+    return fragments.join("\n");
+  };
+  for (const [blockIndex, block] of blocks.entries()) {
     const html = String(block.html || "");
     if (!html) continue;
     const tableMatches = Array.from(html.matchAll(/<ScrollTable\b[\s\S]*?<\/ScrollTable>/gi));
@@ -805,7 +819,23 @@ export function structuredRichSources(body) {
         : precedingStart + captionOffset;
       const nextMatch = tableMatches[index + 1];
       const sourceEnd = nextMatch?.index ?? html.length;
-      const sourceHTML = html.slice(sourceStart, sourceEnd);
+      let precedingCaptionHTML = "";
+      if (captionOffset === undefined && blockIndex > 0) {
+        const previousHTML = String(blocks[blockIndex - 1]?.html || "");
+        const previousAnchors = Array.from(
+          previousHTML.matchAll(/<a\b[^>]*\btitle=["'][^"']*\bTable\s+[A-Z]?\d+(?:\.[0-9A-Za-z-]+)*[^"']*["'][^>]*>/gi)
+        );
+        const previousCaptionOffset = previousAnchors.at(-1)?.index;
+        if (previousCaptionOffset !== undefined) {
+          precedingCaptionHTML = previousHTML.slice(previousCaptionOffset);
+        }
+      }
+      const followingNotesHTML = nextMatch ? "" : continuationHTML(blockIndex);
+      const sourceHTML = [
+        precedingCaptionHTML,
+        html.slice(sourceStart, sourceEnd),
+        followingNotesHTML
+      ].filter(Boolean).join("\n");
       const reference = tableReferenceFromHTML(sourceHTML);
       const grids = Array.from(tableMatch[0].matchAll(/<table\b[\s\S]*?<\/table>/gi))
         .map((match) => ({ rows: structuredRowsFromTableHTML(match[0]) }))

@@ -132,4 +132,32 @@ assert.equal(
   "An explicit routed root must prioritize its material descendants over unrelated candidates."
 );
 
+const explicitTravelDistanceTopic = prioritizeResearchEvidence([
+  candidate("1017.2", "Exit access travel distance shall not exceed Table 1017.2.", {
+    exactReference: true,
+    exactTopicRouteTarget: true,
+    topicRoutes: ["exit-access travel-distance limits and measurement"]
+  }),
+  candidate("1017.1", "Travel distance is measured in accordance with this section.", {
+    exactTopicRouteTarget: true,
+    topicRoutes: ["exit-access travel-distance limits and measurement"]
+  }),
+  candidate("601.1", "Construction is classified by type in Table 601.", {
+    exactTopicRouteTarget: true,
+    topicRoutes: ["construction-type and building-element ratings"],
+    referencesTable: true
+  }),
+  candidate("1004.1", "Occupant load shall be determined by this section.", {
+    exactTopicRouteTarget: true,
+    topicRoutes: ["occupant-load calculation provisions"]
+  })
+]);
+assert.equal(explicitTravelDistanceTopic[0].evidencePriority.topicRouteRelationship, "aligned");
+assert.equal(explicitTravelDistanceTopic[1].evidencePriority.evidenceRole, "governing");
+for (const collateral of explicitTravelDistanceTopic.slice(2)) {
+  assert.equal(collateral.evidencePriority.evidenceRole, "supporting");
+  assert.equal(collateral.evidencePriority.topicRouteRelationship, "collateral");
+  assert.equal(collateral.evidencePriority.claimCoverageRequired, false);
+}
+
 console.log("Permitext deterministic Research evidence priority contract passed.");

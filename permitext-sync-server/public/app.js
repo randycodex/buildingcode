@@ -13615,7 +13615,11 @@ function renderResearchInterpretation(container, result, options = {}) {
       const citationButton = document.createElement("button");
       citationButton.type = "button";
       citationButton.textContent = [
-        citation.evidenceRole === "contextual" ? "Context" : "",
+        citation.evidenceRole === "contextual"
+          ? "Context"
+          : citation.evidenceRole === "supporting"
+            ? "Supporting"
+            : "",
         citation.codePrefix,
         citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
       ].filter(Boolean).join(" ");
@@ -13635,7 +13639,20 @@ function renderResearchInterpretation(container, result, options = {}) {
   const sourceSummary = result.sourceSummary || {};
   const enactedCount = Number(sourceSummary.enactedProvisionCount || 0);
   const contextualCount = Number(sourceSummary.contextualProvisionCount || 0);
-  const sourceScope = enactedCount
+  const citedProvisionCount = Number(sourceSummary.citedProvisionCount || 0);
+  const supportingCitationCount = Number(sourceSummary.supportingCitationCount || 0);
+  const reviewedOnlyProvisionCount = Number(sourceSummary.reviewedOnlyProvisionCount || 0);
+  const sourceScope = citedProvisionCount
+    ? [
+        `Cited ${citedProvisionCount} enacted ${citedProvisionCount === 1 ? "provision" : "provisions"}`,
+        supportingCitationCount
+          ? `${supportingCitationCount} supporting ${supportingCitationCount === 1 ? "citation" : "citations"}`
+          : "",
+        reviewedOnlyProvisionCount
+          ? `${reviewedOnlyProvisionCount} additional ${reviewedOnlyProvisionCount === 1 ? "provision" : "provisions"} reviewed`
+          : ""
+      ].filter(Boolean).join(" · ")
+    : enactedCount
     ? [
         `Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`,
         sourceSummary.userPinnedCount ? `${sourceSummary.userPinnedCount} pinned by you` : "",
@@ -13647,7 +13664,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   boundary.className = "research-answer-boundary";
   boundary.textContent = [
     sourceScope,
-    contextualCount
+    contextualCount && !citedProvisionCount
       ? `${contextualCount} contextual ${contextualCount === 1 ? "provision" : "provisions"} reviewed separately`
       : "",
     missingFactCount ? `${missingFactCount} project ${missingFactCount === 1 ? "fact remains" : "facts remain"} unresolved` : "No unresolved project facts identified",
@@ -13684,7 +13701,11 @@ function renderResearchInterpretation(container, result, options = {}) {
     result.citations.forEach((citation) => {
       const row = document.createElement("li");
       row.textContent = [
-        citation.evidenceRole === "contextual" ? "Context —" : "",
+        citation.evidenceRole === "contextual"
+          ? "Context —"
+          : citation.evidenceRole === "supporting"
+            ? "Supporting —"
+            : "",
         citation.codePrefix,
         citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
       ].filter(Boolean).join(" ");
@@ -15835,9 +15856,20 @@ function renderResearchAnswerSources(conversation, message) {
     message?.answer?.evidenceSourceIDs?.length || 0,
     message?.answer?.citations?.length || 0
   );
-  summary.textContent = sourceCount
-    ? `${sourceCount} ${sourceCount === 1 ? "source" : "sources"} used`
-    : "Sources used";
+  const evidenceEconomy = message?.answer?.answerQuality?.evidenceEconomy || {};
+  const citedSourceCount = Number(evidenceEconomy.citedSourceCount || 0);
+  const reviewedOnlySourceCount = Number(evidenceEconomy.reviewedOnlySourceCount || 0);
+  const sourceSummaryText = () => citedSourceCount
+    ? [
+        `${citedSourceCount} ${citedSourceCount === 1 ? "source" : "sources"} cited`,
+        reviewedOnlySourceCount
+          ? `${reviewedOnlySourceCount} additional ${reviewedOnlySourceCount === 1 ? "source" : "sources"} reviewed`
+          : ""
+      ].filter(Boolean).join(" · ")
+    : sourceCount
+      ? `${sourceCount} ${sourceCount === 1 ? "source" : "sources"} used`
+      : "Sources used";
+  summary.textContent = sourceSummaryText();
   const list = document.createElement("section");
   list.className = "research-answer-source-list";
   const renderSources = (sources) => {
@@ -15900,7 +15932,7 @@ function renderResearchAnswerSources(conversation, message) {
       const exactSources = researchDisplaySources([...enactedSources, ...supportingSources]);
       if (exactSources.length) {
         renderSources(exactSources);
-        summary.textContent = `${exactSources.length} ${exactSources.length === 1 ? "source" : "sources"} used`;
+        summary.textContent = sourceSummaryText();
       } else {
         renderSources(answerSources);
         if (!answerSources.length) list.textContent = "The exact source record is unavailable.";

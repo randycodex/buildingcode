@@ -1,4 +1,4 @@
-export const researchEvidencePriorityVersion = "20260811-deterministic-legal-function-v2";
+export const researchEvidencePriorityVersion = "20260811-deterministic-legal-function-v3";
 
 export const researchEvidenceFunctions = Object.freeze({
   controllingRule: "controlling_rule",
@@ -41,9 +41,31 @@ function uniqueDescriptors(values) {
   return result;
 }
 
-function inferredControllingRoots(items) {
+function topicRoutes(value) {
+  return Array.from(new Set(
+    (Array.isArray(value?.signals?.topicRoutes) ? value.signals.topicRoutes : [])
+      .map((route) => normalizedText(route).toLowerCase())
+      .filter(Boolean)
+  ));
+}
+
+function inferredControllingTopicRoutes(items) {
+  return Array.from(new Set(
+    (Array.isArray(items) ? items : [])
+      .filter((item) => item?.signals?.exactReference === true && item?.signals?.contextualReference !== true)
+      .flatMap(topicRoutes)
+  ));
+}
+
+function routeAligned(value, controllingTopicRoutes) {
+  if (!controllingTopicRoutes.length) return true;
+  const routes = topicRoutes(value);
+  return routes.some((route) => controllingTopicRoutes.includes(route));
+}
+
+function inferredControllingRoots(items, controllingTopicRoutes = []) {
   return uniqueDescriptors((Array.isArray(items) ? items : []).filter((item) =>
-    item?.signals?.exactTopicRouteTarget === true
+    item?.signals?.exactTopicRouteTarget === true && routeAligned(item, controllingTopicRoutes)
   ));
 }
 
@@ -140,6 +162,19 @@ function materialityRank({
 
 export function researchEvidencePriorityMetadata(value, options = {}) {
   const controllingRoots = uniqueDescriptors(options.controllingRoots);
+  const controllingTopicRoutes = Array.from(new Set(
+    (Array.isArray(options.controllingTopicRoutes) ? options.controllingTopicRoutes : [])
+      .map((route) => normalizedText(route).toLowerCase())
+      .filter(Boolean)
+  ));
+  const routes = topicRoutes(value);
+  const topicRouteRelationship = !controllingTopicRoutes.length
+    ? "unrestricted"
+    : routeAligned(value, controllingTopicRoutes)
+      ? "aligned"
+      : routes.length
+        ? "collateral"
+        : "unrouted";
   const controllingRoot = closestControllingRoot(value, controllingRoots);
   const text = sourceText(value);
   const pinned = isPinned(value);
@@ -185,6 +220,9 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
     controllingRoot: controllingRoot
       ? `${controllingRoot.codePrefix} ${controllingRoot.sectionNumber}`
       : null,
+    controllingTopicRoutes,
+    topicRoutes: routes,
+    topicRouteRelationship,
     hierarchyDepth: rootDepth,
     claimCoverageRequired,
     claimCoverageReason: claimCoverageRequired
@@ -207,16 +245,23 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
       ...(calculationTable ? ["calculation or table provision"] : []),
       ...(definition ? ["definition provision"] : []),
       ...(crossReference ? ["supporting cross-reference"] : []),
-      ...(contextual ? ["contextual reference being compared with the governing topic"] : [])
+      ...(contextual ? ["contextual reference being compared with the governing topic"] : []),
+      ...(topicRouteRelationship === "collateral"
+        ? ["collateral topic route matched only by supplied facts"]
+        : [])
     ]
   };
 }
 
 export function prioritizeResearchEvidence(values, options = {}) {
   const items = Array.isArray(values) ? values : [];
+  const controllingTopicRoutes = Array.from(new Set([
+    ...(Array.isArray(options.controllingTopicRoutes) ? options.controllingTopicRoutes : []),
+    ...inferredControllingTopicRoutes(items)
+  ].map((route) => normalizedText(route).toLowerCase()).filter(Boolean)));
   const controllingRoots = uniqueDescriptors([
     ...(Array.isArray(options.controllingRoots) ? options.controllingRoots : []),
-    ...inferredControllingRoots(items)
+    ...inferredControllingRoots(items, controllingTopicRoutes)
   ]);
   const requestedLimit = Number.parseInt(String(options.limit ?? items.length), 10);
   const limit = Number.isSafeInteger(requestedLimit) && requestedLimit >= 0
@@ -225,7 +270,10 @@ export function prioritizeResearchEvidence(values, options = {}) {
   return items.map((value, originalIndex) => ({
     value,
     originalIndex,
-    priority: researchEvidencePriorityMetadata(value, { controllingRoots })
+    priority: researchEvidencePriorityMetadata(value, {
+      controllingRoots,
+      controllingTopicRoutes
+    })
   })).sort((left, right) =>
     left.priority.materialityRank - right.priority.materialityRank ||
     (left.priority.hierarchyDepth ?? Number.MAX_SAFE_INTEGER) -

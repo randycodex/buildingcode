@@ -166,6 +166,10 @@ import {
   researchClaimMaterialityVersion
 } from "./research-claim-materiality.mjs";
 import {
+  evaluateResearchAnswerQuality,
+  researchAnswerQualityRevisionIssues
+} from "./research-answer-quality.mjs";
+import {
   resolveResearchConversationFacts,
   researchConversationFactPromptContext,
   researchConversationFactsVersion
@@ -5758,6 +5762,7 @@ function researchPrompt(question, evidence, options = {}) {
       `EVIDENCE_ORIGIN: ${section.origin || "user_pinned"}`,
       `EVIDENCE_FUNCTION: ${section.evidencePriority?.primaryFunction || "candidate"}`,
       `EVIDENCE_ROLE: ${section.evidencePriority?.evidenceRole || "supporting"}`,
+      `TOPIC_ROUTE_RELATIONSHIP: ${section.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
       `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
       section.evidencePriority?.claimCoverageReason
         ? `REQUIRED_CLAIM_REASON: ${section.evidencePriority.claimCoverageReason}`
@@ -5820,9 +5825,16 @@ function researchPrompt(question, evidence, options = {}) {
       ].filter(Boolean).join("\n\n")
     : "";
   const revisionFeedback = Array.isArray(options.revisionFeedback) && options.revisionFeedback.length
-    ? `VERIFIER FEEDBACK FOR ONE BOUNDED REVISION\n${options.revisionFeedback
-        .map((issue, index) => `${index + 1}. ${issue.type}: ${issue.detail}`)
-        .join("\n")}`
+    ? [
+        "VERIFIER FEEDBACK FOR ONE BOUNDED REVISION",
+        options.revisionFeedback
+          .map((issue, index) => `${index + 1}. ${issue.type}: ${issue.detail}`)
+          .join("\n"),
+        "REVISION NON-REGRESSION RULES",
+        "Resolve all listed feedback together while preserving every supported conclusion and established fact that the feedback does not contradict.",
+        "Do not fix one issue by inventing an unsupplied legal requirement, asking the user to reconfirm an established fact, or weakening the strongest conclusion supported by the same evidence.",
+        "For a numeric table comparison, retain the direct result under the strictest directly applicable supplied limit before discussing a more generous conditional allowance or a genuinely unresolved measurement or modification issue."
+      ].join("\n")
     : "";
   const structuredEvidenceAnalysis = options.structuredEvidenceAnalysis
     ? `STRUCTURED EVIDENCE ANALYSIS — INTERNAL RESEARCH MAP\n${JSON.stringify(options.structuredEvidenceAnalysis)}`
@@ -6072,6 +6084,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       "Organize the supplied enacted evidence into a compact internal legal-research map before a separate model writes the user-facing answer.",
       "Retrieval relevance does not establish legal applicability. Identify controlling provisions only when the supplied text supports that role.",
       "Treat evidence labeled contextual only as the subject of a relevance comparison. Do not place it among controlling provisions or general rules, and do not treat evidence labeled irrelevant as answer support.",
+      "Treat evidence labeled with a collateral topic route as internally reviewed material matched only by a supplied project fact. Do not classify it as controlling or a general rule for the current question unless the question expressly asks that separate legal topic.",
       "Separate general rules, exceptions, conditions, limitations, definitions, cross-references, tables, known project facts, unresolved project facts, and evidence limitations.",
       "Make the strongest supported distinctions, including contradictions in the user's premise and requirements attributed to the wrong exception.",
       "Use only exact supplied Project facts, established conversation facts, or current-turn hypothetical facts in projectFactsUsed. Do not turn missing facts into assumptions.",
@@ -6206,7 +6219,8 @@ export function researchInputForEvidence(question, evidence, options = {}) {
 
 function mockResearchInterpretation(question, evidence, options = {}) {
   const materialEvidence = evidence.filter((section) =>
-    !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole)
+    !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole) &&
+    section?.evidencePriority?.topicRouteRelationship !== "collateral"
   );
   const answerEvidence = materialEvidence.length ? materialEvidence : evidence;
   const subject = answerEvidence.length === 1
@@ -6238,7 +6252,7 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     evidenceLimitations: ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
     additionalEvidenceNeeded: ["Confirm any referenced standard, agency rule, figure, or other authority outside the current enacted corpus before final reliance."],
     supportingSourceUses: [],
-    citations: answerEvidence.map((section) => ({
+    citations: answerEvidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
       sectionID: section.sectionID,
       sourceIDs: [section.sourceID || `section-${section.sectionID}`],
       relevance: `Enacted evidence from ${section.sectionNumber || section.title}.`
@@ -6407,6 +6421,31 @@ function combinedResearchClaimRevisionIssues(...results) {
   });
 }
 
+function combinedResearchAnswerRevisionIssues(requiredClaimCoverage, claimMateriality, answerQuality) {
+  const issues = [
+    ...combinedResearchClaimRevisionIssues(requiredClaimCoverage, claimMateriality),
+    ...researchAnswerQualityRevisionIssues(answerQuality)
+  ];
+  const seen = new Set();
+  return issues.filter((issue) => {
+    const identity = JSON.stringify(issue);
+    if (seen.has(identity)) return false;
+    seen.add(identity);
+    return true;
+  });
+}
+
+export function accumulatedResearchVerificationIssues(attempts = []) {
+  const seen = new Set();
+  return attempts.flatMap((attempt) => Array.isArray(attempt?.issues) ? attempt.issues : [])
+    .filter((issue) => {
+      const identity = `${String(issue?.type || "").trim()}\u0000${String(issue?.detail || "").trim()}`;
+      if (seen.has(identity)) return false;
+      seen.add(identity);
+      return true;
+    });
+}
+
 export function validateResearchInterpretation(value, evidence, supportingSources = []) {
   const allowedSections = new Map();
   const allowedSources = new Map();
@@ -6559,6 +6598,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
   const cleanNarrative = (text) => String(text || "")
     .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
     .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
+    .replace(/[【】：「」『』。“”]+(?=\s*[A-Za-z0-9])/g, " ")
     .replace(/\s+([,.;:!?])/g, "$1")
     .replace(/[;,]\s*$/, "")
     .trim();
@@ -6670,9 +6710,11 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Do not use pretrained or uncited outside knowledge as legal authority and do not invent requirements.",
         "Treat user-provided Project facts and established active-topic conversation facts as factual context for this discussion, never as code authority or cited evidence.",
         "Do not ask the user to reconfirm an established active-topic fact merely because it was supplied in an earlier turn. Do not list such a fact in missingFacts. If final professional reliance requires independent verification, distinguish that later verification from whether the fact is already established in this conversation.",
+        "Preserve the factual content of an established user shorthand such as fully sprinklered. If a code benefit separately depends on compliance with a named installation standard, request records establishing that standard without asking again whether the building is fully sprinklered or the system is installed throughout.",
         "Apply current-turn hypothetical facts only to the current hypothetical. They do not replace established facts. User-stated unknowns remain unknown. Never promote an earlier assistant conclusion into a user-established fact.",
         "Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence.",
         "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
+        "Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic.",
         "Write the conclusion as a concise professional answer of one to three sentences.",
         conversational
           ? "For this ordinary Research conversation, write conclusion and explanation so they read consecutively as one natural response. Lead with the clearest supported answer, such as Yes, No, or Potentially, then explain why in direct plain language. Avoid report boilerplate, process narration, repeated question text, and phrases such as a project-specific answer requires reading. Keep the tone professional but conversational."
@@ -6683,6 +6725,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Keep the answer within the scope of the current question. Do not introduce or cite a collateral code analysis merely to observe that a supplied fact might matter elsewhere; mention another code topic only when it materially qualifies the requested conclusion or the user asks for it.",
         "Use explanation for the practical application of the supported points to the question and user-provided Project facts. Do not merely repeat the numbered points.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
+        "For a numeric limit or table comparison, compare the stated project value with every directly applicable supplied limit. If the value complies with a stricter baseline limit, state that direct conclusion and do not make it conditional on qualifying for a more generous allowance.",
+        "A missing fact belongs in missingFacts or followUpQuestions only when it can change the requested conclusion. A fact that merely confirms an already-supported, more conservative result may be identified as a professional validation item, but it must not weaken or condition that result.",
+        "Treat a corpus or evidence limitation as a boundary on what Permitext evaluated, not as proof that another provision imposes a requirement. Do not say an outside or unsupplied provision requires verification or might change the result unless supplied enacted evidence establishes that consequence.",
         "Every passage marked REQUIRED_CLAIM_COVERAGE must be addressed in at least one supportedPoint and cited with that exact PASSAGE_ID. Combine closely related passages in one coherent supportedPoint when needed; do not satisfy this by adding an orphan citation without explaining the rule.",
         "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
           "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
@@ -6764,7 +6809,10 @@ const researchVerificationIssueTypes = new Set([
   "overstated_compliance",
   "missed_premise_contradiction",
   "incorrect_citation",
-  "weakest_supported_conclusion"
+  "weakest_supported_conclusion",
+  "irrelevant_citation",
+  "unnecessary_qualification",
+  "repeated_established_fact"
 ]);
 const maximumResearchVerificationAttempts = 3;
 
@@ -6825,6 +6873,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     `PASSAGE_ID: ${source.sourceID}`,
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
     `EVIDENCE_ROLE: ${source.evidencePriority?.evidenceRole || "supporting"}`,
+    `TOPIC_ROUTE_RELATIONSHIP: ${source.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
     `TEXT: ${source.text}`
   ].join("\n")).join("\n\n---\n\n");
   const requestBody = {
@@ -6839,6 +6888,12 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
       "Fail an answer that introduces a collateral code example or citation that does not materially qualify the requested conclusion and was not requested by the user.",
+      "Fail with irrelevant_citation when the answer cites evidence labeled with a collateral topic route merely because a supplied project fact matched that separate code topic. Such evidence may be reviewed internally without appearing in the answer.",
+      "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
+      "Fail with repeated_established_fact when the answer asks the user to establish or reconfirm a fact already supplied for the active topic. Independent professional verification of documents or measurements is different and may still be identified when material.",
+      "When the user has established that a building is fully sprinklered, treat installed throughout as established factual context. The answer may request documentation of compliance with a named installation standard when material, but must not return fully sprinklered or installed throughout as a missing fact or follow-up question.",
+      "For a numeric limit or table comparison, fail with weakest_supported_conclusion when the stated value satisfies a stricter directly applicable supplied limit but the answer makes compliance conditional on qualifying for a more generous allowance.",
+      "Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement, or says unsupplied law requires verification or could change the result without enacted support.",
       "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",
       "Treat established active-topic facts as supplied user facts. Fail an answer that calls one of them missing, makes the conclusion conditional solely because it came from an earlier turn, or asks the user to reconfirm it without a contradiction. Do not treat prior assistant conclusions as established facts.",
       "Apply current-turn hypothetical facts only to the current question, and keep user-stated unknowns unresolved.",
@@ -13614,18 +13669,22 @@ async function handleResearchConversationMessage(request, response) {
       evidence: assembledEvidence,
       answer: result.interpretation
     });
+    let answerQuality = evaluateResearchAnswerQuality({
+      evidence: assembledEvidence,
+      answer: result.interpretation
+    });
     if (mockMode) {
       verificationAttempts = [{
-        pass: requiredClaimCoverage.pass && claimMateriality.pass,
-        issues: requiredClaimCoverage.pass && claimMateriality.pass
+        pass: requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass,
+        issues: requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass
           ? []
-          : combinedResearchClaimRevisionIssues(requiredClaimCoverage, claimMateriality),
-        model: requiredClaimCoverage.pass && claimMateriality.pass
+          : combinedResearchAnswerRevisionIssues(requiredClaimCoverage, claimMateriality, answerQuality),
+        model: requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass
           ? "permitext-mock"
-          : "permitext-deterministic-claim-materiality-gate"
+          : "permitext-deterministic-answer-quality-gate"
       }];
-      if (!requiredClaimCoverage.pass || !claimMateriality.pass) {
-        const error = new Error("The mock Research answer omitted required material enacted evidence.");
+      if (!requiredClaimCoverage.pass || !claimMateriality.pass || !answerQuality.pass) {
+        const error = new Error("The mock Research answer failed deterministic materiality or evidence-economy checks.");
         error.code = "RESEARCH_VERIFICATION_FAILED";
         error.verificationAttempts = verificationAttempts;
         throw error;
@@ -13643,7 +13702,7 @@ async function handleResearchConversationMessage(request, response) {
             webSupport,
             codeBasis: answerCodeBasis,
             requiredClaims,
-            revisionFeedback: verificationAttempts.at(-1).issues
+            revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts)
           });
           answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
           result = revised;
@@ -13658,14 +13717,18 @@ async function handleResearchConversationMessage(request, response) {
           evidence: assembledEvidence,
           answer: result.interpretation
         });
-        if (!requiredClaimCoverage.pass || !claimMateriality.pass) {
+        answerQuality = evaluateResearchAnswerQuality({
+          evidence: assembledEvidence,
+          answer: result.interpretation
+        });
+        if (!requiredClaimCoverage.pass || !claimMateriality.pass || !answerQuality.pass) {
           verificationAttempts.push({
             pass: false,
-            issues: combinedResearchClaimRevisionIssues(requiredClaimCoverage, claimMateriality),
-            model: "permitext-deterministic-claim-materiality-gate"
+            issues: combinedResearchAnswerRevisionIssues(requiredClaimCoverage, claimMateriality, answerQuality),
+            model: "permitext-deterministic-answer-quality-gate"
           });
           if (attempt === maximumResearchVerificationAttempts - 1) {
-            const error = new Error("The answer omitted required material enacted evidence after two bounded revisions.");
+            const error = new Error("The answer failed deterministic materiality or evidence-economy checks after two bounded revisions.");
             error.code = "RESEARCH_VERIFICATION_FAILED";
             error.verificationAttempts = verificationAttempts;
             throw error;
@@ -13737,6 +13800,11 @@ async function handleResearchConversationMessage(request, response) {
         sourceSummary: {
           enactedProvisionCount: new Set(materialAssembledEvidence.map((section) => section.sectionID)).size,
           contextualProvisionCount: new Set(contextualAssembledEvidence.map((section) => section.sectionID)).size,
+          citedProvisionCount: answerQuality.evidenceEconomy.citedProvisionCount,
+          governingCitationCount: answerQuality.evidenceEconomy.governingCitationCount,
+          supportingCitationCount: answerQuality.evidenceEconomy.supportingCitationCount,
+          contextualCitationCount: answerQuality.evidenceEconomy.contextualCitationCount,
+          reviewedOnlyProvisionCount: answerQuality.evidenceEconomy.reviewedOnlyProvisionCount,
           userPinnedCount: materialAssembledEvidence.filter((section) => section.origin === "user_pinned").length,
           permitextDiscoveredCount: materialAssembledEvidence.filter((section) => section.origin === "permitext_discovered").length,
           crossReferenceCount: materialAssembledEvidence.filter((section) => section.origin === "permitext_cross_reference").length,
@@ -13748,6 +13816,7 @@ async function handleResearchConversationMessage(request, response) {
         conversationFacts: conversationFactState,
         requiredClaimCoverage,
         claimMateriality,
+        answerQuality,
         retrieval: {
           schemaVersion: evidencePackage.schemaVersion,
           assemblyVersion: evidencePackage.assemblyVersion,
