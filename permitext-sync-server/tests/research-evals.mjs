@@ -2407,7 +2407,7 @@ async function runSelfTest(dataset, datasetText) {
   try {
     validateResearchInterpretation({
       ...interpretation,
-      supportedPoints: Array.from({ length: 9 }, () => interpretation.supportedPoints[0])
+      supportedPoints: Array.from({ length: 13 }, () => interpretation.supportedPoints[0])
     }, validationEvidence);
   } catch (error) {
     excessiveSupportedPointsRejected = error.code === "INVALID_RESEARCH_RESPONSE";

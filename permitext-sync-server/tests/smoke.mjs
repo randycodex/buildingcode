@@ -5815,6 +5815,8 @@ async function main() {
         ) &&
         reusedResearchEvidence.json.conversation.sources[0].id !==
           createdConversation.json.conversation.sources[0].id &&
+        reusedResearchEvidence.json.conversation.sources[0].selectedText ===
+          selectedResearchText &&
         !JSON.stringify(reusedResearchEvidence.json.conversation).includes("When must the owner notify the department?"),
       "Reusing approved evidence did not create a fresh Project-linked conversation with new evidence identities."
     );

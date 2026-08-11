@@ -387,6 +387,8 @@ const allowedMutationKinds = new Set([
 ]);
 const allowedCodeVersionClearScopes = new Set(["bookmarks", "notes", "tags", "folders"]);
 
+const maximumResearchSupportedPoints = 12;
+
 const researchInterpretationSchema = {
   type: "object",
   additionalProperties: false,
@@ -395,7 +397,7 @@ const researchInterpretationSchema = {
     supportedPoints: {
       type: "array",
       minItems: 1,
-      maxItems: 8,
+      maxItems: maximumResearchSupportedPoints,
       items: {
         type: "object",
         additionalProperties: false,
@@ -6065,12 +6067,16 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
         "content-type": "application/json"
       },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(35_000)
+      // Terra can spend more than 35 seconds organizing a dense, multi-branch
+      // evidence package even when retrieval itself is compact. Keep this
+      // bounded, but allow the structured analysis call to finish.
+      signal: AbortSignal.timeout(60_000)
     });
   } catch (error) {
     const providerError = new Error("The Research evidence-analysis request failed.");
     providerError.code = "RESEARCH_PROVIDER_ERROR";
     providerError.cause = error;
+    providerError.providerCause = String(error?.name || error?.code || "network-error").slice(0, 120);
     throw providerError;
   }
   const payload = await response.json().catch(() => ({}));
@@ -6162,7 +6168,7 @@ function mockResearchInterpretation(question, evidence, options = {}) {
         ? "Potentially, yes—but only if the conditions in the assembled enacted provisions are satisfied by the project."
         : "The assembled enacted provisions provide a conditional answer, but the remaining project facts must be confirmed before relying on it."
       : `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`,
-    supportedPoints: evidence.slice(0, 8).map((section) => ({
+    supportedPoints: evidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
         ? `This provision supplies one of the rules that controls the answer to “${question}”.`
@@ -6348,7 +6354,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       typeof value.conclusion !== "string" || !value.conclusion.trim() ||
       !Array.isArray(value.supportedPoints) ||
       value.supportedPoints.length === 0 ||
-      value.supportedPoints.length > 8 ||
+      value.supportedPoints.length > maximumResearchSupportedPoints ||
       typeof value.explanation !== "string" || !value.explanation.trim() ||
       !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
       !Array.isArray(value.missingFacts) || !value.missingFacts.every((item) => typeof item === "string") ||
@@ -12444,20 +12450,44 @@ async function handleResearchConversationReuseEvidence(request, response) {
   }
   const sources = [];
   const relatedSectionIDs = new Set();
+  const answerEvidence = Array.isArray(answer.evidence) ? answer.evidence : [];
+  const pinnedEvidence = answerEvidence.filter((snapshot) =>
+    snapshot?.provenance?.origin === "user_pinned"
+  );
+  const reusableEvidence = pinnedEvidence.length ? pinnedEvidence : answerEvidence;
+  let unavailableAutomaticEvidenceCount = 0;
   try {
-    for (const snapshot of answer.evidence || []) {
+    for (const snapshot of reusableEvidence) {
       const visualSourceIDs = (snapshot.visualSources || []).map((source) => source.id);
-      const resolved = await researchSourcesForSelection(
-        snapshot.sectionID,
-        snapshot.passageText,
-        {
-          richSourceIDs: snapshot.structuredSource?.id
-            ? [snapshot.structuredSource.id]
-            : [],
-          visualSourceIDs,
-          visualReviewConfirmed: visualSourceIDs.length > 0
+      let resolved;
+      try {
+        resolved = await researchSourcesForSelection(
+          snapshot.sectionID,
+          snapshot.provenance?.userSelectedText || snapshot.passageText,
+          {
+            richSourceIDs: snapshot.structuredSource?.id
+              ? [snapshot.structuredSource.id]
+              : [],
+            visualSourceIDs,
+            visualReviewConfirmed: visualSourceIDs.length > 0
+          }
+        );
+      } catch (error) {
+        if (
+          !pinnedEvidence.length &&
+          [
+            "INVALID_RESEARCH_SELECTION",
+            "INVALID_RESEARCH_SECTION",
+            "INVALID_RESEARCH_RICH_SOURCE",
+            "INVALID_RESEARCH_VISUAL_SOURCE",
+            "RESEARCH_VISUAL_REVIEW_REQUIRED"
+          ].includes(error.code)
+        ) {
+          unavailableAutomaticEvidenceCount += 1;
+          continue;
         }
-      );
+        throw error;
+      }
       resolved.forEach((source) => {
         if (source.kind === "selection") {
           sources.push({
@@ -12514,7 +12544,9 @@ async function handleResearchConversationReuseEvidence(request, response) {
     origin: {
       kind: "reusedEvidence",
       answerID: answer.id,
-      sourceConversationID: answer.conversationID
+      sourceConversationID: answer.conversationID,
+      reusedEvidenceCount: reusableEvidence.length - unavailableAutomaticEvidenceCount,
+      unavailableAutomaticEvidenceCount
     },
     sources,
     messages: []
@@ -13749,7 +13781,8 @@ async function handleResearchConversationMessage(request, response) {
         providerStatus: error.providerStatus || null,
         incompleteReason: error.incompleteReason || null,
         providerUsage: error.providerUsage || null,
-        bindingIssue: error.bindingIssue || null
+        bindingIssue: error.bindingIssue || null,
+        providerCause: error.providerCause || null
       }));
       sendError(response, 502, "The research model could not return a verified, cited answer.");
       return;
