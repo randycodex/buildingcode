@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { approvedEvaluationCases, validateEvaluationDataset } from "../evals/evaluation-schema.mjs";
 import {
+  normalizeResearchInterpretationEvidenceBindings,
   researchInputForEvidence,
   validateResearchInterpretation
 } from "../app.mjs";
@@ -2363,6 +2364,42 @@ async function runSelfTest(dataset, datasetText) {
       validatedInterpretation.assumptions[0] === "Assumption." &&
       validatedInterpretation.citations[0].relevance === "Relevant.",
     "Production Research validation exposed internal evidence identifiers in user-facing prose."
+  );
+  const normalizedBindings = normalizeResearchInterpretationEvidenceBindings({
+    ...interpretation,
+    supportedPoints: interpretation.supportedPoints.map((point) => ({
+      ...point,
+      sectionID: "202",
+      sourceIDs: ["source-a", "source-a"]
+    })),
+    citations: interpretation.citations.map((citation) => ({
+      ...citation,
+      sectionID: "202"
+    }))
+  }, validationEvidence);
+  const normalizedInterpretation = validateResearchInterpretation(normalizedBindings, validationEvidence);
+  assert(
+    normalizedInterpretation.supportedPoints[0].sectionID === "101" &&
+      normalizedInterpretation.supportedPoints[0].sourceIDs.length === 1 &&
+      normalizedInterpretation.citations[0].sectionID === "101",
+    "Production Research did not normalize harmless duplicate passage IDs and canonicalize the redundant section ID."
+  );
+  const mixedBinding = normalizeResearchInterpretationEvidenceBindings({
+    ...interpretation,
+    supportedPoints: [{
+      ...interpretation.supportedPoints[0],
+      sourceIDs: ["source-a", "source-b"]
+    }]
+  }, validationEvidence);
+  let mixedBindingRejected = false;
+  try {
+    validateResearchInterpretation(mixedBinding, validationEvidence);
+  } catch (error) {
+    mixedBindingRejected = error.code === "INVALID_RESEARCH_CITATION";
+  }
+  assert(
+    mixedBindingRejected,
+    "Production Research accepted a supported point spanning source passages from different sections."
   );
   let excessiveSupportedPointsRejected = false;
   try {

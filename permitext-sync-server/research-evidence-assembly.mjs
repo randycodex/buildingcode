@@ -1,4 +1,4 @@
-export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v2";
+export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v3";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -189,9 +189,33 @@ async function canonicalSection(resolveSection, value, origin) {
 }
 
 function inlineCrossReferences(text, fallbackCodePrefix) {
+  const source = compactText(text);
   const references = [];
+  const rangePattern = /\b(?:(AC|BC|EBC|FC|FGC|MC|PC)\s+)?(?:Sections?|§{1,2})\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\s+(?:through|to|[-–])\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
+  for (const match of source.matchAll(rangePattern)) {
+    const start = String(match[2] || "").replace(/\.$/, "");
+    const end = String(match[3] || "").replace(/\.$/, "");
+    const startParts = start.split(".");
+    const endParts = end.split(".");
+    const sameParent = startParts.length === endParts.length &&
+      startParts.length > 1 &&
+      startParts.slice(0, -1).join(".") === endParts.slice(0, -1).join(".");
+    const first = Number(startParts.at(-1));
+    const last = Number(endParts.at(-1));
+    if (!sameParent || !Number.isInteger(first) || !Number.isInteger(last) || last < first || last - first > 50) {
+      continue;
+    }
+    const codePrefix = String(match[1] || fallbackCodePrefix || "").toUpperCase();
+    for (let value = first; value <= last; value += 1) {
+      references.push({
+        codePrefix,
+        sectionNumber: [...startParts.slice(0, -1), value].join("."),
+        referenceKind: "section"
+      });
+    }
+  }
   const pattern = /\b(?:(AC|BC|EBC|FC|FGC|MC|PC)\s+)?(?:Sections?|§{1,2}|Table)\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
-  for (const match of compactText(text).matchAll(pattern)) {
+  for (const match of source.matchAll(pattern)) {
     references.push({
       codePrefix: String(match[1] || fallbackCodePrefix || "").toUpperCase(),
       sectionNumber: String(match[2] || "").replace(/\.$/, ""),

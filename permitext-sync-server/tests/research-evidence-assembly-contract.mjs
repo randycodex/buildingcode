@@ -50,6 +50,34 @@ const canonicalSections = new Map([
     sectionNumber: "1006.3",
     title: "Egress from stories",
     canonicalText: "BC 1006.3 Egress from stories. Canonical cross-reference two."
+  }],
+  ["range-root", {
+    sectionID: "range-root",
+    codePrefix: "BC",
+    sectionNumber: "1107.6",
+    title: "Group R",
+    canonicalText: "Accessible unit categories shall comply with Sections 1107.6.1 through 1107.6.3."
+  }],
+  ["range-one", {
+    sectionID: "range-one",
+    codePrefix: "BC",
+    sectionNumber: "1107.6.1",
+    title: "Group R-1",
+    canonicalText: "Group R-1 enacted text."
+  }],
+  ["range-two", {
+    sectionID: "range-two",
+    codePrefix: "BC",
+    sectionNumber: "1107.6.2",
+    title: "Group R-2",
+    canonicalText: "Group R-2 enacted text."
+  }],
+  ["range-three", {
+    sectionID: "range-three",
+    codePrefix: "BC",
+    sectionNumber: "1107.6.3",
+    title: "Group R-3",
+    canonicalText: "Group R-3 enacted text."
   }]
 ]);
 
@@ -224,6 +252,20 @@ const structuredPinned = await assembleResearchEvidence({
 assert.equal(structuredPinned.sources[0].text, "Exact structured table text.");
 assert.equal(structuredPinned.sources[0].richSourceID, "table-source-1");
 assert.equal(structuredPinned.sources[0].richSourceGrids[0].rows[0].cells[0].rowSpan, 1);
+
+const rangedCrossReferences = await assembleResearchEvidence({
+  question: "Which residential accessibility category applies?",
+  discover: async () => ({ candidates: [{ sectionID: "range-root", codePrefix: "BC", sectionNumber: "1107.6" }] }),
+  resolveSection,
+  limits: { maximumDiscovered: 1, maximumCrossReferences: 3, maximumCharacters: 2_000 }
+});
+assert.deepEqual(
+  rangedCrossReferences.sources
+    .filter((source) => source.origin === "permitext_cross_reference")
+    .map((source) => source.sectionNumber),
+  ["1107.6.1", "1107.6.2", "1107.6.3"],
+  "Same-parent enacted section ranges must expand into each direct cross-reference."
+);
 
 const independentQuery = researchEvidenceRetrievalQuery({
   question: "What occupant load factor applies to an office?",

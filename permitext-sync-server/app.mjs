@@ -468,6 +468,33 @@ function researchInterpretationSchemaForEvidence(evidence, supportingSources = [
   return schema;
 }
 
+export function normalizeResearchInterpretationEvidenceBindings(value, evidence) {
+  if (!value || typeof value !== "object") return value;
+  const sourceSectionIDs = new Map((evidence || []).map((source) => [
+    String(source?.sourceID || `section-${source?.sectionID || ""}`),
+    String(source?.sectionID || "")
+  ]));
+  const normalizeBinding = (item) => {
+    if (!item || typeof item !== "object" || !Array.isArray(item.sourceIDs)) return item;
+    const sourceIDs = Array.from(new Set(
+      item.sourceIDs.map((sourceID) => String(sourceID || "").trim()).filter(Boolean)
+    ));
+    if (!sourceIDs.length) return item;
+    const sectionIDs = new Set(sourceIDs.map((sourceID) => sourceSectionIDs.get(sourceID)).filter(Boolean));
+    if (sectionIDs.size !== 1 || sourceIDs.some((sourceID) => !sourceSectionIDs.has(sourceID))) return item;
+    return { ...item, sectionID: Array.from(sectionIDs)[0], sourceIDs };
+  };
+  return {
+    ...value,
+    supportedPoints: Array.isArray(value.supportedPoints)
+      ? value.supportedPoints.map(normalizeBinding)
+      : value.supportedPoints,
+    citations: Array.isArray(value.citations)
+      ? value.citations.map(normalizeBinding)
+      : value.citations
+  };
+}
+
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) {
     return fallback;
@@ -6533,7 +6560,11 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     throw invalidResponse;
   }
   return {
-    interpretation: validateResearchInterpretation(value, passageEvidence, supportingSources),
+    interpretation: validateResearchInterpretation(
+      normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
+      passageEvidence,
+      supportingSources
+    ),
     requestedModel: model,
     model: payload.model || model,
     configuration,

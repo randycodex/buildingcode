@@ -11,6 +11,7 @@ const checks = [
   ["At what point is a standpipe required and what type of standpipe applies?", ["905.3", "905.3.1"]],
   ["Which high-rise systems require emergency or standby power?", ["403.4.8", "403.4.8.3.2", "403.4.8.4.2", "403.4.8.4.3", "2702.1"]],
   ["Does the number of stories alone establish that an elevator is required?", ["1104.4"]],
+  ["In a residential project containing 100 dwelling units, explain which categories of accessible units must be considered and what additional project information is necessary to calculate the required quantities.", ["1107.6", "1107.6.1", "1107.6.1.1", "1107.6.1.2", "1107.6.2", "1107.6.2.1", "1107.6.2.2", "1107.6.3", "1107.7", "1107.7.4"]],
   ["What structural live load applies to a community room?", ["1607.1"]],
   ["Does converting an office to dense file storage require structural evaluation?", ["1604.2", "1607.1"]]
 ];

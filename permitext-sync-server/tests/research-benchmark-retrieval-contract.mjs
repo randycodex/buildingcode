@@ -30,10 +30,10 @@ assert.deepEqual(
 const residentialUnitReferences = requiredBuildingCodeReferences(caseByNumber.get(25), canonicalIndex);
 assert.deepEqual(
   residentialUnitReferences.references.map((item) => item.sectionNumber),
-  ["1107.6"],
-  "Project-dependent residential subsections must not inflate strict required recall."
+  ["1107.6", "1107.6.1", "1107.6.2", "1107.6.3", "1107.6.1.1", "1107.6.1.2", "1107.6.2.1", "1107.6.2.2"],
+  "A comparison across residential unit categories must retrieve every material Group R branch and quantity provision."
 );
-assert.equal(residentialUnitReferences.skipped.length, 3);
+assert.equal(residentialUnitReferences.skipped.length, 0);
 
 await withOfflineResearchHTTPHarness("benchmark-retrieval", async ({ discover, resolveSection }) => {
   const report = await evaluateResearchBenchmarkRetrieval({
@@ -45,7 +45,7 @@ await withOfflineResearchHTTPHarness("benchmark-retrieval", async ({ discover, r
   assert.equal(report.scope.firstCase, 1);
   assert.equal(report.scope.lastCase, 27);
   assert.equal(report.summary.caseCount, 27);
-  assert.equal(report.summary.requiredCitationCount, 48);
+  assert.equal(report.summary.requiredCitationCount, 55);
   assert.equal(report.summary.candidateRecall, 1);
   assert.equal(report.summary.evidenceRecall, 1);
   assert.equal(report.summary.fullCandidateRecallCases, 27);

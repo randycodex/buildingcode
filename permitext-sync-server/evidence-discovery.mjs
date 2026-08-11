@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260811-hybrid-candidates-v13";
+export const evidenceDiscoveryVersion = "20260811-hybrid-candidates-v14";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -302,7 +302,18 @@ const topicRoutes = [
   {
     pattern: /\b(?:accessible|type\s+b\+?nyc|type\s+b)\s+units?\b|\bcategories\s+of\s+accessible\s+units?\b/i,
     label: "residential accessible-unit scoping",
-    targets: [{ codePrefix: "BC", sectionPrefix: "1107.6" }]
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1107.6" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.1" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.1.1" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.1.2" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.2" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.2.1" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.2.2" },
+      { codePrefix: "BC", sectionPrefix: "1107.6.3" },
+      { codePrefix: "BC", sectionPrefix: "1107.7" },
+      { codePrefix: "BC", sectionPrefix: "1107.7.4" }
+    ]
   },
   {
     pattern: /\bmaneuvering\s+clearance\b.*\bdoor\b|\bdoor\s+configuration\b.*\baccessible\b|\bbathroom\b.*\baccessib(?:le|ility)\b/i,

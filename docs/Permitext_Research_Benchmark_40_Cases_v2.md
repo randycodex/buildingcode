@@ -524,7 +524,8 @@ Citation labels:
 **Ideal answer:** The 100-unit total alone is insufficient. Under NYC BC §1107.6, the Building Code categories to evaluate depend first on the residential occupancy group: Group R-1 provisions address Accessible units, Type B+NYC units, and Type B units; Group R-2 provisions address Type B+NYC units and Type B units; and qualifying Group R-3 buildings address Type B units. "Type A unit" is not a general unit-count category in these NYC residential scoping provisions and must not be substituted for Type B+NYC. Permitext needs the exact R occupancy, whether units are dwelling or sleeping units and transient or permanent, the number and distribution of units by story, elevator service, unit/story exemptions, and whether this is new construction or work in a prior-code building. It should then calculate each applicable category under the matching §1107.6 subsection. Funding or agency programs may impose separate unit categories or quantities, but those are outside authorities and must be stated separately.
 
 **Expected citations:**
-- **Required:** NYC BC §1107.6 and the applicable §1107.6.1, §1107.6.2, or §1107.6.3 subsection - Residential unit categories and scoping by Group R occupancy
+- **Required:** NYC BC §1107.6, §1107.6.1, §1107.6.2, and §1107.6.3 - Residential unit categories and scoping across the Group R branches that the question asks Permitext to compare
+- **Required:** NYC BC §1107.6.1.1, §1107.6.1.2, §1107.6.2.1, and §1107.6.2.2 - Group-specific Accessible, Type B+NYC, and Type B quantity provisions needed to explain how the 100-unit input would be used after occupancy is known
 - **Conditional:** NYC BC §1107.7 - Permitted reductions/exceptions for Type B units, when the project facts invoke them
 - **Supporting:** NYC BC §202 - Definitions of Accessible unit, Type B+NYC unit, and Type B unit
 - **Supporting:** NYC BC §1101.2 - Incorporation of ICC A117.1 for technical design criteria
