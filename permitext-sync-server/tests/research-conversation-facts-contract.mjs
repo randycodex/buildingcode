@@ -123,4 +123,56 @@ const returned = resolveResearchConversationFacts({
 });
 assert.equal(returned.establishedFacts.find((item) => item.key === "use")?.value, "a small architectural office");
 
+const expanded = resolve(
+  "This is an existing six-story Group R-2 building of Type IIB construction, 68 feet high."
+);
+const expandedFacts = Object.fromEntries(expanded.facts.establishedFacts.map((item) => [item.key, item.value]));
+assert.equal(expandedFacts.building_status, "existing");
+assert.equal(expandedFacts.story_count, "6");
+assert.equal(expandedFacts.occupancy_group, "R-2");
+assert.equal(expandedFacts.construction_type, "IIB");
+assert.equal(expandedFacts.building_height_feet, "68");
+
+const workFacts = resolve(
+  "The work is an alteration on the third floor.",
+  expanded.topicContext,
+  [{ role: "user", question: expanded.topicContext.currentTopic }]
+);
+assert.equal(workFacts.topicDecision.decision, "continuation");
+assert.equal(workFacts.facts.establishedFacts.find((item) => item.key === "work_scope")?.value, "alteration");
+assert.equal(workFacts.facts.establishedFacts.find((item) => item.key === "floor_location")?.value, "3");
+
+const egressFacts = resolve(
+  "The occupant load is 48 and the exit access travel distance is 120 feet.",
+  workFacts.topicContext,
+  [{ role: "user", question: workFacts.topicContext.currentTopic }]
+);
+assert.equal(egressFacts.facts.establishedFacts.find((item) => item.key === "occupant_load")?.value, "48");
+assert.equal(egressFacts.facts.establishedFacts.find((item) => item.key === "travel_distance_feet")?.value, "120");
+
+const filing = resolve(
+  "The application was filed August 10, 2026 under the 2022 Construction Codes.",
+  egressFacts.topicContext,
+  [{ role: "user", question: egressFacts.topicContext.currentTopic }]
+);
+assert.equal(filing.facts.establishedFacts.find((item) => item.key === "filing_date")?.value, "2026-08-10");
+assert.equal(filing.facts.establishedFacts.find((item) => item.key === "code_basis_year")?.value, "2022");
+
+const combinedNaturalFacts = resolve(
+  "An existing six-story Group R-2 building of Type IIB construction is 68 feet high and fully sprinklered."
+);
+assert.equal(combinedNaturalFacts.facts.establishedFacts.find((item) => item.key === "building_status")?.value, "existing");
+assert.equal(combinedNaturalFacts.facts.establishedFacts.find((item) => item.key === "sprinkler_status")?.value, "fully_sprinklered");
+
+assert.equal(
+  resolve("BC 1017.2 permits an exit access travel distance of 250 feet.").facts.establishedFacts.length,
+  0,
+  "A code travel-distance threshold was incorrectly promoted into a project fact."
+);
+assert.equal(
+  resolve("Table 601 lists Type IIB construction.").facts.establishedFacts.length,
+  0,
+  "A construction type mentioned in enacted text was incorrectly promoted into a project fact."
+);
+
 console.log("Permitext topic-scoped conversation facts contract passed.");

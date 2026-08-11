@@ -1,4 +1,4 @@
-export const researchConversationTopicVersion = "20260811-deterministic-topic-decision-v1";
+export const researchConversationTopicVersion = "20260811-deterministic-topic-decision-v2";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -157,9 +157,13 @@ function decisionSignals(question, rootTopic, currentTopic) {
     /\b(?:related|relevant|responsive|contribute|support|apply|applicable|compare|relationship)\b/i.test(question) &&
     /\b(?:main|original|first|root|prior|previous|earlier|question|answer|issue|topic|this|that)\b/i.test(question);
   const explicitSwitch = /^(?:new topic|different (?:topic|question)|separate(?:ly)?|unrelated (?:topic|question)|moving on|another (?:topic|question))\b/i.test(question);
+  const projectSubjectContinuation = /^(?:the|this|that|our|my)\s+(?:building|structure|project|work|scope|space|room|application|occupant load|(?:exit access )?travel distance|construction type|building height)\b/i.test(question);
+  const hypotheticalContinuation = /^(?:what if|suppose|assuming|assume|hypothetically)\b/i.test(question);
   const contextualContinuation =
     /^(?:why|how so|explain|tell me more|more details?|go on|what about)\b/i.test(question) ||
-    /\b(?:it|its|that|this|those|these|them|they|same|above|remaining|further)\b/i.test(question);
+    /\b(?:it|its|that|this|those|these|them|they|same|above|remaining|further)\b/i.test(question) ||
+    projectSubjectContinuation ||
+    hypotheticalContinuation;
   const questionReferences = extractResearchCodeReferences(question);
   const topicReferences = [...rootTopic.codeReferences, ...currentTopic.codeReferences];
   const relatedReference = referencesOverlap(questionReferences, topicReferences);
@@ -173,6 +177,8 @@ function decisionSignals(question, rootTopic, currentTopic) {
     correction,
     relevanceComparison,
     explicitSwitch,
+    projectSubjectContinuation,
+    hypotheticalContinuation,
     contextualContinuation,
     relatedReference,
     disjointExplicitReference,
@@ -247,6 +253,8 @@ export function decideResearchConversationTopic({
       correction: signals.correction,
       relevanceComparison: signals.relevanceComparison,
       explicitSwitch: signals.explicitSwitch,
+      projectSubjectContinuation: signals.projectSubjectContinuation,
+      hypotheticalContinuation: signals.hypotheticalContinuation,
       contextualContinuation: signals.contextualContinuation,
       relatedReference: signals.relatedReference,
       disjointExplicitReference: signals.disjointExplicitReference,

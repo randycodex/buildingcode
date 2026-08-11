@@ -88,6 +88,20 @@ const uncitedSwitch = decideResearchConversationTopic({
 assert.equal(uncitedSwitch.decision, researchConversationTopicDecisions.topicSwitch);
 assert.equal(uncitedSwitch.signals.selfContained, true);
 
+const projectFactContinuation = decideResearchConversationTopic({
+  question: "The work is an alteration on the third floor.",
+  previousMessages: history
+});
+assert.equal(projectFactContinuation.decision, researchConversationTopicDecisions.continuation);
+assert.equal(projectFactContinuation.signals.projectSubjectContinuation, true);
+
+const explicitProjectSwitch = decideResearchConversationTopic({
+  question: "New topic: the project is a one-story retail building.",
+  previousMessages: history
+});
+assert.equal(explicitProjectSwitch.decision, researchConversationTopicDecisions.topicSwitch);
+assert.equal(explicitProjectSwitch.signals.explicitSwitch, true);
+
 const sameTopic = decideResearchConversationTopic({
   question: "Which accessible units are required in this residential project?",
   previousMessages: history

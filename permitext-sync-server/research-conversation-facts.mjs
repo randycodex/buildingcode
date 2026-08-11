@@ -1,5 +1,5 @@
 export const researchConversationFactsVersion =
-  "20260811-topic-scoped-user-facts-v1";
+  "20260811-topic-scoped-user-facts-v2";
 
 export const researchConversationFactKinds = Object.freeze({
   established: "established",
@@ -30,6 +30,25 @@ function canonicalCount(value) {
     six: "6", seven: "7", eight: "8", nine: "9", ten: "10"
   };
   return words[normalized] || compactText(value);
+}
+
+function canonicalOrdinal(value) {
+  const normalized = compactText(value).toLowerCase();
+  const words = {
+    first: "1", second: "2", third: "3", fourth: "4", fifth: "5",
+    sixth: "6", seventh: "7", eighth: "8", ninth: "9", tenth: "10"
+  };
+  return words[normalized] || canonicalCount(normalized.replace(/(?:st|nd|rd|th)$/i, ""));
+}
+
+function canonicalConstructionType(value) {
+  return compactText(value).toUpperCase().replace(/[\s-]/g, "");
+}
+
+function canonicalDate(value) {
+  const date = new Date(compactText(value));
+  if (Number.isNaN(date.valueOf())) return compactText(value);
+  return date.toISOString().slice(0, 10);
 }
 
 function fact({ key, value, statement, kind, sourceText }) {
@@ -78,6 +97,7 @@ function matchedValue(text, pattern, index = 1) {
 function structuredFacts(question, kind, topicDecision) {
   const text = compactText(question);
   if (!assertionLike(text, kind, topicDecision)) return [];
+  const startsWithLegalAuthority = /^(?:(?:AC|BC|EBC|FC|FGC|MC|PC)\b|Table\b|Section\b)/i.test(text);
   const facts = [];
   const add = (key, value, statement) => {
     if (!value || facts.some((item) => item.key === key)) return;
@@ -105,6 +125,12 @@ function structuredFacts(question, kind, topicDecision) {
   );
   if (occupants) add("occupant_count", occupants, `The active-topic space has ${formattedNumber(occupants)} occupants.`);
 
+  const occupantLoad = matchedValue(
+    text,
+    /\b(?:the\s+|this\s+|its\s+)?occupant\s+load\s+(?:is|was|will be|of|equals?|were)\s+([\d,]+)\b/i
+  );
+  if (occupantLoad && !startsWithLegalAuthority) add("occupant_load", occupantLoad, `The active-topic occupant load is ${formattedNumber(occupantLoad)}.`);
+
   const stories = matchedValue(
     text,
     /\b(?:a\s+)?([\d,]+|one|two|three|four|five|six|seven|eight|nine|ten)(?:\s*[- ]\s*|\s+)(?:story|stories)\b[^.;?]{0,30}\b(?:building|structure|project)\b/i
@@ -116,6 +142,49 @@ function structuredFacts(question, kind, topicDecision) {
     const count = canonicalCount(stories);
     add("story_count", count, `The active-topic building has ${formattedNumber(count)} stories.`);
   }
+
+
+  const constructionType = matchedValue(
+    text,
+    /\b(?:building|structure|project|it|this)\b[^.;?]{0,45}?\b(?:is|has|uses?|of|with)\s+(?:a\s+)?Type\s+(I{1,3}|IV|V)(?:\s*[- ]?\s*([AB]))?\s+construction\b/i
+  ) || matchedValue(
+    text,
+    /\bType\s+(I{1,3}|IV|V)(?:\s*[- ]?\s*([AB]))?\s+construction\b[^.;?]{0,45}\b(?:building|structure|project)\b/i
+  );
+  const constructionMatch = text.match(/\bType\s+(I{1,3}|IV|V)(?:\s*[- ]?\s*([AB]))?\s+construction\b/i);
+  if (constructionType && constructionMatch) {
+    const type = canonicalConstructionType(`${constructionMatch[1]}${constructionMatch[2] || ""}`);
+    add("construction_type", type, `The active-topic building is Type ${type} construction.`);
+  }
+
+  const buildingHeight = matchedValue(
+    text,
+    /\b(?:building|structure|project|it|this)\b[^.;?]{0,40}?\b(?:is|has a height of|height is)\s+([\d,]+(?:\.\d+)?)\s*(?:feet|ft\.?)\s+(?:high|in height)\b/i
+  ) || (
+    /\b(?:building|structure|project)\b/i.test(text)
+      ? matchedValue(text, /\b([\d,]+(?:\.\d+)?)\s*(?:feet|ft\.?)\s+high\b/i)
+      : ""
+  );
+  if (buildingHeight) add("building_height_feet", buildingHeight, `The active-topic building is ${formattedNumber(buildingHeight)} feet high.`);
+
+  const floorLocation = matchedValue(
+    text,
+    /\b(?:work|alteration|space|room|project|application|it)\b[^.;?]{0,45}?\b(?:is|will be|occurs?|proposed)?\s*(?:on|at)\s+(?:the\s+)?([\d,]+(?:st|nd|rd|th)?|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth)\s+floor\b/i
+  );
+  if (floorLocation) {
+    const floor = canonicalOrdinal(floorLocation);
+    add("floor_location", floor, `The active-topic work or space is on floor ${formattedNumber(floor)}.`);
+  }
+
+  const travelDistance = matchedValue(
+    text,
+    /\b(?:the\s+|this\s+|its\s+)?(?:exit\s+access\s+)?travel\s+distance\s+(?:is|was|will be|of|equals?|were)\s+([\d,]+(?:\.\d+)?)\s*(?:feet|ft\.?)\b/i
+  ) || (
+    /\b(?:building|project|space|room|work|application|it|this)\b/i.test(text)
+      ? matchedValue(text, /\b([\d,]+(?:\.\d+)?)\s*[- ]\s*(?:foot|ft\.?)\s+(?:exit\s+access\s+)?travel\s+distance\b/i)
+      : ""
+  );
+  if (travelDistance && !startsWithLegalAuthority) add("travel_distance_feet", travelDistance, `The active-topic exit access travel distance is ${formattedNumber(travelDistance)} feet.`);
 
   const occupancy = matchedValue(
     text,
@@ -129,7 +198,39 @@ function structuredFacts(question, kind, topicDecision) {
   );
   if (occupancy) add("occupancy_group", occupancy.toUpperCase(), `The active-topic building is Group ${occupancy.toUpperCase()}.`);
 
-  if (/\b(?:is|are|will be|has been)\s+(?:fully\s+)?sprinklered\b/i.test(text)) {
+  if (/^(?:an?\s+)?existing\b[^.;?]{0,120}\b(?:building|structure|project)\b|\b(?:this|that)\s+is\s+an?\s+existing\b[^.;?]{0,80}\b(?:building|structure|project)\b|\b(?:this|the|an?)\s+(?:building|structure|project)\s+(?:is|was)\s+existing\b|\bexisting\s+(?:building|structure|project)\b/i.test(text)) {
+    add("building_status", "existing", "The active-topic building is existing.");
+  } else if (/^(?:an?\s+)?new\b[^.;?]{0,120}\b(?:building|structure|project)\b|\b(?:this|that)\s+is\s+an?\s+new\b[^.;?]{0,80}\b(?:building|structure|project)\b|\b(?:this|the|an?)\s+(?:building|structure|project)\s+(?:is|will be)\s+new\b|\bnew\s+(?:building|structure|project)\b/i.test(text)) {
+    add("building_status", "new", "The active-topic building is new construction.");
+  }
+
+  const workScope = matchedValue(
+    text,
+    /\b(?:the\s+|this\s+)?(?:work|project|scope|application)\s+(?:is|was|will be|includes?|consists? of|involves?|proposes?)\s+(?:an?\s+)?(alteration|new construction|change of (?:occupancy|use))\b/i
+  );
+  if (workScope) {
+    add("work_scope", workScope.toLowerCase(), `The active-topic work scope is ${workScope.toLowerCase()}.`);
+  }
+
+  const filingDate = matchedValue(
+    text,
+    /\b(?:the\s+|this\s+)?(?:application|project|work)\s+(?:was|is|will be)?\s*filed\s+(?:on\s+)?((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}|\d{4}-\d{2}-\d{2})\b/i
+  );
+  if (filingDate) {
+    const date = canonicalDate(filingDate);
+    add("filing_date", date, `The active-topic application filing date is ${date}.`);
+  }
+
+  const codeBasisYear = matchedValue(
+    text,
+    /\b(?:filed\b[^.;?]{0,50}?|designed\s+|reviewed\s+|evaluated\s+)under\s+(?:the\s+)?(20\d{2})\s+(?:NYC\s+|New York City\s+)?(?:Construction Codes?|Building Code|codes?)\b/i
+  );
+  if (codeBasisYear) add("code_basis_year", codeBasisYear, `The user-stated code basis year for the active topic is ${codeBasisYear}.`);
+
+  if (
+    /\b(?:is|are|will be|has been)\s+(?:fully\s+)?sprinklered\b/i.test(text) ||
+    (!startsWithLegalAuthority && /\b(?:building|structure|project|it|this)\b/i.test(text) && /\band\s+(?:fully\s+)?sprinklered\b/i.test(text))
+  ) {
     add("sprinkler_status", "fully_sprinklered", "The active-topic building is fully sprinklered.");
   } else if (/\b(?:is|are)\s+(?:not|un)\s*-?sprinklered\b|\bwithout\s+(?:an\s+)?automatic sprinkler/i.test(text)) {
     add("sprinkler_status", "not_sprinklered", "The active-topic building is not sprinklered.");
@@ -150,6 +251,18 @@ function structuredFacts(question, kind, topicDecision) {
     }
     if (/\b(?:story|stories|story count)\b/i.test(text)) {
       add("story_count", "unknown", "The active-topic building's story count");
+    }
+    if (/\bconstruction type\b/i.test(text)) {
+      add("construction_type", "unknown", "The active-topic building's construction type");
+    }
+    if (/\b(?:building )?height\b/i.test(text)) {
+      add("building_height_feet", "unknown", "The active-topic building's height");
+    }
+    if (/\b(?:exit access )?travel distance\b/i.test(text)) {
+      add("travel_distance_feet", "unknown", "The active-topic exit access travel distance");
+    }
+    if (/\boccupant load\b/i.test(text)) {
+      add("occupant_load", "unknown", "The active-topic occupant load");
     }
   }
 
