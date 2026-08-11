@@ -251,7 +251,7 @@ assert.equal(maximumLengthQuestion.previousTopicApplied, false);
 assert.equal(maximumLengthQuestion.projectFactsApplied, false);
 
 assert.equal(researchEvidenceAssemblyLimits.maximumCandidates, 12);
-assert.equal(researchEvidenceAssemblyLimits.maximumDiscovered, 8);
+assert.equal(researchEvidenceAssemblyLimits.maximumDiscovered, 10);
 assert.equal(researchEvidenceAssemblyLimits.maximumCrossReferences, 6);
 assert.equal(researchEvidenceAssemblyLimits.maximumCharacters, 48_000);
 assert.throws(

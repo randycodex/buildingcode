@@ -130,14 +130,15 @@ function chapterHeadings(source) {
   for (const match of source.html.matchAll(expression)) {
     const headingText = decodedPlainText(match[1]);
     const sectionMatch = headingText.match(
-      /^(?:§\s*)?([A-Za-z]*\d+(?:[-.]\s*\d+)*(?:\([A-Za-z0-9]+\))?)\.?(?=\s|$)/
+      /^(?:SECTION\s+BC\s+(202)\.?(?=\s|:|$)|(?:§\s*)?([A-Za-z]*\d+(?:[-.]\s*\d+)*(?:\([A-Za-z0-9]+\))?)\.?(?=\s|$))/i
     );
     if (!sectionMatch) continue;
+    const sectionNumber = sectionMatch[1] || sectionMatch[2];
     const headingStart = match.index;
     const headingEnd = headingStart + match[0].length;
     headings.push({
-      sectionNumber: sectionMatch[1].replace(/\s+/g, ""),
-      normalizedSectionNumber: normalizedSectionNumber(sectionMatch[1]),
+      sectionNumber: sectionNumber.replace(/\s+/g, ""),
+      normalizedSectionNumber: normalizedSectionNumber(sectionNumber),
       headingText,
       normalizedHeadingTitle: normalizedHeadingTitle(headingText),
       headingStart,

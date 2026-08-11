@@ -154,6 +154,7 @@ import {
   sanitizeResearchWebQuery,
   shouldUseResearchWebSupport
 } from "./research-source-policy.mjs";
+import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
 import {
@@ -5714,8 +5715,20 @@ function researchPrompt(question, evidence, options = {}) {
   const structuredEvidenceAnalysis = options.structuredEvidenceAnalysis
     ? `STRUCTURED EVIDENCE ANALYSIS — INTERNAL RESEARCH MAP\n${JSON.stringify(options.structuredEvidenceAnalysis)}`
     : "";
+  const codeBasis = options.codeBasis
+    ? [
+        "RESEARCH CODE BASIS",
+        `JURISDICTION: ${options.codeBasis.jurisdiction}`,
+        `CODE_EDITION: ${options.codeBasis.codeEdition}`,
+        `CODE_VERSION: ${options.codeBasis.codeVersion}`,
+        `RETRIEVAL_SCOPE: ${options.codeBasis.retrievalScope}`,
+        options.codeBasis.limitation ? `LIMITATION: ${options.codeBasis.limitation}` : "",
+        "Treat this as the edition boundary for the answer. Do not imply that another code edition was retrieved."
+      ].filter(Boolean).join("\n")
+    : "";
   return [
     `QUESTION\n${question}`,
+    codeBasis,
     projectFacts
       ? `USER-PROVIDED PROJECT FACTS FOR CONTEXT ONLY — NOT CODE AUTHORITY\n${projectFacts}`
       : "",
@@ -5930,7 +5943,8 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     input: [
       researchPrompt(question, evidence, {
         messages: options.messages,
-        projectContextFacts: options.projectContextFacts
+        projectContextFacts: options.projectContextFacts,
+        codeBasis: options.codeBasis
       }),
       options.retrievalLimitations?.length
         ? `DETERMINISTIC RETRIEVAL LIMITATIONS\n${JSON.stringify(options.retrievalLimitations)}`
@@ -6613,6 +6627,9 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     ].join(" "),
     input: [
       `QUESTION\n${question}`,
+      options.codeBasis
+        ? `RESEARCH CODE BASIS — DO NOT CLAIM ANOTHER EDITION WAS RETRIEVED\n${JSON.stringify(options.codeBasis)}`
+        : "",
       options.projectContextFacts?.length
         ? `PROJECT FACTS\n${options.projectContextFacts.join("\n")}`
         : "",
@@ -6751,6 +6768,7 @@ export function projectResearchConversationForList(conversation) {
     primaryProjectID: conversation.primaryProjectID || null,
     starterQuestion: conversation.starterQuestion || null,
     projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
+    codeBasis: conversation.codeBasis || null,
     sourceStatus: conversation.sourceStatus || "current",
     sources: selectionSources,
     messageCount
@@ -6782,6 +6800,7 @@ function researchConversationSummary(conversation, projectLink = null) {
     codeDecisionLinkVersion: projectLink ? Number(projectLink.version || 1) : null,
     starterQuestion: String(conversation.starterQuestion || "").trim() || null,
     projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
+    codeBasis: conversation.codeBasis || null,
     sourceStatus: conversation.sourceStatus || "current"
   };
 }
@@ -7490,6 +7509,7 @@ function researchProjectInformation(projectID, project) {
   if (!projectID || !project) return null;
   const address = String(project.address || "").trim();
   const description = String(project.description || "").trim();
+  const codeVersion = String(project.codeVersion || "").trim() || null;
   const facts = [];
   if (address) facts.push(`Project address: ${normalizedResearchText(address, 1_000)}`);
   if (description) facts.push(`Project description: ${normalizedResearchText(description, 4_000)}`);
@@ -7497,10 +7517,22 @@ function researchProjectInformation(projectID, project) {
     projectID,
     address,
     description,
+    codeVersion,
+    canonicalCodeVersion: codeVersion ? canonicalCodeVersion(codeVersion) : null,
     facts,
     source: "project-record",
     updatedAt: project.updatedAt || null
   };
+}
+
+function researchCodeBasis(projectID, projectInformation = null, resolvedAt = new Date().toISOString()) {
+  return resolveResearchCodeBasis({
+    projectID,
+    projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
+    availableCodeVersion: defaultSyncCodeVersion,
+    availableCodeEdition: defaultResearchCodeEdition,
+    resolvedAt
+  });
 }
 
 async function currentResearchProjectInformation(userID, projectID) {
@@ -12148,7 +12180,10 @@ async function handleResearchConversationAssignProject(request, response) {
     });
     return;
   }
-  if (targetProjectID && !await requireResearchProject(context, response, targetProjectID)) return;
+  const targetProject = targetProjectID
+    ? await requireResearchProject(context, response, targetProjectID)
+    : null;
+  if (targetProjectID && !targetProject) return;
   const now = new Date().toISOString();
   if (currentProjectID) {
     let removedLink;
@@ -12188,6 +12223,12 @@ async function handleResearchConversationAssignProject(request, response) {
     );
   }
   conversation.primaryProjectID = targetProjectID;
+  conversation.codeVersion = defaultSyncCodeVersion;
+  conversation.codeBasis = researchCodeBasis(
+    targetProjectID,
+    targetProjectID ? researchProjectInformation(targetProjectID, targetProject) : null,
+    now
+  );
   conversation.projectContext = targetProjectID ? {
     projectID: targetProjectID,
     facts: [],
@@ -12268,7 +12309,8 @@ async function handleResearchConversationReuseEvidence(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  if (!await requireResearchProject(context, response, projectID)) return;
+  const project = await requireResearchProject(context, response, projectID);
+  if (!project) return;
   const answerID = String(context.body.answerID || "").trim();
   const answer = (await listStoredResearchAnswers(context.userID))
     .find((item) => item.id === answerID);
@@ -12331,12 +12373,14 @@ async function handleResearchConversationReuseEvidence(request, response) {
     return;
   }
   const now = new Date().toISOString();
+  const projectInformation = researchProjectInformation(projectID, project);
   const conversation = {
     id: randomUUID(),
     title: defaultResearchConversationTitle(now),
     createdAt: now,
     updatedAt: now,
     codeVersion: defaultSyncCodeVersion,
+    codeBasis: researchCodeBasis(projectID, projectInformation, now),
     evidenceSetVersion: 1,
     primaryProjectID: projectID,
     projectContext: {
@@ -12376,7 +12420,8 @@ async function handleResearchConversationCreate(request, response) {
       return;
     }
     const projectID = String(context.body.projectID || "").trim() || null;
-    if (projectID && !await requireResearchProject(context, response, projectID)) return;
+    const project = projectID ? await requireResearchProject(context, response, projectID) : null;
+    if (projectID && !project) return;
     const hasSelectionPayload = context.body.selections !== undefined ||
       String(context.body.sectionID || "").trim() ||
       String(context.body.selectedText || "").trim();
@@ -12392,12 +12437,14 @@ async function handleResearchConversationCreate(request, response) {
     assertResearchConversationVisualLimits(resolved.sources);
     const sources = resolved.sources;
     const now = new Date().toISOString();
+    const projectInformation = projectID ? researchProjectInformation(projectID, project) : null;
     const conversation = {
       id: randomUUID(),
       title: defaultResearchConversationTitle(now),
       createdAt: now,
       updatedAt: now,
       codeVersion: defaultSyncCodeVersion,
+      codeBasis: researchCodeBasis(projectID, projectInformation, now),
       evidenceSetVersion: 1,
       primaryProjectID: projectID,
       projectContext: projectID ? {
@@ -13132,6 +13179,11 @@ async function handleResearchConversationMessage(request, response) {
       context.userID,
       conversation.primaryProjectID
     );
+    const answerCodeBasis = researchCodeBasis(
+      conversation.primaryProjectID,
+      projectInformation,
+      new Date().toISOString()
+    );
     const manualProjectFacts = conversation.projectContext?.facts || [];
     const combinedProjectFacts = combinedResearchProjectFacts(
       projectInformation,
@@ -13143,6 +13195,10 @@ async function handleResearchConversationMessage(request, response) {
       pinnedEvidence,
       projectFacts: combinedProjectFacts
     });
+    const turnRetrievalLimitations = [
+      ...(evidencePackage.limitations || []),
+      ...(answerCodeBasis.limitation ? [{ code: "RESEARCH_CODE_VERSION_FALLBACK", text: answerCodeBasis.limitation }] : [])
+    ];
     const assembledEvidence = evidencePackage.sources || [];
     if (!assembledEvidence.length) {
       sendJSON(response, 422, {
@@ -13226,7 +13282,7 @@ async function handleResearchConversationMessage(request, response) {
           analysis: mockResearchEvidenceAnalysis(
             assembledEvidence,
             combinedProjectFacts,
-            evidencePackage.limitations
+            turnRetrievalLimitations
           ),
           model: "permitext-mock",
           usage: combinedResearchUsage()
@@ -13234,7 +13290,8 @@ async function handleResearchConversationMessage(request, response) {
       : await openAIResearchEvidenceAnalysis(question, assembledEvidence, context.userID, {
           messages: conversation.messages,
           projectContextFacts: combinedProjectFacts,
-          retrievalLimitations: evidencePackage.limitations
+          retrievalLimitations: turnRetrievalLimitations,
+          codeBasis: answerCodeBasis
         });
     let result = mockMode
       ? {
@@ -13255,7 +13312,8 @@ async function handleResearchConversationMessage(request, response) {
           projectContextFacts: combinedProjectFacts,
           responseStyle: "conversational",
           structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
-          webSupport
+          webSupport,
+          codeBasis: answerCodeBasis
         });
     let verificationAttempts = [];
     let verifierUsage = combinedResearchUsage();
@@ -13268,7 +13326,7 @@ async function handleResearchConversationMessage(request, response) {
         assembledEvidence,
         result.interpretation,
         context.userID,
-        { projectContextFacts: combinedProjectFacts, webSupport }
+        { projectContextFacts: combinedProjectFacts, webSupport, codeBasis: answerCodeBasis }
       );
       verifierUsage = combinedResearchUsage(verifierUsage, firstVerification.usage);
       verificationAttempts.push({
@@ -13283,6 +13341,7 @@ async function handleResearchConversationMessage(request, response) {
           responseStyle: "conversational",
           structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
           webSupport,
+          codeBasis: answerCodeBasis,
           revisionFeedback: firstVerification.result.issues
         });
         answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
@@ -13292,7 +13351,7 @@ async function handleResearchConversationMessage(request, response) {
           assembledEvidence,
           result.interpretation,
           context.userID,
-          { projectContextFacts: combinedProjectFacts, webSupport }
+          { projectContextFacts: combinedProjectFacts, webSupport, codeBasis: answerCodeBasis }
         );
         verifierUsage = combinedResearchUsage(verifierUsage, secondVerification.usage);
         verificationAttempts.push({
@@ -13327,8 +13386,9 @@ async function handleResearchConversationMessage(request, response) {
         requestedModel: result.requestedModel || result.model,
         promptVersion: result.configuration.promptVersion,
         evidenceVersion: result.configuration.evidenceVersion,
-        codeEdition: defaultResearchCodeEdition,
-        codeVersion: conversation.codeVersion,
+        codeEdition: answerCodeBasis.codeEdition,
+        codeVersion: answerCodeBasis.codeVersion,
+        codeBasis: answerCodeBasis,
         ...result.interpretation,
         followUpQuestions: result.interpretation.followUpQuestions?.length
           ? result.interpretation.followUpQuestions
@@ -13354,9 +13414,10 @@ async function handleResearchConversationMessage(request, response) {
           sourceScope: evidencePackage.sourceScope,
           limits: evidencePackage.limits,
           usage: evidencePackage.usage,
-          limitations: evidencePackage.limitations,
+          limitations: turnRetrievalLimitations,
           discovery: evidencePackage.discovery,
           sourcePolicyVersion: researchSourcePolicyVersion,
+          codeBasis: answerCodeBasis,
           webSupportRequested,
           webSupportSearched: Boolean(webSupport.searched),
           webQuery: webSupport.sanitizedQuery || null,
@@ -13408,6 +13469,8 @@ async function handleResearchConversationMessage(request, response) {
       },
       ...(decisionContextSnapshot ? { decisionContextSnapshot } : {})
     };
+    conversation.codeVersion = answerCodeBasis.codeVersion;
+    conversation.codeBasis = answerCodeBasis;
     conversation.messages.push(userMessage, assistantMessage);
     conversation.updatedAt = now;
     delete conversation.historyHiddenAt;

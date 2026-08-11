@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260811-research-clear-v2";
+} from "./sync-state.js?v=20260811-research-code-basis-v2";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-clear-v2";
+} from "./offline-storage.js?v=20260811-research-code-basis-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260811-research-clear-v2";
+} from "./workspace-state.js?v=20260811-research-code-basis-v2";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -13591,6 +13591,19 @@ function renderResearchInterpretation(container, result, options = {}) {
   explanation.textContent = researchDisplayText(result.explanation);
   card.append(answer, explanation);
 
+  const codeBasis = result.codeBasis || null;
+  const codeBasisText = String(
+    codeBasis?.disclosure ||
+    (result.codeEdition ? `Code basis: ${result.codeEdition}` : "")
+  ).trim();
+  if (codeBasisText) {
+    const codeDisclosure = document.createElement("p");
+    codeDisclosure.className = "research-answer-code-basis";
+    codeDisclosure.textContent = codeBasisText;
+    if (codeBasis?.limitation) codeDisclosure.title = codeBasis.limitation;
+    card.append(codeDisclosure);
+  }
+
   if (result.citations?.length) {
     const citationRow = document.createElement("nav");
     citationRow.className = "research-answer-citation-chips";
@@ -22543,7 +22556,8 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         )
       })
     : null;
-  panel.querySelector(".saved-evidence-select-toggle").hidden = !selectionController;
+  const savedEvidenceSelectToggle = panel.querySelector(".saved-evidence-select-toggle");
+  if (savedEvidenceSelectToggle) savedEvidenceSelectToggle.hidden = !selectionController;
   let allSavedLimit = savedItemsPageSize;
   let previousViewSignature = "";
   let viewGeneration = 0;

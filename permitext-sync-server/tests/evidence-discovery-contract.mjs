@@ -55,7 +55,7 @@ const catalog = [{
 }, {
   id: "9", codePrefix: "BC", chapterNumber: "3", sectionNumber: "302.1", title: "Occupancy classification"
 }, {
-  id: "10", codePrefix: "BC", chapterNumber: "5", sectionNumber: "508.2.1", title: "Accessory occupancies"
+  id: "10", codePrefix: "BC", chapterNumber: "5", sectionNumber: "508.2", title: "Accessory occupancies"
 }];
 
 const invertedIndex = new Map([
@@ -129,7 +129,7 @@ const bodies = new Map([
   }]
   ,["8", { blocks: [{ id: "community-hall", plainText: "Assembly Group A-3 includes community halls and recreation or social activities." }] }]
   ,["9", { blocks: [{ id: "multiple-occupancy", plainText: "Structures or portions shall be classified in one or more occupancy groups; multiple occupancies shall comply with Section 508." }] }]
-  ,["10", { blocks: [{ id: "accessory-classification", plainText: "Accessory occupancies shall be individually classified in accordance with Section 302.1." }] }]
+  ,["10", { blocks: [{ id: "accessory-classification", plainText: "Accessory occupancies are ancillary to the main occupancy and shall comply with Section 508.2." }] }]
 ]);
 
 const officeClassification = await discoverRelevantEvidence({

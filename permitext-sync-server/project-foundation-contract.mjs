@@ -613,6 +613,9 @@ export function immutableResearchAnswer({
     evidence,
     evidenceSetVersion: Math.max(...evidence.map((item) => item.evidenceSetVersion)),
     answer,
+    codeBasis: answer?.codeBasis && typeof answer.codeBasis === "object"
+      ? structuredClone(answer.codeBasis)
+      : null,
     assumptions: Array.isArray(answer?.assumptions) ? answer.assumptions : [],
     missingFacts: Array.isArray(answer?.missingFacts) ? answer.missingFacts : [],
     followUpQuestions: Array.isArray(answer?.followUpQuestions) ? answer.followUpQuestions : [],

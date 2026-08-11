@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "source": "authoritative bundled chapter HTML only",
   "totalSections": 12891,
-  "availablePreparedBodies": 11610,
-  "classifiedStructuralEntries": 1281,
+  "availablePreparedBodies": 11611,
+  "classifiedStructuralEntries": 1280,
   "classificationCounts": {
     "title-only-official-heading": 62,
-    "nested-or-title-only-catalog-entry": 1219
+    "nested-or-title-only-catalog-entry": 1218
   },
   "entries": [
     {
@@ -92,18 +92,6 @@
       "classification": "nested-or-title-only-catalog-entry",
       "reason": "no-official-heading",
       "sourceHTMLPath": "code-sections/building-code/chapters/1.html"
-    },
-    {
-      "sectionID": 113,
-      "webSectionID": 113,
-      "codePrefix": "BC",
-      "chapterID": 2,
-      "chapterNumber": "2",
-      "sectionNumber": "202",
-      "title": "SECTION 202: Definitions",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
-      "sourceHTMLPath": "code-sections/building-code/chapters/2.html"
     },
     {
       "sectionID": 114,

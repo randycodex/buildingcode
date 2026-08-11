@@ -1,8 +1,8 @@
-export const researchEvidenceAssemblyVersion = "20260810-enacted-chat-evidence-v1";
+export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v2";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
-  maximumDiscovered: 8,
+  maximumDiscovered: 10,
   maximumCrossReferences: 6,
   maximumCharacters: 48_000,
   maximumCharactersPerSource: 12_000
@@ -389,11 +389,20 @@ export async function assembleResearchEvidence({
       resolverFailureCount += 1;
       continue;
     }
+    const remainingCandidateSlots = Math.max(
+      1,
+      Math.min(limits.maximumDiscovered - discoveredCount, candidates.length - index)
+    );
+    const fairCandidateShare = Math.max(1, Math.floor(remainingCharacters / remainingCandidateSlots));
     const record = sourceRecord(resolved, {
       origin: sourceOrigins.discovered,
       sourceID: deterministicSourceID(sourceOrigins.discovered, resolved, index),
       relationship: compactText(candidate.whyRelevant) || "Automatically retrieved for this answer",
-      characterAllowance: Math.min(limits.maximumCharactersPerSource, remainingCharacters),
+      characterAllowance: Math.min(
+        limits.maximumCharactersPerSource,
+        remainingCharacters,
+        fairCandidateShare
+      ),
       canonicalResolved: true,
       retrievalReason: compactText(candidate.whyRelevant) || "Automatically retrieved for this answer",
       retrievalRank: candidate.rank ?? index + 1,
