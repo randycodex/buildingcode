@@ -480,18 +480,70 @@ export function normalizeResearchInterpretationEvidenceBindings(value, evidence)
       item.sourceIDs.map((sourceID) => String(sourceID || "").trim()).filter(Boolean)
     ));
     if (!sourceIDs.length) return item;
-    const sectionIDs = new Set(sourceIDs.map((sourceID) => sourceSectionIDs.get(sourceID)).filter(Boolean));
-    if (sectionIDs.size !== 1 || sourceIDs.some((sourceID) => !sourceSectionIDs.has(sourceID))) return item;
-    return { ...item, sectionID: Array.from(sectionIDs)[0], sourceIDs };
+    if (sourceIDs.some((sourceID) => !sourceSectionIDs.has(sourceID))) return item;
+    const sectionIDs = Array.from(new Set(sourceIDs.map((sourceID) => sourceSectionIDs.get(sourceID))));
+    const declaredSectionID = String(item.sectionID || "").trim();
+    return {
+      ...item,
+      sectionID: sectionIDs.includes(declaredSectionID) ? declaredSectionID : sectionIDs[0],
+      sourceIDs
+    };
   };
+  const normalizedSupportedPoints = Array.isArray(value.supportedPoints)
+    ? value.supportedPoints.map(normalizeBinding)
+    : value.supportedPoints;
+  const normalizedCitations = Array.isArray(value.citations)
+    ? value.citations.flatMap((citation) => {
+        const normalized = normalizeBinding(citation);
+        if (!normalized || !Array.isArray(normalized.sourceIDs)) return [normalized];
+        if (normalized.sourceIDs.some((sourceID) => !sourceSectionIDs.has(sourceID))) return [normalized];
+        const sourceIDsBySection = new Map();
+        for (const sourceID of normalized.sourceIDs) {
+          const sectionID = sourceSectionIDs.get(sourceID);
+          sourceIDsBySection.set(sectionID, [...(sourceIDsBySection.get(sectionID) || []), sourceID]);
+        }
+        return Array.from(sourceIDsBySection, ([sectionID, sourceIDs]) => ({
+          ...normalized,
+          sectionID,
+          sourceIDs
+        }));
+      })
+    : value.citations;
+  if (Array.isArray(normalizedCitations) && Array.isArray(normalizedSupportedPoints)) {
+    const citedSourceIDs = new Set(normalizedCitations.flatMap((citation) => citation?.sourceIDs || []));
+    for (const point of normalizedSupportedPoints) {
+      if (!point || !Array.isArray(point.sourceIDs)) continue;
+      const missingSourceIDs = point.sourceIDs.filter((sourceID) =>
+        sourceSectionIDs.has(sourceID) && !citedSourceIDs.has(sourceID)
+      );
+      const sourceIDsBySection = new Map();
+      for (const sourceID of missingSourceIDs) {
+        const sectionID = sourceSectionIDs.get(sourceID);
+        sourceIDsBySection.set(sectionID, [...(sourceIDsBySection.get(sectionID) || []), sourceID]);
+        citedSourceIDs.add(sourceID);
+      }
+      for (const [sectionID, sourceIDs] of sourceIDsBySection) {
+        normalizedCitations.push({
+          sectionID,
+          sourceIDs,
+          relevance: `Evidence supporting ${String(point.heading || "this point").trim() || "this point"}.`
+        });
+      }
+    }
+  }
+  const seenCitationBindings = new Set();
   return {
     ...value,
-    supportedPoints: Array.isArray(value.supportedPoints)
-      ? value.supportedPoints.map(normalizeBinding)
-      : value.supportedPoints,
-    citations: Array.isArray(value.citations)
-      ? value.citations.map(normalizeBinding)
-      : value.citations
+    supportedPoints: normalizedSupportedPoints,
+    citations: Array.isArray(normalizedCitations)
+      ? normalizedCitations.filter((citation) => {
+          if (!citation || !Array.isArray(citation.sourceIDs)) return true;
+          const key = `${citation.sectionID}:${citation.sourceIDs.slice().sort().join(",")}`;
+          if (seenCitationBindings.has(key)) return false;
+          seenCitationBindings.add(key);
+          return true;
+        })
+      : normalizedCitations
   };
 }
 
@@ -5956,7 +6008,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     model: configuration.model,
     store: false,
     reasoning: { effort: "low" },
-    max_output_tokens: 3_000,
+    max_output_tokens: 6_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       "Organize the supplied enacted evidence into a compact internal legal-research map before a separate model writes the user-facing answer.",
@@ -6292,7 +6344,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     error.code = "INVALID_RESEARCH_RESPONSE";
     throw error;
   }
-  const supportedPoints = value.supportedPoints.map((point) => {
+  const supportedPoints = value.supportedPoints.map((point, pointIndex) => {
     const heading = String(point?.heading || "").trim();
     const explanation = String(point?.explanation || "").trim();
     const sectionID = String(point?.sectionID || "").trim();
@@ -6305,10 +6357,24 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       !allowedSections.has(sectionID) ||
       !sourceIDs.length ||
       new Set(sourceIDs).size !== sourceIDs.length ||
-      sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID !== sectionID)
+      sourceIDs.some((sourceID) => !allowedSources.has(sourceID)) ||
+      !sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID === sectionID)
     ) {
       const error = new Error("The model tied an explanation to evidence outside the selected code sections.");
       error.code = "INVALID_RESEARCH_CITATION";
+      error.bindingIssue = {
+        collection: "supportedPoints",
+        index: pointIndex,
+        headingPresent: Boolean(heading),
+        explanationPresent: Boolean(explanation),
+        declaredSectionID: sectionID || null,
+        declaredSectionKnown: allowedSections.has(sectionID),
+        sourceIDCount: sourceIDs.length,
+        duplicateSourceIDs: new Set(sourceIDs).size !== sourceIDs.length,
+        sourceSectionIDs: Array.from(new Set(
+          sourceIDs.map((sourceID) => allowedSources.get(sourceID)?.sectionID || "unknown")
+        ))
+      };
       throw error;
     }
     return { heading, explanation, sectionID, sourceIDs };
@@ -6369,11 +6435,8 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     throw error;
   }
   for (const point of supportedPoints) {
-    const supportingCitation = citations.find((citation) =>
-      String(citation.sectionID) === point.sectionID &&
-      point.sourceIDs.every((sourceID) => citation.sourceIDs.includes(sourceID))
-    );
-    if (!supportingCitation) {
+    const citedSourceIDs = new Set(citations.flatMap((citation) => citation.sourceIDs));
+    if (!point.sourceIDs.every((sourceID) => citedSourceIDs.has(sourceID))) {
       const error = new Error("A numbered Research point was not covered by the cited selected evidence.");
       error.code = "INVALID_RESEARCH_CITATION";
       throw error;
@@ -6584,6 +6647,7 @@ const researchVerificationIssueTypes = new Set([
   "incorrect_citation",
   "weakest_supported_conclusion"
 ]);
+const maximumResearchVerificationAttempts = 3;
 
 const researchVerificationSchema = {
   type: "object",
@@ -6647,7 +6711,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     model: configuration.model,
     store: false,
     reasoning: { effort: "low" },
-    max_output_tokens: 700,
+    max_output_tokens: 2_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
@@ -6714,6 +6778,9 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     if (error.code === "RESEARCH_REFUSAL") throw error;
     const invalid = new Error("The Research verifier returned invalid structured output.");
     invalid.code = "INVALID_RESEARCH_VERIFICATION";
+    invalid.providerStatus = payload?.status || null;
+    invalid.incompleteReason = payload?.incomplete_details?.reason || null;
+    invalid.providerUsage = researchUsageFromProviderPayload(payload);
     throw invalid;
   }
   return {
@@ -13352,45 +13419,36 @@ async function handleResearchConversationMessage(request, response) {
     if (mockMode) {
       verificationAttempts = [{ pass: true, issues: [], model: "permitext-mock" }];
     } else {
-      const firstVerification = await openAIResearchVerification(
-        question,
-        assembledEvidence,
-        result.interpretation,
-        context.userID,
-        { projectContextFacts: combinedProjectFacts, webSupport, codeBasis: answerCodeBasis }
-      );
-      verifierUsage = combinedResearchUsage(verifierUsage, firstVerification.usage);
-      verificationAttempts.push({
-        ...firstVerification.result,
-        model: firstVerification.model
-      });
-      if (!firstVerification.result.pass) {
-        const revised = await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
-          selections,
-          messages: conversation.messages,
-          projectContextFacts: combinedProjectFacts,
-          responseStyle: "conversational",
-          structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
-          webSupport,
-          codeBasis: answerCodeBasis,
-          revisionFeedback: firstVerification.result.issues
-        });
-        answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
-        result = revised;
-        const secondVerification = await openAIResearchVerification(
+      for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
+        if (attempt > 0) {
+          const revised = await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
+            selections,
+            messages: conversation.messages,
+            projectContextFacts: combinedProjectFacts,
+            responseStyle: "conversational",
+            structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+            webSupport,
+            codeBasis: answerCodeBasis,
+            revisionFeedback: verificationAttempts.at(-1).issues
+          });
+          answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
+          result = revised;
+        }
+        const verification = await openAIResearchVerification(
           question,
           assembledEvidence,
           result.interpretation,
           context.userID,
           { projectContextFacts: combinedProjectFacts, webSupport, codeBasis: answerCodeBasis }
         );
-        verifierUsage = combinedResearchUsage(verifierUsage, secondVerification.usage);
+        verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
         verificationAttempts.push({
-          ...secondVerification.result,
-          model: secondVerification.model
+          ...verification.result,
+          model: verification.model
         });
-        if (!secondVerification.result.pass) {
-          const error = new Error("The answer did not pass verification after one bounded revision.");
+        if (verification.result.pass) break;
+        if (attempt === maximumResearchVerificationAttempts - 1) {
+          const error = new Error("The answer did not pass verification after two bounded revisions.");
           error.code = "RESEARCH_VERIFICATION_FAILED";
           error.verificationAttempts = verificationAttempts;
           throw error;
@@ -13618,7 +13676,8 @@ async function handleResearchConversationMessage(request, response) {
           : [],
         providerStatus: error.providerStatus || null,
         incompleteReason: error.incompleteReason || null,
-        providerUsage: error.providerUsage || null
+        providerUsage: error.providerUsage || null,
+        bindingIssue: error.bindingIssue || null
       }));
       sendError(response, 502, "The research model could not return a verified, cited answer.");
       return;

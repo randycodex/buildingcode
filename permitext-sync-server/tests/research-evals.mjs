@@ -2389,17 +2389,19 @@ async function runSelfTest(dataset, datasetText) {
     supportedPoints: [{
       ...interpretation.supportedPoints[0],
       sourceIDs: ["source-a", "source-b"]
+    }],
+    citations: [{
+      sectionID: "101",
+      sourceIDs: ["source-a"],
+      relevance: "The synthesized point relies on enacted evidence."
     }]
   }, validationEvidence);
-  let mixedBindingRejected = false;
-  try {
-    validateResearchInterpretation(mixedBinding, validationEvidence);
-  } catch (error) {
-    mixedBindingRejected = error.code === "INVALID_RESEARCH_CITATION";
-  }
+  const validatedMixedBinding = validateResearchInterpretation(mixedBinding, validationEvidence);
   assert(
-    mixedBindingRejected,
-    "Production Research accepted a supported point spanning source passages from different sections."
+    validatedMixedBinding.supportedPoints[0].sourceIDs.length === 2 &&
+      validatedMixedBinding.citations.length === 2 &&
+      validatedMixedBinding.citations.every((citation) => citation.sourceIDs.length === 1),
+    "Production Research did not preserve a multi-section synthesized point with section-specific citations."
   );
   let excessiveSupportedPointsRejected = false;
   try {
