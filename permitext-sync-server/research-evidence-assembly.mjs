@@ -1,4 +1,9 @@
-export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v3";
+import {
+  prioritizeResearchEvidence,
+  researchEvidencePriorityMetadata
+} from "./research-evidence-priority.mjs";
+
+export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v4";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -256,6 +261,7 @@ function sourceRecord(value, {
   retrievalScore = null,
   retrievalVersion = "",
   retrievalDepth = 0,
+  evidencePriority = null,
   retrievedAt = new Date().toISOString()
 }) {
   const rawText = canonicalText(value);
@@ -275,6 +281,7 @@ function sourceRecord(value, {
       : null,
     retrievalVersion: compactText(retrievalVersion),
     retrievalDepth: Number.isFinite(Number(retrievalDepth)) ? Number(retrievalDepth) : 0,
+    evidencePriority: evidencePriority ? structuredClone(evidencePriority) : null,
     retrievedAt,
     ...sectionDescriptor(value),
     text,
@@ -322,7 +329,9 @@ export async function assembleResearchEvidence({
     question: query.retrievalQuery,
     limit: limits.maximumCandidates
   });
-  const candidates = candidateValues(discovery).slice(0, limits.maximumCandidates);
+  const candidates = prioritizeResearchEvidence(candidateValues(discovery), {
+    limit: limits.maximumCandidates
+  });
   const sources = [];
   const canonicalForExpansion = [];
   const includedSectionIdentities = new Set();
@@ -364,6 +373,10 @@ export async function assembleResearchEvidence({
       retrievalReason: "Explicitly pinned by the user",
       retrievalVersion: researchEvidenceAssemblyVersion,
       retrievalDepth: 0,
+      evidencePriority: researchEvidencePriorityMetadata({
+        ...entry.value,
+        origin: sourceOrigins.pinned
+      }),
       retrievedAt
     });
     record.userSelectedText = compactText(
@@ -433,6 +446,7 @@ export async function assembleResearchEvidence({
       retrievalScore: candidate.score,
       retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
       retrievalDepth: 0,
+      evidencePriority: candidate.evidencePriority,
       retrievedAt
     });
     if (!record.text) break;
@@ -481,6 +495,11 @@ export async function assembleResearchEvidence({
       retrievalReason: `Direct cross-reference to ${reference.codePrefix || resolved.codePrefix} ${reference.sectionNumber || resolved.sectionNumber}`,
       retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
       retrievalDepth: 1,
+      evidencePriority: researchEvidencePriorityMetadata({
+        ...resolved,
+        origin: sourceOrigins.crossReference,
+        retrievalDepth: 1
+      }),
       retrievedAt
     });
     if (!record.text) break;

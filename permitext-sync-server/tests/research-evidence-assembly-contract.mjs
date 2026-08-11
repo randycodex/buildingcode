@@ -103,7 +103,8 @@ async function discover(request) {
       sectionNumber: "1019.3.1",
       title: "Two-story openings",
       selectedText: "A narrow discovered passage.",
-      whyRelevant: "The question concerns an interior stair."
+      whyRelevant: "The question concerns an interior stair.",
+      signals: { exactTopicRouteTarget: true }
     }, {
       sectionID: "pinned",
       codePrefix: "BC",
@@ -166,11 +167,13 @@ assert.equal(assembled.sources[0].origin, "user_pinned");
 assert.match(assembled.sources[0].text, /unless an exception applies/);
 assert.equal(assembled.sources[0].canonicalContextResolved, true);
 assert.equal(assembled.sources[0].canonicalContextComplete, true);
+assert.equal(assembled.sources[0].evidencePriority.claimCoverageRequired, true);
 
 const discovered = assembled.sources.filter((source) => source.origin === "permitext_discovered");
 assert.equal(discovered.length, 2, "Automatically discovered enacted sources must be bounded.");
 assert.deepEqual(discovered.map((source) => source.sectionID), ["candidate-1", "candidate-2"]);
 assert.match(discovered[0].text, /complete canonical section context/);
+assert.equal(discovered[0].evidencePriority.claimCoverageRequired, true);
 assert.doesNotMatch(discovered[0].text, /narrow discovered passage/);
 assert(!assembled.sources.some((source) => source.sectionID === "candidate-3"));
 assert.equal(
@@ -183,6 +186,7 @@ const crossReferences = assembled.sources.filter((source) => source.origin === "
 assert.equal(crossReferences.length, 1, "Direct cross-reference expansion must be bounded.");
 assert.equal(crossReferences[0].sectionID, "cross-1");
 assert.match(crossReferences[0].text, /Canonical cross-reference one/);
+assert.equal(crossReferences[0].evidencePriority.claimCoverageRequired, false);
 assert.equal(assembled.usage.crossReferenceCount, 1);
 assert(
   assembled.limitations.some((item) => item.kind === "cross-reference-limit"),

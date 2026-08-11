@@ -155,6 +155,12 @@ import {
   shouldUseResearchWebSupport
 } from "./research-source-policy.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
+import {
+  evaluateResearchRequiredClaimCoverage,
+  requiredResearchClaimsFromEvidence,
+  researchRequiredClaimCoverageVersion,
+  researchRequiredClaimRevisionIssues
+} from "./research-required-claim-coverage.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
 import {
@@ -5739,8 +5745,13 @@ function researchPrompt(question, evidence, options = {}) {
       `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
       `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
       `EVIDENCE_ORIGIN: ${section.origin || "user_pinned"}`,
+      `EVIDENCE_FUNCTION: ${section.evidencePriority?.primaryFunction || "candidate"}`,
+      `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
+      section.evidencePriority?.claimCoverageReason
+        ? `REQUIRED_CLAIM_REASON: ${section.evidencePriority.claimCoverageReason}`
+        : "",
       `ENACTED_TEXT: ${section.text}`
-    ];
+    ].filter(Boolean);
     if (section.richSourceID && section.richSourceGrids) {
       lines.push(
         `STRUCTURED_OFFICIAL_SOURCE: ${section.richSourceReference || section.richSourceID}`,
@@ -5794,6 +5805,9 @@ function researchPrompt(question, evidence, options = {}) {
   const structuredEvidenceAnalysis = options.structuredEvidenceAnalysis
     ? `STRUCTURED EVIDENCE ANALYSIS — INTERNAL RESEARCH MAP\n${JSON.stringify(options.structuredEvidenceAnalysis)}`
     : "";
+  const requiredClaimChecklist = Array.isArray(options.requiredClaims) && options.requiredClaims.length
+    ? `DETERMINISTIC REQUIRED CLAIM CHECKLIST\n${JSON.stringify(options.requiredClaims)}`
+    : "";
   const codeBasis = options.codeBasis
     ? [
         "RESEARCH CODE BASIS",
@@ -5813,6 +5827,7 @@ function researchPrompt(question, evidence, options = {}) {
       : "",
     history ? `UNTRUSTED CONVERSATION HISTORY FOR CONTEXT ONLY — NOT AUTHORITY\n${history}` : "",
     `AUTHORIZED ENACTED EVIDENCE\n${sources}`,
+    requiredClaimChecklist,
     structuredEvidenceAnalysis,
     supportingWebContext,
     revisionFeedback
@@ -6017,13 +6032,15 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       "Make the strongest supported distinctions, including contradictions in the user's premise and requirements attributed to the wrong exception.",
       "Use only exact supplied project facts in projectFactsUsed. Do not turn missing facts into assumptions.",
       "Ask only the minimum high-value follow-up questions that could materially change the project conclusion.",
-      "Always state the bounded-corpus limitation. Include any retrieval limitations supplied in the request."
+      "Always state the bounded-corpus limitation. Include any retrieval limitations supplied in the request.",
+      "Every passage marked REQUIRED_CLAIM_COVERAGE must appear in at least one material evidence-map item. Never say a rule is absent when its required passage supplies that rule."
     ].join(" "),
     input: [
       researchPrompt(question, evidence, {
         messages: options.messages,
         projectContextFacts: options.projectContextFacts,
-        codeBasis: options.codeBasis
+        codeBasis: options.codeBasis,
+        requiredClaims: options.requiredClaims
       }),
       options.retrievalLimitations?.length
         ? `DETERMINISTIC RETRIEVAL LIMITATIONS\n${JSON.stringify(options.retrievalLimitations)}`
@@ -6565,6 +6582,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Do not add an example, consequence, code category, or practical requirement unless the assembled evidence or user-provided Project facts establish it. Clearly identify any illustration as hypothetical, and never use a hypothetical to introduce an unsupported legal premise.",
         "Use explanation for the practical application of the supported points to the question and user-provided Project facts. Do not merely repeat the numbered points.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
+        "Every passage marked REQUIRED_CLAIM_COVERAGE must be addressed in at least one supportedPoint and cited with that exact PASSAGE_ID. Combine closely related passages in one coherent supportedPoint when needed; do not satisfy this by adding an orphan citation without explaining the rule.",
         "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
           "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
           "Facts stated by the user may support a conditional answer, but restate any fact material to an exception or numerical threshold as a project fact to verify before final reliance.",
@@ -6717,6 +6735,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
+      "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",
       "Do not demand a final yes-or-no result when project facts genuinely remain unresolved.",
       "Return a compact structured result."
     ].join(" "),
@@ -6729,6 +6748,9 @@ async function openAIResearchVerification(question, evidence, interpretation, us
         ? `PROJECT FACTS\n${options.projectContextFacts.join("\n")}`
         : "",
       `AUTHORIZED ENACTED EVIDENCE\n${evidenceText}`,
+      options.requiredClaims?.length
+        ? `DETERMINISTIC REQUIRED CLAIM CHECKLIST\n${JSON.stringify(options.requiredClaims)}`
+        : "",
       options.webSupport?.sources?.length
         ? `NONCONTROLLING SUPPORTING WEB MATERIAL\n${JSON.stringify({
             summary: options.webSupport.summary,
@@ -13310,6 +13332,7 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
+    const requiredClaims = requiredResearchClaimsFromEvidence(assembledEvidence);
     const mockMode = researchMockMode();
     const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
     const requestLimit = monthlyResearchRequestLimit();
@@ -13389,7 +13412,8 @@ async function handleResearchConversationMessage(request, response) {
           messages: conversation.messages,
           projectContextFacts: combinedProjectFacts,
           retrievalLimitations: turnRetrievalLimitations,
-          codeBasis: answerCodeBasis
+          codeBasis: answerCodeBasis,
+          requiredClaims
         });
     let result = mockMode
       ? {
@@ -13411,13 +13435,33 @@ async function handleResearchConversationMessage(request, response) {
           responseStyle: "conversational",
           structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
           webSupport,
-          codeBasis: answerCodeBasis
+          codeBasis: answerCodeBasis,
+          requiredClaims
         });
     let verificationAttempts = [];
     let verifierUsage = combinedResearchUsage();
     let answerGenerationUsage = result.usage;
+    let requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
+      requiredClaims,
+      evidence: assembledEvidence,
+      answer: result.interpretation
+    });
     if (mockMode) {
-      verificationAttempts = [{ pass: true, issues: [], model: "permitext-mock" }];
+      verificationAttempts = [{
+        pass: requiredClaimCoverage.pass,
+        issues: requiredClaimCoverage.pass
+          ? []
+          : researchRequiredClaimRevisionIssues(requiredClaimCoverage),
+        model: requiredClaimCoverage.pass
+          ? "permitext-mock"
+          : "permitext-deterministic-required-claim-gate"
+      }];
+      if (!requiredClaimCoverage.pass) {
+        const error = new Error("The mock Research answer omitted required material enacted evidence.");
+        error.code = "RESEARCH_VERIFICATION_FAILED";
+        error.verificationAttempts = verificationAttempts;
+        throw error;
+      }
     } else {
       for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
         if (attempt > 0) {
@@ -13429,17 +13473,42 @@ async function handleResearchConversationMessage(request, response) {
             structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
             webSupport,
             codeBasis: answerCodeBasis,
+            requiredClaims,
             revisionFeedback: verificationAttempts.at(-1).issues
           });
           answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
           result = revised;
+        }
+        requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
+          requiredClaims,
+          evidence: assembledEvidence,
+          answer: result.interpretation
+        });
+        if (!requiredClaimCoverage.pass) {
+          verificationAttempts.push({
+            pass: false,
+            issues: researchRequiredClaimRevisionIssues(requiredClaimCoverage),
+            model: "permitext-deterministic-required-claim-gate"
+          });
+          if (attempt === maximumResearchVerificationAttempts - 1) {
+            const error = new Error("The answer omitted required material enacted evidence after two bounded revisions.");
+            error.code = "RESEARCH_VERIFICATION_FAILED";
+            error.verificationAttempts = verificationAttempts;
+            throw error;
+          }
+          continue;
         }
         const verification = await openAIResearchVerification(
           question,
           assembledEvidence,
           result.interpretation,
           context.userID,
-          { projectContextFacts: combinedProjectFacts, webSupport, codeBasis: answerCodeBasis }
+          {
+            projectContextFacts: combinedProjectFacts,
+            webSupport,
+            codeBasis: answerCodeBasis,
+            requiredClaims
+          }
         );
         verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
         verificationAttempts.push({
@@ -13490,9 +13559,11 @@ async function handleResearchConversationMessage(request, response) {
           permitextDiscoveredCount: assembledEvidence.filter((section) => section.origin === "permitext_discovered").length,
           crossReferenceCount: assembledEvidence.filter((section) => section.origin === "permitext_cross_reference").length,
           supportingWebSourceCount: result.interpretation.supportingSources?.length || 0,
-          unresolvedProjectFactCount: result.interpretation.missingFacts?.length || 0
+          unresolvedProjectFactCount: result.interpretation.missingFacts?.length || 0,
+          requiredClaimCount: requiredClaimCoverage.requiredClaimCount
         },
         structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+        requiredClaimCoverage,
         retrieval: {
           schemaVersion: evidencePackage.schemaVersion,
           assemblyVersion: evidencePackage.assemblyVersion,
@@ -13545,7 +13616,8 @@ async function handleResearchConversationMessage(request, response) {
         researchSystemVersion: [
           assistantMessage.answer.promptVersion,
           assistantMessage.answer.evidenceVersion,
-          researchSourcePolicyVersion
+          researchSourcePolicyVersion,
+          researchRequiredClaimCoverageVersion
         ].filter(Boolean).join(":"),
         createdAt: now
       }),
