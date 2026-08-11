@@ -5754,7 +5754,7 @@ function researchPrompt(question, evidence, options = {}) {
     ].filter(Boolean);
     if (section.richSourceID && section.richSourceGrids) {
       lines.push(
-        `STRUCTURED_OFFICIAL_SOURCE: ${section.richSourceReference || section.richSourceID}`,
+        `STRUCTURED_OFFICIAL_SOURCE: ${section.richSourceCanonicalReference || section.richSourceReference || section.richSourceID}`,
         `STRUCTURED_SOURCE_CONTENT_HASH: ${section.richSourceContentHash}`,
         `STRUCTURED_TABLE_GRIDS_JSON: ${JSON.stringify(section.richSourceGrids)}`
       );

@@ -2,12 +2,14 @@ import {
   prioritizeResearchEvidence,
   researchEvidencePriorityMetadata
 } from "./research-evidence-priority.mjs";
+import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v4";
+export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v6";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
   maximumDiscovered: 10,
+  maximumTargetedDefinitions: 2,
   maximumCrossReferences: 6,
   maximumCharacters: 48_000,
   maximumCharactersPerSource: 12_000
@@ -45,6 +47,11 @@ function appliedLimits(value = {}) {
       value.maximumDiscovered,
       researchEvidenceAssemblyLimits.maximumDiscovered,
       researchEvidenceAssemblyLimits.maximumDiscovered
+    ),
+    maximumTargetedDefinitions: positiveInteger(
+      value.maximumTargetedDefinitions,
+      researchEvidenceAssemblyLimits.maximumTargetedDefinitions,
+      researchEvidenceAssemblyLimits.maximumTargetedDefinitions
     ),
     maximumCrossReferences: positiveInteger(
       value.maximumCrossReferences,
@@ -189,7 +196,80 @@ async function canonicalSection(resolveSection, value, origin) {
     ...requested,
     ...sectionDescriptor({ ...requested, ...resolved }),
     text,
-    crossReferences: Array.isArray(resolved.crossReferences) ? resolved.crossReferences : []
+    body: resolved.body,
+    crossReferences: Array.isArray(resolved.crossReferences) ? resolved.crossReferences : [],
+    richSources: Array.isArray(resolved.richSources) ? structuredClone(resolved.richSources) : []
+  };
+}
+
+function comparableTableReference(value, fallbackCodePrefix = "") {
+  const normalized = compactText(value).toUpperCase();
+  const match = normalized.match(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC)\s+)?TABLE\s+([A-Z]?\d+(?:\.[0-9A-Z-]+)*)/i);
+  if (!match) return "";
+  const codePrefix = String(match[1] || fallbackCodePrefix || "").toUpperCase();
+  return codePrefix ? `${codePrefix}:TABLE:${match[2].toUpperCase()}` : `TABLE:${match[2].toUpperCase()}`;
+}
+
+function tableReferences(value, fallbackCodePrefix = "") {
+  const references = new Set();
+  for (const match of compactText(value).matchAll(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC)\s+)?Table\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi)) {
+    const identity = comparableTableReference(match[0], match[1] || fallbackCodePrefix);
+    if (identity) references.add(identity);
+  }
+  return references;
+}
+
+function applicableStructuredTable(value) {
+  const references = tableReferences(canonicalText(value), value?.codePrefix);
+  const completeTables = (Array.isArray(value?.richSources) ? value.richSources : []).filter((source) =>
+    String(source?.kind || "").toLowerCase() === "table" &&
+      compactText(source.id) && compactText(source.contentHash) &&
+      Number(source.rowCount) > 0 && Array.isArray(source.grids) && source.grids.length > 0
+  );
+  const exact = completeTables.find((source) => {
+    if (String(source?.kind || "").toLowerCase() !== "table") return false;
+    const identity = comparableTableReference(source.reference, value?.codePrefix);
+    return identity && references.has(identity);
+  });
+  if (exact) return exact;
+
+  // Some prepared legacy sections preserve a complete grid but label its rich
+  // source only as "Official table." Infer the identity only when the section
+  // itself is the referenced table and contains exactly one complete grid.
+  const ownTableReference = comparableTableReference(
+    `${value?.codePrefix || ""} Table ${value?.sectionNumber || ""}`,
+    value?.codePrefix
+  );
+  if (
+    completeTables.length === 1 &&
+    ownTableReference &&
+    references.has(ownTableReference) &&
+    !comparableTableReference(completeTables[0].reference, value?.codePrefix)
+  ) {
+    return {
+      ...completeTables[0],
+      canonicalReference: `${value.codePrefix} Table ${value.sectionNumber}`
+    };
+  }
+  return null;
+}
+
+function attachStructuredTable(record, value, characterAllowance) {
+  const table = applicableStructuredTable(value);
+  const tableText = String(table?.text || "").trim();
+  if (!table || !tableText || tableText.length > characterAllowance) return record;
+  return {
+    ...record,
+    text: tableText,
+    canonicalContextComplete: false,
+    truncated: false,
+    richSourceID: compactText(table.id),
+    richSourceKind: "table",
+    richSourceReference: compactText(table.reference),
+    richSourceCanonicalReference: compactText(table.canonicalReference || table.reference),
+    richSourceContentHash: compactText(table.contentHash),
+    richSourceRowCount: Number(table.rowCount),
+    richSourceGrids: structuredClone(table.grids)
   };
 }
 
@@ -250,6 +330,30 @@ function normalizedCrossReferences(source) {
     .filter((reference) => sectionIdentity(reference));
 }
 
+function targetedDefinitionValue(value, context, maximumCharacters) {
+  const excerpt = targetedDefinitionExcerpt(value, context, { maximumCharacters });
+  if (!excerpt) return { value, excerpt: null };
+  const { text, ...metadata } = excerpt;
+  return {
+    value: { ...value, text },
+    excerpt: metadata
+  };
+}
+
+function definitionSelectionContext(query, values = []) {
+  return [
+    compactText(query),
+    ...values.map((value) => canonicalText(value).slice(0, 4_000))
+  ].filter(Boolean).join("\n").slice(0, 32_000);
+}
+
+function isDefinitionCandidate(value) {
+  const functions = Array.isArray(value?.evidencePriority?.functions)
+    ? value.evidencePriority.functions
+    : [];
+  return value?.evidencePriority?.primaryFunction === "definition" || functions.includes("definition");
+}
+
 function sourceRecord(value, {
   origin,
   sourceID,
@@ -262,11 +366,12 @@ function sourceRecord(value, {
   retrievalVersion = "",
   retrievalDepth = 0,
   evidencePriority = null,
+  targetedDefinition = null,
   retrievedAt = new Date().toISOString()
 }) {
   const rawText = canonicalText(value);
   const text = rawText.slice(0, Math.max(0, characterAllowance)).trimEnd();
-  return {
+  return attachStructuredTable({
     sourceID,
     origin,
     sourceType: "enacted_text",
@@ -286,9 +391,12 @@ function sourceRecord(value, {
     ...sectionDescriptor(value),
     text,
     canonicalContextResolved: Boolean(canonicalResolved),
-    canonicalContextComplete: Boolean(canonicalResolved && text.length === rawText.length),
-    truncated: text.length < rawText.length
-  };
+    canonicalContextComplete: Boolean(
+      canonicalResolved && !targetedDefinition && text.length === rawText.length
+    ),
+    truncated: targetedDefinition ? false : text.length < rawText.length,
+    targetedDefinition: targetedDefinition ? structuredClone(targetedDefinition) : null
+  }, value, Math.max(0, characterAllowance));
 }
 
 function deterministicSourceID(origin, value, index) {
@@ -338,6 +446,7 @@ export async function assembleResearchEvidence({
   const limitations = [];
   let characterCount = 0;
   let resolverFailureCount = 0;
+  let targetedDefinitionCount = 0;
   const retrievedAt = new Date().toISOString();
 
   const resolvedPins = [];
@@ -363,7 +472,16 @@ export async function assembleResearchEvidence({
     const remainingPins = resolvedPins.length - position;
     const fairPinnedShare = remainingPins ? Math.floor(remainingCharacters / remainingPins) : 0;
     const allowance = Math.min(limits.maximumCharactersPerSource, fairPinnedShare);
-    const record = sourceRecord(entry.value, {
+    const targeted = !entry.pinned.richSourceID &&
+      allowance > 0 &&
+      targetedDefinitionCount < limits.maximumTargetedDefinitions
+      ? targetedDefinitionValue(
+          entry.value,
+          definitionSelectionContext(query.retrievalQuery, [entry.pinned]),
+          allowance
+        )
+      : { value: entry.value, excerpt: null };
+    const record = sourceRecord(targeted.value, {
       origin: sourceOrigins.pinned,
       sourceID: compactText(entry.pinned.sourceID || entry.pinned.id) ||
         deterministicSourceID(sourceOrigins.pinned, entry.value, entry.index),
@@ -377,6 +495,7 @@ export async function assembleResearchEvidence({
         ...entry.value,
         origin: sourceOrigins.pinned
       }),
+      targetedDefinition: targeted.excerpt,
       retrievedAt
     });
     record.userSelectedText = compactText(
@@ -406,6 +525,7 @@ export async function assembleResearchEvidence({
       record.visualSources = structuredClone(entry.pinned.visualSources);
     }
     sources.push(record);
+    if (targeted.excerpt) targetedDefinitionCount += 1;
     characterCount += record.text.length;
     const identity = sectionIdentity(record);
     if (identity) includedSectionIdentities.add(identity);
@@ -431,15 +551,23 @@ export async function assembleResearchEvidence({
       Math.min(limits.maximumDiscovered - discoveredCount, candidates.length - index)
     );
     const fairCandidateShare = Math.max(1, Math.floor(remainingCharacters / remainingCandidateSlots));
-    const record = sourceRecord(resolved, {
+    const allowance = Math.min(
+      limits.maximumCharactersPerSource,
+      remainingCharacters,
+      fairCandidateShare
+    );
+    const targeted = targetedDefinitionCount < limits.maximumTargetedDefinitions
+      ? targetedDefinitionValue(
+          resolved,
+          definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
+          allowance
+        )
+      : { value: resolved, excerpt: null };
+    const record = sourceRecord(targeted.value, {
       origin: sourceOrigins.discovered,
       sourceID: deterministicSourceID(sourceOrigins.discovered, resolved, index),
       relationship: compactText(candidate.whyRelevant) || "Automatically retrieved for this answer",
-      characterAllowance: Math.min(
-        limits.maximumCharactersPerSource,
-        remainingCharacters,
-        fairCandidateShare
-      ),
+      characterAllowance: allowance,
       canonicalResolved: true,
       retrievalReason: compactText(candidate.whyRelevant) || "Automatically retrieved for this answer",
       retrievalRank: candidate.rank ?? index + 1,
@@ -447,14 +575,66 @@ export async function assembleResearchEvidence({
       retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
       retrievalDepth: 0,
       evidencePriority: candidate.evidencePriority,
+      targetedDefinition: targeted.excerpt,
       retrievedAt
     });
     if (!record.text) break;
     sources.push(record);
+    if (targeted.excerpt) targetedDefinitionCount += 1;
     canonicalForExpansion.push(resolved);
     includedSectionIdentities.add(sectionIdentity(resolved));
     characterCount += record.text.length;
     discoveredCount += 1;
+  }
+
+  // Definitions rank after controlling provisions, so a bounded discovery set can
+  // legitimately fill before a giant canonical definition section such as BC 202.
+  // Reserve a separate, small budget for query-targeted enacted definition entries.
+  for (const [index, candidate] of candidates.entries()) {
+    if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
+    if (!isDefinitionCandidate(candidate)) continue;
+    const candidateIdentity = sectionIdentity(candidate);
+    if (!candidateIdentity || includedSectionIdentities.has(candidateIdentity)) continue;
+    const remainingCharacters = limits.maximumCharacters - characterCount;
+    if (remainingCharacters < 1) break;
+    let resolved;
+    try {
+      resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered);
+    } catch {
+      resolverFailureCount += 1;
+      continue;
+    }
+    const identity = sectionIdentity(resolved);
+    if (!identity || includedSectionIdentities.has(identity)) continue;
+    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters);
+    const targeted = targetedDefinitionValue(
+      resolved,
+      definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
+      allowance
+    );
+    if (!targeted.excerpt) continue;
+    const record = sourceRecord(targeted.value, {
+      origin: sourceOrigins.discovered,
+      sourceID: deterministicSourceID(sourceOrigins.discovered, resolved, index),
+      relationship: compactText(candidate.whyRelevant) ||
+        "Query-targeted definitions from the enacted text",
+      characterAllowance: allowance,
+      canonicalResolved: true,
+      retrievalReason: compactText(candidate.whyRelevant) ||
+        "Query-targeted definitions from the enacted text",
+      retrievalRank: candidate.rank ?? index + 1,
+      retrievalScore: candidate.score,
+      retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
+      retrievalDepth: 0,
+      evidencePriority: candidate.evidencePriority,
+      targetedDefinition: targeted.excerpt,
+      retrievedAt
+    });
+    if (!record.text) continue;
+    sources.push(record);
+    includedSectionIdentities.add(identity);
+    characterCount += record.text.length;
+    targetedDefinitionCount += 1;
   }
 
   const crossReferenceQueue = [];
@@ -471,6 +651,10 @@ export async function assembleResearchEvidence({
       crossReferenceQueue.push(reference);
     }
   }
+  crossReferenceQueue.sort((left, right) =>
+    Number(String(right.referenceKind || "").toLowerCase() === "table") -
+      Number(String(left.referenceKind || "").toLowerCase() === "table")
+  );
 
   let crossReferenceCount = 0;
   for (const [index, reference] of crossReferenceQueue.entries()) {
@@ -486,11 +670,19 @@ export async function assembleResearchEvidence({
     }
     const identity = sectionIdentity(resolved);
     if (!identity || includedSectionIdentities.has(identity)) continue;
-    const record = sourceRecord(resolved, {
+    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters);
+    const targeted = targetedDefinitionCount < limits.maximumTargetedDefinitions
+      ? targetedDefinitionValue(
+          resolved,
+          definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
+          allowance
+        )
+      : { value: resolved, excerpt: null };
+    const record = sourceRecord(targeted.value, {
       origin: sourceOrigins.crossReference,
       sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, index),
       relationship: `Direct enacted-text cross-reference from this answer's primary evidence`,
-      characterAllowance: Math.min(limits.maximumCharactersPerSource, remainingCharacters),
+      characterAllowance: allowance,
       canonicalResolved: true,
       retrievalReason: `Direct cross-reference to ${reference.codePrefix || resolved.codePrefix} ${reference.sectionNumber || resolved.sectionNumber}`,
       retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
@@ -500,10 +692,12 @@ export async function assembleResearchEvidence({
         origin: sourceOrigins.crossReference,
         retrievalDepth: 1
       }),
+      targetedDefinition: targeted.excerpt,
       retrievedAt
     });
     if (!record.text) break;
     sources.push(record);
+    if (targeted.excerpt) targetedDefinitionCount += 1;
     includedSectionIdentities.add(identity);
     characterCount += record.text.length;
     crossReferenceCount += 1;
@@ -522,16 +716,45 @@ export async function assembleResearchEvidence({
       text: "At least one enacted section was shortened to keep this answer within the evidence character limit."
     });
   }
+  if (targetedDefinitionCount) {
+    limitations.push({
+      kind: "targeted-definition-excerpt",
+      count: targetedDefinitionCount,
+      text: "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+    });
+  }
   if (crossReferenceQueue.length > crossReferenceCount) {
     limitations.push({
       kind: "cross-reference-limit",
       text: "Additional direct cross-references were identified but were not added to this bounded answer package."
     });
   }
+  const includedDiscoveredIdentities = new Set(sources
+    .filter((source) => source.origin === sourceOrigins.discovered)
+    .map(sectionIdentity)
+    .filter(Boolean));
+  const requestedTableReferences = new Set(candidates
+    .filter((candidate) => includedDiscoveredIdentities.has(sectionIdentity(candidate)))
+    .flatMap((candidate) =>
+    (Array.isArray(candidate?.sourceReviewRequirements) ? candidate.sourceReviewRequirements : [])
+      .filter((requirement) => requirement?.kind === "referenced-table")
+      .flatMap((requirement) => Array.isArray(requirement.references) ? requirement.references : [])
+      .map((reference) => comparableTableReference(reference, candidate.codePrefix))
+      .filter(Boolean)
+  ));
+  const resolvedTableReferences = new Set(sources
+    .map((source) => comparableTableReference(
+      source.richSourceCanonicalReference || source.richSourceReference,
+      source.codePrefix
+    ))
+    .filter(Boolean));
+  const allRequestedTablesResolved = requestedTableReferences.size === 0 ||
+    [...requestedTableReferences].every((reference) => resolvedTableReferences.has(reference));
   for (const limitation of Array.isArray(discovery?.coverageLimitations)
     ? discovery.coverageLimitations
     : []) {
     if (!limitation || limitation.kind === "candidate-review-required") continue;
+    if (limitation.kind === "referenced-table-review-required" && allRequestedTablesResolved) continue;
     limitations.push({
       kind: compactText(limitation.kind) || "retrieval-coverage",
       text: compactText(limitation.text) || "The enacted-corpus retrieval stage reported a coverage limitation."
@@ -559,6 +782,7 @@ export async function assembleResearchEvidence({
       pinnedCount: pinnedEvidence.length,
       candidateCount: candidates.length,
       discoveredCount,
+      targetedDefinitionCount,
       crossReferenceCount,
       characterCount,
       resolverFailureCount
