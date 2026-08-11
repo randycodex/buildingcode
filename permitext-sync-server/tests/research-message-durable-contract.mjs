@@ -69,6 +69,14 @@ const answer = {
 const conversation = {
   id: "conv-1",
   title: "Durable",
+  topicContext: {
+    version: "20260811-research-conversation-topic-v1",
+    originalTopic: "When must the owner notify?",
+    rootTopic: "When must the owner notify?",
+    currentTopic: "When must the owner notify?",
+    lastDecision: "continuation",
+    updatedAt: "2026-08-01T00:02:00.000Z"
+  },
   messages: [
     { id: "u1", role: "user", question: answer.question },
     { id: "answer-1", role: "assistant", answer: answer.answer }
@@ -99,6 +107,11 @@ assert.equal(success.replayed, false);
 assert.equal(successStore.researchUsageByUserID[userID][0].mode, "openai");
 assert.equal(successStore.researchAnswersByUserID[userID][0].id, "answer-1");
 assert.equal(successStore.researchConversationsByUserID[userID][0].messages.length, 2);
+assert.deepEqual(
+  successStore.researchConversationsByUserID[userID][0].topicContext,
+  conversation.topicContext,
+  "Successful answer commit did not preserve the conversation topic state."
+);
 
 // Mid-commit failure after usage mutation must not be treated as durable success:
 // callers wrap this in withMutation which only writes after the mutator returns.

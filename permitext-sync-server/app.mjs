@@ -161,6 +161,10 @@ import {
   researchRequiredClaimCoverageVersion,
   researchRequiredClaimRevisionIssues
 } from "./research-required-claim-coverage.mjs";
+import {
+  evaluateResearchClaimMateriality,
+  researchClaimMaterialityVersion
+} from "./research-claim-materiality.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
 import {
@@ -6349,6 +6353,17 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   };
 }
 
+function combinedResearchClaimRevisionIssues(...results) {
+  const issues = results.flatMap((result) => researchRequiredClaimRevisionIssues(result));
+  const seen = new Set();
+  return issues.filter((issue) => {
+    const identity = JSON.stringify(issue);
+    if (seen.has(identity)) return false;
+    seen.add(identity);
+    return true;
+  });
+}
+
 export function validateResearchInterpretation(value, evidence, supportingSources = []) {
   const allowedSections = new Map();
   const allowedSources = new Map();
@@ -7550,7 +7565,8 @@ async function assembledResearchEvidenceForTurn({
   question,
   messages,
   pinnedEvidence,
-  projectFacts
+  projectFacts,
+  topicContext
 }) {
   const [catalog, invertedIndex] = await Promise.all([
     sectionCatalog(),
@@ -7561,6 +7577,7 @@ async function assembledResearchEvidenceForTurn({
     previousMessages: messages,
     projectFacts,
     pinnedEvidence,
+    topicContext,
     limits: researchEvidenceAssemblyLimits,
     discover: ({ question: retrievalQuestion, limit, retrievalContext }) => discoverRelevantEvidence({
       question: retrievalQuestion,
@@ -13382,7 +13399,8 @@ async function handleResearchConversationMessage(request, response) {
       question,
       messages: conversation.messages || [],
       pinnedEvidence,
-      projectFacts: combinedProjectFacts
+      projectFacts: combinedProjectFacts,
+      topicContext: conversation.topicContext || null
     });
     const turnRetrievalLimitations = [
       ...(evidencePackage.limitations || []),
@@ -13402,6 +13420,10 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     const requiredClaims = requiredResearchClaimsFromEvidence(assembledEvidence);
+    const materialityClaims = requiredClaims.map((claim) => ({
+      ...claim,
+      claimRole: "governing"
+    }));
     const mockMode = researchMockMode();
     const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
     const requestLimit = monthlyResearchRequestLimit();
@@ -13515,17 +13537,22 @@ async function handleResearchConversationMessage(request, response) {
       evidence: assembledEvidence,
       answer: result.interpretation
     });
+    let claimMateriality = evaluateResearchClaimMateriality({
+      claims: materialityClaims,
+      evidence: assembledEvidence,
+      answer: result.interpretation
+    });
     if (mockMode) {
       verificationAttempts = [{
-        pass: requiredClaimCoverage.pass,
-        issues: requiredClaimCoverage.pass
+        pass: requiredClaimCoverage.pass && claimMateriality.pass,
+        issues: requiredClaimCoverage.pass && claimMateriality.pass
           ? []
-          : researchRequiredClaimRevisionIssues(requiredClaimCoverage),
-        model: requiredClaimCoverage.pass
+          : combinedResearchClaimRevisionIssues(requiredClaimCoverage, claimMateriality),
+        model: requiredClaimCoverage.pass && claimMateriality.pass
           ? "permitext-mock"
-          : "permitext-deterministic-required-claim-gate"
+          : "permitext-deterministic-claim-materiality-gate"
       }];
-      if (!requiredClaimCoverage.pass) {
+      if (!requiredClaimCoverage.pass || !claimMateriality.pass) {
         const error = new Error("The mock Research answer omitted required material enacted evidence.");
         error.code = "RESEARCH_VERIFICATION_FAILED";
         error.verificationAttempts = verificationAttempts;
@@ -13553,11 +13580,16 @@ async function handleResearchConversationMessage(request, response) {
           evidence: assembledEvidence,
           answer: result.interpretation
         });
-        if (!requiredClaimCoverage.pass) {
+        claimMateriality = evaluateResearchClaimMateriality({
+          claims: materialityClaims,
+          evidence: assembledEvidence,
+          answer: result.interpretation
+        });
+        if (!requiredClaimCoverage.pass || !claimMateriality.pass) {
           verificationAttempts.push({
             pass: false,
-            issues: researchRequiredClaimRevisionIssues(requiredClaimCoverage),
-            model: "permitext-deterministic-required-claim-gate"
+            issues: combinedResearchClaimRevisionIssues(requiredClaimCoverage, claimMateriality),
+            model: "permitext-deterministic-claim-materiality-gate"
           });
           if (attempt === maximumResearchVerificationAttempts - 1) {
             const error = new Error("The answer omitted required material enacted evidence after two bounded revisions.");
@@ -13640,12 +13672,14 @@ async function handleResearchConversationMessage(request, response) {
         },
         structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
         requiredClaimCoverage,
+        claimMateriality,
         retrieval: {
           schemaVersion: evidencePackage.schemaVersion,
           assemblyVersion: evidencePackage.assemblyVersion,
           retrievalQuery: evidencePackage.retrievalQuery,
           previousTopicApplied: evidencePackage.previousTopicApplied,
           projectFactsApplied: evidencePackage.projectFactsApplied,
+          topicDecision: evidencePackage.topicDecision,
           sourceMode: evidencePackage.sourceMode,
           sourceScope: evidencePackage.sourceScope,
           limits: evidencePackage.limits,
@@ -13693,7 +13727,8 @@ async function handleResearchConversationMessage(request, response) {
           assistantMessage.answer.promptVersion,
           assistantMessage.answer.evidenceVersion,
           researchSourcePolicyVersion,
-          researchRequiredClaimCoverageVersion
+          researchRequiredClaimCoverageVersion,
+          researchClaimMaterialityVersion
         ].filter(Boolean).join(":"),
         createdAt: now
       }),
@@ -13708,6 +13743,25 @@ async function handleResearchConversationMessage(request, response) {
     };
     conversation.codeVersion = answerCodeBasis.codeVersion;
     conversation.codeBasis = answerCodeBasis;
+    conversation.topicContext = {
+      version: evidencePackage.topicDecision?.version || null,
+      originalTopic: normalizedResearchText(
+        conversation.topicContext?.originalTopic ||
+        evidencePackage.topicDecision?.rootTopic?.text ||
+        question,
+        2_000
+      ),
+      rootTopic: normalizedResearchText(
+        evidencePackage.topicDecision?.nextRootTopic?.text || question,
+        2_000
+      ),
+      currentTopic: normalizedResearchText(
+        evidencePackage.topicDecision?.nextCurrentTopic?.text || question,
+        2_000
+      ),
+      lastDecision: evidencePackage.topicDecision?.decision || null,
+      updatedAt: now
+    };
     conversation.messages.push(userMessage, assistantMessage);
     conversation.updatedAt = now;
     delete conversation.historyHiddenAt;

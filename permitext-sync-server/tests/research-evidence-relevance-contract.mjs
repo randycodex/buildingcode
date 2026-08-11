@@ -22,8 +22,8 @@ const query = researchEvidenceRetrievalQuery({
 
 assert.equal(query.previousTopicApplied, true);
 assert.equal(query.relevanceComparison, true);
-assert.match(query.retrievalQuery, /Previous topic: Smoke barriers vs\. smoke partitions/);
-assert.match(query.retrievalQuery, /Immediate context: Is this text related\? SECTION BC 101/);
+assert.match(query.retrievalQuery, /Root topic: Smoke barriers vs\. smoke partitions/);
+assert.match(query.retrievalQuery, /Previous topic: Is this text related\? SECTION BC 101/);
 
 const sections = [
   ["bc-709-1", "BC", "709.1", "General", "Smoke barriers shall comply with this section."],

@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "benchmarkVersion": "20260811-research-multiturn-adversarial-v1",
+  "description": "Deterministic conversation-state and evidence-boundary cases for Permitext Research. These cases diagnose retrieval behavior; they do not approve a legal answer.",
+  "cases": [
+    {
+      "id": "pronoun-follow-up",
+      "behavior": "pronoun follow-up",
+      "question": "Does it require a 1-hour rating?",
+      "previousMessages": [
+        { "role": "user", "content": "Under BC 709.3, what rating applies to the smoke barrier?" },
+        { "role": "assistant", "content": "The provision addresses the fire-resistance rating of smoke barriers." }
+      ],
+      "projectFacts": [],
+      "evidence": [
+        { "sectionID": "bc-709-3", "codePrefix": "BC", "sectionNumber": "709.3", "title": "Fire-resistance rating", "canonicalText": "Smoke barriers shall have a fire-resistance rating of not less than 1 hour.", "signals": { "exactTopicRouteTarget": true } }
+      ],
+      "expected": {
+        "topicAction": "continue_root",
+        "conversationTopicContains": "BC 709.3",
+        "immediateContextContains": "BC 709.3",
+        "previousTopicApplied": true,
+        "projectFactsApplied": false,
+        "requiredQueryFragments": ["Does it require", "Previous topic", "BC 709.3"],
+        "forbiddenQueryFragments": [],
+        "requiredEvidenceRoles": ["governing"],
+        "forbiddenEvidenceRoles": ["irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 709.3"],
+        "forbiddenReferences": []
+      }
+    },
+    {
+      "id": "correction-follow-up",
+      "behavior": "correction",
+      "question": "Correction: it is Group R-2, not Group R-1. What changes?",
+      "previousMessages": [
+        { "role": "user", "content": "For a Group R-1 project, which accessible-unit categories apply under BC 1107.6.1?" },
+        { "role": "assistant", "content": "Group R-1 has its own accessible-unit provisions." }
+      ],
+      "projectFacts": [],
+      "evidence": [
+        { "sectionID": "bc-1107-6-2", "codePrefix": "BC", "sectionNumber": "1107.6.2", "title": "Group R-2", "canonicalText": "Accessible units, Type B+NYC units and Type B units shall be provided in Group R-2 occupancies in accordance with this section.", "signals": { "exactTopicRouteTarget": true } }
+      ],
+      "expected": {
+        "topicAction": "continue_root",
+        "conversationTopicContains": "Group R-1 project",
+        "immediateContextContains": "Group R-1 project",
+        "previousTopicApplied": true,
+        "projectFactsApplied": false,
+        "requiredQueryFragments": ["Correction", "Group R-2", "Previous topic", "BC 1107.6.1"],
+        "forbiddenQueryFragments": [],
+        "requiredEvidenceRoles": ["governing"],
+        "forbiddenEvidenceRoles": ["irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 1107.6.2"],
+        "forbiddenReferences": ["BC 1107.6.1"]
+      }
+    },
+    {
+      "id": "request-for-details",
+      "behavior": "request for details",
+      "question": "Please give me more details about that.",
+      "previousMessages": [
+        { "role": "user", "content": "How many exits are required from the office under BC 1006.2?" },
+        { "role": "assistant", "content": "The answer depends on occupant load, travel distance and the applicable table." }
+      ],
+      "projectFacts": [],
+      "evidence": [
+        { "sectionID": "bc-1006-2", "codePrefix": "BC", "sectionNumber": "1006.2", "title": "Egress from spaces", "canonicalText": "The number of exits or exit access doorways from any space shall be provided in accordance with this section.", "signals": { "exactTopicRouteTarget": true, "referencesTable": true } }
+      ],
+      "expected": {
+        "topicAction": "continue_root",
+        "conversationTopicContains": "BC 1006.2",
+        "immediateContextContains": "BC 1006.2",
+        "previousTopicApplied": true,
+        "projectFactsApplied": false,
+        "requiredQueryFragments": ["more details", "Previous topic", "BC 1006.2"],
+        "forbiddenQueryFragments": [],
+        "requiredEvidenceRoles": ["governing"],
+        "forbiddenEvidenceRoles": ["irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 1006.2"],
+        "forbiddenReferences": []
+      }
+    },
+    {
+      "id": "exact-unrelated-provision-relevance",
+      "behavior": "exact unrelated provision relevance check",
+      "question": "Is BC 101.1 relevant to the original smoke-separation question, and should it govern the required assembly or rating?",
+      "previousMessages": [
+        { "role": "user", "content": "Does the smoke separation require a smoke barrier under BC 709.3?" },
+        { "role": "assistant", "content": "The governing smoke-barrier provision must be evaluated." }
+      ],
+      "projectFacts": [],
+      "evidence": [
+        { "sectionID": "bc-709-3-relevance", "codePrefix": "BC", "sectionNumber": "709.3", "title": "Fire-resistance rating", "canonicalText": "Smoke barriers shall have a fire-resistance rating of not less than 1 hour.", "signals": { "exactTopicRouteTarget": true } },
+        { "sectionID": "bc-101-1-context", "codePrefix": "BC", "sectionNumber": "101.1", "title": "Title", "canonicalText": "This code shall be known and may be cited as the New York City Building Code.", "signals": { "exactReference": true, "contextualReference": true, "relevanceComparison": true } }
+      ],
+      "expected": {
+        "topicAction": "compare_to_root",
+        "conversationTopicContains": "smoke separation",
+        "immediateContextContains": "smoke separation",
+        "previousTopicApplied": true,
+        "projectFactsApplied": false,
+        "requiredQueryFragments": ["BC 101.1", "Previous topic", "BC 709.3"],
+        "forbiddenQueryFragments": [],
+        "requiredEvidenceRoles": ["governing", "contextual"],
+        "forbiddenEvidenceRoles": ["irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 709.3", "BC 101.1"],
+        "forbiddenReferences": ["FGC 101.1", "MC 101.1", "PC 101.1"]
+      }
+    },
+    {
+      "id": "same-number-other-code-books",
+      "behavior": "same-number other code books",
+      "question": "For section 101.1, which code book supplies the title rule for my Building Code question?",
+      "previousMessages": [
+        { "role": "user", "content": "I am researching the New York City Building Code, not the fuel gas, mechanical or plumbing codes." },
+        { "role": "assistant", "content": "The code-book prefix must remain explicit." }
+      ],
+      "projectFacts": [],
+      "evidence": [
+        { "sectionID": "bc-101-1", "codePrefix": "BC", "sectionNumber": "101.1", "title": "Title", "canonicalText": "This code shall be known and may be cited as the New York City Building Code.", "signals": { "exactTopicRouteTarget": true } }
+      ],
+      "expected": {
+        "topicAction": "continue_root",
+        "conversationTopicContains": "New York City Building Code",
+        "immediateContextContains": "New York City Building Code",
+        "previousTopicApplied": true,
+        "projectFactsApplied": false,
+        "requiredQueryFragments": ["section 101.1", "Building Code", "Previous topic"],
+        "forbiddenQueryFragments": [],
+        "requiredEvidenceRoles": ["governing"],
+        "forbiddenEvidenceRoles": ["contextual", "irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 101.1"],
+        "forbiddenReferences": ["FGC 101.1", "MC 101.1", "PC 101.1"]
+      }
+    },
+    {
+      "id": "explicit-new-topic",
+      "behavior": "explicit new topic",
+      "question": "New topic: Under BC 304.1, how should an architectural office be classified?",
+      "previousMessages": [
+        { "role": "user", "content": "Does a smoke barrier require a 1-hour rating under BC 709.3?" },
+        { "role": "assistant", "content": "The smoke-barrier rating is governed by the smoke-barrier provisions." }
+      ],
+      "projectFacts": [],
+      "evidence": [
+        { "sectionID": "bc-304-1", "codePrefix": "BC", "sectionNumber": "304.1", "title": "Business Group B", "canonicalText": "Group B occupancy includes office, professional or service-type transactions.", "signals": { "exactTopicRouteTarget": true } }
+      ],
+      "expected": {
+        "topicAction": "replace_topic",
+        "conversationTopicContains": "architectural office",
+        "immediateContextContains": "architectural office",
+        "previousTopicApplied": false,
+        "projectFactsApplied": false,
+        "requiredQueryFragments": ["New topic", "BC 304.1", "architectural office"],
+        "forbiddenQueryFragments": ["Previous topic", "BC 709.3"],
+        "requiredEvidenceRoles": ["governing"],
+        "forbiddenEvidenceRoles": ["contextual", "irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 304.1"],
+        "forbiddenReferences": ["BC 709.3"]
+      }
+    },
+    {
+      "id": "implicit-new-topic",
+      "behavior": "implicit new topic",
+      "question": "How should a mercantile sales floor be classified under BC 309.1?",
+      "previousMessages": [
+        { "role": "user", "content": "Does a smoke barrier require a 1-hour rating under BC 709.3?" },
+        { "role": "assistant", "content": "The smoke-barrier rating is governed by the smoke-barrier provisions." }
+      ],
+      "projectFacts": [],
+      "evidence": [
+        { "sectionID": "bc-309-1", "codePrefix": "BC", "sectionNumber": "309.1", "title": "Mercantile Group M", "canonicalText": "Mercantile Group M occupancy includes the use of a building or structure for the display and sale of merchandise.", "signals": { "exactTopicRouteTarget": true } }
+      ],
+      "expected": {
+        "topicAction": "replace_topic",
+        "conversationTopicContains": "mercantile sales floor",
+        "immediateContextContains": "mercantile sales floor",
+        "previousTopicApplied": false,
+        "projectFactsApplied": false,
+        "requiredQueryFragments": ["mercantile sales floor", "BC 309.1"],
+        "forbiddenQueryFragments": ["Previous topic", "BC 709.3"],
+        "requiredEvidenceRoles": ["governing"],
+        "forbiddenEvidenceRoles": ["contextual", "irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 309.1"],
+        "forbiddenReferences": ["BC 709.3"]
+      }
+    },
+    {
+      "id": "return-to-original-topic",
+      "behavior": "return to original topic",
+      "question": "What about the original question: does it require a 1-hour smoke-barrier rating?",
+      "previousMessages": [
+        { "role": "user", "content": "Does the smoke separation require a smoke barrier under BC 709.3?" },
+        { "role": "assistant", "content": "The smoke-barrier provision must be evaluated." },
+        { "role": "user", "content": "Separately, which accessible units are required under BC 1107.6.2?" },
+        { "role": "assistant", "content": "That is a Group R-2 accessibility question." }
+      ],
+      "projectFacts": [],
+      "evidence": [
+        { "sectionID": "bc-709-3-return", "codePrefix": "BC", "sectionNumber": "709.3", "title": "Fire-resistance rating", "canonicalText": "Smoke barriers shall have a fire-resistance rating of not less than 1 hour.", "signals": { "exactTopicRouteTarget": true } }
+      ],
+      "expected": {
+        "topicAction": "continue_root",
+        "conversationTopicContains": "BC 709.3",
+        "immediateContextContains": "BC 1107.6.2",
+        "previousTopicApplied": true,
+        "projectFactsApplied": false,
+        "requiredQueryFragments": ["original question", "Previous topic", "BC 709.3"],
+        "forbiddenQueryFragments": [],
+        "requiredEvidenceRoles": ["governing"],
+        "forbiddenEvidenceRoles": ["contextual", "irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 709.3"],
+        "forbiddenReferences": ["BC 1107.6.2"]
+      }
+    },
+    {
+      "id": "pasted-text-comparison",
+      "behavior": "pasted text",
+      "question": "Is this pasted text relevant to the original smoke-separation question, and should it govern the assembly or rating?",
+      "previousMessages": [
+        { "role": "user", "content": "Does the smoke separation require a smoke barrier under BC 709.3?" },
+        { "role": "assistant", "content": "The governing smoke-barrier provision must be evaluated." },
+        { "role": "user", "content": "Pasted text — BC 101.1 Title: This code shall be known and may be cited as the New York City Building Code." }
+      ],
+      "projectFacts": [],
+      "evidence": [
+        { "sectionID": "bc-709-3-paste", "codePrefix": "BC", "sectionNumber": "709.3", "title": "Fire-resistance rating", "canonicalText": "Smoke barriers shall have a fire-resistance rating of not less than 1 hour.", "signals": { "exactTopicRouteTarget": true } },
+        { "sectionID": "bc-101-1-paste", "codePrefix": "BC", "sectionNumber": "101.1", "title": "Title", "canonicalText": "This code shall be known and may be cited as the New York City Building Code.", "signals": { "exactReference": true, "contextualReference": true, "relevanceComparison": true } }
+      ],
+      "expected": {
+        "topicAction": "compare_to_root",
+        "conversationTopicContains": "BC 709.3",
+        "immediateContextContains": "Pasted text",
+        "previousTopicApplied": true,
+        "projectFactsApplied": false,
+        "requiredQueryFragments": ["pasted text", "Root topic", "BC 709.3", "Previous topic", "BC 101.1 Title"],
+        "forbiddenQueryFragments": [],
+        "requiredEvidenceRoles": ["governing", "contextual"],
+        "forbiddenEvidenceRoles": ["irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 709.3", "BC 101.1"],
+        "forbiddenReferences": ["FGC 101.1", "MC 101.1", "PC 101.1"]
+      }
+    },
+    {
+      "id": "project-fact-follow-up",
+      "behavior": "project-fact follow-up",
+      "question": "Given those facts, which unit categories must be counted and what is still missing?",
+      "previousMessages": [
+        { "role": "user", "content": "For a Group R-2 project, which unit categories apply under BC 1107.6.2?" },
+        { "role": "assistant", "content": "The quantities depend on project-specific facts." }
+      ],
+      "projectFacts": [
+        "The project contains 100 dwelling units.",
+        "The occupancy group is R-2."
+      ],
+      "evidence": [
+        { "sectionID": "bc-1107-6-2-facts", "codePrefix": "BC", "sectionNumber": "1107.6.2", "title": "Group R-2", "canonicalText": "Accessible units, Type B+NYC units and Type B units shall be provided in Group R-2 occupancies in accordance with this section.", "signals": { "exactTopicRouteTarget": true, "referencesTable": true } }
+      ],
+      "expected": {
+        "topicAction": "continue_root",
+        "conversationTopicContains": "Group R-2 project",
+        "immediateContextContains": "Group R-2 project",
+        "previousTopicApplied": true,
+        "projectFactsApplied": true,
+        "requiredQueryFragments": ["Given those facts", "Previous topic", "BC 1107.6.2", "Project facts", "100 dwelling units", "occupancy group is R-2"],
+        "forbiddenQueryFragments": [],
+        "requiredEvidenceRoles": ["governing"],
+        "forbiddenEvidenceRoles": ["irrelevant"],
+        "requiredCodePrefixes": ["BC"],
+        "forbiddenCodePrefixes": ["FGC", "MC", "PC"],
+        "requiredReferences": ["BC 1107.6.2"],
+        "forbiddenReferences": []
+      }
+    }
+  ]
+}

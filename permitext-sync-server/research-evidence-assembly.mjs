@@ -2,9 +2,14 @@ import {
   prioritizeResearchEvidence,
   researchEvidencePriorityMetadata
 } from "./research-evidence-priority.mjs";
+import {
+  decideResearchConversationTopic,
+  researchConversationTopicDecisions,
+  researchQuestionReturnsToOriginalTopic
+} from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v8";
+export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v9";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -87,38 +92,12 @@ function previousConversationTopic(messages) {
   return "";
 }
 
-function conversationRootTopic(messages) {
-  const entries = Array.isArray(messages) ? messages : [];
-  for (const entry of entries) {
-    if (entry && typeof entry === "object" && entry.role && entry.role !== "user") continue;
-    const text = messageText(entry);
-    if (text) return text;
-  }
-  return "";
-}
-
-function isContextDependentFollowUp(question) {
-  const normalized = compactText(question);
-  if (!normalized) return false;
-  if (/^(?:why|how so|explain|tell me more|more details?|go on)[?.!]*$/i.test(normalized)) return true;
-  const words = normalized.split(/\s+/);
-  return words.length <= 16 && (
-    /\b(?:it|its|that|this|those|these|them|they|same|above|previous|earlier|remaining|further)\b/i.test(normalized) ||
-    /\b(?:more detail|more details|explain more|what about)\b/i.test(normalized)
-  );
-}
-
-function isEvidenceRelevanceFollowUp(question) {
-  const normalized = compactText(question);
-  return /\b(?:related|relevant|responsive|contribute|support|apply|applicable)\b/i.test(normalized) &&
-    /\b(?:main|original|first|prior|previous|earlier|question|answer|issue|topic)\b/i.test(normalized);
-}
-
 export function researchEvidenceRetrievalQuery({
   question,
   previousTopic = "",
   previousMessages = [],
-  projectFacts = []
+  projectFacts = [],
+  topicContext = null
 } = {}) {
   const normalizedQuestion = compactText(question);
   if (!normalizedQuestion) {
@@ -128,36 +107,66 @@ export function researchEvidenceRetrievalQuery({
     throw new Error("Research questions may contain no more than 2,000 characters.");
   }
   const explicitTopic = compactText(previousTopic);
-  const rootTopic = explicitTopic || conversationRootTopic(previousMessages);
-  const immediateTopic = previousConversationTopic(previousMessages);
-  const topic = rootTopic || immediateTopic;
+  const storedOriginalTopic = compactText(topicContext?.originalTopic);
+  const storedRootTopic = compactText(topicContext?.rootTopic);
+  const storedCurrentTopic = compactText(topicContext?.currentTopic);
+  const returningToOriginal = researchQuestionReturnsToOriginalTopic(normalizedQuestion);
+  const topicDecision = decideResearchConversationTopic({
+    question: normalizedQuestion,
+    previousMessages,
+    rootTopic: (returningToOriginal ? storedOriginalTopic : storedRootTopic) || explicitTopic,
+    currentTopic: storedCurrentTopic || explicitTopic
+  });
+  const rootTopic = topicDecision.rootTopic.text;
+  const immediateTopic = topicDecision.currentTopic.text || previousConversationTopic(previousMessages);
   const factContext = Array.isArray(projectFacts)
     ? projectFacts.map((fact) => compactText(fact)).filter(Boolean).slice(0, 30).join("; ").slice(0, 4_000)
     : "";
   const maximumQueryCharacters = 2_000;
   let retrievalQuery = normalizedQuestion;
   let previousTopicApplied = false;
-  const relevanceComparison = isEvidenceRelevanceFollowUp(normalizedQuestion);
-  const contextDependentFollowUp = isContextDependentFollowUp(normalizedQuestion) || relevanceComparison;
-  if (topic && contextDependentFollowUp) {
+  const relevanceComparison = topicDecision.decision ===
+    researchConversationTopicDecisions.relevanceComparison;
+  const contextDependentFollowUp = topicDecision.decision !==
+    researchConversationTopicDecisions.topicSwitch;
+  const contextualTopics = [];
+  const distinctCurrentTopic = Boolean(
+    topicDecision.contextPolicy.includeCurrentTopic &&
+    immediateTopic &&
+    compactText(immediateTopic) !== compactText(rootTopic)
+  );
+  if (topicDecision.contextPolicy.includeRootTopic && rootTopic) {
+    contextualTopics.push({
+      label: distinctCurrentTopic ? "Root topic" : "Previous topic",
+      text: rootTopic
+    });
+  }
+  if (distinctCurrentTopic) {
+    contextualTopics.push({ label: "Previous topic", text: immediateTopic });
+  }
+  if (
+    topicDecision.contextPolicy.includeCurrentTopic &&
+    immediateTopic &&
+    contextualTopics.length === 0
+  ) {
+    contextualTopics.push({ label: "Previous topic", text: immediateTopic });
+  }
+  if (contextualTopics.length) {
     const followUpPrefix = "Follow-up: ";
-    const topicPrefix = "\nPrevious topic: ";
-    const availableTopicCharacters = maximumQueryCharacters -
-      followUpPrefix.length - normalizedQuestion.length - topicPrefix.length;
-    if (availableTopicCharacters > 0) {
-      retrievalQuery = `${followUpPrefix}${normalizedQuestion}${topicPrefix}${topic.slice(0, availableTopicCharacters)}`;
-      previousTopicApplied = true;
+    let contextualQuery = `${followUpPrefix}${normalizedQuestion}`;
+    let contextualTopicAdded = false;
+    for (const [contextIndex, context] of contextualTopics.entries()) {
+      const prefix = `\n${context.label}: `;
+      const availableCharacters = maximumQueryCharacters - contextualQuery.length - prefix.length;
+      if (availableCharacters < 1) break;
+      const remainingContexts = contextualTopics.length - contextIndex;
+      const fairContextCharacters = Math.max(1, Math.floor(availableCharacters / remainingContexts));
+      contextualQuery += `${prefix}${context.text.slice(0, fairContextCharacters)}`;
+      contextualTopicAdded = true;
     }
-    if (
-      immediateTopic &&
-      compactText(immediateTopic) !== compactText(topic) &&
-      retrievalQuery.length < maximumQueryCharacters
-    ) {
-      const immediatePrefix = "\nImmediate context: ";
-      const availableImmediateCharacters = maximumQueryCharacters - retrievalQuery.length - immediatePrefix.length;
-      if (availableImmediateCharacters > 0) {
-        retrievalQuery += `${immediatePrefix}${immediateTopic.slice(0, availableImmediateCharacters)}`;
-      }
+    if (contextualTopicAdded) {
+      retrievalQuery = contextualQuery;
+      previousTopicApplied = true;
     }
   }
   let projectFactsApplied = false;
@@ -176,8 +185,13 @@ export function researchEvidenceRetrievalQuery({
     projectFactsApplied,
     contextDependentFollowUp,
     relevanceComparison,
-    conversationTopic: topic,
-    immediateContext: immediateTopic
+    conversationTopic: topicDecision.decision === researchConversationTopicDecisions.topicSwitch
+      ? topicDecision.nextRootTopic.text
+      : rootTopic || immediateTopic,
+    immediateContext: topicDecision.decision === researchConversationTopicDecisions.topicSwitch
+      ? normalizedQuestion
+      : immediateTopic,
+    topicDecision
   };
 }
 
@@ -456,6 +470,7 @@ export async function assembleResearchEvidence({
   previousMessages = [],
   projectFacts = [],
   pinnedEvidence = [],
+  topicContext = null,
   discover,
   resolveSection,
   limits: requestedLimits = {}
@@ -470,7 +485,13 @@ export async function assembleResearchEvidence({
     throw new Error("Pinned Research evidence must be an array.");
   }
 
-  const query = researchEvidenceRetrievalQuery({ question, previousTopic, previousMessages, projectFacts });
+  const query = researchEvidenceRetrievalQuery({
+    question,
+    previousTopic,
+    previousMessages,
+    projectFacts,
+    topicContext
+  });
   const limits = appliedLimits(requestedLimits);
   const discovery = await discover({
     question: query.retrievalQuery,
@@ -838,6 +859,7 @@ export async function assembleResearchEvidence({
     retrievalQuery: query.retrievalQuery,
     previousTopicApplied: query.previousTopicApplied,
     projectFactsApplied: query.projectFactsApplied,
+    topicDecision: structuredClone(query.topicDecision),
     sourceScope: "authorized_enacted_text",
     sourceMode: "text_only",
     limits,
