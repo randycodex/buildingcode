@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-notebook-header-gap-v57";
+} from "./research-progress.js?v=20260812-report-idle-status-v58";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-notebook-header-gap-v57";
+} from "./offline-storage.js?v=20260812-report-idle-status-v58";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19628,7 +19628,7 @@ async function renderProjectReportDraft(project) {
             drafts.find((draft) => draft.id === select.value) || emptyProjectReportDraft(identity)
           );
       dirty = false;
-      status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report";
+      status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "";
       renderWorkspaceContent();
     });
     draftPicker.append(select);
@@ -19812,7 +19812,7 @@ async function renderProjectReportDraft(project) {
     }
     pendingReportDraftByProject.delete(projectID);
     activeDraft = requestedDraft ? structuredClone(requestedDraft) : emptyProjectReportDraft(identity);
-    status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report";
+    status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "";
     renderWorkspaceContent();
   } catch (error) {
     status.textContent = error.payload?.code === "PRO_REQUIRED_EXPORTS"
