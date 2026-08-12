@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v32";
+} from "./research-progress.js?v=20260812-research-progress-v33";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v32";
+} from "./offline-storage.js?v=20260812-research-progress-v33";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -22756,7 +22756,10 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
   projectsSection.hidden = false;
   if (!folder) {
     projectsSection.after(inlineFilters, planUsage, savedContent);
+    inlineFilters.hidden = true;
+    savedContent.hidden = true;
     previousContext?.remove();
+    panel.querySelector(".saved-unassigned-notice")?.remove();
     if (savedInstance.selectedFolderID) savedInstance.selectedFolderID = "";
     panel.classList.remove("has-selected-project-folder");
     panel.style.removeProperty("--project-color");
@@ -22765,6 +22768,8 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
 
   const context = document.createElement("section");
   context.className = `saved-folder-context is-${folderType(folder)}`;
+  inlineFilters.hidden = false;
+  savedContent.hidden = false;
   if (folderIsProject(folder)) {
     context.style.setProperty("--project-color", projectColor(folder));
   }
@@ -23094,6 +23099,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
   const selectedFolder = await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
   if (!panel.isConnected) return;
   renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
+  if (!selectedFolder) return;
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     clear(content);
@@ -23326,6 +23332,8 @@ async function renderSaved(instance) {
   panel.classList.add("saved-panel");
   applyPaneWeight(panel, paneID);
   const content = panel.querySelector(".saved-content");
+  content.hidden = !savedInstance.selectedFolderID;
+  panel.querySelector(".saved-inline-filters").hidden = !savedInstance.selectedFolderID;
   clear(content);
   appendMutedRow(content, "Loading saved content", "Projects, bookmarks, notes, and tags will appear here.");
   renderSavedPlanUsage(panel.querySelector(".saved-plan-usage"));
