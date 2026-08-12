@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-selection-actions-v1";
+} from "./offline-storage.js?v=20260811-research-unassigned-start-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15176,14 +15176,6 @@ function renderNewResearchComposer(container, researchEnabled) {
   heading.textContent = "What would you like to research?";
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
-  const projectField = document.createElement("label");
-  projectField.className = "research-start-project";
-  const projectSelect = createResearchProjectSelect({
-    value: preferredResearchProjectID(),
-    unassignedLabel: "No Project context",
-    ariaLabel: "Project context for this Research chat"
-  });
-  projectField.append(projectSelect);
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
@@ -15210,7 +15202,6 @@ function renderNewResearchComposer(container, researchEnabled) {
   bindResearchSendShortcut(input, form);
   if (!researchEnabled) {
     input.disabled = true;
-    projectSelect.disabled = true;
     input.placeholder = "Research Add-On required to start a new chat…";
   }
   updateSendState();
@@ -15219,13 +15210,12 @@ function renderNewResearchComposer(container, researchEnabled) {
     const question = input.value.replace(/\s+/g, " ").trim();
     if (question.length < 3 || sendButton.disabled) return;
     input.disabled = true;
-    projectSelect.disabled = true;
     sendButton.disabled = true;
     status.textContent = "Researching applicable enacted text…";
     let conversationID = "";
     try {
       const created = await postResearch("/research/conversations/create", {
-        projectID: projectSelect.value
+        projectID: ""
       });
       const conversation = created.conversation;
       conversationID = String(conversation?.id || "").trim();
@@ -15247,12 +15237,11 @@ function renderNewResearchComposer(container, researchEnabled) {
       }
       status.textContent = error.message || "Permitext could not start this Research chat.";
       input.disabled = false;
-      projectSelect.disabled = false;
       updateSendState();
     }
   });
   composerBox.append(input, sendButton);
-  form.append(projectField, composerBox, status);
+  form.append(composerBox, status);
   section.append(heading, form);
   container.append(section);
 }
