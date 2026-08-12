@@ -845,6 +845,17 @@ async function main() {
         workspaceScript.text.includes("function renderFirmStandardsEditor") &&
         workspaceScript.text.includes('postResearch("/organizations/controls/save"') &&
         workspaceScript.text.includes('postResearch("/reports/options"') &&
+        workspaceScript.text.includes('currentOption.textContent = activeDraft.id') &&
+        workspaceScript.text.includes(': "Current Report"') &&
+        workspaceScript.text.includes('newOption.textContent = "Create new Report…"') &&
+        !workspaceScript.text.includes('dateInput.type = "date"') &&
+        workspaceScript.text.includes('Date and time added automatically on export') &&
+        workspaceScript.text.includes('appendGroupHeading("Project facts", "Included automatically from the active Project.")') &&
+        workspaceScript.text.includes('appendGroupHeading("Saved evidence", "Add only the enacted passages needed to support this Report.")') &&
+        workspaceScript.text.includes('appendGroupHeading("Research", "Adds the original question and immutable supported answer—not the full conversation transcript.")') &&
+        workspaceScript.text.includes('appendGroupHeading("Notebook notes", "Add only the notes that help explain the Project decision.")') &&
+        workspaceScript.text.includes('source.kind === "researchAnswer"') &&
+        workspaceScript.text.includes('source.kind === "notebookCard"') &&
         workspaceScript.text.includes("reportTemplateID: selectedReportTemplateID") &&
         workspaceScript.text.includes("sourceWarnings = sourcePayload.warnings || []") &&
         workspaceScript.text.includes("linked code ${sourceWarnings.length === 1 ? \"source is\" : \"sources are\"} unavailable") &&
@@ -1375,7 +1386,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-report-idle-status-v58'),
+        webRoot.text.includes('/web/app.js?v=20260812-report-details-v59'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1525,7 +1536,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-idle-status-v58'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-details-v59'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1792,7 +1803,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-idle-status-v58'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-details-v59'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2020,7 +2031,7 @@ async function main() {
         workspaceScript.text.includes("const defaultDetailPaneWidth = 600") &&
         workspaceScript.text.includes("const defaultWorkboardPaneWidth = 750") &&
         workspaceScript.text.includes("const defaultNotebookPaneWidth = 600") &&
-        workspaceScript.text.includes("const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("const defaultReportDraftPaneWidth = 600") &&
         workspaceScript.text.includes("const defaultSettingsPaneWidth = 600") &&
         workspaceScript.text.includes("const defaultResearchPaneWidth = 600") &&
         workspaceScript.text.includes("const defaultCodeDecisionPaneWidth = 600") &&

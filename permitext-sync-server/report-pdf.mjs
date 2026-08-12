@@ -33,6 +33,9 @@ function reportDate(value) {
     year: "numeric",
     month: "long",
     day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
     timeZone: "UTC"
   }).format(date);
 }

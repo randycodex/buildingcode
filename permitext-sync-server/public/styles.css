@@ -12971,7 +12971,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-draft-metadata {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.34fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
 }
 
@@ -12993,6 +12993,23 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 .report-history {
   display: grid;
   gap: var(--space-2);
+}
+
+.report-source-group-heading {
+  display: grid;
+  gap: 3px;
+  margin-top: var(--space-3);
+}
+
+.report-source-group-heading:first-child {
+  margin-top: 0;
+}
+
+.report-source-group-description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.4;
 }
 
 .report-draft-block {
@@ -13084,6 +13101,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-source-card button:disabled {
   opacity: 0.48;
+}
+
+.report-source-included-label {
+  color: var(--text-secondary);
+  font-size: 10px;
 }
 
 .report-draft-primary-actions {

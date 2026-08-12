@@ -431,7 +431,7 @@ export function immutableReportManifest({
       id: requiredText(project?.id, "Report Project ID", 256),
       name: requiredText(project?.name, "Report Project name", 500),
       address: optionalText(project?.address, 1_000),
-      description: optionalText(project?.description, 5_000)
+      description: optionalText(project?.description, maximumAuthoredTextLength)
     },
     draftID: requiredText(draftID, "Report Draft ID", 256),
     title: requiredText(title, "Report title", 300),

@@ -10,6 +10,7 @@ import {
 import { renderReportPDF } from "../report-pdf.mjs";
 
 const createdAt = "2026-07-24T12:00:00.000Z";
+const generatedAt = "2026-07-24T16:37:00.000Z";
 assert.deepEqual(
   unavailableReportEvidenceWarning(
     { code: "ENOENT" },
@@ -155,6 +156,29 @@ const manifestInput = {
   },
   createdAt
 };
+const automaticallyDatedManifest = immutableReportManifest({
+  ...manifestInput,
+  id: "manifest-automatic-date",
+  reportDate: generatedAt,
+  createdAt: generatedAt
+});
+assert.equal(
+  automaticallyDatedManifest.reportDate,
+  generatedAt,
+  "Generated Reports must snapshot the automatic generation date and time."
+);
+const longProjectFactsManifest = immutableReportManifest({
+  ...manifestInput,
+  id: "manifest-long-project-facts",
+  project: {
+    ...manifestInput.project,
+    description: "Project fact. ".repeat(500)
+  }
+});
+assert.ok(
+  longProjectFactsManifest.project.description.length > 5_000,
+  "Reports must retain Project facts that exceed the old 5,000-character boundary."
+);
 const manifest = immutableReportManifest(manifestInput);
 const repeatedManifest = immutableReportManifest(manifestInput);
 assert.equal(manifest.immutable, true);

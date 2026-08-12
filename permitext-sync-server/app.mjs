@@ -11888,7 +11888,7 @@ async function handleReportGenerate(request, response) {
       },
       draftID: draft.envelope.id,
       title: draft.payload.title,
-      reportDate: draft.payload.reportDate,
+      reportDate: now,
       author: {
         userID: context.userID,
         displayName: context.authContext.account?.displayName ||
