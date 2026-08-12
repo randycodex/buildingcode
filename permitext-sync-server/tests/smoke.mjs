@@ -548,7 +548,8 @@ async function main() {
         workspaceScript.text.includes("fitColumnsButton.hidden = !hasColumns") &&
         workspaceScript.text.includes("collapseReadersButton.hidden = !hasColumns") &&
         workspaceScript.text.includes("async function openDeepLinkedSectionInReader") &&
-        workspaceStyles.text.includes(".topbar-workspaces {") &&
+        workspaceStyles.text.match(/\.topbar-workspaces\s*\{[^}]*flex:\s*0 1 auto;[^}]*grid-template-columns:\s*minmax\(0, max-content\) auto auto;[^}]*margin-left:\s*auto;/) &&
+        workspaceStyles.text.match(/\.workspace-tabs\s*\{[^}]*width:\s*max-content;[^}]*max-width:\s*100%;[^}]*justify-content:\s*flex-end;/) &&
         workspaceStyles.text.includes('.topbar .toolbar-button[draggable="true"]') &&
         workspaceStyles.text.match(/\.workspace-tab\s*\{[^}]*font-size:\s*14px;/) &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button\s*\{[^}]*font-size:\s*14px !important;/) &&
@@ -1374,7 +1375,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-notebook-management-v46'),
+        webRoot.text.includes('/web/app.js?v=20260812-workspace-tabs-right-v47'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1521,7 +1522,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-notebook-management-v46'),
+      webRoot.text.includes('/web/styles.css?v=20260812-workspace-tabs-right-v47'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1788,7 +1789,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-notebook-management-v46'),
+      webRoot.text.includes('/web/styles.css?v=20260812-workspace-tabs-right-v47'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
