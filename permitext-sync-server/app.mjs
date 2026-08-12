@@ -133,6 +133,7 @@ import {
 import { codeMemoHTML, codeMemoStructuredJSON } from "./public/code-question-issue.js";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
+import { recordSurvivesBulkClear } from "./public/sync-state.js";
 import {
   estimatedResearchCost,
   reserveResearchEvaluationSpend,
@@ -11463,6 +11464,39 @@ async function reportEvidenceForProjectLinks(links, options = {}) {
   return evidence;
 }
 
+function latestContentMutationsByID(mutations) {
+  const latestByID = new Map();
+  [...(mutations || [])]
+    .sort((left, right) => {
+      const leftRecord = mutationKindAndRecord(left).record;
+      const rightRecord = mutationKindAndRecord(right).record;
+      return Date.parse(rightRecord?.updatedAt || 0) - Date.parse(leftRecord?.updatedAt || 0);
+    })
+    .forEach((mutation) => {
+      const recordID = normalizedMutationRecordID(mutation);
+      if (recordID && !latestByID.has(recordID)) latestByID.set(recordID, mutation);
+    });
+  return Array.from(latestByID.values());
+}
+
+async function currentProjectSectionRecords(userID, projectID) {
+  const mutations = latestContentMutationsByID(await userContentMutations(userID));
+  const clearRecords = mutations
+    .map((mutation) => mutationKindAndRecord(mutation))
+    .filter(({ kind, record }) => kind === "codeVersionClear" && record)
+    .map(({ record }) => record);
+  return mutations
+    .map((mutation) => mutationKindAndRecord(mutation))
+    .filter(({ kind, record }) => {
+      if (kind !== "projectSection" || !record || record.deletedAt) return false;
+      const assignedProjectID = syncProjectIdentity(record.folderClientID, userID) ||
+        (record.localFolderID == null ? "" : `legacy-project-${record.localFolderID}`);
+      return assignedProjectID === projectID &&
+        recordSurvivesBulkClear(record, clearRecords, ["bookmarks", "folders"]);
+    })
+    .map(({ record }) => record);
+}
+
 async function reportSourcesForProject(userID, projectID) {
   const links = (await listStoredProjectLinks(userID))
     .filter((link) => !link.deletedAt && link.projectID === projectID);
@@ -11470,9 +11504,14 @@ async function reportSourcesForProject(userID, projectID) {
   const sources = [];
   const warnings = [];
 
+  const currentProjectSections = await currentProjectSectionRecords(userID, projectID);
+  const currentSectionIDs = new Set(currentProjectSections.map((record) => String(record.sectionID || "")));
   const sectionLinks = Array.from(new Map(
     links
-      .filter((link) => link.targetKind === "canonicalSection")
+      .filter((link) =>
+        link.targetKind === "canonicalSection" &&
+        currentSectionIDs.has(String(link.targetID || ""))
+      )
       .map((link) => [link.targetID, link])
   ).values());
   if (sectionLinks.length) {
