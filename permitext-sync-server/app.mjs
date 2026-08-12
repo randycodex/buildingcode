@@ -278,6 +278,7 @@ const canonicalCodeContentPath = join(
   "new-york-city",
   "2022-construction-codes"
 );
+const authoredNYCCodeContentPath = dirname(canonicalCodeContentPath);
 const canonicalPreparedContentPath = join(canonicalCodeContentPath, "prepared");
 const chapterContentPath = join(canonicalPreparedContentPath, "chapters");
 const chapterManifestPath = join(canonicalPreparedContentPath, "manifest.json");
@@ -11310,6 +11311,158 @@ function reportSourceClientSummary(source) {
   };
 }
 
+const reportPreparedChapterIndexCache = new Map();
+
+function codeLibraryReferenceForProjectLink(link) {
+  const legacyRecordID = String(link?.metadata?.legacyRecordID || "");
+  const match = legacyRecordID.match(
+    /(CodeContent\/authored\/new-york-city\/([a-z0-9-]+)\/bundle\.json(?:#\d+)?)/i
+  );
+  if (!match) {
+    return {
+      slug: "2022-construction-codes",
+      version: defaultSyncCodeVersion
+    };
+  }
+  return {
+    slug: match[2].toLowerCase(),
+    version: match[1]
+  };
+}
+
+function preparedSectionText(section) {
+  const blockText = (section?.blocks || [])
+    .map((block) => block.plainText || plainTextFromPreparedHTML(block.html || ""))
+    .filter(Boolean)
+    .join("\n\n");
+  return String(section?.officialText || blockText || section?.title || "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function indexPreparedChapterSections(value, chapterNumber, index) {
+  if (Array.isArray(value)) {
+    value.forEach((item) => indexPreparedChapterSections(item, chapterNumber, index));
+    return;
+  }
+  if (!value || typeof value !== "object") return;
+  const sectionID = value.id ?? value.sectionID;
+  if (sectionID != null && value.sectionNumber && preparedSectionText(value)) {
+    index.set(String(sectionID), { ...value, chapterNumber: value.chapterNumber || chapterNumber });
+  }
+  Object.values(value).forEach((item) => {
+    if (item && typeof item === "object") {
+      indexPreparedChapterSections(item, chapterNumber, index);
+    }
+  });
+}
+
+async function preparedChapterSectionIndex(librarySlug) {
+  if (!reportPreparedChapterIndexCache.has(librarySlug)) {
+    reportPreparedChapterIndexCache.set(librarySlug, (async () => {
+      const chapterPath = join(authoredNYCCodeContentPath, librarySlug, "prepared", "chapters");
+      const index = new Map();
+      const filenames = (await readdir(chapterPath)).filter((name) => name.endsWith(".json"));
+      for (const filename of filenames) {
+        const chapter = await readJSONFile(join(chapterPath, filename));
+        indexPreparedChapterSections(chapter, chapter.chapterNumber || "", index);
+      }
+      return index;
+    })());
+  }
+  return reportPreparedChapterIndexCache.get(librarySlug);
+}
+
+async function preparedReportEvidence(link, charactersPerSection) {
+  const requestedID = String(link.targetID || "").trim();
+  const library = codeLibraryReferenceForProjectLink(link);
+  const preparedPath = join(authoredNYCCodeContentPath, library.slug, "prepared");
+  const catalogSummary = library.slug === "2022-construction-codes"
+    ? await sectionSummaryByID(requestedID)
+    : null;
+  let section;
+  try {
+    section = await readJSONFile(join(preparedPath, "sections", `${requestedID}.json`));
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    section = (await preparedChapterSectionIndex(library.slug)).get(requestedID) || null;
+  }
+  if (!section) {
+    const error = new Error(`Unknown code section: ${requestedID}.`);
+    error.code = "INVALID_RESEARCH_SECTION";
+    throw error;
+  }
+  const enactedText = preparedSectionText(section);
+  if (!enactedText) {
+    const error = new Error(`Section ${section.sectionNumber || requestedID} has no enacted text available.`);
+    error.code = "INCOMPLETE_RESEARCH_SECTION";
+    throw error;
+  }
+  let manifest = {};
+  try {
+    manifest = await readJSONFile(join(preparedPath, "manifest.json"));
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
+  const chapter = (manifest.chapters || []).find((candidate) =>
+    String(candidate.chapterID || "") === String(section.chapterID || "") ||
+    String(candidate.chapterNumber || "") === String(section.chapterNumber || "")
+  );
+  const codePrefix = String(section.codePrefix || catalogSummary?.codePrefix || chapter?.codePrefix || "");
+  const sectionNumber = String(section.sectionNumber || catalogSummary?.sectionNumber || "");
+  const title = String(section.title || catalogSummary?.title || "Section");
+  const canonicalText = [sectionNumber, title, enactedText]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return {
+    sectionID: String(section.sectionID || section.id || requestedID),
+    sectionNumber,
+    title,
+    codePrefix,
+    chapterNumber: String(
+      section.chapterNumber || catalogSummary?.chapterNumber || chapter?.chapterNumber || ""
+    ),
+    text: enactedText.slice(0, charactersPerSection),
+    canonicalText,
+    sectionTextHash: createHash("sha256").update(canonicalText).digest("hex"),
+    sourceLibraryVersion: library.version
+  };
+}
+
+async function reportEvidenceForProjectLinks(links, options = {}) {
+  const evidence = [];
+  const charactersPerSection = Math.min(12_000, Math.floor(60_000 / links.length));
+  for (const link of links) {
+    const library = codeLibraryReferenceForProjectLink(link);
+    try {
+      if (library.slug === "2022-construction-codes") {
+        try {
+          const [canonicalEvidence] = await researchEvidenceForSectionIDs([link.targetID]);
+          if (canonicalEvidence) {
+            evidence.push({ ...canonicalEvidence, sourceLibraryVersion: library.version });
+            continue;
+          }
+        } catch (error) {
+          if (!["ENOENT", "INCOMPLETE_RESEARCH_SECTION", "INVALID_RESEARCH_SECTION"].includes(error.code)) {
+            throw error;
+          }
+        }
+      }
+      evidence.push(await preparedReportEvidence(link, charactersPerSection));
+    } catch (error) {
+      const warning = unavailableReportEvidenceWarning(error, {
+        requestedID: String(link.targetID || ""),
+        canonicalID: String(link.targetID || "")
+      });
+      if (!options.skipUnavailable || !warning) throw error;
+      options.onUnavailable?.(warning);
+    }
+  }
+  return evidence;
+}
+
 async function reportSourcesForProject(userID, projectID) {
   const links = (await listStoredProjectLinks(userID))
     .filter((link) => !link.deletedAt && link.projectID === projectID);
@@ -11317,11 +11470,13 @@ async function reportSourcesForProject(userID, projectID) {
   const sources = [];
   const warnings = [];
 
-  const sectionIDs = Array.from(new Set(
-    links.filter((link) => link.targetKind === "canonicalSection").map((link) => link.targetID)
-  ));
-  if (sectionIDs.length) {
-    const evidenceItems = await researchEvidenceForSectionIDs(sectionIDs, {
+  const sectionLinks = Array.from(new Map(
+    links
+      .filter((link) => link.targetKind === "canonicalSection")
+      .map((link) => [link.targetID, link])
+  ).values());
+  if (sectionLinks.length) {
+    const evidenceItems = await reportEvidenceForProjectLinks(sectionLinks, {
       skipUnavailable: true,
       onUnavailable(warning) {
         warnings.push(warning);
@@ -11343,7 +11498,7 @@ async function reportSourcesForProject(userID, projectID) {
           title: evidence.title,
           passageText: evidence.text,
           passageTextHash: createHash("sha256").update(evidence.text).digest("hex"),
-          sourceLibraryVersion: defaultSyncCodeVersion
+          sourceLibraryVersion: evidence.sourceLibraryVersion
         }
       });
     });
