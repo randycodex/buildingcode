@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v25";
+} from "./research-progress.js?v=20260812-research-progress-v26";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v25";
+} from "./offline-storage.js?v=20260812-research-progress-v26";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -22718,11 +22718,6 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
   if (folderIsProject(folder)) {
     const identity = projectIdentity(folder);
     context.dataset.projectId = projectDetailKey(identity);
-    const summary = document.createElement("section");
-    summary.className = "saved-project-summary";
-    appendSavedProjectFactEditor(summary, folder, identity);
-    context.append(summary);
-
     const controls = document.createElement("nav");
     controls.className = "saved-folder-controls saved-project-tool-controls";
     controls.setAttribute("aria-label", `${identity.name} tools`);
@@ -22755,6 +22750,11 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       controls.append(button);
     });
     context.append(controls);
+
+    const summary = document.createElement("section");
+    summary.className = "saved-project-summary";
+    appendSavedProjectFactEditor(summary, folder, identity);
+    context.append(summary);
 
     const savedSection = document.createElement("section");
     savedSection.className = "project-studio-section saved-project-evidence-section";
