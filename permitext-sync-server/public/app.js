@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-project-section-preview-v83";
+} from "./research-progress.js?v=20260812-report-content-evidence-v84";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-project-section-preview-v83";
+} from "./offline-storage.js?v=20260812-report-content-evidence-v84";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19538,9 +19538,11 @@ async function renderProjectReportDraft(project) {
         });
         row.append(textarea);
       } else {
-        const sourceTitle = document.createElement("strong");
-        sourceTitle.textContent = reportBlockTitle(block);
         const source = sources.find((item) => item.kind === block.kind && item.id === block.sourceID);
+        const sourceTitle = document.createElement("strong");
+        sourceTitle.textContent = block.kind === "evidence" && source
+          ? [source.codePrefix || "Code", source.sectionNumber].filter(Boolean).join(" ")
+          : reportBlockTitle(block);
         if (source?.summary) {
           const summary = document.createElement("p");
           summary.textContent = source.summary;
