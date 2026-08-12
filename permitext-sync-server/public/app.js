@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-notebook-label-v49";
+} from "./research-progress.js?v=20260812-notebook-collapse-v50";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-notebook-label-v49";
+} from "./offline-storage.js?v=20260812-notebook-collapse-v50";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18282,6 +18282,12 @@ async function renderProjectNotebook(project) {
     wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
     railToggle.addEventListener("click", () => {
       notebookCardMenuOpenByProject.set(projectID, cardMenuState.cardsMenuOpen);
+      if (!cardMenuState.cardsMenuOpen && showingArchivedCards) {
+        showingArchivedCards = false;
+        selectingCards = false;
+        selectedCardIDs.clear();
+        renderCardList();
+      }
     });
 
     const focus = document.createElement("section");
