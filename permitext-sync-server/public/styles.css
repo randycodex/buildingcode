@@ -8621,6 +8621,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-projects-section.is-selecting .saved-project-tile[data-bulk-selectable="true"] {
+  grid-template-columns: minmax(0, 1fr) auto auto;
   cursor: pointer;
 }
 
@@ -8766,6 +8767,35 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .saved-project-tile strong {
   align-self: start;
   font-size: calc(var(--chrome-font-size) * 0.76) !important;
+}
+
+.saved-project-tile-edit {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  align-self: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: currentColor;
+  opacity: 0.72;
+}
+
+.saved-project-tile-edit[hidden] {
+  display: none;
+}
+
+.saved-project-tile-edit:hover,
+.saved-project-tile-edit:focus-visible {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  opacity: 1;
+}
+
+.saved-project-tile-edit svg {
+  width: 13px;
+  height: 13px;
 }
 
 .saved-project-tile.is-reference {

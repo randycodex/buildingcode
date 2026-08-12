@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v33";
+} from "./research-progress.js?v=20260812-research-progress-v34";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v33";
+} from "./offline-storage.js?v=20260812-research-progress-v34";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -23370,19 +23370,13 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const archiveSelectedButton = document.createElement("button");
   archiveSelectedButton.type = "button";
   archiveSelectedButton.className = "saved-projects-selection-action saved-projects-selection-archive";
-  const editSelectedButton = document.createElement("button");
-  editSelectedButton.type = "button";
-  editSelectedButton.className = "saved-projects-selection-action saved-projects-selection-edit";
-  editSelectedButton.title = "Edit selected folder";
-  editSelectedButton.setAttribute("aria-label", editSelectedButton.title);
-  editSelectedButton.innerHTML = pencilIconSVG();
   const deleteSelectedButton = document.createElement("button");
   deleteSelectedButton.type = "button";
   deleteSelectedButton.className = "saved-projects-selection-action saved-projects-selection-delete";
   deleteSelectedButton.title = "Delete selected folders";
   deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
   deleteSelectedButton.innerHTML = trashIconSVG();
-  selectionActions.append(archiveSelectedButton, editSelectedButton, deleteSelectedButton);
+  selectionActions.append(archiveSelectedButton, deleteSelectedButton);
   const cancelSelectionButton = document.createElement("button");
   cancelSelectionButton.type = "button";
   cancelSelectionButton.className = "saved-projects-bulk-link";
@@ -23443,7 +23437,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     archiveSelectedButton.setAttribute("aria-label", archiveSelectedButton.title);
     archiveSelectedButton.innerHTML = showingArchived ? archiveRestoreIconSVG() : archiveIconSVG();
     archiveSelectedButton.disabled = selectedCount === 0 || selectionBusy;
-    editSelectedButton.disabled = selectedCount !== 1 || selectionBusy;
     deleteSelectedButton.disabled = selectedCount === 0 || selectionBusy;
     cancelSelectionButton.disabled = selectionBusy;
     addButton.hidden = showingArchived || selecting;
@@ -23461,6 +23454,11 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       } else {
         tile.removeAttribute("aria-pressed");
         tile.setAttribute("aria-label", tile.dataset.defaultAriaLabel || "Open folder");
+      }
+      const editProjectButton = tile.querySelector(".saved-project-tile-edit");
+      if (editProjectButton) {
+        editProjectButton.hidden = !selecting;
+        editProjectButton.disabled = selectionBusy;
       }
     });
   };
@@ -23545,6 +23543,22 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       countLabel.title = count === 1 ? "1 saved section" : `${count} saved sections`;
       countLabel.setAttribute("aria-label", countLabel.title);
       tile.append(heading, countLabel);
+      if (!project.sharedOnly) {
+        const editProjectButton = document.createElement("button");
+        editProjectButton.type = "button";
+        editProjectButton.className = "saved-project-tile-edit";
+        editProjectButton.title = `Edit ${project.name || project.title || "folder"}`;
+        editProjectButton.setAttribute("aria-label", editProjectButton.title);
+        editProjectButton.innerHTML = pencilIconSVG();
+        editProjectButton.hidden = !selecting;
+        editProjectButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          if (!selecting || selectionBusy) return;
+          showProjectCreateSheet(panel, project);
+        });
+        editProjectButton.addEventListener("keydown", (event) => event.stopPropagation());
+        tile.append(editProjectButton);
+      }
       const open = async () => {
         if (selecting) {
           const id = projectRecordID(project);
@@ -23717,11 +23731,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       selectionBusy = false;
       updateSelectionControls();
     }
-  };
-  editSelectedButton.onclick = () => {
-    const selectedProjects = selectableProjects().filter((project) => selectedProjectIDs.has(projectRecordID(project)));
-    if (selectedProjects.length !== 1 || selectionBusy) return;
-    showProjectCreateSheet(panel, selectedProjects[0]);
   };
   deleteSelectedButton.onclick = async () => {
     const selectedProjects = selectableProjects().filter((project) => selectedProjectIDs.has(projectRecordID(project)));
