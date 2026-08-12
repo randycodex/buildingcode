@@ -608,7 +608,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("function bindImmediateUtilityControls()") &&
         workspaceScript.text.includes("function hydrateSavedPanelWhenConnected") &&
-        workspaceScript.text.includes('appendMutedRow(content, "Loading saved content"') &&
+        !workspaceScript.text.includes('appendMutedRow(content, "Loading saved content"') &&
         workspaceStartupSource.indexOf("bindImmediateUtilityControls();") >= 0 &&
         workspaceStartupSource.indexOf("bindImmediateUtilityControls();") < workspaceStartupSource.indexOf('api("/code/chapters")'),
       "Search and Saved must bind before cold-start catalogs load, and Saved must hydrate after its shell is mounted."
@@ -1372,7 +1372,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v36'),
+        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v37'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1517,7 +1517,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v36'),
+      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v37'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1784,7 +1784,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v36'),
+      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v37'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

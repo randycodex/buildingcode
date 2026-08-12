@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v36";
+} from "./research-progress.js?v=20260812-research-progress-v37";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v36";
+} from "./offline-storage.js?v=20260812-research-progress-v37";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -23335,7 +23335,6 @@ async function renderSaved(instance) {
   content.hidden = !savedInstance.selectedFolderID;
   panel.querySelector(".saved-inline-filters").hidden = !savedInstance.selectedFolderID;
   clear(content);
-  appendMutedRow(content, "Loading saved content", "Projects, bookmarks, notes, and tags will appear here.");
   renderSavedPlanUsage(panel.querySelector(".saved-plan-usage"));
   const summary = currentContentSummary();
   renderSavedProjects(
