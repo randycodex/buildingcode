@@ -12889,8 +12889,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-draft-header {
   display: flex;
-  align-items: start;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: flex-end;
   gap: var(--space-3);
   margin-bottom: var(--space-3);
 }
@@ -12907,7 +12907,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   font-weight: 650;
 }
 
-.report-draft-close,
 .report-draft-add-controls button,
 .report-draft-block-actions button,
 .report-source-card button,
@@ -12923,7 +12922,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   font-weight: 650;
 }
 
-.report-draft-close:hover,
 .report-draft-add-controls button:hover,
 .report-draft-block-actions button:hover,
 .report-source-card button:hover,

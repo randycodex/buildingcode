@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-width-v54";
+} from "./research-progress.js?v=20260812-report-header-v55";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-width-v54";
+} from "./offline-storage.js?v=20260812-report-header-v55";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19236,24 +19236,19 @@ async function renderProjectReportDraft(project) {
 
   const header = document.createElement("header");
   header.className = "report-draft-header";
-  const heading = document.createElement("div");
-  const eyebrow = document.createElement("span");
-  eyebrow.className = "report-draft-eyebrow";
-  eyebrow.textContent = identity.name;
-  const title = document.createElement("h2");
-  title.textContent = "Report";
-  heading.append(eyebrow, title);
   const closeButton = document.createElement("button");
-  closeButton.className = "report-draft-close";
+  closeButton.className = "icon-button utility-close report-draft-close";
   closeButton.type = "button";
-  closeButton.textContent = "Close";
+  closeButton.title = "Close Report";
+  closeButton.setAttribute("aria-label", "Close Report");
+  closeButton.innerHTML = circleXIconSVG();
   closeButton.addEventListener("click", () => {
     void closeProjectReportDraft(identity);
   });
   const actions = document.createElement("div");
   actions.className = "panel-actions report-draft-header-actions";
-  actions.append(createProjectToolDragHandle(identity), closeButton);
-  header.append(heading, actions);
+  actions.append(closeButton, createProjectToolDragHandle(identity));
+  header.append(actions);
 
   const shell = document.createElement("div");
   shell.className = "report-draft-shell";
