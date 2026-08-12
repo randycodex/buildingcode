@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-single-report-template-v65";
+} from "./research-progress.js?v=20260812-report-copy-cleanup-v66";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-single-report-template-v65";
+} from "./offline-storage.js?v=20260812-report-copy-cleanup-v66";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19608,7 +19608,7 @@ async function renderProjectReportDraft(project) {
     });
 
     const evidenceSources = sources.filter((source) => source.kind === "evidence");
-    appendSourceGroup("Saved evidence", "Add only the enacted passages needed to support this Report.", (groupBody) => {
+    appendSourceGroup("Saved evidence", "", (groupBody) => {
       if (sourceWarnings.length) {
         const warning = document.createElement("div");
         warning.className = "project-studio-warning";
@@ -19635,7 +19635,7 @@ async function renderProjectReportDraft(project) {
     });
 
     const researchSources = sources.filter((source) => source.kind === "researchAnswer");
-    appendSourceGroup("Research", "Adds the original question and immutable supported answer—not the full conversation transcript.", (groupBody) => {
+    appendSourceGroup("Research", "", (groupBody) => {
       if (!researchSources.length) {
         const empty = document.createElement("p");
         empty.className = "report-draft-empty";
@@ -19646,7 +19646,7 @@ async function renderProjectReportDraft(project) {
     });
 
     const notebookSources = sources.filter((source) => source.kind === "notebookCard");
-    appendSourceGroup("Notebook notes", "Add only the notes that help explain the Project decision.", (groupBody) => {
+    appendSourceGroup("Notebook notes", "", (groupBody) => {
       if (!notebookSources.length) {
         const empty = document.createElement("p");
         empty.className = "report-draft-empty";
@@ -19659,10 +19659,6 @@ async function renderProjectReportDraft(project) {
 
   function renderHistory(container) {
     if (!history.length) {
-      const empty = document.createElement("p");
-      empty.className = "report-draft-empty";
-      empty.textContent = "Generated reports will appear here as dated, immutable versions.";
-      container.append(empty);
       return;
     }
     history.forEach((report) => {

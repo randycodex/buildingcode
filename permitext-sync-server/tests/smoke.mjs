@@ -860,9 +860,10 @@ async function main() {
         !workspaceScript.text.includes('dateInput.type = "date"') &&
         workspaceScript.text.includes('Date and time added automatically on export') &&
         workspaceScript.text.includes('appendSourceGroup("Project facts", "Included automatically from the active Project."') &&
-        workspaceScript.text.includes('appendSourceGroup("Saved evidence", "Add only the enacted passages needed to support this Report."') &&
-        workspaceScript.text.includes('appendSourceGroup("Research", "Adds the original question and immutable supported answer—not the full conversation transcript."') &&
-        workspaceScript.text.includes('appendSourceGroup("Notebook notes", "Add only the notes that help explain the Project decision."') &&
+        workspaceScript.text.includes('appendSourceGroup("Saved evidence", ""') &&
+        workspaceScript.text.includes('appendSourceGroup("Research", ""') &&
+        workspaceScript.text.includes('appendSourceGroup("Notebook notes", ""') &&
+        !workspaceScript.text.includes("Generated reports will appear here as dated, immutable versions.") &&
         workspaceScript.text.includes('dragHandle.className = "report-draft-block-drag-handle"') &&
         workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], label, initiallyExpanded') &&
         workspaceScript.text.includes('appendOutputDisclosure(') &&
@@ -1402,7 +1403,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-single-report-template-v65'),
+        webRoot.text.includes('/web/app.js?v=20260812-report-copy-cleanup-v66'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1552,7 +1553,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-single-report-template-v65'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-copy-cleanup-v66'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1819,7 +1820,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-single-report-template-v65'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-copy-cleanup-v66'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
