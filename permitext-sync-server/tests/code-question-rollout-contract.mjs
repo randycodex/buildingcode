@@ -366,7 +366,7 @@ assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ens
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
 assert.match(workspaceHTML, /styles\.css\?v=20260811-research-history-weight-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v585/);
+assert.match(serviceWorker, /permitext-pro-shell-v586/);
 assert.match(workspaceScript, /paneID\?\.startsWith\("research:conversation:"\)/);
 assert.match(serviceWorker, /styles\.css\?v=20260811-research-history-weight-v1/);
 assert.match(workspaceScript, /research-feedback-compact/);

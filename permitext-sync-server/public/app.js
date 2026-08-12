@@ -15096,14 +15096,12 @@ function renderNewResearchComposer(container, researchEnabled) {
   form.className = "research-composer research-start-composer";
   const projectField = document.createElement("label");
   projectField.className = "research-start-project";
-  const projectLabel = document.createElement("span");
-  projectLabel.textContent = "Project context (optional)";
   const projectSelect = createResearchProjectSelect({
     value: preferredResearchProjectID(),
     unassignedLabel: "No Project context",
     ariaLabel: "Project context for this Research chat"
   });
-  projectField.append(projectLabel, projectSelect);
+  projectField.append(projectSelect);
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
