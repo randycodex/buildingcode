@@ -84,6 +84,6 @@ const styles = await readFile(join(root, "../public/styles.css"), "utf8");
 assert.match(appSource, /codeBasis: answerCodeBasis/);
 assert.match(appSource, /Do not imply that another code edition was retrieved/);
 assert.match(uiSource, /research-answer-code-basis/);
-assert.match(styles, /\.research-answer-code-basis/);
+assert.match(styles, /workspace-panel:not\(\.reader-panel\) \.research-answer-code-basis\s*\{[\s\S]*?font-size: 10px !important;/);
 
 console.log("permitext Research code-basis contract passed");

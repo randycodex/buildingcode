@@ -5060,10 +5060,10 @@ mark {
   white-space: pre-line;
 }
 
-.research-answer-code-basis {
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-code-basis {
   margin: 0;
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 10px !important;
   line-height: 1.35;
 }
 
