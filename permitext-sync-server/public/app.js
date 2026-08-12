@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-status-cleanup-v68";
+} from "./research-progress.js?v=20260812-notebook-empty-copy-v69";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-status-cleanup-v68";
+} from "./offline-storage.js?v=20260812-notebook-empty-copy-v69";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18647,16 +18647,12 @@ async function renderProjectNotebook(project) {
       if (!activeCard) {
         const welcome = document.createElement("div");
         welcome.className = "notebook-welcome";
-        const welcomeTitle = document.createElement("h3");
-        welcomeTitle.textContent = "A focused workspace for Project thinking";
-        const welcomeCopy = document.createElement("p");
-        welcomeCopy.textContent = "Keep structured notes here, link them to enacted code or historical Research, and reuse them later in a professional report.";
         const welcomeAction = document.createElement("button");
         welcomeAction.className = "notebook-primary-action";
         welcomeAction.type = "button";
         welcomeAction.textContent = "Create first card";
         welcomeAction.addEventListener("click", () => newButton.click());
-        welcome.append(welcomeTitle, welcomeCopy, welcomeAction);
+        welcome.append(welcomeAction);
         focus.append(welcome);
         return;
       }
