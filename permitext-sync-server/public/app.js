@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-pro-research-unlimited-v1";
+} from "./offline-storage.js?v=20260811-reset-column-widths-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -29709,8 +29709,8 @@ async function toggleUtilityPane(key) {
   }
 }
 
-async function fitVisibleColumns() {
-  state.paneOrder = [];
+async function resetVisibleColumnWidths() {
+  const currentLeft = track.scrollLeft;
   const paneIDs = activePaneIDs();
   state.paneWeights = paneIDs.reduce((weights, paneID) => {
     weights[paneID] = defaultPaneWidthForID(paneID);
@@ -29718,7 +29718,9 @@ async function fitVisibleColumns() {
   }, {});
   saveWorkspaceState();
   await transitionWorkspace("utility");
-  track.scrollTo({ left: 0, behavior: "smooth" });
+  requestAnimationFrame(() => {
+    track.scrollLeft = Math.min(currentLeft, Math.max(0, track.scrollWidth - track.clientWidth));
+  });
 }
 
 async function closeAllColumns() {
@@ -29819,7 +29821,7 @@ function workspaceCommandDefinitions() {
       : []),
     { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
     { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
-    { label: "Reset Columns", hint: "Restore the current workspace order and widths", run: () => fitVisibleColumns() },
+    { label: "Reset Column Widths", hint: "Restore each open column to its original width", run: () => resetVisibleColumnWidths() },
     ...(defaultActivePaneIDs().length
       ? [{ label: "Close All", hint: "Close every column in the current workspace", run: () => closeAllColumns() }]
       : [])
@@ -30195,7 +30197,7 @@ async function start() {
     openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
   });
   fitColumnsButton.addEventListener("click", () => {
-    fitVisibleColumns();
+    resetVisibleColumnWidths();
   });
   collapseReadersButton.addEventListener("click", () => {
     closeAllColumns();

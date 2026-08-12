@@ -1138,6 +1138,18 @@ async function main() {
         workspaceScript.text.includes("startScrollLeft + pushedScrollDelta"),
       "Divider resizing no longer preserves default widths while pushing the workspace under the pointer."
     );
+    const resetColumnWidthsStart = workspaceScript.text.indexOf("async function resetVisibleColumnWidths()");
+    const resetColumnWidthsEnd = workspaceScript.text.indexOf("\nasync function closeAllColumns()", resetColumnWidthsStart);
+    const resetColumnWidthsSource = workspaceScript.text.slice(resetColumnWidthsStart, resetColumnWidthsEnd);
+    assert(
+      resetColumnWidthsStart >= 0 &&
+        resetColumnWidthsEnd > resetColumnWidthsStart &&
+        resetColumnWidthsSource.includes("weights[paneID] = defaultPaneWidthForID(paneID)") &&
+        resetColumnWidthsSource.includes("const currentLeft = track.scrollLeft") &&
+        !resetColumnWidthsSource.includes("state.paneOrder") &&
+        !resetColumnWidthsSource.includes("scrollTo({ left: 0"),
+      "Reset must restore open column widths without changing their order or returning the workspace to the first column."
+    );
     assert(
       workspaceScript.text.includes("paneIDForSectionDetail(searchID),"),
       "Search result changes no longer refresh their existing section-detail column."
@@ -1340,7 +1352,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-pro-research-unlimited-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-reset-column-widths-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1482,7 +1494,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-pro-research-unlimited-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-reset-column-widths-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1747,7 +1759,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-pro-research-unlimited-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-reset-column-widths-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
