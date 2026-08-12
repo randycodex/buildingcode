@@ -1280,6 +1280,11 @@ async function main() {
       "Search count no longer sits between the code filter list and the first result."
     );
     assert(
+      workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 100px;[\s\S]*?min-height: 100px;/) &&
+        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 3\.3em;[\s\S]*?-webkit-line-clamp: 3;/),
+      "Recently Viewed previews should reserve three complete lines without clipping the last line."
+    );
+    assert(
       workspaceScript.text.includes("function linkInlineCodeReferences") &&
         workspaceScript.text.includes("function openInlineCodeReference") &&
         workspaceScript.text.includes("function openReferenceInAdjacentReader") &&
@@ -1461,7 +1466,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-research-history-weight-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-search-history-clipping-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1721,7 +1726,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-research-history-weight-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-search-history-clipping-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2351,8 +2356,8 @@ async function main() {
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-x: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
         workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;[\s\S]*?padding: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 100px;[\s\S]*?min-height: 100px;[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 100px;[\s\S]*?min-height: 100px;[\s\S]*?padding: var\(--space-1\);/) &&
         workspaceScript.text.includes('code.className = "search-jump-code"') &&
         workspaceScript.text.includes("isNestedListParagraph = !rawPreview && Boolean(titleWithoutNumber)") &&
         workspaceScript.text.includes('String(entry.sectionNumber || "Paragraph").trim()') &&
