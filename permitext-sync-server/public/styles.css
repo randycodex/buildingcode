@@ -10778,6 +10778,10 @@ body.is-resizing-research-evidence * {
   margin-top: 0;
 }
 
+.settings-panel .settings-card[hidden] {
+  display: none;
+}
+
 .settings-panel .settings-card,
 .settings-panel .settings-list,
 .settings-panel .reader-preview-card,

@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-history-leading-v1";
+} from "./offline-storage.js?v=20260811-firm-collaboration-hidden-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -196,7 +196,8 @@ const releaseSurfaceVisibility = Object.freeze({
   // docs/PERMITEXT_DEFERRED_FEATURES.md before changing this release boundary.
   workboard: false,
   researchHistoryManagement: false,
-  researchConversationEvidencePane: false
+  researchConversationEvidencePane: false,
+  firmCollaboration: false
 });
 const permitextClientCapabilities = Object.freeze([
   "saved-work",
@@ -25031,6 +25032,7 @@ function renderSettings() {
   const syncConflictsCard = panel.querySelector(".settings-sync-conflicts-card");
   const syncConflictsSummary = panel.querySelector(".settings-sync-conflicts-summary");
   const syncConflictsList = panel.querySelector(".settings-sync-conflicts-list");
+  const firmCard = panel.querySelector(".settings-firm-card");
   const checkoutButton = panel.querySelector(".account-checkout");
   const researchCheckoutButton = panel.querySelector(".account-research-checkout");
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
@@ -25044,6 +25046,7 @@ function renderSettings() {
   const projectSelectAll = panel.querySelector(".settings-project-select-all");
   const projectDelete = panel.querySelector(".settings-project-delete");
   const status = panel.querySelector(".settings-status-message");
+  firmCard.hidden = !releaseSurfaceVisibility.firmCollaboration;
 
   const setStatus = (message, isError = false) => {
     status.textContent = message || "";
@@ -25191,7 +25194,9 @@ function renderSettings() {
     }
   });
   updateProjectSelection();
-  void renderFirmWorkspaceSettings(panel, settingsProjects, setStatus);
+  if (releaseSurfaceVisibility.firmCollaboration) {
+    void renderFirmWorkspaceSettings(panel, settingsProjects, setStatus);
+  }
 
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");

@@ -1722,6 +1722,10 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testFirmCollaborationReleaseSurfaceIsDeferred() {
+        XCTAssertFalse(PermitextReleaseSurfaceVisibility.firmCollaboration)
+    }
+
     func testOrganizationSnapshotDecodesNotebookAndGeneratedReportArtifacts() throws {
         let data = Data(
             """

@@ -57,8 +57,10 @@ struct SettingsView: View {
                         accountCard
                     }
 
-                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                        firmWorkspaceCard
+                    if PermitextReleaseSurfaceVisibility.firmCollaboration {
+                        CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                            firmWorkspaceCard
+                        }
                     }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
@@ -135,7 +137,9 @@ struct SettingsView: View {
             selectedProjectIDs.formIntersection(folderIDs)
         }
         .task(id: library.signedInAccount?.appUserID) {
-            await library.refreshOrganizations()
+            if PermitextReleaseSurfaceVisibility.firmCollaboration {
+                await library.refreshOrganizations()
+            }
         }
     }
 

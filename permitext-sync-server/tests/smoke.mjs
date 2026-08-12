@@ -650,7 +650,11 @@ async function main() {
     );
     assert(
       webRoot.text.includes("Firm &amp; Collaboration") &&
+        webRoot.text.includes('data-deferred-feature="firm-collaboration" hidden') &&
         !webRoot.text.includes('class="settings-beta-badge"') &&
+        workspaceScript.text.includes("firmCollaboration: false") &&
+        workspaceScript.text.includes("firmCard.hidden = !releaseSurfaceVisibility.firmCollaboration") &&
+        workspaceScript.text.includes("if (releaseSurfaceVisibility.firmCollaboration) {") &&
         workspaceScript.text.includes('postResearch("/organizations/create"') &&
         workspaceScript.text.includes('postResearch("/organizations/members/invite"') &&
         workspaceScript.text.includes('postResearch("/organizations/projects/snapshot"') &&
@@ -671,7 +675,7 @@ async function main() {
         workspaceScript.text.includes('postResearch("/projects/collaboration/comments/save"') &&
         workspaceScript.text.includes("function appendProjectReportExports") &&
         workspaceScript.text.includes("if (identity.sharedOnly) row.classList.add(\"is-read-only\")"),
-      "Web collaboration UI no longer exposes firm setup, scoped Project access, evidence review, and report downloads."
+      "Deferred Firm Collaboration should be hidden from Settings while its implementation and shared-record compatibility remain preserved."
     );
     const workspaceSourceMap = await request("/web/app.js.map");
     assert(
@@ -1336,7 +1340,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-research-history-leading-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-firm-collaboration-hidden-v2'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1478,7 +1482,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-research-history-leading-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-firm-collaboration-hidden-v2'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1743,7 +1747,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-research-history-leading-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-firm-collaboration-hidden-v2'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

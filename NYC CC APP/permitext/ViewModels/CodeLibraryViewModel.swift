@@ -6,6 +6,10 @@ import os.signpost
 import Security
 import SwiftUI
 
+enum PermitextReleaseSurfaceVisibility {
+    static let firmCollaboration = false
+}
+
 func permitextUpgradeCallToActionTitle(
     isStoreKitTestProActive: Bool,
     currentPlan: AppPlan,
@@ -1481,6 +1485,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func handleOpenURL(_ url: URL) {
         if let invitationToken = Self.organizationInvitationToken(from: url) {
+            guard PermitextReleaseSurfaceVisibility.firmCollaboration else { return }
             pendingOrganizationInvitationToken = invitationToken
             selectedTab = .settings
             return
@@ -2536,7 +2541,9 @@ final class CodeLibraryViewModel: ObservableObject {
         await syncPendingUserContentIfPossible()
         await pullRemoteUserContentIfPossible()
         await refreshLifetimeGrant(announcesMissingGrant: false)
-        await refreshOrganizations()
+        if PermitextReleaseSurfaceVisibility.firmCollaboration {
+            await refreshOrganizations()
+        }
     }
 
     func attachLocalDataIfNeeded() async {
