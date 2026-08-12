@@ -1258,15 +1258,20 @@ async function main() {
         !workspaceScript.text.includes('bookmarkButton.className = "search-jump-bookmark"') &&
         !workspaceScript.text.includes('pages.className = "search-jump-pages"') &&
         !workspaceScript.text.includes('dots.className = "search-jump-dots"') &&
-        workspaceScript.text.includes('createHistorySection("Pinned"') &&
-        workspaceScript.text.includes('createHistorySection("Recent Searches"') &&
-        workspaceScript.text.includes("function bindSearchHistoryDivider") &&
-        workspaceScript.text.includes('"Resize Recently Viewed and Recent Searches"') &&
-        workspaceScript.text.includes('list.classList.add("search-history-scroll-list")') &&
+        workspaceScript.text.includes("const recentSearchPopoverLimit = 15") &&
+        workspaceScript.text.includes("function renderSearchRecentPopover(panel, instance)") &&
+        workspaceScript.text.includes("normalizeSearchHistory(state.recentSearches, recentSearchPopoverLimit)") &&
+        searchTemplateSource.includes('class="search-recent-popover" role="region" aria-label="Recent searches" hidden') &&
+        workspaceScript.text.includes('input.addEventListener("focus", openRecentPopover)') &&
+        workspaceScript.text.includes('input.addEventListener("click", openRecentPopover)') &&
+        workspaceScript.text.includes('event.key === "Escape"') &&
+        workspaceScript.text.includes('event.key === "ArrowDown"') &&
+        workspaceScript.text.includes("if (jumpSection) results.append(jumpSection)") &&
+        !workspaceScript.text.includes('createHistorySection("Recent Searches"') &&
+        !workspaceScript.text.includes('"Resize Recently Viewed and Recent Searches"') &&
         workspaceScript.text.includes("function recordRecentSearch") &&
         !workspaceScript.text.includes("function pinSearch") &&
         !workspaceScript.text.includes('"Pin search"') &&
-        workspaceScript.text.includes('"Unpin search"') &&
         workspaceScript.text.includes("function removeRecentSearch") &&
         searchTemplateSource.indexOf('class="panel-header"') < searchTemplateSource.indexOf('class="search-box"') &&
         searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-code-filter"') &&
@@ -1283,6 +1288,11 @@ async function main() {
       workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 100px;[\s\S]*?min-height: 100px;/) &&
         workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 3\.3em;[\s\S]*?-webkit-line-clamp: 3;/),
       "Recently Viewed previews should reserve three complete lines without clipping the last line."
+    );
+    assert(
+      workspaceStyles.text.match(/\.search-recent-popover \{[\s\S]*?position: absolute;[\s\S]*?opacity: 0;[\s\S]*?transform: translateY\(-6px\) scale\(0\.985\);[\s\S]*?transition: opacity 180ms ease, transform 260ms cubic-bezier\(0\.22, 1, 0\.36, 1\);/) &&
+        workspaceStyles.text.match(/\.search-recent-popover\.is-open \{[\s\S]*?opacity: 1;[\s\S]*?pointer-events: auto;[\s\S]*?transform: translateY\(0\) scale\(1\);/),
+      "Recent Searches should open as a motion-safe popover from the Search box."
     );
     assert(
       workspaceScript.text.includes("function linkInlineCodeReferences") &&
@@ -1324,7 +1334,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-research-project-caption-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-search-history-popover-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1466,7 +1476,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-search-history-clipping-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-search-history-popover-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1726,7 +1736,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-search-history-clipping-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-search-history-popover-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

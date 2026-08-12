@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-search-history-clipping-v1";
+} from "./offline-storage.js?v=20260811-search-history-popover-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -347,6 +347,7 @@ const searchResultPageSize = 25;
 const savedItemsPageSize = 48;
 const recentViewLimit = 50;
 const recentSearchLimit = 50;
+const recentSearchPopoverLimit = 15;
 const repeatableUtilityKeys = new Set(["search", "saved"]);
 const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title", "tag"]);
 const collapsedSettingsCardIDs = new Set();
@@ -12333,6 +12334,83 @@ async function openRecentlyViewedInSDC(searchInstance, entry) {
   await openSectionDetail(searchInstance.id, searchResultDetail(entry));
 }
 
+function setSearchRecentPopoverOpen(panel, requestedOpen) {
+  const input = panel.querySelector(".search-input");
+  const popover = panel.querySelector(".search-recent-popover");
+  if (!input || !popover) return;
+  const open = Boolean(
+    requestedOpen &&
+    !String(input.value || "").trim() &&
+    popover.dataset.hasItems === "true"
+  );
+  window.clearTimeout(popover.hideTimer);
+  input.setAttribute("aria-expanded", String(open));
+  if (open) {
+    popover.hidden = false;
+    requestAnimationFrame(() => popover.classList.add("is-open"));
+    return;
+  }
+  popover.classList.remove("is-open");
+  popover.hideTimer = window.setTimeout(() => {
+    if (!popover.classList.contains("is-open")) popover.hidden = true;
+  }, 280);
+}
+
+function renderSearchRecentPopover(panel, instance) {
+  const input = panel.querySelector(".search-input");
+  const popover = panel.querySelector(".search-recent-popover");
+  if (!input || !popover) return;
+  const wasOpen = popover.classList.contains("is-open");
+  const queries = normalizeSearchHistory(state.recentSearches, recentSearchPopoverLimit);
+  clear(popover);
+  popover.dataset.hasItems = String(queries.length > 0);
+  popover.id = `search-recent-popover-${instance.id}`;
+  input.setAttribute("aria-controls", popover.id);
+  input.setAttribute("aria-haspopup", "true");
+  input.setAttribute("aria-expanded", String(wasOpen && queries.length > 0));
+  if (!queries.length) {
+    setSearchRecentPopoverOpen(panel, false);
+    return;
+  }
+  const heading = document.createElement("p");
+  heading.className = "section-label search-recent-popover-heading";
+  heading.textContent = "Recent Searches";
+  const list = document.createElement("div");
+  list.className = "search-recent-popover-list";
+  queries.forEach((query) => {
+    const row = document.createElement("article");
+    row.className = "search-history-row";
+    const applyButton = document.createElement("button");
+    applyButton.type = "button";
+    applyButton.className = "search-history-apply";
+    applyButton.innerHTML = `${searchHistoryIconSVG("recent")}<span></span>`;
+    applyButton.querySelector("span").textContent = query;
+    applyButton.addEventListener("click", () => {
+      instance.query = query;
+      input.value = query;
+      recordRecentSearch(query);
+      setSearchRecentPopoverOpen(panel, false);
+      updateSearchDock(panel, instance);
+      renderSearchResults(panel, instance);
+    });
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.className = "search-history-action";
+    removeButton.setAttribute("aria-label", `Remove ${query} from recent searches`);
+    removeButton.innerHTML = circleXIconSVG();
+    removeButton.addEventListener("click", () => {
+      removeRecentSearch(query);
+      renderSearchRecentPopover(panel, instance);
+      input.focus({ preventScroll: true });
+      setSearchRecentPopoverOpen(panel, true);
+    });
+    row.append(applyButton, removeButton);
+    list.append(row);
+  });
+  popover.append(heading, list);
+  if (wasOpen) setSearchRecentPopoverOpen(panel, true);
+}
+
 async function renderSearchHistory(panel, instance, options = {}) {
   const results = panel.querySelector(".search-results");
   const recentEntries = searchRecentlyViewedEntries();
@@ -12342,11 +12420,10 @@ async function renderSearchHistory(panel, instance, options = {}) {
       onEntry: (entry) => updateVisibleSearchHistoryEntry(panel, entry)
     });
   if (String(instance?.query || "").trim()) return;
-  const pinned = normalizeSearchHistory(state.pinnedSearches);
-  const recentQueries = normalizeSearchHistory(state.recentSearches, recentSearchLimit)
-    .filter((query) => !isSearchPinned(query));
   clear(results);
   results.classList.add("is-history");
+  results.classList.remove("is-split");
+  results.style.removeProperty("--search-history-upper-size");
 
   let jumpSection = null;
   if (recentSections.length) {
@@ -12388,89 +12465,8 @@ async function renderSearchHistory(panel, instance, options = {}) {
     jumpSection = section;
   }
 
-  const createHistorySection = (title, queries, pinnedSection) => {
-    if (!queries.length) return null;
-    const section = document.createElement("section");
-    section.className = "search-history-section";
-    section.classList.toggle("is-pinned", pinnedSection);
-    section.classList.toggle("is-recent", !pinnedSection);
-    if (!pinnedSection) section.id = `search-recent-${instance.id}`;
-    const label = document.createElement("p");
-    label.className = "section-label search-history-label";
-    label.textContent = title;
-    const list = document.createElement("div");
-    list.className = "search-history-list";
-    if (!pinnedSection) list.classList.add("search-history-scroll-list");
-    section.append(label, list);
-    queries.forEach((query) => {
-      const row = document.createElement("article");
-      row.className = "search-history-row";
-      const applyButton = document.createElement("button");
-      applyButton.type = "button";
-      applyButton.className = "search-history-apply";
-      applyButton.innerHTML = `${searchHistoryIconSVG(pinnedSection ? "pin" : "recent")}<span></span>`;
-      applyButton.querySelector("span").textContent = query;
-      applyButton.addEventListener("click", () => {
-        instance.query = query;
-        panel.querySelector(".search-input").value = query;
-        saveWorkspaceState();
-        updateSearchDock(panel, instance);
-        renderSearchResults(panel, instance);
-      });
-      row.append(applyButton);
-      if (pinnedSection) {
-        const unpinButton = document.createElement("button");
-        unpinButton.type = "button";
-        unpinButton.className = "search-history-action is-active";
-        unpinButton.setAttribute("aria-label", "Unpin search");
-        unpinButton.innerHTML = searchHistoryIconSVG("pin");
-        unpinButton.addEventListener("click", () => {
-          unpinSearch(query);
-          renderSearchHistory(panel, instance);
-        });
-        row.append(unpinButton);
-      } else {
-        const removeButton = document.createElement("button");
-        removeButton.type = "button";
-        removeButton.className = "search-history-action";
-        removeButton.setAttribute("aria-label", "Remove recent search");
-        removeButton.innerHTML = circleXIconSVG();
-        removeButton.addEventListener("click", () => {
-          removeRecentSearch(query);
-          renderSearchHistory(panel, instance);
-        });
-        row.append(removeButton);
-      }
-      list.append(row);
-    });
-    return section;
-  };
-
-  const pinnedSection = createHistorySection("Pinned", pinned, true);
-  const recentSection = createHistorySection("Recent Searches", recentQueries, false);
-  if (jumpSection && recentSection) {
-    results.classList.add("is-split");
-    const upperPane = document.createElement("div");
-    upperPane.className = "search-history-pane search-history-upper";
-    upperPane.append(jumpSection);
-    if (pinnedSection) upperPane.append(pinnedSection);
-    const divider = document.createElement("div");
-    divider.className = "search-history-divider";
-    divider.setAttribute("role", "separator");
-    divider.setAttribute("aria-label", "Resize Recently Viewed and Recent Searches");
-    divider.setAttribute("aria-orientation", "horizontal");
-    divider.setAttribute("aria-controls", `${jumpSection.id} ${recentSection.id}`);
-    divider.tabIndex = 0;
-    const lowerPane = document.createElement("div");
-    lowerPane.className = "search-history-pane search-history-lower";
-    lowerPane.append(recentSection);
-    results.append(upperPane, divider, lowerPane);
-    bindSearchHistoryDivider(results, divider, instance);
-  } else {
-    if (jumpSection) results.append(jumpSection);
-    if (pinnedSection) results.append(pinnedSection);
-    if (recentSection) results.append(recentSection);
-  }
+  if (jumpSection) results.append(jumpSection);
+  renderSearchRecentPopover(panel, instance);
 }
 
 function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0) {
@@ -12576,6 +12572,22 @@ async function renderSearch(instance) {
   renderSearchCodeFilter(filterRail, panel, searchInstance);
   wireCodeFilterMenu(filterRail, searchInstance);
   updateSearchDock(panel, searchInstance);
+  renderSearchRecentPopover(panel, searchInstance);
+
+  const closeRecentPopoverFromOutside = (event) => {
+    if (!panel.isConnected) {
+      document.removeEventListener("pointerdown", closeRecentPopoverFromOutside, true);
+      return;
+    }
+    if (!panel.querySelector(".search-dock")?.contains(event.target)) {
+      setSearchRecentPopoverOpen(panel, false);
+    }
+  };
+  document.addEventListener("pointerdown", closeRecentPopoverFromOutside, true);
+
+  const openRecentPopover = () => setSearchRecentPopoverOpen(panel, true);
+  input.addEventListener("focus", openRecentPopover);
+  input.addEventListener("click", openRecentPopover);
 
   input.addEventListener("input", () => {
     searchInstance.query = input.value;
@@ -12590,10 +12602,19 @@ async function renderSearch(instance) {
       renderSearchResults(panel, searchInstance);
     }, 250));
     updateSearchDock(panel, searchInstance);
+    setSearchRecentPopoverOpen(panel, !searchInstance.query.trim());
   });
 
   input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") recordRecentSearch(searchInstance.query);
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setSearchRecentPopoverOpen(panel, false);
+    }
+    if (event.key === "ArrowDown" && input.getAttribute("aria-expanded") === "true") {
+      event.preventDefault();
+      panel.querySelector(".search-recent-popover .search-history-apply")?.focus({ preventScroll: true });
+    }
   });
 
   clearButton.addEventListener("click", () => {
@@ -12603,6 +12624,7 @@ async function renderSearch(instance) {
     updateSearchDock(panel, searchInstance);
     renderSearchHistory(panel, searchInstance);
     input.focus();
+    setSearchRecentPopoverOpen(panel, true);
   });
 
   if (String(searchInstance.query || "").trim()) {
