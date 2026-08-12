@@ -132,7 +132,7 @@ const researchCapabilities = capabilityContract({
   }
 });
 assert.equal(researchCapabilities.capabilities.research.enabled, true);
-assert.equal(researchCapabilities.capabilities.research.monthlyLimit, 100);
+assert.equal(researchCapabilities.capabilities.research.monthlyLimit, null);
 assert.equal(researchCapabilities.capabilities["evidence-discovery"].enabled, false);
 const discoveryCapabilities = capabilityContract(
   {

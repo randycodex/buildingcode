@@ -61,7 +61,8 @@ function renderSummary() {
     ["Retrieval approved", `${retrievalApproved}/${data.retrievalDataset.cases.length}`],
     ["Zoning approved", `${zoningApproved}/${data.zoningDataset.cases.length}`],
     ["Saved runs", data.runs.length],
-    ["Open feedback", openFeedback]
+    ["Open feedback", openFeedback],
+    ["Month spend", `$${Number(data.researchSpend?.totals?.estimatedCostUSD || 0).toFixed(4)}`]
   ].forEach(([label, value]) => {
     const card = element("article");
     card.append(element("strong", { text: value }), element("span", { text: label }));
@@ -685,6 +686,59 @@ function renderFeedback() {
   panels.feedback.replaceChildren(section);
 }
 
+function renderResearchSpend() {
+  const report = data.researchSpend || { totals: {}, users: [] };
+  const section = element("section");
+  section.append(
+    element("h2", { text: "Research spend" }),
+    element("p", {
+      className: "meta",
+      text: `Owner-only operational estimate since ${report.periodStart || "the current period"}. The private request guardrail is ${Number(report.internalMonthlyRequestGuardrail || 0).toLocaleString()} per account and is not customer-facing.`
+    })
+  );
+  const totals = element("div", { className: "summary" });
+  [
+    ["Estimated spend", `$${Number(report.totals?.estimatedCostUSD || 0).toFixed(6)}`],
+    ["Active users", Number(report.totals?.users || 0).toLocaleString()],
+    ["Research requests", Number(report.totals?.requests || 0).toLocaleString()],
+    ["Total tokens", Number(report.totals?.totalTokens || 0).toLocaleString()]
+  ].forEach(([label, value]) => {
+    const card = element("article");
+    card.append(element("strong", { text: value }), element("span", { text: label }));
+    totals.append(card);
+  });
+  section.append(totals);
+  const table = element("table", { className: "spend-table" });
+  const head = element("thead");
+  const headRow = element("tr");
+  ["User", "Requests", "Input tokens", "Output tokens", "Estimated spend"].forEach((label) =>
+    headRow.append(element("th", { text: label }))
+  );
+  head.append(headRow);
+  const body = element("tbody");
+  (report.users || []).forEach((item) => {
+    const row = element("tr");
+    [
+      item.email || item.userID,
+      Number(item.requests || 0).toLocaleString(),
+      Number(item.inputTokens || 0).toLocaleString(),
+      Number(item.outputTokens || 0).toLocaleString(),
+      `$${Number(item.estimatedCostUSD || 0).toFixed(6)}`
+    ].forEach((value) => row.append(element("td", { text: value })));
+    body.append(row);
+  });
+  if (!report.users?.length) {
+    const row = element("tr");
+    const cell = element("td", { text: "No completed paid Research requests in this period." });
+    cell.colSpan = 5;
+    row.append(cell);
+    body.append(row);
+  }
+  table.append(head, body);
+  section.append(table);
+  panels.spend.replaceChildren(section);
+}
+
 function renderAll() {
   renderSummary();
   renderCases();
@@ -692,6 +746,7 @@ function renderAll() {
   renderZoningCases();
   renderRuns();
   renderFeedback();
+  renderResearchSpend();
   tabs.hidden = false;
   statusElement.hidden = true;
 }

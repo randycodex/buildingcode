@@ -1446,6 +1446,28 @@ function createFileStoreAdapter() {
         entry.createdAt >= since && activeResearchUsageEntry(entry)
       );
     },
+    async researchSpendSince(since) {
+      const store = await this.read();
+      return Object.entries(store.researchUsageByUserID || {}).map(([userID, entries]) => {
+        const account = store.users?.[userID] || {};
+        const completed = (entries || []).filter((entry) =>
+          entry.mode !== "reservation" && entry.createdAt >= since
+        );
+        return {
+          userID,
+          email: account.email || account.emailAddress || account.privateRelayEmail || null,
+          requests: completed.length,
+          inputTokens: completed.reduce((total, entry) => total + Number(entry.inputTokens || 0), 0),
+          outputTokens: completed.reduce((total, entry) => total + Number(entry.outputTokens || 0), 0),
+          totalTokens: completed.reduce((total, entry) => total + Number(entry.totalTokens || 0), 0),
+          estimatedCostUSD: Number(completed.reduce(
+            (total, entry) => total + (Number.isFinite(entry.estimatedCostUSD) ? entry.estimatedCostUSD : 0),
+            0
+          ).toFixed(6))
+        };
+      }).filter((item) => item.requests > 0)
+        .sort((left, right) => right.estimatedCostUSD - left.estimatedCostUSD);
+    },
     async reserveResearchUsage(userID, reservation) {
       return withResearchUsageLock(userID, async () => {
         const store = await this.read();
@@ -1457,7 +1479,7 @@ function createFileStoreAdapter() {
           .filter((entry) =>
             entry.createdAt >= reservation.since && activeResearchUsageEntry(entry)
           );
-        if (entries.length >= reservation.limit) return false;
+        if (Number.isSafeInteger(reservation.limit) && entries.length >= reservation.limit) return false;
         store.researchUsageByUserID ||= {};
         store.researchUsageByUserID[userID] = [
           ...retainedEntries,
@@ -3704,6 +3726,38 @@ async function createPostgresStoreAdapter() {
         createdAt: dateToISO(row.created_at)
       }));
     },
+    async researchSpendSince(since) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT
+          usage.user_id,
+          COALESCE(
+            NULLIF(account.account->>'email', ''),
+            NULLIF(account.account->>'emailAddress', ''),
+            NULLIF(account.account->>'privateRelayEmail', '')
+          ) AS email,
+          count(*)::bigint AS requests,
+          COALESCE(sum(usage.input_tokens), 0)::bigint AS input_tokens,
+          COALESCE(sum(usage.output_tokens), 0)::bigint AS output_tokens,
+          COALESCE(sum(usage.total_tokens), 0)::bigint AS total_tokens,
+          COALESCE(sum(usage.estimated_cost_usd), 0) AS estimated_cost_usd
+        FROM permitext_research_usage usage
+        LEFT JOIN permitext_users account ON account.id = usage.user_id
+        WHERE usage.created_at >= ${since}::timestamptz
+          AND usage.mode <> 'reservation'
+        GROUP BY 1, 2
+        ORDER BY estimated_cost_usd DESC, requests DESC
+      `;
+      return rows.map((row) => ({
+        userID: row.user_id,
+        email: row.email || null,
+        requests: Number(row.requests || 0),
+        inputTokens: Number(row.input_tokens || 0),
+        outputTokens: Number(row.output_tokens || 0),
+        totalTokens: Number(row.total_tokens || 0),
+        estimatedCostUSD: Number(Number(row.estimated_cost_usd || 0).toFixed(6))
+      }));
+    },
     async reserveResearchUsage(userID, reservation) {
       await ensureSchema();
       for (let attempt = 1; attempt <= 3; attempt += 1) {
@@ -3718,15 +3772,18 @@ async function createPostgresStoreAdapter() {
                 ${reservation.id}, ${userID}, 'pending', 'reservation', 0, 0, 0, 0,
                 ${reservation.createdAt}::timestamptz
               WHERE (
-                SELECT count(*)
-                FROM permitext_research_usage
-                WHERE user_id = ${userID}
-                  AND created_at >= ${reservation.since}::timestamptz
-                  AND (
-                    mode <> 'reservation'
-                    OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes'
-                  )
-              ) < ${reservation.limit}
+                ${reservation.limit}::integer IS NULL
+                OR (
+                  SELECT count(*)
+                  FROM permitext_research_usage
+                  WHERE user_id = ${userID}
+                    AND created_at >= ${reservation.since}::timestamptz
+                    AND (
+                      mode <> 'reservation'
+                      OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes'
+                    )
+                ) < ${reservation.limit}
+              )
               ON CONFLICT (id) DO NOTHING
               RETURNING id
             `
@@ -4430,6 +4487,13 @@ async function researchUsageSince(userID, since) {
   const adapter = await storeAdapter();
   return typeof adapter.researchUsageSince === "function"
     ? adapter.researchUsageSince(userID, since)
+    : [];
+}
+
+async function researchSpendSince(since) {
+  const adapter = await storeAdapter();
+  return typeof adapter.researchSpendSince === "function"
+    ? adapter.researchSpendSince(since)
     : [];
 }
 
@@ -7721,8 +7785,41 @@ async function assembledResearchEvidenceForTurn({
   });
 }
 
+function researchAnswerForClient(answer) {
+  if (!answer || typeof answer !== "object") return answer;
+  const {
+    usage: _usage,
+    estimatedCost: _estimatedCost,
+    estimatedCostUSD: _estimatedCostUSD,
+    pricingVersion: _pricingVersion,
+    ...clientAnswer
+  } = answer;
+  return clientAnswer;
+}
+
+export function researchAnswerRecordForClient(answer) {
+  if (!answer || typeof answer !== "object") return answer;
+  const {
+    usage: _usage,
+    estimatedCost: _estimatedCost,
+    estimatedCostUSD: _estimatedCostUSD,
+    pricingVersion: _pricingVersion,
+    ...clientRecord
+  } = answer;
+  return {
+    ...clientRecord,
+    answer: researchAnswerForClient(answer.answer)
+  };
+}
+
 async function researchConversationForClient(conversation, options = {}) {
-  let clientConversation = conversation;
+  let clientConversation = {
+    ...conversation,
+    messages: (conversation.messages || []).map((message) => message?.answer ? {
+      ...message,
+      answer: researchAnswerForClient(message.answer)
+    } : message)
+  };
   if (options.checkSources) {
     const current = await currentResearchEvidence(conversation);
     const evidenceBySectionID = new Map(
@@ -12256,7 +12353,7 @@ async function handleResearchAnswerGet(request, response) {
     .find((item) => item.answerID === answerID);
   sendJSON(response, 200, {
     answer: {
-      ...answer,
+      ...researchAnswerRecordForClient(answer),
       userFeedback: feedback ? {
         id: feedback.id,
         category: feedback.category,
@@ -12609,7 +12706,10 @@ async function handleResearchConversationProjectContext(request, response) {
     metadata: { factCount: facts.length }
   });
   await saveStoredActivityEvent(context.userID, event);
-  sendJSON(response, 200, { conversation, activity: event });
+  sendJSON(response, 200, {
+    conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+    activity: event
+  });
 }
 
 async function handleResearchConversationReuseEvidence(request, response) {
@@ -12741,7 +12841,9 @@ async function handleResearchConversationReuseEvidence(request, response) {
     "item.linked",
     now
   );
-  sendJSON(response, 201, { conversation });
+  sendJSON(response, 201, {
+    conversation: await researchConversationForClient(conversation, { userID: context.userID })
+  });
 }
 
 async function handleResearchConversationCreate(request, response) {
@@ -12808,7 +12910,9 @@ async function handleResearchConversationCreate(request, response) {
         now
       );
     }
-    sendJSON(response, 201, { conversation });
+    sendJSON(response, 201, {
+      conversation: await researchConversationForClient(conversation, { userID: context.userID })
+    });
   } catch (error) {
     if ([
       "INVALID_RESEARCH_SELECTION",
@@ -12874,7 +12978,7 @@ async function handleResearchConversationEvidence(request, response) {
     conversation.sourceStatus = "current";
     await saveStoredResearchConversation(context.userID, conversation);
     sendJSON(response, 200, {
-      conversation,
+      conversation: await researchConversationForClient(conversation, { userID: context.userID }),
       replayed: false,
       addedSelectionCount
     });
@@ -12946,7 +13050,9 @@ async function handleResearchConversationRefresh(request, response) {
   conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
   conversation.updatedAt = new Date().toISOString();
   await saveStoredResearchConversation(context.userID, conversation);
-  sendJSON(response, 200, { conversation });
+  sendJSON(response, 200, {
+    conversation: await researchConversationForClient(conversation, { userID: context.userID })
+  });
 }
 
 function currentMonthStart() {
@@ -12969,25 +13075,34 @@ function nextMonthStart() {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
 }
 
-function researchUsageSummary(entries, options = {}) {
-  const requestLimit = monthlyResearchRequestLimit();
-  const inputTokens = entries.reduce((total, entry) => total + Number(entry.inputTokens || 0), 0);
-  const cachedInputTokens = entries.reduce((total, entry) => total + Number(entry.cachedInputTokens || 0), 0);
-  const outputTokens = entries.reduce((total, entry) => total + Number(entry.outputTokens || 0), 0);
-  const totalTokens = entries.reduce((total, entry) => total + Number(entry.totalTokens || 0), 0);
-  const costsAreReliable = entries.length > 0 && entries.every((entry) => Number.isFinite(entry.estimatedCostUSD));
-  const pricingVersions = Array.from(new Set(entries.map((entry) => entry.pricingVersion).filter(Boolean)));
+function researchUsageSummary(_entries, options = {}) {
+  const unlimited = hasActiveProEntitlement(options.entitlement);
   return {
-    requestsUsed: entries.length,
-    requestLimit,
-    resetDate: nextMonthStart(),
-    tokens: { inputTokens, cachedInputTokens, outputTokens, totalTokens },
-    estimatedCostUSD: costsAreReliable
-      ? Number(entries.reduce((total, entry) => total + entry.estimatedCostUSD, 0).toFixed(6))
-      : null,
-    pricingVersion: costsAreReliable && pricingVersions.length === 1 ? pricingVersions[0] : null,
+    unlimited,
     mockMode: Boolean(options.mockMode),
     evidenceDiscoveryEnabled: Boolean(options.evidenceDiscoveryEnabled)
+  };
+}
+
+async function internalResearchSpendReport() {
+  const periodStart = currentMonthStart();
+  const users = await researchSpendSince(periodStart);
+  return {
+    periodStart,
+    generatedAt: new Date().toISOString(),
+    internalMonthlyRequestGuardrail: monthlyResearchRequestLimit(),
+    totals: {
+      users: users.length,
+      requests: users.reduce((total, item) => total + item.requests, 0),
+      inputTokens: users.reduce((total, item) => total + item.inputTokens, 0),
+      outputTokens: users.reduce((total, item) => total + item.outputTokens, 0),
+      totalTokens: users.reduce((total, item) => total + item.totalTokens, 0),
+      estimatedCostUSD: Number(users.reduce(
+        (total, item) => total + item.estimatedCostUSD,
+        0
+      ).toFixed(6))
+    },
+    users
   };
 }
 
@@ -12999,6 +13114,7 @@ async function handleResearchUsage(request, response) {
   sendJSON(response, 200, {
     usage: researchUsageSummary(entries, {
       mockMode,
+      entitlement: context.authContext.entitlement,
       evidenceDiscoveryEnabled: evidenceDiscoveryFeatureEnabled() &&
         hasActiveResearchEntitlement(context.authContext.entitlement)
     })
@@ -13237,12 +13353,13 @@ async function handleInternalEvaluationData(request, response) {
   if (!context) return;
   const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
   validateEvaluationDataset(dataset);
-  const [retrievalDataset, zoningDataset, runs, reviewStore, storedFeedback] = await Promise.all([
+  const [retrievalDataset, zoningDataset, runs, reviewStore, storedFeedback, researchSpend] = await Promise.all([
     readSupplementalEvaluationDataset(evidenceRetrievalCasesPath, "Evidence retrieval"),
     readSupplementalEvaluationDataset(zoningEvaluationCasesPath, "Zoning"),
     readEvaluationRuns(),
     readEvaluationReviews(),
-    listAllStoredResearchFeedback()
+    listAllStoredResearchFeedback(),
+    internalResearchSpendReport()
   ]);
   const reviews = reviewStore.reviews;
   const feedbackRecords = storedFeedback.filter((item) => item.status === "candidate");
@@ -13262,7 +13379,8 @@ async function handleInternalEvaluationData(request, response) {
       evaluationRunReviewStatus(run, reviews)
     ])),
     feedbackCandidates: feedbackRecords,
-    feedbackRecords
+    feedbackRecords,
+    researchSpend
   });
 }
 
@@ -13576,11 +13694,9 @@ async function handleResearchConversationMessage(request, response) {
       });
       if (!reserved) {
         researchReservationID = null;
-        const currentUsageEntries = await researchUsageSince(context.userID, currentMonthStart());
         sendJSON(response, 429, {
-          error: "This account reached its monthly AI research limit.",
-          code: "RESEARCH_MONTHLY_LIMIT",
-          usage: researchUsageSummary(currentUsageEntries)
+          error: "Research is temporarily unavailable while account capacity is reviewed.",
+          code: "RESEARCH_CAPACITY_REVIEW"
         });
         return;
       }
@@ -13859,9 +13975,6 @@ async function handleResearchConversationMessage(request, response) {
           regenerated: verificationAttempts.length > 1,
           history: verificationAttempts
         },
-        usage: result.usage,
-        estimatedCostUSD: estimatedCost.estimatedUSD,
-        pricingVersion: estimatedCost.pricingVersion,
         disclaimer
       }
     };
@@ -13985,7 +14098,7 @@ async function handleResearchConversationMessage(request, response) {
       totalTokens: result.usage.totalTokens
     }));
     sendJSON(response, 200, {
-      conversation,
+      conversation: await researchConversationForClient(conversation, { userID: context.userID }),
       usage: researchUsageSummary(mockMode ? [] : [
         ...usageEntries,
         {
@@ -13993,7 +14106,7 @@ async function handleResearchConversationMessage(request, response) {
           estimatedCostUSD: estimatedCost.estimatedUSD,
           pricingVersion: estimatedCost.pricingVersion
         }
-      ], { mockMode })
+      ], { mockMode, entitlement: context.authContext.entitlement })
     });
   } catch (error) {
     if (researchReservationID && !researchReservationCompleted) {
@@ -20500,7 +20613,9 @@ async function handleCodeQuestionState(request, response) {
       event.objectID === questionID || event.metadata?.questionID === questionID
     )),
     pendingIssuance: pendingIssuance.filter((item) => item.questionID === questionID),
-    researchAnswers: researchAnswers.filter((answer) => answerIDs.has(answer.id)),
+    researchAnswers: researchAnswers
+      .filter((answer) => answerIDs.has(answer.id))
+      .map(researchAnswerRecordForClient),
     analysisBinding
   });
 }
@@ -21293,8 +21408,8 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
   const usageEntries = mockMode ? [] : await researchUsageSince(actorUserID, currentMonthStart());
   const requestLimit = monthlyResearchRequestLimit();
   if (!mockMode && usageEntries.length >= requestLimit) {
-    throw new CodeQuestionCommandError("This account reached its monthly AI research limit.", {
-      code: "RESEARCH_MONTHLY_LIMIT",
+    throw new CodeQuestionCommandError("Research is temporarily unavailable while account capacity is reviewed.", {
+      code: "RESEARCH_CAPACITY_REVIEW",
       status: 429
     });
   }
@@ -21347,9 +21462,6 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
       ...result.interpretation,
       evidenceSectionIDs: evidence.map((item) => item.sectionID),
       evidenceSourceIDs: evidence.map((item) => item.sourceID),
-      usage: result.usage,
-      estimatedCostUSD: estimatedCost.estimatedUSD,
-      pricingVersion: estimatedCost.pricingVersion,
       disclaimer: "AI-generated research assistance, not an official code determination."
     };
     const immutableEvidence = evidence.map((source) => immutableEvidenceSnapshot({
@@ -21458,7 +21570,10 @@ async function handleCodeQuestionAnalysisCreate(request, response) {
       codeQuestionAnalysisInFlight.set(key, inFlight);
     }
     const result = await inFlight.task;
-    sendJSON(response, result.replayed ? 200 : 201, result);
+    sendJSON(response, result.replayed ? 200 : 201, {
+      ...result,
+      answer: researchAnswerRecordForClient(result.answer)
+    });
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return;
     if (["INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_CITATION"].includes(error.code)) {
@@ -22796,6 +22911,10 @@ async function handleRequestUnlocked(request, response) {
     }
     if (request.method === "GET" && (path === "internal" || path === "internal/" || path.startsWith("internal/"))) {
       await handleInternalStatic(request, path, response);
+      return;
+    }
+    if (request.method === "GET" && (path === "admin" || path === "admin/")) {
+      await handleInternalStatic(request, "internal", response);
       return;
     }
     if (request.method === "GET" && path === "service-worker.js") {

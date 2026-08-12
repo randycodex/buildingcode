@@ -3,7 +3,8 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
-  applyResearchConversationMessageCommit
+  applyResearchConversationMessageCommit,
+  researchAnswerRecordForClient
 } from "../app.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -161,5 +162,27 @@ const replay = applyResearchConversationMessageCommit(successStore, userID, {
 });
 assert.equal(replay.replayed, true);
 assert.equal(successStore.researchAnswersByUserID[userID].length, 1);
+
+const customerRecord = researchAnswerRecordForClient({
+  ...answer,
+  usage: { totalTokens: 30 },
+  estimatedCostUSD: 0.0042,
+  pricingVersion: "private-pricing-v1",
+  answer: {
+    ...answer.answer,
+    usage: { totalTokens: 30 },
+    estimatedCost: { estimatedUSD: 0.0042 },
+    estimatedCostUSD: 0.0042,
+    pricingVersion: "private-pricing-v1"
+  }
+});
+assert.equal(customerRecord.usage, undefined);
+assert.equal(customerRecord.estimatedCostUSD, undefined);
+assert.equal(customerRecord.pricingVersion, undefined);
+assert.equal(customerRecord.answer.usage, undefined);
+assert.equal(customerRecord.answer.estimatedCost, undefined);
+assert.equal(customerRecord.answer.estimatedCostUSD, undefined);
+assert.equal(customerRecord.answer.pricingVersion, undefined);
+assert.equal(customerRecord.answer.conclusion, answer.answer.conclusion);
 
 console.log("permitext research message durable contract passed");

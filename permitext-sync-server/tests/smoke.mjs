@@ -1340,7 +1340,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-firm-collaboration-hidden-v2'),
+        webRoot.text.includes('/web/app.js?v=20260811-pro-research-unlimited-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1482,7 +1482,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-firm-collaboration-hidden-v2'),
+      webRoot.text.includes('/web/styles.css?v=20260811-pro-research-unlimited-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1747,7 +1747,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-firm-collaboration-hidden-v2'),
+        webRoot.text.includes('/web/styles.css?v=20260811-pro-research-unlimited-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -5947,10 +5947,14 @@ async function main() {
     });
     assert(
       researchUsage.response.ok &&
-        researchUsage.json.usage.requestsUsed === 0 &&
-        researchUsage.json.usage.resetDate &&
+        researchUsage.json.usage.unlimited === true &&
+        !("requestsUsed" in researchUsage.json.usage) &&
+        !("requestLimit" in researchUsage.json.usage) &&
+        !("resetDate" in researchUsage.json.usage) &&
+        !("tokens" in researchUsage.json.usage) &&
+        !("estimatedCostUSD" in researchUsage.json.usage) &&
         researchUsage.json.usage.evidenceDiscoveryEnabled === true,
-      "Research usage did not expose the monthly allowance and reset date."
+      "The public Pro Research contract exposed an internal quota or spend metric."
     );
     const evaluationCasesBeforeFeedback = await readFile(
       join(evaluationRoot, "research-cases.json"),
@@ -6044,6 +6048,11 @@ async function main() {
 
     const internalConsole = await request("/internal");
     assert(internalConsole.response.ok && internalConsole.text.includes("Permitext Console"), "Local owner console did not load.");
+    const adminConsole = await request("/admin/");
+    assert(
+      adminConsole.response.ok && adminConsole.text.includes("Permitext Console"),
+      "The canonical owner console route did not load."
+    );
     const unauthorizedInternalData = await request("/internal/evaluations/data", {
       method: "POST",
       body: { auth: { accountUserID: userID } }
@@ -6067,6 +6076,8 @@ async function main() {
           item.triageStatus === "new" &&
           item.professionalRole === "architect_designer"
         ) &&
+        internalData.json.researchSpend?.totals?.estimatedCostUSD === 0 &&
+        internalData.json.researchSpend?.internalMonthlyRequestGuardrail === 100 &&
         internalData.json.runReviewStatuses[evaluationRunID].status === "provisional",
       "Owner console data omitted the private evaluation dataset or feedback candidate."
     );

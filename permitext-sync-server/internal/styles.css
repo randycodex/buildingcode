@@ -87,6 +87,10 @@ textarea, input, select { width: 100%; padding: 10px; border: 1px solid #3a3a3a;
 .feedback-controls { display: grid; grid-template-columns: repeat(2, minmax(180px, 280px)); gap: 10px; margin: 16px 0; }
 .feedback-item { margin-top: 14px; }
 
+.spend-table { width: 100%; border-collapse: collapse; }
+.spend-table th, .spend-table td { padding: 12px; border-bottom: 1px solid #303030; text-align: right; }
+.spend-table th:first-child, .spend-table td:first-child { text-align: left; }
+
 @media (max-width: 800px) {
   .split, .compare-grid, .compare-controls, .feedback-controls { grid-template-columns: 1fr; }
   .console-header { align-items: flex-start; }

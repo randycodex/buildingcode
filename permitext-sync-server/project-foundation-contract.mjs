@@ -427,9 +427,6 @@ export function capabilityContract(entitlement, now = Date.now(), options = {}) 
   const collaboration = options.collaborationEnabled === true;
   const organizationAdministration = options.organizationAdministrationEnabled === true;
   const codeQuestionWorkspace = options.codeQuestionWorkspaceEnabled === true;
-  const researchMonthlyLimit = Number.isSafeInteger(Number(options.researchMonthlyLimit))
-    ? Number(options.researchMonthlyLimit)
-    : defaultResearchMonthlyLimit;
   return {
     schemaVersion: 2,
     plan: pro ? "pro" : "free",
@@ -451,7 +448,7 @@ export function capabilityContract(entitlement, now = Date.now(), options = {}) 
       [capabilityIDs.research]: {
         enabled: research,
         requiresPro: true,
-        monthlyLimit: research ? researchMonthlyLimit : 0
+        monthlyLimit: research ? null : 0
       },
       [capabilityIDs.evidenceDiscovery]: {
         enabled: evidenceDiscovery,

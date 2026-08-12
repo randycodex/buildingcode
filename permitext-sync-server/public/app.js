@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-firm-collaboration-hidden-v2";
+} from "./offline-storage.js?v=20260811-pro-research-unlimited-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -6308,13 +6308,9 @@ function planUsageRows() {
         }
       ];
   if (hasCapability("research")) {
-    const used = Number(researchUsage?.requestsUsed);
-    const limit = Number(researchUsage?.requestLimit);
     rows.push({
       label: "Research",
-      value: Number.isFinite(used) && Number.isFinite(limit)
-        ? `${Math.max(0, limit - used).toLocaleString()} of ${limit.toLocaleString()} remaining`
-        : "Checking allowance…"
+      value: isProAccount() ? "Unlimited" : "Available"
     });
   } else if (isProAccount()) {
     rows.push({ label: "Research", value: "Add-on not active" });
@@ -15401,17 +15397,6 @@ async function renderResearch(paneID = "utility:analysis") {
     });
     decisionResearch.append(decisionAction, decisionStatus);
     content.append(decisionResearch);
-  }
-
-  if (researchUsage && researchEnabled && !projectScopedResearch) {
-    const usage = document.createElement("section");
-    usage.className = "research-usage";
-    const primary = document.createElement("strong");
-    primary.textContent = `${researchUsage.requestsUsed} of ${researchUsage.requestLimit} AI requests used this month`;
-    const reset = document.createElement("p");
-    reset.textContent = `Allowance resets ${researchRelativeDate(researchUsage.resetDate)}.`;
-    usage.append(primary, reset);
-    content.append(usage);
   }
 
   renderNewResearchComposer(content, researchEnabled);
@@ -25298,7 +25283,7 @@ function renderSettings() {
         const researchRow = Array.from(planUsage.querySelectorAll("p"))
           .find((row) => row.querySelector("span")?.textContent === "Research");
         if (researchRow?.querySelector("strong")) {
-          researchRow.querySelector("strong").textContent = "Allowance unavailable";
+          researchRow.querySelector("strong").textContent = "Research status unavailable";
         }
       });
   }

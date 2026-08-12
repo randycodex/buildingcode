@@ -26,6 +26,7 @@ const dynamicRoutes = [
   "/.well-known/apple-app-site-association",
   "/health",
   "/account/:path*",
+  "/admin",
   "/admin/:path*",
   "/billing/:path*",
   "/code/:path*",
