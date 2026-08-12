@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-unassigned-start-v1";
+} from "./offline-storage.js?v=20260811-research-composer-heading-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15172,8 +15172,6 @@ async function showNewResearchChat() {
 function renderNewResearchComposer(container, researchEnabled) {
   const section = document.createElement("section");
   section.className = "research-chat-start";
-  const heading = document.createElement("h3");
-  heading.textContent = "What would you like to research?";
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
   const composerBox = document.createElement("div");
@@ -15242,7 +15240,7 @@ function renderNewResearchComposer(container, researchEnabled) {
   });
   composerBox.append(input, sendButton);
   form.append(composerBox, status);
-  section.append(heading, form);
+  section.append(form);
   container.append(section);
 }
 
