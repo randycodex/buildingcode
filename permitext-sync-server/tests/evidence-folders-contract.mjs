@@ -365,6 +365,7 @@ assert.doesNotMatch(appSource.match(/function appendSavedProjectFactEditor[\s\S]
 assert.match(appSource, /showWebNotice\("Project facts not saved", error\.message \|\| "Could not save Project facts"\)/);
 assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?font-weight: 400;/);
 assert.match(appSource, /function appendSavedProjectResearchConversations[\s\S]*?title\.className = "section-label saved-project-research-toggle"[\s\S]*?body\.className = "project-studio-collapsible-body saved-project-research-body"[\s\S]*?wireProjectSectionMotion\(section, body, \[title, toggle\], "Research", false\)/);
+assert.match(stylesSource, /\.project-studio-section-heading > \.saved-project-research-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);
