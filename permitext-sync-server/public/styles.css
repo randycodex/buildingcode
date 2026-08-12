@@ -5112,14 +5112,33 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   color: var(--text-secondary);
 }
 
-.research-evidence-reviewed > summary {
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidence-reviewed > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   width: fit-content;
   cursor: pointer;
   padding: var(--space-1) 0;
+  list-style: none;
   color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  font-size: 10px !important;
   font-weight: 400;
   line-height: 1.25;
+}
+
+.research-evidence-reviewed > summary::-webkit-details-marker {
+  display: none;
+}
+
+.research-evidence-reviewed > summary::after {
+  content: "›";
+  display: inline-block;
+  line-height: 1;
+  transform-origin: center;
+}
+
+.research-evidence-reviewed[open] > summary::after {
+  transform: rotate(90deg);
 }
 
 .research-evidence-reviewed > summary:focus-visible {
