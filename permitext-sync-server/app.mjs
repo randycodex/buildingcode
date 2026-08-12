@@ -11507,6 +11507,26 @@ async function reportSourcesForProject(userID, projectID) {
   const sources = [];
   const warnings = [];
 
+  const project = (await projectAccessForUser(userID, projectID))?.project || null;
+  if (project?.description) {
+    const facts = String(project.description).trim();
+    sources.push({
+      id: projectID,
+      kind: "projectFacts",
+      label: "Project Facts",
+      summary: [project.address, facts].filter(Boolean).join(" · ").slice(0, 500),
+      sourceClassification: "project-material",
+      updatedAt: project.updatedAt || null,
+      manifestItem: {
+        kind: "projectFacts",
+        sourceID: projectID,
+        title: project.name || project.title || "Project facts",
+        address: project.address || "",
+        facts
+      }
+    });
+  }
+
   const currentProjectSections = await currentProjectSectionRecords(userID, projectID);
   const currentSectionIDs = new Set(currentProjectSections.map((record) => String(record.sectionID || "")));
   const sectionLinks = Array.from(new Map(

@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-content-evidence-v84";
+} from "./research-progress.js?v=20260812-report-project-facts-v85";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-content-evidence-v84";
+} from "./offline-storage.js?v=20260812-report-project-facts-v85";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19185,6 +19185,12 @@ function printReportManifestAsPDF(manifest) {
             [citation.sectionID, ...(citation.sourceIDs || [])].filter(Boolean).join(" · ")
           )
         );
+      } else if (item.kind === "projectFacts") {
+        const heading = documentRoot.createElement("h3");
+        heading.textContent = item.title || "Project facts";
+        const facts = documentRoot.createElement("p");
+        facts.textContent = [item.address, item.facts].filter(Boolean).join(" · ");
+        article.append(heading, facts);
       } else {
         const heading = documentRoot.createElement("h3");
         heading.textContent = item.title || "Project material";
@@ -19275,7 +19281,7 @@ async function renderProjectReportDraft(project) {
   const reportHeaderHelp = Object.freeze({
     "Report introduction": "Briefly explain what this Report addresses, the relevant Project condition, and any important limitations.",
     "Report content": "Review and reorder the authored text and Project sources included in this Report.",
-    "Project facts": "Project address and facts are included automatically in the Report.",
+    "Project facts": "Add the current Project address and facts when they are relevant to this Report.",
     "Saved evidence": "Add enacted passages saved to this Project as supporting evidence.",
     Research: "Add the original question and supported conclusion from a Project Research conversation.",
     "Notebook notes": "Add selected Project notes that provide useful context for the Report.",
@@ -19540,10 +19546,12 @@ async function renderProjectReportDraft(project) {
       } else {
         const source = sources.find((item) => item.kind === block.kind && item.id === block.sourceID);
         const sourceTitle = document.createElement("strong");
-        sourceTitle.textContent = block.kind === "evidence" && source
-          ? [source.codePrefix || "Code", source.sectionNumber].filter(Boolean).join(" ")
-          : reportBlockTitle(block);
-        if (source?.summary) {
+        sourceTitle.textContent = block.kind === "projectFacts"
+          ? "PROJECT FACTS"
+          : block.kind === "evidence" && source
+            ? [source.codePrefix || "Code", source.sectionNumber].filter(Boolean).join(" ")
+            : reportBlockTitle(block);
+        if (source?.summary && block.kind !== "projectFacts") {
           const summary = document.createElement("p");
           summary.textContent = source.summary;
           row.append(sourceTitle, summary);
@@ -19629,23 +19637,16 @@ async function renderProjectReportDraft(project) {
       container.append(row);
     };
 
+    const projectFactsSources = sources.filter((source) => source.kind === "projectFacts");
     appendSourceGroup("Project facts", "", (groupBody) => {
-      const facts = document.createElement("article");
-      facts.className = "report-source-card report-project-facts-source";
-      const factsCopy = document.createElement("div");
-      const factsTitle = document.createElement("strong");
-      factsTitle.textContent = identity.name || "Project";
-      const factsSummary = document.createElement("p");
-      factsSummary.textContent = [identity.address, identity.description]
-        .map((value) => String(value || "").trim())
-        .filter(Boolean)
-        .join(" · ") || "Add Project facts in the Projects column before exporting.";
-      const factsStatus = document.createElement("span");
-      factsStatus.className = "report-source-included-label";
-      factsStatus.textContent = "Included";
-      factsCopy.append(factsTitle, factsSummary);
-      facts.append(factsCopy, factsStatus);
-      groupBody.append(facts);
+      if (!projectFactsSources.length) {
+        const empty = document.createElement("p");
+        empty.className = "report-draft-empty";
+        empty.textContent = "Add Project facts in the Projects column before adding them to this Report.";
+        groupBody.append(empty);
+        return;
+      }
+      projectFactsSources.forEach((source) => appendSourceCard(groupBody, source));
     });
 
     const evidenceSources = sources.filter((source) => source.kind === "evidence");

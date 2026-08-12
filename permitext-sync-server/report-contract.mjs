@@ -29,6 +29,7 @@ export const reportDraftBlockKinds = Object.freeze([
   "heading",
   "paragraph",
   "list",
+  "projectFacts",
   "evidence",
   "notebookCard",
   "researchAnswer",
@@ -320,7 +321,7 @@ export function reportDraftForClient(artifact, projectIDs = []) {
 function manifestSourceClassification(kind) {
   if (kind === "evidence") return "published-code";
   if (kind === "researchAnswer") return "ai-assisted";
-  if (["workboardPreview", "attachment"].includes(kind)) return "project-material";
+  if (["projectFacts", "workboardPreview", "attachment"].includes(kind)) return "project-material";
   return "user-authored";
 }
 
@@ -382,6 +383,16 @@ function normalizeResearchManifestItem(item, base) {
   };
 }
 
+function normalizeProjectFactsManifestItem(item, base) {
+  return {
+    ...base,
+    sourceID: requiredText(item.sourceID, "Report Project facts source ID", 256),
+    title: requiredText(item.title || "Project facts", "Report Project facts title", 500),
+    address: optionalText(item.address, 2_000),
+    facts: requiredText(item.facts, "Report Project facts", maximumAuthoredTextLength)
+  };
+}
+
 export function normalizeReportManifestItem(item, index = 0) {
   const kind = requiredText(item?.kind, "Report item kind", 64);
   if (!reportDraftBlockKinds.includes(kind)) throw new Error("Unsupported Report manifest item.");
@@ -393,6 +404,7 @@ export function normalizeReportManifestItem(item, index = 0) {
   };
   if (authoredBlockKinds.has(kind)) return { ...base, ...normalizeAuthoredBlock(item, kind) };
   if (kind === "evidence") return normalizeEvidenceManifestItem(item, base);
+  if (kind === "projectFacts") return normalizeProjectFactsManifestItem(item, base);
   if (kind === "notebookCard") return normalizeNotebookManifestItem(item, base);
   if (kind === "researchAnswer") return normalizeResearchManifestItem(item, base);
   return {

@@ -308,13 +308,6 @@ function drawCover(document, manifest) {
 function drawBody(document, manifest, projectMaterialBySourceID) {
   const presentation = reportPresentation(manifest);
   document.addPage();
-  if (manifest.project?.description) {
-    document
-      .fillColor(colors.muted)
-      .font("Helvetica")
-      .fontSize(10)
-      .text(manifest.project.description, { lineGap: 2, paragraphGap: 14 });
-  }
   (manifest.items || []).forEach((item) => {
     if (item.kind === "heading") {
       ensureVerticalSpace(document, 70);
@@ -344,6 +337,21 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
           .text(`- ${value}`, { indent: 8, paragraphGap: 4 });
       });
       document.moveDown(0.6);
+      return;
+    }
+    if (item.kind === "projectFacts") {
+      ensureVerticalSpace(document, 90);
+      drawClassification(document, item.sourceClassification);
+      document
+        .fillColor(colors.ink)
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text(item.title || "Project facts", { paragraphGap: 7 });
+      document
+        .font("Helvetica")
+        .fontSize(9.5)
+        .text([item.address, item.facts].filter(Boolean).join(" / "), { lineGap: 2, paragraphGap: 8 });
+      document.moveDown(0.8);
       return;
     }
     drawSourceItem(document, item, projectMaterialBySourceID, presentation);

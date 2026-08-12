@@ -85,6 +85,14 @@ const manifestInput = {
   items: [
     draft.blocks[0],
     {
+      id: "project-facts-1",
+      kind: "projectFacts",
+      sourceID: "project-1",
+      title: "Project Facts",
+      address: "100 Test Avenue, New York, NY",
+      facts: "Interior alteration"
+    },
+    {
       id: "evidence-1",
       kind: "evidence",
       sectionID: "BC-1004.1",
@@ -182,13 +190,14 @@ assert.ok(
 const manifest = immutableReportManifest(manifestInput);
 const repeatedManifest = immutableReportManifest(manifestInput);
 assert.equal(manifest.immutable, true);
-assert.equal(manifest.items[1].sourceClassification, "published-code");
-assert.equal(manifest.items[2].sourceClassification, "ai-assisted");
-assert.equal(manifest.items[3].sourceClassification, "project-material");
+assert.equal(manifest.items[1].sourceClassification, "project-material");
+assert.equal(manifest.items[2].sourceClassification, "published-code");
+assert.equal(manifest.items[3].sourceClassification, "ai-assisted");
+assert.equal(manifest.items[4].sourceClassification, "project-material");
 assert.equal(manifest.presentation.template.id, "template-client");
 assert.equal(manifest.presentation.branding.accentColorHex, "#1267a0");
 assert.equal(manifest.contentHash, repeatedManifest.contentHash);
-assert.equal(reportManifestSummary(manifest).itemCount, 4);
+assert.equal(reportManifestSummary(manifest).itemCount, 5);
 assert.equal(
   reportManifestSummary(manifest).presentation.template.name,
   "Client Report",

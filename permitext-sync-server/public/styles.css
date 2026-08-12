@@ -13251,6 +13251,31 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   background: color-mix(in srgb, #785da8 14%, var(--surface));
 }
 
+.report-draft-block-projectFacts {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block: var(--space-2);
+  background: transparent;
+}
+
+.report-draft-block-projectFacts .report-draft-block-top {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.report-draft-block-projectFacts .report-draft-classification {
+  display: none;
+}
+
+.report-draft-block-projectFacts > strong {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
 .report-draft-block-top {
   display: flex;
   align-items: center;
