@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-search-filter-focus-v51";
+} from "./research-progress.js?v=20260812-notebook-research-hidden-v52";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-search-filter-focus-v51";
+} from "./offline-storage.js?v=20260812-notebook-research-hidden-v52";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18773,7 +18773,7 @@ async function renderProjectNotebook(project) {
       researchButton.type = "button";
       researchButton.textContent = "Start Research";
       researchButton.title = "Use this card as the starting point for a new evidence-selected Research question";
-      researchButton.hidden = notebookReadOnly;
+      researchButton.hidden = true;
       const coordinateButton = document.createElement("button");
       coordinateButton.className = "notebook-secondary-action";
       coordinateButton.type = "button";
