@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-alignment-v78";
+} from "./research-progress.js?v=20260812-report-code-colors-v79";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-alignment-v78";
+} from "./offline-storage.js?v=20260812-report-code-colors-v79";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19592,6 +19592,9 @@ async function renderProjectReportDraft(project) {
     const appendSourceCard = (container, source) => {
       const row = document.createElement("article");
       row.className = "report-source-card";
+      if (source.kind === "evidence") {
+        row.classList.add("report-evidence-source-card", `code-theme-${codeTheme(source.codePrefix)}`);
+      }
       const copy = document.createElement("div");
       const heading = document.createElement("strong");
       heading.textContent = source.label;

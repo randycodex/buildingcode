@@ -11305,6 +11305,7 @@ function reportSourceClientSummary(source) {
   return {
     id: source.id,
     kind: source.kind,
+    codePrefix: source.codePrefix || "",
     label: source.label,
     summary: source.summary || "",
     sourceClassification: source.sourceClassification,
@@ -11525,6 +11526,7 @@ async function reportSourcesForProject(userID, projectID) {
       sources.push({
         id: evidence.sectionID,
         kind: "evidence",
+        codePrefix: evidence.codePrefix || "BC",
         label: `${evidence.codePrefix || "Code"} ${evidence.sectionNumber}: ${evidence.title}`,
         summary: evidence.text.slice(0, 500),
         sourceClassification: "published-code",

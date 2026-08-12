@@ -13351,6 +13351,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   background: color-mix(in srgb, var(--project-color) 9%, var(--surface-muted));
 }
 
+.report-source-card.report-evidence-source-card {
+  border: 1px solid color-mix(in srgb, var(--code-accent) 28%, transparent);
+  background: color-mix(in srgb, var(--code-accent) 13%, var(--surface-muted));
+}
+
+.report-source-card.report-evidence-source-card strong {
+  color: color-mix(in srgb, var(--code-accent) 72%, var(--text-primary));
+}
+
 .report-source-card > div {
   display: grid;
   gap: 4px;
