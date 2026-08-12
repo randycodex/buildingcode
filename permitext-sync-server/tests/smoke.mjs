@@ -1375,7 +1375,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-topbar-focus-v48'),
+        webRoot.text.includes('/web/app.js?v=20260812-notebook-label-v49'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1485,7 +1485,9 @@ async function main() {
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-rail-actions {") &&
         workspaceScript.text.includes('rail.className = "notebook-card-rail code-filter-menu notebook-card-menu"') &&
-        workspaceScript.text.includes('railLabel.textContent = "Project notes"') &&
+        workspaceScript.text.includes('railLabel.textContent = ""') &&
+        workspaceScript.text.includes('label: () => showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes"') &&
+        workspaceScript.text.includes('railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";') &&
         workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false") &&
         workspaceScript.text.includes("wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions)") &&
         workspaceScript.text.includes('closeButton.className = "icon-button utility-close notebook-close";') &&
@@ -1522,7 +1524,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-topbar-focus-v48'),
+      webRoot.text.includes('/web/styles.css?v=20260812-notebook-label-v49'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1789,7 +1791,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-topbar-focus-v48'),
+      webRoot.text.includes('/web/styles.css?v=20260812-notebook-label-v49'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

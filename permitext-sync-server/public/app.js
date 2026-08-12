@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-topbar-focus-v48";
+} from "./research-progress.js?v=20260812-notebook-label-v49";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-topbar-focus-v48";
+} from "./offline-storage.js?v=20260812-notebook-label-v49";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18160,7 +18160,7 @@ async function renderProjectNotebook(project) {
     railToggle.type = "button";
     const railLabel = document.createElement("span");
     railLabel.className = "code-filter-menu-label";
-    railLabel.textContent = "Project notes";
+    railLabel.textContent = "";
     const railIcon = document.createElement("span");
     railIcon.className = "code-filter-menu-icon";
     railIcon.setAttribute("aria-hidden", "true");
@@ -18270,13 +18270,14 @@ async function renderProjectNotebook(project) {
       resizeCardListTo(cardList.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
     });
     rail.append(railHeader, cardList, cardListResizeHandle);
+    let showingArchivedCards = false;
     const cardMenuState = {
       cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false
     };
     const cardMenuOptions = {
       stateKey: "cardsMenuOpen",
       menuName: "Project notes",
-      label: "Project notes"
+      label: () => showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes"
     };
     wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
     railToggle.addEventListener("click", () => {
@@ -18289,7 +18290,6 @@ async function renderProjectNotebook(project) {
 
     let notebookAutosaveTask = null;
     let notebookRevision = 0;
-    let showingArchivedCards = false;
     let selectingCards = false;
     let cardSelectionBusy = false;
     const selectedCardIDs = new Set();
@@ -18545,6 +18545,7 @@ async function renderProjectNotebook(project) {
       const visibleCards = cards.filter((card) => Boolean(card.archivedAt) === showingArchivedCards);
       rail.classList.toggle("is-selecting-cards", selectingCards);
       rail.classList.toggle("is-showing-archived-cards", showingArchivedCards);
+      railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";
       selectButton.setAttribute("aria-pressed", String(selectingCards));
       archiveButton.setAttribute("aria-pressed", String(showingArchivedCards));
       archiveButton.title = showingArchivedCards ? "Show active notes" : "Show archived notes";
