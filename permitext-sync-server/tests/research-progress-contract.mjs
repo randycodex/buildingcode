@@ -86,6 +86,8 @@ assert(serverSource.includes("researchRequestSignal(options.signal"));
 assert(clientSource.includes("new AbortController()"));
 assert(clientSource.includes('progress.retry = () => void execute(true)'));
 assert(clientSource.includes('error.name === "AbortError"'));
+assert(clientSource.includes("if (!completed) {"), "Completed Research cards must omit the task disclosure and rows.");
+assert(!clientSource.includes('summary.textContent = completed ? "Research steps"'), "Completed Research cards still expose a Research steps control.");
 assert(styleSource.includes("grid-template-columns: repeat(3, 4px)"));
 assert(styleSource.includes("@media (prefers-reduced-motion: reduce)"));
 

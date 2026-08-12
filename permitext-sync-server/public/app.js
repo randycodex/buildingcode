@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v5";
+} from "./research-progress.js?v=20260812-research-progress-v6";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v5";
+} from "./offline-storage.js?v=20260812-research-progress-v6";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15321,32 +15321,34 @@ function renderResearchProgressCard(progress, { completed = false } = {}) {
   loading.append(renderResearchPixelGrid(), label, elapsed);
   card.append(loading);
 
-  const details = document.createElement("details");
-  details.className = "research-progress-details";
-  details.open = !completed && !["failed", "cancelled"].includes(progress.status);
-  const summary = document.createElement("summary");
-  summary.textContent = completed ? "Research steps" : "Research progress";
-  const taskList = document.createElement("ol");
-  taskList.className = "research-progress-tasks";
-  researchProgressStages.forEach((stage) => {
-    const state = progress.stages.get(stage.id) || "pending";
-    const row = document.createElement("li");
-    row.className = `research-progress-task is-${state}`;
-    row.dataset.progressStage = stage.id;
-    const icon = document.createElement("span");
-    icon.className = "research-progress-task-icon";
-    icon.setAttribute("aria-hidden", "true");
-    icon.textContent = state === "completed" ? "✓" : state === "failed" ? "!" : state === "cancelled" ? "×" : "";
-    const text = document.createElement("span");
-    text.textContent = stage.label;
-    const stateText = document.createElement("span");
-    stateText.className = "research-progress-task-state";
-    stateText.textContent = state === "retrying" ? "Retrying" : state === "active" ? "Active" : "";
-    row.append(icon, text, stateText);
-    taskList.append(row);
-  });
-  details.append(summary, taskList);
-  card.append(details);
+  if (!completed) {
+    const details = document.createElement("details");
+    details.className = "research-progress-details";
+    details.open = !["failed", "cancelled"].includes(progress.status);
+    const summary = document.createElement("summary");
+    summary.textContent = "Research progress";
+    const taskList = document.createElement("ol");
+    taskList.className = "research-progress-tasks";
+    researchProgressStages.forEach((stage) => {
+      const state = progress.stages.get(stage.id) || "pending";
+      const row = document.createElement("li");
+      row.className = `research-progress-task is-${state}`;
+      row.dataset.progressStage = stage.id;
+      const icon = document.createElement("span");
+      icon.className = "research-progress-task-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = state === "completed" ? "✓" : state === "failed" ? "!" : state === "cancelled" ? "×" : "";
+      const text = document.createElement("span");
+      text.textContent = stage.label;
+      const stateText = document.createElement("span");
+      stateText.className = "research-progress-task-state";
+      stateText.textContent = state === "retrying" ? "Retrying" : state === "active" ? "Active" : "";
+      row.append(icon, text, stateText);
+      taskList.append(row);
+    });
+    details.append(summary, taskList);
+    card.append(details);
+  }
 
   if (progress.error) {
     const error = document.createElement("p");
