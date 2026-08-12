@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-delete-icon-v63";
+} from "./research-progress.js?v=20260812-report-drag-sections-v64";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-delete-icon-v63";
+} from "./offline-storage.js?v=20260812-report-drag-sections-v64";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19276,6 +19276,8 @@ async function renderProjectReportDraft(project) {
   let activeDraft = emptyProjectReportDraft(identity);
   let dirty = false;
   let disposed = false;
+  let draggedReportBlock = null;
+  const reportSourceGroupExpanded = new Map();
 
   const mountState = {
     panel,
@@ -19379,6 +19381,7 @@ async function renderProjectReportDraft(project) {
     activeDraft.blocks.forEach((block, index) => {
       const row = document.createElement("article");
       row.className = `report-draft-block report-draft-block-${block.kind}`;
+      row.dataset.blockId = block.id || `${block.kind}-${index}`;
       const top = document.createElement("div");
       top.className = "report-draft-block-top";
       const label = document.createElement("span");
@@ -19391,30 +19394,76 @@ async function renderProjectReportDraft(project) {
       );
       const actions = document.createElement("div");
       actions.className = "report-draft-block-actions";
-      [
-        { label: "Move up", text: "↑", disabled: index === 0, action: () => index - 1 },
-        {
-          label: "Move down",
-          text: "↓",
-          disabled: index === activeDraft.blocks.length - 1,
-          action: () => index + 1
+      const reorderBlock = (targetIndex, focusHandle = false) => {
+        if (targetIndex === index || targetIndex < 0 || targetIndex >= activeDraft.blocks.length) return;
+        const [moved] = activeDraft.blocks.splice(index, 1);
+        activeDraft.blocks.splice(targetIndex, 0, moved);
+        setDirty();
+        renderWorkspaceContent();
+        if (focusHandle) {
+          requestAnimationFrame(() => {
+            const blockID = block.id || `${block.kind}-${targetIndex}`;
+            const escapedID = globalThis.CSS?.escape ? CSS.escape(blockID) : blockID;
+            shell.querySelector(
+              `.report-draft-block[data-block-id="${escapedID}"] .report-draft-block-drag-handle`
+            )?.focus({ preventScroll: true });
+          });
         }
-      ].forEach((action) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = action.text;
-        button.title = action.label;
-        button.setAttribute("aria-label", action.label);
-        button.disabled = action.disabled;
-        button.addEventListener("click", () => {
-          const target = action.action();
-          const [moved] = activeDraft.blocks.splice(index, 1);
-          activeDraft.blocks.splice(target, 0, moved);
-          setDirty();
-          renderWorkspaceContent();
-        });
-        actions.append(button);
+      };
+      const dragHandle = document.createElement("button");
+      dragHandle.type = "button";
+      dragHandle.className = "report-draft-block-drag-handle";
+      dragHandle.draggable = true;
+      dragHandle.title = "Drag to reorder Report item";
+      dragHandle.setAttribute("aria-label", "Drag to reorder Report item");
+      dragHandle.setAttribute("aria-keyshortcuts", "ArrowUp ArrowDown");
+      dragHandle.innerHTML = paneDragHandleSVG();
+      dragHandle.addEventListener("keydown", (event) => {
+        if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+        event.preventDefault();
+        reorderBlock(index + (event.key === "ArrowUp" ? -1 : 1), true);
       });
+      dragHandle.addEventListener("dragstart", (event) => {
+        draggedReportBlock = block;
+        row.classList.add("is-dragging");
+        event.dataTransfer?.setData("text/plain", block.id || `${block.kind}-${index}`);
+        if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
+      });
+      dragHandle.addEventListener("dragend", () => {
+        draggedReportBlock = null;
+        container.querySelectorAll(".report-draft-block").forEach((item) => {
+          item.classList.remove("is-dragging", "is-drop-before", "is-drop-after");
+        });
+      });
+      row.addEventListener("dragover", (event) => {
+        if (!draggedReportBlock || draggedReportBlock === block) return;
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+        const after = event.clientY > row.getBoundingClientRect().top + row.offsetHeight / 2;
+        container.querySelectorAll(".report-draft-block").forEach((item) => {
+          item.classList.remove("is-drop-before", "is-drop-after");
+        });
+        row.classList.add(after ? "is-drop-after" : "is-drop-before");
+      });
+      row.addEventListener("dragleave", (event) => {
+        if (!row.contains(event.relatedTarget)) {
+          row.classList.remove("is-drop-before", "is-drop-after");
+        }
+      });
+      row.addEventListener("drop", (event) => {
+        const sourceIndex = activeDraft.blocks.indexOf(draggedReportBlock);
+        if (sourceIndex < 0 || sourceIndex === index) return;
+        event.preventDefault();
+        const after = event.clientY > row.getBoundingClientRect().top + row.offsetHeight / 2;
+        let insertionIndex = index + (after ? 1 : 0);
+        const [moved] = activeDraft.blocks.splice(sourceIndex, 1);
+        if (insertionIndex > sourceIndex) insertionIndex -= 1;
+        activeDraft.blocks.splice(insertionIndex, 0, moved);
+        draggedReportBlock = null;
+        setDirty();
+        renderWorkspaceContent();
+      });
+      actions.append(dragHandle);
       const remove = document.createElement("button");
       remove.type = "button";
       remove.className = "report-draft-block-remove";
@@ -19478,22 +19527,39 @@ async function renderProjectReportDraft(project) {
   }
 
   function renderSourcePalette(container) {
-    const appendGroupHeading = (label, description = "") => {
+    const appendSourceGroup = (label, description, renderBody) => {
+      const section = document.createElement("section");
+      section.className = "report-source-group";
       const heading = document.createElement("div");
-      heading.className = "report-source-group-heading";
-      const title = document.createElement("p");
-      title.className = "section-label";
+      heading.className = "report-source-group-heading project-collapsible-heading";
+      const title = document.createElement("button");
+      title.type = "button";
+      title.className = "project-section-toggle-label section-label report-source-group-toggle";
       title.textContent = label;
-      heading.append(title);
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "project-section-toggle-chevron report-source-group-chevron";
+      toggle.innerHTML = researchChevronIconsSVG();
+      heading.append(title, toggle);
+      const body = document.createElement("div");
+      body.className = "report-source-group-body";
       if (description) {
         const copy = document.createElement("p");
         copy.className = "report-source-group-description";
         copy.textContent = description;
-        heading.append(copy);
+        body.append(copy);
       }
-      container.append(heading);
+      renderBody(body);
+      section.append(heading, body);
+      container.append(section);
+      const initiallyExpanded = reportSourceGroupExpanded.get(label) ?? true;
+      wireProjectSectionMotion(section, body, [title, toggle], label, initiallyExpanded, {
+        onChange(expanded) {
+          reportSourceGroupExpanded.set(label, expanded);
+        }
+      });
     };
-    const appendSourceCard = (source) => {
+    const appendSourceCard = (container, source) => {
       const row = document.createElement("article");
       row.className = "report-source-card";
       const copy = document.createElement("div");
@@ -19523,76 +19589,76 @@ async function renderProjectReportDraft(project) {
       container.append(row);
     };
 
-    appendGroupHeading("Project facts", "Included automatically from the active Project.");
-    const facts = document.createElement("article");
-    facts.className = "report-source-card report-project-facts-source";
-    const factsCopy = document.createElement("div");
-    const factsTitle = document.createElement("strong");
-    factsTitle.textContent = identity.name || "Project";
-    const factsSummary = document.createElement("p");
-    factsSummary.textContent = [identity.address, identity.description]
-      .map((value) => String(value || "").trim())
-      .filter(Boolean)
-      .join(" · ") || "Add Project facts in the Projects column before exporting.";
-    const factsStatus = document.createElement("span");
-    factsStatus.className = "report-source-included-label";
-    factsStatus.textContent = "Included";
-    factsCopy.append(factsTitle, factsSummary);
-    facts.append(factsCopy, factsStatus);
-    container.append(facts);
+    appendSourceGroup("Project facts", "Included automatically from the active Project.", (groupBody) => {
+      const facts = document.createElement("article");
+      facts.className = "report-source-card report-project-facts-source";
+      const factsCopy = document.createElement("div");
+      const factsTitle = document.createElement("strong");
+      factsTitle.textContent = identity.name || "Project";
+      const factsSummary = document.createElement("p");
+      factsSummary.textContent = [identity.address, identity.description]
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+        .join(" · ") || "Add Project facts in the Projects column before exporting.";
+      const factsStatus = document.createElement("span");
+      factsStatus.className = "report-source-included-label";
+      factsStatus.textContent = "Included";
+      factsCopy.append(factsTitle, factsSummary);
+      facts.append(factsCopy, factsStatus);
+      groupBody.append(facts);
+    });
 
     const evidenceSources = sources.filter((source) => source.kind === "evidence");
-    appendGroupHeading("Saved evidence", "Add only the enacted passages needed to support this Report.");
-    if (sourceWarnings.length) {
-      const warning = document.createElement("div");
-      warning.className = "project-studio-warning";
-      const warningTitle = document.createElement("strong");
-      warningTitle.textContent = `${sourceWarnings.length} linked code ${sourceWarnings.length === 1 ? "source is" : "sources are"} unavailable`;
-      const warningCopy = document.createElement("p");
-      warningCopy.textContent = "The unavailable source was omitted so you can continue editing this Report. Re-open or remove its Saved evidence link before finalizing the report.";
-      const warningList = document.createElement("ul");
-      sourceWarnings.slice(0, 5).forEach((item) => {
-        const row = document.createElement("li");
-        row.textContent = item.message || item.sourceID || "Unavailable linked code source";
-        warningList.append(row);
-      });
-      warning.append(warningTitle, warningCopy, warningList);
-      container.append(warning);
-    }
-    if (!evidenceSources.length && !sourceWarnings.length) {
-      const empty = document.createElement("p");
-      empty.className = "report-draft-empty";
-      empty.textContent = "No Saved Evidence is linked to this Project.";
-      container.append(empty);
-    }
-    evidenceSources.forEach(appendSourceCard);
+    appendSourceGroup("Saved evidence", "Add only the enacted passages needed to support this Report.", (groupBody) => {
+      if (sourceWarnings.length) {
+        const warning = document.createElement("div");
+        warning.className = "project-studio-warning";
+        const warningTitle = document.createElement("strong");
+        warningTitle.textContent = `${sourceWarnings.length} linked code ${sourceWarnings.length === 1 ? "source is" : "sources are"} unavailable`;
+        const warningCopy = document.createElement("p");
+        warningCopy.textContent = "The unavailable source was omitted so you can continue editing this Report. Re-open or remove its Saved evidence link before finalizing the report.";
+        const warningList = document.createElement("ul");
+        sourceWarnings.slice(0, 5).forEach((item) => {
+          const row = document.createElement("li");
+          row.textContent = item.message || item.sourceID || "Unavailable linked code source";
+          warningList.append(row);
+        });
+        warning.append(warningTitle, warningCopy, warningList);
+        groupBody.append(warning);
+      }
+      if (!evidenceSources.length && !sourceWarnings.length) {
+        const empty = document.createElement("p");
+        empty.className = "report-draft-empty";
+        empty.textContent = "No Saved Evidence is linked to this Project.";
+        groupBody.append(empty);
+      }
+      evidenceSources.forEach((source) => appendSourceCard(groupBody, source));
+    });
 
     const researchSources = sources.filter((source) => source.kind === "researchAnswer");
-    appendGroupHeading("Research", "Adds the original question and immutable supported answer—not the full conversation transcript.");
-    if (!researchSources.length) {
-      const empty = document.createElement("p");
-      empty.className = "report-draft-empty";
-      empty.textContent = "No Research conversation is assigned to this Project.";
-      container.append(empty);
-    }
-    researchSources.forEach(appendSourceCard);
+    appendSourceGroup("Research", "Adds the original question and immutable supported answer—not the full conversation transcript.", (groupBody) => {
+      if (!researchSources.length) {
+        const empty = document.createElement("p");
+        empty.className = "report-draft-empty";
+        empty.textContent = "No Research conversation is assigned to this Project.";
+        groupBody.append(empty);
+      }
+      researchSources.forEach((source) => appendSourceCard(groupBody, source));
+    });
 
     const notebookSources = sources.filter((source) => source.kind === "notebookCard");
-    appendGroupHeading("Notebook notes", "Add only the notes that help explain the Project decision.");
-    if (!notebookSources.length) {
-      const empty = document.createElement("p");
-      empty.className = "report-draft-empty";
-      empty.textContent = "No Notebook Notes are linked to this Project.";
-      container.append(empty);
-    }
-    notebookSources.forEach(appendSourceCard);
+    appendSourceGroup("Notebook notes", "Add only the notes that help explain the Project decision.", (groupBody) => {
+      if (!notebookSources.length) {
+        const empty = document.createElement("p");
+        empty.className = "report-draft-empty";
+        empty.textContent = "No Notebook Notes are linked to this Project.";
+        groupBody.append(empty);
+      }
+      notebookSources.forEach((source) => appendSourceCard(groupBody, source));
+    });
   }
 
   function renderHistory(container) {
-    const title = document.createElement("p");
-    title.className = "section-label";
-    title.textContent = "Immutable Report history";
-    container.append(title);
     if (!history.length) {
       const empty = document.createElement("p");
       empty.className = "report-draft-empty";
@@ -19801,17 +19867,14 @@ async function renderProjectReportDraft(project) {
 
     const preview = document.createElement("section");
     preview.className = "report-draft-preview";
-    const previewTitle = document.createElement("p");
-    previewTitle.className = "section-label";
     const selectedTemplate = (reportOptions.templates || []).find((template) =>
       template.id === selectedReportTemplateID
     );
-    previewTitle.textContent = selectedTemplate?.coverLabel || "Report preview";
     const previewHeading = document.createElement("h3");
     previewHeading.textContent = activeDraft.title || "Untitled Report";
     const previewMeta = document.createElement("p");
     previewMeta.textContent = `${identity.name} · Date and time added automatically on export`;
-    preview.append(previewTitle, previewHeading, previewMeta);
+    preview.append(previewHeading, previewMeta);
     if (activeDraft.introduction) {
       const paragraph = document.createElement("p");
       paragraph.textContent = activeDraft.introduction;
@@ -19824,9 +19887,45 @@ async function renderProjectReportDraft(project) {
       preview.append(row);
     });
 
-    const historySection = document.createElement("section");
-    historySection.className = "report-history";
-    renderHistory(historySection);
+    const appendOutputDisclosure = (label, body, className) => {
+      const section = document.createElement("section");
+      section.className = `report-output-section ${className}`;
+      const heading = document.createElement("div");
+      heading.className = "report-output-heading project-collapsible-heading";
+      const title = document.createElement("button");
+      title.type = "button";
+      title.className = "project-section-toggle-label section-label report-output-toggle";
+      title.textContent = label;
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "project-section-toggle-chevron report-output-chevron";
+      toggle.innerHTML = researchChevronIconsSVG();
+      heading.append(title, toggle);
+      const disclosureBody = document.createElement("div");
+      disclosureBody.className = "report-output-body";
+      disclosureBody.append(body);
+      section.append(heading, disclosureBody);
+      const initiallyExpanded = reportSourceGroupExpanded.get(label) ?? true;
+      wireProjectSectionMotion(section, disclosureBody, [title, toggle], label, initiallyExpanded, {
+        onChange(expanded) {
+          reportSourceGroupExpanded.set(label, expanded);
+        }
+      });
+      return section;
+    };
+    const previewSection = appendOutputDisclosure(
+      selectedTemplate?.coverLabel || "Report preview",
+      preview,
+      "report-preview-section"
+    );
+    const historyBody = document.createElement("div");
+    historyBody.className = "report-history";
+    renderHistory(historyBody);
+    const historySection = appendOutputDisclosure(
+      "Immutable Report history",
+      historyBody,
+      "report-history-section"
+    );
     shell.append(
       draftPicker,
       metadata,
@@ -19834,7 +19933,7 @@ async function renderProjectReportDraft(project) {
       blocks,
       sourcePalette,
       primaryActions,
-      preview,
+      previewSection,
       historySection
     );
     enhanceSelect(select);

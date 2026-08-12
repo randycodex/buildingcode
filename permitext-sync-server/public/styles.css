@@ -13023,13 +13023,19 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   gap: var(--space-2);
 }
 
-.report-source-group-heading {
+.report-source-group {
   display: grid;
-  gap: 3px;
+}
+
+.report-source-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
   margin-top: var(--space-3);
 }
 
-.report-source-group-heading:first-child {
+.report-source-group:first-child .report-source-group-heading {
   margin-top: 0;
 }
 
@@ -13038,6 +13044,54 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   color: var(--text-secondary);
   font-size: 11px;
   line-height: 1.4;
+}
+
+.report-source-group-toggle {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.report-source-group-chevron {
+  flex: 0 0 auto;
+}
+
+.report-source-group-body {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.report-output-section {
+  display: grid;
+}
+
+.report-output-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.report-output-toggle {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.report-output-chevron {
+  flex: 0 0 auto;
+}
+
+.report-output-body {
+  display: grid;
 }
 
 .report-draft-block {
@@ -13096,9 +13150,35 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   place-items: center;
 }
 
-.report-draft-block-remove svg {
+.report-draft-block-actions .report-draft-block-drag-handle {
+  display: inline-grid;
+  width: 30px;
+  min-width: 30px;
+  padding: 6px;
+  place-items: center;
+  cursor: grab;
+}
+
+.report-draft-block-drag-handle:active {
+  cursor: grabbing;
+}
+
+.report-draft-block-remove svg,
+.report-draft-block-drag-handle svg {
   width: 14px;
   height: 14px;
+}
+
+.report-draft-block.is-dragging {
+  opacity: 0.45;
+}
+
+.report-draft-block.is-drop-before {
+  box-shadow: inset 0 2px 0 var(--project-color);
+}
+
+.report-draft-block.is-drop-after {
+  box-shadow: inset 0 -2px 0 var(--project-color);
 }
 
 .report-draft-block textarea {

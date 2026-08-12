@@ -860,10 +860,17 @@ async function main() {
         workspaceStyles.text.includes(".report-draft-picker .custom-select") &&
         !workspaceScript.text.includes('dateInput.type = "date"') &&
         workspaceScript.text.includes('Date and time added automatically on export') &&
-        workspaceScript.text.includes('appendGroupHeading("Project facts", "Included automatically from the active Project.")') &&
-        workspaceScript.text.includes('appendGroupHeading("Saved evidence", "Add only the enacted passages needed to support this Report.")') &&
-        workspaceScript.text.includes('appendGroupHeading("Research", "Adds the original question and immutable supported answer—not the full conversation transcript.")') &&
-        workspaceScript.text.includes('appendGroupHeading("Notebook notes", "Add only the notes that help explain the Project decision.")') &&
+        workspaceScript.text.includes('appendSourceGroup("Project facts", "Included automatically from the active Project."') &&
+        workspaceScript.text.includes('appendSourceGroup("Saved evidence", "Add only the enacted passages needed to support this Report."') &&
+        workspaceScript.text.includes('appendSourceGroup("Research", "Adds the original question and immutable supported answer—not the full conversation transcript."') &&
+        workspaceScript.text.includes('appendSourceGroup("Notebook notes", "Add only the notes that help explain the Project decision."') &&
+        workspaceScript.text.includes('dragHandle.className = "report-draft-block-drag-handle"') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], label, initiallyExpanded') &&
+        workspaceScript.text.includes('appendOutputDisclosure(') &&
+        workspaceScript.text.includes('"Immutable Report history"') &&
+        workspaceStyles.text.includes(".report-source-group-body") &&
+        workspaceStyles.text.includes(".report-output-body") &&
+        workspaceStyles.text.includes(".report-draft-block.is-drop-before") &&
         workspaceScript.text.includes('source.kind === "researchAnswer"') &&
         workspaceScript.text.includes('source.kind === "notebookCard"') &&
         workspaceScript.text.includes("reportTemplateID: selectedReportTemplateID") &&
@@ -1396,7 +1403,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-report-delete-icon-v63'),
+        webRoot.text.includes('/web/app.js?v=20260812-report-drag-sections-v64'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1546,7 +1553,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-delete-icon-v63'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-drag-sections-v64'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1813,7 +1820,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-delete-icon-v63'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-drag-sections-v64'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
