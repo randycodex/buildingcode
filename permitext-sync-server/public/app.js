@@ -15067,8 +15067,6 @@ function renderNewResearchComposer(container, researchEnabled) {
   section.className = "research-chat-start";
   const heading = document.createElement("h3");
   heading.textContent = "What would you like to research?";
-  const copy = document.createElement("p");
-  copy.textContent = "Ask naturally. Permitext will research the applicable enacted text and cite the sources used in its answer.";
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
   const projectField = document.createElement("label");
@@ -15150,7 +15148,7 @@ function renderNewResearchComposer(container, researchEnabled) {
   });
   composerBox.append(input, sendButton);
   form.append(projectField, composerBox, status);
-  section.append(heading, copy, form);
+  section.append(heading, form);
   container.append(section);
 }
 
