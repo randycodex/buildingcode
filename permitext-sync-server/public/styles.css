@@ -13352,7 +13352,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 }
 
 .report-source-card.report-evidence-source-card {
-  border: 1px solid color-mix(in srgb, var(--code-accent) 28%, transparent);
   background: color-mix(in srgb, var(--code-accent) 13%, var(--surface-muted));
 }
 
