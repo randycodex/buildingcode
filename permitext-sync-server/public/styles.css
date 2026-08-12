@@ -8846,11 +8846,31 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-fact-description {
-  height: 112px !important;
+  height: 112px;
   min-height: 72px;
-  max-height: 180px;
+  max-height: min(70vh, 760px);
   overflow-y: auto;
-  resize: vertical;
+  resize: none;
+}
+
+.saved-project-fact-resize-handle {
+  position: relative;
+  height: 14px;
+  margin-top: -14px;
+  cursor: row-resize;
+  touch-action: none;
+}
+
+.saved-project-fact-resize-handle::after {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  width: 10px;
+  height: 10px;
+  border-right: 1px solid var(--text-secondary);
+  border-bottom: 1px solid var(--text-secondary);
+  content: "";
+  opacity: 0.7;
 }
 
 .saved-project-facts-status {

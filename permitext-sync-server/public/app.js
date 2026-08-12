@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v21";
+} from "./research-progress.js?v=20260812-research-progress-v24";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v21";
+} from "./offline-storage.js?v=20260812-research-progress-v24";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -22544,6 +22544,37 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   description.placeholder = "Add occupancy, construction type, height, existing conditions, proposed work, relevant dates, and other Project facts";
   description.rows = 2;
   description.setAttribute("aria-label", "Project description and facts");
+  const descriptionResizeHandle = document.createElement("div");
+  descriptionResizeHandle.className = "saved-project-fact-resize-handle";
+  descriptionResizeHandle.setAttribute("role", "separator");
+  descriptionResizeHandle.setAttribute("aria-label", "Resize Project description and facts");
+  descriptionResizeHandle.setAttribute("aria-orientation", "horizontal");
+  descriptionResizeHandle.tabIndex = 0;
+  const resizeDescriptionTo = (height) => {
+    const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
+    description.style.height = `${Math.max(72, Math.min(maximumHeight, height))}px`;
+  };
+  descriptionResizeHandle.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    const startY = event.clientY;
+    const startHeight = description.getBoundingClientRect().height;
+    descriptionResizeHandle.setPointerCapture(event.pointerId);
+    const resize = (moveEvent) => resizeDescriptionTo(startHeight + moveEvent.clientY - startY);
+    const finish = () => {
+      window.removeEventListener("pointermove", resize);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
+    };
+    window.addEventListener("pointermove", resize);
+    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", finish);
+  });
+  descriptionResizeHandle.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+    event.preventDefault();
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    resizeDescriptionTo(description.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
+  });
 
   const status = document.createElement("span");
   status.className = "saved-project-facts-status";
@@ -22556,10 +22587,6 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   };
   let saved = { ...initial };
   let saveSequence = Promise.resolve();
-  const resizeDescription = () => {
-    description.style.height = "auto";
-    description.style.height = `${Math.max(description.scrollHeight, 38)}px`;
-  };
   const save = () => {
     const next = {
       address: address.value.trim(),
@@ -22588,12 +22615,10 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   const restore = (control, value) => {
     control.value = value;
     control.blur();
-    resizeDescription();
   };
 
   address.addEventListener("blur", save);
   description.addEventListener("blur", save);
-  description.addEventListener("input", resizeDescription);
   address.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -22618,10 +22643,9 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     description.disabled = true;
     address.title = description.title = "Project facts are read-only in this shared Project";
   }
-  body.append(address, description, status);
+  body.append(address, description, descriptionResizeHandle, status);
   container.append(heading, body);
   wireProjectSectionMotion(container, body, [toggle, chevron], "Project facts", false);
-  requestAnimationFrame(resizeDescription);
 }
 
 async function appendSavedProjectResearchConversations(container, identity) {
