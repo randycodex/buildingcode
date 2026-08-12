@@ -11940,7 +11940,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-card-list-resize-handle {
   position: relative;
   display: none;
-  height: 16px;
+  height: 5px;
   cursor: row-resize;
   touch-action: none;
 }
@@ -11952,7 +11952,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-card-list-resize-handle::after {
   position: absolute;
   right: var(--space-3);
-  bottom: 3px;
+  bottom: 0;
   left: var(--space-3);
   height: 1px;
   background: var(--border);
