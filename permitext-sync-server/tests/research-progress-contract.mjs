@@ -93,6 +93,9 @@ assert.match(styleSource, /workspace-panel:not\(\.reader-panel\) \.research-prog
 assert.match(styleSource, /workspace-panel:not\(\.reader-panel\) \.research-progress-elapsed\s*\{[\s\S]*?font-size: 10px !important;[\s\S]*?font-weight: 400;/);
 assert(styleSource.includes("grid-template-columns: repeat(3, 2px)"));
 assert(!styleSource.includes("research-progress-shimmer"), "Research status text still uses a blinking shimmer animation.");
+assert.match(styleSource, /\.research-message\.is-assistant\.is-pending\s*\{\s*min-block-size: 0;/);
+assert.match(styleSource, /\.research-progress-loading\s*\{[\s\S]*?grid-template-columns: auto auto;[\s\S]*?justify-content: end;/);
+assert.match(styleSource, /\.research-progress-elapsed\s*\{[\s\S]*?grid-column: 1 \/ -1;[\s\S]*?justify-self: end;/);
 assert(styleSource.includes("@media (prefers-reduced-motion: reduce)"));
 
 console.log("permitext research progress contract passed");
