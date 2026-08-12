@@ -13013,6 +13013,60 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   resize: vertical;
 }
 
+.report-introduction-section {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.report-introduction-label {
+  margin: 0;
+}
+
+.report-introduction-label {
+  width: fit-content;
+  cursor: help;
+}
+
+.report-draft-panel [data-report-help] {
+  position: relative;
+}
+
+.report-draft-panel [data-report-help]::after {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  width: min(280px, calc(100vw - 40px));
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-card);
+  content: attr(data-report-help);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.report-draft-panel [data-report-help]:hover::after,
+.report-draft-panel [data-report-help]:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-draft-panel [data-report-help]::after {
+    transition: none;
+  }
+}
+
 .report-draft-add-controls,
 .report-draft-primary-actions {
   display: flex;

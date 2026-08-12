@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-content-collapse-v73";
+} from "./research-progress.js?v=20260812-report-header-help-v75";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-content-collapse-v73";
+} from "./offline-storage.js?v=20260812-report-header-help-v75";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19272,6 +19272,22 @@ async function renderProjectReportDraft(project) {
   let disposed = false;
   let draggedReportBlock = null;
   const reportSourceGroupExpanded = new Map();
+  const reportHeaderHelp = Object.freeze({
+    "Report introduction": "Briefly explain what this Report addresses, the relevant Project condition, and any important limitations.",
+    "Report content": "Review and reorder the authored text and Project sources included in this Report.",
+    "Project facts": "Project address and facts are included automatically in the Report.",
+    "Saved evidence": "Add enacted passages saved to this Project as supporting evidence.",
+    Research: "Add the original question and supported conclusion from a Project Research conversation.",
+    "Notebook notes": "Add selected Project notes that provide useful context for the Report.",
+    "Permitext Project Report": "Preview how the current Report will be assembled for export.",
+    "Immutable Report history": "Open or download previously generated, dated Report versions."
+  });
+  const applyReportHeaderHelp = (element, label) => {
+    const help = reportHeaderHelp[label];
+    if (!help) return;
+    element.dataset.reportHelp = help;
+    element.setAttribute("aria-description", help);
+  };
 
   const mountState = {
     panel,
@@ -19536,6 +19552,7 @@ async function renderProjectReportDraft(project) {
       title.type = "button";
       title.className = "project-section-toggle-label section-label report-source-group-toggle";
       title.textContent = label;
+      applyReportHeaderHelp(title, label);
       const toggle = document.createElement("button");
       toggle.type = "button";
       toggle.className = "project-section-toggle-chevron report-source-group-chevron";
@@ -19773,15 +19790,25 @@ async function renderProjectReportDraft(project) {
       activeDraft.title = titleInput.value;
       setDirty();
     });
+    const introductionSection = document.createElement("section");
+    introductionSection.className = "report-introduction-section";
+    const introductionLabel = document.createElement("label");
+    introductionLabel.className = "section-label report-introduction-label";
+    introductionLabel.textContent = "Report introduction";
+    introductionLabel.tabIndex = 0;
+    applyReportHeaderHelp(introductionLabel, "Report introduction");
     const introduction = document.createElement("textarea");
+    introduction.id = `report-introduction-${activeDraft.id || projectID}`;
     introduction.value = activeDraft.introduction || "";
-    introduction.placeholder = "Optional scope, purpose, and limitations";
-    introduction.setAttribute("aria-label", "Report scope and context");
+    introduction.placeholder = "Write the Report introduction";
+    introduction.setAttribute("aria-label", "Report introduction");
+    introductionLabel.htmlFor = introduction.id;
     introduction.addEventListener("input", () => {
       activeDraft.introduction = introduction.value;
       setDirty();
     });
-    metadata.append(titleInput, introduction);
+    introductionSection.append(introductionLabel, introduction);
+    metadata.append(titleInput, introductionSection);
 
     const addControls = document.createElement("div");
     addControls.className = "report-draft-add-controls";
@@ -19814,6 +19841,7 @@ async function renderProjectReportDraft(project) {
     blocksTitle.type = "button";
     blocksTitle.className = "project-section-toggle-label section-label report-draft-blocks-toggle";
     blocksTitle.textContent = "Report content";
+    applyReportHeaderHelp(blocksTitle, "Report content");
     const blocksToggle = document.createElement("button");
     blocksToggle.type = "button";
     blocksToggle.className = "project-section-toggle-chevron report-draft-blocks-chevron";
@@ -19904,6 +19932,7 @@ async function renderProjectReportDraft(project) {
       title.type = "button";
       title.className = "project-section-toggle-label section-label report-output-toggle";
       title.textContent = label;
+      applyReportHeaderHelp(title, label);
       const toggle = document.createElement("button");
       toggle.type = "button";
       toggle.className = "project-section-toggle-chevron report-output-chevron";
@@ -19922,7 +19951,7 @@ async function renderProjectReportDraft(project) {
       return section;
     };
     const previewSection = appendOutputDisclosure(
-      selectedTemplate?.coverLabel || "Report preview",
+      "Permitext Project Report",
       preview,
       "report-preview-section"
     );
