@@ -870,6 +870,10 @@ async function main() {
         workspaceScript.text.includes('appendSourceGroup("Project facts", ""') &&
         !workspaceScript.text.includes("Add a paragraph, heading, list, or Project source to begin the professional narrative.") &&
         workspaceScript.text.includes('appendSourceGroup("Saved evidence", ""') &&
+        workspaceScript.text.includes('codeGroup.className = `report-evidence-code-group code-theme-${codeTheme(prefix)}`') &&
+        workspaceScript.text.includes('codeTitle.textContent = prefix === "Other" ? "Other enacted codes" : codeLabel(prefix)') &&
+        workspaceScript.text.includes('const groupKey = `Saved evidence:${prefix}`') &&
+        workspaceScript.text.includes('{ numeric: true, sensitivity: "base" }') &&
         workspaceScript.text.includes('`code-theme-${codeTheme(source.codePrefix)}`') &&
         workspaceScript.text.includes('heading.textContent = [source.codePrefix || "Code", sectionNumber]') &&
         workspaceScript.text.includes('block.kind === "evidence" && source') &&
@@ -883,6 +887,8 @@ async function main() {
         !workspaceScript.text.includes('"Permitext Project Report",\n      preview,') &&
         workspaceScript.text.includes('"Immutable Report history"') &&
         workspaceStyles.text.includes(".report-source-group-body") &&
+        workspaceStyles.text.includes(".report-evidence-code-heading") &&
+        workspaceStyles.text.includes(".report-evidence-code-body") &&
         workspaceStyles.text.includes(".report-output-body") &&
         workspaceStyles.text.includes(".report-draft-block.is-drop-before") &&
         workspaceScript.text.includes('source.kind === "researchAnswer"') &&
@@ -1417,7 +1423,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-report-title-v86'),
+        webRoot.text.includes('/web/app.js?v=20260812-report-evidence-groups-v87'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1567,7 +1573,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-title-v86'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-evidence-groups-v87'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1834,7 +1840,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-title-v86'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-evidence-groups-v87'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

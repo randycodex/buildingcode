@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-title-v86";
+} from "./research-progress.js?v=20260812-report-evidence-groups-v87";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-title-v86";
+} from "./offline-storage.js?v=20260812-report-evidence-groups-v87";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19680,7 +19680,59 @@ async function renderProjectReportDraft(project) {
         empty.textContent = "No Saved Evidence is linked to this Project.";
         groupBody.append(empty);
       }
-      evidenceSources.forEach((source) => appendSourceCard(groupBody, source));
+      const codeOrder = new Map(codeOptions.map((option, index) => [option.prefix, index]));
+      const groupedEvidence = Array.from(
+        evidenceSources.reduce((groups, source) => {
+          const prefix = String(source.codePrefix || "Other").trim() || "Other";
+          if (!groups.has(prefix)) groups.set(prefix, []);
+          groups.get(prefix).push(source);
+          return groups;
+        }, new Map())
+      ).sort(([leftPrefix], [rightPrefix]) => {
+        const leftOrder = codeOrder.get(leftPrefix) ?? Number.MAX_SAFE_INTEGER;
+        const rightOrder = codeOrder.get(rightPrefix) ?? Number.MAX_SAFE_INTEGER;
+        return leftOrder - rightOrder || codeLabel(leftPrefix).localeCompare(codeLabel(rightPrefix));
+      });
+      groupedEvidence.forEach(([prefix, codeSources]) => {
+        const codeGroup = document.createElement("section");
+        codeGroup.className = `report-evidence-code-group code-theme-${codeTheme(prefix)}`;
+        const codeHeading = document.createElement("div");
+        codeHeading.className = "report-evidence-code-heading project-collapsible-heading";
+        const codeTitle = document.createElement("button");
+        codeTitle.type = "button";
+        codeTitle.className = "project-section-toggle-label section-label report-evidence-code-toggle";
+        codeTitle.textContent = prefix === "Other" ? "Other enacted codes" : codeLabel(prefix);
+        const codeToggle = document.createElement("button");
+        codeToggle.type = "button";
+        codeToggle.className = "project-section-toggle-chevron report-evidence-code-chevron";
+        codeToggle.innerHTML = researchChevronIconsSVG();
+        codeHeading.append(codeTitle, codeToggle);
+        const codeBody = document.createElement("div");
+        codeBody.className = "report-evidence-code-body";
+        codeSources
+          .sort((left, right) => String(left.sectionNumber || "").localeCompare(
+            String(right.sectionNumber || ""),
+            undefined,
+            { numeric: true, sensitivity: "base" }
+          ))
+          .forEach((source) => appendSourceCard(codeBody, source));
+        codeGroup.append(codeHeading, codeBody);
+        groupBody.append(codeGroup);
+        const groupKey = `Saved evidence:${prefix}`;
+        const initiallyExpanded = reportSourceGroupExpanded.get(groupKey) ?? true;
+        wireProjectSectionMotion(
+          codeGroup,
+          codeBody,
+          [codeTitle, codeToggle],
+          codeTitle.textContent,
+          initiallyExpanded,
+          {
+            onChange(expanded) {
+              reportSourceGroupExpanded.set(groupKey, expanded);
+            }
+          }
+        );
+      });
     });
 
     const researchSources = sources.filter((source) => source.kind === "researchAnswer");
