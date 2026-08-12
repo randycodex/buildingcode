@@ -190,7 +190,7 @@ assert.doesNotMatch(savedFolderContextSource, /loadProjectCoordinationFoundation
 assert.match(savedFolderContextSource, /previousContext\.replaceWith\(context\)/);
 assert.doesNotMatch(savedFolderContextSource, /previousContext\?\.remove\(\)[\s\S]*?const folder/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /addButton\.onclick[\s\S]*?projectsMenuToggle\.onclick[\s\S]*?archiveButton\.onclick/);
-assert.match(indexSource, /saved-projects-select-button[\s\S]*?saved-projects-add-button/);
+assert.match(indexSource, /saved-projects-add-button[\s\S]*?saved-projects-archive-button[\s\S]*?saved-projects-select-button/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /selectButton\.onclick = \(\) => setSelecting\(!selecting\)/);
 const savedProjectsSource = functionSource(appSource, "renderSavedProjects");
 assert.match(savedProjectsSource, /archiveSelectedButton\.onclick[\s\S]*?archiveProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)/);
