@@ -1301,8 +1301,8 @@ async function main() {
       "Search count no longer sits between the code filter list and the first result."
     );
     assert(
-      workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 100px;[\s\S]*?min-height: 100px;/) &&
-        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 3\.3em;[\s\S]*?-webkit-line-clamp: 3;/) &&
+      workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 112px;[\s\S]*?min-height: 112px;/) &&
+        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 4\.05em;[\s\S]*?line-height: 1\.35;[\s\S]*?-webkit-line-clamp: 3;/) &&
         workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \{[\s\S]*?grid-template-rows: minmax\(0, 1fr\);[\s\S]*?overflow: hidden;/) &&
         workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \.search-jump-list \{[\s\S]*?max-height: none;[\s\S]*?overflow-y: auto;/),
       "Recently Viewed previews should reserve three complete lines without clipping the last line."
@@ -1352,7 +1352,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-reset-column-widths-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-recently-viewed-spacing-v2'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1494,7 +1494,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-reset-column-widths-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-recently-viewed-spacing-v2'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1759,7 +1759,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-reset-column-widths-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-recently-viewed-spacing-v2'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2394,8 +2394,8 @@ async function main() {
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-x: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
         workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 100px;[\s\S]*?min-height: 100px;[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 100px;[\s\S]*?min-height: 100px;[\s\S]*?padding: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 112px;[\s\S]*?min-height: 112px;[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 112px;[\s\S]*?min-height: 112px;[\s\S]*?padding: var\(--space-1\);/) &&
         workspaceScript.text.includes('code.className = "search-jump-code"') &&
         workspaceScript.text.includes("isNestedListParagraph = !rawPreview && Boolean(titleWithoutNumber)") &&
         workspaceScript.text.includes('String(entry.sectionNumber || "Paragraph").trim()') &&
