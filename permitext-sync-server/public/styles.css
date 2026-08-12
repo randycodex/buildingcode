@@ -8508,7 +8508,7 @@ body.is-resizing-research-evidence * {
 
 .saved-projects-bulk-bar {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: var(--space-2);
   margin: var(--space-2);
@@ -8519,14 +8519,9 @@ body.is-resizing-research-evidence * {
   display: none;
 }
 
-.saved-projects-bulk-count,
 .saved-projects-bulk-link {
   font-size: calc(var(--chrome-font-size) * 0.66) !important;
   font-weight: 400;
-}
-
-.saved-projects-bulk-count {
-  color: var(--text-secondary);
 }
 
 .saved-projects-bulk-link {

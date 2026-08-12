@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-project-actions-order-v1";
+} from "./offline-storage.js?v=20260811-project-selection-counter-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -22963,8 +22963,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
   deleteSelectedButton.innerHTML = trashIconSVG();
   selectionActions.append(archiveSelectedButton, editSelectedButton, deleteSelectedButton);
-  const selectionCount = document.createElement("span");
-  selectionCount.className = "saved-projects-bulk-count";
   const selectAllButton = document.createElement("button");
   selectAllButton.type = "button";
   selectAllButton.className = "saved-projects-bulk-link";
@@ -22972,7 +22970,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   cancelSelectionButton.type = "button";
   cancelSelectionButton.className = "saved-projects-bulk-link";
   cancelSelectionButton.textContent = "Cancel";
-  bulkBar.append(selectionActions, selectionCount, selectAllButton, cancelSelectionButton);
+  bulkBar.append(selectionActions, selectAllButton, cancelSelectionButton);
   section.insertBefore(bulkBar, list);
   const projectsMenuLabel = (savedInstance) => {
     if (savedInstance.projectsMenuOpen) return "";
@@ -23024,7 +23022,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     selectButton.setAttribute("aria-label", selectButton.title);
     bulkBar.hidden = !selecting;
     const selectedCount = selectedProjectIDs.size;
-    selectionCount.textContent = `${selectedCount} selected`;
     selectAllButton.textContent = selectableIDs.length > 0 && selectedCount === selectableIDs.length
       ? "Clear all"
       : "Select all";

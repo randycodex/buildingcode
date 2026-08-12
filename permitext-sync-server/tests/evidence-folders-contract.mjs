@@ -195,6 +195,7 @@ assert.match(functionSource(appSource, "renderSavedProjects"), /selectButton\.on
 const savedProjectsSource = functionSource(appSource, "renderSavedProjects");
 assert.match(savedProjectsSource, /archiveSelectedButton\.onclick[\s\S]*?archiveProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)/);
 assert.match(savedProjectsSource, /selectionActions\.append\(archiveSelectedButton, editSelectedButton, deleteSelectedButton\)[\s\S]*?section\.insertBefore\(bulkBar, list\)/);
+assert.doesNotMatch(savedProjectsSource, /saved-projects-bulk-count|selectionCount/);
 assert.match(savedProjectsSource, /if \(showingArchived\) \{[\s\S]*?restoreArchivedProject\(project\)/);
 assert.match(savedProjectsSource, /editSelectedButton\.onclick[\s\S]*?selectedProjects\.length !== 1[\s\S]*?showProjectCreateSheet\(panel, selectedProjects\[0\]\)/);
 assert.match(savedProjectsSource, /deleteSelectedButton\.onclick[\s\S]*?deleteArchivedProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)/);
