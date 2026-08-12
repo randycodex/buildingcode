@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-notebook-list-copy-v70";
+} from "./research-progress.js?v=20260812-report-content-heading-v71";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-notebook-list-copy-v70";
+} from "./offline-storage.js?v=20260812-report-content-heading-v71";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19807,6 +19807,10 @@ async function renderProjectReportDraft(project) {
 
     const blocks = document.createElement("section");
     blocks.className = "report-draft-blocks";
+    const blocksHeading = document.createElement("p");
+    blocksHeading.className = "section-label report-draft-blocks-heading";
+    blocksHeading.textContent = "Report content";
+    blocks.append(blocksHeading);
     renderBlockEditor(blocks);
     const sourcePalette = document.createElement("section");
     sourcePalette.className = "report-source-palette";
