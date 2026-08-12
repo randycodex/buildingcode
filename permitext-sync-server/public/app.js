@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-idle-hidden-v60";
+} from "./research-progress.js?v=20260812-report-floating-menu-v61";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-idle-hidden-v60";
+} from "./offline-storage.js?v=20260812-report-floating-menu-v61";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -4942,10 +4942,12 @@ function enhanceSelect(select) {
   menu.className = "custom-select-menu";
   const readerCodeMenu = select.classList.contains("code-select");
   const readerChapterMenu = select.classList.contains("chapter-select");
+  const reportDraftMenu = select.classList.contains("report-draft-select");
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
   menu.classList.toggle("reader-chapter-select-menu", readerChapterMenu);
+  menu.classList.toggle("report-draft-select-menu", reportDraftMenu);
   menu.dataset.floatingSelect = "true";
   menu.hidden = true;
   select._customSelectMenu = menu;
@@ -19646,11 +19648,13 @@ async function renderProjectReportDraft(project) {
 
   function renderWorkspaceContent() {
     if (disposed) return;
+    resetEnhancedSelects(shell);
     shell.querySelectorAll(":scope > :not(.report-draft-status)").forEach((element) => element.remove());
 
     const draftPicker = document.createElement("div");
     draftPicker.className = "report-draft-picker";
     const select = document.createElement("select");
+    select.className = "report-draft-select";
     select.setAttribute("aria-label", "Report");
     const currentOption = document.createElement("option");
     currentOption.value = activeDraft.id || "";
@@ -19828,6 +19832,7 @@ async function renderProjectReportDraft(project) {
       preview,
       historySection
     );
+    enhanceSelect(select);
   }
 
   try {

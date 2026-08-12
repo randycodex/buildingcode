@@ -2164,12 +2164,40 @@ label {
 }
 
 .reader-code-select-menu,
-.reader-chapter-select-menu {
+.reader-chapter-select-menu,
+.report-draft-select-menu {
   box-sizing: border-box;
   padding: clamp(14px, 2vw, 20px);
   border-radius: clamp(22px, 4vw, 30px);
   background: var(--menu-surface);
   box-shadow: none;
+}
+
+.report-draft-picker .custom-select {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+}
+
+.report-draft-picker .custom-select-trigger {
+  min-height: 22px;
+  font-weight: 700;
+}
+
+.report-draft-select-menu .custom-select-option {
+  min-height: 34px;
+  padding: 7px var(--space-2);
+  border-radius: var(--radius-control);
+  color: var(--text-secondary);
+  line-height: 1.25;
+}
+
+.report-draft-select-menu .custom-select-option[aria-selected="true"] {
+  background: color-mix(in srgb, var(--project-color) 14%, transparent);
+  color: var(--text-primary);
+  font-weight: 650;
 }
 
 .reader-code-select-menu .custom-select-group-label {

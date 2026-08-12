@@ -848,6 +848,10 @@ async function main() {
         workspaceScript.text.includes('currentOption.textContent = activeDraft.id') &&
         workspaceScript.text.includes(': "Current Report"') &&
         workspaceScript.text.includes('newOption.textContent = "Create new Report…"') &&
+        workspaceScript.text.includes('select.className = "report-draft-select"') &&
+        workspaceScript.text.includes("enhanceSelect(select)") &&
+        workspaceStyles.text.includes(".report-draft-select-menu") &&
+        workspaceStyles.text.includes(".report-draft-picker .custom-select") &&
         !workspaceScript.text.includes('dateInput.type = "date"') &&
         workspaceScript.text.includes('Date and time added automatically on export') &&
         workspaceScript.text.includes('appendGroupHeading("Project facts", "Included automatically from the active Project.")') &&
@@ -1386,7 +1390,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-report-idle-hidden-v60'),
+        webRoot.text.includes('/web/app.js?v=20260812-report-floating-menu-v61'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1428,11 +1432,11 @@ async function main() {
         workspaceScript.text.includes('selectPanel?.querySelector(".chapter-select + .custom-select .custom-select-trigger")') &&
         workspaceScript.text.includes("const verticalAnchorRect = chapterTrigger?.getBoundingClientRect() || rect") &&
         workspaceScript.text.includes("window.innerHeight - menuTop - menuBottomGap") &&
-        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu {\n  box-sizing: border-box;\n  padding: clamp(14px, 2vw, 20px);\n  border-radius: clamp(22px, 4vw, 30px);") &&
+        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu,\n.report-draft-select-menu {\n  box-sizing: border-box;\n  padding: clamp(14px, 2vw, 20px);\n  border-radius: clamp(22px, 4vw, 30px);") &&
         workspaceStyles.text.includes("--menu-surface: #121213;") &&
         workspaceStyles.text.includes("--menu-subtle-surface: #121213;") &&
         workspaceStyles.text.includes("--saved-projects-card-radius: 22px;") &&
-        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu {") &&
+        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu,\n.report-draft-select-menu {") &&
         workspaceStyles.text.includes("background: var(--menu-surface);") &&
         workspaceStyles.text.includes(".reader-code-select-menu .custom-select-group-label {") &&
         workspaceStyles.text.includes(".reader-trust {\n  position: static;") &&
@@ -1536,7 +1540,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-idle-hidden-v60'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-floating-menu-v61'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1803,7 +1807,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-idle-hidden-v60'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-floating-menu-v61'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
