@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-notebook-empty-copy-v69";
+} from "./research-progress.js?v=20260812-notebook-list-copy-v70";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-notebook-empty-copy-v69";
+} from "./offline-storage.js?v=20260812-notebook-list-copy-v70";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18587,20 +18587,18 @@ async function renderProjectNotebook(project) {
     function renderCardList() {
       cardList.replaceChildren();
       if (!cards.length) {
-        const empty = document.createElement("p");
-        empty.className = "notebook-card-list-empty";
-        empty.textContent = "Create a card for a question, finding, decision, or coordination item.";
-        cardList.append(empty);
         updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
         updateNotebookCardManagement();
         return;
       }
       const visibleCards = cards.filter((card) => Boolean(card.archivedAt) === showingArchivedCards);
       if (!visibleCards.length) {
-        const empty = document.createElement("p");
-        empty.className = "notebook-card-list-empty";
-        empty.textContent = showingArchivedCards ? "No archived notes." : "Create a card for a question, finding, decision, or coordination item.";
-        cardList.append(empty);
+        if (showingArchivedCards) {
+          const empty = document.createElement("p");
+          empty.className = "notebook-card-list-empty";
+          empty.textContent = "No archived notes.";
+          cardList.append(empty);
+        }
         updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
         updateNotebookCardManagement();
         return;
