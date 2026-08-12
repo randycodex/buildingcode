@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-evidence-pane-v1";
+} from "./offline-storage.js?v=20260811-research-history-groups-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -377,6 +377,7 @@ const globalWorkspaceStateKeys = [
   "recentChaptersByCode",
   "readerSettings",
   "savedTextSize",
+  "researchHistoryGroupExpansion",
   "researchEvidenceSplitRatios",
   "detachedWorkboards"
 ];
@@ -587,6 +588,12 @@ function loadWorkspaceState() {
       readerSettings: normalizeReaderSettings(saved.readerSettings),
       savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
       researchConversationID: typeof saved.researchConversationID === "string" ? saved.researchConversationID : "",
+      researchHistoryGroupExpansion: saved.researchHistoryGroupExpansion && typeof saved.researchHistoryGroupExpansion === "object"
+        ? Object.fromEntries(
+            Object.entries(saved.researchHistoryGroupExpansion)
+              .filter(([groupID, expanded]) => typeof groupID === "string" && typeof expanded === "boolean")
+          )
+        : {},
       researchEvidenceSplitRatios: saved.researchEvidenceSplitRatios && typeof saved.researchEvidenceSplitRatios === "object"
         ? Object.fromEntries(
             Object.entries(saved.researchEvidenceSplitRatios)
@@ -676,6 +683,7 @@ function loadWorkspaceState() {
       readerSettings: { ...defaultReaderSettings },
       savedTextSize: 10,
       researchConversationID: "",
+      researchHistoryGroupExpansion: {},
       researchEvidenceSplitRatios: {},
       workboards: [],
       notebooks: [],
@@ -14120,6 +14128,55 @@ function researchConversationDate(value) {
   }).format(new Date(timestamp));
 }
 
+function researchHistoryDayIndex(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (!Number.isFinite(date.getTime())) return null;
+  return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000);
+}
+
+function researchConversationHistoryGroups(conversations = [], now = new Date()) {
+  const todayIndex = researchHistoryDayIndex(now);
+  const currentYear = now.getFullYear();
+  const monthFormatter = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" });
+  const groups = new Map();
+  const orderedConversations = [...conversations].sort((left, right) =>
+    String(right.createdAt || "").localeCompare(String(left.createdAt || ""))
+  );
+  orderedConversations.forEach((conversation) => {
+    const created = new Date(conversation.createdAt);
+    const createdDayIndex = researchHistoryDayIndex(created);
+    const ageInDays = todayIndex === null || createdDayIndex === null
+      ? Number.POSITIVE_INFINITY
+      : Math.max(0, todayIndex - createdDayIndex);
+    let id;
+    let label;
+    let defaultExpanded = false;
+    if (ageInDays < 7) {
+      id = "last-7-days";
+      label = "Last 7 days";
+      defaultExpanded = true;
+    } else if (ageInDays < 14) {
+      id = "previous-7-days";
+      label = "Previous 7 days";
+    } else if (ageInDays < 30) {
+      id = "previous-30-days";
+      label = "Previous 30 days";
+    } else if (Number.isFinite(created.getTime()) && created.getFullYear() === currentYear) {
+      id = `month-${created.getFullYear()}-${String(created.getMonth() + 1).padStart(2, "0")}`;
+      label = monthFormatter.format(created);
+    } else if (Number.isFinite(created.getTime())) {
+      id = `year-${created.getFullYear()}`;
+      label = String(created.getFullYear());
+    } else {
+      id = "older";
+      label = "Older";
+    }
+    if (!groups.has(id)) groups.set(id, { id, label, defaultExpanded, conversations: [] });
+    groups.get(id).conversations.push(conversation);
+  });
+  return Array.from(groups.values());
+}
+
 function researchProjects() {
   return activeProjectRecords(currentContentSummary().projects || []);
 }
@@ -15372,7 +15429,36 @@ async function renderResearch(paneID = "utility:analysis") {
   listHeading.className = "research-conversation-list-heading";
   listHeading.textContent = "Previous chats";
   content.append(listHeading);
-  researchConversationList.forEach((initialConversation) => {
+  researchConversationHistoryGroups(researchConversationList).forEach((historyGroup) => {
+    const group = document.createElement("section");
+    group.className = "research-history-group";
+    group.dataset.historyGroup = historyGroup.id;
+    const groupHeading = document.createElement("div");
+    groupHeading.className = "research-history-group-heading";
+    const groupLabel = document.createElement("button");
+    groupLabel.className = "research-history-group-label";
+    groupLabel.type = "button";
+    groupLabel.textContent = historyGroup.label;
+    const groupCount = document.createElement("span");
+    groupCount.className = "research-history-group-count";
+    groupCount.textContent = String(historyGroup.conversations.length);
+    groupCount.setAttribute(
+      "aria-label",
+      `${historyGroup.conversations.length} ${historyGroup.conversations.length === 1 ? "conversation" : "conversations"}`
+    );
+    const groupToggle = document.createElement("button");
+    groupToggle.className = "project-section-toggle-chevron research-history-group-chevron";
+    groupToggle.type = "button";
+    groupToggle.innerHTML = researchChevronIconsSVG();
+    const groupBody = document.createElement("div");
+    groupBody.className = "research-history-group-body";
+    groupBody.id = `research-history-${historyGroup.id}`;
+    groupLabel.setAttribute("aria-controls", groupBody.id);
+    groupToggle.setAttribute("aria-controls", groupBody.id);
+    groupHeading.append(groupLabel, groupCount, groupToggle);
+    group.append(groupHeading, groupBody);
+
+    historyGroup.conversations.forEach((initialConversation) => {
     let conversation = initialConversation;
     const row = document.createElement("article");
     row.className = "research-conversation-row";
@@ -15642,7 +15728,31 @@ async function renderResearch(paneID = "utility:analysis") {
       row.append(openButton, actions, projectSelectWrap);
     };
     renderRow();
-    list.append(row);
+    groupBody.append(row);
+    });
+
+    const storedExpanded = state.researchHistoryGroupExpansion?.[historyGroup.id];
+    const containsActiveConversation = historyGroup.conversations.some((conversation) =>
+      conversation.id === state.researchConversationID
+    );
+    const initialExpanded = typeof storedExpanded === "boolean"
+      ? storedExpanded
+      : historyGroup.defaultExpanded || containsActiveConversation;
+    wireProjectSectionMotion(
+      group,
+      groupBody,
+      [groupLabel, groupToggle],
+      historyGroup.label,
+      initialExpanded,
+      {
+        onChange: (expanded) => {
+          state.researchHistoryGroupExpansion ||= {};
+          state.researchHistoryGroupExpansion[historyGroup.id] = expanded;
+          saveWorkspaceState();
+        }
+      }
+    );
+    list.append(group);
   });
   content.append(list);
   return panel;
