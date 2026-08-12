@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-alignment-v77";
+} from "./research-progress.js?v=20260812-report-alignment-v78";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-alignment-v77";
+} from "./offline-storage.js?v=20260812-report-alignment-v78";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19279,7 +19279,6 @@ async function renderProjectReportDraft(project) {
     "Saved evidence": "Add enacted passages saved to this Project as supporting evidence.",
     Research: "Add the original question and supported conclusion from a Project Research conversation.",
     "Notebook notes": "Add selected Project notes that provide useful context for the Report.",
-    "Permitext Project Report": "Preview how the current Report will be assembled for export.",
     "Immutable Report history": "Open or download previously generated, dated Report versions."
   });
   const createReportHeaderHelp = (label) => {
@@ -19920,28 +19919,6 @@ async function renderProjectReportDraft(project) {
     });
     primaryActions.append(save, generate, coordinate);
 
-    const preview = document.createElement("section");
-    preview.className = "report-draft-preview";
-    const selectedTemplate = (reportOptions.templates || []).find((template) =>
-      template.id === selectedReportTemplateID
-    );
-    const previewHeading = document.createElement("h3");
-    previewHeading.textContent = activeDraft.title || "Untitled Report";
-    const previewMeta = document.createElement("p");
-    previewMeta.textContent = `${identity.name} · Date and time added automatically on export`;
-    preview.append(previewHeading, previewMeta);
-    if (activeDraft.introduction) {
-      const paragraph = document.createElement("p");
-      paragraph.textContent = activeDraft.introduction;
-      preview.append(paragraph);
-    }
-    activeDraft.blocks.slice(0, 12).forEach((block) => {
-      const row = document.createElement(block.kind === "heading" ? "h4" : "p");
-      row.textContent = reportBlockTitle(block);
-      row.className = `report-preview-${block.kind}`;
-      preview.append(row);
-    });
-
     const appendOutputDisclosure = (label, body, className) => {
       const section = document.createElement("section");
       section.className = `report-output-section ${className}`;
@@ -19971,11 +19948,6 @@ async function renderProjectReportDraft(project) {
       });
       return section;
     };
-    const previewSection = appendOutputDisclosure(
-      "Permitext Project Report",
-      preview,
-      "report-preview-section"
-    );
     const historyBody = document.createElement("div");
     historyBody.className = "report-history";
     renderHistory(historyBody);
@@ -19991,7 +19963,6 @@ async function renderProjectReportDraft(project) {
       blocks,
       sourcePalette,
       primaryActions,
-      previewSection,
       historySection
     );
     enhanceSelect(select);
