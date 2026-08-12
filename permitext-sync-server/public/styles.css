@@ -5966,12 +5966,6 @@ mark {
   display: grid;
 }
 
-.research-conversation-list-heading {
-  margin: var(--space-5) 0 var(--space-1);
-  color: var(--text-primary);
-  font-size: 0.9rem;
-}
-
 .research-history-group {
   display: grid;
 }

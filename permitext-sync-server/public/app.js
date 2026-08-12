@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-new-chat-button-v1";
+} from "./offline-storage.js?v=20260811-research-history-heading-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15391,10 +15391,6 @@ async function renderResearch(paneID = "utility:analysis") {
 
   const list = document.createElement("section");
   list.className = "research-conversation-list";
-  const listHeading = document.createElement("h3");
-  listHeading.className = "research-conversation-list-heading";
-  listHeading.textContent = "Previous chats";
-  content.append(listHeading);
   researchConversationHistoryGroups(researchConversationList).forEach((historyGroup) => {
     const group = document.createElement("section");
     group.className = "research-history-group";
