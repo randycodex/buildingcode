@@ -13088,6 +13088,19 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   font-size: 10px !important;
 }
 
+.report-draft-block-actions .report-draft-block-remove {
+  display: inline-grid;
+  width: 30px;
+  min-width: 30px;
+  padding: 6px;
+  place-items: center;
+}
+
+.report-draft-block-remove svg {
+  width: 14px;
+  height: 14px;
+}
+
 .report-draft-block textarea {
   min-height: 90px;
   resize: vertical;

@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-template-menu-v62";
+} from "./research-progress.js?v=20260812-report-delete-icon-v63";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-template-menu-v62";
+} from "./offline-storage.js?v=20260812-report-delete-icon-v63";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19417,7 +19417,10 @@ async function renderProjectReportDraft(project) {
       });
       const remove = document.createElement("button");
       remove.type = "button";
-      remove.textContent = "Remove";
+      remove.className = "report-draft-block-remove";
+      remove.title = "Remove Report item";
+      remove.setAttribute("aria-label", "Remove Report item");
+      remove.innerHTML = trashIconSVG();
       remove.addEventListener("click", () => {
         activeDraft.blocks.splice(index, 1);
         setDirty();
