@@ -223,6 +223,17 @@ assert.ok(
     functionSource(appSource, "performSavedPanelHydration").indexOf("renderSavedProjects"),
   "Saved tiles and context must swap in the same render turn after the Project foundation is ready."
 );
+const renderSavedSource = functionSource(appSource, "renderSaved");
+assert.ok(
+  renderSavedSource.indexOf("renderSavedProjects(") >= 0 &&
+    renderSavedSource.indexOf("renderSavedProjects(") < renderSavedSource.indexOf("requestAnimationFrame("),
+  "Projects should render from the cached content summary before deferred Saved hydration."
+);
+assert.match(
+  functionSource(appSource, "renderSavedProjects"),
+  /section\.querySelector\("\.saved-projects-bulk-bar"\)\?\.remove\(\)/,
+  "Refreshing cached Projects should replace the existing bulk-selection controls instead of duplicating them."
+);
 [
   "detachProjectWorkboard",
   "reattachProjectWorkboard"

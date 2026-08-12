@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-group-counter-v1";
+} from "./offline-storage.js?v=20260811-project-card-first-frame-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -13888,8 +13888,7 @@ function sharedProjectsFromOrganizations(workspace = organizationWorkspace) {
   );
 }
 
-async function projectsWithOrganizationAccess(projects = []) {
-  const workspace = await loadOrganizationWorkspace();
+function mergeProjectsWithOrganizationAccess(projects = [], workspace = organizationWorkspace) {
   const sharedProjects = sharedProjectsFromOrganizations(workspace);
   const sharedByID = new Map(sharedProjects.map((project) => [String(project.id), project]));
   const localIDs = new Set();
@@ -13903,6 +13902,11 @@ async function projectsWithOrganizationAccess(projects = []) {
     if (!localIDs.has(projectDetailKey(project))) combined.push(project);
   });
   return combined;
+}
+
+async function projectsWithOrganizationAccess(projects = []) {
+  const workspace = await loadOrganizationWorkspace();
+  return mergeProjectsWithOrganizationAccess(projects, workspace);
 }
 
 async function downloadProjectReportFile(projectID, file, title = "Permitext Project Report") {
@@ -22928,6 +22932,14 @@ async function renderSaved(instance) {
   clear(content);
   appendMutedRow(content, "Loading saved content", "Projects, bookmarks, notes, and tags will appear here.");
   renderSavedPlanUsage(panel.querySelector(".saved-plan-usage"));
+  const summary = currentContentSummary();
+  renderSavedProjects(
+    panel,
+    savedInstance,
+    paneID,
+    mergeProjectsWithOrganizationAccess(summary.projects || []),
+    summary.projectSections || []
+  );
   requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID));
 
   return panel;
@@ -22939,6 +22951,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const selectButton = panel.querySelector(".saved-projects-select-button");
   const addButton = panel.querySelector(".saved-projects-add-button");
   const archiveButton = panel.querySelector(".saved-projects-archive-button");
+  section.querySelector(".saved-projects-bulk-bar")?.remove();
   let showingArchived = Boolean(instance.projectsArchiveMode);
   let selecting = false;
   let selectionBusy = false;
