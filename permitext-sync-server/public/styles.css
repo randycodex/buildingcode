@@ -13024,7 +13024,44 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-introduction-label {
   width: fit-content;
+}
+
+.report-introduction-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.report-header-info {
+  position: relative;
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  margin-left: auto;
+  padding: 3px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-muted);
   cursor: help;
+}
+
+.report-header-info:hover,
+.report-header-info:focus-visible {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.report-header-info svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .report-draft-panel [data-report-help] {
@@ -13035,7 +13072,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   position: absolute;
   z-index: 20;
   top: calc(100% + var(--space-2));
-  left: 0;
+  right: 0;
   width: min(280px, calc(100vw - 40px));
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border-subtle);

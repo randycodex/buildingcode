@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-header-help-v75";
+} from "./research-progress.js?v=20260812-report-info-icons-v76";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-header-help-v75";
+} from "./offline-storage.js?v=20260812-report-info-icons-v76";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19282,11 +19282,23 @@ async function renderProjectReportDraft(project) {
     "Permitext Project Report": "Preview how the current Report will be assembled for export.",
     "Immutable Report history": "Open or download previously generated, dated Report versions."
   });
-  const applyReportHeaderHelp = (element, label) => {
+  const createReportHeaderHelp = (label) => {
     const help = reportHeaderHelp[label];
-    if (!help) return;
-    element.dataset.reportHelp = help;
-    element.setAttribute("aria-description", help);
+    if (!help) return null;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "report-header-info";
+    button.dataset.reportHelp = help;
+    button.setAttribute("aria-label", `About ${label}`);
+    button.setAttribute("aria-description", help);
+    button.innerHTML = `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M12 16v-4"></path>
+        <path d="M12 8h.01"></path>
+      </svg>
+    `;
+    return button;
   };
 
   const mountState = {
@@ -19552,12 +19564,14 @@ async function renderProjectReportDraft(project) {
       title.type = "button";
       title.className = "project-section-toggle-label section-label report-source-group-toggle";
       title.textContent = label;
-      applyReportHeaderHelp(title, label);
+      const info = createReportHeaderHelp(label);
       const toggle = document.createElement("button");
       toggle.type = "button";
       toggle.className = "project-section-toggle-chevron report-source-group-chevron";
       toggle.innerHTML = researchChevronIconsSVG();
-      heading.append(title, toggle);
+      heading.append(title);
+      if (info) heading.append(info);
+      heading.append(toggle);
       const body = document.createElement("div");
       body.className = "report-source-group-body";
       if (description) {
@@ -19792,11 +19806,12 @@ async function renderProjectReportDraft(project) {
     });
     const introductionSection = document.createElement("section");
     introductionSection.className = "report-introduction-section";
+    const introductionHeading = document.createElement("div");
+    introductionHeading.className = "report-introduction-heading";
     const introductionLabel = document.createElement("label");
     introductionLabel.className = "section-label report-introduction-label";
     introductionLabel.textContent = "Report introduction";
-    introductionLabel.tabIndex = 0;
-    applyReportHeaderHelp(introductionLabel, "Report introduction");
+    const introductionInfo = createReportHeaderHelp("Report introduction");
     const introduction = document.createElement("textarea");
     introduction.id = `report-introduction-${activeDraft.id || projectID}`;
     introduction.value = activeDraft.introduction || "";
@@ -19807,7 +19822,9 @@ async function renderProjectReportDraft(project) {
       activeDraft.introduction = introduction.value;
       setDirty();
     });
-    introductionSection.append(introductionLabel, introduction);
+    introductionHeading.append(introductionLabel);
+    if (introductionInfo) introductionHeading.append(introductionInfo);
+    introductionSection.append(introductionHeading, introduction);
     metadata.append(titleInput, introductionSection);
 
     const addControls = document.createElement("div");
@@ -19841,12 +19858,14 @@ async function renderProjectReportDraft(project) {
     blocksTitle.type = "button";
     blocksTitle.className = "project-section-toggle-label section-label report-draft-blocks-toggle";
     blocksTitle.textContent = "Report content";
-    applyReportHeaderHelp(blocksTitle, "Report content");
+    const blocksInfo = createReportHeaderHelp("Report content");
     const blocksToggle = document.createElement("button");
     blocksToggle.type = "button";
     blocksToggle.className = "project-section-toggle-chevron report-draft-blocks-chevron";
     blocksToggle.innerHTML = researchChevronIconsSVG();
-    blocksHeading.append(blocksTitle, blocksToggle);
+    blocksHeading.append(blocksTitle);
+    if (blocksInfo) blocksHeading.append(blocksInfo);
+    blocksHeading.append(blocksToggle);
     const blocksBody = document.createElement("div");
     blocksBody.className = "report-draft-blocks-body";
     renderBlockEditor(blocksBody);
@@ -19932,12 +19951,14 @@ async function renderProjectReportDraft(project) {
       title.type = "button";
       title.className = "project-section-toggle-label section-label report-output-toggle";
       title.textContent = label;
-      applyReportHeaderHelp(title, label);
+      const info = createReportHeaderHelp(label);
       const toggle = document.createElement("button");
       toggle.type = "button";
       toggle.className = "project-section-toggle-chevron report-output-chevron";
       toggle.innerHTML = researchChevronIconsSVG();
-      heading.append(title, toggle);
+      heading.append(title);
+      if (info) heading.append(info);
+      heading.append(toggle);
       const disclosureBody = document.createElement("div");
       disclosureBody.className = "report-output-body";
       disclosureBody.append(body);
