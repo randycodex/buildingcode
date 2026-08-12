@@ -1306,7 +1306,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-research-relevance-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-workboard-deferred-v2'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -2794,6 +2794,10 @@ async function main() {
     );
     assert(
       webRoot.text.includes('id="toggle-workboard"') &&
+        webRoot.text.includes('data-deferred-feature="workboard" hidden') &&
+        workspaceScript.text.includes("workboard: false") &&
+        workspaceScript.text.includes('toggleWorkboardButton.style.display = releaseSurfaceVisibility.workboard ? "" : "none"') &&
+        workspaceScript.text.includes("if (!releaseSurfaceVisibility.workboard && !detachedProjectWindow) return false;") &&
         workspaceScript.text.includes('id: "permitext-generic-workboard"') &&
         workspaceScript.text.includes("const syncEnabled = !isGeneric && Boolean(activeAccount())") &&
         workspaceScript.text.includes("saveSyncedBoard: isGeneric ? null : saveSyncedWorkboard") &&
@@ -2801,7 +2805,7 @@ async function main() {
         !workspaceScript.text.includes('workboardButton.textContent = "Workboard"') &&
         !iosBookmarksSource.includes("Workboard editing stays on the web") &&
         !iosOrganizationProjectHubSource.includes("Workboard preview"),
-      "Workboard must be a local-only web toolbar tool, outside Projects and iOS."
+      "Deferred Workboard must stay hidden from web and iOS while its implementation and data compatibility remain preserved."
     );
     assert(
       workspaceScript.text.includes("function placeProjectToolPaneLast(detail, paneID)") &&

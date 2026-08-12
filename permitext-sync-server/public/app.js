@@ -191,6 +191,11 @@ import {
 } from "./code-question-legacy.js?v=20260806-code-question-legacy-v1";
 
 const permitextSyncSchemaVersion = 2;
+const releaseSurfaceVisibility = Object.freeze({
+  // Preserved for data, report, and restoration compatibility. See
+  // docs/PERMITEXT_DEFERRED_FEATURES.md before changing this release boundary.
+  workboard: false
+});
 const permitextClientCapabilities = Object.freeze([
   "saved-work",
   "notes",
@@ -214,7 +219,6 @@ const defaultToolbarButtonIDs = Object.freeze([
   "toggle-search",
   "toggle-saved",
   "toggle-analysis",
-  "toggle-workboard",
   "toggle-settings",
   "fit-columns",
   "collapse-readers"
@@ -260,6 +264,12 @@ const toggleAnalysisButton = document.querySelector("#toggle-analysis") || (() =
   return button;
 })();
 const toggleWorkboardButton = document.querySelector("#toggle-workboard");
+if (toggleWorkboardButton) {
+  toggleWorkboardButton.hidden = !releaseSurfaceVisibility.workboard;
+  toggleWorkboardButton.disabled = !releaseSurfaceVisibility.workboard;
+  toggleWorkboardButton.style.display = releaseSurfaceVisibility.workboard ? "" : "none";
+  toggleWorkboardButton.setAttribute("aria-hidden", String(!releaseSurfaceVisibility.workboard));
+}
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
@@ -580,7 +590,8 @@ function loadWorkspaceState() {
               .map(([conversationID, ratio]) => [conversationID, normalizeResearchEvidenceSplitRatio(ratio)])
           )
         : {},
-      workboards: savedWorkboards.some((item) => projectDetailMatches(genericWorkboardIdentity, item))
+      workboards: (releaseSurfaceVisibility.workboard || detachedProjectWindow) &&
+        savedWorkboards.some((item) => projectDetailMatches(genericWorkboardIdentity, item))
         ? [genericWorkboardIdentity]
         : [],
       notebooks: activeProjectDetail && savedNotebooks.some((item) => projectDetailMatches(activeProjectDetail, item))
@@ -601,7 +612,9 @@ function loadWorkspaceState() {
       coordinationFilters: saved.coordinationFilters && typeof saved.coordinationFilters === "object"
         ? saved.coordinationFilters
         : {},
-      detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards),
+      detachedWorkboards: releaseSurfaceVisibility.workboard || detachedProjectWindow
+        ? normalizeProjectIdentities(saved.detachedWorkboards)
+        : [],
       trackScrollLeft: Number.isFinite(Number(saved.trackScrollLeft)) ? Math.max(0, Number(saved.trackScrollLeft)) : 0,
       // Professional Code Question records are restored only from the
       // authenticated account-scoped cache after the general layout loads.
@@ -1562,6 +1575,7 @@ function genericWorkboardIsOpen() {
 }
 
 async function openGenericWorkboard() {
+  if (!releaseSurfaceVisibility.workboard && !detachedProjectWindow) return false;
   const paneID = paneIDForProjectWorkboard(genericWorkboardIdentity);
   state.workboards = [genericWorkboardIdentity];
   state.paneWeights[paneID] ||= defaultWorkboardPaneWidth;
@@ -1797,6 +1811,7 @@ async function closeProjectWorkboard(project) {
 }
 
 async function openProjectWorkboard(project) {
+  if (!releaseSurfaceVisibility.workboard && !detachedProjectWindow) return false;
   const identity = projectIdentity(project);
   const wasOpen = projectHasOpenWorkboard(identity);
   if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
@@ -2244,6 +2259,14 @@ function reattachDetachedProject() {
 
 async function reattachProjectWorkboard(project, detachedWindow = null) {
   const identity = projectIdentity(project);
+  if (!releaseSurfaceVisibility.workboard && !detachedProjectWindow) {
+    closeDetachedWorkboardWindow(detachedWindow);
+    state.detachedWorkboards = detachedWorkboards()
+      .filter((item) => !projectDetailMatches(identity, item));
+    localStorage.removeItem("permitext:pendingWorkboardReattach");
+    saveWorkspaceState();
+    return false;
+  }
   if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
     const activated = await activateProjectStudio(identity, {
       openWorkboard: true,
@@ -5519,8 +5542,12 @@ function setCodeQuestionWorkspaceState(next, options = {}) {
   state.codeQuestionWorkspace = normalizeCodeQuestionWorkspaceState(next, {
     activeProjectID: projectID
   });
+  if (!releaseSurfaceVisibility.workboard) {
+    state.codeQuestionWorkspace.openPanes = state.codeQuestionWorkspace.openPanes
+      .filter((pane) => pane.paneRole !== "workboard");
+  }
   // One Workboard role pane per Project in CQ shell.
-  if (projectID) {
+  if (projectID && releaseSurfaceVisibility.workboard) {
     state.codeQuestionWorkspace.openPanes = ensureSingleWorkboardPane(
       state.codeQuestionWorkspace.openPanes,
       projectID
@@ -17421,7 +17448,9 @@ async function notebookReferenceCandidates(project, foundation, cards) {
       label: `Notebook: ${card.title}`
     });
   });
-  activeLinks.filter((link) => link.targetKind === "workboard").forEach((link) => {
+  activeLinks.filter((link) =>
+    releaseSurfaceVisibility.workboard && link.targetKind === "workboard"
+  ).forEach((link) => {
     references.push({
       referenceKind: "workboard",
       referenceID: String(link.targetID),
@@ -26148,7 +26177,9 @@ function localLegacyInventory(project) {
   const projectID = String(projectDetailKey(identity) || activeProjectIDForCodeQuestions() || "").trim();
   const current = getLegacyForProject(projectID);
   const summary = currentContentSummary();
-  const existingItems = new Map(current.items.map((item) => [item.id, item]));
+  const existingItems = new Map(current.items
+    .filter((item) => releaseSurfaceVisibility.workboard || item.sourceKind !== "workboard")
+    .map((item) => [item.id, item]));
   const projectSections = summary.projectSections || [];
   (summary.savedItems || []).forEach((item) => {
     const sourceID = String(item.id || item.sectionID || "").trim();
@@ -26170,7 +26201,7 @@ function localLegacyInventory(project) {
       promotions: current.promotions
     });
   });
-  (summary.workboards || []).forEach((record) => {
+  (releaseSurfaceVisibility.workboard ? summary.workboards || [] : []).forEach((record) => {
     const workboardID = String(record.id || "").trim();
     const recordProjectID = String(syncProjectIdentity(record.projectID) || record.projectID || "").trim();
     if (!workboardID || recordProjectID !== projectID) return;
@@ -26194,16 +26225,28 @@ function localLegacyInventory(project) {
   };
 }
 
+function filterDeferredLegacyInventory(inventory) {
+  if (releaseSurfaceVisibility.workboard) return inventory;
+  return {
+    ...inventory,
+    items: (inventory?.items || []).filter((item) => item.sourceKind !== "workboard")
+  };
+}
+
 async function hydrateCodeQuestionLegacy(project, target = null, options = {}) {
   const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "").trim();
   if (!projectID) return getLegacyForProject(projectID);
-  let next = mergeLegacyInventory(getLegacyForProject(projectID), localLegacyInventory(project), projectID);
+  let next = filterDeferredLegacyInventory(
+    mergeLegacyInventory(getLegacyForProject(projectID), localLegacyInventory(project), projectID)
+  );
   saveLegacyForProject(projectID, next);
   if (!activeAccount()) return next;
   if (!legacyHydrationByProject.has(projectID)) {
     const request = postCodeQuestion("/projects/code-questions/legacy/list", { projectID })
       .then((inventory) => {
-        const merged = mergeLegacyInventory(getLegacyForProject(projectID), inventory, projectID);
+        const merged = filterDeferredLegacyInventory(
+          mergeLegacyInventory(getLegacyForProject(projectID), inventory, projectID)
+        );
         saveLegacyForProject(projectID, merged);
         return merged;
       })
@@ -29737,7 +29780,7 @@ function bindImmediateUtilityControls() {
       void focusUtility("search", ".search-input");
     });
   }
-  if (toggleWorkboardButton?.dataset.coldStartBound !== "true") {
+  if (releaseSurfaceVisibility.workboard && toggleWorkboardButton?.dataset.coldStartBound !== "true") {
     toggleWorkboardButton.dataset.coldStartBound = "true";
     toggleWorkboardButton.addEventListener("pointerenter", () => void loadWorkboardModule().catch(() => {}), { once: true });
     toggleWorkboardButton.addEventListener("focus", () => void loadWorkboardModule().catch(() => {}), { once: true });
