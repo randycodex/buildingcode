@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-evidence-edge-v82";
+} from "./research-progress.js?v=20260812-project-section-preview-v83";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-evidence-edge-v82";
+} from "./offline-storage.js?v=20260812-project-section-preview-v83";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -23629,8 +23629,23 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         .filter((link) => projectSectionBelongsToProject(link, selectedFolder))
         .map((link) => savedEvidenceKey(link)))
     : null;
+  const selectedFolderSectionEvidenceKeys = selectedFolder
+    ? new Set((summary.projectSections || [])
+        .filter((link) =>
+          projectSectionBelongsToProject(link, selectedFolder) &&
+          !normalizeAnnotationBlockID(link.blockID || link.anchorID || link.contentBlockID)
+        )
+        .map((link) => savedEvidenceKey(link)))
+    : null;
   const folderHydrationItems = selectedFolder && !savedInstance.showAllSaved
-    ? combinedItems.filter((item) => selectedFolderEvidenceKeys.has(savedEvidenceKey(item)))
+    ? combinedItems
+        .filter((item) => selectedFolderEvidenceKeys.has(savedEvidenceKey(item)))
+        .map((item) =>
+          item.savedColumnKind === "bookmark" &&
+          selectedFolderSectionEvidenceKeys.has(savedEvidenceKey(item))
+          ? { ...item, projectSavedScope: "section" }
+          : item
+        )
     : combinedItems;
   const resolvedFolderItems = selectedFolder
     ? mergeEquivalentSavedColumnRows(await hydrateItems(folderHydrationItems))
@@ -24316,7 +24331,9 @@ async function hydrateSavedColumnItems(items = []) {
   return Promise.all(items.map(async (item) => {
     try {
       const { chapter, section, detail } = await resolveItemSection(item);
-      const blockID = normalizeAnnotationBlockID(item.blockID || item.anchorID || item.contentBlockID);
+      const blockID = item.projectSavedScope === "section"
+        ? ""
+        : normalizeAnnotationBlockID(item.blockID || item.anchorID || item.contentBlockID);
       const annotatedBlocks = section ? annotatedBlocksForSection(section) : [];
       const block = blockID
         ? annotatedBlocks.find((candidate) =>
