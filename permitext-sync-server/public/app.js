@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-copy-cleanup-v67";
+} from "./research-progress.js?v=20260812-report-status-cleanup-v68";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-copy-cleanup-v67";
+} from "./offline-storage.js?v=20260812-report-status-cleanup-v68";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19257,7 +19257,7 @@ async function renderProjectReportDraft(project) {
   const status = document.createElement("p");
   status.className = "report-draft-status";
   status.setAttribute("role", "status");
-  status.textContent = "Loading Report…";
+  status.hidden = true;
   shell.append(status);
   panel.append(header, shell);
 
@@ -19294,18 +19294,28 @@ async function renderProjectReportDraft(project) {
   };
   reportDraftMounts.set(projectID, mountState);
 
+  const clearStatus = () => {
+    status.textContent = "";
+    status.hidden = true;
+  };
+
+  const showStatusError = (message) => {
+    status.textContent = message;
+    status.hidden = false;
+  };
+
   if (!activeAccount()) {
-    status.textContent = "Sign in from Settings to use private Project Reports.";
+    showStatusError("Sign in from Settings to use private Project Reports.");
     return panel;
   }
 
   const setDirty = () => {
     dirty = true;
-    status.textContent = "Unsaved changes";
+    clearStatus();
   };
 
   const saveDraft = async () => {
-    status.textContent = "Saving Report…";
+    clearStatus();
     try {
       const payload = await postResearch("/reports/drafts/save", {
         projectID,
@@ -19321,33 +19331,33 @@ async function renderProjectReportDraft(project) {
       if (index === -1) drafts.unshift(structuredClone(activeDraft));
       else drafts[index] = structuredClone(activeDraft);
       dirty = false;
-      status.textContent = `Saved revision ${activeDraft.version}`;
+      clearStatus();
       renderWorkspaceContent();
       return true;
     } catch (error) {
-      status.textContent = error.message || "The Report could not be saved.";
+      showStatusError(error.message || "The Report could not be saved.");
       return false;
     }
   };
 
   const openHistoricalReport = async (manifestID) => {
-    status.textContent = "Loading immutable Report…";
+    clearStatus();
     try {
       const payload = await postResearch("/reports/manifests/get", { manifestID });
-      status.textContent = `Opened Report version ${payload.manifest.reportVersion}`;
+      clearStatus();
       printReportManifestAsPDF(payload.manifest);
     } catch (error) {
-      status.textContent = error.message || "The historical Report could not be opened.";
+      showStatusError(error.message || "The historical Report could not be opened.");
     }
   };
 
   const generateReport = async () => {
     if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
     if (!activeDraft.blocks.length && !activeDraft.introduction) {
-      status.textContent = "Add at least one Report item before generating a PDF.";
+      showStatusError("Add at least one Report item before generating a PDF.");
       return;
     }
-    status.textContent = "Creating immutable Report Manifest…";
+    clearStatus();
     try {
       const payload = await postResearch("/reports/generate", {
         projectID,
@@ -19356,16 +19366,16 @@ async function renderProjectReportDraft(project) {
       });
       const historyPayload = await postResearch("/reports/history/list", { projectID });
       history = historyPayload.reports || [];
-      status.textContent = `Generated immutable Report version ${payload.manifest.reportVersion}`;
+      clearStatus();
       renderWorkspaceContent();
       printReportManifestAsPDF(payload.manifest);
       await transitionWorkspace("utility", {
         refreshPaneIDs: [paneIDForProjectDetail(identity)]
       });
     } catch (error) {
-      status.textContent = error.message === "Report text is too long."
+      showStatusError(error.message === "Report text is too long."
         ? "A Report item exceeds the supported text length. Shorten that item and try again."
-        : error.message || "The Report could not be generated.";
+        : error.message || "The Report could not be generated.");
     }
   };
 
@@ -19689,12 +19699,12 @@ async function renderProjectReportDraft(project) {
             : "Download Web PDF";
           download.addEventListener("click", async () => {
             download.disabled = true;
-            status.textContent = "Downloading private Report PDF…";
+            clearStatus();
             try {
               await downloadProjectReportFile(projectID, file, report.title);
-              status.textContent = `Downloaded Report version ${report.reportVersion}`;
+              clearStatus();
             } catch (error) {
-              status.textContent = error.message || "The Report PDF could not be downloaded.";
+              showStatusError(error.message || "The Report PDF could not be downloaded.");
             } finally {
               download.disabled = false;
             }
@@ -19746,7 +19756,7 @@ async function renderProjectReportDraft(project) {
             drafts.find((draft) => draft.id === select.value) || emptyProjectReportDraft(identity)
           );
       dirty = false;
-      status.textContent = "";
+      clearStatus();
       renderWorkspaceContent();
     });
     draftPicker.append(select);
