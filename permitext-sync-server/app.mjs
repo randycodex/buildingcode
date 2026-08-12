@@ -9979,7 +9979,7 @@ async function reviewTargetInProject(storageOwnerUserID, projectID, targetKind, 
   }
   const fallbackLabelByTargetKind = {
     evidenceReview: "Evidence review",
-    reportDraft: "Report Draft",
+    reportDraft: "Report",
     notebookCard: "Notebook card",
     codeQuestion: "Code Question",
     questionInput: "Question Input",
@@ -11505,7 +11505,7 @@ async function handleReportDraftGet(request, response) {
     context.body.draftID
   );
   if (!artifact) {
-    sendError(response, 404, "Report Draft not found.");
+    sendError(response, 404, "Report not found.");
     return;
   }
   sendJSON(response, 200, { draft: reportDraftForClient(artifact, [access.projectID]) });
@@ -11538,7 +11538,7 @@ async function handleReportDraftSave(request, response) {
     ? await reportDraftArtifact(storageOwnerUserID, access.projectID, requestedDraftID)
     : null;
   if (requestedDraftID && !existing) {
-    sendError(response, 404, "Report Draft not found.");
+    sendError(response, 404, "Report not found.");
     return;
   }
   const expectedVersion = Number(context.body.expectedVersion ?? 0);
@@ -11547,7 +11547,7 @@ async function handleReportDraftSave(request, response) {
     (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existing.envelope.version)
   ) {
     sendJSON(response, 409, {
-      error: "This Report Draft changed after you opened it. Review the current version before saving.",
+      error: "This Report changed after you opened it. Review the current version before saving.",
       code: "REPORT_DRAFT_VERSION_CONFLICT",
       draft: reportDraftForClient(existing, [access.projectID])
     });
@@ -11601,7 +11601,7 @@ async function handleReportDraftSave(request, response) {
     });
   } catch (error) {
     sendJSON(response, 400, {
-      error: error instanceof Error ? error.message : "Invalid Report Draft.",
+      error: error instanceof Error ? error.message : "Invalid Report.",
       code: "INVALID_REPORT_DRAFT"
     });
   }
@@ -11624,13 +11624,13 @@ async function handleReportDraftDelete(request, response) {
     context.body.draftID
   );
   if (!artifact) {
-    sendError(response, 404, "Report Draft not found.");
+    sendError(response, 404, "Report not found.");
     return;
   }
   const expectedVersion = Number(context.body.expectedVersion);
   if (!Number.isSafeInteger(expectedVersion) || expectedVersion !== artifact.envelope.version) {
     sendJSON(response, 409, {
-      error: "This Report Draft changed after you opened it. Review the current version before deleting it.",
+      error: "This Report changed after you opened it. Review the current version before deleting it.",
       code: "REPORT_DRAFT_VERSION_CONFLICT",
       draft: reportDraftForClient(artifact, [access.projectID])
     });
@@ -11784,7 +11784,7 @@ async function handleReportGenerate(request, response) {
     context.body.draftID
   );
   if (!draft) {
-    sendError(response, 404, "Report Draft not found.");
+    sendError(response, 404, "Report not found.");
     return;
   }
   if (!privateProjectAssetStorageConfigured()) {
@@ -19652,7 +19652,7 @@ const codeQuestionLegacySourceLabels = Object.freeze({
   notebookCard: "Working Notes",
   savedItem: "Saved passage",
   researchAnswer: "Research answer",
-  reportDraft: "Advanced Report Draft",
+  reportDraft: "Report",
   reviewThread: "Coordination thread",
   workboard: "Workboard"
 });

@@ -1345,7 +1345,10 @@ struct ProjectView: View {
         ) {
             projectHubMetric(value: "\(projectBookmarks.count)", label: "Saved")
             projectHubMetric(value: "\(projectCodeQuestions.count)", label: "Questions")
-            projectHubMetric(value: "\(projectHubSnapshot?.notebookCards.count ?? 0)", label: "Notebook")
+            projectHubMetric(
+                value: "\((projectHubSnapshot?.notebookCards ?? []).filter { PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item" }.count)",
+                label: "Notebook"
+            )
             projectHubMetric(value: "\(projectHubSnapshot?.researchAnswers.count ?? 0)", label: "Research")
             projectHubMetric(value: "\(projectHubSnapshot?.reports.count ?? 0)", label: "Reports")
         }
@@ -1383,7 +1386,9 @@ struct ProjectView: View {
 
     @ViewBuilder
     private var projectNotebookSummary: some View {
-        let cards = projectHubSnapshot?.notebookCards ?? []
+        let cards = (projectHubSnapshot?.notebookCards ?? []).filter {
+            PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"
+        }
         projectHubSection(title: "Notebook", systemImage: "note.text") {
             if cards.isEmpty {
                 projectHubEmpty("No synced Notebook cards yet.")

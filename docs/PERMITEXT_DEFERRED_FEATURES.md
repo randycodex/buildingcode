@@ -77,3 +77,18 @@ separate entry documents a concrete technical reason for deletion.
 | Preserved data | Existing organizations, memberships, invitations, shared Projects, collaboration records, reports, and account-deletion coverage remain unchanged. |
 | Restore | Set both web and iOS Firm Collaboration release flags to `true`, then re-verify invitation links, organization loading, role-aware Project Hub access, offline snapshots, member administration, and web/iOS Settings presentation. |
 | Delete only if | A replacement collaboration model is shipped with explicit membership, shared-record, invitation, retention, and export migrations. |
+
+## Coordination
+
+| Field | Decision |
+| --- | --- |
+| Status | Hidden and frozen |
+| Deferred on | 2026-08-12 |
+| Product reason | Coordination requests, assignments, and review-thread columns are outside the release-critical Project -> Ask -> Research -> Evidence -> Conclusion -> Save -> Export workflow. |
+| Web release surface | Hide the Project Coordination tool, Project summary, Notebook and evidence-review entry points, Report action, and persisted Coordination columns. Direct open calls are blocked while hidden. |
+| iOS release surface | Hide the Coordination section in the native Project Hub. Do not add a replacement or nonfunctional handoff control. |
+| Preserved web implementation | Keep Coordination panes, composer, threads, statuses, comments, permissions, routes, sync, and compatibility adapters behind `releaseSurfaceVisibility.coordination`. |
+| Preserved iOS implementation | Keep Coordination models, snapshot decoding, transport, and Project Hub section behind `PermitextReleaseSurfaceVisibility.coordination`. |
+| Preserved data | Existing requests, responses, assignees, statuses, linked targets, timestamps, and activity records remain unchanged. |
+| Restore | Set the web and iOS Coordination visibility flags to `true`, then re-verify every Project tool entry point, persisted panes, permissions, thread transitions, linked records, narrow columns, and web/iOS parity. |
+| Delete only if | A replacement review workflow ships with an explicit migration and retention/export plan for existing Coordination records. |

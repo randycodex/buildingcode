@@ -113,7 +113,9 @@ struct OrganizationProjectHubView: View {
                     notebookSection
                     researchSection
                     evidenceReviewSection
-                    reviewCoordinationSection
+                    if PermitextReleaseSurfaceVisibility.coordination {
+                        reviewCoordinationSection
+                    }
                     reportSection
                     activitySection
                 }

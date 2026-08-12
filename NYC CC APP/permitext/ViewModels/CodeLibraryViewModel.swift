@@ -8,6 +8,7 @@ import SwiftUI
 
 enum PermitextReleaseSurfaceVisibility {
     static let firmCollaboration = false
+    static let coordination = false
 }
 
 func permitextUpgradeCallToActionTitle(

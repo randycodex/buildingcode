@@ -27,7 +27,7 @@ const source = Object.freeze({
   sourceKind: "reportDraft",
   sourceID: "draft-legacy-1",
   sourceVersion: 4,
-  typeLabel: "Advanced Report Draft",
+  typeLabel: "Report",
   title: "Existing generic report",
   summary: "Authored background that must remain editable outside the Code Memo.",
   assignment: "project",

@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v38";
+} from "./research-progress.js?v=20260812-release-surface-v39";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v38";
+} from "./offline-storage.js?v=20260812-release-surface-v39";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -201,7 +201,8 @@ const releaseSurfaceVisibility = Object.freeze({
   workboard: false,
   researchHistoryManagement: false,
   researchConversationEvidencePane: false,
-  firmCollaboration: false
+  firmCollaboration: false,
+  coordination: false
 });
 const permitextClientCapabilities = Object.freeze([
   "saved-work",
@@ -617,10 +618,10 @@ function loadWorkspaceState() {
       reportDrafts: activeProjectDetail && savedReportDrafts.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
-      coordinations: activeProjectDetail && savedCoordinations.some((item) => projectDetailMatches(activeProjectDetail, item))
+      coordinations: releaseSurfaceVisibility.coordination && activeProjectDetail && savedCoordinations.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
-      coordinationThreads: activeProjectDetail
+      coordinationThreads: releaseSurfaceVisibility.coordination && activeProjectDetail
         ? savedCoordinationThreads
           .filter((item) => projectDetailMatches(activeProjectDetail, item))
           .slice(0, 1)
@@ -1984,6 +1985,7 @@ async function closeProjectCoordination(project) {
 }
 
 async function openProjectCoordination(project, options = {}) {
+  if (!releaseSurfaceVisibility.coordination) return false;
   const identity = projectIdentity(project);
   const wasOpen = projectHasOpenCoordination(identity);
   if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
@@ -2025,6 +2027,7 @@ async function closeProjectCoordinationThread(project) {
 }
 
 async function openProjectCoordinationThread(project, threadID) {
+  if (!releaseSurfaceVisibility.coordination) return false;
   const identity = projectIdentity(project);
   if (!projectHasOpenCoordination(identity)) {
     const opened = await openProjectCoordination(identity);
@@ -2815,7 +2818,10 @@ function reconcileOpenProjectToolState() {
   state.workboards = keepGenericWorkboard ? [genericWorkboardIdentity] : [];
   state.notebooks = openNotebooks().some((item) => projectDetailMatches(current, item)) ? [identity] : [];
   state.reportDrafts = openReportDrafts().some((item) => projectDetailMatches(current, item)) ? [identity] : [];
-  state.coordinations = openCoordinations().some((item) => projectDetailMatches(current, item)) ? [identity] : [];
+  state.coordinations = releaseSurfaceVisibility.coordination &&
+    openCoordinations().some((item) => projectDetailMatches(current, item))
+      ? [identity]
+      : [];
   const thread = state.coordinations.length
     ? openCoordinationThreads().find((item) => projectDetailMatches(current, item))
     : null;
@@ -2966,9 +2972,9 @@ async function activateProjectStudio(project, options = {}) {
   const keepReportDraftOpen = current
     ? projectHasOpenReportDraft(current)
     : Boolean(options.openReportDraft);
-  const keepCoordinationOpen = current
+  const keepCoordinationOpen = releaseSurfaceVisibility.coordination && (current
     ? projectHasOpenCoordination(current)
-    : Boolean(options.openCoordination);
+    : Boolean(options.openCoordination));
   const currentCoordinationThread = current ? openCoordinationThreadForProject(current) : null;
   const currentDetailID = current ? paneIDForProjectDetail(current) : "";
   const currentNotebookID = current ? paneIDForProjectNotebook(current) : "";
@@ -18553,7 +18559,8 @@ async function renderProjectNotebook(project) {
         ? "Open a coordination item linked to this Notebook card"
         : "Save this card before opening a coordination item";
       coordinateButton.disabled = !activeCard.id;
-      coordinateButton.hidden = !projectCollaborationAccess(identity, "project.review.request");
+      coordinateButton.hidden = !releaseSurfaceVisibility.coordination ||
+        !projectCollaborationAccess(identity, "project.review.request");
       coordinateButton.addEventListener("click", () => {
         void openCoordinationComposer({
           projectID,
@@ -18950,7 +18957,7 @@ async function renderProjectReportDraft(project) {
   eyebrow.className = "report-draft-eyebrow";
   eyebrow.textContent = identity.name;
   const title = document.createElement("h2");
-  title.textContent = "Report Draft";
+  title.textContent = "Report";
   heading.append(eyebrow, title);
   const closeButton = document.createElement("button");
   closeButton.className = "report-draft-close";
@@ -18969,7 +18976,7 @@ async function renderProjectReportDraft(project) {
   const status = document.createElement("p");
   status.className = "report-draft-status";
   status.setAttribute("role", "status");
-  status.textContent = "Loading Report Draft…";
+  status.textContent = "Loading Report…";
   shell.append(status);
   panel.append(header, shell);
 
@@ -18993,7 +19000,7 @@ async function renderProjectReportDraft(project) {
     async confirmDiscardIfNeeded() {
       if (!dirty) return true;
       return confirmWebWarning(
-        "Discard unsaved Report Draft changes?",
+        "Discard unsaved Report changes?",
         `Your edits to “${activeDraft.title || "Untitled report"}” have not been saved.`,
         { confirmLabel: "Discard changes" }
       );
@@ -19015,7 +19022,7 @@ async function renderProjectReportDraft(project) {
   };
 
   const saveDraft = async () => {
-    status.textContent = "Saving Report Draft…";
+    status.textContent = "Saving Report…";
     try {
       const payload = await postResearch("/reports/drafts/save", {
         projectID,
@@ -19035,7 +19042,7 @@ async function renderProjectReportDraft(project) {
       renderWorkspaceContent();
       return true;
     } catch (error) {
-      status.textContent = error.message || "The Report Draft could not be saved.";
+      status.textContent = error.message || "The Report could not be saved.";
       return false;
     }
   };
@@ -19194,7 +19201,7 @@ async function renderProjectReportDraft(project) {
       const warningTitle = document.createElement("strong");
       warningTitle.textContent = `${sourceWarnings.length} linked code ${sourceWarnings.length === 1 ? "source is" : "sources are"} unavailable`;
       const warningCopy = document.createElement("p");
-      warningCopy.textContent = "The unavailable source was omitted so you can continue editing this Report Draft. Re-open or remove its Saved evidence link before finalizing the report.";
+      warningCopy.textContent = "The unavailable source was omitted so you can continue editing this Report. Re-open or remove its Saved evidence link before finalizing the report.";
       const warningList = document.createElement("ul");
       sourceWarnings.slice(0, 5).forEach((item) => {
         const row = document.createElement("li");
@@ -19314,12 +19321,12 @@ async function renderProjectReportDraft(project) {
     const draftPicker = document.createElement("div");
     draftPicker.className = "report-draft-picker";
     const select = document.createElement("select");
-    select.setAttribute("aria-label", "Report Draft");
+    select.setAttribute("aria-label", "Report");
     const currentOption = document.createElement("option");
     currentOption.value = activeDraft.id || "";
     currentOption.textContent = activeDraft.id
       ? `${activeDraft.title} · revision ${activeDraft.version}`
-      : "New Report Draft";
+      : "New Report";
     select.append(currentOption);
     drafts.filter((draft) => draft.id !== activeDraft.id).forEach((draft) => {
       const option = document.createElement("option");
@@ -19329,7 +19336,7 @@ async function renderProjectReportDraft(project) {
     });
     const newOption = document.createElement("option");
     newOption.value = "__new__";
-    newOption.textContent = "New Report Draft…";
+    newOption.textContent = "New Report…";
     select.append(newOption);
     select.addEventListener("change", async () => {
       if (dirty && !(await mountState.confirmDiscardIfNeeded())) {
@@ -19342,7 +19349,7 @@ async function renderProjectReportDraft(project) {
             drafts.find((draft) => draft.id === select.value) || emptyProjectReportDraft(identity)
           );
       dirty = false;
-      status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report Draft";
+      status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report";
       renderWorkspaceContent();
     });
     draftPicker.append(select);
@@ -19445,16 +19452,16 @@ async function renderProjectReportDraft(project) {
     coordinate.textContent = "Coordinate";
     coordinate.disabled = !activeDraft.id;
     coordinate.title = activeDraft.id
-      ? "Open a coordination item linked to this Report Draft"
+      ? "Open a coordination item linked to this Report"
       : "Save this draft before opening a coordination item";
-    coordinate.hidden = !projectCollaborationAccess(identity, "project.review.request");
+    coordinate.hidden = !releaseSurfaceVisibility.coordination || !projectCollaborationAccess(identity, "project.review.request");
     coordinate.addEventListener("click", () => {
       void openCoordinationComposer({
         projectID,
         type: "revision-request",
         targetKind: "reportDraft",
         targetID: activeDraft.id,
-        snapshot: { label: `Report Draft: ${activeDraft.title || "Untitled Report"}` }
+        snapshot: { label: `Report: ${activeDraft.title || "Untitled Report"}` }
       });
     });
     primaryActions.append(save, generate, coordinate);
@@ -19526,12 +19533,12 @@ async function renderProjectReportDraft(project) {
     }
     pendingReportDraftByProject.delete(projectID);
     activeDraft = requestedDraft ? structuredClone(requestedDraft) : emptyProjectReportDraft(identity);
-    status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report Draft";
+    status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report";
     renderWorkspaceContent();
   } catch (error) {
     status.textContent = error.payload?.code === "PRO_REQUIRED_EXPORTS"
       ? "Professional Project Reports are included with Permitext Pro."
-      : `Report Draft unavailable: ${error.message}`;
+      : `Report unavailable: ${error.message}`;
   }
   return panel;
 }
@@ -20100,7 +20107,7 @@ function appendProjectEvidenceReviews(content, identity, foundation) {
       });
       actions.append(propose);
     }
-    if (projectCollaborationAccess(identity, "project.review.request")) {
+    if (releaseSurfaceVisibility.coordination && projectCollaborationAccess(identity, "project.review.request")) {
       const coordinate = document.createElement("button");
       coordinate.type = "button";
       coordinate.textContent = "Coordinate";
@@ -20414,7 +20421,7 @@ function projectReviewTargets(identity, foundation) {
   [
     ["evidenceReview", "Evidence review"],
     ["notebookCard", "Notebook"],
-    ["reportDraft", "Report Draft"]
+    ["reportDraft", "Report"]
   ].forEach(([type, label]) => {
     projectCollaborationArtifacts(foundation, type).forEach((artifact) => {
       targets.push({
@@ -20616,6 +20623,7 @@ function coordinationComposer(identity, foundation, preset = {}) {
 }
 
 async function openCoordinationComposer(options = {}) {
+  if (!releaseSurfaceVisibility.coordination) return false;
   const projectID = String(options.projectID || "");
   const project = openProjectDetails().find((item) => projectDetailKey(item) === projectID) ||
     visibleProjectRecords(currentContentSummary().projects || [])
@@ -20645,6 +20653,7 @@ window.PermitextCoordination = Object.freeze({
 });
 
 function appendProjectCoordinationSummary(content, identity, foundation) {
+  if (!releaseSurfaceVisibility.coordination) return;
   const threads = projectCollaborationArtifacts(foundation, "reviewThread");
   const openCount = threads.filter((thread) => coordinationThreadStatus(thread) === "open").length;
   const waitingCount = threads.filter((thread) => coordinationThreadStatus(thread) === "waiting").length;
@@ -20759,8 +20768,8 @@ async function openCoordinationTarget(identity, foundation, thread) {
     reportDraftFocusResultByProject.delete(projectDetailKey(identity));
     if (!focusResult?.focused) {
       await showWebNotice(
-        "Linked Report Draft",
-        "The coordination thread preserves this Report Draft's identity, but that exact draft is no longer available."
+        "Linked Report",
+        "The coordination thread preserves this Report's identity, but that exact report is no longer available."
       );
     }
     return;
@@ -21499,12 +21508,12 @@ async function renderProjectDetail(detail) {
   const reportDraftButton = document.createElement("button");
   reportDraftButton.className = "project-report-draft-button";
   reportDraftButton.type = "button";
-  reportDraftButton.textContent = "Report Draft";
+  reportDraftButton.textContent = "Report";
   reportDraftButton.setAttribute("aria-pressed", String(projectHasOpenReportDraft(identity)));
   reportDraftButton.hidden = detachedProjectWindow;
   if (identity.sharedOnly) {
     reportDraftButton.disabled = true;
-    reportDraftButton.title = "Shared Report Draft editing will follow the collaboration foundation.";
+    reportDraftButton.title = "Shared Report editing will follow the collaboration foundation.";
   }
   reportDraftButton.addEventListener("click", async () => {
     if (projectHasOpenReportDraft(identity)) {
@@ -21520,7 +21529,7 @@ async function renderProjectDetail(detail) {
   coordinationButton.type = "button";
   coordinationButton.textContent = "Coordination";
   coordinationButton.setAttribute("aria-pressed", String(projectHasOpenCoordination(identity)));
-  coordinationButton.hidden = detachedProjectWindow;
+  coordinationButton.hidden = detachedProjectWindow || !releaseSurfaceVisibility.coordination;
   coordinationButton.addEventListener("click", async () => {
     if (projectHasOpenCoordination(identity)) {
       const closed = await closeProjectCoordination(identity);
@@ -21536,7 +21545,8 @@ async function renderProjectDetail(detail) {
     className: "project-detail-back",
     svg: circleXIconSVG()
   });
-  actions.prepend(notebookButton, reportDraftButton, coordinationButton);
+  actions.prepend(notebookButton, reportDraftButton);
+  if (releaseSurfaceVisibility.coordination) actions.append(coordinationButton);
   const headingGroup = document.createElement("div");
   headingGroup.className = "project-detail-heading";
   const title = document.createElement("h2");
@@ -21787,7 +21797,9 @@ async function renderProjectDetail(detail) {
   content.append(savedSection);
   appendProjectResearchHistory(content, identity, foundation);
   appendProjectEvidenceReviews(content, identity, foundation);
-  appendProjectCoordinationSummary(content, identity, foundation);
+  if (releaseSurfaceVisibility.coordination) {
+    appendProjectCoordinationSummary(content, identity, foundation);
+  }
   appendProjectReportExports(content, identity, foundation);
   appendProjectActivity(content, foundation);
   if (projectResearchConversation) appendProjectContextNotice(content);
@@ -22788,15 +22800,17 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     controls.setAttribute("aria-label", `${identity.name} tools`);
     [
       ["Notebook", "project-notebook-button", projectHasOpenNotebook, openProjectNotebook, closeProjectNotebook],
-      ["Report Draft", "project-report-draft-button", projectHasOpenReportDraft, openProjectReportDraft, closeProjectReportDraft],
-      ["Coordination", "project-coordination-button", projectHasOpenCoordination, openProjectCoordination, closeProjectCoordination]
+      ["Report", "project-report-draft-button", projectHasOpenReportDraft, openProjectReportDraft, closeProjectReportDraft],
+      ...(releaseSurfaceVisibility.coordination
+        ? [["Coordination", "project-coordination-button", projectHasOpenCoordination, openProjectCoordination, closeProjectCoordination]]
+        : [])
     ].forEach(([label, className, isOpen, openTool, closeTool]) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = className;
       button.textContent = label;
       button.setAttribute("aria-pressed", String(isOpen(identity)));
-      if (identity.sharedOnly && label === "Report Draft") {
+      if (identity.sharedOnly && label === "Report") {
         button.disabled = true;
         button.title = `${label} editing is unavailable for shared-only Projects.`;
       }
@@ -22852,7 +22866,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     convert.addEventListener("click", async () => {
       const confirmed = await openWebWarning({
         title: "Convert to Project?",
-        message: "This keeps every saved section, note, tag, and folder association, then adds Notebook, Report Draft, Coordination, and Project history.",
+        message: "This keeps every saved section, note, tag, and folder association, then adds Notebook, Report, and Project history.",
         confirmLabel: "Convert",
         container: panel
       });
@@ -26659,7 +26673,7 @@ function codeQuestionPaneTitle(paneRole) {
     versions: "Versions",
     "working-notes": "Working Notes",
     workboard: "Workboard",
-    "report-draft": "Report Draft",
+    "report-draft": "Report",
     legacy: "Legacy / Unassigned"
   };
   return labels[paneRole] || paneRole;
@@ -29480,7 +29494,7 @@ function renderCodeMemoDraftBody(project, questionID) {
   const stateLabel = codeMemoDerivedState(context).replaceAll("-", " ");
   const boundary = document.createElement("section");
   boundary.className = "code-memo-boundary";
-  boundary.innerHTML = `<p class="code-question-pane-status">Typed Code Memo · ${escapeHTML(stateLabel)}</p><p>A constrained professional memo assembled from selected versions. Editing creates a new immutable draft revision; generic Report Draft remains available under Add column.</p>`;
+  boundary.innerHTML = `<p class="code-question-pane-status">Typed Code Memo · ${escapeHTML(stateLabel)}</p><p>A constrained professional memo assembled from selected versions. Editing creates a new immutable draft revision; the general Report remains available under Add column.</p>`;
   wrap.appendChild(boundary);
 
   const form = document.createElement("form");
@@ -29877,7 +29891,7 @@ async function renderWorkspace(options = {}) {
   for (const detail of openProjectDetails()) {
     if (projectHasOpenNotebook(detail)) panes.push(await renderProjectNotebook(detail));
     if (projectHasOpenReportDraft(detail)) panes.push(await renderProjectReportDraft(detail));
-    if (projectHasOpenCoordination(detail)) {
+    if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)) {
       panes.push(await renderProjectCoordination(detail));
       const thread = openCoordinationThreadForProject(detail);
       if (thread) panes.push(await renderProjectCoordinationThread(detail, thread.threadID));
@@ -29960,7 +29974,7 @@ async function renderUtilityWorkspace(options = {}) {
       const reportDraftID = paneIDForProjectReportDraft(detail);
       panes.push(await reuseOrRenderPane(reportDraftID, () => renderProjectReportDraft(detail)));
     }
-    if (projectHasOpenCoordination(detail)) {
+    if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)) {
       const coordinationID = paneIDForProjectCoordination(detail);
       panes.push(await reuseOrRenderPane(coordinationID, () => renderProjectCoordination(detail)));
       const thread = openCoordinationThreadForProject(detail);

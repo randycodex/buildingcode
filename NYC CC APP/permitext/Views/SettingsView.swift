@@ -158,7 +158,7 @@ struct SettingsView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.")
-                planFeatureRow("Pro", details: "Unlimited saved sections and notes, Projects, Notebook, Report Draft, professional exports, tags, and offline access. Optional Research add-on: unlimited selected-evidence Research, verified citations, immutable answer history, and conversation history.")
+                planFeatureRow("Pro", details: "Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, tags, and offline access. Optional Research add-on: unlimited selected-evidence Research, verified citations, immutable answer history, and conversation history.")
             }
 
             Button {
@@ -552,9 +552,9 @@ struct SettingsView: View {
                 return "Lifetime Pro is active, including Research. This gifted account does not need an App Store subscription."
             }
             if library.hasResearchAccess {
-                return "Pro and Research are active. Projects, Notebook, Report Draft, professional exports, offline access, and selected-evidence Research are unlocked."
+                return "Pro and Research are active. Projects, Notebook, Report, professional exports, offline access, and selected-evidence Research are unlocked."
             }
-            return "Pro is active. Projects, Notebook, Report Draft, professional exports, tags, and offline access are unlocked. Research is available separately."
+            return "Pro is active. Projects, Notebook, Report, professional exports, tags, and offline access are unlocked. Research is available separately."
         }
         return "Free includes reading, search, recents, 25 saved sections, 10 notes, continuity, and cross-device sync. Pro unlocks the professional workspace."
     }

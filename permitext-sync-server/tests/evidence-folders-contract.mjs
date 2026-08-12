@@ -101,10 +101,10 @@ const savedFolderContextSource = functionSource(appSource, "renderSavedFolderCon
 assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
 assert.match(savedFolderContextSource, /appendSavedProjectFactEditor\(summary, folder, identity\)/);
-assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"/);
+assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report"[\s\S]*?releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"/);
 assert.doesNotMatch(savedFolderContextSource, /"Workboard"/);
 assert.match(savedFolderContextSource, /context\.dataset\.projectId = projectDetailKey\(identity\)/);
-assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?appendSavedProjectFactEditor\(summary, folder, identity\)[\s\S]*?context\.append\(summary\)[\s\S]*?populateSavedEvidenceSection/);
+assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report"[\s\S]*?releaseSurfaceVisibility\.coordination[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?appendSavedProjectFactEditor\(summary, folder, identity\)[\s\S]*?context\.append\(summary\)[\s\S]*?populateSavedEvidenceSection/);
 assert.doesNotMatch(savedFolderContextSource, /Blocknotes|appendProjectNotes|appendProjectResearchHistory|loadProjectCoordinationFoundation/);
 assert.doesNotMatch(savedFolderContextSource, /appendProjectActivity|Recent Activities/);
 const savedEvidenceHeadingSource = functionSource(appSource, "createSavedEvidenceHeading");
@@ -139,7 +139,7 @@ assert.ok(
 assert.ok(
   deactivateProjectStudioSource.indexOf("confirmReportDraftDiscard") <
     deactivateProjectStudioSource.indexOf("closeProjectDetailForProject"),
-  "Project deactivation must confirm Report Draft edits before changing workspace state."
+  "Project deactivation must confirm Report edits before changing workspace state."
 );
 assert.match(functionSource(appSource, "transitionProjectSelection"), /refreshSavedPanelInPlace/);
 assert.match(functionSource(appSource, "refreshSavedPanelInPlace"), /scrollTop[\s\S]*?hydrateSavedPanel[\s\S]*?scrollTop/);

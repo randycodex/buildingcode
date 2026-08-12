@@ -20,7 +20,7 @@ export const legacySourceLabels = Object.freeze({
   notebookCard: "Working Notes",
   savedItem: "Saved passage",
   researchAnswer: "Research answer",
-  reportDraft: "Advanced Report Draft",
+  reportDraft: "Report",
   reviewThread: "Coordination thread",
   workboard: "Workboard"
 });
@@ -308,7 +308,7 @@ export function legacyGuidanceForSource(sourceKind) {
     notebookCard: "Link this Working Notes card as background. Its prose does not become a governed fact automatically.",
     savedItem: "Link this Saved passage as a candidate. It is not approved Evidence until reviewed in the Evidence stage.",
     researchAnswer: "Link this historical answer as provenance and a starting point. It is not silently reused as current analysis.",
-    reportDraft: "Link this advanced Report Draft as authored background. The generic draft remains editable and separate from the Code Memo.",
+    reportDraft: "Link this Report as authored background. The Report remains editable and separate from the Code Memo.",
     reviewThread: "Link this Coordination thread while preserving its comments, statuses, actors, and existing editing rules.",
     workboard: "Link this Project Workboard without changing Project ownership or treating diagram text as hidden model context."
   };

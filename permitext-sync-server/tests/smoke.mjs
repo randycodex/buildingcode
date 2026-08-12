@@ -805,7 +805,7 @@ async function main() {
         workspaceScript.text.includes("state.workboards = keepGenericWorkboardOpen ? [genericWorkboardIdentity] : []") &&
         workspaceScript.text.includes("state.reportDrafts = keepReportDraftOpen ? [identity] : []") &&
         workspaceScript.text.includes("confirmDiscardIfNeeded()") &&
-        workspaceScript.text.includes("Discard unsaved Report Draft changes?") &&
+        workspaceScript.text.includes("Discard unsaved Report changes?") &&
         !workspaceScript.text.includes("This active Project controls every Project-specific workspace.") &&
         !workspaceScript.text.includes('eyebrow.textContent = "Project Studio"') &&
         workspaceScript.text.includes('toggle.className = "project-studio-activity-toggle section-label"') &&
@@ -847,7 +847,7 @@ async function main() {
         workspaceScript.text.includes("reportTemplateID: selectedReportTemplateID") &&
         workspaceScript.text.includes("sourceWarnings = sourcePayload.warnings || []") &&
         workspaceScript.text.includes("linked code ${sourceWarnings.length === 1 ? \"source is\" : \"sources are\"} unavailable") &&
-        workspaceScript.text.includes("The unavailable source was omitted so you can continue editing this Report Draft.") &&
+        workspaceScript.text.includes("The unavailable source was omitted so you can continue editing this Report.") &&
         workspaceScript.text.includes("function notebookResearchAnswers(foundation)") &&
         workspaceScript.text.includes("notebookResearchAnswers(foundation).forEach((answer) =>") &&
         workspaceScript.text.includes("Array.isArray(document?.document?.content) ? document.document.content : []") &&
@@ -898,7 +898,7 @@ async function main() {
         !workspaceStyles.text.includes(".notebook-eyebrow") &&
         workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);\n  align-items: flex-start;\n  justify-content: flex-end;") &&
         workspaceScript.text.includes("cardType: cardAtStart.cardType"),
-      "Web Project Studio no longer switches its Project overview, Notebook, Research history, and Report Draft as one guarded workspace."
+      "Web Project Studio no longer switches its Project overview, Notebook, Research history, and Report as one guarded workspace."
     );
     assert(
       (
@@ -1372,7 +1372,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v38'),
+        webRoot.text.includes('/web/app.js?v=20260812-release-surface-v39'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1517,7 +1517,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v38'),
+      webRoot.text.includes('/web/styles.css?v=20260812-release-surface-v39'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1761,7 +1761,7 @@ async function main() {
       !webRoot.text.includes("account-plan-detail") &&
         !workspaceScript.text.includes("account-plan-detail") &&
         webRoot.text.includes("Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
-        webRoot.text.includes("Unlimited saved sections and notes, Projects, Notebook, Report Draft, professional exports, tags, and web offline access."),
+        webRoot.text.includes("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, tags, and web offline access."),
       "Plan details should live in the Free and Pro descriptions instead of a redundant summary."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant manual sync card");
@@ -1784,7 +1784,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v38'),
+      webRoot.text.includes('/web/styles.css?v=20260812-release-surface-v39'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2898,6 +2898,15 @@ async function main() {
         workspaceScript.text.includes("createProjectToolDragHandle(identity)") &&
         workspaceStyles.text.includes(".workboard-panel > .project-tool-pane-drag-handle"),
       "Project tools should append in opening order and only drag within their own Project group."
+    );
+    assert(
+      workspaceScript.text.includes("coordination: false") &&
+        workspaceScript.text.includes("if (!releaseSurfaceVisibility.coordination) return false;") &&
+        workspaceScript.text.includes("releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)") &&
+        iosLibraryViewModelSource.includes("static let coordination = false") &&
+        iosOrganizationProjectHubSource.includes("if PermitextReleaseSurfaceVisibility.coordination {") &&
+        iosBookmarksSource.includes('PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"'),
+      "Deferred Coordination must stay hidden and blocked on web and iOS while its implementation remains preserved."
     );
     assert(
       workboardSource.includes("const preventWheelPanning = (event) =>") &&
