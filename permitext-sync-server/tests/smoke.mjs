@@ -849,6 +849,12 @@ async function main() {
         workspaceScript.text.includes(': "Current Report"') &&
         workspaceScript.text.includes('newOption.textContent = "Create new Report…"') &&
         workspaceScript.text.includes('select.className = "report-draft-select"') &&
+        workspaceScript.text.includes('titleControl.className = "report-title-control"') &&
+        workspaceScript.text.includes('titleButton.className = "report-title-text"') &&
+        workspaceScript.text.includes('titleEditor.setAttribute("aria-label", "Edit Report title")') &&
+        workspaceScript.text.includes('revisionLabel.textContent = `Revision ${activeDraft.version || 1}`') &&
+        workspaceScript.text.includes('select.dataset.customTrigger = "icon-only"') &&
+        !workspaceScript.text.includes('titleInput.setAttribute("aria-label", "Report title")') &&
         workspaceScript.text.includes("enhanceSelect(select)") &&
         !workspaceScript.text.includes('templateSelect.className = "report-template-select"') &&
         workspaceScript.text.includes('remove.className = "report-draft-block-remove"') &&
@@ -857,6 +863,8 @@ async function main() {
         workspaceStyles.text.includes(".report-draft-block-actions .report-draft-block-remove") &&
         workspaceStyles.text.includes(".report-draft-select-menu") &&
         workspaceStyles.text.includes(".report-draft-picker .custom-select") &&
+        workspaceStyles.text.includes(".report-title-control") &&
+        workspaceStyles.text.includes(".report-title-revision") &&
         !workspaceScript.text.includes('dateInput.type = "date"') &&
         !workspaceScript.text.includes('previewMeta.textContent = `${identity.name} · Date and time added automatically on export`') &&
         workspaceScript.text.includes('appendSourceGroup("Project facts", ""') &&
@@ -1409,7 +1417,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-report-project-facts-v85'),
+        webRoot.text.includes('/web/app.js?v=20260812-report-title-v86'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1559,7 +1567,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-project-facts-v85'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-title-v86'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1826,7 +1834,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-project-facts-v85'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-title-v86'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

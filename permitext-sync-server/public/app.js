@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-project-facts-v85";
+} from "./research-progress.js?v=20260812-report-title-v86";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-project-facts-v85";
+} from "./offline-storage.js?v=20260812-report-title-v86";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -4943,6 +4943,7 @@ function enhanceSelect(select) {
   const readerCodeMenu = select.classList.contains("code-select");
   const readerChapterMenu = select.classList.contains("chapter-select");
   const reportDraftMenu = select.classList.contains("report-draft-select");
+  const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
@@ -4959,7 +4960,13 @@ function enhanceSelect(select) {
   }
 
   const syncTrigger = () => {
-    trigger.textContent = select.options[select.selectedIndex]?.textContent || "";
+    const selectedLabel = select.options[select.selectedIndex]?.textContent || "";
+    trigger.textContent = iconOnlyTrigger ? "⌄" : selectedLabel;
+    if (iconOnlyTrigger) {
+      trigger.classList.add("is-icon-only");
+      trigger.setAttribute("aria-label", select.dataset.customTriggerLabel || selectedLabel);
+      trigger.title = select.dataset.customTriggerLabel || selectedLabel;
+    }
   };
 
   const closeMenu = () => {
@@ -19760,9 +19767,61 @@ async function renderProjectReportDraft(project) {
 
     const draftPicker = document.createElement("div");
     draftPicker.className = "report-draft-picker";
+    const titleControl = document.createElement("div");
+    titleControl.className = "report-title-control";
+    const titleButton = document.createElement("button");
+    titleButton.type = "button";
+    titleButton.className = "report-title-text";
+    titleButton.textContent = activeDraft.title || "Untitled Report";
+    titleButton.setAttribute("aria-label", "Edit Report title");
+    const titleEditor = document.createElement("input");
+    titleEditor.type = "text";
+    titleEditor.className = "report-title-editor";
+    titleEditor.value = activeDraft.title || "";
+    titleEditor.setAttribute("aria-label", "Edit Report title");
+    titleEditor.hidden = true;
+    const revisionLabel = document.createElement("span");
+    revisionLabel.className = "report-title-revision";
+    revisionLabel.textContent = `Revision ${activeDraft.version || 1}`;
+    const beginTitleEditing = () => {
+      titleEditor.value = activeDraft.title || "";
+      titleButton.hidden = true;
+      titleEditor.hidden = false;
+      titleEditor.focus();
+      titleEditor.select();
+    };
+    const finishTitleEditing = ({ cancel = false } = {}) => {
+      if (titleEditor.hidden) return;
+      const previousTitle = activeDraft.title || "Untitled Report";
+      const nextTitle = cancel ? previousTitle : titleEditor.value.trim() || previousTitle;
+      if (!cancel && nextTitle !== activeDraft.title) {
+        activeDraft.title = nextTitle;
+        setDirty();
+      }
+      titleButton.textContent = activeDraft.title || "Untitled Report";
+      currentOption.textContent = activeDraft.id
+        ? `${activeDraft.title} · revision ${activeDraft.version}`
+        : activeDraft.title || "Current Report";
+      titleEditor.hidden = true;
+      titleButton.hidden = false;
+      if (!cancel) titleButton.focus();
+    };
+    titleButton.addEventListener("click", beginTitleEditing);
+    titleEditor.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        finishTitleEditing();
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        finishTitleEditing({ cancel: true });
+      }
+    });
+    titleEditor.addEventListener("blur", () => finishTitleEditing());
     const select = document.createElement("select");
     select.className = "report-draft-select";
-    select.setAttribute("aria-label", "Report");
+    select.setAttribute("aria-label", "Switch or create Report");
+    select.dataset.customTrigger = "icon-only";
+    select.dataset.customTriggerLabel = "Switch or create Report";
     const currentOption = document.createElement("option");
     currentOption.value = activeDraft.id || "";
     currentOption.textContent = activeDraft.id
@@ -19795,7 +19854,8 @@ async function renderProjectReportDraft(project) {
       clearStatus();
       renderWorkspaceContent();
     });
-    draftPicker.append(select);
+    titleControl.append(titleButton, titleEditor, revisionLabel, select);
+    draftPicker.append(titleControl);
     if (reportOptions.tags?.length) {
       const tags = document.createElement("p");
       tags.className = "report-draft-empty";
@@ -19805,15 +19865,6 @@ async function renderProjectReportDraft(project) {
 
     const metadata = document.createElement("div");
     metadata.className = "report-draft-metadata";
-    const titleInput = document.createElement("input");
-    titleInput.type = "text";
-    titleInput.value = activeDraft.title || "";
-    titleInput.placeholder = "Report title";
-    titleInput.setAttribute("aria-label", "Report title");
-    titleInput.addEventListener("input", () => {
-      activeDraft.title = titleInput.value;
-      setDirty();
-    });
     const introductionSection = document.createElement("section");
     introductionSection.className = "report-introduction-section";
     const introductionHeading = document.createElement("div");
@@ -19835,7 +19886,7 @@ async function renderProjectReportDraft(project) {
     introductionHeading.append(introductionLabel);
     if (introductionInfo) introductionHeading.append(introductionInfo);
     introductionSection.append(introductionHeading, introduction);
-    metadata.append(titleInput, introductionSection);
+    metadata.append(introductionSection);
 
     const addControls = document.createElement("div");
     addControls.className = "report-draft-add-controls";
