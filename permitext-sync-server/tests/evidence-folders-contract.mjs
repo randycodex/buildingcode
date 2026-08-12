@@ -377,7 +377,7 @@ assert.match(appSource, /function appendSavedProjectResearchConversations[\s\S]*
 assert.match(stylesSource, /\.project-studio-section-heading > \.saved-project-research-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);
-assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);
+assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-auto-flow: column;[\s\S]*?grid-auto-columns: minmax\(0, 1fr\);[\s\S]*?width: 100%;/);
 assert.doesNotMatch(appSource, /\["Research", "project-code-decisions-button", projectHasOpenCodeDecisions, openProjectCodeDecisions, closeProjectCodeDecisions\]/);
 assert.match(appSource, /"toggle-analysis"/);
 assert.match(appSource, /async function openProjectCodeDecisions[\s\S]*?await focusUtility\("analysis", "\.evidence-discovery textarea"\);/);

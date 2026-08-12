@@ -8947,7 +8947,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-folder-context.is-project .saved-project-tool-controls {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   width: 100%;
   padding-top: var(--space-3);
 }
