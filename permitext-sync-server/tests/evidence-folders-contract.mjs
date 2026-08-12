@@ -184,10 +184,11 @@ assert.equal(
 assert.match(functionSource(appSource, "closeAllColumns"), /state\.coordinations = \[\][\s\S]*?state\.coordinationThreads = \[\][\s\S]*?state\.projectHostPaneID = ""/);
 assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordinationFilters = \{\}/);
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
-const pinnedProjectsSource = functionSource(appSource, "pinProjectsPanesToLeft");
-assert.match(pinnedProjectsSource, /new Set\(savedPaneIDs\(\)\)/);
-assert.match(functionSource(appSource, "activePaneIDs"), /pinProjectsPanesToLeft\(paired\)/);
-assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinProjectsPanesToLeft\(order\)/);
+const pinnedWorkflowSource = functionSource(appSource, "pinCriticalWorkflowPanesToLeft");
+assert.match(pinnedWorkflowSource, /new Set\(savedPaneIDs\(\)\)/);
+assert.match(pinnedWorkflowSource, /\["utility:analysis", paneIDForResearchConversation\(\)\]/);
+assert.match(functionSource(appSource, "activePaneIDs"), /pinCriticalWorkflowPanesToLeft\(paired\)/);
+assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
 assert.match(savedFolderContextSource, /if \(!folder\)[\s\S]*?inlineFilters\.hidden = true;[\s\S]*?savedContent\.hidden = true;/);
 assert.match(savedFolderContextSource, /inlineFilters\.hidden = false;[\s\S]*?savedContent\.hidden = false;/);

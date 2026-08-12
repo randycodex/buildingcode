@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v37";
+} from "./research-progress.js?v=20260812-research-progress-v38";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v37";
+} from "./offline-storage.js?v=20260812-research-progress-v38";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -3254,11 +3254,17 @@ function isProjectToolPaneID(paneID) {
   return Boolean(projectForToolPaneID(paneID));
 }
 
-function pinProjectsPanesToLeft(paneIDs) {
+function pinCriticalWorkflowPanesToLeft(paneIDs) {
   const projectsPaneIDs = new Set(savedPaneIDs());
+  const researchPaneIDs = new Set(
+    state.utilities.analysis
+      ? ["utility:analysis", paneIDForResearchConversation()].filter(Boolean)
+      : []
+  );
   return [
     ...paneIDs.filter((paneID) => projectsPaneIDs.has(paneID)),
-    ...paneIDs.filter((paneID) => !projectsPaneIDs.has(paneID))
+    ...paneIDs.filter((paneID) => researchPaneIDs.has(paneID)),
+    ...paneIDs.filter((paneID) => !projectsPaneIDs.has(paneID) && !researchPaneIDs.has(paneID))
   ];
 }
 
@@ -3344,9 +3350,9 @@ function activePaneIDs() {
       paired.splice(anchorIndex + 1, 0, detailID);
     }
   });
-  const projectsFirst = pinProjectsPanesToLeft(paired);
-  state.paneOrder = projectsFirst;
-  return projectsFirst;
+  const criticalWorkflowFirst = pinCriticalWorkflowPanesToLeft(paired);
+  state.paneOrder = criticalWorkflowFirst;
+  return criticalWorkflowFirst;
 }
 
 function orderPanes(panes) {
@@ -26175,7 +26181,7 @@ function orderWithPaneMoved(draggedPaneID, targetPaneID, position) {
   const targetIndex = position === "after" ? Math.max(...targetIndexes) + 1 : Math.min(...targetIndexes);
   if (targetIndex === -1) return null;
   order.splice(targetIndex, 0, ...draggedGroup);
-  return pinProjectsPanesToLeft(order);
+  return pinCriticalWorkflowPanesToLeft(order);
 }
 
 function applyDragPreviewOrder(order) {
