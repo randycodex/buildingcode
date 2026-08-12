@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-composer-heading-v1";
+} from "./offline-storage.js?v=20260811-research-back-button-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15257,19 +15257,13 @@ async function renderResearch(paneID = "utility:analysis") {
   newChatButton.type = "button";
   newChatButton.textContent = "New chat";
   newChatButton.addEventListener("click", () => void showNewResearchChat());
-  const backButton = document.createElement("button");
-  backButton.className = "ghost-button research-back-button";
-  backButton.type = "button";
-  backButton.textContent = "Back";
-  backButton.hidden = !state.researchConversationID;
-  backButton.addEventListener("click", () => void showNewResearchChat());
   const clearChatsButton = document.createElement("button");
   clearChatsButton.className = "ghost-button research-clear-chats-button";
   clearChatsButton.type = "button";
   clearChatsButton.textContent = "Clear";
   clearChatsButton.hidden = true;
   clearChatsButton.addEventListener("click", () => void clearResearchConversationHistory(clearChatsButton));
-  panelActions?.prepend(backButton, newChatButton, clearChatsButton);
+  panelActions?.prepend(newChatButton, clearChatsButton);
   const content = panel.querySelector(".analysis-content");
 
   if (!activeAccount()) {
