@@ -184,6 +184,10 @@ assert.equal(
 assert.match(functionSource(appSource, "closeAllColumns"), /state\.coordinations = \[\][\s\S]*?state\.coordinationThreads = \[\][\s\S]*?state\.projectHostPaneID = ""/);
 assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordinationFilters = \{\}/);
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
+const pinnedProjectsSource = functionSource(appSource, "pinProjectsPanesToLeft");
+assert.match(pinnedProjectsSource, /new Set\(savedPaneIDs\(\)\)/);
+assert.match(functionSource(appSource, "activePaneIDs"), /pinProjectsPanesToLeft\(paired\)/);
+assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinProjectsPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /outcome\.value === "cancelled"[\s\S]*?expectedHostPaneID[\s\S]*?expectedSelectedFolderID/);
 assert.doesNotMatch(savedFolderContextSource, /loadProjectCoordinationFoundation/);
