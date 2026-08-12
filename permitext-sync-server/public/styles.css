@@ -13572,6 +13572,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 .report-history-card span {
   color: var(--text-secondary);
   font-size: 10px;
+  font-weight: 400;
+  line-height: 1.35;
 }
 
 .report-draft-close:focus-visible,

@@ -880,6 +880,11 @@ async function main() {
         workspaceScript.text.includes('[source.codePrefix || "Code", source.sectionNumber]') &&
         workspaceScript.text.includes('appendSourceGroup("Research", ""') &&
         workspaceScript.text.includes('appendSourceGroup("Notebook notes", ""') &&
+        workspaceScript.text.includes('heading.textContent = `${report.title} · VERSION ${report.reportVersion}`') &&
+        workspaceScript.text.includes('`${generatedDate} at ${generatedTime}`') &&
+        workspaceScript.text.includes('`${report.itemCount} included ${report.itemCount === 1 ? "item" : "items"}`') &&
+        workspaceScript.text.includes('minute: "2-digit"') &&
+        !workspaceScript.text.includes('report.presentation?.template?.name,\n        report.author?.displayName') &&
         !workspaceScript.text.includes("Generated reports will appear here as dated, immutable versions.") &&
         workspaceScript.text.includes('dragHandle.className = "report-draft-block-drag-handle"') &&
         workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], label, initiallyExpanded') &&
@@ -1423,7 +1428,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-report-evidence-groups-v87'),
+        webRoot.text.includes('/web/app.js?v=20260812-report-history-v89'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1573,7 +1578,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-evidence-groups-v87'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-history-v89'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1840,7 +1845,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-report-evidence-groups-v87'),
+      webRoot.text.includes('/web/styles.css?v=20260812-report-history-v89'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

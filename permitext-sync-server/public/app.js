@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-evidence-groups-v87";
+} from "./research-progress.js?v=20260812-report-history-v89";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-evidence-groups-v87";
+} from "./offline-storage.js?v=20260812-report-history-v89";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19769,13 +19769,21 @@ async function renderProjectReportDraft(project) {
       button.className = "report-history-card";
       button.type = "button";
       const heading = document.createElement("strong");
-      heading.textContent = `Version ${report.reportVersion} · ${report.title}`;
+      heading.textContent = `${report.title} · VERSION ${report.reportVersion}`;
       const meta = document.createElement("span");
+      const generatedAt = new Date(report.createdAt);
+      const generatedDate = generatedAt.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+      const generatedTime = generatedAt.toLocaleTimeString(undefined, {
+        hour: "numeric",
+        minute: "2-digit"
+      });
       meta.textContent = [
-        new Date(report.createdAt).toLocaleDateString(),
-        `${report.itemCount} ${report.itemCount === 1 ? "item" : "items"}`,
-        report.presentation?.template?.name,
-        report.author?.displayName
+        `${generatedDate} at ${generatedTime}`,
+        `${report.itemCount} included ${report.itemCount === 1 ? "item" : "items"}`
       ].filter(Boolean).join(" · ");
       button.append(heading, meta);
       button.addEventListener("click", () => {
