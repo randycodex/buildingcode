@@ -1372,7 +1372,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-project-evidence-hide-v43'),
+        webRoot.text.includes('/web/app.js?v=20260812-notebook-three-row-v44'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1493,6 +1493,8 @@ async function main() {
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-flow: row;") &&
         workspaceStyles.text.includes(".notebook-card-menu.is-open .notebook-card-list {\n  height: min(var(--notebook-card-list-height, 156px), 70vh);\n  max-height: min(var(--notebook-card-list-height, 156px), 70vh);") &&
         workspaceScript.text.includes('cardListResizeHandle.className = "notebook-card-list-resize-handle"') &&
+        workspaceScript.text.includes("const minimumCardListHeight = 156") &&
+        workspaceScript.text.includes("Math.max(minimumCardListHeight, last.bottom - first.top)") &&
         workspaceScript.text.includes("requestAnimationFrame(sizeCardListForThreeRows)") &&
         workspaceStyles.text.includes(".notebook-card-tile {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);") &&
         workspaceStyles.text.includes(".notebook-reference-menu .notebook-reference-list {\n  background-image: none;") &&
@@ -1517,7 +1519,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-project-evidence-hide-v43'),
+      webRoot.text.includes('/web/styles.css?v=20260812-notebook-three-row-v44'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1784,7 +1786,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-project-evidence-hide-v43'),
+      webRoot.text.includes('/web/styles.css?v=20260812-notebook-three-row-v44'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

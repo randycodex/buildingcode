@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-project-evidence-hide-v43";
+} from "./research-progress.js?v=20260812-notebook-three-row-v44";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-project-evidence-hide-v43";
+} from "./offline-storage.js?v=20260812-notebook-three-row-v44";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18190,9 +18190,11 @@ async function renderProjectNotebook(project) {
     cardListResizeHandle.setAttribute("aria-label", "Resize Project notes list");
     cardListResizeHandle.setAttribute("aria-orientation", "horizontal");
     cardListResizeHandle.tabIndex = 0;
+    const minimumCardListHeight = 156;
     const resizeCardListTo = (height, userInitiated = true) => {
       const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
-      const nextHeight = Math.max(48, Math.min(maximumHeight, height));
+      const minimumHeight = Math.min(minimumCardListHeight, maximumHeight);
+      const nextHeight = Math.max(minimumHeight, Math.min(maximumHeight, height));
       rail.style.setProperty("--notebook-card-list-height", `${nextHeight}px`);
       if (userInitiated) rail.dataset.userResized = "true";
     };
@@ -18202,7 +18204,7 @@ async function renderProjectNotebook(project) {
       if (!rows.length) return;
       const first = rows[0].getBoundingClientRect();
       const last = rows.at(-1).getBoundingClientRect();
-      resizeCardListTo(last.bottom - first.top, false);
+      resizeCardListTo(Math.max(minimumCardListHeight, last.bottom - first.top), false);
     };
     cardListResizeHandle.addEventListener("pointerdown", (event) => {
       event.preventDefault();
