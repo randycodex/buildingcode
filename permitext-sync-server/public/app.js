@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-info-icons-v76";
+} from "./research-progress.js?v=20260812-report-alignment-v77";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-info-icons-v76";
+} from "./offline-storage.js?v=20260812-report-alignment-v77";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19570,8 +19570,8 @@ async function renderProjectReportDraft(project) {
       toggle.className = "project-section-toggle-chevron report-source-group-chevron";
       toggle.innerHTML = researchChevronIconsSVG();
       heading.append(title);
-      if (info) heading.append(info);
       heading.append(toggle);
+      if (info) heading.append(info);
       const body = document.createElement("div");
       body.className = "report-source-group-body";
       if (description) {
@@ -19864,8 +19864,8 @@ async function renderProjectReportDraft(project) {
     blocksToggle.className = "project-section-toggle-chevron report-draft-blocks-chevron";
     blocksToggle.innerHTML = researchChevronIconsSVG();
     blocksHeading.append(blocksTitle);
-    if (blocksInfo) blocksHeading.append(blocksInfo);
     blocksHeading.append(blocksToggle);
+    if (blocksInfo) blocksHeading.append(blocksInfo);
     const blocksBody = document.createElement("div");
     blocksBody.className = "report-draft-blocks-body";
     renderBlockEditor(blocksBody);
@@ -19957,8 +19957,8 @@ async function renderProjectReportDraft(project) {
       toggle.className = "project-section-toggle-chevron report-output-chevron";
       toggle.innerHTML = researchChevronIconsSVG();
       heading.append(title);
-      if (info) heading.append(info);
       heading.append(toggle);
+      if (info) heading.append(info);
       const disclosureBody = document.createElement("div");
       disclosureBody.className = "report-output-body";
       disclosureBody.append(body);

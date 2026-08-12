@@ -12964,12 +12964,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 }
 
 .report-draft-shell {
+  --report-content-edge: var(--space-3);
   display: grid;
   align-content: start;
   gap: var(--space-3);
   min-height: 0;
   overflow-y: auto;
-  padding: var(--space-3);
+  padding: var(--report-content-edge);
   border-radius: calc(var(--radius-card) + 4px);
   background: color-mix(in srgb, var(--surface) 78%, transparent);
 }
@@ -13125,6 +13126,18 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   gap: var(--space-2);
 }
 
+.report-draft-blocks-heading,
+.report-source-group-heading,
+.report-output-heading,
+.report-introduction-heading,
+.report-draft-add-controls,
+.report-draft-blocks-body,
+.report-source-group-body,
+.report-output-body {
+  width: 100%;
+  min-width: 0;
+}
+
 .report-draft-blocks-toggle {
   flex: 1 1 auto;
   min-width: 0;
@@ -13137,6 +13150,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-draft-blocks-chevron {
   flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .report-draft-blocks-body {
@@ -13179,6 +13193,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-source-group-chevron {
   flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .report-source-group-body {
@@ -13209,6 +13224,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-output-chevron {
   flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .report-output-body {
