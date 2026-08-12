@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-evidence-copy-v80";
+} from "./research-progress.js?v=20260812-report-evidence-copy-v81";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-evidence-copy-v80";
+} from "./offline-storage.js?v=20260812-report-evidence-copy-v81";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19599,14 +19599,7 @@ async function renderProjectReportDraft(project) {
       const heading = document.createElement("strong");
       if (source.kind === "evidence") {
         const sectionNumber = String(source.sectionNumber || "").trim();
-        const sourceTitle = stripLeadingSectionNumber(source.title || "", sectionNumber).trim();
-        const summaryText = String(source.summary || "").trim();
-        const titleRepeatsPassage = sourceTitle && summaryText &&
-          sourceTitle.replace(/\s+/g, " ").toLowerCase() === summaryText.replace(/\s+/g, " ").toLowerCase();
-        heading.textContent = [
-          [source.codePrefix || "Code", sectionNumber].filter(Boolean).join(" "),
-          titleRepeatsPassage ? "" : sourceTitle
-        ].filter(Boolean).join(" · ");
+        heading.textContent = [source.codePrefix || "Code", sectionNumber].filter(Boolean).join(" ");
       } else {
         heading.textContent = source.label;
       }
