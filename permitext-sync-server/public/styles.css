@@ -4021,6 +4021,12 @@ select option:checked {
   background: color-mix(in srgb, var(--text-tertiary) 24%, transparent);
 }
 
+.search-code-filter-menu .code-filter-menu-toggle:focus-visible {
+  outline: 0;
+  outline-offset: 0;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-secondary) 46%, transparent);
+}
+
 .code-filter-menu-icon {
   display: grid;
   flex: 0 0 18px;
