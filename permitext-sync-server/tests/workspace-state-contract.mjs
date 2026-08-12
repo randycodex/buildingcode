@@ -105,7 +105,7 @@ assert.equal(legacyLayout.coordinationThreads[0].threadID, "thread-1");
 assert.deepEqual(legacyLayout.coordinationFilters, { "project-1": "waiting" });
 assert.equal(workspaceLayoutHasVisiblePanes(legacyLayout), true);
 
-const unifiedResearchLayout = normalizeWorkspaceLayout({
+const restoredResearchLayout = normalizeWorkspaceLayout({
   utilities: { analysis: true },
   researchConversationID: "research-1",
   paneOrder: ["utility:analysis", "research:conversation:research-1"],
@@ -113,12 +113,24 @@ const unifiedResearchLayout = normalizeWorkspaceLayout({
     "research:conversation:research-1": 742
   }
 });
-assert.equal(unifiedResearchLayout.researchConversationID, "research-1");
-assert.deepEqual(unifiedResearchLayout.paneOrder, ["utility:analysis", "research:conversation:research-1"]);
-assert.deepEqual(unifiedResearchLayout.paneWeights, {
-  "utility:analysis": 742,
-  "research:conversation:research-1": 742
+assert.equal(restoredResearchLayout.utilities.analysis, true);
+assert.equal(restoredResearchLayout.researchConversationID, "");
+assert.deepEqual(restoredResearchLayout.paneOrder, ["utility:analysis"]);
+assert.deepEqual(restoredResearchLayout.paneWeights, { "utility:analysis": 742 });
+
+const capturedResearchLayout = captureWorkspaceLayout({
+  ...emptyWorkspaceLayout(),
+  utilities: { analysis: true },
+  researchConversationID: "research-2",
+  paneOrder: ["utility:analysis", "research:conversation:research-2"],
+  paneWeights: {
+    "utility:analysis": 600,
+    "research:conversation:research-2": 640
+  }
 });
+assert.equal(capturedResearchLayout.researchConversationID, "");
+assert.deepEqual(capturedResearchLayout.paneOrder, ["utility:analysis"]);
+assert.deepEqual(capturedResearchLayout.paneWeights, { "utility:analysis": 600 });
 
 const hostedProjectLayout = normalizeWorkspaceLayout({
   utilityInstances: [{ id: "saved-1", key: "saved" }, { id: "saved-2", key: "saved" }],
