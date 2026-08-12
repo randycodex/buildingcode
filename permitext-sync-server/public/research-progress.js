@@ -1,4 +1,4 @@
-export const researchProgressVersion = "20260812-report-details-v59";
+export const researchProgressVersion = "20260812-report-idle-hidden-v60";
 
 export const researchProgressStages = Object.freeze([
   Object.freeze({ id: "preparing_question", label: "Preparing the question" }),
