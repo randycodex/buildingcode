@@ -1369,7 +1369,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v17'),
+        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v19'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1515,7 +1515,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v17'),
+      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v19'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1782,7 +1782,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v17'),
+      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v19'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -5844,23 +5844,22 @@ async function main() {
     assert(
       moveResearchWithReview.response.ok &&
         moveResearchWithReview.json.conversation.primaryProjectID === researchProjectIDs[1] &&
-        moveResearchWithReview.json.conversation.projectContextReviewRequired === true &&
+        moveResearchWithReview.json.conversation.projectContextReviewRequired === false &&
         moveResearchWithReview.json.conversation.projectContext.facts.length === 0,
-      "Confirmed Research movement did not clear Project facts and require a context review."
+      "Confirmed Research movement did not switch to the destination Project's current facts."
     );
-    const blockedResearchBeforeContextReview = await request("/research/conversations/message", {
+    const continuedResearchAfterMove = await request("/research/conversations/message", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
         conversationID,
-        question: "Can I continue before reviewing the new Project context?"
+        question: "Which current facts from the destination Project apply to this question?"
       }
     });
     assert(
-      blockedResearchBeforeContextReview.response.status === 409 &&
-        blockedResearchBeforeContextReview.json.code === "RESEARCH_PROJECT_REVIEW_REQUIRED",
-      "Research generated a new answer before the moved conversation's Project context was reviewed."
+      continuedResearchAfterMove.response.ok,
+      "Research did not continue using the destination Project's visible current facts after a confirmed move."
     );
     const reviewedMovedProjectContext = await request("/research/conversations/project-context", {
       method: "POST",

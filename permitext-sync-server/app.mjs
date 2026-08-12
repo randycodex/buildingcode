@@ -12739,7 +12739,7 @@ async function handleResearchConversationAssignProject(request, response) {
     source: "user-provided",
     updatedAt: now
   } : null;
-  conversation.projectContextReviewRequired = Boolean(targetProjectID && currentProjectID);
+  conversation.projectContextReviewRequired = false;
   conversation.movedFromProjectID = currentProjectID;
   conversation.movedAt = now;
   conversation.updatedAt = now;

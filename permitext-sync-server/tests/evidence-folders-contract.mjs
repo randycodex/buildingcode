@@ -100,11 +100,11 @@ assert(!appSource.includes("No archived folders."), "An empty archive should not
 const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");
 assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
-assert.match(savedFolderContextSource, /"Address"[\s\S]*?hideLabel: true[\s\S]*?"Description"[\s\S]*?hideLabel: true/);
+assert.match(savedFolderContextSource, /appendSavedProjectFactEditor\(summary, folder, identity\)/);
 assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"/);
 assert.doesNotMatch(savedFolderContextSource, /"Workboard"/);
 assert.match(savedFolderContextSource, /context\.dataset\.projectId = projectDetailKey\(identity\)/);
-assert.match(savedFolderContextSource, /"Address"[\s\S]*?hideLabel: true[\s\S]*?"Description"[\s\S]*?hideLabel: true[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?populateSavedEvidenceSection/);
+assert.match(savedFolderContextSource, /appendSavedProjectFactEditor\(summary, folder, identity\)[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?populateSavedEvidenceSection/);
 assert.doesNotMatch(savedFolderContextSource, /Blocknotes|appendProjectNotes|appendProjectResearchHistory|loadProjectCoordinationFoundation/);
 assert.doesNotMatch(savedFolderContextSource, /appendProjectActivity|Recent Activities/);
 const savedEvidenceHeadingSource = functionSource(appSource, "createSavedEvidenceHeading");
@@ -353,7 +353,11 @@ assert.match(appSource, /options\.onCodeGroupToggle\(normalizedPrefix, collapsed
 assert.match(appSource, /wireProjectSectionMotion\([\s\S]*?codeGroup,[\s\S]*?codeBody,[\s\S]*?onChange: \(expanded\)/);
 assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle-chevron/);
 assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body[\s\S]*?max-height 420ms cubic-bezier/);
-assert.match(stylesSource, /\.saved-project-summary-field > \.section-label \{[\s\S]*?text-transform: none;/);
+assert.match(appSource, /function appendSavedProjectFactEditor\(container, folder, identity\)[\s\S]*?toggle\.textContent = "Project facts"[\s\S]*?address\.setAttribute\("aria-label", "Project address"\)[\s\S]*?description\.setAttribute\("aria-label", "Project description and facts"\)[\s\S]*?wireProjectSectionMotion\(container, body, \[toggle, chevron\], "Project facts", false\)/);
+assert.match(appSource, /address\.addEventListener\("blur", save\)[\s\S]*?description\.addEventListener\("blur", save\)[\s\S]*?updateProjectFolder\(folder,/);
+assert.match(stylesSource, /\.saved-project-fact-input \{[\s\S]*?background: transparent;[\s\S]*?font: inherit;/);
+assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: inset 0 -1px 0 var\(--project-color, var\(--accent\)\);/);
+assert.match(stylesSource, /\.saved-project-fact-description \{[\s\S]*?height: 112px !important;[\s\S]*?overflow-y: auto;[\s\S]*?resize: vertical;/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);

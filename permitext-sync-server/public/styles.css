@@ -8767,23 +8767,74 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-project-summary {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-1);
 }
 
-.saved-project-summary-field {
+.saved-project-facts-heading {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+}
+
+.saved-project-facts-toggle {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.saved-project-facts-toggle:hover,
+.saved-project-facts-toggle:focus-visible {
+  color: var(--text-primary);
+}
+
+.saved-project-facts-chevron {
+  margin-left: var(--space-2);
+}
+
+.saved-project-facts-body {
   display: grid;
   gap: var(--space-1);
 }
 
-.saved-project-summary-field p {
+.saved-project-fact-input {
+  width: 100%;
+  min-width: 0;
   margin: 0;
+  padding: var(--space-1) 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
   color: var(--text-primary);
+  font: inherit;
   line-height: 1.45;
 }
 
-.saved-project-summary-field > .section-label {
-  letter-spacing: normal;
-  text-transform: none;
+.saved-project-fact-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.saved-project-fact-input:focus-visible {
+  box-shadow: inset 0 -1px 0 var(--project-color, var(--accent));
+}
+
+.saved-project-fact-description {
+  height: 112px !important;
+  min-height: 72px;
+  max-height: 180px;
+  overflow-y: auto;
+  resize: vertical;
+}
+
+.saved-project-facts-status {
+  min-height: 12px;
+  color: var(--text-secondary);
+  font-size: 10px;
 }
 
 .saved-folder-context.is-project .saved-project-tool-controls {

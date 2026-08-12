@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v17";
+} from "./research-progress.js?v=20260812-research-progress-v19";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v17";
+} from "./offline-storage.js?v=20260812-research-progress-v19";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14374,7 +14374,7 @@ async function assignResearchConversationProject(conversation, targetProjectID, 
         ? `Move this conversation to ${targetProjectName}?`
         : `Remove this conversation from ${currentProjectName}?`,
       targetProjectID
-        ? `The entire conversation will move from ${currentProjectName} to ${targetProjectName}. Its existing answers and citations will not change. Facts supplied by ${currentProjectName} will be removed; review the facts from ${targetProjectName} before asking another question.`
+        ? `The entire conversation will move from ${currentProjectName} to ${targetProjectName}. Its existing answers and citations will not change. Future questions will use the current Project facts from ${targetProjectName}.`
         : `The conversation will no longer appear in ${currentProjectName}. Its existing answers and citations will not change, but it will not use or add Project-specific facts until you assign it to another Project.`,
       {
         confirmLabel: targetProjectID ? "Move conversation" : "Remove from Project",
@@ -22514,23 +22514,114 @@ function populateSavedEvidenceSection(section, savedInstance, folderID, ...child
   }, { capture: true }));
 }
 
-function appendSavedProjectSummaryField(container, label, value, options = {}) {
-  const normalizedValue = String(value || "").trim();
-  if (!normalizedValue && options.optional) return;
-  const field = document.createElement("section");
-  field.className = "saved-project-summary-field";
-  const copy = document.createElement("p");
-  copy.textContent = normalizedValue || options.emptyText || "Not provided";
-  if (options.hideLabel) {
-    field.setAttribute("aria-label", label);
-    field.append(copy);
-  } else {
-    const heading = document.createElement("span");
-    heading.className = "section-label";
-    heading.textContent = label;
-    field.append(heading, copy);
+function appendSavedProjectFactEditor(container, folder, identity) {
+  const heading = document.createElement("div");
+  heading.className = "saved-project-facts-heading";
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "saved-project-facts-toggle section-label";
+  toggle.textContent = "Project facts";
+  const chevron = document.createElement("button");
+  chevron.type = "button";
+  chevron.className = "project-section-toggle-chevron saved-project-facts-chevron";
+  chevron.innerHTML = researchChevronIconsSVG();
+  heading.append(toggle, chevron);
+
+  const body = document.createElement("section");
+  body.className = "saved-project-facts-body";
+
+  const address = document.createElement("input");
+  address.type = "text";
+  address.className = "saved-project-fact-input saved-project-fact-address";
+  address.value = String(folder.address || identity.address || "");
+  address.placeholder = "Add project address";
+  address.autocomplete = "street-address";
+  address.setAttribute("aria-label", "Project address");
+
+  const description = document.createElement("textarea");
+  description.className = "saved-project-fact-input saved-project-fact-description";
+  description.value = String(folder.description || identity.description || "");
+  description.placeholder = "Add occupancy, construction type, height, existing conditions, proposed work, relevant dates, and other Project facts";
+  description.rows = 2;
+  description.setAttribute("aria-label", "Project description and facts");
+
+  const status = document.createElement("span");
+  status.className = "saved-project-facts-status";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+
+  const initial = {
+    address: address.value,
+    description: description.value
+  };
+  let saved = { ...initial };
+  let saveSequence = Promise.resolve();
+  const resizeDescription = () => {
+    description.style.height = "auto";
+    description.style.height = `${Math.max(description.scrollHeight, 38)}px`;
+  };
+  const save = () => {
+    const next = {
+      address: address.value.trim(),
+      description: description.value.trim()
+    };
+    if (next.address === saved.address && next.description === saved.description) return saveSequence;
+    status.textContent = "Saving…";
+    saveSequence = saveSequence.then(async () => {
+      await updateProjectFolder(folder, {
+        name: folder.name || folder.title || identity.name,
+        address: next.address,
+        description: next.description,
+        color: projectColor(folder),
+        folderType: folderType(folder)
+      });
+      saved = next;
+      status.textContent = "Saved";
+      window.setTimeout(() => {
+        if (status.textContent === "Saved") status.textContent = "";
+      }, 1_500);
+    }).catch((error) => {
+      status.textContent = error.message || "Could not save Project facts";
+    });
+    return saveSequence;
+  };
+  const restore = (control, value) => {
+    control.value = value;
+    control.blur();
+    resizeDescription();
+  };
+
+  address.addEventListener("blur", save);
+  description.addEventListener("blur", save);
+  description.addEventListener("input", resizeDescription);
+  address.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      address.blur();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      restore(address, saved.address);
+    }
+  });
+  description.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      event.preventDefault();
+      description.blur();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      restore(description, saved.description);
+    }
+  });
+
+  if (identity.sharedOnly) {
+    address.disabled = true;
+    description.disabled = true;
+    address.title = description.title = "Project facts are read-only in this shared Project";
   }
-  container.append(field);
+  body.append(address, description, status);
+  container.append(heading, body);
+  wireProjectSectionMotion(container, body, [toggle, chevron], "Project facts", false);
+  requestAnimationFrame(resizeDescription);
 }
 
 async function appendSavedProjectResearchConversations(container, identity) {
@@ -22604,14 +22695,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     context.dataset.projectId = projectDetailKey(identity);
     const summary = document.createElement("section");
     summary.className = "saved-project-summary";
-    appendSavedProjectSummaryField(summary, "Address", folder.address || identity.address, {
-      emptyText: "No address added",
-      hideLabel: true
-    });
-    appendSavedProjectSummaryField(summary, "Description", folder.description || identity.description, {
-      optional: true,
-      hideLabel: true
-    });
+    appendSavedProjectFactEditor(summary, folder, identity);
     context.append(summary);
 
     const controls = document.createElement("nav");
