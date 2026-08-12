@@ -107,6 +107,8 @@ assert.match(clientSource, /meta\.textContent = researchConversationDate\(conver
 assert.match(clientSource, /conversation\.starterQuestion \|\| summaryQuestion \|\| conversation\.title/, "The standalone conversation column does not retain the original question as its title.");
 assert.match(clientSource, /if \(!releaseSurfaceVisibility\.researchHistoryManagement\)/, "Deferred per-chat management controls are not hidden behind the release boundary.");
 assert.doesNotMatch(clientSource, /Ask naturally\. Permitext will research/, "The redundant Research start helper sentence is still visible.");
+assert.match(stylesSource, /\.research-composer\.research-start-composer \{[\s\S]*?background: transparent;/, "The Research start composer still renders a tinted outer block.");
+assert.match(stylesSource, /\.search-box,[\s\S]*?\.research-start-composer \.research-composer-box \{[\s\S]*?background: #111111;/, "The dark Research chat box does not match the Search pill surface.");
 assert.match(
   clientSource,
   /clearChatsButton\.textContent = "Clear"/,

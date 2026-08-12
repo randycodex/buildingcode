@@ -3921,7 +3921,8 @@ select option:checked {
 }
 
 @media (prefers-color-scheme: dark) {
-  .search-box {
+  .search-box,
+  .research-start-composer .research-composer-box {
     background: #111111;
   }
 }
@@ -5943,8 +5944,9 @@ mark {
   line-height: 1.5;
 }
 
-.research-start-composer {
+.research-composer.research-start-composer {
   padding-bottom: var(--space-3);
+  background: transparent;
 }
 
 .research-start-project {

@@ -1461,7 +1461,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-research-code-basis-v2'),
+      webRoot.text.includes('/web/styles.css?v=20260811-research-composer-v2'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1721,7 +1721,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-research-code-basis-v2'),
+        webRoot.text.includes('/web/styles.css?v=20260811-research-composer-v2'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
