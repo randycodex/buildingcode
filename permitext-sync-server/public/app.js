@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v24";
+} from "./research-progress.js?v=20260812-research-progress-v25";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v24";
+} from "./offline-storage.js?v=20260812-research-progress-v25";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -22576,11 +22576,6 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     resizeDescriptionTo(description.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
   });
 
-  const status = document.createElement("span");
-  status.className = "saved-project-facts-status";
-  status.setAttribute("role", "status");
-  status.setAttribute("aria-live", "polite");
-
   const initial = {
     address: address.value,
     description: description.value
@@ -22593,7 +22588,6 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       description: description.value.trim()
     };
     if (next.address === saved.address && next.description === saved.description) return saveSequence;
-    status.textContent = "Saving…";
     saveSequence = saveSequence.then(async () => {
       await updateProjectFolder(folder, {
         name: folder.name || folder.title || identity.name,
@@ -22603,12 +22597,8 @@ function appendSavedProjectFactEditor(container, folder, identity) {
         folderType: folderType(folder)
       });
       saved = next;
-      status.textContent = "Saved";
-      window.setTimeout(() => {
-        if (status.textContent === "Saved") status.textContent = "";
-      }, 1_500);
     }).catch((error) => {
-      status.textContent = error.message || "Could not save Project facts";
+      void showWebNotice("Project facts not saved", error.message || "Could not save Project facts");
     });
     return saveSequence;
   };
@@ -22643,7 +22633,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     description.disabled = true;
     address.title = description.title = "Project facts are read-only in this shared Project";
   }
-  body.append(address, description, descriptionResizeHandle, status);
+  body.append(address, description, descriptionResizeHandle);
   container.append(heading, body);
   wireProjectSectionMotion(container, body, [toggle, chevron], "Project facts", false);
 }

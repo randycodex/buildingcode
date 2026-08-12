@@ -360,6 +360,9 @@ assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?b
 assert.match(stylesSource, /\.saved-project-fact-description \{[\s\S]*?height: 112px;[\s\S]*?max-height: min\(70vh, 760px\);[\s\S]*?overflow-y: auto;[\s\S]*?resize: none;/);
 assert.match(appSource, /descriptionResizeHandle\.className = "saved-project-fact-resize-handle"[\s\S]*?descriptionResizeHandle\.setPointerCapture\(event\.pointerId\)[\s\S]*?event\.key !== "ArrowUp" && event\.key !== "ArrowDown"/);
 assert.doesNotMatch(appSource, /description\.addEventListener\("input", resizeDescription\)/);
+assert.doesNotMatch(appSource, /saved-project-facts-status/);
+assert.doesNotMatch(appSource.match(/function appendSavedProjectFactEditor[\s\S]*?async function appendSavedProjectResearchConversations/)?.[0] || "", /status\.textContent = "Saving…"|status\.textContent = "Saved"/);
+assert.match(appSource, /showWebNotice\("Project facts not saved", error\.message \|\| "Could not save Project facts"\)/);
 assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?font-weight: 400;/);
 assert.match(appSource, /function appendSavedProjectResearchConversations[\s\S]*?title\.className = "section-label saved-project-research-toggle"[\s\S]*?body\.className = "project-studio-collapsible-body saved-project-research-body"[\s\S]*?wireProjectSectionMotion\(section, body, \[title, toggle\], "Research", false\)/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
