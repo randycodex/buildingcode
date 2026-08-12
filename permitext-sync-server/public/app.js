@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-release-surface-v39";
+} from "./research-progress.js?v=20260812-research-history-selection-v41";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-release-surface-v39";
+} from "./offline-storage.js?v=20260812-research-history-selection-v41";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14451,20 +14451,22 @@ async function deleteResearchConversationFromList(conversation, button) {
   }
 }
 
-async function clearResearchConversationHistory(button) {
-  const conversations = [...researchConversationList];
+async function clearResearchConversationHistory(button, selectedConversations = researchConversationList) {
+  const conversations = [...selectedConversations];
   if (!conversations.length) return;
   const confirmed = await confirmWebWarning(
-    "Clear Research history?",
-    `${conversations.length} ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from this list. Unassigned chats will be deleted. Chats attached to Projects will remain available from their Projects. Saved Research answers and governed Code Decision records will remain.`,
-    { confirmLabel: "Clear all" }
+    "Remove selected Research history?",
+    `${conversations.length} selected ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from this list. Unassigned chats will be deleted. Chats attached to Projects will remain available from their Projects. Saved Research answers and governed Code Decision records will remain.`,
+    { confirmLabel: conversations.length === 1 ? "Remove conversation" : `Remove ${conversations.length}` }
   );
-  if (!confirmed) return;
+  if (!confirmed) return false;
 
   button.disabled = true;
-  button.textContent = "Clearing…";
+  button.setAttribute("aria-busy", "true");
   try {
-    await postResearch("/research/conversations/clear-history", {});
+    await postResearch("/research/conversations/clear-history", {
+      conversationIDs: conversations.map((conversation) => conversation.id)
+    });
     const clearedIDs = new Set(conversations.map((conversation) => conversation.id));
     if (clearedIDs.has(String(state.researchConversationID || ""))) {
       researchOpenGeneration += 1;
@@ -14477,10 +14479,12 @@ async function clearResearchConversationHistory(button) {
     await refreshResearchConversationList();
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+    return true;
   } catch (error) {
     button.disabled = false;
-    button.textContent = "Clear";
+    button.removeAttribute("aria-busy");
     await showWebNotice("Research history not cleared", error.message);
+    return false;
   }
 }
 
@@ -15567,14 +15571,97 @@ async function renderResearch(paneID = "utility:analysis") {
   applyProjectDerivedPaneTheme(panel, preferredResearchProjectID());
   panel.querySelector(".utility-close")?.addEventListener("click", closeResearchWorkspace);
   const panelActions = panel.querySelector(".panel-actions");
-  const clearChatsButton = document.createElement("button");
-  clearChatsButton.className = "ghost-button research-clear-chats-button";
-  clearChatsButton.type = "button";
-  clearChatsButton.textContent = "Clear";
-  clearChatsButton.hidden = true;
-  clearChatsButton.addEventListener("click", () => void clearResearchConversationHistory(clearChatsButton));
-  panelActions?.prepend(clearChatsButton);
+  const selectedConversationIDs = new Set();
+  const conversationRows = new Map();
+  let selectingConversations = false;
+  let clearingSelectedConversations = false;
+  const cancelSelectionButton = document.createElement("button");
+  cancelSelectionButton.className = "ghost-button research-history-selection-link";
+  cancelSelectionButton.type = "button";
+  cancelSelectionButton.textContent = "Cancel";
+  cancelSelectionButton.hidden = true;
+  const selectAllButton = document.createElement("button");
+  selectAllButton.className = "ghost-button research-history-selection-link";
+  selectAllButton.type = "button";
+  selectAllButton.textContent = "Select all";
+  selectAllButton.hidden = true;
+  const selectHistoryButton = document.createElement("button");
+  selectHistoryButton.className = "icon-button research-history-select-button";
+  selectHistoryButton.type = "button";
+  selectHistoryButton.title = "Select Research conversations";
+  selectHistoryButton.setAttribute("aria-label", selectHistoryButton.title);
+  selectHistoryButton.setAttribute("aria-pressed", "false");
+  selectHistoryButton.innerHTML = selectionModeIconSVG();
+  selectHistoryButton.hidden = true;
+  panelActions?.prepend(cancelSelectionButton, selectAllButton, selectHistoryButton);
   const content = panel.querySelector(".analysis-content");
+
+  const updateConversationSelection = () => {
+    panel.classList.toggle("is-research-history-selecting", selectingConversations);
+    selectHistoryButton.setAttribute("aria-pressed", String(selectingConversations));
+    cancelSelectionButton.hidden = !selectingConversations;
+    selectAllButton.hidden = !selectingConversations;
+    const allSelected = researchConversationList.length > 0 &&
+      selectedConversationIDs.size === researchConversationList.length;
+    selectAllButton.textContent = allSelected ? "Clear all" : "Select all";
+    selectHistoryButton.title = selectingConversations
+      ? selectedConversationIDs.size
+        ? `Remove ${selectedConversationIDs.size} selected ${selectedConversationIDs.size === 1 ? "conversation" : "conversations"}`
+        : "Select one or more conversations"
+      : "Select Research conversations";
+    selectHistoryButton.setAttribute("aria-label", selectHistoryButton.title);
+    selectHistoryButton.disabled = clearingSelectedConversations ||
+      (selectingConversations && selectedConversationIDs.size === 0);
+    cancelSelectionButton.disabled = clearingSelectedConversations;
+    selectAllButton.disabled = clearingSelectedConversations;
+    conversationRows.forEach((row, conversationID) => {
+      const selected = selectedConversationIDs.has(conversationID);
+      row.classList.toggle("is-selected", selected);
+      const openButton = row.querySelector(".research-conversation-open");
+      if (selectingConversations) openButton?.setAttribute("aria-pressed", String(selected));
+      else openButton?.removeAttribute("aria-pressed");
+    });
+  };
+  const setConversationSelectionActive = (active) => {
+    selectingConversations = Boolean(active);
+    selectedConversationIDs.clear();
+    updateConversationSelection();
+  };
+  const toggleConversationSelection = (conversationID) => {
+    if (!selectingConversations || clearingSelectedConversations) return;
+    if (selectedConversationIDs.has(conversationID)) selectedConversationIDs.delete(conversationID);
+    else selectedConversationIDs.add(conversationID);
+    updateConversationSelection();
+  };
+  selectHistoryButton.addEventListener("click", async () => {
+    if (!selectingConversations) {
+      setConversationSelectionActive(true);
+      return;
+    }
+    const selectedConversations = researchConversationList.filter((conversation) =>
+      selectedConversationIDs.has(conversation.id)
+    );
+    if (!selectedConversations.length) return;
+    clearingSelectedConversations = true;
+    updateConversationSelection();
+    const cleared = await clearResearchConversationHistory(selectHistoryButton, selectedConversations);
+    if (!cleared && panel.isConnected) {
+      clearingSelectedConversations = false;
+      updateConversationSelection();
+    }
+  });
+  cancelSelectionButton.addEventListener("click", () => setConversationSelectionActive(false));
+  selectAllButton.addEventListener("click", () => {
+    if (selectedConversationIDs.size === researchConversationList.length) selectedConversationIDs.clear();
+    else researchConversationList.forEach((conversation) => selectedConversationIDs.add(conversation.id));
+    updateConversationSelection();
+  });
+  panel.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !selectingConversations || clearingSelectedConversations) return;
+    event.preventDefault();
+    setConversationSelectionActive(false);
+    selectHistoryButton.focus({ preventScroll: true });
+  });
 
   if (!activeAccount()) {
     const empty = document.createElement("article");
@@ -15595,7 +15682,7 @@ async function renderResearch(paneID = "utility:analysis") {
 
   try {
     await refreshResearchConversationList();
-    clearChatsButton.hidden = researchConversationList.length === 0;
+    selectHistoryButton.hidden = researchConversationList.length === 0;
   } catch (error) {
     const status = document.createElement("p");
     status.className = "research-list-status is-error";
@@ -15732,6 +15819,7 @@ async function renderResearch(paneID = "utility:analysis") {
     let conversation = initialConversation;
     const row = document.createElement("article");
     row.className = "research-conversation-row";
+    conversationRows.set(conversation.id, row);
     const renderRow = () => {
       clear(row);
       row.classList.toggle("is-active", state.researchConversationID === conversation.id);
@@ -15743,7 +15831,13 @@ async function renderResearch(paneID = "utility:analysis") {
       const meta = document.createElement("span");
       meta.textContent = researchConversationDate(conversation.createdAt);
       openButton.append(title, meta);
-      openButton.addEventListener("click", () => openResearchConversation(conversation.id));
+      openButton.addEventListener("click", () => {
+        if (selectingConversations) {
+          toggleConversationSelection(conversation.id);
+          return;
+        }
+        void openResearchConversation(conversation.id);
+      });
       if (!releaseSurfaceVisibility.researchHistoryManagement) {
         row.append(openButton);
         return;
@@ -16025,6 +16119,7 @@ async function renderResearch(paneID = "utility:analysis") {
     list.append(group);
   });
   content.append(list);
+  updateConversationSelection();
   return panel;
 }
 

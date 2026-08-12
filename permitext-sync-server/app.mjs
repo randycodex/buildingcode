@@ -14367,7 +14367,17 @@ async function handleResearchConversationDelete(request, response) {
 async function handleResearchConversationClearHistory(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
-  const conversations = await listStoredResearchConversations(context.userID);
+  const requestedConversationIDs = Array.isArray(context.body.conversationIDs)
+    ? new Set(context.body.conversationIDs.map((value) => String(value || "").trim()).filter(Boolean))
+    : null;
+  if (requestedConversationIDs && requestedConversationIDs.size > 500) {
+    sendError(response, 400, "Select no more than 500 Research conversations at once.");
+    return;
+  }
+  const allConversations = await listStoredResearchConversations(context.userID);
+  const conversations = requestedConversationIDs
+    ? allConversations.filter((conversation) => requestedConversationIDs.has(conversation.id))
+    : allConversations;
   const now = new Date().toISOString();
   let hiddenProjectConversationCount = 0;
   let deletedConversationCount = 0;

@@ -129,15 +129,15 @@ assert.doesNotMatch(clientSource, /Ask naturally\. Permitext will research/, "Th
 assert.doesNotMatch(clientSource, /Project context \(optional\)/i, "The redundant Project context caption is still visible above the Research selector.");
 assert.match(stylesSource, /\.research-composer\.research-start-composer \{[\s\S]*?background: transparent;/, "The Research start composer still renders a tinted outer block.");
 assert.match(stylesSource, /\.search-box,[\s\S]*?\.research-start-composer \.research-composer-box \{[\s\S]*?background: #111111;/, "The dark Research chat box does not match the Search pill surface.");
+assert.match(clientSource, /selectHistoryButton\.innerHTML = selectionModeIconSVG\(\)/, "Research history does not expose its selection icon.");
+assert.match(clientSource, /cancelSelectionButton\.textContent = "Cancel"[\s\S]*?selectAllButton\.textContent = "Select all"/, "Research selection mode is missing Cancel or Select all.");
+assert.match(clientSource, /if \(selectingConversations\)[\s\S]*?toggleConversationSelection\(conversation\.id\)/, "Conversation rows do not toggle selection instead of opening while selection mode is active.");
+assert.match(clientSource, /row\.classList\.toggle\("is-selected", selected\)/, "Selected Research rows do not receive a visible state hook.");
+assert.match(clientSource, /conversationIDs: conversations\.map\(\(conversation\) => conversation\.id\)/, "Research history removal does not send only the selected conversation IDs.");
 assert.match(
   clientSource,
-  /clearChatsButton\.textContent = "Clear"/,
-  "Research history does not expose a clear action beside New chat."
-);
-assert.match(
-  clientSource,
-  /Clear Research history\?/,
-  "Research history clearing is missing an explicit confirmation."
+  /Remove selected Research history\?/,
+  "Selected Research history removal is missing an explicit confirmation."
 );
 assert.match(
   clientSource,
@@ -151,9 +151,12 @@ assert.match(
 );
 assert.match(
   stylesSource,
-  /\.research-clear-chats-button/,
-  "Research history clear control has no dedicated header styling."
+  /\.research-history-select-button/,
+  "Research history selection control has no dedicated header styling."
 );
+assert.match(stylesSource, /\.research-conversation-row\.is-selected \{[\s\S]*?background:/, "Selected Research rows do not visibly change color.");
+assert.match(stylesSource, /\.research-history-select-button \{[\s\S]*?border: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "The Research selection icon does not match Permitext's bare column-header controls.");
+assert.match(appSource, /requestedConversationIDs[\s\S]*?allConversations\.filter\(\(conversation\) => requestedConversationIDs\.has\(conversation\.id\)\)/, "The server does not scope Research history removal to the selected IDs.");
 assert.match(appSource, /conversation\?\.primaryProjectID[\s\S]*historyHiddenAt/, "Project conversations are not preserved when history is cleared.");
 assert.match(appSource, /filter\(\(conversation\) => !conversation\.historyHiddenAt\)/, "Hidden Project conversations still appear in the main history.");
 assert.doesNotMatch(clientSource, /className = "ghost-button research-back-button"/, "The redundant Research Back control should remain removed.");

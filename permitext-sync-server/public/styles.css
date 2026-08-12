@@ -6101,18 +6101,48 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   white-space: nowrap;
 }
 
-.research-clear-chats-button {
-  min-height: 32px;
-  padding-inline: var(--space-2);
+.research-history-selection-link {
+  width: auto;
+  height: var(--panel-title-control-size);
+  min-height: 0;
+  padding: 0;
   border: 0;
+  border-radius: 0;
   background: transparent;
   color: var(--text-secondary);
+  font-weight: 400;
+  line-height: 1;
   white-space: nowrap;
+  box-shadow: none;
 }
 
-.research-clear-chats-button:hover,
-.research-clear-chats-button:focus-visible {
-  color: var(--destructive);
+.research-history-selection-link:hover,
+.research-history-selection-link:focus-visible {
+  color: var(--text-primary);
+}
+
+.research-history-select-button {
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.research-history-select-button svg {
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
+}
+
+.research-history-select-button[aria-pressed="true"] {
+  color: var(--text-primary);
+}
+
+.research-list-panel .panel-actions {
+  align-items: center;
 }
 
 .research-conversation-row {
@@ -6126,6 +6156,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 .research-conversation-row.is-active {
   background: transparent;
   box-shadow: none;
+}
+
+.research-conversation-row.is-selected {
+  background: color-mix(in srgb, var(--project-color, var(--accent-building)) 22%, transparent);
+}
+
+.research-conversation-row.is-selected .research-conversation-open {
+  color: var(--text-primary);
 }
 
 .research-conversation-open,
