@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v16";
+} from "./research-progress.js?v=20260812-research-progress-v17";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v16";
+} from "./offline-storage.js?v=20260812-research-progress-v17";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14363,13 +14363,21 @@ async function assignResearchConversationProject(conversation, targetProjectID, 
     });
   } catch (error) {
     if (error.payload?.code !== "RESEARCH_PROJECT_REVIEW_REQUIRED") throw error;
+    const currentProjectName = conversation.primaryProjectID
+      ? researchProjectName(conversation.primaryProjectID)
+      : "its current Project";
+    const targetProjectName = targetProjectID
+      ? researchProjectName(targetProjectID)
+      : "";
     const confirmed = await confirmWebWarning(
-      targetProjectID ? "Move Research to this Project?" : "Unassign this Research?",
       targetProjectID
-        ? "Existing answers remain immutable in their original Project history. Additional Research facts will be cleared, and you must review the new Project context before asking another question."
-        : "Existing answers remain immutable in their original Project history. The conversation will no longer contribute new activity to a Project.",
+        ? `Move this conversation to ${targetProjectName}?`
+        : `Remove this conversation from ${currentProjectName}?`,
+      targetProjectID
+        ? `The entire conversation will move from ${currentProjectName} to ${targetProjectName}. Its existing answers and citations will not change. Facts supplied by ${currentProjectName} will be removed; review the facts from ${targetProjectName} before asking another question.`
+        : `The conversation will no longer appear in ${currentProjectName}. Its existing answers and citations will not change, but it will not use or add Project-specific facts until you assign it to another Project.`,
       {
-        confirmLabel: targetProjectID ? "Move and review" : "Unassign",
+        confirmLabel: targetProjectID ? "Move conversation" : "Remove from Project",
         container: options.warningContainer
       }
     );
