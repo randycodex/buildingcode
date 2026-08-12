@@ -29,7 +29,7 @@ assert.equal(blankRegistry.workspaces[0].name, "Main");
 assert.equal(blankRegistry.activeWorkspaceID, blankRegistry.workspaces[0].id);
 assert.deepEqual(emptyWorkspaceLayout().readers, []);
 assert.equal(emptyWorkspaceLayout().projectHostPaneID, "");
-assert.equal(emptyWorkspaceLayout().paneWidthDefaultsVersion, 3);
+assert.equal(emptyWorkspaceLayout().paneWidthDefaultsVersion, 4);
 assert.equal(workspaceLayoutHasVisiblePanes(emptyWorkspaceLayout()), false);
 
 const migratedQuestionIndexWidth = normalizeWorkspaceLayout({
@@ -59,7 +59,17 @@ const migratedQuestionIndexWidth = normalizeWorkspaceLayout({
 });
 assert.equal(migratedQuestionIndexWidth.paneWeights["cq:project-1:_:question-index"], 300);
 assert.equal(migratedQuestionIndexWidth.paneWeights["cq:project-1:question-1:decision-record"], 720);
-assert.equal(migratedQuestionIndexWidth.paneWidthDefaultsVersion, 3);
+assert.equal(migratedQuestionIndexWidth.paneWidthDefaultsVersion, 4);
+const migratedSettingsWidth = normalizeWorkspaceLayout({
+  paneWidthDefaultsVersion: 3,
+  paneWeights: { "utility:settings": 400 }
+});
+assert.equal(migratedSettingsWidth.paneWeights["utility:settings"], 600);
+const preservedSettingsWidth = normalizeWorkspaceLayout({
+  paneWidthDefaultsVersion: 4,
+  paneWeights: { "utility:settings": 480 }
+});
+assert.equal(preservedSettingsWidth.paneWeights["utility:settings"], 480);
 const preservedResizedQuestionIndex = normalizeWorkspaceLayout({
   ...migratedQuestionIndexWidth,
   paneWeights: {

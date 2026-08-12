@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v28";
+} from "./research-progress.js?v=20260812-research-progress-v29";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v28";
+} from "./offline-storage.js?v=20260812-research-progress-v29";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -342,7 +342,7 @@ const defaultNotebookPaneWidth = 600;
 const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth;
 const defaultCoordinationPaneWidth = 600;
 const defaultCoordinationThreadPaneWidth = 520;
-const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;
+const defaultSettingsPaneWidth = 600;
 const defaultResearchPaneWidth = 600;
 const defaultCodeDecisionPaneWidth = 600;
 const readerSearchFlashDurationMS = 2000;
@@ -3725,6 +3725,7 @@ function normalizePaneWeights(ids) {
   const current = state.paneWeights || {};
   const hasManyColumns = ids.length >= 4;
   const migrateQuestionIndexWidth = Number(state.paneWidthDefaultsVersion || 0) < 3;
+  const migrateSettingsWidth = Number(state.paneWidthDefaultsVersion || 0) < 4;
   state.paneWeights = ids.reduce((weights, id) => {
     const value = migrateLegacyPaneWidth(id, Number(current[id]));
     const defaultWidth = defaultPaneWidthForID(id);
@@ -3732,12 +3733,14 @@ function normalizePaneWeights(ids) {
       parseQuestionPaneKey(id)?.paneRole === "question-index";
     weights[id] = migrateQuestionIndexWidth && isQuestionIndex
       ? defaultWidth
+      : migrateSettingsWidth && id === "utility:settings" && value === defaultNonReaderPaneWidth
+        ? defaultWidth
       : Number.isFinite(value) && value > 40
       ? (hasManyColumns ? Math.max(value, defaultWidth) : value)
       : defaultWidth;
     return weights;
   }, {});
-  state.paneWidthDefaultsVersion = 3;
+  state.paneWidthDefaultsVersion = 4;
 }
 
 function applyPaneWeight(panel, paneID) {

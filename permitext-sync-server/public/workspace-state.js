@@ -205,7 +205,7 @@ export function emptyWorkspaceLayout() {
     projectHostPaneID: "",
     utilityInstances: [],
     utilities: utilityState(),
-    paneWidthDefaultsVersion: 3,
+    paneWidthDefaultsVersion: 4,
     paneWeights: {},
     paneOrder: [],
     researchConversationID: "",
@@ -255,7 +255,7 @@ export function normalizeWorkspaceLayout(value = {}) {
     : "";
   layout.utilities = utilityState(source.utilities);
   const priorPaneWidthDefaultsVersion = Number(source.paneWidthDefaultsVersion || 0);
-  layout.paneWidthDefaultsVersion = 3;
+  layout.paneWidthDefaultsVersion = 4;
   layout.paneWeights = source.paneWeights && typeof source.paneWeights === "object"
     ? Object.fromEntries(
         Object.entries(source.paneWeights)
@@ -274,6 +274,9 @@ export function normalizeWorkspaceLayout(value = {}) {
       .forEach((paneID) => {
         layout.paneWeights[paneID] = 300;
       });
+  }
+  if (priorPaneWidthDefaultsVersion < 4 && layout.paneWeights["utility:settings"] === 400) {
+    layout.paneWeights["utility:settings"] = 600;
   }
   layout.paneOrder = Array.isArray(source.paneOrder)
     ? source.paneOrder.filter((paneID) => typeof paneID === "string" && !paneID.startsWith("section:detail:"))
