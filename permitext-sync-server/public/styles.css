@@ -8494,6 +8494,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   scrollbar-gutter: auto;
 }
 
+.saved-panel .saved-content[hidden] {
+  display: none;
+}
+
 .saved-projects-section {
   --saved-projects-card-radius: 22px;
   display: grid;

@@ -366,6 +366,7 @@ assert.match(appSource, /function appendSavedProjectFactEditor\(container, folde
 assert.match(appSource, /address\.addEventListener\("blur", save\)[\s\S]*?description\.addEventListener\("blur", save\)[\s\S]*?updateProjectFolder\(folder,/);
 assert.match(stylesSource, /\.saved-project-fact-input \{[\s\S]*?background: transparent;[\s\S]*?font: inherit;/);
 assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: inset 0 -1px 0 var\(--project-color, var\(--accent\)\);/);
+assert.match(stylesSource, /\.saved-panel \.saved-content\[hidden\] \{[\s\S]*?display: none;/, "Deactivating a Project must hide its Saved Evidence list.");
 assert.match(stylesSource, /\.saved-project-fact-description \{[\s\S]*?height: 112px;[\s\S]*?max-height: min\(70vh, 760px\);[\s\S]*?overflow-y: auto;[\s\S]*?resize: none;/);
 assert.match(appSource, /descriptionResizeHandle\.className = "saved-project-fact-resize-handle"[\s\S]*?descriptionResizeHandle\.setPointerCapture\(event\.pointerId\)[\s\S]*?event\.key !== "ArrowUp" && event\.key !== "ArrowDown"/);
 assert.doesNotMatch(appSource, /description\.addEventListener\("input", resizeDescription\)/);
