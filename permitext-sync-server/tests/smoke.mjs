@@ -1234,7 +1234,7 @@ async function main() {
     assert(
       webRoot.text.includes('id="workspace-issue"') &&
         webRoot.text.includes('class="saved-plan-usage"') &&
-        webRoot.text.includes('class="settings-plan-usage"') &&
+        webRoot.text.includes('class="settings-plan-usage" role="status" aria-label="Current plan usage" hidden aria-hidden="true"') &&
         workspaceStyles.text.match(/\.settings-plan-usage \{[\s\S]*?background: transparent;/) &&
         workspaceScript.text.includes("function renderPlanUsageRows") &&
         workspaceScript.text.includes("function refreshVisiblePlanUsage") &&
@@ -1242,7 +1242,7 @@ async function main() {
         workspaceScript.text.includes('card.style.removeProperty("--settings-card-content-height");') &&
         workspaceScript.text.includes("syncAccountState();\n  wireSettingsCardCollapsing(panel);") &&
         workspaceScript.text.includes("function presentWorkspaceIssue"),
-      "Plan usage or persistent workspace failure feedback is no longer rendered."
+      "Hidden plan usage tracking or persistent workspace failure feedback is no longer preserved."
     );
     assert(
       !workspaceScript.text.includes('activeReaderButton') &&
@@ -1369,7 +1369,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v30'),
+        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v31'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1514,7 +1514,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v30'),
+      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v31'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1781,7 +1781,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v30'),
+      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v31'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
