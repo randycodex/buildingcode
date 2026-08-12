@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-floating-menu-v61";
+} from "./research-progress.js?v=20260812-report-template-menu-v62";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-floating-menu-v61";
+} from "./offline-storage.js?v=20260812-report-template-menu-v62";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -4942,7 +4942,8 @@ function enhanceSelect(select) {
   menu.className = "custom-select-menu";
   const readerCodeMenu = select.classList.contains("code-select");
   const readerChapterMenu = select.classList.contains("chapter-select");
-  const reportDraftMenu = select.classList.contains("report-draft-select");
+  const reportDraftMenu = select.classList.contains("report-draft-select") ||
+    select.classList.contains("report-template-select");
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
@@ -19690,6 +19691,7 @@ async function renderProjectReportDraft(project) {
     });
     draftPicker.append(select);
     const templateSelect = document.createElement("select");
+    templateSelect.className = "report-template-select";
     templateSelect.setAttribute("aria-label", "Firm Report template");
     (reportOptions.templates || []).forEach((template) => {
       const option = document.createElement("option");
@@ -19833,6 +19835,7 @@ async function renderProjectReportDraft(project) {
       historySection
     );
     enhanceSelect(select);
+    enhanceSelect(templateSelect);
   }
 
   try {

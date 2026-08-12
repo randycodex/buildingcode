@@ -1,4 +1,4 @@
-export const researchProgressVersion = "20260812-report-floating-menu-v61";
+export const researchProgressVersion = "20260812-report-template-menu-v62";
 
 export const researchProgressStages = Object.freeze([
   Object.freeze({ id: "preparing_question", label: "Preparing the question" }),
