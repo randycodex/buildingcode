@@ -88,6 +88,9 @@ assert(clientSource.includes('progress.retry = () => void execute(true)'));
 assert(clientSource.includes('error.name === "AbortError"'));
 assert(!clientSource.includes('className = "research-progress-details"'), "Research progress cards still expose the internal stage checklist.");
 assert(!clientSource.includes('className = "research-progress-tasks"'), "Research progress task rows are still rendered.");
+assert.match(styleSource, /\.research-progress-card\s*\{[\s\S]*?padding: 0;[\s\S]*?border: 0;[\s\S]*?background: transparent;/);
+assert.match(styleSource, /workspace-panel:not\(\.reader-panel\) \.research-progress-loading-label\s*\{[\s\S]*?font-size: 10px !important;[\s\S]*?font-weight: 400;/);
+assert.match(styleSource, /workspace-panel:not\(\.reader-panel\) \.research-progress-elapsed\s*\{[\s\S]*?font-size: 10px !important;[\s\S]*?font-weight: 400;/);
 assert(styleSource.includes("grid-template-columns: repeat(3, 4px)"));
 assert(styleSource.includes("@media (prefers-reduced-motion: reduce)"));
 

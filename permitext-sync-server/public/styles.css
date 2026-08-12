@@ -6852,10 +6852,10 @@ body.is-resizing-research-evidence * {
   display: grid;
   gap: var(--space-3);
   min-width: 0;
-  padding: var(--space-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--surface-muted) 90%, var(--research-conversation-background));
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--text-primary);
 }
 
@@ -6891,11 +6891,11 @@ body.is-resizing-research-evidence * {
   opacity: 0.55;
 }
 
-.research-progress-loading-label {
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-progress-loading-label {
   min-width: 0;
   overflow-wrap: anywhere;
-  font-size: calc(var(--chrome-font-size) * 0.88) !important;
-  font-weight: 650;
+  font-size: 10px !important;
+  font-weight: 400;
   line-height: 1.35;
   background: linear-gradient(
     100deg,
@@ -6917,10 +6917,11 @@ body.is-resizing-research-evidence * {
   color: var(--text-primary);
 }
 
-.research-progress-elapsed {
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-progress-elapsed {
   color: var(--text-secondary);
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: calc(var(--chrome-font-size) * 0.75) !important;
+  font-size: 10px !important;
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
 }
 
