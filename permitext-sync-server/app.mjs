@@ -8565,7 +8565,8 @@ async function notebookCardSummariesForProject(storageOwnerUserID, projectID) {
       referenceCount: artifact.payload.references?.length || 0,
       sourceClassification: artifact.payload.sourceClassification,
       createdAt: artifact.envelope.createdAt,
-      updatedAt: artifact.envelope.updatedAt
+      updatedAt: artifact.envelope.updatedAt,
+      archivedAt: artifact.envelope.archivedAt || null
     }))
     .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
 }
@@ -9818,6 +9819,7 @@ async function handleOrganizationEvidenceReviewSave(request, response) {
         owner: access.owner,
         createdAt: existing?.envelope.createdAt || now,
         updatedAt: now,
+        archivedAt: existing?.envelope.archivedAt || null,
         version: Number(existing?.envelope.version || 0) + 1
       }),
       payload
@@ -10721,6 +10723,7 @@ function notebookCardForClient(artifact, projectIDs = []) {
     version: artifact.envelope.version,
     createdAt: artifact.envelope.createdAt,
     updatedAt: artifact.envelope.updatedAt,
+    archivedAt: artifact.envelope.archivedAt || null,
     deletedAt: artifact.envelope.deletedAt,
     projectIDs,
     ...artifact.payload
@@ -11157,6 +11160,74 @@ async function handleNotebookCardDelete(request, response) {
     cardID: artifact.envelope.id,
     deletedAt: now,
     unlinkedProjectCount: activeLinks.length
+  });
+}
+
+async function handleNotebookCardArchive(request, response) {
+  const context = await authenticatedNotebookBody(request, response);
+  if (!context) return;
+  const access = await notebookProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  const artifact = await ownedNotebookArtifact(
+    access.storageOwnerUserID,
+    context.body.cardID
+  );
+  if (!artifact) {
+    sendError(response, 404, "Notebook card not found.");
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion);
+  if (!Number.isSafeInteger(expectedVersion) || expectedVersion !== artifact.envelope.version) {
+    sendJSON(response, 409, {
+      error: "This Notebook card changed after you opened it. Review the current version before changing its archive status.",
+      code: "NOTEBOOK_VERSION_CONFLICT",
+      card: notebookCardForClient(artifact)
+    });
+    return;
+  }
+  const links = (await listStoredProjectLinks(access.storageOwnerUserID))
+    .filter((link) =>
+      !link.deletedAt &&
+      link.projectID === access.projectID &&
+      link.targetKind === "notebookCard" &&
+      link.targetID === artifact.envelope.id
+    );
+  if (!links.length) {
+    sendError(response, 404, "Notebook card not found.");
+    return;
+  }
+  const archived = context.body.archived === true;
+  const now = new Date().toISOString();
+  const updatedArtifact = {
+    ...artifact,
+    envelope: artifactEnvelope({
+      ...artifact.envelope,
+      owner: access.owner,
+      updatedAt: now,
+      archivedAt: archived ? now : null,
+      version: artifact.envelope.version + 1
+    })
+  };
+  await saveStoredFoundationArtifact(access.storageOwnerUserID, updatedArtifact);
+  const activity = activityEvent({
+    owner: access.owner,
+    projectID: access.projectID,
+    actorUserID: context.userID,
+    action: archived ? "notebook-card.archived" : "notebook-card.restored",
+    objectKind: "notebookCard",
+    objectID: artifact.envelope.id,
+    previousStatus: archived ? "active" : "archived",
+    newStatus: archived ? "archived" : "active",
+    createdAt: now
+  });
+  await saveStoredActivityEvent(access.storageOwnerUserID, activity);
+  sendJSON(response, 200, {
+    card: notebookCardForClient(updatedArtifact, [access.projectID]),
+    activity
   });
 }
 
@@ -23019,6 +23090,7 @@ const handlers = {
   "notebook/cards/list": handleNotebookCardList,
   "notebook/cards/get": handleNotebookCardGet,
   "notebook/cards/save": handleNotebookCardSave,
+  "notebook/cards/archive": handleNotebookCardArchive,
   "notebook/cards/delete": handleNotebookCardDelete,
   "notebook/assets/upload": handleNotebookAssetUpload,
   "notebook/assets/read": handleNotebookAssetRead,

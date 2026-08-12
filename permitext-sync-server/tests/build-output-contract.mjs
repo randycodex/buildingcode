@@ -45,6 +45,7 @@ assert.equal(notebookSchema.includes('notebookSchemaVersion = 2'), true);
 assert.equal(packageManifest.dependencies["@tiptap/core"], undefined);
 assert(
   appServer.includes('"notebook/assets/upload": handleNotebookAssetUpload') &&
+    appServer.includes('"notebook/cards/archive": handleNotebookCardArchive') &&
     appServer.includes('"notebook/assets/read": handleNotebookAssetRead') &&
     appServer.includes('"notebook/assets/delete": handleNotebookAssetDelete') &&
     appServer.includes('type: "notebookImageAsset"') &&

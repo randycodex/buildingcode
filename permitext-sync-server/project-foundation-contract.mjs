@@ -157,6 +157,8 @@ export const activityActions = Object.freeze([
   "project-note.revision.saved",
   "notebook-card.created",
   "notebook-card.revision.saved",
+  "notebook-card.archived",
+  "notebook-card.restored",
   "evidence.approved",
   "evidence.removed",
   "research.question.submitted",

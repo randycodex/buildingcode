@@ -11838,34 +11838,72 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: transparent;
 }
 
-.notebook-card-add-action {
+.notebook-card-rail-actions {
   position: absolute;
   top: 50%;
   right: calc(var(--space-3) + 18px + var(--space-2));
   z-index: 1;
   display: none;
+  align-items: center;
+  gap: var(--space-2);
+  transform: translateY(-50%);
+}
+
+.notebook-card-menu.is-open .notebook-card-rail-actions {
+  display: flex;
+}
+
+.notebook-card-add-action,
+.notebook-card-archive-action,
+.notebook-card-select-action,
+.notebook-card-selection-action {
+  display: grid;
   width: 28px;
   height: 28px;
   place-items: center;
   padding: 0;
   border: 0;
+  border-radius: 0;
   background: transparent;
   color: var(--text-secondary);
-  transform: translateY(-50%);
+  box-shadow: none;
 }
 
-.notebook-card-menu.is-open .notebook-card-add-action {
-  display: grid;
+.notebook-card-selection-cancel {
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 400;
+  box-shadow: none;
 }
 
 .notebook-card-add-action:hover,
-.notebook-card-add-action:focus-visible {
+.notebook-card-add-action:focus-visible,
+.notebook-card-archive-action:hover,
+.notebook-card-archive-action:focus-visible,
+.notebook-card-select-action:hover,
+.notebook-card-select-action:focus-visible,
+.notebook-card-selection-action:hover,
+.notebook-card-selection-action:focus-visible,
+.notebook-card-selection-cancel:hover,
+.notebook-card-selection-cancel:focus-visible {
   color: var(--text-primary);
 }
 
-.notebook-card-add-action svg {
+.notebook-card-rail-actions svg {
   width: 14px;
   height: 14px;
+}
+
+.notebook-card-rail-actions button:disabled {
+  opacity: 0.34;
+}
+
+.notebook-card-rail-actions button[hidden] {
+  display: none;
 }
 
 .notebook-card-list {
@@ -11926,44 +11964,17 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .notebook-card-tile {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
+  column-gap: var(--space-3);
   row-gap: 2px;
   width: 100%;
-  padding: var(--space-1) 30px var(--space-1) 0;
+  padding: var(--space-1) 0;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: var(--text-primary);
   text-align: left;
-}
-
-.notebook-card-delete {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transform: translateY(-50%);
-}
-
-.notebook-card-delete:hover,
-.notebook-card-delete:focus-visible {
-  background: color-mix(in srgb, #d43b32 16%, transparent);
-  color: color-mix(in srgb, #d43b32 78%, var(--text-primary));
-}
-
-.notebook-card-delete svg {
-  width: 14px;
-  height: 14px;
 }
 
 .notebook-card-tile:hover,
@@ -11986,7 +11997,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .notebook-card-tile small {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
   white-space: nowrap;
+}
+
+.notebook-card-row.is-selected {
+  background: color-mix(in srgb, var(--project-color) 22%, transparent);
 }
 
 .notebook-focus {

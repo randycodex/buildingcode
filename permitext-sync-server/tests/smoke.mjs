@@ -868,9 +868,11 @@ async function main() {
         workspaceScript.text.includes("if (dirty && !(await flushNotebookAutosave())) return;") &&
         !workspaceScript.text.includes("Saved · Version") &&
         !workspaceScript.text.includes("notebookSaveStatus") &&
-        workspaceScript.text.includes("async function deleteNotebookCard(card, trigger)") &&
-        workspaceScript.text.includes('deleteButton.className = "notebook-card-delete"') &&
-        workspaceScript.text.includes('deleteButton.innerHTML = trashIconSVG()') &&
+        workspaceScript.text.includes("async function deleteNotebookCard(card, trigger, options = {})") &&
+        !workspaceScript.text.includes('deleteButton.className = "notebook-card-delete"') &&
+        workspaceScript.text.includes('deleteSelectedButton.innerHTML = trashIconSVG()') &&
+        workspaceScript.text.includes('archiveButton.innerHTML = archiveIconSVG()') &&
+        workspaceScript.text.includes('selectButton.innerHTML = selectionModeIconSVG()') &&
         !workspaceScript.text.includes('deleteButton.className = "notebook-danger-action"') &&
         workspaceScript.text.includes('referenceToggle.className = "code-filter-menu-toggle notebook-reference-menu-toggle"') &&
         workspaceScript.text.includes('referenceList.className = "notebook-reference-list"') &&
@@ -1372,7 +1374,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-notebook-three-row-v44'),
+        webRoot.text.includes('/web/app.js?v=20260812-notebook-management-v46'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1480,7 +1482,7 @@ async function main() {
         workspaceStyles.text.includes(".project-note-editor-surface {") &&
         !workspaceStyles.text.includes(".notebook-tiptap-editor {") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
-        workspaceStyles.text.includes(".notebook-card-delete {\n  position: absolute;") &&
+        workspaceStyles.text.includes(".notebook-card-rail-actions {") &&
         workspaceScript.text.includes('rail.className = "notebook-card-rail code-filter-menu notebook-card-menu"') &&
         workspaceScript.text.includes('railLabel.textContent = "Project notes"') &&
         workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false") &&
@@ -1496,7 +1498,7 @@ async function main() {
         workspaceScript.text.includes("const minimumCardListHeight = 156") &&
         workspaceScript.text.includes("Math.max(minimumCardListHeight, last.bottom - first.top)") &&
         workspaceScript.text.includes("requestAnimationFrame(sizeCardListForThreeRows)") &&
-        workspaceStyles.text.includes(".notebook-card-tile {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);") &&
+        workspaceStyles.text.includes(".notebook-card-tile {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;") &&
         workspaceStyles.text.includes(".notebook-reference-menu .notebook-reference-list {\n  background-image: none;") &&
         workspaceStyles.text.includes("max-height: min(var(--code-filter-menu-height, 240px), 52vh, 360px);") &&
         workspaceStyles.text.includes("overflow-y: auto;\n  overscroll-behavior-y: contain;\n  scrollbar-gutter: stable;") &&
@@ -1519,7 +1521,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-notebook-three-row-v44'),
+      webRoot.text.includes('/web/styles.css?v=20260812-notebook-management-v46'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1786,7 +1788,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-notebook-three-row-v44'),
+      webRoot.text.includes('/web/styles.css?v=20260812-notebook-management-v46'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -7930,6 +7932,42 @@ async function main() {
         reviseNotebookCard.json.activity.action === "notebook-card.revision.saved",
       "Saving an explicit Notebook revision failed."
     );
+    const archiveNotebookCard = await request("/notebook/cards/archive", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
+        cardID: notebookCardID,
+        expectedVersion: 2,
+        archived: true
+      }
+    });
+    assert(
+      archiveNotebookCard.response.ok &&
+        archiveNotebookCard.json.card.version === 3 &&
+        archiveNotebookCard.json.card.archivedAt &&
+        archiveNotebookCard.json.activity.action === "notebook-card.archived",
+      "Archiving a Notebook card did not preserve it as an archived Project note."
+    );
+    const restoreNotebookCard = await request("/notebook/cards/archive", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
+        cardID: notebookCardID,
+        expectedVersion: 3,
+        archived: false
+      }
+    });
+    assert(
+      restoreNotebookCard.response.ok &&
+        restoreNotebookCard.json.card.version === 4 &&
+        !restoreNotebookCard.json.card.archivedAt &&
+        restoreNotebookCard.json.activity.action === "notebook-card.restored",
+      "Restoring an archived Notebook card failed."
+    );
     const deleteNotebookCard = await request("/notebook/cards/delete", {
       method: "POST",
       token: currentSmokeUserToken,
@@ -7937,7 +7975,7 @@ async function main() {
         auth: { accountUserID: userID },
         projectID: "project-client-smoke",
         cardID: notebookCardID,
-        expectedVersion: 2
+        expectedVersion: 4
       }
     });
     assert(

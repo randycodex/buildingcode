@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-notebook-three-row-v44";
+} from "./research-progress.js?v=20260812-notebook-management-v46";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-notebook-three-row-v44";
+} from "./offline-storage.js?v=20260812-notebook-management-v46";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18181,7 +18181,49 @@ async function renderProjectNotebook(project) {
       </svg>
     `;
     newButton.disabled = notebookReadOnly;
-    railHeader.append(railToggle, newButton);
+    const archiveButton = document.createElement("button");
+    archiveButton.className = "notebook-card-archive-action";
+    archiveButton.type = "button";
+    archiveButton.title = "Show archived notes";
+    archiveButton.setAttribute("aria-label", archiveButton.title);
+    archiveButton.setAttribute("aria-pressed", "false");
+    archiveButton.innerHTML = archiveIconSVG();
+    archiveButton.disabled = notebookReadOnly;
+    const selectButton = document.createElement("button");
+    selectButton.className = "notebook-card-select-action";
+    selectButton.type = "button";
+    selectButton.title = "Select notes";
+    selectButton.setAttribute("aria-label", selectButton.title);
+    selectButton.setAttribute("aria-pressed", "false");
+    selectButton.innerHTML = selectionModeIconSVG();
+    selectButton.disabled = notebookReadOnly;
+    const cancelSelectionButton = document.createElement("button");
+    cancelSelectionButton.className = "notebook-card-selection-cancel";
+    cancelSelectionButton.type = "button";
+    cancelSelectionButton.textContent = "Cancel";
+    cancelSelectionButton.hidden = true;
+    const archiveSelectedButton = document.createElement("button");
+    archiveSelectedButton.className = "notebook-card-selection-action notebook-card-selection-archive";
+    archiveSelectedButton.type = "button";
+    archiveSelectedButton.hidden = true;
+    const deleteSelectedButton = document.createElement("button");
+    deleteSelectedButton.className = "notebook-card-selection-action notebook-card-selection-delete";
+    deleteSelectedButton.type = "button";
+    deleteSelectedButton.title = "Delete selected notes";
+    deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
+    deleteSelectedButton.innerHTML = trashIconSVG();
+    deleteSelectedButton.hidden = true;
+    const railActions = document.createElement("div");
+    railActions.className = "notebook-card-rail-actions";
+    railActions.append(
+      cancelSelectionButton,
+      newButton,
+      archiveButton,
+      archiveSelectedButton,
+      deleteSelectedButton,
+      selectButton
+    );
+    railHeader.append(railToggle, railActions);
     const cardList = document.createElement("div");
     cardList.className = "notebook-card-list";
     const cardListResizeHandle = document.createElement("div");
@@ -18247,6 +18289,10 @@ async function renderProjectNotebook(project) {
 
     let notebookAutosaveTask = null;
     let notebookRevision = 0;
+    let showingArchivedCards = false;
+    let selectingCards = false;
+    let cardSelectionBusy = false;
+    const selectedCardIDs = new Set();
 
     const notebookSummaryForCard = (card, savedCard = card) => ({
       id: card.id,
@@ -18256,7 +18302,8 @@ async function renderProjectNotebook(project) {
       plainText: savedCard.plainText,
       referenceCount: savedCard.references?.length || 0,
       createdAt: savedCard.createdAt,
-      updatedAt: savedCard.updatedAt
+      updatedAt: savedCard.updatedAt,
+      archivedAt: savedCard.archivedAt || null
     });
 
     function scheduleNotebookAutosave(delay = 700) {
@@ -18415,19 +18462,21 @@ async function renderProjectNotebook(project) {
       await renderFocusedCard();
     }
 
-    async function deleteNotebookCard(card, trigger) {
+    async function deleteNotebookCard(card, trigger, options = {}) {
       let target = card;
       if (activeCard?.id === card.id) {
         if (dirty && !(await flushNotebookAutosave())) return;
         target = activeCard;
       }
-      const confirmed = await confirmWebWarning(
-        "Delete Notebook card?",
-        `“${target.title}” will be removed from its linked Projects. Its tombstone remains in sync history.`,
-        { confirmLabel: "Delete card" }
-      );
-      if (!confirmed) return;
-      trigger.disabled = true;
+      if (!options.skipConfirmation) {
+        const confirmed = await confirmWebWarning(
+          "Delete Notebook card?",
+          `“${target.title}” will be removed from its linked Projects. Its tombstone remains in sync history.`,
+          { confirmLabel: "Delete card" }
+        );
+        if (!confirmed) return false;
+      }
+      if (trigger) trigger.disabled = true;
       try {
         await postResearch("/notebook/cards/delete", {
           projectID,
@@ -18454,11 +18503,74 @@ async function renderProjectNotebook(project) {
         } else {
           renderCardList();
         }
+        return true;
       } catch (error) {
-        trigger.disabled = false;
+        if (trigger) trigger.disabled = false;
         await showWebNotice("Card not deleted", error.message);
+        return false;
       }
     }
+
+    async function setNotebookCardArchived(card, archived) {
+      if (activeCard?.id === card.id && dirty && !(await flushNotebookAutosave())) return false;
+      try {
+        const payload = await postResearch("/notebook/cards/archive", {
+          projectID,
+          cardID: card.id,
+          expectedVersion: activeCard?.id === card.id ? activeCard.version : card.version,
+          archived
+        });
+        const summary = notebookSummaryForCard(payload.card, payload.card);
+        cards = cards.map((candidate) => candidate.id === summary.id ? summary : candidate);
+        if (activeCard?.id === summary.id) {
+          activeCard = null;
+          draftDocument = emptyNotebookDocument();
+          dirty = false;
+          await renderFocusedCard();
+        }
+        await saveNotebookProjectSnapshot({
+          accountUserID: activeAccount().userID,
+          projectID,
+          foundation,
+          cardPayload: { cards, access: { readOnly: notebookReadOnly } }
+        }).catch(() => {});
+        return true;
+      } catch (error) {
+        await showWebNotice(archived ? "Note not archived" : "Note not restored", error.message);
+        return false;
+      }
+    }
+
+    const updateNotebookCardManagement = () => {
+      const visibleCards = cards.filter((card) => Boolean(card.archivedAt) === showingArchivedCards);
+      rail.classList.toggle("is-selecting-cards", selectingCards);
+      rail.classList.toggle("is-showing-archived-cards", showingArchivedCards);
+      selectButton.setAttribute("aria-pressed", String(selectingCards));
+      archiveButton.setAttribute("aria-pressed", String(showingArchivedCards));
+      archiveButton.title = showingArchivedCards ? "Show active notes" : "Show archived notes";
+      archiveButton.setAttribute("aria-label", archiveButton.title);
+      archiveButton.innerHTML = showingArchivedCards ? activeProjectsIconSVG() : archiveIconSVG();
+      cancelSelectionButton.hidden = !selectingCards;
+      newButton.hidden = selectingCards || showingArchivedCards;
+      archiveButton.hidden = selectingCards;
+      archiveSelectedButton.hidden = !selectingCards;
+      deleteSelectedButton.hidden = !selectingCards;
+      selectButton.hidden = visibleCards.length === 0;
+      archiveSelectedButton.title = showingArchivedCards ? "Restore selected notes" : "Archive selected notes";
+      archiveSelectedButton.setAttribute("aria-label", archiveSelectedButton.title);
+      archiveSelectedButton.innerHTML = showingArchivedCards ? archiveRestoreIconSVG() : archiveIconSVG();
+      archiveSelectedButton.disabled = cardSelectionBusy || selectedCardIDs.size === 0;
+      deleteSelectedButton.disabled = cardSelectionBusy || selectedCardIDs.size === 0;
+      cancelSelectionButton.disabled = cardSelectionBusy;
+      selectButton.disabled = notebookReadOnly || cardSelectionBusy;
+      archiveButton.disabled = notebookReadOnly || cardSelectionBusy;
+      cardList.querySelectorAll(".notebook-card-row").forEach((row) => {
+        const selected = selectedCardIDs.has(row.dataset.cardId);
+        row.classList.toggle("is-selected", selected);
+        const button = row.querySelector(".notebook-card-tile");
+        if (selectingCards) button?.setAttribute("aria-pressed", String(selected));
+      });
+    };
 
     function renderCardList() {
       cardList.replaceChildren();
@@ -18468,11 +18580,23 @@ async function renderProjectNotebook(project) {
         empty.textContent = "Create a card for a question, finding, decision, or coordination item.";
         cardList.append(empty);
         updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
+        updateNotebookCardManagement();
         return;
       }
-      cards.forEach((card) => {
+      const visibleCards = cards.filter((card) => Boolean(card.archivedAt) === showingArchivedCards);
+      if (!visibleCards.length) {
+        const empty = document.createElement("p");
+        empty.className = "notebook-card-list-empty";
+        empty.textContent = showingArchivedCards ? "No archived notes." : "Create a card for a question, finding, decision, or coordination item.";
+        cardList.append(empty);
+        updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
+        updateNotebookCardManagement();
+        return;
+      }
+      visibleCards.forEach((card) => {
         const row = document.createElement("article");
         row.className = "notebook-card-row";
+        row.dataset.cardId = card.id;
         const button = document.createElement("button");
         button.className = "notebook-card-tile";
         button.type = "button";
@@ -18483,24 +18607,19 @@ async function renderProjectNotebook(project) {
         meta.textContent = `${card.referenceCount || 0} linked · ${researchRelativeDate(card.updatedAt)}`;
         button.append(cardTitle, meta);
         button.addEventListener("click", () => {
+          if (selectingCards) {
+            if (selectedCardIDs.has(card.id)) selectedCardIDs.delete(card.id);
+            else selectedCardIDs.add(card.id);
+            updateNotebookCardManagement();
+            return;
+          }
           void loadCard(card.id).catch((error) => showWebNotice("Card not opened", error.message));
         });
         row.append(button);
-        if (!notebookReadOnly) {
-          const deleteButton = document.createElement("button");
-          deleteButton.className = "notebook-card-delete";
-          deleteButton.type = "button";
-          deleteButton.title = "Delete card";
-          deleteButton.setAttribute("aria-label", `Delete ${card.title}`);
-          deleteButton.innerHTML = trashIconSVG();
-          deleteButton.addEventListener("click", () => {
-            void deleteNotebookCard(card, deleteButton);
-          });
-          row.append(deleteButton);
-        }
         cardList.append(row);
       });
       updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
+      updateNotebookCardManagement();
       requestAnimationFrame(sizeCardListForThreeRows);
     }
 
@@ -18732,6 +18851,64 @@ async function renderProjectNotebook(project) {
         }
       });
     }
+
+    archiveButton.addEventListener("click", () => {
+      showingArchivedCards = !showingArchivedCards;
+      selectingCards = false;
+      selectedCardIDs.clear();
+      renderCardList();
+    });
+    selectButton.addEventListener("click", () => {
+      selectingCards = !selectingCards;
+      selectedCardIDs.clear();
+      renderCardList();
+    });
+    cancelSelectionButton.addEventListener("click", () => {
+      selectingCards = false;
+      selectedCardIDs.clear();
+      renderCardList();
+      selectButton.focus({ preventScroll: true });
+    });
+    archiveSelectedButton.addEventListener("click", async () => {
+      const selectedCards = cards.filter((card) => selectedCardIDs.has(card.id));
+      if (!selectedCards.length) return;
+      cardSelectionBusy = true;
+      updateNotebookCardManagement();
+      for (const card of selectedCards) {
+        if (!(await setNotebookCardArchived(card, !showingArchivedCards))) break;
+      }
+      cardSelectionBusy = false;
+      selectingCards = false;
+      selectedCardIDs.clear();
+      renderCardList();
+    });
+    deleteSelectedButton.addEventListener("click", async () => {
+      const selectedCards = cards.filter((card) => selectedCardIDs.has(card.id));
+      if (!selectedCards.length) return;
+      const confirmed = await confirmWebWarning(
+        "Delete selected Notebook cards?",
+        `${selectedCards.length} selected ${selectedCards.length === 1 ? "card" : "cards"} will be removed from linked Projects. Tombstones remain in sync history.`,
+        { confirmLabel: selectedCards.length === 1 ? "Delete card" : `Delete ${selectedCards.length}` }
+      );
+      if (!confirmed) return;
+      cardSelectionBusy = true;
+      updateNotebookCardManagement();
+      for (const card of selectedCards) {
+        if (!(await deleteNotebookCard(card, null, { skipConfirmation: true }))) break;
+      }
+      cardSelectionBusy = false;
+      selectingCards = false;
+      selectedCardIDs.clear();
+      renderCardList();
+    });
+    rail.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !selectingCards || cardSelectionBusy) return;
+      event.preventDefault();
+      selectingCards = false;
+      selectedCardIDs.clear();
+      renderCardList();
+      selectButton.focus({ preventScroll: true });
+    });
 
     newButton.addEventListener("click", async () => {
       if (dirty && activeCard && !(await flushNotebookAutosave())) {
