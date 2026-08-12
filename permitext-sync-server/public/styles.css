@@ -8636,7 +8636,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-projects-bulk-bar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
   margin: var(--space-2);
@@ -8654,8 +8654,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-projects-bulk-link {
   min-height: 28px;
+  justify-self: start;
   padding: 0 var(--space-2);
   border-radius: var(--radius-pill);
+  text-align: left;
 }
 
 .saved-projects-bulk-link {

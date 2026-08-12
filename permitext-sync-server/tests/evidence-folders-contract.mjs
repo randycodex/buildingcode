@@ -215,6 +215,7 @@ assert.match(functionSource(appSource, "refreshProjectOverviewPreservingSavedPan
 assert.match(functionSource(appSource, "renderSavedProjects"), /archiveSelectedButton\.innerHTML = showingArchived \? archiveRestoreIconSVG\(\) : archiveIconSVG\(\)/);
 assert.match(stylesSource, /\.saved-project-tile-edit \{[\s\S]*?width: 22px;[\s\S]*?background: transparent;/);
 assert.match(stylesSource, /\.saved-projects-selection-actions \{[\s\S]*?display: flex;[\s\S]*?justify-self: end;[\s\S]*?gap: var\(--space-1\);/);
+assert.match(stylesSource, /\.saved-projects-bulk-link \{[\s\S]*?justify-self: start;[\s\S]*?text-align: left;/);
 assert.match(stylesSource, /\.saved-projects-selection-action \{[\s\S]*?width: 24px;[\s\S]*?background: transparent;/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /project\.sharedOnly[\s\S]*?return/);
 assert.match(savedFolderContextSource, /state\.projectHostPaneID = paneID[\s\S]*?await (?:closeTool|openTool)/);
