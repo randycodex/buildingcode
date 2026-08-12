@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v20";
+} from "./research-progress.js?v=20260812-research-progress-v21";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v20";
+} from "./offline-storage.js?v=20260812-research-progress-v21";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -22645,11 +22645,21 @@ async function appendSavedProjectResearchConversations(container, identity) {
   section.className = "project-studio-section saved-project-research-answers";
   const heading = document.createElement("div");
   heading.className = "project-studio-section-heading";
-  const title = document.createElement("p");
-  title.className = "section-label";
+  const title = document.createElement("button");
+  title.type = "button";
+  title.className = "section-label saved-project-research-toggle";
   title.textContent = "Research";
-  heading.append(title, projectSectionCount(conversations.length, "Research conversations"));
-  section.append(heading);
+  const headingActions = document.createElement("div");
+  headingActions.className = "project-section-heading-actions";
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "project-section-toggle-chevron saved-project-research-chevron";
+  toggle.innerHTML = researchChevronIconsSVG();
+  headingActions.append(projectSectionCount(conversations.length, "Research conversations"), toggle);
+  heading.append(title, headingActions);
+  const body = document.createElement("section");
+  body.className = "project-studio-collapsible-body saved-project-research-body";
+  section.append(heading, body);
 
   conversations.slice(0, 12).forEach((conversation) => {
     const card = document.createElement("button");
@@ -22660,8 +22670,9 @@ async function appendSavedProjectResearchConversations(container, identity) {
     question.textContent = conversation.starterQuestion;
     card.append(question);
     card.addEventListener("click", () => void openResearchConversation(conversation.id));
-    section.append(card);
+    body.append(card);
   });
+  wireProjectSectionMotion(section, body, [title, toggle], "Research", false);
   container.append(section);
 }
 

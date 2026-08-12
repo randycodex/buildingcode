@@ -7987,6 +7987,27 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   line-height: 1.3;
 }
 
+.saved-project-research-toggle {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.saved-project-research-toggle:hover,
+.saved-project-research-toggle:focus-visible {
+  color: var(--text-primary);
+}
+
+.saved-project-research-body {
+  display: grid;
+  gap: var(--space-2);
+}
+
 .project-research-history-card p {
   display: -webkit-box;
   margin: 0;
@@ -11698,7 +11719,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   display: grid;
   gap: 0;
   min-width: 0;
-  margin: var(--space-3) var(--space-3) var(--space-3);
+  margin: var(--space-3) var(--panel-padding) var(--space-3);
   padding: 0;
   overflow: hidden;
   border-radius: var(--radius-card);

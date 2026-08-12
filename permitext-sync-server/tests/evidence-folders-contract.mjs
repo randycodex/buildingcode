@@ -359,6 +359,7 @@ assert.match(stylesSource, /\.saved-project-fact-input \{[\s\S]*?background: tra
 assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: inset 0 -1px 0 var\(--project-color, var\(--accent\)\);/);
 assert.match(stylesSource, /\.saved-project-fact-description \{[\s\S]*?height: 112px !important;[\s\S]*?overflow-y: auto;[\s\S]*?resize: vertical;/);
 assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?font-weight: 400;/);
+assert.match(appSource, /function appendSavedProjectResearchConversations[\s\S]*?title\.className = "section-label saved-project-research-toggle"[\s\S]*?body\.className = "project-studio-collapsible-body saved-project-research-body"[\s\S]*?wireProjectSectionMotion\(section, body, \[title, toggle\], "Research", false\)/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);
