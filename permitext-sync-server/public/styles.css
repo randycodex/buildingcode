@@ -11871,6 +11871,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   align-items: center;
 }
 
+.notebook-card-rail-header[hidden] {
+  display: none;
+}
+
 .notebook-card-menu-toggle {
   width: 100%;
   min-height: 40px;
@@ -13024,7 +13028,29 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 }
 
 .report-draft-blocks-heading {
-  margin: 0 0 var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.report-draft-blocks-toggle {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.report-draft-blocks-chevron {
+  flex: 0 0 auto;
+}
+
+.report-draft-blocks-body {
+  display: grid;
+  gap: var(--space-2);
 }
 
 .report-source-group {

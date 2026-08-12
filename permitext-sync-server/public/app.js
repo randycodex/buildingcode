@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-content-heading-v71";
+} from "./research-progress.js?v=20260812-report-content-collapse-v73";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-content-heading-v71";
+} from "./offline-storage.js?v=20260812-report-content-collapse-v73";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18554,6 +18554,7 @@ async function renderProjectNotebook(project) {
 
     const updateNotebookCardManagement = () => {
       const visibleCards = cards.filter((card) => Boolean(card.archivedAt) === showingArchivedCards);
+      railHeader.hidden = visibleCards.length === 0;
       rail.classList.toggle("is-selecting-cards", selectingCards);
       rail.classList.toggle("is-showing-archived-cards", showingArchivedCards);
       railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";
@@ -19807,11 +19808,34 @@ async function renderProjectReportDraft(project) {
 
     const blocks = document.createElement("section");
     blocks.className = "report-draft-blocks";
-    const blocksHeading = document.createElement("p");
-    blocksHeading.className = "section-label report-draft-blocks-heading";
-    blocksHeading.textContent = "Report content";
-    blocks.append(blocksHeading);
-    renderBlockEditor(blocks);
+    const blocksHeading = document.createElement("div");
+    blocksHeading.className = "report-draft-blocks-heading project-collapsible-heading";
+    const blocksTitle = document.createElement("button");
+    blocksTitle.type = "button";
+    blocksTitle.className = "project-section-toggle-label section-label report-draft-blocks-toggle";
+    blocksTitle.textContent = "Report content";
+    const blocksToggle = document.createElement("button");
+    blocksToggle.type = "button";
+    blocksToggle.className = "project-section-toggle-chevron report-draft-blocks-chevron";
+    blocksToggle.innerHTML = researchChevronIconsSVG();
+    blocksHeading.append(blocksTitle, blocksToggle);
+    const blocksBody = document.createElement("div");
+    blocksBody.className = "report-draft-blocks-body";
+    renderBlockEditor(blocksBody);
+    blocks.append(blocksHeading, blocksBody);
+    const blocksExpanded = reportSourceGroupExpanded.get("Report content") ?? true;
+    wireProjectSectionMotion(
+      blocks,
+      blocksBody,
+      [blocksTitle, blocksToggle],
+      "Report content",
+      blocksExpanded,
+      {
+        onChange(expanded) {
+          reportSourceGroupExpanded.set("Report content", expanded);
+        }
+      }
+    );
     const sourcePalette = document.createElement("section");
     sourcePalette.className = "report-source-palette";
     renderSourcePalette(sourcePalette);
