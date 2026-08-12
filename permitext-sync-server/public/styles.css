@@ -13358,6 +13358,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-source-card.report-evidence-source-card strong {
   color: color-mix(in srgb, var(--code-accent) 72%, var(--text-primary));
+  font-weight: 400;
 }
 
 .report-source-card > div {
