@@ -2926,7 +2926,10 @@ async function createPostgresStoreAdapter() {
                 'updatedAt', conversation->>'updatedAt',
                 'historyHiddenAt', conversation->>'historyHiddenAt',
                 'primaryProjectID', conversation->>'primaryProjectID',
-                'starterQuestion', conversation->>'starterQuestion',
+                'starterQuestion', COALESCE(
+                  NULLIF(conversation->>'starterQuestion', ''),
+                  NULLIF(conversation#>>'{messages,0,question}', '')
+                ),
                 'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
                 'sourceStatus', COALESCE(conversation->>'sourceStatus', 'current'),
                 'messageCount', jsonb_array_length(COALESCE(conversation->'messages', '[]'::jsonb)),
@@ -2952,7 +2955,10 @@ async function createPostgresStoreAdapter() {
                 'updatedAt', conversation->>'updatedAt',
                 'historyHiddenAt', conversation->>'historyHiddenAt',
                 'primaryProjectID', conversation->>'primaryProjectID',
-                'starterQuestion', conversation->>'starterQuestion',
+                'starterQuestion', COALESCE(
+                  NULLIF(conversation->>'starterQuestion', ''),
+                  NULLIF(conversation#>>'{messages,0,question}', '')
+                ),
                 'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
                 'sourceStatus', COALESCE(conversation->>'sourceStatus', 'current'),
                 'messageCount', jsonb_array_length(COALESCE(conversation->'messages', '[]'::jsonb)),
@@ -7056,13 +7062,21 @@ export function projectResearchConversationForList(conversation) {
     updatedAt: conversation.updatedAt,
     historyHiddenAt: conversation.historyHiddenAt || null,
     primaryProjectID: conversation.primaryProjectID || null,
-    starterQuestion: conversation.starterQuestion || null,
+    starterQuestion: originalResearchQuestion(conversation),
     projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
     codeBasis: conversation.codeBasis || null,
     sourceStatus: conversation.sourceStatus || "current",
     sources: selectionSources,
     messageCount
   };
+}
+
+function originalResearchQuestion(conversation) {
+  const storedQuestion = String(conversation?.starterQuestion || "").trim();
+  if (storedQuestion) return storedQuestion;
+  const firstUserMessage = (Array.isArray(conversation?.messages) ? conversation.messages : [])
+    .find((message) => message?.role === "user");
+  return String(firstUserMessage?.question || "").trim() || null;
 }
 
 function researchConversationSummary(conversation, projectLink = null) {
@@ -7088,7 +7102,7 @@ function researchConversationSummary(conversation, projectLink = null) {
     primaryProjectID: conversation.primaryProjectID || null,
     linkedCodeDecisionID: decisionLink?.questionID || null,
     codeDecisionLinkVersion: projectLink ? Number(projectLink.version || 1) : null,
-    starterQuestion: String(conversation.starterQuestion || "").trim() || null,
+    starterQuestion: originalResearchQuestion(conversation),
     projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
     codeBasis: conversation.codeBasis || null,
     sourceStatus: conversation.sourceStatus || "current"
@@ -13910,6 +13924,7 @@ async function handleResearchConversationMessage(request, response) {
       factTopics: conversationFactState.nextFactTopics,
       updatedAt: now
     };
+    conversation.starterQuestion ||= question;
     conversation.messages.push(userMessage, assistantMessage);
     conversation.updatedAt = now;
     delete conversation.historyHiddenAt;

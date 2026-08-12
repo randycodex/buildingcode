@@ -55,6 +55,7 @@ assert.equal(projected.messageCount, 2);
 assert.equal(projected.sources.length, 1);
 assert.equal(projected.sources[0].sectionID, "8881");
 assert.equal(projected.messages, undefined);
+assert.equal(projected.starterQuestion, "What applies?");
 assert.equal(
   JSON.stringify(projected).includes(hugeVisual),
   false,
@@ -64,6 +65,20 @@ assert.equal(
   JSON.stringify(projected).includes("Long passage body"),
   false,
   "List projection still embeds full passage text."
+);
+
+const legacyProjected = projectResearchConversationForList({
+  ...conversation,
+  starterQuestion: null,
+  messages: [
+    { id: "m1", role: "user", question: "What was originally asked?" },
+    { id: "m2", role: "assistant", answer: { conclusion: "Answer" } }
+  ]
+});
+assert.equal(
+  legacyProjected.starterQuestion,
+  "What was originally asked?",
+  "Legacy conversations should derive the original question without returning message history."
 );
 
 assert.match(
@@ -81,6 +96,15 @@ assert.match(
   /jsonb_array_length\(COALESCE\(conversation->'messages'/,
   "Postgres summary listing does not project messageCount without loading full messages."
 );
+assert.match(
+  appSource,
+  /conversation#>>'\{messages,0,question\}'/,
+  "Postgres summary listing does not recover the original question for legacy conversations."
+);
+assert.match(appSource, /conversation\.starterQuestion \|\|= question;/, "The first ordinary Research question is not persisted as the stable starter question.");
+assert.match(clientSource, /title\.textContent = conversation\.starterQuestion \|\| "Question not yet asked";/, "Previous chats do not show the original question.");
+assert.match(clientSource, /meta\.textContent = researchConversationDate\(conversation\.createdAt\);/, "Previous chats do not show the conversation creation date.");
+assert.match(clientSource, /if \(!releaseSurfaceVisibility\.researchHistoryManagement\)/, "Deferred per-chat management controls are not hidden behind the release boundary.");
 assert.match(
   clientSource,
   /clearChatsButton\.textContent = "Clear"/,

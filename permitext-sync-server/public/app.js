@@ -194,7 +194,8 @@ const permitextSyncSchemaVersion = 2;
 const releaseSurfaceVisibility = Object.freeze({
   // Preserved for data, report, and restoration compatibility. See
   // docs/PERMITEXT_DEFERRED_FEATURES.md before changing this release boundary.
-  workboard: false
+  workboard: false,
+  researchHistoryManagement: false
 });
 const permitextClientCapabilities = Object.freeze([
   "saved-work",
@@ -14060,6 +14061,16 @@ function researchRelativeDate(value) {
   return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(timestamp));
 }
 
+function researchConversationDate(value) {
+  const timestamp = Date.parse(value);
+  if (!Number.isFinite(timestamp)) return "";
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(new Date(timestamp));
+}
+
 function researchProjects() {
   return activeProjectRecords(currentContentSummary().projects || []);
 }
@@ -15356,19 +15367,19 @@ async function renderResearch(paneID = "utility:analysis") {
       openButton.className = "research-conversation-open";
       openButton.type = "button";
       const title = document.createElement("strong");
-      title.textContent = conversation.title;
+      title.textContent = conversation.starterQuestion || "Question not yet asked";
       const meta = document.createElement("span");
+      meta.textContent = researchConversationDate(conversation.createdAt);
+      openButton.append(title, meta);
+      openButton.addEventListener("click", () => openResearchConversation(conversation.id));
+      if (!releaseSurfaceVisibility.researchHistoryManagement) {
+        row.append(openButton);
+        return;
+      }
+
       const linkedQuestion = questionsForActiveProject().find((item) =>
         item.id === conversation.linkedCodeDecisionID
       );
-      meta.textContent = [
-        `${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"}`,
-        `${conversation.sourceCount} ${conversation.sourceCount === 1 ? "source" : "sources"}`,
-        linkedQuestion ? `Linked to ${linkedQuestion.displayID || "Code Decision"}` : "",
-        researchRelativeDate(conversation.updatedAt)
-      ].filter(Boolean).join(" · ");
-      openButton.append(title, meta);
-      openButton.addEventListener("click", () => openResearchConversation(conversation.id));
 
       const actions = document.createElement("div");
       actions.className = "research-conversation-row-actions";

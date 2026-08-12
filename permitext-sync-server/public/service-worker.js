@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v577";
+const shellCacheName = "permitext-pro-shell-v578";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -11,7 +11,7 @@ const shellURLs = [
   "/web/fonts/inter-latin-wght-italic.woff2",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260811-toolbar-toggle-v1",
+  "/web/app.js?v=20260811-research-history-v1",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
   "/web/offline-storage.js?v=20260811-research-code-basis-v2",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
