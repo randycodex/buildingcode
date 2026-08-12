@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v15";
+} from "./research-progress.js?v=20260812-research-progress-v16";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v15";
+} from "./offline-storage.js?v=20260812-research-progress-v16";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -30006,11 +30006,6 @@ async function openNewSearchColumn() {
   if (!instance) return;
   const paneID = paneIDForUtilityInstance(instance);
   scrollPaneIntoView(paneID);
-  requestAnimationFrame(() => {
-    track
-      .querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"] .search-input`)
-      ?.focus({ preventScroll: true });
-  });
 }
 
 async function toggleProjectsColumns() {

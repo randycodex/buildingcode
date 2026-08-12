@@ -568,7 +568,8 @@ async function main() {
     assert(
       workspaceScript.text.includes("async function openNewSearchColumn()") &&
         workspaceScript.text.includes('toggleSearchButton.addEventListener("click", () => {\n      void openNewSearchColumn();') &&
-        workspaceScript.text.includes('run: () => openNewSearchColumn()'),
+        workspaceScript.text.includes('run: () => openNewSearchColumn()') &&
+        !workspaceScript.text.match(/async function openNewSearchColumn\(\)[\s\S]*?\.search-input[`"]\)\s*\?\.focus/),
       "Search should create a new Search column from both the toolbar and command palette."
     );
     assert(
@@ -1368,7 +1369,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v15'),
+        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v16'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1514,7 +1515,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v15'),
+      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v16'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1781,7 +1782,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v15'),
+      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v16'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
