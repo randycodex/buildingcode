@@ -6015,6 +6015,10 @@ mark {
   text-overflow: ellipsis;
 }
 
+.research-conversation-open strong {
+  font-weight: 400;
+}
+
 .research-conversation-open span {
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.78) !important;
