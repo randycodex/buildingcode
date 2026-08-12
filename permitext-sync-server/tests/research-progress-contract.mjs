@@ -91,7 +91,8 @@ assert(!clientSource.includes('className = "research-progress-tasks"'), "Researc
 assert.match(styleSource, /\.research-progress-card\s*\{[\s\S]*?padding: 0;[\s\S]*?border: 0;[\s\S]*?background: transparent;/);
 assert.match(styleSource, /workspace-panel:not\(\.reader-panel\) \.research-progress-loading-label\s*\{[\s\S]*?font-size: 10px !important;[\s\S]*?font-weight: 400;/);
 assert.match(styleSource, /workspace-panel:not\(\.reader-panel\) \.research-progress-elapsed\s*\{[\s\S]*?font-size: 10px !important;[\s\S]*?font-weight: 400;/);
-assert(styleSource.includes("grid-template-columns: repeat(3, 4px)"));
+assert(styleSource.includes("grid-template-columns: repeat(3, 2px)"));
+assert(!styleSource.includes("research-progress-shimmer"), "Research status text still uses a blinking shimmer animation.");
 assert(styleSource.includes("@media (prefers-reduced-motion: reduce)"));
 
 console.log("permitext research progress contract passed");

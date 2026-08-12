@@ -6869,11 +6869,11 @@ body.is-resizing-research-evidence * {
 
 .research-progress-grid {
   display: grid;
-  grid-template-columns: repeat(3, 4px);
-  grid-auto-rows: 4px;
-  gap: 2px;
-  width: 16px;
-  height: 16px;
+  grid-template-columns: repeat(3, 2px);
+  grid-auto-rows: 2px;
+  gap: 1px;
+  width: 8px;
+  height: 8px;
 }
 
 .research-progress-grid > span {
@@ -6897,16 +6897,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   font-size: 10px !important;
   font-weight: 400;
   line-height: 1.35;
-  background: linear-gradient(
-    100deg,
-    var(--text-secondary) 20%,
-    var(--text-primary) 48%,
-    var(--text-secondary) 76%
-  );
-  background-size: 220% 100%;
-  background-clip: text;
-  color: transparent;
-  animation: research-progress-shimmer 1.8s linear infinite;
+  color: var(--text-primary);
 }
 
 [data-progress-state="completed"] .research-progress-loading-label,
@@ -6946,25 +6937,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   45% { opacity: 1; transform: scale(1); }
 }
 
-@keyframes research-progress-shimmer {
-  from { background-position: 120% 0; }
-  to { background-position: -120% 0; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .research-progress-grid > span,
-  .research-progress-loading-label {
+  .research-progress-grid > span {
     animation: none;
     transform: none;
   }
 
   .research-progress-grid > span {
     opacity: 0.58;
-  }
-
-  .research-progress-loading-label {
-    background: none;
-    color: var(--text-primary);
   }
 }
 
