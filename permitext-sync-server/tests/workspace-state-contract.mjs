@@ -104,8 +104,11 @@ const unifiedResearchLayout = normalizeWorkspaceLayout({
   }
 });
 assert.equal(unifiedResearchLayout.researchConversationID, "research-1");
-assert.deepEqual(unifiedResearchLayout.paneOrder, ["utility:analysis"]);
-assert.deepEqual(unifiedResearchLayout.paneWeights, { "utility:analysis": 742 });
+assert.deepEqual(unifiedResearchLayout.paneOrder, ["utility:analysis", "research:conversation:research-1"]);
+assert.deepEqual(unifiedResearchLayout.paneWeights, {
+  "utility:analysis": 742,
+  "research:conversation:research-1": 742
+});
 
 const hostedProjectLayout = normalizeWorkspaceLayout({
   utilityInstances: [{ id: "saved-1", key: "saved" }, { id: "saved-2", key: "saved" }],

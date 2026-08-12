@@ -1319,7 +1319,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-research-start-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-research-columns-v3'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1843,7 +1843,8 @@ async function main() {
         workspaceScript.text.includes('postResearch("/research/conversations/candidate-disposition"') &&
         !workspaceScript.text.includes("Selected for exploratory Research") &&
         workspaceScript.text.includes("(embeddedEvidenceNoticeRegion || evidenceScroll).append(warning)") &&
-        workspaceScript.text.includes('panel.classList.add("has-research-composer")') &&
+        workspaceScript.text.includes("panes.push(await renderResearchConversation(state.researchConversationID))") &&
+        !workspaceScript.text.includes('panel.classList.add("has-research-composer")') &&
         workspaceScript.text.includes("input.style.height = `${input.scrollHeight}px`") &&
         workspaceScript.text.includes("research-selected-evidence-notices") &&
         workspaceScript.text.includes("researchOpenContextIsCurrent(dispositionContext, { requireConversationID: true })") &&
@@ -2084,10 +2085,10 @@ async function main() {
       workspaceScript.text.includes(
         'if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:"))'
       ) &&
-        workspaceScript.text.includes(
-          'active.has("utility:analysis") ? ["utility:analysis"] : []'
-        ),
-      "Unified Research no longer moves as one stable draggable pane."
+      workspaceScript.text.includes(
+        'return ["utility:analysis", paneIDForResearchConversation()].filter((id) => id && active.has(id));'
+      ),
+      "The Research list and its adjacent conversation no longer move as one stable group."
     );
     assert(
       !workspaceScript.text.includes("if (!window.confirm(`Archive ${name}?`)) return;"),
