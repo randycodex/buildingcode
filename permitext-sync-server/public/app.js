@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-header-v55";
+} from "./research-progress.js?v=20260812-notebook-header-order-v56";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-header-v55";
+} from "./offline-storage.js?v=20260812-notebook-header-order-v56";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18049,7 +18049,7 @@ async function renderProjectNotebook(project) {
   closeButton.addEventListener("click", () => {
     void closeProjectNotebook(identity);
   });
-  header.append(dragHandle, closeButton);
+  header.append(closeButton, dragHandle);
 
   const shell = document.createElement("div");
   shell.className = "notebook-shell";
