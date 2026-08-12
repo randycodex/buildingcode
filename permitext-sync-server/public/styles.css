@@ -5992,8 +5992,8 @@ mark {
   background: transparent;
   color: var(--text-secondary);
   font: inherit;
-  font-size: calc(var(--chrome-font-size) * 0.76) !important;
-  font-weight: 650;
+  font-size: 14px !important;
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-align: left;
   text-transform: uppercase;

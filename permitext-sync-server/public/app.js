@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-recently-viewed-spacing-v2";
+} from "./offline-storage.js?v=20260811-research-group-heading-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14150,7 +14150,7 @@ function researchConversationHistoryGroups(conversations = [], now = new Date())
     let defaultExpanded = false;
     if (ageInDays < 7) {
       id = "last-7-days";
-      label = "Last 7 days";
+      label = "7 days";
       defaultExpanded = true;
     } else if (ageInDays < 14) {
       id = "previous-7-days";
