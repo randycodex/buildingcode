@@ -1336,7 +1336,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-research-chat-trust-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-research-policy-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1478,7 +1478,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-research-chat-trust-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-research-policy-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1738,7 +1738,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-research-chat-trust-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-research-policy-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2062,12 +2062,15 @@ async function main() {
     assert(
       workspaceScript.text.includes('const researchChatPlaceholder = "AI-assisted research — not an official interpretation"') &&
         (workspaceScript.text.match(/input\.placeholder = researchChatPlaceholder;/g) || []).length === 2 &&
-        !workspaceScript.text.includes('trustHeading.textContent = "AI-assisted research — not an official interpretation"') &&
-        workspaceScript.text.includes('trustNotice.className = "research-trust-notice"') &&
-        workspaceScript.text.includes("if (!projectScopedResearch) content.append(trustNotice);") &&
+        !workspaceScript.text.includes('research-trust-notice') &&
+        !workspaceScript.text.includes("appendTrustNotice") &&
+        privacyPolicy.text.includes("grounds code conclusions in applicable enacted text") &&
+        privacyPolicy.text.includes("Supporting sources are identified separately") &&
+        privacyPolicy.text.includes("private notes are excluded") &&
+        privacyPolicy.text.includes("Research evidence sent for generation") &&
         !workspaceScript.text.includes('trustBanner.className = "research-trust-banner"') &&
         !workspaceScript.text.includes('noteLabel.textContent = "Private note · not code text"'),
-      "Research trust labeling should remain as a compact footer notice rather than a banner card."
+      "Research trust labeling should remain in the composer while the detailed boundary lives in the Privacy Policy."
     );
     assert(
       workspaceScript.text.includes('findButton.textContent = "Search"') &&
@@ -2516,8 +2519,8 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.research-list-panel \.analysis-content \{[\s\S]*?display: flex;[\s\S]*?flex-direction: column;/) &&
-        workspaceStyles.text.match(/\.research-trust-notice \{[\s\S]*?margin-top: auto;[\s\S]*?padding: var\(--space-5\) 0 calc\(var\(--space-2\) \+ 34px\);[\s\S]*?font-size: calc\(var\(--chrome-font-size\) \* 0\.72\);/),
-      "Research trust notice should remain small and anchored below the column content."
+        !workspaceStyles.text.includes(".research-trust-notice"),
+      "The retired Research footer notice should not leave unused styling."
     );
     assert(
       workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?border: 0;[\s\S]*?background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);[\s\S]*?color: var\(--text-primary\);/),

@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-chat-trust-v1";
+} from "./offline-storage.js?v=20260811-research-policy-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15226,16 +15226,6 @@ async function renderResearch(paneID = "utility:analysis") {
   panelActions?.prepend(backButton, newChatButton, clearChatsButton);
   const content = panel.querySelector(".analysis-content");
 
-  const trustNotice = document.createElement("aside");
-  trustNotice.className = "research-trust-notice";
-  trustNotice.setAttribute("role", "note");
-  const trustCopy = document.createElement("p");
-  trustCopy.textContent = "Permitext grounds code conclusions in applicable enacted text and cites the sources used. Supporting sources are identified separately; private notes are excluded.";
-  trustNotice.append(trustCopy);
-  const appendTrustNotice = () => {
-    if (!projectScopedResearch) content.append(trustNotice);
-  };
-
   if (!activeAccount()) {
     const empty = document.createElement("article");
     empty.className = "analysis-card research-empty-state";
@@ -15250,7 +15240,6 @@ async function renderResearch(paneID = "utility:analysis") {
     button.addEventListener("click", () => focusUtility("settings"));
     empty.append(heading, copy, button);
     content.append(empty);
-    appendTrustNotice();
     return panel;
   }
 
@@ -15262,7 +15251,6 @@ async function renderResearch(paneID = "utility:analysis") {
     status.className = "research-list-status is-error";
     status.textContent = error.message;
     content.append(status);
-    appendTrustNotice();
     return panel;
   }
 
@@ -15374,7 +15362,6 @@ async function renderResearch(paneID = "utility:analysis") {
     empty.className = "research-conversation-empty";
     empty.textContent = "Your previous chats will appear here.";
     content.append(empty);
-    appendTrustNotice();
     return panel;
   }
 
@@ -15657,7 +15644,6 @@ async function renderResearch(paneID = "utility:analysis") {
     list.append(row);
   });
   content.append(list);
-  appendTrustNotice();
   return panel;
 }
 
