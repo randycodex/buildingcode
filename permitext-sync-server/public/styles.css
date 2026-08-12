@@ -12401,6 +12401,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 }
 
 .report-draft-panel {
+  --pane-min-width: 600px;
   --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
   --project-pane-band-background: color-mix(in srgb, var(--project-color) 42%, var(--surface));
   position: relative;
