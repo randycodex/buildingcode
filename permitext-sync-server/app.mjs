@@ -12665,7 +12665,7 @@ async function handleResearchConversationAssignProject(request, response) {
   if (!conversation) return;
   const targetProjectID = String(context.body.projectID || "").trim() || null;
   const currentProjectID = conversation.primaryProjectID || null;
-  const requiresContextReview = Boolean(currentProjectID || (conversation.messages || []).length > 0);
+  const requiresContextReview = Boolean(currentProjectID);
   if (targetProjectID === currentProjectID) {
     sendJSON(response, 200, {
       conversation: await researchConversationForClient(conversation, { userID: context.userID }),
@@ -12739,7 +12739,7 @@ async function handleResearchConversationAssignProject(request, response) {
     source: "user-provided",
     updatedAt: now
   } : null;
-  conversation.projectContextReviewRequired = Boolean(targetProjectID && requiresContextReview);
+  conversation.projectContextReviewRequired = Boolean(targetProjectID && currentProjectID);
   conversation.movedFromProjectID = currentProjectID;
   conversation.movedAt = now;
   conversation.updatedAt = now;

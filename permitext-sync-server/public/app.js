@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v13";
+} from "./research-progress.js?v=20260812-research-progress-v15";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v13";
+} from "./offline-storage.js?v=20260812-research-progress-v15";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -16351,75 +16351,6 @@ function renderResearchAnswerSources(conversation, message) {
   return details;
 }
 
-function researchSaveProjectOptions(conversation) {
-  const projects = activeFolderRecords(currentContentSummary().projects || []).filter(folderIsProject);
-  const preferredID = String(conversation?.primaryProjectID || preferredResearchProjectID(conversation) || "");
-  return {
-    projects,
-    preferredID: projects.some((project) => researchProjectID(project) === preferredID) ? preferredID : ""
-  };
-}
-
-function renderResearchAnswerSave(conversation, message) {
-  const controls = document.createElement("div");
-  controls.className = "research-answer-save";
-  const { projects, preferredID } = researchSaveProjectOptions(conversation);
-  const projectSelect = document.createElement("select");
-  projectSelect.className = "research-answer-save-project";
-  projectSelect.setAttribute("aria-label", "Project for saved Research answer");
-  if (!projects.length) {
-    const option = document.createElement("option");
-    option.value = "";
-    option.textContent = "Create a Project to save";
-    projectSelect.append(option);
-  } else {
-    projects.forEach((project) => {
-      const option = document.createElement("option");
-      option.value = researchProjectID(project);
-      option.textContent = readableProjectName(project);
-      projectSelect.append(option);
-    });
-    projectSelect.value = preferredID || researchProjectID(projects[0]);
-  }
-  const saveButton = document.createElement("button");
-  saveButton.type = "button";
-  saveButton.className = "ghost-button research-answer-save-button";
-  saveButton.textContent = "Save to Project";
-  saveButton.disabled = !message?.id || !projects.length || !isProAccount();
-  if (!projects.length) saveButton.title = "Create a Project before saving this answer";
-  else if (!isProAccount()) saveButton.title = "Saving Research to a Project requires Pro";
-  const status = document.createElement("span");
-  status.className = "research-answer-save-status";
-  status.setAttribute("role", "status");
-  status.setAttribute("aria-live", "polite");
-  saveButton.addEventListener("click", async () => {
-    const projectID = projectSelect.value;
-    if (!projectID || !message?.id) return;
-    saveButton.disabled = true;
-    projectSelect.disabled = true;
-    status.textContent = "Saving…";
-    try {
-      await postResearch("/projects/foundation/link", {
-        projectID,
-        targetKind: "researchAnswer",
-        targetID: message.id
-      });
-      saveButton.textContent = "Saved";
-      saveButton.setAttribute("aria-pressed", "true");
-      status.textContent = `Saved to ${researchProjectName(projectID)}`;
-      const project = activeFolderRecords(currentContentSummary().projects || [])
-        .find((item) => researchProjectID(item) === String(projectID));
-      if (project) await refreshProjectMembershipPanes(project);
-    } catch (error) {
-      status.textContent = error.message || "This answer could not be saved.";
-      saveButton.disabled = false;
-      projectSelect.disabled = false;
-    }
-  });
-  controls.append(projectSelect, saveButton, status);
-  return controls;
-}
-
 function appendHistoricalResearchList(container, title, items = []) {
   if (!items.length) return;
   const heading = document.createElement("strong");
@@ -16868,6 +16799,47 @@ async function renderResearchConversation(conversationID, options = {}) {
   applyProjectDerivedPaneTheme(panel, conversation.primaryProjectID);
   const summaryQuestion = researchConversationList.find((item) => item.id === conversation.id)?.starterQuestion;
   panelTitle.textContent = conversation.starterQuestion || summaryQuestion || conversation.title;
+  if (!embedded) {
+    const projectSelect = createResearchProjectSelect({
+      value: conversation.primaryProjectID || "",
+      unassignedLabel: "Not in a Project",
+      ariaLabel: "Project for this Research conversation"
+    });
+    projectSelect.classList.add("research-conversation-header-project");
+    projectSelect.disabled = !hasCapability("research");
+    projectSelect.title = conversation.primaryProjectID
+      ? `This conversation is in ${researchProjectName(conversation.primaryProjectID)}`
+      : "This conversation is not part of a Project";
+    projectSelect.addEventListener("change", async () => {
+      const previousProjectID = conversation.primaryProjectID || "";
+      const targetProjectID = projectSelect.value;
+      if (targetProjectID === previousProjectID) return;
+      projectSelect.disabled = true;
+      try {
+        const payload = await assignResearchConversationProject(conversation, targetProjectID, {
+          warningContainer: panel
+        });
+        if (!payload) {
+          projectSelect.value = previousProjectID;
+          return;
+        }
+        conversation = { ...conversation, ...payload.conversation };
+        activeResearchConversation = conversation;
+        researchConversationList = researchConversationList.map((item) =>
+          item.id === conversation.id ? { ...item, ...conversation } : item
+        );
+        const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
+        await transitionWorkspace("utility", {
+          refreshPaneIDs: ["utility:analysis", paneID, ...projectPaneIDs]
+        });
+      } catch (error) {
+        projectSelect.value = previousProjectID;
+        projectSelect.disabled = false;
+        await showWebNotice("Project not changed", error.message);
+      }
+    });
+    actions.prepend(projectSelect);
+  }
   const selectedSources = conversation.sources.filter((source) => source.kind === "selection");
   const displayedSources = researchDisplaySources(selectedSources);
   const evidencePane = document.createElement("section");
@@ -16993,7 +16965,6 @@ async function renderResearchConversation(conversationID, options = {}) {
       const evidenceReviewedBody = bubble.querySelector(".research-evidence-reviewed-body");
       (evidenceReviewedBody || bubble).append(answerSources);
     }
-    bubble.append(renderResearchAnswerSave(conversation, message));
     thread.append(bubble);
   });
   const pendingProgress = activeResearchProgress.get(conversationID);
@@ -19903,11 +19874,8 @@ function appendProjectResearchContextEditor(content, identity, initialConversati
 }
 
 function appendProjectResearchHistory(content, identity, foundation) {
-  const answers = [...(foundation?.researchAnswers || [])]
-    .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
-  const answeredConversationIDs = new Set(answers.map((answer) => answer.conversationID).filter(Boolean));
-  const unansweredConversations = [...(foundation?.researchConversations || [])]
-    .filter((conversation) => !answeredConversationIDs.has(conversation.id))
+  const conversations = [...(foundation?.researchConversations || [])]
+    .filter((conversation) => String(conversation.starterQuestion || "").trim())
     .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
   const section = document.createElement("section");
   section.className = "project-studio-section project-studio-research";
@@ -19921,8 +19889,8 @@ function appendProjectResearchHistory(content, identity, foundation) {
   const headingActions = document.createElement("div");
   headingActions.className = "project-section-heading-actions";
   headingActions.append(projectSectionCount(
-    answers.length + unansweredConversations.length,
-    "Research history entries"
+    conversations.length,
+    "Research conversations"
   ));
   const toggle = document.createElement("button");
   toggle.className = "project-section-toggle-chevron";
@@ -19936,43 +19904,14 @@ function appendProjectResearchHistory(content, identity, foundation) {
   body.className = "project-studio-collapsible-body project-research-history-body";
   section.append(heading, body);
 
-  if (answers.length) {
-    answers.slice(0, 8).forEach((answer) => {
-      const card = document.createElement(identity.sharedOnly ? "article" : "button");
-      card.className = "project-research-history-card";
-      card.dataset.researchAnswerId = answer.id;
-      if (!identity.sharedOnly) card.type = "button";
-      const question = document.createElement("strong");
-      question.textContent = answer.question || "Research answer";
-      const conclusion = document.createElement("p");
-      conclusion.textContent = answer.conclusion || "Open the historical record to review its conclusion.";
-      const meta = document.createElement("span");
-      meta.textContent = [
-        `${answer.evidenceCount || 0} approved ${answer.evidenceCount === 1 ? "source" : "sources"}`,
-        researchRelativeDate(answer.createdAt),
-        answer.reviewStatus
-      ].filter(Boolean).join(" · ");
-      card.append(question, conclusion, meta);
-      if (!identity.sharedOnly) {
-        card.addEventListener("click", () => {
-          if (answer.conversationID) void openResearchConversation(answer.conversationID);
-        });
-      }
-      body.append(card);
-    });
-  }
-  unansweredConversations.slice(0, Math.max(0, 8 - answers.length)).forEach((conversation) => {
+  conversations.slice(0, 8).forEach((conversation) => {
     const card = document.createElement(identity.sharedOnly ? "article" : "button");
     card.className = "project-research-history-card";
     card.dataset.researchConversationId = conversation.id;
     if (!identity.sharedOnly) card.type = "button";
     const question = document.createElement("strong");
-    question.textContent = conversation.title || conversation.starterQuestion || "Research conversation";
-    const status = document.createElement("p");
-    status.textContent = "No completed answer yet.";
-    const meta = document.createElement("span");
-    meta.textContent = researchRelativeDate(conversation.updatedAt || conversation.createdAt);
-    card.append(question, status, meta);
+    question.textContent = conversation.starterQuestion;
+    card.append(question);
     if (!identity.sharedOnly) {
       card.addEventListener("click", () => void openResearchConversation(conversation.id));
     }
@@ -22586,7 +22525,7 @@ function appendSavedProjectSummaryField(container, label, value, options = {}) {
   container.append(field);
 }
 
-async function appendSavedProjectResearchAnswers(container, identity) {
+async function appendSavedProjectResearchConversations(container, identity) {
   if (!activeAccount()) return;
   const projectID = projectDetailKey(identity);
   let foundation;
@@ -22598,9 +22537,10 @@ async function appendSavedProjectResearchAnswers(container, identity) {
   } catch {
     return;
   }
-  const answers = [...notebookResearchAnswers(foundation)]
-    .sort((left, right) => String(right.createdAt || "").localeCompare(String(left.createdAt || "")));
-  if (!answers.length) return;
+  const conversations = [...(foundation?.researchConversations || [])]
+    .filter((conversation) => String(conversation.starterQuestion || "").trim())
+    .sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")));
+  if (!conversations.length) return;
 
   const section = document.createElement("section");
   section.className = "project-studio-section saved-project-research-answers";
@@ -22608,29 +22548,19 @@ async function appendSavedProjectResearchAnswers(container, identity) {
   heading.className = "project-studio-section-heading";
   const title = document.createElement("p");
   title.className = "section-label";
-  title.textContent = "Research answers";
-  heading.append(title, projectSectionCount(answers.length, "saved Research answers"));
+  title.textContent = "Research";
+  heading.append(title, projectSectionCount(conversations.length, "Research conversations"));
   section.append(heading);
 
-  answers.slice(0, 12).forEach((answer) => {
+  conversations.slice(0, 12).forEach((conversation) => {
     const card = document.createElement("button");
     card.className = "project-research-history-card";
     card.type = "button";
-    card.dataset.researchAnswerId = answer.id;
+    card.dataset.researchConversationId = conversation.id;
     const question = document.createElement("strong");
-    question.textContent = answer.question || "Research answer";
-    const conclusion = document.createElement("p");
-    conclusion.textContent = answer.conclusion || "Open the cited answer and its immutable source record.";
-    const sourceCount = Number(answer.evidenceCount || answer.evidence?.length || 0);
-    const meta = document.createElement("span");
-    meta.textContent = [
-      `${sourceCount} cited ${sourceCount === 1 ? "source" : "sources"}`,
-      researchRelativeDate(answer.createdAt)
-    ].filter(Boolean).join(" · ");
-    card.append(question, conclusion, meta);
-    card.addEventListener("click", () => {
-      if (answer.conversationID) void openResearchConversation(answer.conversationID);
-    });
+    question.textContent = conversation.starterQuestion;
+    card.append(question);
+    card.addEventListener("click", () => void openResearchConversation(conversation.id));
     section.append(card);
   });
   container.append(section);
@@ -22720,7 +22650,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       savedContent
     );
     context.append(savedSection);
-    await appendSavedProjectResearchAnswers(context, identity);
+    await appendSavedProjectResearchConversations(context, identity);
 
   } else {
     const controls = document.createElement("div");

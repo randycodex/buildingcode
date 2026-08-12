@@ -159,7 +159,11 @@ assert.match(appSource, /filter\(\(conversation\) => !conversation\.historyHidde
 assert.doesNotMatch(clientSource, /className = "ghost-button research-back-button"/, "The redundant Research Back control should remain removed.");
 assert.doesNotMatch(clientSource, /className = "ghost-button research-new-chat-button"/, "The redundant Research New chat control should remain removed.");
 assert.match(clientSource, /function bindResearchSendShortcut[\s\S]*?event\.key !== "Enter" \|\| event\.shiftKey \|\| event\.isComposing[\s\S]*?form\.requestSubmit\(\)/, "Enter should start a Research conversation while Shift+Enter remains available for a line break.");
-assert.match(clientSource, /unansweredConversations[\s\S]*No completed answer yet\./, "Empty Project conversations cannot be reopened from Project Research history.");
+assert.match(clientSource, /const conversations = \[\.\.\.\(foundation\?\.researchConversations \|\| \[\]\)\][\s\S]*?filter\(\(conversation\) => String\(conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = conversation\.starterQuestion;/, "Project Research history must show only conversations with an original question.");
+assert.doesNotMatch(clientSource, /renderResearchAnswerSave|Save to Project|research-answer-save/, "Per-answer Project saving must remain removed from Research conversations.");
+assert.match(clientSource, /unassignedLabel: "Not in a Project"[\s\S]*?assignResearchConversationProject\(conversation, targetProjectID/, "The conversation header does not auto-assign the full conversation to a Project.");
+assert.match(appSource, /const requiresContextReview = Boolean\(currentProjectID\);/, "A first-time Project assignment should not require a move confirmation.");
+assert.match(clientSource, /function appendSavedProjectResearchConversations[\s\S]*?filter\(\(conversation\) => String\(conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = conversation\.starterQuestion[\s\S]*?openResearchConversation\(conversation\.id\)/, "The Project folder does not render assigned conversations by original question.");
 assert.match(clientSource, /Cited \$\{citedProvisionCount\} enacted/, "Research answers do not distinguish cited provisions from reviewed evidence.");
 assert.match(clientSource, /additional \$\{reviewedOnlyProvisionCount/, "Research answers do not disclose additional provisions reviewed.");
 assert.match(clientSource, /citation\.evidenceRole === "supporting"/, "Supporting citations are not visibly classified.");
