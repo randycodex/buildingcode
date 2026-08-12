@@ -1336,7 +1336,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-search-history-popover-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-research-chat-trust-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1478,7 +1478,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-search-history-height-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-research-chat-trust-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1738,7 +1738,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-search-history-height-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-research-chat-trust-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2060,7 +2060,9 @@ async function main() {
       "Web share controls no longer generate permitext.com section links."
     );
     assert(
-      workspaceScript.text.includes('trustHeading.textContent = "AI-assisted research — not an official interpretation"') &&
+      workspaceScript.text.includes('const researchChatPlaceholder = "AI-assisted research — not an official interpretation"') &&
+        (workspaceScript.text.match(/input\.placeholder = researchChatPlaceholder;/g) || []).length === 2 &&
+        !workspaceScript.text.includes('trustHeading.textContent = "AI-assisted research — not an official interpretation"') &&
         workspaceScript.text.includes('trustNotice.className = "research-trust-notice"') &&
         workspaceScript.text.includes("if (!projectScopedResearch) content.append(trustNotice);") &&
         !workspaceScript.text.includes('trustBanner.className = "research-trust-banner"') &&

@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-search-history-popover-v1";
+} from "./offline-storage.js?v=20260811-research-chat-trust-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -348,6 +348,7 @@ const savedItemsPageSize = 48;
 const recentViewLimit = 50;
 const recentSearchLimit = 50;
 const recentSearchPopoverLimit = 15;
+const researchChatPlaceholder = "AI-assisted research — not an official interpretation";
 const repeatableUtilityKeys = new Set(["search", "saved"]);
 const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title", "tag"]);
 const collapsedSettingsCardIDs = new Set();
@@ -15130,7 +15131,7 @@ function renderNewResearchComposer(container, researchEnabled) {
   input.className = "research-question-input";
   input.rows = 2;
   input.maxLength = 2000;
-  input.placeholder = "Ask a building-code question…";
+  input.placeholder = researchChatPlaceholder;
   input.value = researchQuestionDraft;
   const sendButton = document.createElement("button");
   sendButton.className = "ghost-button research-send-button";
@@ -15228,11 +15229,9 @@ async function renderResearch(paneID = "utility:analysis") {
   const trustNotice = document.createElement("aside");
   trustNotice.className = "research-trust-notice";
   trustNotice.setAttribute("role", "note");
-  const trustHeading = document.createElement("strong");
-  trustHeading.textContent = "AI-assisted research — not an official interpretation";
   const trustCopy = document.createElement("p");
   trustCopy.textContent = "Permitext grounds code conclusions in applicable enacted text and cites the sources used. Supporting sources are identified separately; private notes are excluded.";
-  trustNotice.append(trustHeading, trustCopy);
+  trustNotice.append(trustCopy);
   const appendTrustNotice = () => {
     if (!projectScopedResearch) content.append(trustNotice);
   };
@@ -16662,9 +16661,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const starterAnalysisQuestion = conversation.messages.length === 0
     ? conversation.starterQuestion || ""
     : "";
-  input.placeholder = starterAnalysisQuestion
-    ? "Ask a follow-up, or send the Research question…"
-    : "Ask a building-code question…";
+  input.placeholder = researchChatPlaceholder;
   input.value = researchQuestionDraft && researchQuestionDraft !== starterAnalysisQuestion
     ? researchQuestionDraft
     : "";
