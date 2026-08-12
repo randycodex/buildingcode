@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-group-heading-v1";
+} from "./offline-storage.js?v=20260811-research-group-counter-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15425,13 +15425,6 @@ async function renderResearch(paneID = "utility:analysis") {
     groupLabel.className = "research-history-group-label";
     groupLabel.type = "button";
     groupLabel.textContent = historyGroup.label;
-    const groupCount = document.createElement("span");
-    groupCount.className = "research-history-group-count";
-    groupCount.textContent = String(historyGroup.conversations.length);
-    groupCount.setAttribute(
-      "aria-label",
-      `${historyGroup.conversations.length} ${historyGroup.conversations.length === 1 ? "conversation" : "conversations"}`
-    );
     const groupToggle = document.createElement("button");
     groupToggle.className = "project-section-toggle-chevron research-history-group-chevron";
     groupToggle.type = "button";
@@ -15441,7 +15434,7 @@ async function renderResearch(paneID = "utility:analysis") {
     groupBody.id = `research-history-${historyGroup.id}`;
     groupLabel.setAttribute("aria-controls", groupBody.id);
     groupToggle.setAttribute("aria-controls", groupBody.id);
-    groupHeading.append(groupLabel, groupCount, groupToggle);
+    groupHeading.append(groupLabel, groupToggle);
     group.append(groupHeading, groupBody);
 
     historyGroup.conversations.forEach((initialConversation) => {

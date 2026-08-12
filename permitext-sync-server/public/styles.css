@@ -6006,13 +6006,6 @@ mark {
   color: var(--text-primary);
 }
 
-.research-history-group-count {
-  flex: 0 0 auto;
-  color: var(--text-tertiary);
-  font-size: calc(var(--chrome-font-size) * 0.72) !important;
-  font-variant-numeric: tabular-nums;
-}
-
 .research-history-group-chevron {
   margin-left: var(--space-2);
 }
