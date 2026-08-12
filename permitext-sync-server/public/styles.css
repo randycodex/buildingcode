@@ -10567,6 +10567,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: transparent;
 }
 
+.settings-plan-usage[hidden] {
+  display: none;
+}
+
 .settings-plan-usage p {
   display: flex;
   min-height: 34px;
