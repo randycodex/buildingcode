@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-copy-cleanup-v66";
+} from "./research-progress.js?v=20260812-report-copy-cleanup-v67";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-copy-cleanup-v66";
+} from "./offline-storage.js?v=20260812-report-copy-cleanup-v67";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19371,10 +19371,6 @@ async function renderProjectReportDraft(project) {
 
   function renderBlockEditor(container) {
     if (!activeDraft.blocks.length) {
-      const empty = document.createElement("p");
-      empty.className = "report-draft-empty";
-      empty.textContent = "Add a paragraph, heading, list, or Project source to begin the professional narrative.";
-      container.append(empty);
       return;
     }
     activeDraft.blocks.forEach((block, index) => {
@@ -19588,7 +19584,7 @@ async function renderProjectReportDraft(project) {
       container.append(row);
     };
 
-    appendSourceGroup("Project facts", "Included automatically from the active Project.", (groupBody) => {
+    appendSourceGroup("Project facts", "", (groupBody) => {
       const facts = document.createElement("article");
       facts.className = "report-source-card report-project-facts-source";
       const factsCopy = document.createElement("div");
