@@ -473,6 +473,7 @@ export async function assembleResearchEvidence({
   topicContext = null,
   discover,
   resolveSection,
+  onStage,
   limits: requestedLimits = {}
 } = {}) {
   if (typeof discover !== "function") {
@@ -493,6 +494,7 @@ export async function assembleResearchEvidence({
     topicContext
   });
   const limits = appliedLimits(requestedLimits);
+  await onStage?.("searching_authorized_library", "active");
   const discovery = await discover({
     question: query.retrievalQuery,
     limit: limits.maximumCandidates,
@@ -517,6 +519,8 @@ export async function assembleResearchEvidence({
       )
     : prioritizedCandidates;
   const nonMaterialCandidateCount = prioritizedCandidates.length - candidates.length;
+  await onStage?.("searching_authorized_library", "completed");
+  await onStage?.("reviewing_provisions", "active");
   const sources = [];
   const canonicalForExpansion = [];
   const includedSectionIdentities = new Set();
@@ -720,6 +724,9 @@ export async function assembleResearchEvidence({
     targetedDefinitionCount += 1;
   }
 
+  await onStage?.("reviewing_provisions", "completed");
+  await onStage?.("following_cross_references", "active");
+
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
   for (const source of canonicalForExpansion) {
@@ -787,6 +794,7 @@ export async function assembleResearchEvidence({
     characterCount += record.text.length;
     crossReferenceCount += 1;
   }
+  await onStage?.("following_cross_references", "completed");
 
   if (resolverFailureCount) {
     limitations.push({

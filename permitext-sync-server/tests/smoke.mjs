@@ -72,6 +72,22 @@ async function requestBinary(path, { method = "GET", body, token, headers = {}, 
   };
 }
 
+async function requestNDJSON(path, { body, token, signal } = {}) {
+  const response = await fetch(`${baseURL}${path}`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...(token ? { authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify(body),
+    signal
+  });
+  const text = await response.text();
+  const events = text.split("\n").filter(Boolean).map((line) => JSON.parse(line));
+  const result = events.find((event) => event.type === "result")?.payload || null;
+  return { response, events, json: result, text };
+}
+
 async function waitForServer() {
   for (let attempt = 0; attempt < 40; attempt += 1) {
     try {
@@ -1352,7 +1368,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-project-selection-layout-v1'),
+        webRoot.text.includes('/web/app.js?v=20260812-research-progress-v5'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1498,7 +1514,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-project-selection-layout-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v5'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1765,7 +1781,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-project-selection-layout-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260812-research-progress-v5'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1903,7 +1919,8 @@ async function main() {
         evidenceDiscoveryClientSource.includes('targetConversationID ? "/research/conversations/evidence" : "/research/conversations/create"') &&
         evidenceDiscoveryClientSource.includes("{ conversationID: targetConversationID, selections: selectedPassages }") &&
         !evidenceDiscoveryClientSource.includes("const existingPassages = new Set") &&
-        evidenceDiscoveryClientSource.includes('postResearch("/research/conversations/message"'),
+        evidenceDiscoveryClientSource.includes("runResearchProgressSession(progress") &&
+        workspaceScript.text.includes('fetch("/research/conversations/message"'),
       "The Evidence Tray no longer preserves explicit candidate review before Research analysis."
     );
     assert(
@@ -2123,7 +2140,7 @@ async function main() {
         !workspaceScript.text.includes('heading.textContent = "Conversations"') &&
         !workspaceScript.text.includes("Highlight enacted text in any Reader, search detail, or project section to begin.") &&
         workspaceScript.text.includes('postResearch("/research/conversations/create"') &&
-        workspaceScript.text.includes('postResearch("/research/conversations/message"') &&
+        workspaceScript.text.includes('fetch("/research/conversations/message"') &&
         researchConversationRendererSource.includes("dialoguePane.append(thread)") &&
         researchConversationRendererSource.includes("dialoguePane.append(composer)") &&
         !workspaceScript.text.includes("opening this conversation has not called an AI model") &&
@@ -4058,16 +4075,25 @@ async function main() {
       "Private research history did not list the new conversation."
     );
 
-    const conversationMessage = await request("/research/conversations/message", {
-      method: "POST",
+    const conversationMessage = await requestNDJSON("/research/conversations/message", {
       token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
         conversationID,
-        question: "When must the owner notify the department?"
+        question: "When must the owner notify the department?",
+        progressStream: "ndjson"
       }
     });
     assert(conversationMessage.response.ok, "Research conversation message failed in mock mode.");
+    const publicProgress = conversationMessage.events
+      .filter((event) => event.type === "progress")
+      .map((event) => event.progress);
+    assert(
+      publicProgress.length === 12 &&
+        publicProgress.every((event, index) => event.sequence === index + 1) &&
+        publicProgress.every((event) => Object.keys(event).sort().join(",") === "at,label,sequence,stage,state,version"),
+      "Streamed Research progress was missing, unordered, or exposed fields outside the public contract."
+    );
     assert(conversationMessage.json.usage.mockMode === true, "Mock research did not disclose its zero-call mode.");
     assert(
       conversationMessage.json.conversation.messages.length === 2 &&
@@ -4080,7 +4106,8 @@ async function main() {
           citation.sectionID === "8881"
         ) &&
         conversationMessage.json.conversation.messages[1].answer.evidenceSourceIDs.length >= 1 &&
-        conversationMessage.json.conversation.messages[1].answer.sourceSummary.userPinnedCount >= 1,
+        conversationMessage.json.conversation.messages[1].answer.sourceSummary.userPinnedCount >= 1 &&
+        conversationMessage.json.conversation.messages[1].researchProgress.status === "completed",
       "Research conversation did not persist a cited user and assistant exchange."
     );
     assert(

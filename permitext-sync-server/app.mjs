@@ -26,6 +26,10 @@ import {
 } from "./search-postings.mjs";
 import { resolveContainedPrivatePath } from "./private-path-containment.mjs";
 import { createImageStorageProvider } from "./image-storage.mjs";
+import {
+  createResearchProgressEvent,
+  researchProgressSummary
+} from "./public/research-progress.js";
 import { matchesConfiguredAdminToken, timingSafeAdminTokenEqual } from "./admin-token-auth.mjs";
 import {
   accountRateLimitPrincipal,
@@ -4706,6 +4710,97 @@ function sendError(response, status, message, extraHeaders = {}) {
   sendJSON(response, status, { error: message }, extraHeaders);
 }
 
+function researchRequestSignal(signal, timeoutMilliseconds) {
+  const timeoutSignal = AbortSignal.timeout(timeoutMilliseconds);
+  return signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal;
+}
+
+function researchProgressResponder(request, response, enabled) {
+  let started = false;
+  let ended = false;
+  let sequence = 0;
+  let activeStageID = null;
+  const events = [];
+  const startedAt = new Date().toISOString();
+  const cancellationController = new AbortController();
+
+  const cancel = () => {
+    if (!ended && !cancellationController.signal.aborted) cancellationController.abort();
+  };
+  request.once("aborted", cancel);
+  response.once("close", () => {
+    if (!response.writableEnded) cancel();
+  });
+
+  const start = () => {
+    if (!enabled || started || response.headersSent || response.writableEnded) return;
+    response.writeHead(200, {
+      ...securityHeaders(),
+      "content-type": "application/x-ndjson; charset=utf-8",
+      "cache-control": "no-store",
+      "x-accel-buffering": "no"
+    });
+    started = true;
+  };
+  const write = (value) => {
+    if (!enabled || ended || response.writableEnded || cancellationController.signal.aborted) return;
+    start();
+    response.write(`${JSON.stringify(value)}\n`);
+  };
+  const progress = (stageID, state) => {
+    if (cancellationController.signal.aborted) {
+      const error = new Error("Research request cancelled.");
+      error.code = "RESEARCH_CANCELLED";
+      throw error;
+    }
+    const event = createResearchProgressEvent({ stageID, state, sequence: ++sequence });
+    if (state === "active" || state === "retrying") activeStageID = stageID;
+    if (["completed", "failed", "cancelled"].includes(state) && activeStageID === stageID) {
+      activeStageID = null;
+    }
+    events.push(event);
+    write({ type: "progress", progress: event });
+    return event;
+  };
+  const assertActive = () => {
+    if (!cancellationController.signal.aborted) return;
+    const error = new Error("Research request cancelled.");
+    error.code = "RESEARCH_CANCELLED";
+    throw error;
+  };
+  const json = (status, body, extraHeaders = {}) => {
+    if (!enabled) {
+      sendJSON(response, status, body, extraHeaders);
+      return;
+    }
+    if (ended || response.writableEnded) return;
+    if (status >= 400 && activeStageID && !cancellationController.signal.aborted) {
+      progress(activeStageID, "failed");
+    }
+    write(status >= 400
+      ? { type: "error", error: { status, message: body?.error || "Research request failed.", code: body?.code || null } }
+      : { type: "result", payload: body });
+    ended = true;
+    response.end();
+  };
+  const error = (status, message, extra = {}) => json(status, { error: message, ...extra });
+  const failActive = (state) => {
+    if (activeStageID && !cancellationController.signal.aborted) progress(activeStageID, state);
+  };
+  return {
+    enabled,
+    signal: cancellationController.signal,
+    startedAt,
+    events,
+    progress,
+    assertActive,
+    json,
+    error,
+    failActive,
+    summary: (completedAt) => researchProgressSummary(events, { startedAt, completedAt })
+  };
+}
+
 function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}) {
   const scriptPolicy = scriptNonce
     ? `'self' 'nonce-${scriptNonce}' https://appleid.cdn-apple.com`
@@ -6198,7 +6293,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       // Terra can spend more than 35 seconds organizing a dense, multi-branch
       // evidence package even when retrieval itself is compact. Keep this
       // bounded, but allow the structured analysis call to finish.
-      signal: AbortSignal.timeout(60_000)
+      signal: researchRequestSignal(options.signal, 60_000)
     });
   } catch (error) {
     const providerError = new Error("The Research evidence-analysis request failed.");
@@ -6434,7 +6529,7 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
         "content-type": "application/json"
       },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(30_000)
+      signal: researchRequestSignal(options.signal, 30_000)
     });
   } catch {
     return {
@@ -6832,7 +6927,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "content-type": "application/json"
       },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(45_000)
+      signal: researchRequestSignal(options.signal, 45_000)
     });
   } catch (error) {
     if (error.name === "TimeoutError") throw error;
@@ -7018,7 +7113,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
         "content-type": "application/json"
       },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(30_000)
+      signal: researchRequestSignal(options.signal, 30_000)
     });
   } catch (error) {
     const providerError = new Error("The Research verifier request failed.");
@@ -7757,7 +7852,8 @@ async function assembledResearchEvidenceForTurn({
   messages,
   pinnedEvidence,
   projectFacts,
-  topicContext
+  topicContext,
+  onStage
 }) {
   const [catalog, invertedIndex] = await Promise.all([
     sectionCatalog(),
@@ -7769,6 +7865,7 @@ async function assembledResearchEvidenceForTurn({
     projectFacts,
     pinnedEvidence,
     topicContext,
+    onStage,
     limits: researchEvidenceAssemblyLimits,
     discover: ({ question: retrievalQuestion, limit, retrievalContext }) => discoverRelevantEvidence({
       question: retrievalQuestion,
@@ -7815,10 +7912,13 @@ export function researchAnswerRecordForClient(answer) {
 async function researchConversationForClient(conversation, options = {}) {
   let clientConversation = {
     ...conversation,
-    messages: (conversation.messages || []).map((message) => message?.answer ? {
-      ...message,
-      answer: researchAnswerForClient(message.answer)
-    } : message)
+    messages: (conversation.messages || []).map((message) => {
+      const { researchRequestID: _researchRequestID, ...clientMessage } = message || {};
+      return clientMessage.answer ? {
+        ...clientMessage,
+        answer: researchAnswerForClient(clientMessage.answer)
+      } : clientMessage;
+    })
   };
   if (options.checkSources) {
     const current = await currentResearchEvidence(conversation);
@@ -13600,15 +13700,43 @@ async function handleResearchConversationMessage(request, response) {
     });
     return;
   }
+  const progressResponse = researchProgressResponder(
+    request,
+    response,
+    context.body.progressStream === "ndjson"
+  );
+  const researchRequestID = normalizedResearchText(context.body.requestID, 100);
+  const replayedAnswer = researchRequestID
+    ? (conversation.messages || []).find((message) =>
+        message.role === "assistant" && message.researchRequestID === researchRequestID
+      )
+    : null;
+  if (replayedAnswer) {
+    for (const stage of replayedAnswer.researchProgress?.stages || []) {
+      if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
+    }
+    const mockMode = researchMockMode();
+    const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
+    progressResponse.json(200, {
+      conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+      usage: researchUsageSummary(usageEntries, {
+        mockMode,
+        entitlement: context.authContext.entitlement
+      }),
+      replayed: true
+    });
+    return;
+  }
   let researchReservationID = null;
   let researchReservationCreatedAt = null;
   let researchReservationCompleted = false;
   try {
+    progressResponse.progress("preparing_question", "active");
     const current = await currentResearchEvidence(conversation);
     if (current.stale) {
       conversation.sourceStatus = "changed";
       await saveStoredResearchConversation(context.userID, conversation);
-      sendJSON(response, 409, {
+      progressResponse.json(409, {
         error: "The enacted passage, structured source, or visual attachment changed after it was added. Refresh the sources before asking another question.",
         code: "RESEARCH_SOURCE_CHANGED",
         conversation: { ...conversation, sourceStatuses: current.sourceStatuses }
@@ -13619,7 +13747,7 @@ async function handleResearchConversationMessage(request, response) {
     const projectLink = await researchConversationProjectLink(context.userID, conversation);
     const decisionLink = researchCodeDecisionLink(projectLink);
     if (decisionLink && selections.length === 0) {
-      sendJSON(response, 422, {
+      progressResponse.json(422, {
         error: "Add approved enacted evidence before using Research from a Code Decision.",
         code: "RESEARCH_EVIDENCE_REQUIRED"
       });
@@ -13640,12 +13768,14 @@ async function handleResearchConversationMessage(request, response) {
       projectInformation,
       manualProjectFacts
     );
+    progressResponse.progress("preparing_question", "completed");
     const evidencePackage = await assembledResearchEvidenceForTurn({
       question,
       messages: conversation.messages || [],
       pinnedEvidence,
       projectFacts: combinedProjectFacts,
-      topicContext: conversation.topicContext || null
+      topicContext: conversation.topicContext || null,
+      onStage: progressResponse.progress
     });
     const conversationFactState = resolveResearchConversationFacts({
       question,
@@ -13664,7 +13794,8 @@ async function handleResearchConversationMessage(request, response) {
     ];
     const assembledEvidence = evidencePackage.sources || [];
     if (!assembledEvidence.length) {
-      sendJSON(response, 422, {
+      progressResponse.progress("checking_citation_support", "active");
+      progressResponse.json(422, {
         error: "Permitext could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation.",
         code: "RESEARCH_EVIDENCE_NOT_FOUND",
         retrieval: {
@@ -13675,6 +13806,7 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
+    progressResponse.progress("checking_citation_support", "active");
     const requiredClaims = requiredResearchClaimsFromEvidence(assembledEvidence);
     const materialityClaims = requiredClaims.map((claim) => ({
       ...claim,
@@ -13694,7 +13826,7 @@ async function handleResearchConversationMessage(request, response) {
       });
       if (!reserved) {
         researchReservationID = null;
-        sendJSON(response, 429, {
+        progressResponse.json(429, {
           error: "Research is temporarily unavailable while account capacity is reviewed.",
           code: "RESEARCH_CAPACITY_REVIEW"
         });
@@ -13734,7 +13866,8 @@ async function handleResearchConversationMessage(request, response) {
     });
     const webSupport = !mockMode && webSupportRequested
       ? await openAIResearchWebSupport(question, context.userID, {
-          retrievalQuery: question
+          retrievalQuery: question,
+          signal: progressResponse.signal
         })
       : {
           summary: "",
@@ -13760,8 +13893,11 @@ async function handleResearchConversationMessage(request, response) {
           validUserFacts,
           retrievalLimitations: turnRetrievalLimitations,
           codeBasis: answerCodeBasis,
-          requiredClaims
+          requiredClaims,
+          signal: progressResponse.signal
         });
+    progressResponse.progress("checking_citation_support", "completed");
+    progressResponse.progress("preparing_conclusion", "active");
     let result = mockMode
       ? {
           interpretation: validateResearchInterpretation(mockResearchInterpretation(question, assembledEvidence, {
@@ -13784,7 +13920,8 @@ async function handleResearchConversationMessage(request, response) {
           structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
           webSupport,
           codeBasis: answerCodeBasis,
-          requiredClaims
+          requiredClaims,
+          signal: progressResponse.signal
         });
     let verificationAttempts = [];
     let verifierUsage = combinedResearchUsage();
@@ -13832,7 +13969,8 @@ async function handleResearchConversationMessage(request, response) {
             webSupport,
             codeBasis: answerCodeBasis,
             requiredClaims,
-            revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts)
+            revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts),
+            signal: progressResponse.signal
           });
           answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
           result = revised;
@@ -13875,7 +14013,8 @@ async function handleResearchConversationMessage(request, response) {
             conversationFactContext,
             webSupport,
             codeBasis: answerCodeBasis,
-            requiredClaims
+            requiredClaims,
+            signal: progressResponse.signal
           }
         );
         verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
@@ -13900,6 +14039,7 @@ async function handleResearchConversationMessage(request, response) {
     );
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
+    progressResponse.progress("preparing_conclusion", "completed");
     const disclaimer = "AI-generated research assistance, not an official code determination.";
     const materialAssembledEvidence = assembledEvidence.filter((section) =>
       !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole)
@@ -13907,11 +14047,19 @@ async function handleResearchConversationMessage(request, response) {
     const contextualAssembledEvidence = assembledEvidence.filter((section) =>
       section?.evidencePriority?.evidenceRole === "contextual"
     );
-    const userMessage = { id: randomUUID(), role: "user", question, createdAt: now };
+    const userMessage = {
+      id: randomUUID(),
+      role: "user",
+      question,
+      createdAt: now,
+      ...(researchRequestID ? { researchRequestID } : {})
+    };
     const assistantMessage = {
       id: randomUUID(),
       role: "assistant",
       createdAt: now,
+      ...(researchRequestID ? { researchRequestID } : {}),
+      researchProgress: progressResponse.summary(now),
       answer: {
         mode: mockMode ? "mock" : "openai",
         model: result.model,
@@ -14069,6 +14217,7 @@ async function handleResearchConversationMessage(request, response) {
         ]
       : [];
     // Usage completion is part of the same durable commit as answer + conversation (+ events).
+    progressResponse.assertActive();
     await commitResearchConversationMessage(context.userID, {
       reservationID: mockMode ? null : researchReservationID,
       usageEntry: mockMode ? null : {
@@ -14097,7 +14246,7 @@ async function handleResearchConversationMessage(request, response) {
       evidencePassages: assembledEvidence.length,
       totalTokens: result.usage.totalTokens
     }));
-    sendJSON(response, 200, {
+    progressResponse.json(200, {
       conversation: await researchConversationForClient(conversation, { userID: context.userID }),
       usage: researchUsageSummary(mockMode ? [] : [
         ...usageEntries,
@@ -14117,19 +14266,28 @@ async function handleResearchConversationMessage(request, response) {
       }
     }
     if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
-      sendError(response, 422, "A cited code section is incomplete and cannot be analyzed yet.");
+      progressResponse.failActive("failed");
+      progressResponse.error(422, "A cited code section is incomplete and cannot be analyzed yet.");
       return;
     }
     if (error.code === "RESEARCH_NOT_CONFIGURED") {
-      sendError(response, 503, error.message);
+      progressResponse.failActive("failed");
+      progressResponse.error(503, error.message);
       return;
     }
     if (error.code === "RESEARCH_EVAL_SPEND_CAP") {
-      sendError(response, 503, error.message);
+      progressResponse.failActive("failed");
+      progressResponse.error(503, error.message);
       return;
     }
     if (error.code === "RESEARCH_REFUSAL") {
-      sendError(response, 422, error.message);
+      progressResponse.failActive("failed");
+      progressResponse.error(422, error.message);
+      return;
+    }
+    if (["RESEARCH_CANCELLED", "AbortError"].includes(error.code || error.name)) {
+      progressResponse.failActive("cancelled");
+      progressResponse.error(499, "Research was cancelled.", { code: "RESEARCH_CANCELLED" });
       return;
     }
     if ([
@@ -14158,7 +14316,8 @@ async function handleResearchConversationMessage(request, response) {
         bindingIssue: error.bindingIssue || null,
         providerCause: error.providerCause || null
       }));
-      sendError(response, 502, "The research model could not return a verified, cited answer.");
+      progressResponse.failActive("failed");
+      progressResponse.error(502, "The research model could not return a verified, cited answer.");
       return;
     }
     throw error;

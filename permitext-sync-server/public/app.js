@@ -4,6 +4,10 @@ import {
   rewriteStructuredCodeLinks
 } from "./code-references.js?v=20260720-code-reference-links-v18";
 import {
+  researchProgressStages,
+  researchProgressStage
+} from "./research-progress.js?v=20260812-research-progress-v5";
+import {
   defaultSyncCodeVersion,
   syncCodeVersion,
   syncCodeVersionForPrefix,
@@ -45,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-project-selection-layout-v1";
+} from "./offline-storage.js?v=20260812-research-progress-v5";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -457,6 +461,7 @@ const pendingReportDraftByProject = new Map();
 const reportDraftFocusResultByProject = new Map();
 let researchConversationList = [];
 let activeResearchConversation = null;
+const activeResearchProgress = new Map();
 let researchOpenGeneration = 0;
 let researchUsage = null;
 let researchQuestionDraft = "";
@@ -13828,6 +13833,75 @@ async function postResearch(path, values = {}) {
   return postJSON(path, researchRequestBody(values), { token: account.sessionToken });
 }
 
+async function postResearchWithProgress(values, { signal, onProgress } = {}) {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in from Settings to use private research conversations.");
+  let response;
+  try {
+    response = await fetch("/research/conversations/message", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${account.sessionToken}`
+      },
+      body: JSON.stringify(researchRequestBody({ ...values, progressStream: "ndjson" })),
+      signal
+    });
+    serverReachable = response.status < 500;
+  } catch (error) {
+    serverReachable = false;
+    updateConnectionStatus();
+    throw error;
+  }
+  updateConnectionStatus();
+  const contentType = String(response.headers.get("content-type") || "");
+  if (!contentType.includes("application/x-ndjson") || !response.body) {
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error(payload.error || `Request failed: ${response.status}`);
+      error.status = response.status;
+      error.payload = payload;
+      throw error;
+    }
+    return payload;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let result = null;
+  const consumeLine = (line) => {
+    if (!line.trim()) return;
+    const event = JSON.parse(line);
+    if (event.type === "progress") {
+      onProgress?.(event.progress);
+      return;
+    }
+    if (event.type === "result") {
+      result = event.payload;
+      return;
+    }
+    if (event.type === "error") {
+      const error = new Error(event.error?.message || "Research request failed.");
+      error.status = Number(event.error?.status || 500);
+      error.code = event.error?.code || null;
+      error.payload = event.error?.code ? { code: event.error.code } : {};
+      throw error;
+    }
+  };
+  while (true) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+    lines.forEach(consumeLine);
+    if (done) break;
+  }
+  consumeLine(buffer);
+  if (!result) throw new Error("Research ended before returning a verified answer.");
+  return result;
+}
+
 async function fetchAuthoritativeResearchConversation(conversationID) {
   const account = activeAccount();
   if (!account) throw new Error("Sign in from Settings to open private Research conversations.");
@@ -15179,6 +15253,216 @@ async function showNewResearchChat() {
   });
 }
 
+function createResearchProgressSession(conversationID, question) {
+  const session = {
+    id: crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`,
+    conversationID,
+    question,
+    startedAt: Date.now(),
+    endedAt: null,
+    status: "active",
+    stages: new Map(researchProgressStages.map((stage) => [stage.id, "pending"])),
+    controller: new AbortController(),
+    retry: null,
+    timer: null,
+    error: ""
+  };
+  session.stages.set("preparing_question", "active");
+  if (conversationID) activeResearchProgress.set(conversationID, session);
+  return session;
+}
+
+function researchProgressElapsed(startedAt, endedAt = Date.now()) {
+  const elapsedSeconds = Math.max(0, Math.floor(((endedAt || Date.now()) - startedAt) / 1_000));
+  const minutes = Math.floor(elapsedSeconds / 60);
+  const seconds = elapsedSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function researchProgressStatusLabel(progress) {
+  const active = researchProgressStages.find((stage) =>
+    ["active", "retrying"].includes(progress.stages.get(stage.id))
+  );
+  if (active) return active.label;
+  if (progress.status === "completed") return "Research complete";
+  if (progress.status === "cancelled") return "Research cancelled";
+  if (progress.status === "failed") return "Research interrupted";
+  return "Preparing the question";
+}
+
+function renderResearchPixelGrid() {
+  const grid = document.createElement("span");
+  grid.className = "research-progress-grid";
+  grid.setAttribute("aria-hidden", "true");
+  for (let index = 0; index < 9; index += 1) {
+    const pixel = document.createElement("span");
+    pixel.style.setProperty("--research-progress-pixel", index);
+    grid.append(pixel);
+  }
+  return grid;
+}
+
+function renderResearchProgressCard(progress, { completed = false } = {}) {
+  const card = document.createElement("section");
+  card.className = "research-progress-card";
+  card.dataset.researchProgressId = progress.id || "saved";
+  card.dataset.progressState = progress.status || (completed ? "completed" : "active");
+  card.setAttribute("aria-label", "Research progress");
+
+  const loading = document.createElement("div");
+  loading.className = "research-progress-loading";
+  const label = document.createElement("span");
+  label.className = "research-progress-loading-label";
+  label.textContent = researchProgressStatusLabel(progress);
+  const elapsed = document.createElement("time");
+  elapsed.className = "research-progress-elapsed";
+  elapsed.dataset.researchProgressElapsed = "true";
+  elapsed.textContent = researchProgressElapsed(progress.startedAt, progress.endedAt);
+  loading.append(renderResearchPixelGrid(), label, elapsed);
+  card.append(loading);
+
+  const details = document.createElement("details");
+  details.className = "research-progress-details";
+  details.open = !completed && !["failed", "cancelled"].includes(progress.status);
+  const summary = document.createElement("summary");
+  summary.textContent = completed ? "Research steps" : "Research progress";
+  const taskList = document.createElement("ol");
+  taskList.className = "research-progress-tasks";
+  researchProgressStages.forEach((stage) => {
+    const state = progress.stages.get(stage.id) || "pending";
+    const row = document.createElement("li");
+    row.className = `research-progress-task is-${state}`;
+    row.dataset.progressStage = stage.id;
+    const icon = document.createElement("span");
+    icon.className = "research-progress-task-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = state === "completed" ? "✓" : state === "failed" ? "!" : state === "cancelled" ? "×" : "";
+    const text = document.createElement("span");
+    text.textContent = stage.label;
+    const stateText = document.createElement("span");
+    stateText.className = "research-progress-task-state";
+    stateText.textContent = state === "retrying" ? "Retrying" : state === "active" ? "Active" : "";
+    row.append(icon, text, stateText);
+    taskList.append(row);
+  });
+  details.append(summary, taskList);
+  card.append(details);
+
+  if (progress.error) {
+    const error = document.createElement("p");
+    error.className = "research-progress-error";
+    error.setAttribute("role", "alert");
+    error.textContent = progress.error;
+    card.append(error);
+  }
+  if (!completed && ["active", "retrying", "failed", "cancelled"].includes(progress.status)) {
+    const actions = document.createElement("div");
+    actions.className = "research-progress-actions";
+    if (["active", "retrying"].includes(progress.status)) {
+      const cancel = document.createElement("button");
+      cancel.className = "ghost-button";
+      cancel.type = "button";
+      cancel.textContent = "Cancel";
+      cancel.addEventListener("click", () => progress.controller.abort());
+      actions.append(cancel);
+    } else if (typeof progress.retry === "function") {
+      const retry = document.createElement("button");
+      retry.className = "ghost-button";
+      retry.type = "button";
+      retry.textContent = "Retry";
+      retry.addEventListener("click", progress.retry);
+      actions.append(retry);
+    }
+    card.append(actions);
+  }
+  return card;
+}
+
+function researchProgressFromSavedMessage(message) {
+  const value = message?.researchProgress;
+  if (!value || value.status !== "completed" || !Array.isArray(value.stages)) return null;
+  return {
+    id: `saved-${message.id}`,
+    status: "completed",
+    startedAt: Date.parse(value.startedAt) || Date.parse(message.createdAt) || Date.now(),
+    endedAt: Date.parse(value.completedAt) || Date.parse(message.createdAt) || Date.now(),
+    stages: new Map(value.stages.map((stage) => [stage.id, stage.state]))
+  };
+}
+
+function refreshResearchProgressCard(progress) {
+  const selector = `[data-research-progress-id="${CSS.escape(progress.id)}"]`;
+  document.querySelectorAll(selector).forEach((card) => {
+    card.replaceWith(renderResearchProgressCard(progress));
+  });
+}
+
+function startResearchProgressTimer(progress) {
+  clearInterval(progress.timer);
+  progress.timer = window.setInterval(() => {
+    const selector = `[data-research-progress-id="${CSS.escape(progress.id)}"] [data-research-progress-elapsed]`;
+    document.querySelectorAll(selector).forEach((elapsed) => {
+      elapsed.textContent = researchProgressElapsed(progress.startedAt, progress.endedAt);
+    });
+  }, 1_000);
+}
+
+function updateResearchProgressSession(progress, event) {
+  const stage = researchProgressStage(event?.stage);
+  if (!stage || stage.label !== event.label) return;
+  progress.stages.set(stage.id, event.state);
+  if (["active", "retrying"].includes(event.state)) progress.status = event.state;
+  refreshResearchProgressCard(progress);
+}
+
+async function runResearchProgressSession(progress, { onSuccess, onFailure, onRetry } = {}) {
+  const execute = async (retrying = false) => {
+    if (retrying) {
+      onRetry?.();
+      progress.stages = new Map(researchProgressStages.map((stage) => [stage.id, "pending"]));
+      progress.stages.set("preparing_question", "retrying");
+      progress.status = "retrying";
+      progress.error = "";
+      progress.startedAt = Date.now();
+      progress.endedAt = null;
+      progress.controller = new AbortController();
+      refreshResearchProgressCard(progress);
+      startResearchProgressTimer(progress);
+    }
+    try {
+      const result = await postResearchWithProgress({
+        conversationID: progress.conversationID,
+        question: progress.question,
+        requestID: progress.id
+      }, {
+        signal: progress.controller.signal,
+        onProgress: (event) => updateResearchProgressSession(progress, event)
+      });
+      progress.status = "completed";
+      progress.endedAt = Date.now();
+      clearInterval(progress.timer);
+      activeResearchProgress.delete(progress.conversationID);
+      await onSuccess?.(result);
+    } catch (error) {
+      const cancelled = error.name === "AbortError" || error.code === "RESEARCH_CANCELLED";
+      const activeStage = researchProgressStages.find((stage) =>
+        ["active", "retrying"].includes(progress.stages.get(stage.id))
+      ) || researchProgressStages.find((stage) => progress.stages.get(stage.id) === "pending");
+      if (activeStage) progress.stages.set(activeStage.id, cancelled ? "cancelled" : "failed");
+      progress.status = cancelled ? "cancelled" : "failed";
+      progress.error = cancelled
+        ? "Research was cancelled before an answer was saved."
+        : error.message || "Permitext could not complete this Research question.";
+      progress.endedAt = Date.now();
+      clearInterval(progress.timer);
+      refreshResearchProgressCard(progress);
+      onFailure?.(error, { cancelled });
+    }
+  };
+  progress.retry = () => void execute(true);
+  await execute(false);
+}
+
 function renderNewResearchComposer(container, researchEnabled) {
   const section = document.createElement("section");
   section.className = "research-chat-start";
@@ -15219,8 +15503,11 @@ function renderNewResearchComposer(container, researchEnabled) {
     if (question.length < 3 || sendButton.disabled) return;
     input.disabled = true;
     sendButton.disabled = true;
-    status.textContent = "Researching applicable enacted text…";
+    status.textContent = "";
     let conversationID = "";
+    const progress = createResearchProgressSession("", question);
+    section.append(renderResearchProgressCard(progress));
+    startResearchProgressTimer(progress);
     try {
       const created = await postResearch("/research/conversations/create", {
         projectID: ""
@@ -15230,12 +15517,25 @@ function renderNewResearchComposer(container, researchEnabled) {
       if (!conversationID) throw new Error("Research did not return a new conversation.");
       activeResearchConversation = conversation;
       state.researchConversationID = conversationID;
-      const result = await postResearch("/research/conversations/message", { conversationID, question });
-      activeResearchConversation = result.conversation;
+      progress.conversationID = conversationID;
+      activeResearchProgress.set(conversationID, progress);
       researchQuestionDraft = "";
       await refreshResearchConversationList();
-      await openResearchConversation(conversationID, { refreshList: true });
+      await openResearchConversation(conversationID, { refreshList: false });
+      await runResearchProgressSession(progress, {
+        onSuccess: async (result) => {
+          activeResearchConversation = result.conversation;
+          await refreshResearchConversationList();
+          await openResearchConversation(conversationID, { refreshList: true });
+        }
+      });
     } catch (error) {
+      clearInterval(progress.timer);
+      progress.status = "failed";
+      progress.error = error.message || "Permitext could not start this Research chat.";
+      progress.endedAt = Date.now();
+      progress.stages.set("preparing_question", "failed");
+      refreshResearchProgressCard(progress);
       researchQuestionDraft = question;
       if (conversationID) {
         await refreshResearchConversationList().catch(() => {});
@@ -16712,7 +17012,9 @@ async function renderResearchConversation(conversationID, options = {}) {
     }
     const bubble = document.createElement("article");
     bubble.className = "research-message is-assistant";
+    const savedProgress = researchProgressFromSavedMessage(message);
     renderResearchInterpretation(bubble, message.answer, { message, conversationID });
+    if (savedProgress) bubble.prepend(renderResearchProgressCard(savedProgress, { completed: true }));
     const answerSources = renderResearchAnswerSources(conversation, message);
     if (answerSources) {
       const evidenceReviewedBody = bubble.querySelector(".research-evidence-reviewed-body");
@@ -16721,6 +17023,19 @@ async function renderResearchConversation(conversationID, options = {}) {
     bubble.append(renderResearchAnswerSave(conversation, message));
     thread.append(bubble);
   });
+  const pendingProgress = activeResearchProgress.get(conversationID);
+  if (pendingProgress) {
+    const pendingQuestion = document.createElement("article");
+    pendingQuestion.className = "research-message is-user is-pending";
+    const pendingQuestionText = document.createElement("p");
+    pendingQuestionText.textContent = pendingProgress.question;
+    pendingQuestion.append(pendingQuestionText);
+    const pendingAnswer = document.createElement("article");
+    pendingAnswer.className = "research-message is-assistant is-pending";
+    pendingAnswer.append(renderResearchProgressCard(pendingProgress));
+    thread.append(pendingQuestion, pendingAnswer);
+    startResearchProgressTimer(pendingProgress);
+  }
   dialoguePane.append(thread);
 
   const composer = document.createElement("form");
@@ -16744,13 +17059,17 @@ async function renderResearchConversation(conversationID, options = {}) {
   composerBox.className = "research-composer-box";
   const projectContextBlocked = Boolean(conversation.projectContextReviewRequired);
   const researchEnabled = hasCapability("research");
+  const researchRequestActive = Boolean(
+    pendingProgress && ["active", "retrying"].includes(pendingProgress.status)
+  );
   sendButton.disabled = !researchEnabled ||
+    researchRequestActive ||
     conversation.sourceStatus === "changed" ||
     projectContextBlocked ||
     (input.value.trim() || starterAnalysisQuestion).length < 3;
-  if (!researchEnabled) {
+  if (!researchEnabled || researchRequestActive) {
     input.disabled = true;
-    input.placeholder = "Research Add-On required to continue this conversation…";
+    if (!researchEnabled) input.placeholder = "Research Add-On required to continue this conversation…";
   }
   const status = document.createElement("p");
   status.className = "research-composer-status";
@@ -16767,6 +17086,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     resizeComposerInput();
     researchQuestionDraft = input.value;
     sendButton.disabled = !researchEnabled ||
+      researchRequestActive ||
       conversation.sourceStatus === "changed" ||
       projectContextBlocked ||
       (input.value.trim() || starterAnalysisQuestion).length < 3;
@@ -16778,22 +17098,40 @@ async function renderResearchConversation(conversationID, options = {}) {
     if (question.length < 3 || sendButton.disabled) return;
     input.disabled = true;
     sendButton.disabled = true;
-    status.textContent = "Researching applicable enacted text…";
-    try {
-      const result = await postResearch("/research/conversations/message", { conversationID, question });
-      activeResearchConversation = result.conversation;
-      researchQuestionDraft = "";
-      await refreshResearchConversationList();
-      await openResearchConversation(conversationID, { refreshList: true });
-    } catch (error) {
-      if (error.payload?.conversation) activeResearchConversation = error.payload.conversation;
-      status.textContent = error.message;
-      input.disabled = false;
-      sendButton.disabled = false;
-      if (error.status === 409) {
+    status.textContent = "";
+    researchQuestionDraft = "";
+    input.value = "";
+    const progress = createResearchProgressSession(conversationID, question);
+    const pendingQuestion = document.createElement("article");
+    pendingQuestion.className = "research-message is-user is-pending";
+    const pendingQuestionText = document.createElement("p");
+    pendingQuestionText.textContent = question;
+    pendingQuestion.append(pendingQuestionText);
+    const pendingAnswer = document.createElement("article");
+    pendingAnswer.className = "research-message is-assistant is-pending";
+    pendingAnswer.append(renderResearchProgressCard(progress));
+    thread.append(pendingQuestion, pendingAnswer);
+    thread.scrollTop = thread.scrollHeight;
+    startResearchProgressTimer(progress);
+    await runResearchProgressSession(progress, {
+      onRetry: () => {
+        input.disabled = true;
+        sendButton.disabled = true;
+        status.textContent = "";
+      },
+      onSuccess: async (result) => {
+        activeResearchConversation = result.conversation;
+        researchQuestionDraft = "";
+        await refreshResearchConversationList();
         await openResearchConversation(conversationID, { refreshList: true });
+      },
+      onFailure: (error) => {
+        if (error.payload?.conversation) activeResearchConversation = error.payload.conversation;
+        status.textContent = "";
+        input.disabled = false;
+        sendButton.disabled = input.value.trim().length < 3;
       }
-    }
+    });
   });
   composerBox.append(input, sendButton);
   composer.append(composerBox, status);

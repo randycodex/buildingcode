@@ -6093,7 +6093,7 @@ mark {
 
 .research-clear-chats-button:hover,
 .research-clear-chats-button:focus-visible {
-  color: var(--danger);
+  color: var(--destructive);
 }
 
 .research-conversation-row {
@@ -6842,6 +6842,213 @@ body.is-resizing-research-evidence * {
 .research-message.is-assistant {
   display: grid;
   gap: var(--space-3);
+}
+
+.research-message.is-assistant.is-pending {
+  min-block-size: 250px;
+}
+
+.research-progress-card {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--surface-muted) 90%, var(--research-conversation-background));
+  color: var(--text-primary);
+}
+
+.research-progress-loading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 28px;
+}
+
+.research-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 4px);
+  grid-auto-rows: 4px;
+  gap: 2px;
+  width: 16px;
+  height: 16px;
+}
+
+.research-progress-grid > span {
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0.24;
+  animation: research-progress-pixel 1.35s ease-in-out infinite;
+  animation-delay: calc(var(--research-progress-pixel) * 70ms);
+}
+
+[data-progress-state="completed"] .research-progress-grid > span,
+[data-progress-state="failed"] .research-progress-grid > span,
+[data-progress-state="cancelled"] .research-progress-grid > span {
+  animation: none;
+  opacity: 0.55;
+}
+
+.research-progress-loading-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: calc(var(--chrome-font-size) * 0.88) !important;
+  font-weight: 650;
+  line-height: 1.35;
+  background: linear-gradient(
+    100deg,
+    var(--text-secondary) 20%,
+    var(--text-primary) 48%,
+    var(--text-secondary) 76%
+  );
+  background-size: 220% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: research-progress-shimmer 1.8s linear infinite;
+}
+
+[data-progress-state="completed"] .research-progress-loading-label,
+[data-progress-state="failed"] .research-progress-loading-label,
+[data-progress-state="cancelled"] .research-progress-loading-label {
+  animation: none;
+  background: none;
+  color: var(--text-primary);
+}
+
+.research-progress-elapsed {
+  color: var(--text-secondary);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: calc(var(--chrome-font-size) * 0.75) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.research-progress-details {
+  min-width: 0;
+}
+
+.research-progress-details > summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  font-weight: 600;
+}
+
+.research-progress-details > summary:focus-visible {
+  outline: 2px solid var(--text-secondary);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.research-progress-tasks {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.research-progress-task {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: start;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.8) !important;
+  line-height: 1.35;
+}
+
+.research-progress-task.is-active,
+.research-progress-task.is-retrying {
+  color: var(--text-primary);
+}
+
+.research-progress-task.is-failed {
+  color: var(--destructive);
+}
+
+.research-progress-task-icon {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 9px !important;
+  line-height: 1;
+  opacity: 0.5;
+}
+
+.research-progress-task.is-active .research-progress-task-icon,
+.research-progress-task.is-retrying .research-progress-task-icon {
+  border-width: 2px;
+  border-right-color: transparent;
+  animation: research-progress-spin 0.85s linear infinite;
+  opacity: 1;
+}
+
+.research-progress-task.is-completed .research-progress-task-icon,
+.research-progress-task.is-failed .research-progress-task-icon,
+.research-progress-task.is-cancelled .research-progress-task-icon {
+  opacity: 1;
+}
+
+.research-progress-task-state {
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+}
+
+.research-progress-error {
+  margin: 0;
+  color: var(--destructive);
+  font-size: calc(var(--chrome-font-size) * 0.8) !important;
+  line-height: 1.4;
+}
+
+.research-progress-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.research-progress-actions .ghost-button {
+  min-height: 34px;
+}
+
+@keyframes research-progress-pixel {
+  0%, 100% { opacity: 0.2; transform: scale(0.82); }
+  45% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes research-progress-shimmer {
+  from { background-position: 120% 0; }
+  to { background-position: -120% 0; }
+}
+
+@keyframes research-progress-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-progress-grid > span,
+  .research-progress-loading-label,
+  .research-progress-task.is-active .research-progress-task-icon,
+  .research-progress-task.is-retrying .research-progress-task-icon {
+    animation: none;
+    transform: none;
+  }
+
+  .research-progress-grid > span {
+    opacity: 0.58;
+  }
+
+  .research-progress-loading-label {
+    background: none;
+    color: var(--text-primary);
+  }
 }
 
 .research-answer-source-text {
