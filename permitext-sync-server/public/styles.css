@@ -8455,7 +8455,8 @@ body.is-resizing-research-evidence * {
   display: none;
 }
 
-.saved-projects-add-button[hidden] {
+.saved-projects-add-button[hidden],
+.saved-projects-archive-button[hidden] {
   display: grid;
   visibility: hidden;
   pointer-events: none;

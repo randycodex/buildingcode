@@ -199,6 +199,8 @@ assert.match(savedProjectsSource, /if \(showingArchived\) \{[\s\S]*?restoreArchi
 assert.match(savedProjectsSource, /editSelectedButton\.onclick[\s\S]*?selectedProjects\.length !== 1[\s\S]*?showProjectCreateSheet\(panel, selectedProjects\[0\]\)/);
 assert.match(savedProjectsSource, /deleteSelectedButton\.onclick[\s\S]*?deleteArchivedProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)/);
 assert.match(savedProjectsSource, /const setSelecting = \(nextSelecting\) => \{[\s\S]*?selectedProjectIDs\.clear\(\);\n    updateSelectionControls\(\);\n  \};/);
+assert.match(savedProjectsSource, /addButton\.hidden = showingArchived \|\| selecting;[\s\S]*?archiveButton\.hidden = selecting;/);
+assert.match(stylesSource, /\.saved-projects-add-button\[hidden\],[\s\S]*?\.saved-projects-archive-button\[hidden\] \{[\s\S]*?visibility: hidden;[\s\S]*?pointer-events: none;/);
 assert.match(functionSource(appSource, "refreshProjectOverviewPreservingSavedPanes"), /savedPaneIDs\(\)[\s\S]*?refreshSavedPanelInPlace[\s\S]*?failedSavedIDs[\s\S]*?transitionWorkspace/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /archiveSelectedButton\.innerHTML = showingArchived \? archiveRestoreIconSVG\(\) : archiveIconSVG\(\)/);
 assert.doesNotMatch(stylesSource, /\.saved-project-tile-actions/);

@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-project-card-first-frame-v1";
+} from "./offline-storage.js?v=20260811-selection-actions-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -23051,6 +23051,8 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     deleteSelectedButton.disabled = selectedCount === 0 || selectionBusy;
     selectAllButton.disabled = selectionBusy;
     cancelSelectionButton.disabled = selectionBusy;
+    addButton.hidden = showingArchived || selecting;
+    archiveButton.hidden = selecting;
     addButton.disabled = showingArchived || selecting || selectionBusy;
     archiveButton.disabled = selecting || selectionBusy;
     list.querySelectorAll(".saved-project-tile").forEach((tile) => {

@@ -1352,7 +1352,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-project-card-first-frame-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-selection-actions-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1377,7 +1377,8 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
-        workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
+        workspaceStyles.text.includes(".saved-projects-add-button[hidden],") &&
+        workspaceStyles.text.includes(".saved-projects-archive-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
         workspaceStyles.text.includes(".notebook-card-title {\n  display: block;\n  width: 100%;") &&
         workspaceStyles.text.includes(".reader-code-heading {\n  position: relative;\n  z-index: 30;\n  display: flex;") &&
@@ -1494,7 +1495,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-project-card-first-frame-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-selection-actions-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1759,7 +1760,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-project-card-first-frame-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-selection-actions-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
