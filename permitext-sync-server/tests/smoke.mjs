@@ -1286,7 +1286,9 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 100px;[\s\S]*?min-height: 100px;/) &&
-        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 3\.3em;[\s\S]*?-webkit-line-clamp: 3;/),
+        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?max-height: 3\.3em;[\s\S]*?-webkit-line-clamp: 3;/) &&
+        workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \{[\s\S]*?grid-template-rows: minmax\(0, 1fr\);[\s\S]*?overflow: hidden;/) &&
+        workspaceStyles.text.match(/\.search-results\.is-history:not\(\.is-split\) \.search-jump-list \{[\s\S]*?max-height: none;[\s\S]*?overflow-y: auto;/),
       "Recently Viewed previews should reserve three complete lines without clipping the last line."
     );
     assert(
@@ -1476,7 +1478,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-search-history-popover-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-search-history-height-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1736,7 +1738,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-search-history-popover-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-search-history-height-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

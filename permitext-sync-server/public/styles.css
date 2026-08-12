@@ -4366,6 +4366,24 @@ select option:checked {
   margin-bottom: var(--space-4);
 }
 
+.search-results.is-history:not(.is-split) {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.search-results.is-history:not(.is-split) .search-jump-section {
+  min-height: 0;
+  margin-bottom: 0;
+}
+
+.search-results.is-history:not(.is-split) .search-jump-list {
+  max-height: none;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .search-recent-popover {
   position: absolute;
   z-index: 12;
