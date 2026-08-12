@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-project-select-all-v1";
+} from "./offline-storage.js?v=20260811-project-selection-layout-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -22967,7 +22967,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   cancelSelectionButton.type = "button";
   cancelSelectionButton.className = "saved-projects-bulk-link";
   cancelSelectionButton.textContent = "Cancel";
-  bulkBar.append(selectionActions, cancelSelectionButton);
+  bulkBar.append(cancelSelectionButton, selectionActions);
   section.insertBefore(bulkBar, list);
   const projectsMenuLabel = (savedInstance) => {
     if (savedInstance.projectsMenuOpen) return "";
