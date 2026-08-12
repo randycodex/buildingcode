@@ -11742,7 +11742,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .notebook-card-rail.is-open {
-  padding-bottom: var(--space-3);
+  padding-bottom: 0;
 }
 
 .notebook-card-rail-header {
@@ -11793,11 +11793,41 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   grid-auto-flow: row;
   align-content: start;
   width: 100%;
-  gap: var(--space-1) calc(2 * var(--space-3));
+  gap: var(--space-1);
   min-height: 0;
   overflow-y: auto;
   padding-inline: var(--space-3);
   background-image: none;
+}
+
+.notebook-card-menu.is-open .notebook-card-list {
+  height: min(var(--notebook-card-list-height, 156px), 70vh);
+  max-height: min(var(--notebook-card-list-height, 156px), 70vh);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+
+.notebook-card-list-resize-handle {
+  position: relative;
+  display: none;
+  height: 16px;
+  cursor: row-resize;
+  touch-action: none;
+}
+
+.notebook-card-menu.is-open .notebook-card-list-resize-handle {
+  display: block;
+}
+
+.notebook-card-list-resize-handle::after {
+  position: absolute;
+  right: var(--space-3);
+  bottom: 3px;
+  left: var(--space-3);
+  height: 1px;
+  background: var(--border);
+  content: "";
 }
 
 .notebook-card-list-empty {
@@ -11876,68 +11906,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .notebook-card-tile small {
   white-space: nowrap;
-}
-
-@container (min-width: 320px) {
-  .notebook-card-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    background-image: linear-gradient(
-      to right,
-      transparent calc(50% - 0.5px),
-      var(--border) calc(50% - 0.5px),
-      var(--border) calc(50% + 0.5px),
-      transparent calc(50% + 0.5px)
-    );
-  }
-}
-
-@container (min-width: 580px) {
-  .notebook-card-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    background-image:
-      linear-gradient(
-        to right,
-        transparent calc(33.333% - 0.5px),
-        var(--border) calc(33.333% - 0.5px),
-        var(--border) calc(33.333% + 0.5px),
-        transparent calc(33.333% + 0.5px)
-      ),
-      linear-gradient(
-        to right,
-        transparent calc(66.666% - 0.5px),
-        var(--border) calc(66.666% - 0.5px),
-        var(--border) calc(66.666% + 0.5px),
-        transparent calc(66.666% + 0.5px)
-      );
-  }
-}
-
-@container (min-width: 820px) {
-  .notebook-card-list {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    background-image:
-      linear-gradient(
-        to right,
-        transparent calc(25% - 0.5px),
-        var(--border) calc(25% - 0.5px),
-        var(--border) calc(25% + 0.5px),
-        transparent calc(25% + 0.5px)
-      ),
-      linear-gradient(
-        to right,
-        transparent calc(50% - 0.5px),
-        var(--border) calc(50% - 0.5px),
-        var(--border) calc(50% + 0.5px),
-        transparent calc(50% + 0.5px)
-      ),
-      linear-gradient(
-        to right,
-        transparent calc(75% - 0.5px),
-        var(--border) calc(75% - 0.5px),
-        var(--border) calc(75% + 0.5px),
-        transparent calc(75% + 0.5px)
-      );
-  }
 }
 
 .notebook-focus {

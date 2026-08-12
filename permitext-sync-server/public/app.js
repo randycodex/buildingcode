@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-progress-v26";
+} from "./research-progress.js?v=20260812-research-progress-v28";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-progress-v26";
+} from "./offline-storage.js?v=20260812-research-progress-v28";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18065,7 +18065,48 @@ async function renderProjectNotebook(project) {
     railHeader.append(railToggle, newButton);
     const cardList = document.createElement("div");
     cardList.className = "notebook-card-list";
-    rail.append(railHeader, cardList);
+    const cardListResizeHandle = document.createElement("div");
+    cardListResizeHandle.className = "notebook-card-list-resize-handle";
+    cardListResizeHandle.setAttribute("role", "separator");
+    cardListResizeHandle.setAttribute("aria-label", "Resize Project notes list");
+    cardListResizeHandle.setAttribute("aria-orientation", "horizontal");
+    cardListResizeHandle.tabIndex = 0;
+    const resizeCardListTo = (height, userInitiated = true) => {
+      const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
+      const nextHeight = Math.max(48, Math.min(maximumHeight, height));
+      rail.style.setProperty("--notebook-card-list-height", `${nextHeight}px`);
+      if (userInitiated) rail.dataset.userResized = "true";
+    };
+    const sizeCardListForThreeRows = () => {
+      if (rail.dataset.userResized === "true") return;
+      const rows = Array.from(cardList.querySelectorAll(":scope > .notebook-card-row")).slice(0, 3);
+      if (!rows.length) return;
+      const first = rows[0].getBoundingClientRect();
+      const last = rows.at(-1).getBoundingClientRect();
+      resizeCardListTo(last.bottom - first.top, false);
+    };
+    cardListResizeHandle.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      const startY = event.clientY;
+      const startHeight = cardList.getBoundingClientRect().height;
+      cardListResizeHandle.setPointerCapture(event.pointerId);
+      const resize = (moveEvent) => resizeCardListTo(startHeight + moveEvent.clientY - startY);
+      const finish = () => {
+        window.removeEventListener("pointermove", resize);
+        window.removeEventListener("pointerup", finish);
+        window.removeEventListener("pointercancel", finish);
+      };
+      window.addEventListener("pointermove", resize);
+      window.addEventListener("pointerup", finish);
+      window.addEventListener("pointercancel", finish);
+    });
+    cardListResizeHandle.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+      event.preventDefault();
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      resizeCardListTo(cardList.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
+    });
+    rail.append(railHeader, cardList, cardListResizeHandle);
     const cardMenuState = {
       cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false
     };
@@ -18339,6 +18380,7 @@ async function renderProjectNotebook(project) {
         cardList.append(row);
       });
       updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
+      requestAnimationFrame(sizeCardListForThreeRows);
     }
 
     async function renderFocusedCard() {
