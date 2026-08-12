@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-history-heading-v1";
+} from "./offline-storage.js?v=20260811-evidence-reviewed-collapse-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -13637,12 +13637,12 @@ function renderResearchFeedback(container, message, conversationID) {
     await saveFeedback(selectedCategory);
   });
   details.append(choices, optionalContext, actions);
-  const answerDetails = container.lastElementChild?.querySelector(":scope > .research-answer-details");
-  if (answerDetails) {
+  const evidenceReviewed = container.lastElementChild?.querySelector(":scope > .research-evidence-reviewed");
+  if (evidenceReviewed) {
     const reviewRow = document.createElement("div");
     reviewRow.className = "research-answer-review-row";
-    answerDetails.replaceWith(form);
-    reviewRow.append(answerDetails, compact);
+    evidenceReviewed.replaceWith(form);
+    reviewRow.append(evidenceReviewed, compact);
     form.append(reviewRow, details);
   } else {
     form.append(compact, details);
@@ -13678,6 +13678,14 @@ function renderResearchInterpretation(container, result, options = {}) {
     card.append(codeDisclosure);
   }
 
+  const evidenceReviewed = document.createElement("details");
+  evidenceReviewed.className = "research-evidence-reviewed";
+  evidenceReviewed.open = Boolean(options.detailsOpen);
+  const evidenceReviewedSummary = document.createElement("summary");
+  evidenceReviewedSummary.textContent = "Evidence reviewed";
+  const evidenceReviewedBody = document.createElement("section");
+  evidenceReviewedBody.className = "research-evidence-reviewed-body";
+
   if (result.citations?.length) {
     const citationRow = document.createElement("nav");
     citationRow.className = "research-answer-citation-chips";
@@ -13702,7 +13710,7 @@ function renderResearchInterpretation(container, result, options = {}) {
       });
       citationRow.append(citationButton);
     });
-    card.append(citationRow);
+    evidenceReviewedBody.append(citationRow);
   }
 
   const missingFactCount = result.missingFacts?.length || 0;
@@ -13741,7 +13749,7 @@ function renderResearchInterpretation(container, result, options = {}) {
     missingFactCount ? `${missingFactCount} project ${missingFactCount === 1 ? "fact remains" : "facts remain"} unresolved` : "No unresolved project facts identified",
     evidenceLimitCount ? `${evidenceLimitCount} evidence ${evidenceLimitCount === 1 ? "limit" : "limits"}` : "No additional evidence limits identified"
   ].filter(Boolean).join(" · ");
-  card.append(boundary);
+  evidenceReviewedBody.append(boundary);
 
   const details = document.createElement("details");
   details.className = "research-answer-details";
@@ -13785,7 +13793,9 @@ function renderResearchInterpretation(container, result, options = {}) {
     detailsBody.append(citationsHeading, citations);
   }
   details.append(summary, detailsBody);
-  card.append(details);
+  evidenceReviewedBody.append(details);
+  evidenceReviewed.append(evidenceReviewedSummary, evidenceReviewedBody);
+  card.append(evidenceReviewed);
   container.append(card);
   if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
 }
@@ -16704,7 +16714,10 @@ async function renderResearchConversation(conversationID, options = {}) {
     bubble.className = "research-message is-assistant";
     renderResearchInterpretation(bubble, message.answer, { message, conversationID });
     const answerSources = renderResearchAnswerSources(conversation, message);
-    if (answerSources) bubble.append(answerSources);
+    if (answerSources) {
+      const evidenceReviewedBody = bubble.querySelector(".research-evidence-reviewed-body");
+      (evidenceReviewedBody || bubble).append(answerSources);
+    }
     bubble.append(renderResearchAnswerSave(conversation, message));
     thread.append(bubble);
   });

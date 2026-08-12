@@ -1352,7 +1352,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-research-history-heading-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-evidence-reviewed-collapse-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1495,7 +1495,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-research-history-heading-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-evidence-reviewed-collapse-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1645,7 +1645,9 @@ async function main() {
         workspaceScript.text.includes('compact.className = "research-feedback-compact"') &&
         workspaceScript.text.includes('details.className = "research-feedback-details"') &&
         workspaceScript.text.includes('reviewRow.className = "research-answer-review-row"') &&
-        workspaceScript.text.includes("reviewRow.append(answerDetails, compact)") &&
+        workspaceScript.text.includes('evidenceReviewedSummary.textContent = "Evidence reviewed"') &&
+        workspaceScript.text.includes("reviewRow.append(evidenceReviewed, compact)") &&
+        workspaceScript.text.includes("(evidenceReviewedBody || bubble).append(answerSources)") &&
         workspaceScript.text.includes('void saveFeedback("helpful"') &&
         workspaceScript.text.includes('problemButton.setAttribute("aria-expanded", String(open))') &&
         !workspaceScript.text.includes("Was this answer useful?") &&
@@ -1760,7 +1762,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-research-history-heading-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-evidence-reviewed-collapse-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

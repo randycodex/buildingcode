@@ -5107,6 +5107,33 @@ mark {
   line-height: 1.4;
 }
 
+.research-evidence-reviewed {
+  min-width: 0;
+  color: var(--text-secondary);
+}
+
+.research-evidence-reviewed > summary {
+  width: fit-content;
+  cursor: pointer;
+  padding: var(--space-1) 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.research-evidence-reviewed > summary:focus-visible {
+  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline-offset: 3px;
+  border-radius: var(--radius-control);
+}
+
+.research-evidence-reviewed-body {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-2) 0 var(--space-1);
+}
+
 .research-answer-details {
   color: var(--text-secondary);
 }
@@ -5224,7 +5251,7 @@ mark {
   gap: var(--space-2);
 }
 
-.research-answer-review-row .research-answer-details {
+.research-answer-review-row .research-evidence-reviewed {
   min-width: 0;
   flex: 1;
 }
@@ -6820,6 +6847,10 @@ body.is-resizing-research-evidence * {
 .research-answer-source-text {
   margin: 0 var(--space-4);
   color: var(--text-secondary);
+}
+
+.research-evidence-reviewed-body > .research-answer-source-text {
+  margin: 0;
 }
 
 .research-answer-source-text > summary {
