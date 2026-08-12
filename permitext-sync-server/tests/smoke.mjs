@@ -549,6 +549,19 @@ async function main() {
       workspaceScript.text.includes('panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"))'),
       "Settings close-column control is not wired to close the Settings pane."
     );
+    assert(
+      workspaceScript.text.includes("async function openNewSearchColumn()") &&
+        workspaceScript.text.includes('toggleSearchButton.addEventListener("click", () => {\n      void openNewSearchColumn();') &&
+        workspaceScript.text.includes('run: () => openNewSearchColumn()'),
+      "Search should create a new Search column from both the toolbar and command palette."
+    );
+    assert(
+      workspaceScript.text.includes("async function toggleProjectsColumns()") &&
+        workspaceScript.text.includes('void toggleProjectsColumns();') &&
+        workspaceScript.text.includes('void toggleUtilityPane("analysis");') &&
+        workspaceScript.text.includes('toggleSettingsButton.addEventListener("click", () => {\n    toggleUtilityPane("settings");'),
+      "Projects, Research, and Settings toolbar controls should toggle their columns open and closed."
+    );
     const syncStateScript = await request("/web/sync-state.js");
     const evidenceDiscoveryClientSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("function renderEvidenceDiscovery"),
@@ -1306,7 +1319,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-workboard-deferred-v2'),
+        webRoot.text.includes('/web/app.js?v=20260811-toolbar-toggle-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

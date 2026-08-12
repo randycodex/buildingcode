@@ -29637,9 +29637,39 @@ async function focusUtility(key, selector = "") {
   });
 }
 
+async function openNewSearchColumn() {
+  await toggleUtilityPane("search");
+  const instance = (state.utilityInstances || []).filter((item) => item.key === "search").at(-1);
+  if (!instance) return;
+  const paneID = paneIDForUtilityInstance(instance);
+  scrollPaneIntoView(paneID);
+  requestAnimationFrame(() => {
+    track
+      .querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"] .search-input`)
+      ?.focus({ preventScroll: true });
+  });
+}
+
+async function toggleProjectsColumns() {
+  const instances = (state.utilityInstances || []).filter((item) => item.key === "saved");
+  if (!instances.length) {
+    await focusUtility("saved");
+    return;
+  }
+
+  const projectHostPaneID = state.projectHostPaneID;
+  const closeOrder = [...instances].sort((left, right) =>
+    Number(paneIDForUtilityInstance(left) === projectHostPaneID) -
+    Number(paneIDForUtilityInstance(right) === projectHostPaneID)
+  );
+  for (const instance of closeOrder) {
+    if (!(await closeUtilityInstance(instance))) return;
+  }
+}
+
 function workspaceCommandDefinitions() {
   return [
-    { label: "Open Search", hint: "Find sections across all codes", run: () => focusUtility("search", ".search-input") },
+    { label: "Open Search", hint: "Find sections across all codes", run: () => openNewSearchColumn() },
     { label: "Open Research", hint: "Ask a cited building-code question", run: () => focusUtility("analysis", ".research-question-input") },
     ...(isProAccount() || state.readers.length < 2
       ? [{ label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
@@ -29777,7 +29807,7 @@ function bindImmediateUtilityControls() {
   if (toggleSearchButton.dataset.coldStartBound !== "true") {
     toggleSearchButton.dataset.coldStartBound = "true";
     toggleSearchButton.addEventListener("click", () => {
-      void focusUtility("search", ".search-input");
+      void openNewSearchColumn();
     });
   }
   if (releaseSurfaceVisibility.workboard && toggleWorkboardButton?.dataset.coldStartBound !== "true") {
@@ -29789,13 +29819,13 @@ function bindImmediateUtilityControls() {
   if (toggleAnalysisButton?.dataset.coldStartBound !== "true") {
     toggleAnalysisButton.dataset.coldStartBound = "true";
     toggleAnalysisButton.addEventListener("click", () => {
-      void focusUtility("analysis", ".research-question-input");
+      void toggleUtilityPane("analysis");
     });
   }
   if (toggleSavedButton.dataset.coldStartBound === "true") return;
   toggleSavedButton.dataset.coldStartBound = "true";
   toggleSavedButton.addEventListener("click", () => {
-    void focusUtility("saved");
+    void toggleProjectsColumns();
   });
 }
 
@@ -30009,7 +30039,7 @@ async function start() {
     toggleUtilityPane("archive");
   });
   toggleSettingsButton.addEventListener("click", () => {
-    focusUtility("settings");
+    toggleUtilityPane("settings");
   });
   addWorkspaceButton?.addEventListener("click", () => {
     void createNewWorkspace();
