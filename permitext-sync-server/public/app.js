@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-research-policy-v1";
+} from "./offline-storage.js?v=20260811-research-evidence-pane-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -195,7 +195,8 @@ const releaseSurfaceVisibility = Object.freeze({
   // Preserved for data, report, and restoration compatibility. See
   // docs/PERMITEXT_DEFERRED_FEATURES.md before changing this release boundary.
   workboard: false,
-  researchHistoryManagement: false
+  researchHistoryManagement: false,
+  researchConversationEvidencePane: false
 });
 const permitextClientCapabilities = Object.freeze([
   "saved-work",
@@ -16454,6 +16455,10 @@ async function renderResearchConversation(conversationID, options = {}) {
   header.append(headingWrap, actions);
   const content = document.createElement("section");
   content.className = "research-conversation-content";
+  content.classList.toggle(
+    "is-evidence-pane-deferred",
+    !releaseSurfaceVisibility.researchConversationEvidencePane
+  );
   panel.append(...(embedded ? [content] : [header, content]));
 
   let conversation = null;
@@ -16519,6 +16524,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const displayedSources = researchDisplaySources(selectedSources);
   const evidencePane = document.createElement("section");
   evidencePane.className = "research-evidence-pane";
+  evidencePane.hidden = !releaseSurfaceVisibility.researchConversationEvidencePane;
   const evidenceScroll = document.createElement("section");
   evidenceScroll.className = "research-evidence-scroll";
   evidenceScroll.id = `research-evidence-${conversation.id}`;
@@ -16526,6 +16532,7 @@ async function renderResearchConversation(conversationID, options = {}) {
 
   const divider = document.createElement("div");
   divider.className = "research-evidence-divider";
+  divider.hidden = !releaseSurfaceVisibility.researchConversationEvidencePane;
   divider.setAttribute("role", "separator");
   divider.setAttribute("aria-label", "Resize context and evidence above the conversation");
   divider.setAttribute("aria-orientation", "horizontal");
@@ -16713,7 +16720,9 @@ async function renderResearchConversation(conversationID, options = {}) {
   composerBox.append(input, sendButton);
   composer.append(composerBox, status);
   dialoguePane.append(composer);
-  if (!embedded) bindResearchEvidenceDivider(content, divider, conversation.id);
+  if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
+    bindResearchEvidenceDivider(content, divider, conversation.id);
+  }
   requestAnimationFrame(() => {
     resizeComposerInput();
     thread.scrollTop = thread.scrollHeight;

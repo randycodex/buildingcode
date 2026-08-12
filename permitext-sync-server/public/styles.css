@@ -6245,6 +6245,14 @@ mark {
   overflow: hidden;
 }
 
+.research-conversation-content.is-evidence-pane-deferred {
+  grid-template-rows: minmax(128px, 1fr);
+}
+
+.research-conversation-content.is-evidence-pane-deferred .research-dialogue-pane {
+  grid-row: 1;
+}
+
 .research-conversation-embedded {
   min-height: 0;
 }
@@ -6334,6 +6342,10 @@ mark {
   grid-row: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+.research-evidence-pane[hidden] {
+  display: none;
 }
 
 .research-evidence-scroll {

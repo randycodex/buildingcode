@@ -49,3 +49,16 @@ separate entry documents a concrete technical reason for deletion.
 | Preserved data | Conversation titles, Project links, Code Decision links, messages, sources, and timestamps remain unchanged. Existing conversations derive their original question from the first user message when a stored starter question is absent. |
 | Restore | Set `releaseSurfaceVisibility.researchHistoryManagement` to `true`, then re-verify per-chat actions, Project assignment, Code Decision linking, keyboard focus, and narrow-column layout. |
 | Delete only if | A replacement management workflow is shipped with an explicit migration and data-retention plan. |
+
+## Research conversation evidence pane
+
+| Field | Decision |
+| --- | --- |
+| Status | Hidden and frozen |
+| Deferred on | 2026-08-11 |
+| Product reason | The separate evidence pane, expand-all control, and resizable split duplicate evidence details already available with the Research answer and interrupt the release-critical conversation flow. |
+| Web release surface | Hide the upper Research evidence pane, its passage expansion control, and its horizontal resize divider. Let the conversation use the full column height. |
+| Preserved implementation | Keep evidence assembly, source records, passage rendering, expansion behavior, split-state compatibility, and divider behavior behind the centralized release visibility boundary. |
+| Preserved data | Selected and automatically retrieved evidence, citations, source snapshots, code-basis metadata, and immutable Research answer records remain unchanged. |
+| Restore | Set `releaseSurfaceVisibility.researchConversationEvidencePane` to `true`, then re-verify evidence scrolling, expand/collapse behavior, keyboard and pointer resizing, saved split ratios, and narrow-column layout. |
+| Delete only if | A replacement evidence inspection workflow is shipped and existing evidence records remain reviewable and exportable. |

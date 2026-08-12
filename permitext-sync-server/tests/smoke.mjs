@@ -1336,7 +1336,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260811-research-policy-v1'),
+        webRoot.text.includes('/web/app.js?v=20260811-research-evidence-pane-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1478,7 +1478,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260811-research-policy-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260811-research-evidence-pane-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1639,12 +1639,15 @@ async function main() {
       "Research composer should match the conversation background and answer feedback should stay compact until requested."
     );
     assert(
+        workspaceScript.text.includes("researchConversationEvidencePane: false") &&
         workspaceScript.text.includes("function bindResearchEvidenceDivider") &&
         workspaceScript.text.includes("researchEvidenceSplitRatios") &&
         workspaceScript.text.includes("delete state.researchEvidenceSplitRatios[conversation.id]") &&
         researchConversationRendererSource.includes('evidencePane.className = "research-evidence-pane"') &&
+        researchConversationRendererSource.includes("evidencePane.hidden = !releaseSurfaceVisibility.researchConversationEvidencePane") &&
         researchConversationRendererSource.includes('dialoguePane.className = "research-dialogue-pane"') &&
         researchConversationRendererSource.includes('divider.className = "research-evidence-divider"') &&
+        researchConversationRendererSource.includes("divider.hidden = !releaseSurfaceVisibility.researchConversationEvidencePane") &&
         researchConversationRendererSource.includes('divider.setAttribute("aria-orientation", "horizontal")') &&
         !researchConversationRendererSource.includes('evidenceHeading.className = "research-evidence-heading"') &&
         !researchConversationRendererSource.includes('evidenceCollapse.className = "icon-button research-evidence-collapse"') &&
@@ -1655,11 +1658,13 @@ async function main() {
         workspaceStyles.text.includes(".research-evidence-pane {\n  grid-row: 1;") &&
         workspaceStyles.text.includes(".research-evidence-divider {\n  grid-row: 2;") &&
         workspaceStyles.text.includes(".research-dialogue-pane {\n  grid-row: 3;") &&
+        workspaceStyles.text.includes(".research-conversation-content.is-evidence-pane-deferred {") &&
+        workspaceStyles.text.includes(".research-evidence-pane[hidden] {") &&
         workspaceStyles.text.includes("min-height: 17px;") &&
         workspaceStyles.text.includes("top: 8px;") &&
         workspaceStyles.text.includes("cursor: row-resize;") &&
         workspaceStyles.text.includes(".research-message-thread {\n  display: grid;\n  min-height: 0;"),
-      "Research evidence and conversation should use independently scrollable panes with a persistent horizontal divider."
+      "Deferred Research evidence UI should remain implemented behind the release boundary while the conversation fills the pane."
     );
     assert(
       !workspaceScript.text.includes("Assign this conversation when its research belongs to a specific Project.") &&
@@ -1738,7 +1743,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260811-research-policy-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260811-research-evidence-pane-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
