@@ -2963,7 +2963,7 @@ select option:checked {
 .reader-notes-project-picker .reader-notes-project-option {
   --project-color: var(--text-secondary);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-1);
   background: color-mix(in srgb, var(--project-color) 16%, transparent);

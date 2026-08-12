@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260811-project-selection-counter-v1";
+} from "./offline-storage.js?v=20260811-project-select-all-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -22963,14 +22963,11 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
   deleteSelectedButton.innerHTML = trashIconSVG();
   selectionActions.append(archiveSelectedButton, editSelectedButton, deleteSelectedButton);
-  const selectAllButton = document.createElement("button");
-  selectAllButton.type = "button";
-  selectAllButton.className = "saved-projects-bulk-link";
   const cancelSelectionButton = document.createElement("button");
   cancelSelectionButton.type = "button";
   cancelSelectionButton.className = "saved-projects-bulk-link";
   cancelSelectionButton.textContent = "Cancel";
-  bulkBar.append(selectionActions, selectAllButton, cancelSelectionButton);
+  bulkBar.append(selectionActions, cancelSelectionButton);
   section.insertBefore(bulkBar, list);
   const projectsMenuLabel = (savedInstance) => {
     if (savedInstance.projectsMenuOpen) return "";
@@ -23022,16 +23019,12 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     selectButton.setAttribute("aria-label", selectButton.title);
     bulkBar.hidden = !selecting;
     const selectedCount = selectedProjectIDs.size;
-    selectAllButton.textContent = selectableIDs.length > 0 && selectedCount === selectableIDs.length
-      ? "Clear all"
-      : "Select all";
     archiveSelectedButton.title = showingArchived ? "Restore selected folders" : "Archive selected folders";
     archiveSelectedButton.setAttribute("aria-label", archiveSelectedButton.title);
     archiveSelectedButton.innerHTML = showingArchived ? archiveRestoreIconSVG() : archiveIconSVG();
     archiveSelectedButton.disabled = selectedCount === 0 || selectionBusy;
     editSelectedButton.disabled = selectedCount !== 1 || selectionBusy;
     deleteSelectedButton.disabled = selectedCount === 0 || selectionBusy;
-    selectAllButton.disabled = selectionBusy;
     cancelSelectionButton.disabled = selectionBusy;
     addButton.hidden = showingArchived || selecting;
     archiveButton.hidden = selecting;
@@ -23282,12 +23275,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   };
 
   selectButton.onclick = () => setSelecting(!selecting);
-  selectAllButton.onclick = () => {
-    const ids = selectableProjects().map(projectRecordID).filter(Boolean);
-    if (selectedProjectIDs.size === ids.length) selectedProjectIDs.clear();
-    else ids.forEach((id) => selectedProjectIDs.add(id));
-    updateSelectionControls();
-  };
   cancelSelectionButton.onclick = () => setSelecting(false);
   archiveSelectedButton.onclick = async () => {
     const selectedProjects = selectableProjects().filter((project) => selectedProjectIDs.has(projectRecordID(project)));
