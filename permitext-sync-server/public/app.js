@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-report-drag-sections-v64";
+} from "./research-progress.js?v=20260812-single-report-template-v65";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-report-drag-sections-v64";
+} from "./offline-storage.js?v=20260812-single-report-template-v65";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -4942,8 +4942,7 @@ function enhanceSelect(select) {
   menu.className = "custom-select-menu";
   const readerCodeMenu = select.classList.contains("code-select");
   const readerChapterMenu = select.classList.contains("chapter-select");
-  const reportDraftMenu = select.classList.contains("report-draft-select") ||
-    select.classList.contains("report-template-select");
+  const reportDraftMenu = select.classList.contains("report-draft-select");
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
@@ -19759,21 +19758,6 @@ async function renderProjectReportDraft(project) {
       renderWorkspaceContent();
     });
     draftPicker.append(select);
-    const templateSelect = document.createElement("select");
-    templateSelect.className = "report-template-select";
-    templateSelect.setAttribute("aria-label", "Firm Report template");
-    (reportOptions.templates || []).forEach((template) => {
-      const option = document.createElement("option");
-      option.value = template.id;
-      option.textContent = `${template.name} · ${template.coverLabel}`;
-      templateSelect.append(option);
-    });
-    templateSelect.value = selectedReportTemplateID;
-    templateSelect.addEventListener("change", () => {
-      selectedReportTemplateID = templateSelect.value;
-      renderWorkspaceContent();
-    });
-    draftPicker.append(templateSelect);
     if (reportOptions.tags?.length) {
       const tags = document.createElement("p");
       tags.className = "report-draft-empty";
@@ -19937,7 +19921,6 @@ async function renderProjectReportDraft(project) {
       historySection
     );
     enhanceSelect(select);
-    enhanceSelect(templateSelect);
   }
 
   try {
