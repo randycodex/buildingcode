@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-neutral-v95";
+} from "./research-progress.js?v=20260812-research-inner-scroll-v96";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-neutral-v95";
+} from "./offline-storage.js?v=20260812-research-inner-scroll-v96";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14165,8 +14165,8 @@ async function openResearchConversation(conversationID, options = {}) {
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
   const showResearchList = options.showResearchList !== false;
-  const researchPaneScrollTop = track.querySelector(
-    '.workspace-panel[data-pane-id="utility:analysis"]'
+  const researchListScrollTop = track.querySelector(
+    '.workspace-panel[data-pane-id="utility:analysis"] .analysis-content'
   )?.scrollTop ?? 0;
   const openingAccount = activeAccount();
   const openingContext = {
@@ -14255,11 +14255,14 @@ async function openResearchConversation(conversationID, options = {}) {
       ...projectPaneIDs
     ]
   });
-  const refreshedResearchPane = track.querySelector(
-    '.workspace-panel[data-pane-id="utility:analysis"]'
+  const refreshedResearchList = track.querySelector(
+    '.workspace-panel[data-pane-id="utility:analysis"] .analysis-content'
   );
-  if (showResearchList && refreshedResearchPane) {
-    refreshedResearchPane.scrollTop = researchPaneScrollTop;
+  if (showResearchList && refreshedResearchList) {
+    refreshedResearchList.scrollTop = Math.min(
+      researchListScrollTop,
+      Math.max(0, refreshedResearchList.scrollHeight - refreshedResearchList.clientHeight)
+    );
   }
   if (!researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return null;
   scrollPaneIntoView(conversationPaneID);
