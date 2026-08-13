@@ -382,7 +382,8 @@ assert.match(workspaceScript, /evidenceReviewedSummary\.textContent = "Evidence 
 assert.match(workspaceScript, /reviewRow\.append\(evidenceReviewed, compact\)/);
 assert.match(workspaceScript, /\(evidenceReviewedBody \|\| bubble\)\.append\(answerSources\)/);
 assert.match(workspaceStyles, /\.research-answer-review-row \.research-evidence-reviewed \{[\s\S]*?flex: 1;/);
-assert.match(workspaceStyles, /workspace-panel:not\(\.reader-panel\) \.research-evidence-reviewed > summary \{[\s\S]*?font-size: 10px !important;/);
+assert.match(workspaceStyles, /workspace-panel:not\(\.reader-panel\) \.research-evidence-reviewed > summary \{[\s\S]*?font-size: 14px !important;/);
+assert.match(workspaceStyles, /\.research-answer-primary \{[\s\S]*?font-weight: 400;/);
 assert.match(workspaceStyles, /\.research-evidence-reviewed > summary::after \{[\s\S]*?content: "›";/);
 assert.doesNotMatch(workspaceScript, /Was this answer useful\?/);
 assert.doesNotMatch(workspaceScript, /explanation\.textContent = researchDisplayText\(point\.explanation\)/);

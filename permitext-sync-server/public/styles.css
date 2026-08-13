@@ -5196,7 +5196,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 
 .research-answer-primary {
   font-size: 1.02rem;
-  font-weight: 650;
+  font-weight: 400;
 }
 
 .research-answer-explanation {
@@ -5248,7 +5248,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   padding: var(--space-1) 0;
   list-style: none;
   color: var(--text-secondary);
-  font-size: 10px !important;
+  font-size: 14px !important;
   font-weight: 400;
   line-height: 1.25;
 }
