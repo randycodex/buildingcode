@@ -6827,6 +6827,37 @@ body.is-resizing-research-evidence * {
   margin: 0;
 }
 
+.research-source-structured-tables {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-3);
+}
+
+.research-source-structured-table {
+  margin: 0;
+  font-family: var(--reader-font-family);
+  font-size: 0.9rem !important;
+}
+
+.research-source-structured-table table {
+  width: 100%;
+  min-width: 32rem;
+  table-layout: auto;
+}
+
+.research-source-structured-table caption {
+  padding: 0 0 var(--space-2);
+  color: var(--text-primary);
+  font-weight: 700;
+  text-align: left;
+}
+
+.research-source-structured-table :where(th, td) {
+  min-width: 6rem;
+  padding: var(--space-2);
+  white-space: normal;
+}
+
 .research-source-toggle > strong {
   color: var(--code-accent);
 }

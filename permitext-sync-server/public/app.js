@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260813-open-source-link-v106";
+} from "./research-progress.js?v=20260813-research-table-grid-v108";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260813-open-source-link-v106";
+} from "./offline-storage.js?v=20260813-research-table-grid-v108";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -16468,14 +16468,56 @@ function renderResearchSource(source) {
       contextLabel.textContent = "Complete enacted context used";
       body.append(contextLabel);
     }
-    const quote = document.createElement("blockquote");
-    quote.textContent = sourceText;
-    body.append(quote);
+    const structuredSource = renderResearchStructuredSource(source.structuredSource);
+    if (structuredSource) {
+      body.append(structuredSource);
+    } else {
+      const quote = document.createElement("blockquote");
+      quote.textContent = sourceText;
+      body.append(quote);
+    }
   }
   const visualEvidence = renderResearchVisualEvidence(source.visualSources);
   if (visualEvidence) body.append(visualEvidence);
   card.append(toggle, body);
   return card;
+}
+
+function renderResearchStructuredSource(structuredSource) {
+  const grids = Array.isArray(structuredSource?.grids) ? structuredSource.grids : [];
+  if (!grids.some((grid) => Array.isArray(grid?.rows) && grid.rows.length)) return null;
+  const container = document.createElement("section");
+  container.className = "research-source-structured-tables";
+  grids.forEach((grid, gridIndex) => {
+    if (!Array.isArray(grid?.rows) || !grid.rows.length) return;
+    const wrapper = document.createElement("div");
+    wrapper.className = "code-table research-source-structured-table";
+    const table = document.createElement("table");
+    if (gridIndex === 0 && structuredSource.reference) {
+      const caption = document.createElement("caption");
+      caption.textContent = structuredSource.reference;
+      table.append(caption);
+    }
+    const tableBody = document.createElement("tbody");
+    grid.rows.forEach((row, rowIndex) => {
+      const tableRow = document.createElement("tr");
+      (Array.isArray(row?.cells) ? row.cells : []).forEach((cell) => {
+        const tableCell = document.createElement(rowIndex === 0 ? "th" : "td");
+        if (rowIndex === 0) tableCell.scope = "col";
+        tableCell.textContent = String(cell?.text || "");
+        const rowSpan = Number(cell?.rowSpan || 1);
+        const columnSpan = Number(cell?.columnSpan || 1);
+        if (rowSpan > 1) tableCell.rowSpan = rowSpan;
+        if (columnSpan > 1) tableCell.colSpan = columnSpan;
+        tableRow.append(tableCell);
+      });
+      tableBody.append(tableRow);
+    });
+    table.append(tableBody);
+    wrapper.append(table);
+    container.append(wrapper);
+  });
+  return container.childElementCount ? container : null;
 }
 
 function researchDisplaySources(sources = []) {
