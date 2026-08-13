@@ -9,7 +9,7 @@ const notebookImagesStoreName = "notebook-images";
 const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v659";
+const shellCacheName = "permitext-pro-shell-v661";
 const shellAssetVersion = "20260812-project-multi-conversation-v97";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -24,7 +24,7 @@ const shellURLs = [
   "/web/fonts/inter-latin-wght-italic.woff2",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260813-section-open-retry-v101",
+  "/web/app.js?v=20260813-project-section-state-v103",
   "/web/research-progress.js?v=20260812-project-multi-conversation-v97",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
   "/web/offline-storage.js?v=20260812-project-multi-conversation-v97",

@@ -1431,7 +1431,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260813-section-open-retry-v101'),
+        webRoot.text.includes('/web/app.js?v=20260813-project-section-state-v103'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1803,6 +1803,13 @@ async function main() {
       workspaceScript.text.includes("function createSavedEvidenceHeading()") &&
         workspaceScript.text.includes("function populateSavedEvidenceSection(") &&
         workspaceScript.text.includes("collapsedEvidenceFolderIDs") &&
+        workspaceScript.text.includes('"projectSectionExpansion"') &&
+        workspaceScript.text.includes('projectSectionExpanded(folder, "savedEvidence", !collapsedFolderIDs.has(folderID))') &&
+        workspaceScript.text.includes('persistProjectSectionExpansion(folder, "savedEvidence", expanded)') &&
+        workspaceScript.text.includes('projectSectionExpanded(identity, "projectFacts", false)') &&
+        workspaceScript.text.includes('persistProjectSectionExpansion(identity, "projectFacts", expanded)') &&
+        workspaceScript.text.includes('projectSectionExpanded(identity, "research", false)') &&
+        workspaceScript.text.includes('persistProjectSectionExpansion(identity, "research", expanded)') &&
         workspaceScript.text.includes("wireProjectSectionMotion(") &&
         workspaceScript.text.includes('toggle.className = "project-section-toggle-chevron saved-evidence-collapse-toggle"') &&
         workspaceScript.text.includes('search.className = "saved-evidence-search-toggle"') &&

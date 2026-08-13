@@ -384,6 +384,7 @@ const globalWorkspaceStateKeys = [
   "readerSettings",
   "savedTextSize",
   "researchHistoryGroupExpansion",
+  "projectSectionExpansion",
   "researchEvidenceSplitRatios",
   "detachedWorkboards"
 ];
@@ -609,6 +610,12 @@ function loadWorkspaceState() {
               .filter(([groupID, expanded]) => typeof groupID === "string" && typeof expanded === "boolean")
           )
         : {},
+      projectSectionExpansion: saved.projectSectionExpansion && typeof saved.projectSectionExpansion === "object"
+        ? Object.fromEntries(
+            Object.entries(saved.projectSectionExpansion)
+              .filter(([key, expanded]) => typeof key === "string" && typeof expanded === "boolean")
+          )
+        : {},
       researchEvidenceSplitRatios: saved.researchEvidenceSplitRatios && typeof saved.researchEvidenceSplitRatios === "object"
         ? Object.fromEntries(
             Object.entries(saved.researchEvidenceSplitRatios)
@@ -699,6 +706,7 @@ function loadWorkspaceState() {
       savedTextSize: 10,
       researchConversationID: "",
       researchHistoryGroupExpansion: {},
+      projectSectionExpansion: {},
       researchEvidenceSplitRatios: {},
       workboards: [],
       notebooks: [],
@@ -2757,6 +2765,22 @@ function projectDetailKey(detail) {
     detail.title ||
     "legacy"
   );
+}
+
+function projectSectionExpansionKey(project, sectionName) {
+  const accountID = String(activeAccount()?.userID || "local").trim() || "local";
+  return `${accountID}:${projectDetailKey(project)}:${String(sectionName || "section")}`;
+}
+
+function projectSectionExpanded(project, sectionName, fallback) {
+  const stored = state.projectSectionExpansion?.[projectSectionExpansionKey(project, sectionName)];
+  return typeof stored === "boolean" ? stored : Boolean(fallback);
+}
+
+function persistProjectSectionExpansion(project, sectionName, expanded) {
+  state.projectSectionExpansion ||= {};
+  state.projectSectionExpansion[projectSectionExpansionKey(project, sectionName)] = Boolean(expanded);
+  saveWorkspaceState();
 }
 
 function paneIDForProjectDetail(detail = null) {
@@ -23343,7 +23367,8 @@ function createSavedEvidenceHeading() {
   return { heading, title, toggle, search, select };
 }
 
-function populateSavedEvidenceSection(section, savedInstance, folderID, ...children) {
+function populateSavedEvidenceSection(section, savedInstance, folder, ...children) {
+  const folderID = projectRecordID(folder);
   const { heading, title, toggle, search, select } = createSavedEvidenceHeading();
   const body = document.createElement("div");
   body.className = "saved-project-evidence-body";
@@ -23357,14 +23382,14 @@ function populateSavedEvidenceSection(section, savedInstance, folderID, ...child
     if (expanded) collapsedFolderIDs.delete(folderID);
     else collapsedFolderIDs.add(folderID);
     savedInstance.collapsedEvidenceFolderIDs = Array.from(collapsedFolderIDs);
-    saveWorkspaceState();
+    persistProjectSectionExpansion(folder, "savedEvidence", expanded);
   };
   const setExpanded = wireProjectSectionMotion(
     section,
     body,
     [title, toggle],
     "Saved evidence",
-    !collapsedFolderIDs.has(folderID),
+    projectSectionExpanded(folder, "savedEvidence", !collapsedFolderIDs.has(folderID)),
     {
       onChange: recordExpandedState
     }
@@ -23497,7 +23522,18 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   }
   body.append(address, description, descriptionResizeHandle);
   container.append(heading, body);
-  wireProjectSectionMotion(container, body, [toggle, chevron], "Project facts", false);
+  wireProjectSectionMotion(
+    container,
+    body,
+    [toggle, chevron],
+    "Project facts",
+    projectSectionExpanded(identity, "projectFacts", false),
+    {
+      onChange(expanded) {
+        persistProjectSectionExpansion(identity, "projectFacts", expanded);
+      }
+    }
+  );
 }
 
 async function appendSavedProjectResearchConversations(container, identity) {
@@ -23555,7 +23591,18 @@ async function appendSavedProjectResearchConversations(container, identity) {
     });
     body.append(card);
   });
-  wireProjectSectionMotion(section, body, [title, toggle], "Research", false);
+  wireProjectSectionMotion(
+    section,
+    body,
+    [title, toggle],
+    "Research",
+    projectSectionExpanded(identity, "research", false),
+    {
+      onChange(expanded) {
+        persistProjectSectionExpansion(identity, "research", expanded);
+      }
+    }
+  );
   container.append(section);
 }
 
@@ -23637,7 +23684,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     populateSavedEvidenceSection(
       savedSection,
       savedInstance,
-      projectRecordID(folder),
+      folder,
       inlineFilters,
       planUsage,
       savedContent
