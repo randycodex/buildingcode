@@ -136,6 +136,7 @@ assert.doesNotMatch(clientSource, /research-conversation-list-heading|listHeadin
 assert.doesNotMatch(stylesSource, /\.research-conversation-list-heading/, "Removed Research history heading styles should not remain in the release surface.");
 assert.match(clientSource, /researchHistoryGroupExpansion[\s\S]*?wireProjectSectionMotion\([\s\S]*?onChange: \(expanded\)/, "Research history group expansion is not persisted through the standard motion control.");
 assert.match(stylesSource, /\.research-history-group-body \{[\s\S]*?display: grid;/, "Research history groups have no collapsible body layout.");
+assert.match(stylesSource, /\.research-conversation-header-project \{[\s\S]*?appearance: none;[\s\S]*?-webkit-appearance: none;[\s\S]*?background: color-mix\(in srgb, var\(--project-color, var\(--text-tertiary\)\) 42%, var\(--surface\)\);[\s\S]*?background-image: none;/, "The conversation Project pill should hide the native chevron and use its Project card color.");
 assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body \{[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/, "Research history cannot inherit the established collapse motion.");
 assert.match(clientSource, /conversation\.starterQuestion \|\| summaryQuestion \|\| conversation\.title/, "The standalone conversation column does not retain the original question as its title.");
 assert.match(clientSource, /if \(!releaseSurfaceVisibility\.researchHistoryManagement\)/, "Deferred per-chat management controls are not hidden behind the release boundary.");

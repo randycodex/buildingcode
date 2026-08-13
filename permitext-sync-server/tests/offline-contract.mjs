@@ -195,9 +195,9 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260813-project-section-state-v103"));
-assert(shellPrecacheURLs.includes("/web/styles.css?v=20260812-project-multi-conversation-v97"));
-assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260812-project-multi-conversation-v97"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260813-conversation-project-pill-v105"));
+assert(shellPrecacheURLs.includes("/web/styles.css?v=20260813-conversation-project-pill-v104"));
+assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260813-conversation-project-pill-v104"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260811-research-columns-v3"));
 assert(!shellPrecacheURLs.some((url) => url.includes("/web/workboard-assets/workboard.css")));

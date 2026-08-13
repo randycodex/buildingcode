@@ -7215,11 +7215,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   max-width: 180px;
   min-height: 28px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--radius-pill);
-  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  background: color-mix(in srgb, var(--project-color, var(--text-tertiary)) 42%, var(--surface));
+  background-image: none;
   color: var(--text-primary);
   font-size: 10px !important;
+  text-overflow: ellipsis;
 }
 
 .research-historical-details {
