@@ -2175,17 +2175,21 @@ label {
 }
 
 .research-project-custom-select {
-  width: min(180px, 42vw);
+  flex: 0 1 auto;
+  width: max-content;
+  max-width: min(260px, 48vw);
 }
 
 .research-project-custom-select .custom-select-trigger {
+  width: max-content;
+  max-width: 100%;
   min-height: 28px;
   padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--project-color, var(--text-tertiary)) 42%, var(--surface));
   color: var(--text-primary);
   font-size: 10px !important;
-  text-align: center;
+  text-align: right;
 }
 
 .research-project-select-menu .custom-select-option {
