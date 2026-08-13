@@ -6270,14 +6270,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 
 .research-conversation-open {
   display: grid;
-  gap: 5px;
+  gap: var(--space-3);
   min-width: 0;
   padding: var(--space-4) 0;
   text-align: left;
 }
 
-.research-conversation-open strong,
-.research-conversation-open span {
+.research-conversation-open strong {
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -6287,9 +6286,33 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   line-height: 1.35;
 }
 
-.research-conversation-open span {
+.research-conversation-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.research-conversation-date {
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  white-space: nowrap;
+}
+
+.research-conversation-project-pill {
+  display: block;
+  width: fit-content;
+  max-width: min(70%, 260px);
+  margin-left: auto;
+  padding: 3px 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--project-color, var(--text-tertiary)) 32%, transparent);
+  color: var(--text-primary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  line-height: 1.2;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

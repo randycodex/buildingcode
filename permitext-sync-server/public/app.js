@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-conversation-v91";
+} from "./research-progress.js?v=20260812-research-history-project-v92";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-conversation-v91";
+} from "./offline-storage.js?v=20260812-research-history-project-v92";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15862,9 +15862,24 @@ async function renderResearch(paneID = "utility:analysis") {
       openButton.type = "button";
       const title = document.createElement("strong");
       title.textContent = conversation.starterQuestion || "Question not yet asked";
+      const metaRow = document.createElement("span");
+      metaRow.className = "research-conversation-meta";
       const meta = document.createElement("span");
+      meta.className = "research-conversation-date";
       meta.textContent = researchConversationDate(conversation.createdAt);
-      openButton.append(title, meta);
+      const projectPill = document.createElement("span");
+      projectPill.className = "research-conversation-project-pill";
+      projectPill.textContent = conversation.primaryProjectID
+        ? researchProjectName(conversation.primaryProjectID)
+        : "Not in a Project";
+      const conversationProject = researchProjects().find((project) =>
+        researchProjectID(project) === String(conversation.primaryProjectID || "")
+      );
+      if (conversationProject) {
+        projectPill.style.setProperty("--project-color", projectColor(conversationProject));
+      }
+      metaRow.append(meta, projectPill);
+      openButton.append(title, metaRow);
       openButton.addEventListener("click", () => {
         if (selectingConversations) {
           toggleConversationSelection(conversation.id);
