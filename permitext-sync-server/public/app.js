@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260813-research-table-grid-v108";
+} from "./research-progress.js?v=20260813-research-project-picker-v110";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260813-research-table-grid-v108";
+} from "./offline-storage.js?v=20260813-research-project-picker-v110";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -4993,12 +4993,15 @@ function enhanceSelect(select) {
   const readerCodeMenu = select.classList.contains("code-select");
   const readerChapterMenu = select.classList.contains("chapter-select");
   const reportDraftMenu = select.classList.contains("report-draft-select");
+  const researchProjectMenu = select.classList.contains("research-conversation-header-project");
   const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
   menu.classList.toggle("reader-chapter-select-menu", readerChapterMenu);
   menu.classList.toggle("report-draft-select-menu", reportDraftMenu);
+  menu.classList.toggle("research-project-select-menu", researchProjectMenu);
+  custom.classList.toggle("research-project-custom-select", researchProjectMenu);
   menu.dataset.floatingSelect = "true";
   menu.hidden = true;
   select._customSelectMenu = menu;
@@ -5018,6 +5021,7 @@ function enhanceSelect(select) {
       trigger.title = select.dataset.customTriggerLabel || selectedLabel;
     }
   };
+  select._syncCustomSelect = syncTrigger;
 
   const closeMenu = () => {
     menu.hidden = true;
@@ -5130,6 +5134,7 @@ function resetEnhancedSelects(scope) {
   scope.querySelectorAll("select.native-select-hidden").forEach((select) => {
     select._customSelectMenu?.remove();
     delete select._customSelectMenu;
+    delete select._syncCustomSelect;
     if (select.nextElementSibling?.classList.contains("custom-select")) {
       select.nextElementSibling.remove();
     }
@@ -17216,6 +17221,7 @@ async function renderResearchConversation(conversationID, options = {}) {
         });
         if (!payload) {
           projectSelect.value = previousProjectID;
+          projectSelect._syncCustomSelect?.();
           return;
         }
         conversation = { ...conversation, ...payload.conversation };
@@ -17230,11 +17236,13 @@ async function renderResearchConversation(conversationID, options = {}) {
         });
       } catch (error) {
         projectSelect.value = previousProjectID;
+        projectSelect._syncCustomSelect?.();
         projectSelect.disabled = false;
         await showWebNotice("Project not changed", error.message);
       }
     });
     actions.prepend(projectSelect);
+    enhanceSelect(projectSelect);
   }
   const selectedSources = conversation.sources.filter((source) => source.kind === "selection");
   const displayedSources = researchDisplaySources(selectedSources);

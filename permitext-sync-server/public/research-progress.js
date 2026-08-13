@@ -1,4 +1,4 @@
-export const researchProgressVersion = "20260813-research-table-grid-v108";
+export const researchProgressVersion = "20260813-research-project-picker-v110";
 
 export const researchProgressStages = Object.freeze([
   Object.freeze({ id: "preparing_question", label: "Preparing the question" }),

@@ -195,9 +195,9 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260813-research-table-grid-v109"));
-assert(shellPrecacheURLs.includes("/web/styles.css?v=20260813-research-table-grid-v108"));
-assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260813-research-table-grid-v108"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260813-research-project-picker-v111"));
+assert(shellPrecacheURLs.includes("/web/styles.css?v=20260813-research-project-picker-v110"));
+assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260813-research-project-picker-v110"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260811-research-columns-v3"));
 assert(!shellPrecacheURLs.some((url) => url.includes("/web/workboard-assets/workboard.css")));
