@@ -7206,9 +7206,22 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .research-answer-open-source {
   width: fit-content;
   justify-self: start;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--text-primary);
   font-size: calc(var(--chrome-font-size) * 0.78) !important;
   font-weight: 650;
+  box-shadow: none;
+}
+
+.research-answer-open-source:hover,
+.research-answer-open-source:focus-visible {
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .research-conversation-header-project {
