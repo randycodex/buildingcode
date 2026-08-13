@@ -15293,7 +15293,11 @@ function renderEvidenceDiscovery(container) {
           targetConversationID ? "/research/conversations/evidence" : "/research/conversations/create",
           targetConversationID
             ? { conversationID: targetConversationID, selections: selectedPassages }
-            : { projectID: discovery.projectID || "", selections: selectedPassages }
+            : {
+                projectID: discovery.projectID || "",
+                selections: selectedPassages,
+                originSurface: "evidenceDiscovery"
+              }
         );
         if (!researchOpenContextIsCurrent(prepareContext)) return;
         if (!payload.conversation) throw new Error("Research did not return the updated conversation.");
@@ -16467,6 +16471,62 @@ function researchDisplaySources(sources = []) {
   return displayed;
 }
 
+function researchConversationSelectionOriginLabel(conversation) {
+  const originKind = String(conversation?.origin?.kind || "");
+  const originSurface = String(conversation?.origin?.surface || "");
+  if (originSurface === "reader") return "Started from Reader";
+  if (originSurface) return "";
+  // Older selection-origin records did not preserve which surface created them.
+  return originKind === "selectedPassage" || originKind === "selectedPassages"
+    ? "Started from selected code"
+    : "";
+}
+
+function researchOriginExcerpt(source, limit = 280) {
+  const text = String(
+    source?.selectedText || source?.passageText || source?.excerpt || source?.snippet || ""
+  ).replace(/\s+/g, " ").trim();
+  return text.length > limit ? `${text.slice(0, limit - 1).trimEnd()}…` : text;
+}
+
+function renderReaderResearchOrigin(conversation, sources, anchorPaneID) {
+  const originLabel = researchConversationSelectionOriginLabel(conversation);
+  if (!originLabel || !sources.length) return null;
+  const origin = document.createElement("section");
+  origin.className = "research-reader-origin";
+  origin.setAttribute("aria-label", "Research started from Reader evidence");
+  const header = document.createElement("header");
+  const title = document.createElement("strong");
+  title.textContent = `${originLabel} · ${sources.length} ${sources.length === 1 ? "passage" : "passages"}`;
+  header.append(title);
+  const list = document.createElement("section");
+  list.className = "research-reader-origin-list";
+  sources.forEach((source) => {
+    const passage = document.createElement("article");
+    const passageHeader = document.createElement("div");
+    const reference = document.createElement("strong");
+    const prefix = String(source.codePrefix || "").trim();
+    const sectionNumber = String(source.sectionNumber || "").trim();
+    reference.textContent = [prefix, sectionNumber ? `§ ${sectionNumber}` : ""]
+      .filter(Boolean)
+      .join(" ") || source.title || "Selected code passage";
+    const openButton = document.createElement("button");
+    openButton.type = "button";
+    openButton.className = "research-reader-origin-open";
+    openButton.textContent = "Open source";
+    openButton.addEventListener("click", () => openSectionDetailForExistingSearch(source, {
+      anchorPaneID
+    }));
+    passageHeader.append(reference, openButton);
+    const excerpt = document.createElement("blockquote");
+    excerpt.textContent = researchOriginExcerpt(source);
+    passage.append(passageHeader, excerpt);
+    list.append(passage);
+  });
+  origin.append(header, list);
+  return origin;
+}
+
 function researchSourcesForAnswer(conversation, message) {
   const answer = message?.answer || {};
   const answerSources = [
@@ -17201,6 +17261,8 @@ async function renderResearchConversation(conversationID, options = {}) {
   thread.className = "research-message-thread";
   thread.id = `research-dialogue-${conversation.id}`;
   divider.setAttribute("aria-controls", `${evidenceScroll.id} ${thread.id}`);
+  const readerOrigin = renderReaderResearchOrigin(conversation, displayedSources, paneID);
+  if (readerOrigin) thread.append(readerOrigin);
   conversation.messages.forEach((message) => {
     if (message.role === "user") {
       const bubble = document.createElement("article");
@@ -17468,7 +17530,8 @@ async function saveResearchSelection(mode, button, status) {
             savedItemID
           })),
           projectID: selection.projectID || "",
-          savedItemID: selection.savedItemID || ""
+          savedItemID: selection.savedItemID || "",
+          originSurface: "reader"
         });
     activeResearchConversation = payload.conversation;
     closeResearchSelectionMenu();

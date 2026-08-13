@@ -7688,15 +7688,26 @@ async function validateResearchSavedSelections(userID, selections) {
   }
 }
 
-function researchOriginForSelections(selections) {
+function researchOriginForSelections(selections, surface = "") {
   const savedItemIDs = selections.map((selection) => selection.savedItemID).filter(Boolean);
+  const normalizedSurface = String(surface || "").trim();
   if (selections.length === 1 && savedItemIDs.length === 1) {
-    return { kind: "savedItem", savedItemID: savedItemIDs[0] };
+    return {
+      kind: "savedItem",
+      savedItemID: savedItemIDs[0],
+      ...(normalizedSurface ? { surface: normalizedSurface } : {})
+    };
   }
-  if (selections.length === 1) return { kind: "selectedPassage" };
+  if (selections.length === 1) {
+    return {
+      kind: "selectedPassage",
+      ...(normalizedSurface ? { surface: normalizedSurface } : {})
+    };
+  }
   return {
     kind: "selectedPassages",
-    savedItemIDs: Array.from(new Set(savedItemIDs))
+    savedItemIDs: Array.from(new Set(savedItemIDs)),
+    ...(normalizedSurface ? { surface: normalizedSurface } : {})
   };
 }
 
@@ -13280,7 +13291,9 @@ async function handleResearchConversationCreate(request, response) {
         updatedAt: now
       } : null,
       projectContextReviewRequired: false,
-      origin: selections.length ? researchOriginForSelections(selections) : { kind: "chat" },
+      origin: selections.length
+        ? researchOriginForSelections(selections, context.body.originSurface)
+        : { kind: "chat" },
       sourceStatus: "current",
       sources,
       messages: []

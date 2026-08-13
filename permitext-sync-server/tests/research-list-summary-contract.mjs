@@ -67,6 +67,15 @@ assert.equal(
   "List projection still embeds full passage text."
 );
 
+assert.match(clientSource, /if \(originSurface === "reader"\) return "Started from Reader";/, "Reader-started Research does not identify its origin inside the conversation.");
+assert.match(clientSource, /\? "Started from selected code"/, "Legacy selected-code conversations overstate an unrecorded Reader origin.");
+assert.match(clientSource, /originSurface: "reader"/, "Reader selections do not persist their conversation origin.");
+assert.match(clientSource, /originSurface: "evidenceDiscovery"/, "Evidence Discovery selections are not distinguished from Reader origins.");
+assert.match(clientSource, /sources\.length === 1 \? "passage" : "passages"/, "Reader origins do not summarize multiple selected passages.");
+assert.match(clientSource, /openButton\.textContent = "Open source";/, "Reader-origin passages cannot navigate back to their source.");
+assert.match(stylesSource, /\.research-reader-origin \{[\s\S]*?border: 1px solid var\(--border\);/, "Reader-origin evidence has no visible conversation card.");
+assert.match(appSource, /researchOriginForSelections\(selections, context\.body\.originSurface\)/, "The server does not persist the supplied Research origin surface.");
+
 const legacyProjected = projectResearchConversationForList({
   ...conversation,
   starterQuestion: null,
