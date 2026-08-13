@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260813-manual-structured-facts-v127";
+} from "./offline-storage.js?v=20260813-manual-structured-facts-v128";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -23652,16 +23652,13 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   structuredHeading.append(structuredToggle, structuredChevron);
   const structuredBody = document.createElement("section");
   structuredBody.className = "saved-project-structured-facts";
-  const structuredHelp = document.createElement("p");
-  structuredHelp.className = "saved-project-structured-facts-help";
-  structuredHelp.textContent = "Enter the Project details Research may use as user-provided context. Blank fields are ignored.";
   const structuredList = document.createElement("div");
   structuredList.className = "saved-project-structured-facts-list";
   const addFact = document.createElement("button");
   addFact.type = "button";
   addFact.className = "saved-project-structured-fact-add";
   addFact.textContent = "Add another fact";
-  structuredBody.append(structuredHelp, structuredList, addFact);
+  structuredBody.append(structuredList, addFact);
   structuredSection.append(structuredHeading, structuredBody);
 
   const factKey = (label) => String(label || "")

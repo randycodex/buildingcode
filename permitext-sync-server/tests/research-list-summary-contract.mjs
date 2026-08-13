@@ -98,7 +98,7 @@ assert.equal(structuredProjectInformation.structuredFacts[0].usedInResearch, tru
 assert.equal(structuredProjectInformation.structuredFacts[2].usedInResearch, false);
 assert.equal(structuredProjectInformation.facts.at(-1).startsWith("Additional Project facts:"), true);
 assert.match(clientSource, /structuredFacts: projectStructuredFacts\(project\)/, "Project mutations do not preserve structured facts.");
-assert.match(clientSource, /Research may use as user-provided context\. Blank fields are ignored\./, "The Structured Facts UI does not explain its manual inputs.");
+assert.doesNotMatch(clientSource, /Research may use as user-provided context\. Blank fields are ignored\./, "The removed Structured Facts helper text returned.");
 assert.match(clientSource, /appendResearchProjectContextDisclosure\(card, result\)/, "Research answers do not disclose the Project context used.");
 assert.match(stylesSource, /\.saved-project-structured-fact \{[\s\S]*?background:/, "Structured Project facts have no distinct review surface.");
 assert.match(appSource, /incomingProject\?\.structuredFacts === undefined[\s\S]*?structuredFacts: existingProject\.structuredFacts/, "Older clients can erase structured Project facts during sync.");

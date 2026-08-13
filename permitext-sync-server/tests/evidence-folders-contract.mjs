@@ -392,6 +392,7 @@ assert.match(projectFactEditorSource, /projectStructuredFactFields\.forEach/);
 assert.match(projectFactEditorSource, /addFact\.textContent = "Add another fact"/);
 assert.doesNotMatch(appSource, /function extractedProjectStructuredFacts/);
 assert.doesNotMatch(projectFactEditorSource, /Proposed from the narrative|saved-project-structured-fact-status/);
+assert.doesNotMatch(projectFactEditorSource, /Research may use as user-provided context/);
 assert.match(projectFactEditorSource, /address\.addEventListener\("blur", save\)/);
 assert.match(projectFactEditorSource, /description\.addEventListener\("blur", save\)/);
 assert.match(projectFactEditorSource, /updateProjectFolder\(folder,/);
