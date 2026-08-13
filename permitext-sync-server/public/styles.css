@@ -6473,6 +6473,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 
 .research-list-panel {
   position: relative;
+  background: var(--background);
 }
 
 .research-conversation-content {

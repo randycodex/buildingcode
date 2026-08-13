@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-project-research-direct-v94";
+} from "./research-progress.js?v=20260812-research-neutral-v95";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-project-research-direct-v94";
+} from "./offline-storage.js?v=20260812-research-neutral-v95";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15620,7 +15620,6 @@ async function renderResearch(paneID = "utility:analysis") {
   panel.classList.add("analysis-panel", "research-list-panel");
   const projectScopedResearch = Boolean(activeProjectIDForCodeQuestions());
   panel.classList.toggle("is-project-scoped", projectScopedResearch);
-  applyProjectDerivedPaneTheme(panel, preferredResearchProjectID());
   panel.querySelector(".utility-close")?.addEventListener("click", closeResearchWorkspace);
   const panelActions = panel.querySelector(".panel-actions");
   const selectedConversationIDs = new Set();
