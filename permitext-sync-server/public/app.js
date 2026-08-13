@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-inner-scroll-v96";
+} from "./research-progress.js?v=20260812-project-multi-conversation-v97";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-inner-scroll-v96";
+} from "./offline-storage.js?v=20260812-project-multi-conversation-v97";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -466,6 +466,10 @@ let activeResearchConversation = null;
 // resolve a conversation ID, but only an explicit Research action mounts its
 // column in the current tab.
 let researchConversationPaneOpened = false;
+// Project Research can open alongside the primary Research list/conversation
+// pair. These additional drill-ins are deliberately session-only.
+const supplementalResearchConversationIDs = [];
+const supplementalResearchConversations = new Map();
 const activeResearchProgress = new Map();
 let researchOpenGeneration = 0;
 let researchUsage = null;
@@ -2732,6 +2736,13 @@ function researchConversationPaneIsOpen() {
   return researchConversationPaneOpened && Boolean(state.researchConversationID);
 }
 
+function openResearchConversationPaneIDs() {
+  return [
+    ...(researchConversationPaneIsOpen() ? [paneIDForResearchConversation()] : []),
+    ...supplementalResearchConversationIDs.map((id) => paneIDForResearchConversation(id))
+  ];
+}
+
 function paneIDForSectionDetail(searchID = "legacy") {
   return `section:detail:${searchID}`;
 }
@@ -3224,10 +3235,7 @@ function defaultActivePaneIDs() {
   if (state.utilities.analysis) {
     ids.push("utility:analysis");
   }
-  const conversationPaneID = researchConversationPaneIsOpen()
-    ? paneIDForResearchConversation()
-    : "";
-  if (conversationPaneID) ids.push(conversationPaneID);
+  ids.push(...openResearchConversationPaneIDs());
   if (state.utilities.settings) ids.push("utility:settings");
   state.readers.forEach((reader) => ids.push(paneIDForReader(reader)));
   openCodeQuestionPaneIDs().forEach((id) => ids.push(id));
@@ -3275,7 +3283,7 @@ function pinCriticalWorkflowPanesToLeft(paneIDs) {
   const researchPaneIDs = new Set(
     [
       state.utilities.analysis ? "utility:analysis" : "",
-      researchConversationPaneIsOpen() ? paneIDForResearchConversation() : ""
+      ...openResearchConversationPaneIDs()
     ].filter(Boolean)
   );
   return [
@@ -3302,16 +3310,16 @@ function activePaneIDs() {
     !isProjectWorkboardPaneID(id) &&
     !isCodeQuestionPaneID(id)
   );
-  const conversationPaneID = researchConversationPaneIsOpen()
-    ? paneIDForResearchConversation()
-    : "";
-  if (conversationPaneID) {
-    const existingConversationIndex = paired.indexOf(conversationPaneID);
-    if (existingConversationIndex !== -1) paired.splice(existingConversationIndex, 1);
+  const conversationPaneIDs = openResearchConversationPaneIDs();
+  if (conversationPaneIDs.length) {
+    conversationPaneIDs.forEach((conversationPaneID) => {
+      const existingConversationIndex = paired.indexOf(conversationPaneID);
+      if (existingConversationIndex !== -1) paired.splice(existingConversationIndex, 1);
+    });
     const researchIndex = paired.indexOf("utility:analysis");
     const savedIndex = paired.indexOf(primarySavedPaneID());
     const anchorIndex = researchIndex === -1 ? savedIndex : researchIndex;
-    paired.splice(anchorIndex === -1 ? paired.length : anchorIndex + 1, 0, conversationPaneID);
+    paired.splice(anchorIndex === -1 ? paired.length : anchorIndex + 1, 0, ...conversationPaneIDs);
   }
   if (openProjectDetails().length) {
     const detailIDs = openProjectDetails().flatMap(projectWorkspacePaneIDs);
@@ -3340,7 +3348,7 @@ function activePaneIDs() {
     });
     const researchSurfaceIDs = [
       state.utilities.analysis ? "utility:analysis" : "",
-      researchConversationPaneIsOpen() ? paneIDForResearchConversation() : ""
+      ...openResearchConversationPaneIDs()
     ].filter(Boolean);
     researchSurfaceIDs.forEach((id) => {
       const currentIndex = paired.indexOf(id);
@@ -14127,6 +14135,8 @@ async function closeResearchWorkspace() {
   state.utilities.analysis = false;
   state.researchConversationID = "";
   activeResearchConversation = null;
+  supplementalResearchConversationIDs.splice(0);
+  supplementalResearchConversations.clear();
   closeCodeQuestionDownstreamPanes({ clearSelection: true });
   delete state.paneWeights["utility:analysis"];
   Object.keys(state.paneWeights).filter((id) => id.startsWith("research:conversation:")).forEach((id) => delete state.paneWeights[id]);
@@ -14135,7 +14145,19 @@ async function closeResearchWorkspace() {
   await transitionWorkspace("utility", { refreshPaneIDs: projectPaneIDs });
 }
 
-async function closeResearchConversation() {
+async function closeResearchConversation(conversationIDOverride = "") {
+  const requestedConversationID = String(conversationIDOverride || "").trim();
+  const supplementalIndex = supplementalResearchConversationIDs.indexOf(requestedConversationID);
+  if (supplementalIndex !== -1) {
+    supplementalResearchConversationIDs.splice(supplementalIndex, 1);
+    supplementalResearchConversations.delete(requestedConversationID);
+    const supplementalPaneID = paneIDForResearchConversation(requestedConversationID);
+    delete state.paneWeights[supplementalPaneID];
+    state.paneOrder = (state.paneOrder || []).filter((id) => id !== supplementalPaneID);
+    saveWorkspaceState();
+    await transitionWorkspace("utility");
+    return;
+  }
   researchOpenGeneration += 1;
   researchConversationPaneOpened = false;
   const conversationID = String(state.researchConversationID || "").trim();
@@ -14159,6 +14181,38 @@ async function closeResearchConversation() {
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis", ...projectPaneIDs] });
+}
+
+async function openSupplementalResearchConversation(conversationID) {
+  const normalizedConversationID = String(conversationID || "").trim();
+  if (!normalizedConversationID) return null;
+  if (normalizedConversationID === state.researchConversationID) {
+    scrollPaneIntoView(paneIDForResearchConversation(normalizedConversationID));
+    return activeResearchConversation;
+  }
+  let conversation;
+  try {
+    conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
+  } catch (error) {
+    await showWebNotice("Could not open Research", error.message || "The conversation could not be loaded.");
+    return null;
+  }
+  supplementalResearchConversations.set(normalizedConversationID, conversation);
+  if (!supplementalResearchConversationIDs.includes(normalizedConversationID)) {
+    supplementalResearchConversationIDs.push(normalizedConversationID);
+  }
+  const paneID = paneIDForResearchConversation(normalizedConversationID);
+  state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
+  const openConversationIDs = openResearchConversationPaneIDs();
+  const lastConversationIndex = state.paneOrder.reduce((last, id, index) =>
+    openConversationIDs.includes(id) ? index : last, -1
+  );
+  state.paneOrder.splice(lastConversationIndex === -1 ? state.paneOrder.length : lastConversationIndex + 1, 0, paneID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  scrollPaneIntoView(paneID);
+  return conversation;
 }
 
 async function openResearchConversation(conversationID, options = {}) {
@@ -14233,14 +14287,14 @@ async function openResearchConversation(conversationID, options = {}) {
   if (showResearchList) {
     state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
   }
-  Object.keys(state.paneWeights)
-    .filter((id) => id.startsWith("research:conversation:"))
-    .forEach((id) => delete state.paneWeights[id]);
   const conversationPaneID = paneIDForResearchConversation(normalizedConversationID);
+  if (previousConversationPaneID && previousConversationPaneID !== conversationPaneID) {
+    delete state.paneWeights[previousConversationPaneID];
+  }
   state.paneWeights[conversationPaneID] = Number.isFinite(Number(previousConversationWidth))
     ? Number(previousConversationWidth)
     : defaultPaneWidthForID(conversationPaneID);
-  const nextPaneOrder = (state.paneOrder || []).filter((id) => !id.startsWith("research:conversation:"));
+  const nextPaneOrder = (state.paneOrder || []).filter((id) => id !== previousConversationPaneID);
   const researchIndex = nextPaneOrder.indexOf("utility:analysis");
   const savedIndex = nextPaneOrder.indexOf(primarySavedPaneID());
   const anchorIndex = showResearchList ? researchIndex : savedIndex;
@@ -16893,6 +16947,7 @@ function bindResearchEvidenceDivider(layout, divider, conversationID) {
 
 async function renderResearchConversation(conversationID, options = {}) {
   const embedded = options.embedded === true;
+  const supplemental = options.supplemental === true;
   const paneID = paneIDForResearchConversation(conversationID);
   const renderingAccount = activeAccount();
   const renderingContext = {
@@ -16924,7 +16979,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   closeButton.title = "Close conversation";
   closeButton.setAttribute("aria-label", "Close conversation");
   closeButton.innerHTML = circleXIconSVG();
-  closeButton.addEventListener("click", closeResearchConversation);
+  closeButton.addEventListener("click", () => closeResearchConversation(conversationID));
   const actions = document.createElement("div");
   actions.className = "panel-actions";
   actions.append(closeButton);
@@ -16939,12 +16994,15 @@ async function renderResearchConversation(conversationID, options = {}) {
 
   let conversation = null;
   try {
+    const supplementalConversation = supplementalResearchConversations.get(conversationID);
     const alreadyLoaded = activeResearchConversation?.id === conversationID &&
       Array.isArray(activeResearchConversation.messages) &&
       Array.isArray(activeResearchConversation.sources);
-    conversation = alreadyLoaded
-      ? activeResearchConversation
-      : await fetchAuthoritativeResearchConversation(conversationID);
+    conversation = supplemental && supplementalConversation
+      ? supplementalConversation
+      : alreadyLoaded
+        ? activeResearchConversation
+        : await fetchAuthoritativeResearchConversation(conversationID);
   } catch (error) {
     const status = document.createElement("p");
     status.className = "research-list-status is-error";
@@ -16952,8 +17010,10 @@ async function renderResearchConversation(conversationID, options = {}) {
     content.append(status);
     return panel;
   }
-  if (!researchOpenContextIsCurrent(renderingContext, { requireConversationID: true })) return panel;
-  activeResearchConversation = conversation;
+  if (!supplemental && !researchOpenContextIsCurrent(renderingContext, { requireConversationID: true })) return panel;
+  if (supplemental && !supplementalResearchConversationIDs.includes(conversationID)) return panel;
+  if (supplemental) supplementalResearchConversations.set(conversationID, conversation);
+  else activeResearchConversation = conversation;
 
   const activeCodeQuestionProjectID = activeProjectIDForCodeQuestions();
   const linkedQuestion = questionsForActiveProject().find((item) =>
@@ -16964,7 +17024,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     conversation.primaryProjectID === activeCodeQuestionProjectID &&
     linkedQuestion?.researchConversationID === conversation.id
   );
-  if (codeQuestionWorkspaceEnabled() && activeCodeQuestionProjectID) {
+  if (!supplemental && codeQuestionWorkspaceEnabled() && activeCodeQuestionProjectID) {
     if (exactLinkedDecision) {
       const cq = codeQuestionWorkspaceState();
       if (cq.activeQuestionID !== conversation.linkedCodeDecisionID) {
@@ -17021,7 +17081,8 @@ async function renderResearchConversation(conversationID, options = {}) {
           return;
         }
         conversation = { ...conversation, ...payload.conversation };
-        activeResearchConversation = conversation;
+        if (supplemental) supplementalResearchConversations.set(conversationID, conversation);
+        else activeResearchConversation = conversation;
         researchConversationList = researchConversationList.map((item) =>
           item.id === conversation.id ? { ...item, ...conversation } : item
         );
@@ -17261,13 +17322,18 @@ async function renderResearchConversation(conversationID, options = {}) {
         status.textContent = "";
       },
       onSuccess: async (result) => {
-        activeResearchConversation = result.conversation;
+        if (supplemental) supplementalResearchConversations.set(conversationID, result.conversation);
+        else activeResearchConversation = result.conversation;
         researchQuestionDraft = "";
         await refreshResearchConversationList();
-        await openResearchConversation(conversationID, { refreshList: true });
+        if (supplemental) await openSupplementalResearchConversation(conversationID);
+        else await openResearchConversation(conversationID, { refreshList: true });
       },
       onFailure: (error) => {
-        if (error.payload?.conversation) activeResearchConversation = error.payload.conversation;
+        if (error.payload?.conversation) {
+          if (supplemental) supplementalResearchConversations.set(conversationID, error.payload.conversation);
+          else activeResearchConversation = error.payload.conversation;
+        }
         status.textContent = "";
         input.disabled = false;
         sendButton.disabled = input.value.trim().length < 3;
@@ -20631,6 +20697,10 @@ function appendProjectResearchHistory(content, identity, foundation) {
     card.append(question);
     if (!identity.sharedOnly) {
       card.addEventListener("click", () => {
+        if (state.utilities.analysis && researchConversationPaneIsOpen()) {
+          void openSupplementalResearchConversation(conversation.id);
+          return;
+        }
         researchConversationPaneOpened = true;
         void openResearchConversation(conversation.id, { showResearchList: false });
       });
@@ -23401,6 +23471,10 @@ async function appendSavedProjectResearchConversations(container, identity) {
     question.textContent = conversation.starterQuestion;
     card.append(question);
     card.addEventListener("click", () => {
+      if (state.utilities.analysis && researchConversationPaneIsOpen()) {
+        void openSupplementalResearchConversation(conversation.id);
+        return;
+      }
       researchConversationPaneOpened = true;
       void openResearchConversation(conversation.id, { showResearchList: false });
     });
@@ -30584,6 +30658,9 @@ async function renderWorkspace(options = {}) {
   if (researchConversationPaneIsOpen()) {
     panes.push(await renderResearchConversation(state.researchConversationID));
   }
+  for (const conversationID of supplementalResearchConversationIDs) {
+    panes.push(await renderResearchConversation(conversationID, { supplemental: true }));
+  }
   if (state.utilities.settings) {
     panes.push(renderSettings());
   }
@@ -30684,6 +30761,13 @@ async function renderUtilityWorkspace(options = {}) {
     panes.push(await reuseOrRenderPane(
       conversationPaneID,
       () => renderResearchConversation(state.researchConversationID)
+    ));
+  }
+  for (const conversationID of supplementalResearchConversationIDs) {
+    const supplementalPaneID = paneIDForResearchConversation(conversationID);
+    panes.push(await reuseOrRenderPane(
+      supplementalPaneID,
+      () => renderResearchConversation(conversationID, { supplemental: true })
     ));
   }
   if (state.utilities.settings) {

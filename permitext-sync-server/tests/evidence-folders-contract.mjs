@@ -186,7 +186,7 @@ assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordi
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
 const pinnedWorkflowSource = functionSource(appSource, "pinCriticalWorkflowPanesToLeft");
 assert.match(pinnedWorkflowSource, /new Set\(savedPaneIDs\(\)\)/);
-assert.match(pinnedWorkflowSource, /\["utility:analysis", paneIDForResearchConversation\(\)\]/);
+assert.match(pinnedWorkflowSource, /state\.utilities\.analysis \? "utility:analysis" : ""[\s\S]*?\.\.\.openResearchConversationPaneIDs\(\)/);
 assert.match(functionSource(appSource, "activePaneIDs"), /pinCriticalWorkflowPanesToLeft\(paired\)/);
 assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
