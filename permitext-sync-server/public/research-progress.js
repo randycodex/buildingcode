@@ -1,4 +1,4 @@
-export const researchProgressVersion = "20260813-code-basis-type-v118";
+export const researchProgressVersion = "20260813-research-reader-spacing-v120";
 
 export const researchProgressStages = Object.freeze([
   Object.freeze({ id: "preparing_question", label: "Preparing the question" }),

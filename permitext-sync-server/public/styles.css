@@ -5183,7 +5183,7 @@ mark {
 .research-answer-explanation {
   margin: 0;
   color: var(--text-primary);
-  line-height: 1.6;
+  line-height: var(--reader-line-height);
   white-space: pre-line;
 }
 
@@ -7075,7 +7075,7 @@ body.is-resizing-research-evidence * {
   border-radius: 18px 18px 5px 18px;
   background: #000;
   color: #fff;
-  line-height: 1.45;
+  line-height: var(--reader-line-height);
 }
 
 .research-message.is-user > p {
