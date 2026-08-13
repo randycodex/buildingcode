@@ -8030,18 +8030,56 @@ async function ownedProjectRecord(userID, projectID) {
   return projectMutation ? mutationKindAndRecord(projectMutation).record : null;
 }
 
-function researchProjectInformation(projectID, project) {
+const researchProjectFactStatuses = new Set(["stated", "confirmed", "unknown", "rejected"]);
+
+function normalizedResearchProjectStructuredFacts(project) {
+  return (Array.isArray(project?.structuredFacts) ? project.structuredFacts : []).flatMap((fact) => {
+    if (!fact || typeof fact !== "object") return [];
+    const key = normalizedResearchText(fact.key || fact.id || "", 120)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    const label = normalizedResearchText(fact.label, 160);
+    const value = normalizedResearchText(fact.value, 1_000);
+    if (!key || !label || !value) return [];
+    const status = researchProjectFactStatuses.has(String(fact.status || "").toLowerCase())
+      ? String(fact.status).toLowerCase()
+      : "stated";
+    return [{
+      id: normalizedResearchText(fact.id || `project-fact:${key}`, 200),
+      key,
+      label,
+      value,
+      status,
+      source: normalizedResearchText(fact.source || "description", 100),
+      sourceText: normalizedResearchText(fact.sourceText || "", 500),
+      updatedAt: fact.updatedAt || null,
+      usedInResearch: status === "stated" || status === "confirmed"
+    }];
+  });
+}
+
+export function researchProjectInformation(projectID, project) {
   if (!projectID || !project) return null;
   const address = String(project.address || "").trim();
   const description = String(project.description || "").trim();
   const codeVersion = String(project.codeVersion || "").trim() || null;
+  const structuredFacts = normalizedResearchProjectStructuredFacts(project);
+  const usableStructuredFacts = structuredFacts.filter((fact) => fact.usedInResearch);
   const facts = [];
   if (address) facts.push(`Project address: ${normalizedResearchText(address, 1_000)}`);
-  if (description) facts.push(`Project description: ${normalizedResearchText(description, 4_000)}`);
+  usableStructuredFacts.forEach((fact) => {
+    const provenance = fact.status === "confirmed" ? "user-confirmed" : "user-stated";
+    facts.push(`${fact.label}: ${fact.value} (${provenance}; not independently verified)`);
+  });
+  if (description && !usableStructuredFacts.length) {
+    facts.push(`Project description: ${normalizedResearchText(description, 4_000)}`);
+  }
   return {
     projectID,
     address,
     description,
+    structuredFacts,
     codeVersion,
     canonicalCodeVersion: codeVersion ? canonicalCodeVersion(codeVersion) : null,
     facts,
@@ -16969,6 +17007,22 @@ function validateMutation(mutation, userID) {
   ) {
     return validationError("Folder type must be project or reference.");
   }
+  if (kind === "project" && record.structuredFacts !== undefined) {
+    if (!Array.isArray(record.structuredFacts) || record.structuredFacts.length > 50) {
+      return validationError("Project structured facts must be an array of no more than 50 records.");
+    }
+    const invalidStructuredFact = record.structuredFacts.some((fact) =>
+      !fact ||
+      typeof fact !== "object" ||
+      typeof fact.key !== "string" || fact.key.length > 120 ||
+      typeof fact.label !== "string" || fact.label.length > 160 ||
+      typeof fact.value !== "string" || fact.value.length > 1_000 ||
+      !researchProjectFactStatuses.has(String(fact.status || "stated").toLowerCase())
+    );
+    if (invalidStructuredFact) {
+      return validationError("Project structured facts contain an invalid record.");
+    }
+  }
   if (kind === "workboard") {
     return validateWorkboardRecord(record);
   }
@@ -17018,9 +17072,14 @@ function mergeMutations(existing, incoming) {
     if (kind === "project" && existingMutation) {
       const existingProject = mutationKindAndRecord(existingMutation).record;
       const incomingProject = mutationKindAndRecord(mutation).record;
+      let mergedIncomingProject = incomingProject;
       if (existingProject?.folderType === "reference" && incomingProject?.folderType === undefined) {
-        acceptedMutation = { project: { ...incomingProject, folderType: "reference" } };
+        mergedIncomingProject = { ...mergedIncomingProject, folderType: "reference" };
       }
+      if (existingProject?.structuredFacts?.length && incomingProject?.structuredFacts === undefined) {
+        mergedIncomingProject = { ...mergedIncomingProject, structuredFacts: existingProject.structuredFacts };
+      }
+      acceptedMutation = { project: mergedIncomingProject };
     }
     byID.set(
       id,

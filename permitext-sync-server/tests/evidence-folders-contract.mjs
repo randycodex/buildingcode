@@ -74,6 +74,40 @@ assert.deepEqual(
   "Tags must normalize Unicode whitespace and merge case-insensitive duplicates."
 );
 
+const normalizeProjectStructuredFact = new Function(
+  "projectStructuredFactStatuses",
+  `${functionSource(appSource, "normalizeProjectStructuredFact")}; return normalizeProjectStructuredFact;`
+)(new Set(["stated", "confirmed", "unknown", "rejected"]));
+const projectStoryValue = new Function(
+  `${functionSource(appSource, "projectStoryValue")}; return projectStoryValue;`
+)();
+const extractedProjectStructuredFacts = new Function(
+  "normalizeProjectStructuredFact",
+  "projectStoryValue",
+  `${functionSource(appSource, "extractedProjectStructuredFacts")}; return extractedProjectStructuredFacts;`
+)(normalizeProjectStructuredFact, projectStoryValue);
+const extractedFacts = extractedProjectStructuredFacts(
+  "An existing six-story Group R-2, 68-foot-tall Type IIIA building is fully sprinklered. " +
+  "The work is an interior alteration on the third floor. Exit access travel distance is 95 feet, " +
+  "exit separation is 112 feet, and the dead-end corridor is 27 feet."
+);
+assert.deepEqual(
+  extractedFacts.map((fact) => [fact.key, fact.value, fact.status]),
+  [
+    ["occupancy", "Group R-2", "stated"],
+    ["construction-type", "Type IIIA", "stated"],
+    ["stories", "6", "stated"],
+    ["building-height", "68 feet", "stated"],
+    ["sprinkler-status", "Fully sprinklered", "stated"],
+    ["work-type", "Interior Alteration", "stated"],
+    ["floor-affected", "Third Floor", "stated"],
+    ["travel-distance", "95 feet", "stated"],
+    ["exit-separation", "112 feet", "stated"],
+    ["dead-end-length", "27 feet", "stated"]
+  ],
+  "The Project narrative did not produce the expected reviewable structured facts."
+);
+
 assert.match(appSource, /function persistSectionFolderSelection\([\s\S]*?if \(!selectedByID\.size\) return/);
 assert.match(appSource, /destinationList\.setAttribute\("aria-multiselectable", "true"\)/);
 assert.match(appSource, /confirmButton\.disabled = selected\.length === 0/);
@@ -362,8 +396,14 @@ assert.match(appSource, /options\.onCodeGroupToggle\(normalizedPrefix, collapsed
 assert.match(appSource, /wireProjectSectionMotion\([\s\S]*?codeGroup,[\s\S]*?codeBody,[\s\S]*?onChange: \(expanded\)/);
 assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle-chevron/);
 assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body[\s\S]*?max-height 420ms cubic-bezier/);
-assert.match(appSource, /function appendSavedProjectFactEditor\(container, folder, identity\)[\s\S]*?toggle\.textContent = "Project facts"[\s\S]*?address\.setAttribute\("aria-label", "Project address"\)[\s\S]*?description\.setAttribute\("aria-label", "Project description and facts"\)[\s\S]*?wireProjectSectionMotion\(container, body, \[toggle, chevron\], "Project facts", false\)/);
-assert.match(appSource, /address\.addEventListener\("blur", save\)[\s\S]*?description\.addEventListener\("blur", save\)[\s\S]*?updateProjectFolder\(folder,/);
+const projectFactEditorSource = functionSource(appSource, "appendSavedProjectFactEditor");
+assert.match(projectFactEditorSource, /toggle\.textContent = "Project facts"/);
+assert.match(projectFactEditorSource, /address\.setAttribute\("aria-label", "Project address"\)/);
+assert.match(projectFactEditorSource, /description\.setAttribute\("aria-label", "Project description and facts"\)/);
+assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "projectFacts", false\)/);
+assert.match(projectFactEditorSource, /address\.addEventListener\("blur", save\)/);
+assert.match(projectFactEditorSource, /description\.addEventListener\("blur", \(\) => \{/);
+assert.match(projectFactEditorSource, /updateProjectFolder\(folder,/);
 assert.match(stylesSource, /\.saved-project-fact-input \{[\s\S]*?background: transparent;[\s\S]*?font: inherit;/);
 assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: inset 0 -1px 0 var\(--project-color, var\(--accent\)\);/);
 assert.match(stylesSource, /\.saved-panel \.saved-content\[hidden\] \{[\s\S]*?display: none;/, "Deactivating a Project must hide its Saved Evidence list.");
@@ -374,7 +414,10 @@ assert.doesNotMatch(appSource, /saved-project-facts-status/);
 assert.doesNotMatch(appSource.match(/function appendSavedProjectFactEditor[\s\S]*?async function appendSavedProjectResearchConversations/)?.[0] || "", /status\.textContent = "Saving…"|status\.textContent = "Saved"/);
 assert.match(appSource, /showWebNotice\("Project facts not saved", error\.message \|\| "Could not save Project facts"\)/);
 assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?font-weight: 400;/);
-assert.match(appSource, /function appendSavedProjectResearchConversations[\s\S]*?title\.className = "section-label saved-project-research-toggle"[\s\S]*?body\.className = "project-studio-collapsible-body saved-project-research-body"[\s\S]*?wireProjectSectionMotion\(section, body, \[title, toggle\], "Research", false\)/);
+const projectResearchSource = functionSource(appSource, "appendSavedProjectResearchConversations");
+assert.match(projectResearchSource, /title\.className = "section-label saved-project-research-toggle"/);
+assert.match(projectResearchSource, /body\.className = "project-studio-collapsible-body saved-project-research-body"/);
+assert.match(projectResearchSource, /projectSectionExpanded\(identity, "research", false\)/);
 assert.match(stylesSource, /\.project-studio-section-heading > \.saved-project-research-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);

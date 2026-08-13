@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260813-research-reader-spacing-v120";
+} from "./offline-storage.js?v=20260813-structured-project-facts-v125";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -8941,6 +8941,99 @@ function numericLocalFolderID(project) {
   return Number.isInteger(value) && value > 0 ? value : 0;
 }
 
+const projectStructuredFactStatuses = new Set(["stated", "confirmed", "unknown", "rejected"]);
+
+function normalizeProjectStructuredFact(fact) {
+  if (!fact || typeof fact !== "object") return null;
+  const key = String(fact.key || fact.id || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  const label = String(fact.label || "").trim();
+  const value = String(fact.value || "").trim();
+  if (!key || !label || !value) return null;
+  const status = projectStructuredFactStatuses.has(String(fact.status || "").toLowerCase())
+    ? String(fact.status).toLowerCase()
+    : "stated";
+  return {
+    id: String(fact.id || `project-fact:${key}`),
+    key,
+    label,
+    value,
+    status,
+    source: String(fact.source || "description"),
+    sourceText: String(fact.sourceText || "").trim().slice(0, 500),
+    updatedAt: fact.updatedAt || null
+  };
+}
+
+function projectStructuredFacts(project) {
+  return (Array.isArray(project?.structuredFacts) ? project.structuredFacts : [])
+    .map(normalizeProjectStructuredFact)
+    .filter(Boolean);
+}
+
+function projectStoryValue(value) {
+  const wordNumbers = {
+    one: 1, two: 2, three: 3, four: 4, five: 5, six: 6,
+    seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12
+  };
+  const normalized = String(value || "").toLowerCase();
+  return String(wordNumbers[normalized] || Number(normalized) || value);
+}
+
+function extractedProjectStructuredFacts(description) {
+  const text = String(description || "").replace(/\s+/g, " ").trim();
+  if (!text) return [];
+  const proposals = [];
+  const add = (key, label, value, match) => {
+    if (!value || proposals.some((fact) => fact.key === key)) return;
+    proposals.push(normalizeProjectStructuredFact({
+      id: `project-fact:${key}`,
+      key,
+      label,
+      value,
+      status: "stated",
+      source: "description",
+      sourceText: match?.[0] || ""
+    }));
+  };
+
+  let match = text.match(/\b(?:occupancy(?:\s+group)?(?:\s+is)?|group)\s+([A-Z](?:-\d+)?)\b/i);
+  if (match) add("occupancy", "Occupancy", `Group ${match[1].toUpperCase()}`, match);
+  match = text.match(/\btype\s+([IVX]+[AB]?)\s+(?:construction|building)\b/i);
+  if (match) add("construction-type", "Construction type", `Type ${match[1].toUpperCase()}`, match);
+  match = text.match(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\d+)[-\s]+stor(?:y|ies)\b/i);
+  if (match) add("stories", "Stories", projectStoryValue(match[1]), match);
+  match = text.match(/\b(\d+(?:\.\d+)?)\s*-?\s*(?:feet|foot|ft\.?)\s*-?\s*(?:tall|high)\b/i);
+  if (match) add("building-height", "Building height", `${match[1]} feet`, match);
+  match = text.match(/\b(NFPA\s*13(?:\s+throughout)?|fully sprinklered|sprinklered throughout|automatic sprinkler system throughout)\b/i);
+  if (match) add("sprinkler-status", "Sprinkler status", /nfpa/i.test(match[1]) ? match[1].replace(/nfpa\s*/i, "NFPA ") : "Fully sprinklered", match);
+  match = text.match(/\b(interior alteration|alteration)\b/i);
+  if (match) add("work-type", "Work type", match[1].replace(/\b\w/g, (character) => character.toUpperCase()), match);
+  match = text.match(/\b(?:on|at)\s+the\s+((?:first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|\d+(?:st|nd|rd|th))\s+floor)\b/i);
+  if (match) add("floor-affected", "Floor affected", match[1].replace(/\b\w/g, (character) => character.toUpperCase()), match);
+  match = text.match(/\b(?:exit[- ]access\s+)?travel distance(?:\s+is|\s+of)?\s+(?:approximately\s+)?(\d+(?:\.\d+)?)\s*(?:feet|foot|ft\.?)\b/i)
+    || text.match(/\bfarthest location\b.{0,160}?\b(?:approximately\s+)?(\d+(?:\.\d+)?)\s*(?:feet|foot|ft\.?)\b/i);
+  if (match) add("travel-distance", "Travel distance", `${match[1]} feet`, match);
+  match = text.match(/\b(?:exit|stair)(?:\s+door)?\s+separation(?:\s+is|\s+of)?\s+(?:approximately\s+)?(\d+(?:\.\d+)?)\s*(?:feet|foot|ft\.?)\b/i)
+    || text.match(/\b(\d+(?:\.\d+)?)\s*(?:feet|foot|ft\.?)\s+between\s+(?:the\s+)?(?:exit|stair)\s+doors\b/i);
+  if (match) add("exit-separation", "Exit separation", `${match[1]} feet`, match);
+  match = text.match(/\bdead[- ]end(?:\s+(?:corridor|condition|length))?(?:\s+is|\s+of|\s+measures)?\s+(?:approximately\s+)?(\d+(?:\.\d+)?)\s*(?:feet|foot|ft\.?)\b/i)
+    || text.match(/\bdead[- ]end\b.{0,100}?\b(?:approximately\s+)?(\d+(?:\.\d+)?)\s*(?:feet|foot|ft\.?)\b/i);
+  if (match) add("dead-end-length", "Dead-end length", `${match[1]} feet`, match);
+  return proposals.filter(Boolean);
+}
+
+function mergeProjectStructuredFacts(description, existingFacts = []) {
+  const existingByKey = new Map(projectStructuredFacts({ structuredFacts: existingFacts }).map((fact) => [fact.key, fact]));
+  const extracted = extractedProjectStructuredFacts(description).map((proposal) => {
+    const existing = existingByKey.get(proposal.key);
+    if (!existing || existing.value !== proposal.value) return proposal;
+    existingByKey.delete(proposal.key);
+    return { ...proposal, ...existing, sourceText: proposal.sourceText };
+  });
+  const retained = Array.from(existingByKey.values()).filter((fact) => fact.source !== "description" || fact.status === "confirmed");
+  return [...extracted, ...retained];
+}
+
 function projectMutationForRecord(project, accountOverride = null) {
   const account = accountOverride || activeAccount();
   const now = project.updatedAt || new Date().toISOString();
@@ -8956,6 +9049,7 @@ function projectMutationForRecord(project, accountOverride = null) {
       title: project.title || project.name || "Project",
       address: project.address || "",
       description: project.description || "",
+      structuredFacts: projectStructuredFacts(project),
       folderType: folderType(project),
       color,
       colorHex: color,
@@ -9189,7 +9283,10 @@ async function updateProjectFolder(project, details = {}) {
   const now = new Date().toISOString();
   const name = String(details.name || "").trim() || project.name || project.title || "Project";
   const color = details.color || projectColor(project);
-  const address = String(details.address || "").trim();
+  const hasAddress = Object.prototype.hasOwnProperty.call(details, "address");
+  const hasDescription = Object.prototype.hasOwnProperty.call(details, "description");
+  const hasStructuredFacts = Object.prototype.hasOwnProperty.call(details, "structuredFacts");
+  const address = String(hasAddress ? details.address : project.address || "").trim();
   const updated = {
     ...project,
     id: project.id || id,
@@ -9199,7 +9296,10 @@ async function updateProjectFolder(project, details = {}) {
     name,
     title: name,
     address,
-    description: String(details.description || "").trim(),
+    description: String(hasDescription ? details.description : project.description || "").trim(),
+    structuredFacts: hasStructuredFacts
+      ? projectStructuredFacts({ structuredFacts: details.structuredFacts })
+      : projectStructuredFacts(project),
     folderType: nextFolderType,
     color,
     colorHex: color,
@@ -13538,6 +13638,34 @@ function researchDisplayList(values) {
   return (values || []).map(researchDisplayText).filter(Boolean);
 }
 
+function appendResearchProjectContextDisclosure(container, result) {
+  const analysis = result?.structuredEvidenceAnalysis || {};
+  const used = researchDisplayList(analysis.projectFactsUsed || result?.projectFactsUsed || []);
+  const needed = researchDisplayList(analysis.unresolvedProjectFacts || []);
+  if (!used.length && !needed.length) return;
+
+  const details = document.createElement("details");
+  details.className = "research-project-context-used";
+  const summary = document.createElement("summary");
+  summary.textContent = "Project context used";
+  const body = document.createElement("section");
+  body.className = "research-project-context-used-body";
+  const appendGroup = (label, values) => {
+    if (!values.length) return;
+    const group = document.createElement("p");
+    const heading = document.createElement("strong");
+    heading.textContent = `${label}: `;
+    const content = document.createElement("span");
+    content.textContent = values.join(" · ");
+    group.append(heading, content);
+    body.append(group);
+  };
+  appendGroup("Used in this answer", used);
+  appendGroup("Still needed", needed);
+  details.append(summary, body);
+  container.append(details);
+}
+
 function appendResearchSupportedPoints(container, points) {
   if (!points?.length) return;
   const heading = document.createElement("h4");
@@ -13786,6 +13914,8 @@ function renderResearchInterpretation(container, result, options = {}) {
     if (codeBasis?.limitation) codeDisclosure.title = codeBasis.limitation;
     card.append(codeDisclosure);
   }
+
+  appendResearchProjectContextDisclosure(card, result);
 
   const evidenceReviewed = document.createElement("details");
   evidenceReviewed.className = "research-evidence-reviewed";
@@ -17983,6 +18113,7 @@ function projectIdentity(project) {
     title: project.title || project.name || "Project",
     address: project.address || "",
     description: project.description || "",
+    structuredFacts: projectStructuredFacts(project),
     folderType: folderType(project),
     color: projectColor(project),
     ...(project.sharedOrganizationID ? {
@@ -23513,23 +23644,31 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     resizeDescriptionTo(description.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
   });
 
-  const initial = {
+  const storedStructuredFacts = projectStructuredFacts(folder);
+  let structuredFacts = mergeProjectStructuredFacts(description.value, storedStructuredFacts);
+  let saved = {
     address: address.value,
-    description: description.value
+    description: description.value,
+    structuredFacts: storedStructuredFacts
   };
-  let saved = { ...initial };
   let saveSequence = Promise.resolve();
   const save = () => {
     const next = {
       address: address.value.trim(),
-      description: description.value.trim()
+      description: description.value.trim(),
+      structuredFacts: projectStructuredFacts({ structuredFacts })
     };
-    if (next.address === saved.address && next.description === saved.description) return saveSequence;
+    if (
+      next.address === saved.address &&
+      next.description === saved.description &&
+      JSON.stringify(next.structuredFacts) === JSON.stringify(saved.structuredFacts)
+    ) return saveSequence;
     saveSequence = saveSequence.then(async () => {
       await updateProjectFolder(folder, {
         name: folder.name || folder.title || identity.name,
         address: next.address,
         description: next.description,
+        structuredFacts: next.structuredFacts,
         color: projectColor(folder),
         folderType: folderType(folder)
       });
@@ -23539,13 +23678,105 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     });
     return saveSequence;
   };
+
+  const structuredSection = document.createElement("section");
+  structuredSection.className = "saved-project-structured-facts";
+  const structuredHeading = document.createElement("strong");
+  structuredHeading.className = "saved-project-structured-facts-title";
+  structuredHeading.textContent = "Structured facts";
+  const structuredHelp = document.createElement("p");
+  structuredHelp.className = "saved-project-structured-facts-help";
+  structuredHelp.textContent = "Proposed from the narrative. Confirmed means user-confirmed, not independently verified.";
+  const structuredList = document.createElement("div");
+  structuredList.className = "saved-project-structured-facts-list";
+  structuredSection.append(structuredHeading, structuredHelp, structuredList);
+
+  const renderStructuredFacts = () => {
+    clear(structuredList);
+    if (!structuredFacts.length) {
+      const empty = document.createElement("p");
+      empty.className = "saved-project-structured-facts-empty";
+      empty.textContent = "Add details above to propose reviewable Project facts.";
+      structuredList.append(empty);
+      return;
+    }
+    structuredFacts.forEach((fact, index) => {
+      const row = document.createElement("article");
+      row.className = `saved-project-structured-fact is-${fact.status}`;
+      const label = document.createElement("span");
+      label.className = "saved-project-structured-fact-label";
+      label.textContent = fact.label;
+      const value = document.createElement("input");
+      value.type = "text";
+      value.className = "saved-project-structured-fact-value";
+      value.value = fact.value;
+      value.setAttribute("aria-label", `${fact.label} value`);
+      const status = document.createElement("select");
+      status.className = "saved-project-structured-fact-status";
+      status.setAttribute("aria-label", `${fact.label} status`);
+      [
+        ["stated", "Stated"],
+        ["confirmed", "Confirmed"],
+        ["unknown", "Unknown"],
+        ["rejected", "Rejected"]
+      ].forEach(([optionValue, optionLabel]) => {
+        const option = document.createElement("option");
+        option.value = optionValue;
+        option.textContent = optionLabel;
+        status.append(option);
+      });
+      status.value = fact.status;
+      value.addEventListener("change", () => {
+        const nextValue = value.value.trim();
+        if (!nextValue) {
+          value.value = fact.value;
+          return;
+        }
+        structuredFacts[index] = {
+          ...fact,
+          value: nextValue,
+          status: "confirmed",
+          source: "user",
+          updatedAt: new Date().toISOString()
+        };
+        renderStructuredFacts();
+        void save();
+      });
+      status.addEventListener("change", () => {
+        structuredFacts[index] = {
+          ...fact,
+          status: status.value,
+          updatedAt: new Date().toISOString()
+        };
+        renderStructuredFacts();
+        void save();
+      });
+      if (identity.sharedOnly) {
+        value.disabled = true;
+        status.disabled = true;
+      }
+      row.append(label, value, status);
+      structuredList.append(row);
+    });
+  };
+  renderStructuredFacts();
+  if (
+    !identity.sharedOnly &&
+    JSON.stringify(structuredFacts) !== JSON.stringify(storedStructuredFacts)
+  ) {
+    queueMicrotask(() => void save());
+  }
   const restore = (control, value) => {
     control.value = value;
     control.blur();
   };
 
   address.addEventListener("blur", save);
-  description.addEventListener("blur", save);
+  description.addEventListener("blur", () => {
+    structuredFacts = mergeProjectStructuredFacts(description.value, structuredFacts);
+    renderStructuredFacts();
+    void save();
+  });
   address.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -23570,7 +23801,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     description.disabled = true;
     address.title = description.title = "Project facts are read-only in this shared Project";
   }
-  body.append(address, description, descriptionResizeHandle);
+  body.append(address, description, descriptionResizeHandle, structuredSection);
   container.append(heading, body);
   wireProjectSectionMotion(
     container,

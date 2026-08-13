@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
   projectResearchConversationForList,
+  researchProjectInformation,
   validateResearchEvidenceAnalysis
 } from "../app.mjs";
 
@@ -75,6 +76,35 @@ assert.match(clientSource, /sources\.length === 1 \? "passage" : "passages"/, "R
 assert.match(clientSource, /openButton\.textContent = "Open source";/, "Reader-origin passages cannot navigate back to their source.");
 assert.match(stylesSource, /\.research-reader-origin \{[\s\S]*?border: 1px solid var\(--border\);/, "Reader-origin evidence has no visible conversation card.");
 assert.match(appSource, /researchOriginForSelections\(selections, context\.body\.originSurface\)/, "The server does not persist the supplied Research origin surface.");
+
+const structuredProjectInformation = researchProjectInformation("project-structured", {
+  address: "214 West 118th Street",
+  description: "An existing six-story Group R-2 building of Type IIIA construction.",
+  structuredFacts: [
+    { id: "project-fact:occupancy", key: "occupancy", label: "Occupancy", value: "Group R-2", status: "confirmed", source: "user" },
+    { id: "project-fact:stories", key: "stories", label: "Stories", value: "6", status: "stated", source: "description" },
+    { id: "project-fact:sprinkler", key: "sprinkler", label: "Sprinkler status", value: "Unknown", status: "unknown", source: "user" },
+    { id: "project-fact:type", key: "type", label: "Construction type", value: "Type IIB", status: "rejected", source: "user" }
+  ]
+});
+assert.deepEqual(structuredProjectInformation.facts, [
+  "Project address: 214 West 118th Street",
+  "Occupancy: Group R-2 (user-confirmed; not independently verified)",
+  "Stories: 6 (user-stated; not independently verified)"
+]);
+assert.equal(structuredProjectInformation.structuredFacts.length, 4);
+assert.equal(structuredProjectInformation.structuredFacts[0].usedInResearch, true);
+assert.equal(structuredProjectInformation.structuredFacts[2].usedInResearch, false);
+assert.equal(
+  structuredProjectInformation.facts.some((fact) => fact.startsWith("Project description:")),
+  false,
+  "The Research prompt duplicates the narrative after usable discrete Project facts exist."
+);
+assert.match(clientSource, /structuredFacts: projectStructuredFacts\(project\)/, "Project mutations do not preserve structured facts.");
+assert.match(clientSource, /Confirmed means user-confirmed, not independently verified\./, "The Project Facts UI overstates user confirmation as verification.");
+assert.match(clientSource, /appendResearchProjectContextDisclosure\(card, result\)/, "Research answers do not disclose the Project context used.");
+assert.match(stylesSource, /\.saved-project-structured-fact \{[\s\S]*?background:/, "Structured Project facts have no distinct review surface.");
+assert.match(appSource, /incomingProject\?\.structuredFacts === undefined[\s\S]*?structuredFacts: existingProject\.structuredFacts/, "Older clients can erase structured Project facts during sync.");
 
 const legacyProjected = projectResearchConversationForList({
   ...conversation,
