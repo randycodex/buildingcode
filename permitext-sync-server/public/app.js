@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-history-project-v92";
+} from "./research-progress.js?v=20260812-research-history-scroll-v93";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-history-project-v92";
+} from "./offline-storage.js?v=20260812-research-history-scroll-v93";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14164,6 +14164,9 @@ async function closeResearchConversation() {
 async function openResearchConversation(conversationID, options = {}) {
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
+  const researchPaneScrollTop = track.querySelector(
+    '.workspace-panel[data-pane-id="utility:analysis"]'
+  )?.scrollTop ?? 0;
   const openingAccount = activeAccount();
   const openingContext = {
     generation: ++researchOpenGeneration,
@@ -14243,6 +14246,10 @@ async function openResearchConversation(conversationID, options = {}) {
   await transitionWorkspace("utility", {
     refreshPaneIDs: ["utility:analysis", conversationPaneID, ...projectPaneIDs]
   });
+  const refreshedResearchPane = track.querySelector(
+    '.workspace-panel[data-pane-id="utility:analysis"]'
+  );
+  if (refreshedResearchPane) refreshedResearchPane.scrollTop = researchPaneScrollTop;
   if (!researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return null;
   scrollPaneIntoView(conversationPaneID);
   requestAnimationFrame(() => {
