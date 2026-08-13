@@ -1330,6 +1330,9 @@ async function main() {
         workspaceScript.text.includes("async function openRecentlyViewedInSDC(searchInstance, entry)") &&
         workspaceScript.text.includes("closeLinkedReaderForSearch(searchInstance.id)") &&
         workspaceScript.text.includes("await openSectionDetail(searchInstance.id, searchResultDetail(entry))") &&
+        workspaceScript.text.includes('console.warn("Could not open recently viewed section.", error)') &&
+        workspaceScript.text.includes('presentWorkspaceIssue(error?.message || "This section could not be loaded. Try opening it again.")') &&
+        workspaceScript.text.includes("for (let attempt = 0; attempt < 3 && !section; attempt += 1)") &&
         workspaceScript.text.includes("void openRecentlyViewedInSDC(instance, entry)") &&
         workspaceScript.text.includes("await renderSearchHistory(panel, searchInstance, { hydrate: false });") &&
         workspaceScript.text.includes("function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0)") &&
@@ -1428,7 +1431,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260812-project-multi-conversation-v97'),
+        webRoot.text.includes('/web/app.js?v=20260813-section-open-retry-v101'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

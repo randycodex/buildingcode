@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260812-project-multi-conversation-v97"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260813-section-open-retry-v101"));
 assert(shellPrecacheURLs.includes("/web/styles.css?v=20260812-project-multi-conversation-v97"));
 assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260812-project-multi-conversation-v97"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));

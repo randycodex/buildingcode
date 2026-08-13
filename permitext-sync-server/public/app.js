@@ -12406,7 +12406,12 @@ function updateVisibleSearchHistoryEntry(panel, entry) {
 async function openRecentlyViewedInSDC(searchInstance, entry) {
   if (!searchInstance?.id || !entry) return;
   closeLinkedReaderForSearch(searchInstance.id);
-  await openSectionDetail(searchInstance.id, searchResultDetail(entry));
+  try {
+    await openSectionDetail(searchInstance.id, searchResultDetail(entry));
+  } catch (error) {
+    console.warn("Could not open recently viewed section.", error);
+    presentWorkspaceIssue(error?.message || "This section could not be loaded. Try opening it again.");
+  }
 }
 
 function setSearchRecentPopoverOpen(panel, requestedOpen) {
@@ -12990,25 +12995,28 @@ async function resolveSectionDetail(detail) {
   let chapter = null;
   let section = null;
   if (detail.sectionID) {
-    try {
-      const payload = await api(`/code/sections/${encodeURIComponent(detail.sectionID)}`);
-      const resolvedSection = payload.section;
-      if (resolvedSection) {
-        detail.chapterID = resolvedSection.chapterID || detail.chapterID || "";
-        detail.codePrefix = resolvedSection.codePrefix || detail.codePrefix || "BC";
-        detail.chapterNumber = resolvedSection.chapterNumber || detail.chapterNumber || "";
-        detail.sectionNumber = resolvedSection.sectionNumber || detail.sectionNumber || "";
-        detail.title = resolvedSection.title || detail.title || "Section";
-        if (detail.chapterID) {
-          chapter = await fetchChapter(detail.chapterID);
+    for (let attempt = 0; attempt < 3 && !section; attempt += 1) {
+      try {
+        const payload = await api(`/code/sections/${encodeURIComponent(detail.sectionID)}`);
+        const resolvedSection = payload.section;
+        if (resolvedSection) {
+          detail.chapterID = resolvedSection.chapterID || detail.chapterID || "";
+          detail.codePrefix = resolvedSection.codePrefix || detail.codePrefix || "BC";
+          detail.chapterNumber = resolvedSection.chapterNumber || detail.chapterNumber || "";
+          detail.sectionNumber = resolvedSection.sectionNumber || detail.sectionNumber || "";
+          detail.title = resolvedSection.title || detail.title || "Section";
+          if (detail.chapterID) {
+            chapter = await fetchChapter(detail.chapterID);
+          }
+          section = {
+            ...resolvedSection,
+            id: resolvedSection.id || resolvedSection.sectionID || Number(detail.sectionID)
+          };
         }
-        section = {
-          ...resolvedSection,
-          id: resolvedSection.id || resolvedSection.sectionID || Number(detail.sectionID)
-        };
+      } catch (error) {
+        if (attempt >= 2) break;
+        await new Promise((resolve) => window.setTimeout(resolve, 180 * (attempt + 1)));
       }
-    } catch {
-      // Fall through to text search for legacy records that are not addressable by ID.
     }
   }
   if (!section && detail.chapterID) {
@@ -13020,18 +13028,22 @@ async function resolveSectionDetail(detail) {
     }
   }
   if (!section) {
-    const search = await api(`/code/search?q=${encodeURIComponent(detail.sectionNumber || detail.sectionID)}`);
-    const result = (search.results || []).find((item) => String(item.id) === String(detail.sectionID)) || search.results?.[0];
-    if (result?.chapterID) {
-      detail.chapterID = result.chapterID;
-      detail.codePrefix = result.codePrefix || detail.codePrefix || "BC";
-      detail.chapterNumber = result.chapterNumber || detail.chapterNumber || "";
-      detail.sectionNumber = result.sectionNumber || detail.sectionNumber || "";
-      detail.title = result.title || detail.title || "Section";
-      detail.headerLine = result.headerLine || detail.headerLine || "";
-      detail.headingLine = result.headingLine || detail.headingLine || "";
-      chapter = await fetchChapter(result.chapterID, { includeBody: true });
-      section = sectionTitleFromID(detail.sectionID, chapter);
+    try {
+      const search = await api(`/code/search?q=${encodeURIComponent(detail.sectionNumber || detail.sectionID)}`);
+      const result = (search.results || []).find((item) => String(item.id) === String(detail.sectionID)) || search.results?.[0];
+      if (result?.chapterID) {
+        detail.chapterID = result.chapterID;
+        detail.codePrefix = result.codePrefix || detail.codePrefix || "BC";
+        detail.chapterNumber = result.chapterNumber || detail.chapterNumber || "";
+        detail.sectionNumber = result.sectionNumber || detail.sectionNumber || "";
+        detail.title = result.title || detail.title || "Section";
+        detail.headerLine = result.headerLine || detail.headerLine || "";
+        detail.headingLine = result.headingLine || detail.headingLine || "";
+        chapter = await fetchChapter(result.chapterID, { includeBody: true });
+        section = sectionTitleFromID(detail.sectionID, chapter);
+      }
+    } catch (error) {
+      throw new Error("This section could not be loaded. Try opening it again.", { cause: error });
     }
   }
   return { chapter, section };
