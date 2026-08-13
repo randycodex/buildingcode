@@ -1275,7 +1275,7 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
   const currentProjectFacts = currentConversation.conversation.projectInformation?.facts || [];
   assert(
     currentProjectFacts.includes(`Project address: ${currentAddress}`) &&
-      currentProjectFacts.includes(`Project description: ${currentDescription}`) &&
+      currentProjectFacts.includes(`Additional Project facts: ${currentDescription}`) &&
       !currentProjectFacts.some((fact) => fact.includes("100 Initial Avenue")),
     "Research did not refresh current Project address and description from the Project record."
   );
@@ -1296,9 +1296,9 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
   const snapshot = historicalAnswer.answer.projectContextSnapshot;
   assert(
     snapshot?.projectInformation?.facts?.includes(`Project address: ${currentAddress}`) &&
-      snapshot?.projectInformation?.facts?.includes(`Project description: ${currentDescription}`) &&
+      snapshot?.projectInformation?.facts?.includes(`Additional Project facts: ${currentDescription}`) &&
       snapshot?.combinedFacts?.includes(`Project address: ${currentAddress}`) &&
-      snapshot?.combinedFacts?.includes(`Project description: ${currentDescription}`),
+      snapshot?.combinedFacts?.includes(`Additional Project facts: ${currentDescription}`),
     "Research did not use and preserve the current Project information as non-authoritative model context."
   );
 }

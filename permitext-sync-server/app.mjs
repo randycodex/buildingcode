@@ -8069,11 +8069,10 @@ export function researchProjectInformation(projectID, project) {
   const facts = [];
   if (address) facts.push(`Project address: ${normalizedResearchText(address, 1_000)}`);
   usableStructuredFacts.forEach((fact) => {
-    const provenance = fact.status === "confirmed" ? "user-confirmed" : "user-stated";
-    facts.push(`${fact.label}: ${fact.value} (${provenance}; not independently verified)`);
+    facts.push(`${fact.label}: ${fact.value} (user-provided; not independently verified)`);
   });
-  if (description && !usableStructuredFacts.length) {
-    facts.push(`Project description: ${normalizedResearchText(description, 4_000)}`);
+  if (description) {
+    facts.push(`Additional Project facts: ${normalizedResearchText(description, 4_000)}`);
   }
   return {
     projectID,

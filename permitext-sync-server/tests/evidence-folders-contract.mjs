@@ -78,34 +78,19 @@ const normalizeProjectStructuredFact = new Function(
   "projectStructuredFactStatuses",
   `${functionSource(appSource, "normalizeProjectStructuredFact")}; return normalizeProjectStructuredFact;`
 )(new Set(["stated", "confirmed", "unknown", "rejected"]));
-const projectStoryValue = new Function(
-  `${functionSource(appSource, "projectStoryValue")}; return projectStoryValue;`
-)();
-const extractedProjectStructuredFacts = new Function(
-  "normalizeProjectStructuredFact",
-  "projectStoryValue",
-  `${functionSource(appSource, "extractedProjectStructuredFacts")}; return extractedProjectStructuredFacts;`
-)(normalizeProjectStructuredFact, projectStoryValue);
-const extractedFacts = extractedProjectStructuredFacts(
-  "An existing six-story Group R-2, 68-foot-tall Type IIIA building is fully sprinklered. " +
-  "The work is an interior alteration on the third floor. Exit access travel distance is 95 feet, " +
-  "exit separation is 112 feet, and the dead-end corridor is 27 feet."
-);
 assert.deepEqual(
-  extractedFacts.map((fact) => [fact.key, fact.value, fact.status]),
-  [
-    ["occupancy", "Group R-2", "stated"],
-    ["construction-type", "Type IIIA", "stated"],
-    ["stories", "6", "stated"],
-    ["building-height", "68 feet", "stated"],
-    ["sprinkler-status", "Fully sprinklered", "stated"],
-    ["work-type", "Interior Alteration", "stated"],
-    ["floor-affected", "Third Floor", "stated"],
-    ["travel-distance", "95 feet", "stated"],
-    ["exit-separation", "112 feet", "stated"],
-    ["dead-end-length", "27 feet", "stated"]
-  ],
-  "The Project narrative did not produce the expected reviewable structured facts."
+  normalizeProjectStructuredFact({ key: "occupancy", label: "Occupancy", value: "Group R-2", source: "user" }),
+  {
+    id: "project-fact:occupancy",
+    key: "occupancy",
+    label: "Occupancy",
+    value: "Group R-2",
+    status: "stated",
+    source: "user",
+    sourceText: "",
+    updatedAt: null
+  },
+  "Manually entered structured facts must normalize into the Project record."
 );
 
 assert.match(appSource, /function persistSectionFolderSelection\([\s\S]*?if \(!selectedByID\.size\) return/);
@@ -401,8 +386,14 @@ assert.match(projectFactEditorSource, /toggle\.textContent = "Project facts"/);
 assert.match(projectFactEditorSource, /address\.setAttribute\("aria-label", "Project address"\)/);
 assert.match(projectFactEditorSource, /description\.setAttribute\("aria-label", "Project description and facts"\)/);
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "projectFacts", false\)/);
+assert.match(projectFactEditorSource, /structuredToggle\.textContent = "Structured facts"/);
+assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "structuredFacts", false\)/);
+assert.match(projectFactEditorSource, /projectStructuredFactFields\.forEach/);
+assert.match(projectFactEditorSource, /addFact\.textContent = "Add another fact"/);
+assert.doesNotMatch(appSource, /function extractedProjectStructuredFacts/);
+assert.doesNotMatch(projectFactEditorSource, /Proposed from the narrative|saved-project-structured-fact-status/);
 assert.match(projectFactEditorSource, /address\.addEventListener\("blur", save\)/);
-assert.match(projectFactEditorSource, /description\.addEventListener\("blur", \(\) => \{/);
+assert.match(projectFactEditorSource, /description\.addEventListener\("blur", save\)/);
 assert.match(projectFactEditorSource, /updateProjectFolder\(folder,/);
 assert.match(stylesSource, /\.saved-project-fact-input \{[\s\S]*?background: transparent;[\s\S]*?font: inherit;/);
 assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: inset 0 -1px 0 var\(--project-color, var\(--accent\)\);/);
