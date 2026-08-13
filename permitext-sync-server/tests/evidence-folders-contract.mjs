@@ -389,6 +389,7 @@ assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "projec
 assert.match(projectFactEditorSource, /structuredToggle\.textContent = "Structured facts"/);
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "structuredFacts", false\)/);
 assert.match(projectFactEditorSource, /projectStructuredFactFields\.forEach/);
+assert.doesNotMatch(appSource.match(/const projectStructuredFactFields = \[[\s\S]*?\];/)?.[0] || "", /floor-affected/);
 assert.match(projectFactEditorSource, /addFact\.textContent = "Add another fact"/);
 assert.doesNotMatch(appSource, /function extractedProjectStructuredFacts/);
 assert.doesNotMatch(projectFactEditorSource, /Proposed from the narrative|saved-project-structured-fact-status/);

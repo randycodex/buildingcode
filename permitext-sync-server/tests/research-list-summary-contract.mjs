@@ -84,7 +84,8 @@ const structuredProjectInformation = researchProjectInformation("project-structu
     { id: "project-fact:occupancy", key: "occupancy", label: "Occupancy", value: "Group R-2", status: "confirmed", source: "user" },
     { id: "project-fact:stories", key: "stories", label: "Stories", value: "6", status: "stated", source: "description" },
     { id: "project-fact:sprinkler", key: "sprinkler", label: "Sprinkler status", value: "Unknown", status: "unknown", source: "user" },
-    { id: "project-fact:type", key: "type", label: "Construction type", value: "Type IIB", status: "rejected", source: "user" }
+    { id: "project-fact:type", key: "type", label: "Construction type", value: "Type IIB", status: "rejected", source: "user" },
+    { id: "project-fact:floor", key: "floor-affected", label: "Floor affected", value: "Third floor", status: "stated", source: "user" }
   ]
 });
 assert.deepEqual(structuredProjectInformation.facts, [
@@ -93,9 +94,10 @@ assert.deepEqual(structuredProjectInformation.facts, [
   "Stories: 6 (user-provided; not independently verified)",
   "Additional Project facts: An existing six-story Group R-2 building of Type IIIA construction."
 ]);
-assert.equal(structuredProjectInformation.structuredFacts.length, 4);
+assert.equal(structuredProjectInformation.structuredFacts.length, 5);
 assert.equal(structuredProjectInformation.structuredFacts[0].usedInResearch, true);
 assert.equal(structuredProjectInformation.structuredFacts[2].usedInResearch, false);
+assert.equal(structuredProjectInformation.facts.some((fact) => fact.startsWith("Floor affected:")), false);
 assert.equal(structuredProjectInformation.facts.at(-1).startsWith("Additional Project facts:"), true);
 assert.match(clientSource, /structuredFacts: projectStructuredFacts\(project\)/, "Project mutations do not preserve structured facts.");
 assert.doesNotMatch(clientSource, /Research may use as user-provided context\. Blank fields are ignored\./, "The removed Structured Facts helper text returned.");

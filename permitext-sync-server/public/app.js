@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260813-manual-structured-facts-v128";
+} from "./offline-storage.js?v=20260813-manual-structured-facts-v129";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -8977,7 +8977,6 @@ const projectStructuredFactFields = [
   ["building-height", "Building height"],
   ["sprinkler-status", "Sprinkler status"],
   ["work-type", "Work type"],
-  ["floor-affected", "Floor affected"],
   ["travel-distance", "Travel distance"],
   ["exit-separation", "Exit separation"],
   ["dead-end-length", "Dead-end length"]
@@ -23597,7 +23596,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
 
   const storedStructuredFacts = projectStructuredFacts(folder);
   let structuredFacts = storedStructuredFacts
-    .filter((fact) => fact.status === "stated" || fact.status === "confirmed")
+    .filter((fact) => fact.key !== "floor-affected" && (fact.status === "stated" || fact.status === "confirmed"))
     .map((fact) => ({ ...fact, status: "stated", source: "user", sourceText: "" }));
   let saved = {
     address: address.value,

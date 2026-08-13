@@ -8065,7 +8065,7 @@ export function researchProjectInformation(projectID, project) {
   const description = String(project.description || "").trim();
   const codeVersion = String(project.codeVersion || "").trim() || null;
   const structuredFacts = normalizedResearchProjectStructuredFacts(project);
-  const usableStructuredFacts = structuredFacts.filter((fact) => fact.usedInResearch);
+  const usableStructuredFacts = structuredFacts.filter((fact) => fact.usedInResearch && fact.key !== "floor-affected");
   const facts = [];
   if (address) facts.push(`Project address: ${normalizedResearchText(address, 1_000)}`);
   usableStructuredFacts.forEach((fact) => {
