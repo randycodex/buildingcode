@@ -6,7 +6,7 @@ import {
 import {
   researchProgressStages,
   researchProgressStage
-} from "./research-progress.js?v=20260812-research-history-scroll-v93";
+} from "./research-progress.js?v=20260812-project-research-direct-v94";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260812-research-history-scroll-v93";
+} from "./offline-storage.js?v=20260812-project-research-direct-v94";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -3223,11 +3223,11 @@ function defaultActivePaneIDs() {
   });
   if (state.utilities.analysis) {
     ids.push("utility:analysis");
-    const conversationPaneID = researchConversationPaneIsOpen()
-      ? paneIDForResearchConversation()
-      : "";
-    if (conversationPaneID) ids.push(conversationPaneID);
   }
+  const conversationPaneID = researchConversationPaneIsOpen()
+    ? paneIDForResearchConversation()
+    : "";
+  if (conversationPaneID) ids.push(conversationPaneID);
   if (state.utilities.settings) ids.push("utility:settings");
   state.readers.forEach((reader) => ids.push(paneIDForReader(reader)));
   openCodeQuestionPaneIDs().forEach((id) => ids.push(id));
@@ -3273,12 +3273,10 @@ function isProjectToolPaneID(paneID) {
 function pinCriticalWorkflowPanesToLeft(paneIDs) {
   const projectsPaneIDs = new Set(savedPaneIDs());
   const researchPaneIDs = new Set(
-    state.utilities.analysis
-      ? [
-          "utility:analysis",
-          researchConversationPaneIsOpen() ? paneIDForResearchConversation() : ""
-        ].filter(Boolean)
-      : []
+    [
+      state.utilities.analysis ? "utility:analysis" : "",
+      researchConversationPaneIsOpen() ? paneIDForResearchConversation() : ""
+    ].filter(Boolean)
   );
   return [
     ...paneIDs.filter((paneID) => projectsPaneIDs.has(paneID)),
@@ -3307,11 +3305,13 @@ function activePaneIDs() {
   const conversationPaneID = researchConversationPaneIsOpen()
     ? paneIDForResearchConversation()
     : "";
-  if (state.utilities.analysis && conversationPaneID) {
+  if (conversationPaneID) {
     const existingConversationIndex = paired.indexOf(conversationPaneID);
     if (existingConversationIndex !== -1) paired.splice(existingConversationIndex, 1);
     const researchIndex = paired.indexOf("utility:analysis");
-    paired.splice(researchIndex === -1 ? paired.length : researchIndex + 1, 0, conversationPaneID);
+    const savedIndex = paired.indexOf(primarySavedPaneID());
+    const anchorIndex = researchIndex === -1 ? savedIndex : researchIndex;
+    paired.splice(anchorIndex === -1 ? paired.length : anchorIndex + 1, 0, conversationPaneID);
   }
   if (openProjectDetails().length) {
     const detailIDs = openProjectDetails().flatMap(projectWorkspacePaneIDs);
@@ -3338,12 +3338,10 @@ function activePaneIDs() {
     indexIDs.forEach((id, offset) => {
       if (!paired.includes(id)) paired.splice(indexInsertAt + offset, 0, id);
     });
-    const researchSurfaceIDs = state.utilities.analysis
-      ? [
-          "utility:analysis",
-          researchConversationPaneIsOpen() ? paneIDForResearchConversation() : ""
-        ].filter(Boolean)
-      : [];
+    const researchSurfaceIDs = [
+      state.utilities.analysis ? "utility:analysis" : "",
+      researchConversationPaneIsOpen() ? paneIDForResearchConversation() : ""
+    ].filter(Boolean);
     researchSurfaceIDs.forEach((id) => {
       const currentIndex = paired.indexOf(id);
       if (currentIndex !== -1) paired.splice(currentIndex, 1);
@@ -3353,9 +3351,11 @@ function activePaneIDs() {
     if (researchSurfaceIDs.length) {
       paired.splice(lastIndexPosition === -1 ? paired.length : lastIndexPosition + 1, 0, ...researchSurfaceIDs);
     }
-    const researchAnchor = state.utilities.analysis
-      ? (researchConversationPaneIsOpen() ? paneIDForResearchConversation() : "") || "utility:analysis"
-      : indexIDs.at(-1) || primarySavedPaneID();
+    const researchAnchor = researchConversationPaneIsOpen()
+      ? paneIDForResearchConversation()
+      : state.utilities.analysis
+        ? "utility:analysis"
+        : indexIDs.at(-1) || primarySavedPaneID();
     const researchAnchorIndex = paired.indexOf(researchAnchor);
     const recordInsertAt = researchAnchorIndex === -1 ? paired.length : researchAnchorIndex + 1;
     recordIDs.forEach((id, offset) => {
@@ -14164,6 +14164,7 @@ async function closeResearchConversation() {
 async function openResearchConversation(conversationID, options = {}) {
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
+  const showResearchList = options.showResearchList !== false;
   const researchPaneScrollTop = track.querySelector(
     '.workspace-panel[data-pane-id="utility:analysis"]'
   )?.scrollTop ?? 0;
@@ -14227,9 +14228,11 @@ async function openResearchConversation(conversationID, options = {}) {
   const previousConversationWidth = previousConversationPaneID
     ? state.paneWeights[previousConversationPaneID]
     : null;
-  state.utilities.analysis = true;
+  state.utilities.analysis = showResearchList;
   state.researchConversationID = normalizedConversationID;
-  state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
+  if (showResearchList) {
+    state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
+  }
   Object.keys(state.paneWeights)
     .filter((id) => id.startsWith("research:conversation:"))
     .forEach((id) => delete state.paneWeights[id]);
@@ -14239,17 +14242,25 @@ async function openResearchConversation(conversationID, options = {}) {
     : defaultPaneWidthForID(conversationPaneID);
   const nextPaneOrder = (state.paneOrder || []).filter((id) => !id.startsWith("research:conversation:"));
   const researchIndex = nextPaneOrder.indexOf("utility:analysis");
-  nextPaneOrder.splice(researchIndex === -1 ? nextPaneOrder.length : researchIndex + 1, 0, conversationPaneID);
+  const savedIndex = nextPaneOrder.indexOf(primarySavedPaneID());
+  const anchorIndex = showResearchList ? researchIndex : savedIndex;
+  nextPaneOrder.splice(anchorIndex === -1 ? nextPaneOrder.length : anchorIndex + 1, 0, conversationPaneID);
   state.paneOrder = nextPaneOrder;
   saveWorkspaceState();
   const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   await transitionWorkspace("utility", {
-    refreshPaneIDs: ["utility:analysis", conversationPaneID, ...projectPaneIDs]
+    refreshPaneIDs: [
+      ...(showResearchList ? ["utility:analysis"] : []),
+      conversationPaneID,
+      ...projectPaneIDs
+    ]
   });
   const refreshedResearchPane = track.querySelector(
     '.workspace-panel[data-pane-id="utility:analysis"]'
   );
-  if (refreshedResearchPane) refreshedResearchPane.scrollTop = researchPaneScrollTop;
+  if (showResearchList && refreshedResearchPane) {
+    refreshedResearchPane.scrollTop = researchPaneScrollTop;
+  }
   if (!researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return null;
   scrollPaneIntoView(conversationPaneID);
   requestAnimationFrame(() => {
@@ -20617,7 +20628,10 @@ function appendProjectResearchHistory(content, identity, foundation) {
     question.textContent = conversation.starterQuestion;
     card.append(question);
     if (!identity.sharedOnly) {
-      card.addEventListener("click", () => void openResearchConversation(conversation.id));
+      card.addEventListener("click", () => {
+        researchConversationPaneOpened = true;
+        void openResearchConversation(conversation.id, { showResearchList: false });
+      });
     }
     body.append(card);
   });
@@ -23384,7 +23398,10 @@ async function appendSavedProjectResearchConversations(container, identity) {
     const question = document.createElement("strong");
     question.textContent = conversation.starterQuestion;
     card.append(question);
-    card.addEventListener("click", () => void openResearchConversation(conversation.id));
+    card.addEventListener("click", () => {
+      researchConversationPaneOpened = true;
+      void openResearchConversation(conversation.id, { showResearchList: false });
+    });
     body.append(card);
   });
   wireProjectSectionMotion(section, body, [title, toggle], "Research", false);
@@ -30561,9 +30578,9 @@ async function renderWorkspace(options = {}) {
   }
   if (state.utilities.analysis) {
     panes.push(await renderResearch());
-    if (researchConversationPaneIsOpen()) {
-      panes.push(await renderResearchConversation(state.researchConversationID));
-    }
+  }
+  if (researchConversationPaneIsOpen()) {
+    panes.push(await renderResearchConversation(state.researchConversationID));
   }
   if (state.utilities.settings) {
     panes.push(renderSettings());
@@ -30657,15 +30674,15 @@ async function renderUtilityWorkspace(options = {}) {
   }
   if (state.utilities.analysis) {
     panes.push(await reuseOrRenderPane("utility:analysis", renderResearch));
-    const conversationPaneID = researchConversationPaneIsOpen()
-      ? paneIDForResearchConversation()
-      : "";
-    if (conversationPaneID) {
-      panes.push(await reuseOrRenderPane(
-        conversationPaneID,
-        () => renderResearchConversation(state.researchConversationID)
-      ));
-    }
+  }
+  const conversationPaneID = researchConversationPaneIsOpen()
+    ? paneIDForResearchConversation()
+    : "";
+  if (conversationPaneID) {
+    panes.push(await reuseOrRenderPane(
+      conversationPaneID,
+      () => renderResearchConversation(state.researchConversationID)
+    ));
   }
   if (state.utilities.settings) {
     panes.push(await reuseOrRenderPane("utility:settings", renderSettings));
