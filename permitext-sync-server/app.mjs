@@ -150,7 +150,8 @@ import {
 import {
   assembleResearchEvidence,
   researchEvidenceAssemblyLimits,
-  researchEvidenceAssemblyVersion
+  researchEvidenceAssemblyVersion,
+  researchEvidenceStrategyForTurn
 } from "./research-evidence-assembly.mjs";
 import {
   normalizeResearchWebSources,
@@ -7864,6 +7865,7 @@ async function assembledResearchEvidenceForTurn({
   question,
   messages,
   pinnedEvidence,
+  originSurface,
   projectFacts,
   topicContext,
   onStage
@@ -7872,11 +7874,17 @@ async function assembledResearchEvidenceForTurn({
     sectionCatalog(),
     shippedSearchIndex()
   ]);
+  const strategy = researchEvidenceStrategyForTurn({
+    question,
+    pinnedEvidence,
+    originSurface
+  });
   return assembleResearchEvidence({
     question,
     previousMessages: messages,
     projectFacts,
     pinnedEvidence,
+    strategy,
     topicContext,
     onStage,
     limits: researchEvidenceAssemblyLimits,
@@ -14077,6 +14085,7 @@ async function handleResearchConversationMessage(request, response) {
       question,
       messages: conversation.messages || [],
       pinnedEvidence,
+      originSurface: conversation.origin?.surface || "",
       projectFacts: combinedProjectFacts,
       topicContext: conversation.topicContext || null,
       onStage: progressResponse.progress
@@ -14409,6 +14418,7 @@ async function handleResearchConversationMessage(request, response) {
           conversationFactsVersion: researchConversationFactsVersion,
           sourceMode: evidencePackage.sourceMode,
           sourceScope: evidencePackage.sourceScope,
+          strategy: evidencePackage.strategy,
           limits: evidencePackage.limits,
           usage: evidencePackage.usage,
           limitations: turnRetrievalLimitations,

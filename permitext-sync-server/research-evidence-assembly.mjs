@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260811-enacted-chat-evidence-v9";
+export const researchEvidenceAssemblyVersion = "20260813-adaptive-reader-evidence-v10";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -25,6 +25,48 @@ const sourceOrigins = Object.freeze({
   discovered: "permitext_discovered",
   crossReference: "permitext_cross_reference"
 });
+
+export const researchEvidenceStrategies = Object.freeze({
+  broad: "broad",
+  pinnedFirst: "pinned_first"
+});
+
+const selectedEvidenceCuePattern = /\b(?:selected|pinned)\s+(?:code\s+)?(?:passage|passages|evidence|text)|\b(?:both|these|the)\s+(?:selected\s+)?(?:passage|passages|provision|provisions)\b/i;
+const broaderEvidenceCuePattern = /\b(?:applicab(?:le|ility)|comply|compliance|exception|exceptions|definition|definitions|defined|table|tables|calculate|calculation|other provisions?|additional provisions?|related provisions?|cross[- ]references?|project[- ]specific|verify|verification)\b/i;
+
+function explicitCodeReferences(value) {
+  return Array.from(String(value || "").matchAll(
+    /\b(AC|BC|EBC|FC|FGC|MC|PC)\s+(?:§\s*)?([A-Z]?\d+(?:\.[0-9A-Z-]+)*)/gi
+  )).map((match) => `${String(match[1]).toUpperCase()}:${String(match[2]).toUpperCase()}`);
+}
+
+export function researchEvidenceStrategyForTurn({
+  question,
+  pinnedEvidence = [],
+  originSurface = ""
+} = {}) {
+  if (String(originSurface || "").trim() !== "reader" || !pinnedEvidence.length) {
+    return { mode: researchEvidenceStrategies.broad, reason: "default_authorized_retrieval" };
+  }
+  const normalizedQuestion = compactText(question);
+  if (!selectedEvidenceCuePattern.test(normalizedQuestion)) {
+    return { mode: researchEvidenceStrategies.broad, reason: "question_not_bounded_to_selected_evidence" };
+  }
+  if (broaderEvidenceCuePattern.test(normalizedQuestion)) {
+    return { mode: researchEvidenceStrategies.broad, reason: "question_requests_broader_legal_context" };
+  }
+  const pinnedReferences = new Set(pinnedEvidence.map((source) => {
+    const codePrefix = compactText(source?.codePrefix).toUpperCase();
+    const sectionNumber = compactText(source?.sectionNumber).replace(/\.$/, "").toUpperCase();
+    return codePrefix && sectionNumber ? `${codePrefix}:${sectionNumber}` : "";
+  }).filter(Boolean));
+  const outsideReferences = explicitCodeReferences(normalizedQuestion)
+    .filter((reference) => !pinnedReferences.has(reference));
+  if (outsideReferences.length) {
+    return { mode: researchEvidenceStrategies.broad, reason: "question_names_unselected_citation" };
+  }
+  return { mode: researchEvidenceStrategies.pinnedFirst, reason: "reader_question_bounded_to_selected_evidence" };
+}
 
 function compactText(value) {
   return String(value || "")
@@ -471,6 +513,7 @@ export async function assembleResearchEvidence({
   projectFacts = [],
   pinnedEvidence = [],
   topicContext = null,
+  strategy = null,
   discover,
   resolveSection,
   onStage,
@@ -494,18 +537,35 @@ export async function assembleResearchEvidence({
     topicContext
   });
   const limits = appliedLimits(requestedLimits);
+  const appliedStrategy = strategy?.mode === researchEvidenceStrategies.pinnedFirst
+    ? {
+        mode: researchEvidenceStrategies.pinnedFirst,
+        reason: compactText(strategy.reason) || "selected_evidence_first"
+      }
+    : {
+        mode: researchEvidenceStrategies.broad,
+        reason: compactText(strategy?.reason) || "default_authorized_retrieval"
+      };
   await onStage?.("searching_authorized_library", "active");
-  const discovery = await discover({
-    question: query.retrievalQuery,
-    limit: limits.maximumCandidates,
-    retrievalContext: {
-      currentQuestion: query.question,
-      conversationTopic: query.conversationTopic,
-      immediateContext: query.immediateContext,
-      contextDependentFollowUp: query.contextDependentFollowUp,
-      relevanceComparison: query.relevanceComparison
-    }
-  });
+  const discovery = appliedStrategy.mode === researchEvidenceStrategies.pinnedFirst
+    ? {
+        retrievalVersion: researchEvidenceAssemblyVersion,
+        searchedSectionCount: 0,
+        candidates: [],
+        outsideCurrentLibrary: [],
+        coverageLimitations: []
+      }
+    : await discover({
+        question: query.retrievalQuery,
+        limit: limits.maximumCandidates,
+        retrievalContext: {
+          currentQuestion: query.question,
+          conversationTopic: query.conversationTopic,
+          immediateContext: query.immediateContext,
+          contextDependentFollowUp: query.contextDependentFollowUp,
+          relevanceComparison: query.relevanceComparison
+        }
+      });
   const prioritizedCandidates = prioritizeResearchEvidence(candidateValues(discovery), {
     limit: limits.maximumCandidates
   });
@@ -870,6 +930,7 @@ export async function assembleResearchEvidence({
     topicDecision: structuredClone(query.topicDecision),
     sourceScope: "authorized_enacted_text",
     sourceMode: "text_only",
+    strategy: appliedStrategy,
     limits,
     sources,
     usage: {

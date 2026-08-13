@@ -3,7 +3,9 @@ import {
   assembleResearchEvidence,
   researchEvidenceAssemblyLimits,
   researchEvidenceAssemblyVersion,
-  researchEvidenceRetrievalQuery
+  researchEvidenceRetrievalQuery,
+  researchEvidenceStrategies,
+  researchEvidenceStrategyForTurn
 } from "../research-evidence-assembly.mjs";
 
 const canonicalSections = new Map([
@@ -300,6 +302,78 @@ assert.equal(researchEvidenceAssemblyLimits.maximumCandidates, 12);
 assert.equal(researchEvidenceAssemblyLimits.maximumDiscovered, 10);
 assert.equal(researchEvidenceAssemblyLimits.maximumCrossReferences, 6);
 assert.equal(researchEvidenceAssemblyLimits.maximumCharacters, 48_000);
+
+const twoReaderPins = [{ codePrefix: "PC", sectionNumber: "101.1" }, {
+  codePrefix: "PC",
+  sectionNumber: "101.2"
+}];
+assert.deepEqual(
+  researchEvidenceStrategyForTurn({
+    question: "Using both selected passages, what does PC 101.1 establish and what is within PC 101.2's scope?",
+    pinnedEvidence: twoReaderPins,
+    originSurface: "reader"
+  }),
+  {
+    mode: researchEvidenceStrategies.pinnedFirst,
+    reason: "reader_question_bounded_to_selected_evidence"
+  },
+  "A Reader question explicitly bounded to its selected passages should begin with those passages."
+);
+for (const question of [
+  "Do the selected passages establish compliance?",
+  "Which exception applies beyond these passages?",
+  "Using these passages and PC 202, what definition controls?"
+]) {
+  assert.equal(
+    researchEvidenceStrategyForTurn({
+      question,
+      pinnedEvidence: twoReaderPins,
+      originSurface: "reader"
+    }).mode,
+    researchEvidenceStrategies.broad,
+    `Broader legal question did not expand retrieval: ${question}`
+  );
+}
+assert.equal(
+  researchEvidenceStrategyForTurn({
+    question: "Using both selected passages, summarize them.",
+    pinnedEvidence: twoReaderPins,
+    originSurface: "evidenceDiscovery"
+  }).mode,
+  researchEvidenceStrategies.broad,
+  "Only explicitly Reader-started Research should use the Reader adaptive path."
+);
+
+let adaptiveDiscoveryCalls = 0;
+const adaptivePinnedOnly = await assembleResearchEvidence({
+  question: "Using both selected passages, keep PC 101.1 and PC 101.2 distinct.",
+  pinnedEvidence: [{
+    id: "pin-reader-1",
+    sectionID: "pinned",
+    codePrefix: "BC",
+    sectionNumber: "1019.3",
+    selectedText: "Interior exit access stairways shall be enclosed."
+  }],
+  strategy: {
+    mode: researchEvidenceStrategies.pinnedFirst,
+    reason: "reader_question_bounded_to_selected_evidence"
+  },
+  discover: async () => {
+    adaptiveDiscoveryCalls += 1;
+    return { candidates: [{ sectionID: "candidate-1" }] };
+  },
+  resolveSection,
+  limits: { maximumCrossReferences: 1, maximumCharacters: 2_000 }
+});
+assert.equal(adaptiveDiscoveryCalls, 0, "Pinned-first assembly still performed broad corpus discovery.");
+assert.equal(adaptivePinnedOnly.strategy.mode, researchEvidenceStrategies.pinnedFirst);
+assert.equal(adaptivePinnedOnly.usage.discoveredCount, 0);
+assert.equal(adaptivePinnedOnly.discovery.searchedSectionCount, 0);
+assert(adaptivePinnedOnly.sources.some((source) => source.origin === "user_pinned"));
+assert(
+  adaptivePinnedOnly.sources.every((source) => source.origin !== "permitext_discovered"),
+  "Pinned-first assembly unexpectedly included broad discovered evidence."
+);
 assert.throws(
   () => researchEvidenceRetrievalQuery({ question: "" }),
   /requires a text question/
