@@ -479,6 +479,8 @@ assert.match(stylesSource, /\.saved-project-tile\.is-bulk-selected \{[\s\S]*?opa
 assert.match(stylesSource, /\.workspace-add-button \{[\s\S]*?font-size: 20px;[\s\S]*?line-height: 1;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-notebook-button,[\s\S]*?\.project-report-draft-button \{[^}]*height: 28px;[^}]*min-height: 28px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section:not\(\.is-open\) > \.saved-project-facts-heading,[\s\S]*?\.saved-project-research-answers:not\(\.is-open\) > \.project-studio-section-heading \{[^}]*height: 28px;[^}]*min-height: 28px;/);
+assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section:not\(\.is-open\)[\s\S]*?\.saved-project-research-toggle \{[^}]*height: 28px;[^}]*min-height: 28px;/);
+assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-section-motion:not\(\.is-open\)[^}]*\.project-section-toggle-chevron \{[^}]*width: 28px;[^}]*height: 28px;[^}]*flex-basis: 28px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project > \.project-studio-section > \.project-studio-section-heading \{[^}]*min-height: 30px;/);
 assert.doesNotMatch(stylesSource, /\.reader-chapter-select-menu \[role="treeitem"\]\[aria-selected="true"\]/);
 assert.match(stylesSource, /\.reader-nav-chapter-row \{[^}]*background: color-mix\(in srgb, var\(--code-accent\) 12%, transparent\);/);

@@ -9365,6 +9365,19 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   min-height: 28px;
 }
 
+.saved-folder-context.is-project .saved-project-facts-section:not(.is-open) > .saved-project-facts-heading > .saved-project-facts-toggle,
+.saved-folder-context.is-project .saved-project-structured-section:not(.is-open) > .saved-project-facts-heading > .saved-project-facts-toggle,
+.saved-folder-context.is-project .saved-project-research-answers:not(.is-open) > .project-studio-section-heading > .saved-project-research-toggle {
+  height: 28px;
+  min-height: 28px;
+}
+
+.saved-folder-context.is-project .project-section-motion:not(.is-open) > :is(.saved-project-facts-heading, .saved-evidence-heading, .project-studio-section-heading) .project-section-toggle-chevron {
+  width: 28px;
+  height: 28px;
+  flex-basis: 28px;
+}
+
 .saved-folder-context.is-project .saved-project-facts-section > .saved-project-facts-heading .project-section-toggle-chevron,
 .saved-folder-context.is-project .saved-project-structured-section > .saved-project-facts-heading .project-section-toggle-chevron,
 .saved-folder-context.is-project .saved-project-evidence-section > .saved-evidence-heading .project-section-toggle-chevron,
