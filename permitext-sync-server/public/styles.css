@@ -9377,14 +9377,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-primary);
 }
 
-.saved-project-structured-custom-title {
+.saved-project-structured-custom-group {
   margin-top: var(--space-2);
-  color: var(--text-secondary);
-  font-weight: 400;
-}
-
-.saved-project-structured-custom-title[hidden] {
-  display: none;
 }
 
 .saved-project-structured-facts-help,

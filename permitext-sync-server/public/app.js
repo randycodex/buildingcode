@@ -24052,16 +24052,30 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   structuredBody.className = "saved-project-structured-facts";
   const structuredGroups = document.createElement("div");
   structuredGroups.className = "saved-project-structured-groups";
-  const customTitle = document.createElement("strong");
-  customTitle.className = "saved-project-structured-custom-title section-label";
-  customTitle.textContent = "Custom Facts";
+  const customSection = document.createElement("section");
+  customSection.className = "saved-project-structured-group saved-project-structured-custom-group";
+  const customHeading = document.createElement("div");
+  customHeading.className = "saved-project-structured-group-heading";
+  const customToggle = document.createElement("button");
+  customToggle.type = "button";
+  customToggle.className = "saved-project-structured-group-toggle section-label";
+  customToggle.textContent = "Custom Facts";
+  const customChevron = document.createElement("button");
+  customChevron.type = "button";
+  customChevron.className = "project-section-toggle-chevron saved-project-structured-group-chevron";
+  customChevron.innerHTML = researchChevronIconsSVG();
+  customHeading.append(customToggle, customChevron);
+  const customBody = document.createElement("section");
+  customBody.className = "saved-project-structured-group-body";
   const customList = document.createElement("div");
   customList.className = "saved-project-structured-facts-list saved-project-structured-custom-list";
   const addFact = document.createElement("button");
   addFact.type = "button";
   addFact.className = "saved-project-structured-fact-add";
   addFact.textContent = "Add another fact";
-  structuredBody.append(structuredGroups, customTitle, customList, addFact);
+  customBody.append(customList, addFact);
+  customSection.append(customHeading, customBody);
+  structuredBody.append(structuredGroups, customSection);
   structuredSection.append(structuredHeading, structuredBody);
 
   const factKey = (label) => String(label || "")
@@ -24217,6 +24231,18 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       }
     );
   });
+  wireProjectSectionMotion(
+    customSection,
+    customBody,
+    [customToggle, customChevron],
+    "Custom Facts",
+    projectSectionExpanded(identity, "structuredFacts:custom", true),
+    {
+      onChange(expanded) {
+        persistProjectSectionExpansion(identity, "structuredFacts:custom", expanded);
+      }
+    }
+  );
 
   const structuredSuggestionMenus = [];
   const renderStructuredFacts = () => {
@@ -24275,7 +24301,6 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       row.append(label, value, remove);
       customList.append(row);
     });
-    customTitle.hidden = customList.childElementCount === 0;
   };
   renderStructuredFacts();
   if (
