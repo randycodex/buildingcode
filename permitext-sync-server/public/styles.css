@@ -9751,8 +9751,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-folder-context.is-project .project-notebook-button,
 .saved-folder-context.is-project .project-report-draft-button {
-  height: 28px;
-  min-height: 28px;
+  height: 40px;
+  min-height: 40px;
 }
 
 .saved-project-summary {
@@ -9781,21 +9781,21 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .saved-folder-context.is-project .saved-project-structured-section:not(.is-open) > .saved-project-facts-heading,
 .saved-folder-context.is-project .saved-project-evidence-section:not(.is-open) > .saved-evidence-heading,
 .saved-folder-context.is-project .saved-project-research-answers:not(.is-open) > .project-studio-section-heading {
-  height: 28px;
-  min-height: 28px;
+  height: 40px;
+  min-height: 40px;
 }
 
 .saved-folder-context.is-project .saved-project-facts-section:not(.is-open) > .saved-project-facts-heading > .saved-project-facts-toggle,
 .saved-folder-context.is-project .saved-project-structured-section:not(.is-open) > .saved-project-facts-heading > .saved-project-facts-toggle,
 .saved-folder-context.is-project .saved-project-research-answers:not(.is-open) > .project-studio-section-heading > .saved-project-research-toggle {
-  height: 28px;
-  min-height: 28px;
+  height: 40px;
+  min-height: 40px;
 }
 
 .saved-folder-context.is-project .project-section-motion:not(.is-open) > :is(.saved-project-facts-heading, .saved-evidence-heading, .project-studio-section-heading) .project-section-toggle-chevron {
-  width: 28px;
-  height: 28px;
-  flex-basis: 28px;
+  width: 40px;
+  height: 40px;
+  flex-basis: 40px;
 }
 
 .saved-folder-context.is-project .saved-project-facts-section > .saved-project-facts-heading .project-section-toggle-chevron,
