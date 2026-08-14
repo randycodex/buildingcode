@@ -494,6 +494,8 @@ assert.doesNotMatch(appSource, /saved-project-facts-status/);
 assert.doesNotMatch(appSource.match(/function appendSavedProjectFactEditor[\s\S]*?async function appendSavedProjectResearchConversations/)?.[0] || "", /status\.textContent = "Saving…"|status\.textContent = "Saved"/);
 assert.match(appSource, /showWebNotice\("Project context not saved", error\.message \|\| "Could not save Project context"\)/);
 assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?font-weight: 400;/);
+assert.match(stylesSource, /\.project-research-history-card:hover,[\s\S]*?\.project-research-history-card:focus-visible \{[\s\S]*?background: transparent;[\s\S]*?color: var\(--project-color\);/, "Project Research history hover should color the text without filling the row.");
+assert.match(stylesSource, /\.project-research-history-card:hover :is\(strong, p, span\),[\s\S]*?color: inherit;/, "Project Research history child text does not follow the row hover color.");
 const projectResearchSource = functionSource(appSource, "appendSavedProjectResearchConversations");
 assert.match(projectResearchSource, /title\.className = "section-label saved-project-research-toggle"/);
 assert.match(projectResearchSource, /body\.className = "project-studio-collapsible-body saved-project-research-body"/);

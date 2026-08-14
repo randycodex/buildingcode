@@ -8783,7 +8783,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .project-research-history-card:hover,
 .project-research-history-card:focus-visible {
-  background: color-mix(in srgb, var(--project-color) 12%, transparent);
+  background: transparent;
+  color: var(--project-color);
+}
+
+.project-research-history-card:hover :is(strong, p, span),
+.project-research-history-card:focus-visible :is(strong, p, span) {
+  color: inherit;
 }
 
 .project-research-history-card strong {
