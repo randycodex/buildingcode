@@ -9193,6 +9193,16 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: color-mix(in srgb, var(--project-color) 42%, var(--surface));
   color: var(--text-primary);
   cursor: pointer;
+  transition: opacity 160ms ease;
+}
+
+.saved-project-list:has(.saved-project-tile.is-selected) .saved-project-tile:not(.is-selected) {
+  opacity: 0.58;
+}
+
+.saved-project-list:has(.saved-project-tile.is-selected) .saved-project-tile:not(.is-selected):hover,
+.saved-project-list:has(.saved-project-tile.is-selected) .saved-project-tile:not(.is-selected):focus-visible {
+  opacity: 0.78;
 }
 
 .saved-project-tile[data-draggable="true"] {
@@ -9235,7 +9245,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-project-tile.is-selected {
   background: color-mix(in srgb, var(--project-color) 70%, var(--surface));
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--project-color) 76%, var(--text-primary));
+  box-shadow: none;
 }
 
 .saved-project-tile strong,
@@ -9931,6 +9941,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   justify-self: end;
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.66) !important;
+}
+
+.saved-project-tile.is-selected .saved-project-count {
+  color: #ffffff;
 }
 
 .saved-projects-empty {
