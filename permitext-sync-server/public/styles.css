@@ -7607,7 +7607,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   width: 100%;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--radius-card);
   background: var(--surface-muted);
 }
