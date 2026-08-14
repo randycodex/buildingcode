@@ -13988,13 +13988,27 @@ function researchDisplayList(values) {
 function appendResearchProjectContextDisclosure(container, result) {
   const analysis = result?.structuredEvidenceAnalysis || {};
   const used = researchDisplayList(analysis.projectFactsUsed || result?.projectFactsUsed || []);
+  const usage = result?.factUsage || {};
+  const storedConversationFacts = [
+    ...(result?.conversationFacts?.establishedFacts || []),
+    ...(result?.conversationFacts?.hypotheticalFacts || [])
+  ].map((fact) => researchDisplayText(fact?.statement)).filter(Boolean);
+  const storedConversationFactSet = new Set(storedConversationFacts);
+  const conversation = researchDisplayList(
+    usage.conversation || used.filter((fact) => storedConversationFactSet.has(fact))
+  );
+  const conversationSet = new Set(conversation);
+  const projectContext = researchDisplayList(
+    usage.projectContext || used.filter((fact) => !conversationSet.has(fact))
+  );
+  const other = researchDisplayList(usage.other || []);
   const needed = researchDisplayList(analysis.unresolvedProjectFacts || []);
   if (!used.length && !needed.length) return;
 
   const details = document.createElement("details");
   details.className = "research-project-context-used";
   const summary = document.createElement("summary");
-  summary.textContent = "Project context used";
+  summary.textContent = "Facts used in this answer";
   const body = document.createElement("section");
   body.className = "research-project-context-used-body";
   const appendGroup = (label, values) => {
@@ -14007,7 +14021,13 @@ function appendResearchProjectContextDisclosure(container, result) {
     group.append(heading, content);
     body.append(group);
   };
-  appendGroup("Used in this answer", used);
+  if (projectContext.length || conversation.length || other.length) {
+    appendGroup("Project context", projectContext);
+    appendGroup("Research conversation", conversation);
+    appendGroup("Other supplied facts", other);
+  } else {
+    appendGroup("Supplied facts", used);
+  }
   appendGroup("Still needed", needed);
   details.append(summary, body);
   container.append(details);

@@ -5,7 +5,8 @@ import { dirname, join } from "node:path";
 import {
   projectResearchConversationForList,
   researchProjectInformation,
-  validateResearchEvidenceAnalysis
+  validateResearchEvidenceAnalysis,
+  researchFactUsageDisclosure
 } from "../app.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -119,6 +120,9 @@ assert.match(appSource, /A missing fact is unknown, not false, none, or inapplic
 assert.match(clientSource, /structuredFacts: projectStructuredFacts\(project\)/, "Project mutations do not preserve structured facts.");
 assert.doesNotMatch(clientSource, /Research may use as user-provided context\. Blank fields are ignored\./, "The removed Structured Facts helper text returned.");
 assert.match(clientSource, /appendResearchProjectContextDisclosure\(card, result\)/, "Research answers do not disclose the Project context used.");
+assert.match(clientSource, /summary\.textContent = "Facts used in this answer"/, "Research answers use a misleading Project-only heading for mixed fact sources.");
+assert.match(clientSource, /appendGroup\("Project context", projectContext\)/, "Research answers do not identify facts sourced from Project context.");
+assert.match(clientSource, /appendGroup\("Research conversation", conversation\)/, "Research answers do not identify facts extracted from the conversation.");
 assert.match(stylesSource, /\.saved-project-structured-fact \{[\s\S]*?background:/, "Structured Project facts have no distinct review surface.");
 assert.match(appSource, /incomingProject\?\.structuredFacts === undefined[\s\S]*?structuredFacts: existingProject\.structuredFacts/, "Older clients can erase structured Project facts during sync.");
 
@@ -266,6 +270,20 @@ const analysisFixture = {
 assert.doesNotThrow(
   () => validateResearchEvidenceAnalysis(analysisFixture, [], []),
   "Question facts should not be misclassified as invented Project-folder facts."
+);
+assert.deepEqual(
+  researchFactUsageDisclosure({
+    factsUsed: ["Project fact", "Conversation fact"],
+    projectFacts: ["Project fact"],
+    conversationFactContext: { established: ["Conversation fact"], hypothetical: [] }
+  }),
+  {
+    schemaVersion: 1,
+    projectContext: ["Project fact"],
+    conversation: ["Conversation fact"],
+    other: []
+  },
+  "Research fact disclosure does not preserve deterministic source provenance."
 );
 assert.match(appSource, /projectFactsUsed\.maxItems = 0/, "The evidence-analysis schema does not forbid invented Project facts when no Project facts exist.");
 assert.match(appSource, /max_output_tokens: 6_000,/, "The evidence-analysis model can still be cut off before returning its structured legal-research map.");

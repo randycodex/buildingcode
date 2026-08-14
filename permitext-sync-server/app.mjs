@@ -8173,6 +8173,31 @@ function combinedResearchProjectFacts(projectInformation, manualFacts) {
   ].filter(Boolean)));
 }
 
+export function researchFactUsageDisclosure({
+  factsUsed = [],
+  projectFacts = [],
+  conversationFactContext = null
+} = {}) {
+  const normalized = (values) => Array.from(new Set(
+    (Array.isArray(values) ? values : []).map((value) => String(value || "").trim()).filter(Boolean)
+  ));
+  const used = normalized(factsUsed);
+  const projectSet = new Set(normalized(projectFacts));
+  const conversationSet = new Set(normalized([
+    ...(conversationFactContext?.established || []),
+    ...(conversationFactContext?.hypothetical || [])
+  ]));
+  const projectContext = used.filter((fact) => projectSet.has(fact));
+  const conversation = used.filter((fact) => conversationSet.has(fact) && !projectSet.has(fact));
+  const classified = new Set([...projectContext, ...conversation]);
+  return {
+    schemaVersion: 1,
+    projectContext,
+    conversation,
+    other: used.filter((fact) => !classified.has(fact))
+  };
+}
+
 function rolePermissions(role) {
   return Object.values(organizationPermissions)
     .filter((permission) => roleAllows(role, permission));
@@ -14503,6 +14528,11 @@ async function handleResearchConversationMessage(request, response) {
           requiredClaimCount: requiredClaimCoverage.requiredClaimCount
         },
         structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+        factUsage: researchFactUsageDisclosure({
+          factsUsed: evidenceAnalysisResult.analysis.projectFactsUsed,
+          projectFacts: combinedProjectFacts,
+          conversationFactContext
+        }),
         conversationFacts: conversationFactState,
         requiredClaimCoverage,
         claimMateriality,
