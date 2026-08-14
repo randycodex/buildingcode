@@ -9755,6 +9755,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   box-shadow: none;
 }
 
+@media (prefers-color-scheme: dark) {
+  .saved-evidence-search-input {
+    background: #080808;
+  }
+}
+
 .saved-evidence-search-close {
   position: absolute;
   right: var(--space-2);
