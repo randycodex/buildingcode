@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/web/styles.css?v=20260814-saved-search-icon-v147">
+    <link rel="stylesheet" href="/web/styles.css?v=20260814-settings-icon-v148">
   </head>
   <body>
     <main class="workspace-shell">
@@ -22,7 +22,6 @@
           <button class="toolbar-button" id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false">Projects</button>
           <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Research" title="Research" aria-pressed="false">Research</button>
           <button class="toolbar-button" id="toggle-workboard" type="button" aria-label="Workboard" title="Workboard" aria-pressed="false" data-deferred-feature="workboard" hidden>Workboard</button>
-          <button class="toolbar-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false">Settings</button>
           <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset column widths" title="Reset column widths">Reset</button>
           <button class="toolbar-button" id="collapse-readers" type="button" aria-label="Close all columns" title="Close all columns">Close All</button>
         </nav>
@@ -31,6 +30,12 @@
           <button class="workspace-add-button" id="add-workspace" type="button" aria-label="Create workspace" title="Create workspace">+</button>
           <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Workspace actions" title="Workspace actions" aria-haspopup="menu">•••</button>
         </div>
+        <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
         <div class="topbar-account-state">
           <span class="connection-status" id="connection-status" role="status" aria-live="polite">Online</span>
           <div class="topbar-brand" aria-label="permitext">
@@ -531,6 +536,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260814-custom-facts-disclosure-v140" type="module"></script>
+    <script src="/web/app.js?v=20260814-settings-icon-v148" type="module"></script>
   </body>
 </html>

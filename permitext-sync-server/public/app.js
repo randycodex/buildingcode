@@ -227,7 +227,6 @@ const defaultToolbarButtonIDs = Object.freeze([
   "toggle-search",
   "toggle-saved",
   "toggle-analysis",
-  "toggle-settings",
   "fit-columns",
   "collapse-readers"
 ]);

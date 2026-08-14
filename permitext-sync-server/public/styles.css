@@ -759,6 +759,37 @@ textarea:focus-visible {
   letter-spacing: 1px;
 }
 
+.topbar-settings-button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.topbar-settings-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.topbar-settings-button:hover,
+.topbar-settings-button:focus-visible {
+  outline: 0;
+  background: color-mix(in srgb, var(--text-primary) 15%, transparent);
+  color: var(--text-primary);
+}
+
+.topbar-settings-button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--code-accent) 20%, transparent);
+  color: var(--toolbar-active-text);
+}
+
 .workspace-name-input {
   width: 132px;
   min-width: 0;
@@ -12217,8 +12248,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   }
 
   .workspace-add-button,
-  .workspace-actions-button {
+  .workspace-actions-button,
+  .topbar-settings-button {
     width: 38px;
+    height: 42px;
+    flex-basis: 38px;
   }
 
   .panel-track {
