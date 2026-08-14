@@ -4349,7 +4349,7 @@ select option:checked {
 
 @media (prefers-color-scheme: dark) {
   .search-box {
-    background: #111111;
+    background: rgb(246 244 241 / 10%);
   }
 }
 
