@@ -9265,19 +9265,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .saved-folder-context.is-project .saved-project-structured-section,
 .saved-folder-context.is-project .saved-project-evidence-section,
 .saved-folder-context.is-project .saved-project-research-answers {
+  overflow: hidden;
   padding: 0 var(--space-3);
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
-  transition:
-    border-radius 260ms ease,
-    background 260ms ease;
-}
-
-.saved-folder-context.is-project .saved-project-facts-section.is-open,
-.saved-folder-context.is-project .saved-project-structured-section.is-open,
-.saved-folder-context.is-project .saved-project-evidence-section.is-open,
-.saved-folder-context.is-project .saved-project-research-answers.is-open {
-  border-radius: var(--radius-card);
+  border-radius: 22px;
+  background: var(--menu-subtle-surface);
 }
 
 .saved-folder-context.is-project .saved-project-facts-section.is-open > .project-section-motion-body,
