@@ -476,6 +476,7 @@ assert.match(projectResearchSource, /title\.className = "section-label saved-pro
 assert.match(projectResearchSource, /body\.className = "project-studio-collapsible-body saved-project-research-body"/);
 assert.doesNotMatch(projectResearchSource, /projectSectionCount\(conversations\.length/);
 assert.match(projectResearchSource, /itemNumber\.className = "project-research-history-index"[\s\S]*?itemNumber\.textContent = String\(index \+ 1\)[\s\S]*?card\.append\(itemNumber, question\)/);
+assert.match(appSource, /let savedSearchContentMinHeight = 0;[\s\S]*?const preservedScrollTop = scrollContainer\?\.scrollTop \|\| 0;[\s\S]*?content\.style\.minHeight = `\$\{savedSearchContentMinHeight\}px`;[\s\S]*?scrollContainer\.scrollTop = preservedScrollTop;/);
 assert.match(projectResearchSource, /projectSectionExpanded\(identity, "research", false\)/);
 assert.match(stylesSource, /\.project-studio-section-heading > \.saved-project-research-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/);
 assert.match(stylesSource, /\.saved-project-structured-group \{[\s\S]*?gap: 0;[\s\S]*?\.saved-project-structured-group\.project-section-motion\.is-open > \.saved-project-structured-group-body \{[\s\S]*?padding-top: 2px;/);

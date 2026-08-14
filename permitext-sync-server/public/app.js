@@ -24893,12 +24893,26 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
   const savedEvidenceSelectToggle = panel.querySelector(".saved-evidence-select-toggle");
   if (savedEvidenceSelectToggle) savedEvidenceSelectToggle.hidden = !selectionController;
   let allSavedLimit = savedItemsPageSize;
+  let savedSearchContentMinHeight = 0;
   let previousViewSignature = "";
   let viewGeneration = 0;
   const applySavedView = async () => {
     const generation = ++viewGeneration;
     const query = savedInstance.folderQuery.trim();
     const searchActive = Boolean(query);
+    const scrollContainer = panel.querySelector(".saved-column-scroll");
+    const preservedScrollTop = scrollContainer?.scrollTop || 0;
+    if (searchActive) {
+      if (!savedSearchContentMinHeight) {
+        savedSearchContentMinHeight = Math.ceil(content.getBoundingClientRect().height);
+      }
+      if (savedSearchContentMinHeight > 0) {
+        content.style.minHeight = `${savedSearchContentMinHeight}px`;
+      }
+    } else {
+      savedSearchContentMinHeight = 0;
+      content.style.removeProperty("min-height");
+    }
     const viewSignature = [
       query.toLocaleLowerCase(),
       savedInstance.tagFilter,
@@ -24994,6 +25008,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       footer.append(status, button);
       content.append(footer);
     }
+    if (scrollContainer) scrollContainer.scrollTop = preservedScrollTop;
   };
   panel.__applySavedView = applySavedView;
   renderSavedFilters(panel, savedInstance, resolvedFolderItems || combinedItems, () => {
