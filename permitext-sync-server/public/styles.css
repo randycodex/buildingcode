@@ -581,8 +581,8 @@ textarea:focus-visible {
 .connection-status {
   display: inline-flex;
   align-items: center;
-  min-height: 26px;
-  padding: 0 10px;
+  min-height: 40px;
+  padding: 0 12px;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 7%, transparent);
   color: var(--text-secondary);
@@ -682,7 +682,7 @@ textarea:focus-visible {
 .workspace-add-button,
 .workspace-actions-button,
 .workspace-name-input {
-  min-height: 30px;
+  min-height: 40px;
   border: 0;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 8%, transparent);
@@ -746,8 +746,8 @@ textarea:focus-visible {
 .workspace-add-button,
 .workspace-actions-button {
   display: grid;
-  width: 30px;
-  flex: 0 0 30px;
+  width: 40px;
+  flex: 0 0 40px;
   padding: 0;
   place-items: center;
   cursor: pointer;
@@ -755,15 +755,15 @@ textarea:focus-visible {
 }
 
 .workspace-actions-button {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 1px;
 }
 
 .topbar-settings-button {
   display: grid;
-  width: 30px;
-  height: 30px;
-  flex: 0 0 30px;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
   place-items: center;
   padding: 0;
   border: 0;
@@ -774,8 +774,8 @@ textarea:focus-visible {
 }
 
 .topbar-settings-button svg {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
 }
 
 .topbar-settings-button:hover,
