@@ -16980,7 +16980,7 @@ function setResearchSourceCardExpanded(card, expanded, options = {}) {
   window.setTimeout(hideBody, 500);
 }
 
-function renderResearchSource(source) {
+function renderResearchSource(source, options = {}) {
   const sourceKind = String(
     source.kind || source.sourceClassification || source.authorityClass || "related"
   ).trim();
@@ -16998,14 +16998,37 @@ function renderResearchSource(source) {
   const disclosure = document.createElement("span");
   disclosure.className = "research-source-disclosure";
   disclosure.setAttribute("aria-hidden", "true");
-  disclosure.innerHTML = researchChevronIconsSVG();
+  if (options.openInReader) {
+    card.classList.add("is-direct-open");
+    disclosure.classList.add("is-direct-open");
+    disclosure.textContent = "›";
+  } else {
+    disclosure.innerHTML = researchChevronIconsSVG();
+  }
   const body = document.createElement("div");
   body.className = "research-source-body";
   toggle.append(citation, disclosure);
-  toggle.addEventListener("click", () => {
-    const expanded = toggle.getAttribute("aria-expanded") === "true";
-    setResearchSourceCardExpanded(card, !expanded);
-  });
+  if (options.openInReader) {
+    toggle.removeAttribute("aria-expanded");
+    toggle.setAttribute("aria-label", `Open ${citation.textContent} in source column`);
+    toggle.addEventListener("click", () => {
+      const sourceURL = String(source.sourceURL || source.url || "").trim();
+      if (source.sectionID || (!sourceURL && source.id)) {
+        void openSectionDetailForExistingSearch(source, { anchorPaneID: options.anchorPaneID });
+      } else if (sourceURL) {
+        window.open(sourceURL, "_blank", "noopener,noreferrer");
+      }
+    });
+  } else {
+    toggle.addEventListener("click", () => {
+      const expanded = toggle.getAttribute("aria-expanded") === "true";
+      setResearchSourceCardExpanded(card, !expanded);
+    });
+  }
+  if (options.openInReader) {
+    card.append(toggle);
+    return card;
+  }
   if (sourceKind === "related") {
     const label = document.createElement("p");
     label.className = "section-label";
@@ -17226,7 +17249,7 @@ function researchSourcesForAnswer(conversation, message) {
   ]);
 }
 
-function renderResearchAnswerSources(conversation, message) {
+function renderResearchAnswerSources(conversation, message, anchorPaneID) {
   const answerSources = researchSourcesForAnswer(conversation, message);
   if (!answerSources.length && !message?.id) return null;
   const details = document.createElement("details");
@@ -17256,19 +17279,7 @@ function renderResearchAnswerSources(conversation, message) {
   const renderSources = (sources) => {
     clear(list);
     sources.forEach((source) => {
-      const card = renderResearchSource(source);
-      setResearchSourceCardExpanded(card, false, { instant: true });
-      const body = card.querySelector(".research-source-body");
-      const sourceURL = String(source.sourceURL || source.url || "").trim();
-      if (!source.sectionID && sourceURL) {
-        const openLink = document.createElement("a");
-        openLink.className = "research-answer-open-source";
-        openLink.href = sourceURL;
-        openLink.target = "_blank";
-        openLink.rel = "noopener noreferrer";
-        openLink.textContent = "Open supporting source";
-        body?.append(openLink);
-      }
+      const card = renderResearchSource(source, { openInReader: true, anchorPaneID });
       list.append(card);
     });
   };
@@ -17944,7 +17955,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     const savedProgress = researchProgressFromSavedMessage(message);
     renderResearchInterpretation(bubble, message.answer, { message, conversationID });
     if (savedProgress) bubble.prepend(renderResearchProgressCard(savedProgress, { completed: true }));
-    const answerSources = renderResearchAnswerSources(conversation, message);
+    const answerSources = renderResearchAnswerSources(conversation, message, paneID);
     if (answerSources) {
       const evidenceReviewedBody = bubble.querySelector(".research-evidence-reviewed-body");
       (evidenceReviewedBody || bubble).append(answerSources);

@@ -213,7 +213,7 @@ assert.match(stylesSource, /\.research-answer-primary \{[\s\S]*?font-weight: 400
 assert.match(stylesSource, /workspace-panel:not\(\.reader-panel\) \.research-answer-code-basis \{[\s\S]*?font-size: 14px !important;/, "The Research Code basis disclosure should remain legible at 14px.");
 assert.match(stylesSource, /\.research-answer-primary,[\s\S]*?\.research-answer-explanation \{[\s\S]*?line-height: var\(--reader-line-height\);/, "Research answer prose should share the Reader line-spacing token.");
 assert.match(stylesSource, /\.research-message\.is-user \{[\s\S]*?line-height: var\(--reader-line-height\);/, "Research questions should share the Reader line-spacing token.");
-assert.match(stylesSource, /\.research-answer-open-source \{[\s\S]*?padding: 0;[\s\S]*?border: 0;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "Open source should render as a plain text action rather than a pill.");
+assert.doesNotMatch(stylesSource, /\.research-answer-open-source/, "Removed answer-level Open source button styles should not remain in the client.");
 assert.match(clientSource, /function renderResearchStructuredSource\(structuredSource\)[\s\S]*?structuredSource\.grids[\s\S]*?createElement\("table"\)[\s\S]*?cell\?\.rowSpan[\s\S]*?cell\?\.columnSpan/, "Saved structured enacted sources should render their table grid and cell spans instead of flattened passage text.");
 assert.match(clientSource, /const structuredSource = renderResearchStructuredSource\(source\.structuredSource\);[\s\S]*?body\.append\(structuredSource\)/, "Research source cards should use the immutable structured source snapshot when it is available.");
 assert.match(stylesSource, /\.research-source-structured-table table \{[\s\S]*?min-width: 32rem;[\s\S]*?table-layout: auto;/, "Structured Research tables should remain readable and horizontally scroll within narrow conversation columns.");
@@ -311,5 +311,7 @@ assert.match(clientSource, /wireResearchDetailsMotion\(evidenceReviewed, evidenc
 assert.match(clientSource, /wireResearchDetailsMotion\(details, detailsBody\)/, "The nested evidence details do not use the shared disclosure motion.");
 assert.match(clientSource, /wireResearchDetailsMotion\(details, list\)/, "The sources-used submenu does not use the shared disclosure motion.");
 assert.match(stylesSource, /\.research-details-motion > \.research-details-motion-body \{[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/, "Research disclosures do not match the standard 420ms collapsible transition.");
+assert.match(clientSource, /renderResearchSource\(source, \{ openInReader: true, anchorPaneID \}\)/, "Answer source rows do not open directly in a source column.");
+assert.match(clientSource, /openSectionDetailForExistingSearch\(source, \{ anchorPaneID: options\.anchorPaneID \}\)/, "Answer source rows do not preserve their Research-column anchor.");
 
 console.log("permitext research list summary contract passed");
