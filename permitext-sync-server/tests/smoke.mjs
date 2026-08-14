@@ -1432,7 +1432,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260814-reader-nav-filter-v134'),
+        webRoot.text.includes('/web/app.js?v=20260814-code-figure-rendering-v135'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1582,7 +1582,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260814-reader-nav-filter-v134'),
+      webRoot.text.includes('/web/styles.css?v=20260814-code-figure-rendering-v135'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1856,7 +1856,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260814-reader-nav-filter-v134'),
+      webRoot.text.includes('/web/styles.css?v=20260814-code-figure-rendering-v135'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2570,6 +2570,7 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function codeBlockHasVisibleContent(block)") &&
+        workspaceScript.text.includes('node.querySelector("img, table")') &&
         workspaceScript.text.includes("isZoningSection ? blocks.filter(codeBlockHasVisibleContent) : blocks") &&
         workspaceScript.text.includes('startsWith("zr-")') &&
         workspaceStyles.text.match(/\.reader-panel\.code-theme-zoning \.section-block \{[\s\S]*?margin-bottom: var\(--space-2\);/) &&

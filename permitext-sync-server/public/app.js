@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260814-reader-nav-filter-v134";
+} from "./offline-storage.js?v=20260814-code-figure-rendering-v135";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -10587,12 +10587,15 @@ function splitAnnotatedCodeBlock(block, blockIndex = 0) {
   if (block?.kind !== "html" || !block.html || typeof document === "undefined") return [block];
   const wrapper = document.createElement("div");
   wrapper.innerHTML = rewriteCodeHTML(block.html);
+  const hasReadableCodeNodeContent = (node) => Boolean(
+    String(node.textContent || "").trim() || node.querySelector("img, table")
+  );
   const paragraphBlocks = Array.from(wrapper.querySelectorAll(".Normal-Level[id]"))
-    .filter((node) => String(node.textContent || "").trim());
+    .filter(hasReadableCodeNodeContent);
   const noteBlocks = paragraphBlocks.length
     ? paragraphBlocks
     : Array.from(wrapper.querySelectorAll(".rbox[id]"))
-      .filter((node) => String(node.textContent || "").trim());
+      .filter(hasReadableCodeNodeContent);
   if (noteBlocks.length === 0) return [block];
   return noteBlocks.map((node, nodeIndex) => ({
     ...block,
