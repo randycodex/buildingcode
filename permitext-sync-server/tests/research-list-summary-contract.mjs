@@ -75,7 +75,9 @@ assert.match(clientSource, /\? "Started from selected code"/, "Legacy selected-c
 assert.match(clientSource, /originSurface: "reader"/, "Reader selections do not persist their conversation origin.");
 assert.match(clientSource, /originSurface: "evidenceDiscovery"/, "Evidence Discovery selections are not distinguished from Reader origins.");
 assert.match(clientSource, /sources\.length === 1 \? "passage" : "passages"/, "Reader origins do not summarize multiple selected passages.");
-assert.match(clientSource, /openButton\.textContent = "Open source";/, "Reader-origin passages cannot navigate back to their source.");
+assert.match(clientSource, /reference\.textContent = \[prefix, sectionDisplayTitle\(sectionNumber, source\.title, "Selected code passage"\)\]/, "Reader-origin links omit the complete section subtitle.");
+assert.match(clientSource, /reference\.addEventListener\("click", \(\) => openSectionDetailForExistingSearch/, "Reader-origin subtitles cannot navigate back to their source.");
+assert.match(clientSource, /passageHeader\.append\(reference\);/, "Reader-origin passages still expose a separate source action.");
 assert.match(clientSource, /passage\.classList\.add\(`code-theme-\$\{codeTheme\(source\.codePrefix \|\| "BC"\)\}`\)/, "Reader-origin passage cards do not inherit their source code color.");
 assert.match(stylesSource, /\.research-reader-origin-list article \{[\s\S]*?border-radius: var\(--radius-card\);[\s\S]*?background: color-mix\(in srgb, var\(--code-accent, var\(--text-primary\)\) 13%, transparent\);/, "Reader-origin passages are not separated into source-colored cards.");
 assert.match(appSource, /researchOriginForSelections\(selections, context\.body\.originSurface\)/, "The server does not persist the supplied Research origin surface.");

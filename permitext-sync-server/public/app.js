@@ -17391,20 +17391,19 @@ function renderReaderResearchOrigin(conversation, sources, anchorPaneID) {
     const passage = document.createElement("article");
     passage.classList.add(`code-theme-${codeTheme(source.codePrefix || "BC")}`);
     const passageHeader = document.createElement("div");
-    const reference = document.createElement("strong");
+    const reference = document.createElement("button");
+    reference.type = "button";
+    reference.className = "research-reader-origin-open";
     const prefix = String(source.codePrefix || "").trim();
     const sectionNumber = String(source.sectionNumber || "").trim();
-    reference.textContent = [prefix, sectionNumber ? `§ ${sectionNumber}` : ""]
+    reference.textContent = [prefix, sectionDisplayTitle(sectionNumber, source.title, "Selected code passage")]
       .filter(Boolean)
       .join(" ") || source.title || "Selected code passage";
-    const openButton = document.createElement("button");
-    openButton.type = "button";
-    openButton.className = "research-reader-origin-open";
-    openButton.textContent = "Open source";
-    openButton.addEventListener("click", () => openSectionDetailForExistingSearch(source, {
+    reference.setAttribute("aria-label", `Open ${reference.textContent}`);
+    reference.addEventListener("click", () => openSectionDetailForExistingSearch(source, {
       anchorPaneID
     }));
-    passageHeader.append(reference, openButton);
+    passageHeader.append(reference);
     const excerpt = document.createElement("blockquote");
     excerpt.textContent = researchOriginExcerpt(source);
     passage.append(passageHeader, excerpt);

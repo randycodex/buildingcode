@@ -7219,10 +7219,6 @@ body.is-resizing-research-evidence * {
   background: color-mix(in srgb, var(--code-accent, var(--text-primary)) 13%, transparent);
 }
 
-.research-reader-origin-list article > div > strong {
-  color: var(--code-accent, var(--text-primary));
-}
-
 .research-reader-origin-list blockquote {
   margin: var(--space-2) 0 0;
   padding: 0;
@@ -7232,15 +7228,26 @@ body.is-resizing-research-evidence * {
 }
 
 .research-reader-origin-open {
-  flex: 0 0 auto;
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--text-primary);
+  color: var(--code-accent, var(--text-primary));
   cursor: pointer;
   font: inherit;
-  text-decoration: underline;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
   text-underline-offset: 3px;
+}
+
+.research-reader-origin-open:hover {
+  text-decoration: underline;
+}
+
+.research-reader-origin-open:focus-visible {
+  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline-offset: 3px;
+  border-radius: 3px;
 }
 
 .research-sources {
