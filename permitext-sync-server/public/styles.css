@@ -7727,17 +7727,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   font-weight: 700;
 }
 
-.research-answer-source-group-heading span {
-  min-width: 22px;
-  padding: 2px 7px;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
-  color: var(--text-secondary);
-  text-align: center;
-  font-size: calc(var(--chrome-font-size) * 0.72) !important;
-  font-variant-numeric: tabular-nums;
-}
-
 .research-answer-source-group.is-cited {
   padding: var(--space-3);
   border-radius: var(--radius-card);
@@ -7749,7 +7738,16 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .research-answer-source-group-items .research-source-card {
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  align-items: start;
   padding-block: var(--space-2);
+}
+
+.research-answer-source-number {
+  color: var(--text-tertiary);
+  font-size: calc(var(--chrome-font-size) * 0.76) !important;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
 }
 
 .research-answer-source-group-items .research-source-card + .research-source-card {

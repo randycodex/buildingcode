@@ -17435,17 +17435,20 @@ function renderResearchAnswerSources(conversation, message, anchorPaneID) {
     heading.className = "research-answer-source-group-heading";
     const title = document.createElement("strong");
     title.textContent = label;
-    const count = document.createElement("span");
-    count.textContent = String(sources.length);
-    heading.append(title, count);
+    heading.append(title);
     const items = document.createElement("section");
     items.className = "research-answer-source-group-items";
-    sources.forEach((source) => {
+    sources.forEach((source, index) => {
       const card = renderResearchSource(source, {
         openInReader: true,
         anchorPaneID,
         projectID: conversation.primaryProjectID || ""
       });
+      const number = document.createElement("span");
+      number.className = "research-answer-source-number";
+      number.setAttribute("aria-hidden", "true");
+      number.textContent = `${index + 1}.`;
+      card.prepend(number);
       items.append(card);
     });
     group.append(heading, items);

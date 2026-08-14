@@ -333,6 +333,9 @@ assert.match(stylesSource, /\.research-answer-source-group\.is-cited \{[\s\S]*?b
 assert.match(clientSource, /function researchAnswerSourceCitation\(source\)[\s\S]*?`NYC \$\{year\}`[\s\S]*?\[codePrefix, sectionNumber\][\s\S]*?join\(" \/ "\)/, "Answer-source citations are not reduced to year, code prefix, and section number.");
 assert.match(clientSource, /options\.openInReader[\s\S]*?researchAnswerSourceCitation\(source\)/, "Direct-opening answer sources do not use the compact citation format.");
 assert.match(stylesSource, /\.research-answer-source-list \.research-source-toggle > strong \{[\s\S]*?font-weight: 400;/, "Answer-source citations remain bold.");
+assert.match(clientSource, /sources\.forEach\(\(source, index\) =>[\s\S]*?number\.className = "research-answer-source-number"[\s\S]*?number\.textContent = `\$\{index \+ 1\}\.`/, "Answer source groups are not rendered as numbered lists.");
+assert.doesNotMatch(clientSource, /count\.textContent = String\(sources\.length\)/, "Answer source groups still render total-count pills.");
+assert.match(stylesSource, /\.research-answer-source-group-items \.research-source-card \{[\s\S]*?grid-template-columns: 1\.5rem minmax\(0, 1fr\);/, "Answer source row numbers do not have a stable list column.");
 assert.match(clientSource, /if \(!options\.openInReader\) toggle\.append\(disclosure\)/, "Direct-opening answer sources still render disclosure chevrons.");
 assert.match(stylesSource, /\.workspace-tab \{[\s\S]*?font-size: 12px;/, "Workspace tab labels are not 12px.");
 assert.match(stylesSource, /\.connection-status \{[\s\S]*?font-size: 12px;/, "Connection status labels are not 12px.");
