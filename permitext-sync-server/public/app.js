@@ -5415,9 +5415,13 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
     .filter((chapter) => chapter.id);
   const activeChapterID = String(select.value || reader?.chapterID || "");
   const activeSectionID = String(reader?.sectionID || sectionSelect?.value || "");
-  const expandedChapterID = options.expandedChapterID === ""
-    ? ""
-    : options.expandedChapterID || activeChapterID || chapters[0]?.id || "";
+  const hasRequestedExpandedChapter = Object.prototype.hasOwnProperty.call(options, "expandedChapterID");
+  const hasPreservedExpandedChapter = Object.prototype.hasOwnProperty.call(menu, "_expandedChapterID");
+  const expandedChapterID = hasRequestedExpandedChapter
+    ? options.expandedChapterID
+    : hasPreservedExpandedChapter
+      ? menu._expandedChapterID
+      : activeChapterID || chapters[0]?.id || "";
   menu._expandedChapterID = expandedChapterID;
 
   let sections = [];

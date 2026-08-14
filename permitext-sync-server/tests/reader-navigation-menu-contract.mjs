@@ -22,6 +22,12 @@ assert(app.includes("ArrowRight"), "Chapter menu does not expand with ArrowRight
 assert(app.includes("ArrowLeft"), "Chapter menu does not collapse with ArrowLeft.");
 assert(app.includes("Escape"), "Chapter menu does not close on Escape.");
 assert(app.includes("fetchChapter(expandedChapterID)"), "Chapter expansion must use the chapter-detail endpoint.");
+assert(
+  app.includes('hasOwnProperty.call(menu, "_expandedChapterID")') &&
+    app.includes("hasPreservedExpandedChapter") &&
+    app.includes("? menu._expandedChapterID"),
+  "Closing and reopening the chapter menu must preserve its last disclosure state, including fully collapsed."
+);
 assert(app.includes("function readerNavigationSections"), "Chapter menu does not filter nested list-item catalog rows.");
 assert(app.includes("isReaderNavigationSection"), "Chapter menu lacks a section-navigation predicate.");
 assert(
