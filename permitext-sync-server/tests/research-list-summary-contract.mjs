@@ -128,6 +128,7 @@ assert.match(stylesSource, /\.research-feedback-choice \{[\s\S]*?border: 0;[\s\S
 assert.match(stylesSource, /\.research-feedback-actions \.research-feedback-cancel \{[\s\S]*?background: color-mix\(in srgb, var\(--text-primary\) 9%, transparent\);[\s\S]*?color: var\(--text-primary\);/, "Research feedback Cancel does not match the Update feedback action.");
 assert.match(clientSource, /professionalRole\.className = "research-feedback-role-select"[\s\S]*?enhanceSelect\(professionalRole\)/, "Professional role does not use the shared floating-card select behavior.");
 assert.match(stylesSource, /\.research-feedback-role-select-menu \{[\s\S]*?border-radius:[\s\S]*?background: var\(--menu-surface\)/, "Professional-role options do not open in the standard rounded floating card.");
+assert.doesNotMatch(clientSource, /Supporting code section or official source|supportingReference/, "The removed supporting-source feedback field is still rendered or submitted by the client.");
 assert.match(stylesSource, /\.saved-project-structured-fact \{[\s\S]*?background:/, "Structured Project facts have no distinct review surface.");
 assert.match(appSource, /incomingProject\?\.structuredFacts === undefined[\s\S]*?structuredFacts: existingProject\.structuredFacts/, "Older clients can erase structured Project facts during sync.");
 

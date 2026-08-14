@@ -14147,8 +14147,7 @@ function renderResearchFeedback(container, message, conversationID) {
   optionalContext.className = "research-feedback-context";
   optionalContext.open = Boolean(
     comment.value ||
-    message.feedback?.professionalRole ||
-    message.feedback?.supportingReference
+    message.feedback?.professionalRole
   );
   const optionalSummary = document.createElement("summary");
   optionalSummary.textContent = "Add supporting context (optional)";
@@ -14172,13 +14171,7 @@ function renderResearchFeedback(container, message, conversationID) {
     professionalRole.append(option);
   });
   professionalRole.value = message.feedback?.professionalRole || "";
-  const supportingReference = document.createElement("input");
-  supportingReference.type = "text";
-  supportingReference.maxLength = 500;
-  supportingReference.placeholder = "Code section or official source supporting your feedback";
-  supportingReference.setAttribute("aria-label", "Supporting code section or official source");
-  supportingReference.value = message.feedback?.supportingReference || "";
-  optionalContext.append(optionalSummary, professionalRole, supportingReference, comment);
+  optionalContext.append(optionalSummary, professionalRole, comment);
   const submit = document.createElement("button");
   submit.type = "submit";
   submit.className = "ghost-button";
@@ -14215,8 +14208,7 @@ function renderResearchFeedback(container, message, conversationID) {
         answerID: message.id,
         category,
         comment: fields.comment ?? comment.value,
-        professionalRole: fields.professionalRole ?? professionalRole.value,
-        supportingReference: fields.supportingReference ?? supportingReference.value
+        professionalRole: fields.professionalRole ?? professionalRole.value
       });
       message.feedback = payload.feedback;
       selectedCategory = payload.feedback.category;
@@ -14233,8 +14225,7 @@ function renderResearchFeedback(container, message, conversationID) {
     comment.value = "";
     professionalRole.value = "";
     professionalRole._syncCustomSelect?.();
-    supportingReference.value = "";
-    void saveFeedback("helpful", { comment: "", professionalRole: "", supportingReference: "" });
+    void saveFeedback("helpful", { comment: "", professionalRole: "" });
   });
   problemButton.addEventListener("click", () => {
     setDetailsOpen(details.hidden);
