@@ -5385,14 +5385,18 @@ mark {
 .research-answer-primary,
 .research-answer-explanation {
   margin: 0;
-  color: var(--text-primary);
   line-height: var(--reader-line-height);
   white-space: pre-line;
 }
 
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-primary,
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-explanation {
+  color: #ffffff !important;
+}
+
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-code-basis {
   margin: 0;
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 14px !important;
   line-height: 1.35;
 }
