@@ -754,6 +754,11 @@ textarea:focus-visible {
   font-weight: 700;
 }
 
+.workspace-add-button {
+  font-size: 20px;
+  line-height: 1;
+}
+
 .workspace-actions-button {
   font-size: 12px;
   letter-spacing: 1px;
