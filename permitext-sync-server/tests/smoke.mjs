@@ -373,8 +373,8 @@ async function main() {
       "Web topbar tools are no longer draggable on the left with workspaces and the brand on the right."
     );
     assert(
-      topbarSource.includes('id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false">Projects</button>'),
-      "The Projects toolbar label is no longer concise."
+      topbarSource.includes('id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false" data-icon-only>'),
+      "The Projects toolbar control no longer exposes its icon-only accessible label."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -521,7 +521,7 @@ async function main() {
       webRoot.text.includes('id="workspace-tabs"') &&
         webRoot.text.includes('id="add-workspace"') &&
         webRoot.text.includes('id="workspace-actions"') &&
-        webRoot.text.includes(">Close All</button>") &&
+        webRoot.text.includes('id="collapse-readers" type="button" aria-label="Close all columns" title="Close all columns" data-icon-only>') &&
         !webRoot.text.includes(">One Reader</button>") &&
         workspaceScript.text.includes('const workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
         workspaceScript.text.includes('const toolbarOrderKey = "permitext:webToolbarOrder:v1"') &&

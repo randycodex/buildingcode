@@ -1661,6 +1661,17 @@ body.is-detached-workboard-window .detached-workboard-error p {
   box-shadow: none;
 }
 
+.topbar .toolbar-button[data-icon-only] {
+  justify-content: center;
+  width: 30px;
+  padding: 0;
+}
+
+.topbar .toolbar-button[data-icon-only] svg {
+  width: 15px;
+  height: 15px;
+}
+
 .topbar .toolbar-button[draggable="true"] {
   cursor: grab;
 }
