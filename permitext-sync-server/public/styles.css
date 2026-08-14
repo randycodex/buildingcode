@@ -3238,6 +3238,18 @@ select option:checked {
   outline-offset: 2px;
 }
 
+.reader-notes-research-action {
+  min-height: 28px;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--code-accent) 16%, var(--surface));
+  color: var(--text-primary);
+}
+
+.reader-notes-research-action:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--code-accent) 24%, var(--surface));
+}
+
 .reader-notes-project-picker {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
