@@ -42,6 +42,7 @@ assert.equal(codeAssetContentType(zoningAsset), "image/jpeg");
 const roots = await listCodeAssetRoots();
 assert(roots.some((root) => root.id === "2022-construction-codes"), "Construction asset root is not allowlisted.");
 assert(roots.some((root) => root.id === "2026-zoning-resolution"), "Zoning asset root is not allowlisted.");
+assert(roots.some((root) => root.id === "2026-enacted-administrative-code"), "Enacted-admin asset root is not allowlisted.");
 assert.equal(roots[0].id, "2022-construction-codes");
 
 const construction = await resolveCodeAsset(constructionAsset);

@@ -26,9 +26,9 @@
       "id": "nyc-fire-code",
       "packageID": "nyc-enacted-administrative-code",
       "codePrefix": "FC",
-      "officialSource": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/overview",
-      "rightsState": "pending-review",
-      "notes": "Fire Code is Title 29 in the AmLegal enacted-admin package. Pilot figures 503.2.7.2.1, 503.2.9, and 503.4.1 stay unbound until rights are approved."
+      "officialSource": "https://www.nyc.gov/site/fdny/codes/fire-code/fire-code.page",
+      "rightsState": "approved",
+      "notes": "Owner authorized binding FC Figures 503.2.7.2.1, 503.2.9, and 503.4.1 from the official FDNY 2022 Chapter 5 PDF. Other AmLegal Fire Code graphics remain pending-review and must not be scraped."
     },
     {
       "id": "nyc-2025-specialty-codes",
