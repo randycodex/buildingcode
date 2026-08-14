@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v680";
+const shellCacheName = "permitext-pro-shell-v681";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -6,15 +6,15 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260813-building-zoning-facts-v130",
+  "/web/styles.css?v=20260813-structured-fact-menus-v131",
   "/web/fonts/inter-latin-wght-normal.woff2",
   "/web/fonts/inter-latin-wght-italic.woff2",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260813-building-zoning-facts-v130",
+  "/web/app.js?v=20260813-structured-fact-menus-v131",
   "/web/research-progress.js?v=20260813-research-reader-spacing-v120",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260813-building-zoning-facts-v130",
+  "/web/offline-storage.js?v=20260813-structured-fact-menus-v131",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260811-research-columns-v3",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",

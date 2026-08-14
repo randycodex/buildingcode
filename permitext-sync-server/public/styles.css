@@ -9339,6 +9339,26 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   font-size: 0.8em;
 }
 
+.saved-project-structured-suggestion-menu {
+  padding: clamp(14px, 2vw, 20px);
+  border-radius: clamp(22px, 4vw, 30px);
+  background: var(--menu-surface);
+}
+
+.saved-project-structured-suggestion-menu .custom-select-option {
+  min-height: 26px;
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-control);
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.saved-project-structured-suggestion-menu .custom-select-option[aria-selected="true"] {
+  background: color-mix(in srgb, var(--project-color, var(--accent)) 14%, transparent);
+  color: var(--text-primary);
+  font-weight: 650;
+}
+
 .saved-project-structured-fact-add,
 .saved-project-structured-fact-remove {
   border: 0;

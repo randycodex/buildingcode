@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260813-building-zoning-facts-v130";
+} from "./offline-storage.js?v=20260813-structured-fact-menus-v131";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -23763,18 +23763,77 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     value.placeholder = "Add value";
     value.setAttribute("aria-label", fieldLabel);
     label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
+    row.append(label, value);
     if (suggestions.length) {
-      const choices = document.createElement("datalist");
-      choices.id = `${value.id}-choices`;
+      const menu = document.createElement("div");
+      menu.className = "custom-select-menu reader-chapter-select-menu saved-project-structured-suggestion-menu";
+      menu.dataset.floatingSelect = "true";
+      menu.hidden = true;
       suggestions.forEach((suggestion) => {
-        const option = document.createElement("option");
-        option.value = suggestion;
-        choices.append(option);
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "custom-select-option";
+        option.textContent = suggestion;
+        option.setAttribute("aria-selected", String(value.value === suggestion));
+        option.addEventListener("mousedown", (event) => event.preventDefault());
+        option.addEventListener("click", () => {
+          value.value = suggestion;
+          value.dispatchEvent(new Event("input", { bubbles: true }));
+          menu.querySelectorAll(".custom-select-option").forEach((candidate) => {
+            candidate.setAttribute("aria-selected", String(candidate === option));
+          });
+          closeActiveCustomSelect();
+          value.focus();
+        });
+        menu.append(option);
       });
-      value.setAttribute("list", choices.id);
-      row.append(label, value, choices);
-    } else {
-      row.append(label, value);
+      const closeMenu = () => {
+        menu.hidden = true;
+        value.setAttribute("aria-expanded", "false");
+        if (activeCustomSelect?.menu === menu) activeCustomSelect = null;
+      };
+      const positionMenu = () => {
+        const rect = row.getBoundingClientRect();
+        const viewportPadding = 8;
+        const left = Math.max(viewportPadding, rect.left);
+        const width = Math.min(rect.width, window.innerWidth - left - viewportPadding);
+        const top = value.getBoundingClientRect().bottom + 6;
+        menu.style.setProperty("--select-menu-top", `${top}px`);
+        menu.style.setProperty("--select-menu-left", `${left}px`);
+        menu.style.setProperty("--select-menu-width", `${width}px`);
+        menu.style.setProperty("--select-menu-max-height", `${Math.max(0, window.innerHeight - top - viewportPadding)}px`);
+      };
+      const openMenu = () => {
+        if (identity.sharedOnly) return;
+        closeActiveCustomSelect();
+        menu.querySelectorAll(".custom-select-option").forEach((option) => {
+          option.setAttribute("aria-selected", String(option.textContent === value.value));
+        });
+        menu.hidden = false;
+        value.setAttribute("aria-expanded", "true");
+        activeCustomSelect = { custom: row, menu, trigger: value, positionMenu, panel: null };
+        positionMenu();
+      };
+      value.setAttribute("role", "combobox");
+      value.setAttribute("aria-autocomplete", "list");
+      value.setAttribute("aria-haspopup", "listbox");
+      value.setAttribute("aria-expanded", "false");
+      value.addEventListener("focus", openMenu);
+      value.addEventListener("click", (event) => {
+        event.stopPropagation();
+        openMenu();
+      });
+      value.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !menu.hidden) {
+          event.preventDefault();
+          closeMenu();
+        } else if (event.key === "ArrowDown" && menu.hidden) {
+          event.preventDefault();
+          openMenu();
+        }
+      });
+      document.body.append(menu);
+      structuredSuggestionMenus.push(menu);
     }
     value.addEventListener("input", () => {
       if (projectAddress) address.value = value.value;
@@ -23823,7 +23882,12 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     );
   });
 
+  const structuredSuggestionMenus = [];
   const renderStructuredFacts = () => {
+    structuredSuggestionMenus.splice(0).forEach((menu) => {
+      if (activeCustomSelect?.menu === menu) closeActiveCustomSelect();
+      menu.remove();
+    });
     groupLists.forEach((list) => clear(list));
     clear(customList);
     const factsByKey = new Map(structuredFacts.map((fact) => [fact.key, fact]));
