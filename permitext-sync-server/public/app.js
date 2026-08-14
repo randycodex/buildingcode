@@ -14066,7 +14066,38 @@ async function renderSectionDetail(searchID, detail) {
   textarea.value = noteBody;
   textarea.placeholder = "Add a note";
   textarea.setAttribute("aria-label", `Note for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
-  textareaWrap.append(textarea);
+  const noteResizeHandle = document.createElement("div");
+  noteResizeHandle.className = "section-detail-note-resize-handle";
+  noteResizeHandle.setAttribute("role", "separator");
+  noteResizeHandle.setAttribute("aria-label", "Resize note");
+  noteResizeHandle.setAttribute("aria-orientation", "horizontal");
+  noteResizeHandle.tabIndex = 0;
+  const resizeNoteTo = (height) => {
+    const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
+    textarea.style.height = `${Math.max(118, Math.min(maximumHeight, height))}px`;
+  };
+  noteResizeHandle.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    const startY = event.clientY;
+    const startHeight = textarea.getBoundingClientRect().height;
+    noteResizeHandle.setPointerCapture(event.pointerId);
+    const resize = (moveEvent) => resizeNoteTo(startHeight + moveEvent.clientY - startY);
+    const finish = () => {
+      window.removeEventListener("pointermove", resize);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
+    };
+    window.addEventListener("pointermove", resize);
+    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", finish);
+  });
+  noteResizeHandle.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+    event.preventDefault();
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    resizeNoteTo(textarea.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
+  });
+  textareaWrap.append(textarea, noteResizeHandle);
   const projectsHost = document.createElement("section");
   projectsHost.className = "section-detail-projects";
   renderAnnotationProjectEditor(projectsHost, sectionTarget, sectionPayload, {

@@ -3020,13 +3020,16 @@ select option:checked {
 }
 
 .section-detail-note-box {
-  display: block;
+  display: grid;
 }
 
 .section-detail-note-box textarea {
   width: 100%;
-  min-height: clamp(118px, 24vh, 210px);
-  resize: vertical;
+  height: clamp(118px, 24vh, 210px);
+  min-height: 118px;
+  max-height: min(70vh, 760px);
+  overflow-y: auto;
+  resize: none;
   padding: var(--space-4);
   border: 1px solid var(--border);
   border-radius: 18px;
@@ -3041,6 +3044,33 @@ select option:checked {
 
 .section-detail-note-box textarea::placeholder {
   color: var(--text-tertiary);
+}
+
+.section-detail-note-resize-handle {
+  position: relative;
+  z-index: 1;
+  height: 14px;
+  margin-top: -14px;
+  cursor: row-resize;
+  touch-action: none;
+}
+
+.section-detail-note-resize-handle::after {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 36px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--text-secondary);
+  content: "";
+  opacity: 0.7;
+  transform: translateX(-50%);
+}
+
+.section-detail-note-resize-handle:focus-visible {
+  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline-offset: -2px;
 }
 
 .reader-internal-results {
