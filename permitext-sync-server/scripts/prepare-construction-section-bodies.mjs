@@ -1,7 +1,10 @@
 import { access, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { constructionHTMLBodyStatusForSection } from "../construction-html-content.mjs";
+import {
+  constructionHTMLBodyStatusForSection,
+  officialBodyHasUnboundImages
+} from "../construction-html-content.mjs";
 
 const serverRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const workspaceRoot = dirname(serverRoot);
@@ -107,6 +110,18 @@ async function bodyAlreadyAvailable(canonicalID, webSectionID) {
   return false;
 }
 
+async function firstExistingPreparedBody(canonicalID, webSectionID) {
+  const candidates = [
+    join(canonicalSectionRoot, `${canonicalID}.json`),
+    join(canonicalSectionRoot, `${webSectionID}.json`),
+    join(legacySectionRoot, `${webSectionID}.json`)
+  ];
+  for (const path of candidates) {
+    if (await exists(path)) return readJSON(path);
+  }
+  return null;
+}
+
 async function main() {
   assert(!(write && check), "Use either --write or --check, not both.");
   const [manifest, canonicalMap, chapterFiles] = await Promise.all([
@@ -137,10 +152,19 @@ async function main() {
 
   const structuralEntries = [];
   const extracted = [];
+  const reboundOfficialBodies = [];
   let existingBodies = 0;
   for (const section of sections) {
     if (await bodyAlreadyAvailable(section.id, section.webSectionID)) {
       existingBodies += 1;
+      const authoredPath = join(canonicalSectionRoot, `${section.id}.json`);
+      if (!(await exists(authoredPath))) {
+        const status = await constructionHTMLBodyStatusForSection(section);
+        const prepared = await firstExistingPreparedBody(section.id, section.webSectionID);
+        if (status.body && officialBodyHasUnboundImages(prepared, status.body)) {
+          reboundOfficialBodies.push({ section, body: status.body });
+        }
+      }
       continue;
     }
     const status = await constructionHTMLBodyStatusForSection(section);
@@ -166,7 +190,7 @@ async function main() {
 
   if (write) {
     await mkdir(canonicalSectionRoot, { recursive: true });
-    for (const { section, body } of extracted) {
+    for (const { section, body } of [...extracted, ...reboundOfficialBodies]) {
       const path = join(canonicalSectionRoot, `${section.id}.json`);
       assert(!(await exists(path)), `Refusing to replace existing prepared body ${path}.`);
       await writeFile(path, `${JSON.stringify(body)}\n`);
@@ -181,7 +205,7 @@ async function main() {
       JSON.stringify(savedCatalog) === JSON.stringify(catalog),
       "Prepared HTML bodies or structural classification are stale; run scripts/prepare-construction-section-bodies.mjs --write."
     );
-    for (const { section } of extracted) {
+    for (const { section } of [...extracted, ...reboundOfficialBodies]) {
       assert(
         await exists(join(canonicalSectionRoot, `${section.id}.json`)),
         `Prepared HTML body for section ${section.id} is missing; run with --write.`
@@ -194,6 +218,7 @@ async function main() {
     sections: sections.length,
     existingPreparedBodies: existingBodies,
     deterministicHTMLBodies: extracted.length,
+    reboundOfficialFigureBodies: reboundOfficialBodies.length,
     preparedBodiesAfterWrite: existingBodies + extracted.length,
     classifiedStructuralEntries: structuralEntries.length,
     classificationCounts: catalog.classificationCounts

@@ -5,8 +5,8 @@
   "availablePreparedBodies": 11611,
   "classifiedStructuralEntries": 1280,
   "classificationCounts": {
-    "title-only-official-heading": 62,
-    "nested-or-title-only-catalog-entry": 1218
+    "title-only-official-heading": 67,
+    "nested-or-title-only-catalog-entry": 1213
   },
   "entries": [
     {
@@ -6497,8 +6497,8 @@
       "chapterNumber": "A",
       "sectionNumber": "A",
       "title": "Appendix A: Reserved",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
+      "classification": "title-only-official-heading",
+      "reason": "empty-official-heading",
       "sourceHTMLPath": "code-sections/building-code/chapters/A.html"
     },
     {
@@ -6509,8 +6509,8 @@
       "chapterNumber": "B",
       "sectionNumber": "B",
       "title": "Appendix B: Reserved",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
+      "classification": "title-only-official-heading",
+      "reason": "empty-official-heading",
       "sourceHTMLPath": "code-sections/building-code/chapters/B.html"
     },
     {
@@ -7637,8 +7637,8 @@
       "chapterNumber": "I",
       "sectionNumber": "I",
       "title": "Appendix I: Reserved",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
+      "classification": "title-only-official-heading",
+      "reason": "empty-official-heading",
       "sourceHTMLPath": "code-sections/building-code/chapters/I.html"
     },
     {
@@ -7649,8 +7649,8 @@
       "chapterNumber": "J",
       "sectionNumber": "J",
       "title": "Appendix J: Reserved",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
+      "classification": "title-only-official-heading",
+      "reason": "empty-official-heading",
       "sourceHTMLPath": "code-sections/building-code/chapters/J.html"
     },
     {
@@ -7661,8 +7661,8 @@
       "chapterNumber": "K",
       "sectionNumber": "K",
       "title": "Appendix K: Modified Industry Standards for Elevators and Conveying Systems",
-      "classification": "nested-or-title-only-catalog-entry",
-      "reason": "no-official-heading",
+      "classification": "title-only-official-heading",
+      "reason": "empty-official-heading",
       "sourceHTMLPath": "code-sections/building-code/chapters/K.html"
     },
     {

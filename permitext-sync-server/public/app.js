@@ -12071,8 +12071,8 @@ function renderSectionComments(commentsList, targets) {
 
 function rewriteCodeHTML(html) {
   return rewriteStructuredCodeLinks(html)
-    .replace(/src=(["'])(?:\.\.\/)+assets\/([^"']+)\1/gi, (_match, quote, fileName) => {
-      return `src=${quote}/code/assets/${encodeURIComponent(fileName)}?v=${offlineFeatureMetadata.assetVersion}${quote}`;
+    .replace(/\b(src|href)=(["'])(?:\.\.\/)+assets\/([^"']+)\2/gi, (_match, attribute, quote, fileName) => {
+      return `${attribute}=${quote}/code/assets/${encodeURIComponent(fileName)}?v=${offlineFeatureMetadata.assetVersion}${quote}`;
     })
     .replace(/<\s*\/?\s*(annotationdrawer|codeoptions)\b[^>]*>/gi, "");
 }
@@ -27301,7 +27301,7 @@ function renderSettings() {
       offlineDownload.textContent = account ? "Upgrade to Pro" : "Sign In to Continue";
       return;
     }
-    offlineCopy.textContent = `Keep the app and complete searchable 2022 Construction Codes on this device. Estimated download: ${offlineFeatureMetadata.estimatedDownload}.`;
+    offlineCopy.textContent = `Keep the app and the complete searchable enacted-code library on this device. Estimated download: ${offlineFeatureMetadata.estimatedDownload}.`;
     if (!library.supported) {
       offlineStatus.textContent = "This browser does not provide the storage required for offline codes.";
       offlineDownload.textContent = "Offline Storage Unavailable";

@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { dirname, join, relative } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const serverRoot = dirname(fileURLToPath(import.meta.url));
@@ -123,6 +123,30 @@ function decodedPlainText(html) {
     .trim();
 }
 
+function parsedHeading(source, match, sectionNumber = "") {
+  const headingText = decodedPlainText(match[1]);
+  const headingStart = match.index;
+  const headingEnd = headingStart + match[0].length;
+  return {
+    sectionNumber: String(sectionNumber || "").replace(/\s+/g, ""),
+    normalizedSectionNumber: normalizedSectionNumber(sectionNumber),
+    headingText,
+    normalizedHeadingTitle: normalizedHeadingTitle(headingText),
+    headingStart,
+    contentStart: headingEnd,
+    wrapperStart: headingWrapperStart(source.html, headingStart)
+  };
+}
+
+function allChapterHeadings(source) {
+  const headings = [];
+  const expression = /<h6\b[^>]*>([\s\S]*?)<\/h6>/gi;
+  for (const match of source.html.matchAll(expression)) {
+    headings.push(parsedHeading(source, match));
+  }
+  return headings;
+}
+
 function chapterHeadings(source) {
   if (cachedChapterHeadings.has(source.cacheKey)) return cachedChapterHeadings.get(source.cacheKey);
   const headings = [];
@@ -133,21 +157,72 @@ function chapterHeadings(source) {
       /^(?:SECTION\s+BC\s+(202)\.?(?=\s|:|$)|(?:§\s*)?([A-Za-z]*\d+(?:[-.]\s*\d+)*(?:\([A-Za-z0-9]+\))?)\.?(?=\s|$))/i
     );
     if (!sectionMatch) continue;
-    const sectionNumber = sectionMatch[1] || sectionMatch[2];
-    const headingStart = match.index;
-    const headingEnd = headingStart + match[0].length;
-    headings.push({
-      sectionNumber: sectionNumber.replace(/\s+/g, ""),
-      normalizedSectionNumber: normalizedSectionNumber(sectionNumber),
-      headingText,
-      normalizedHeadingTitle: normalizedHeadingTitle(headingText),
-      headingStart,
-      contentStart: headingEnd,
-      wrapperStart: headingWrapperStart(source.html, headingStart)
-    });
+    headings.push(parsedHeading(source, match, sectionMatch[1] || sectionMatch[2]));
   }
   cachedChapterHeadings.set(source.cacheKey, headings);
   return headings;
+}
+
+export function constructionImageAssetNames(blocks) {
+  const names = new Set();
+  for (const block of blocks || []) {
+    if (block.imageID) names.add(basename(String(block.imageID)));
+    for (const match of String(block.html || "").matchAll(/<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi)) {
+      const source = match[1].split(/[?#]/, 1)[0];
+      if (!source || source.startsWith("data:")) continue;
+      try {
+        names.add(basename(decodeURIComponent(source)));
+      } catch {
+        names.add(basename(source));
+      }
+    }
+  }
+  return [...names].filter(Boolean);
+}
+
+export function officialBodyHasUnboundImages(preparedBody, officialBody) {
+  if (!officialBody) return false;
+  const prepared = new Set(constructionImageAssetNames(preparedBody?.blocks));
+  return constructionImageAssetNames(officialBody.blocks).some((name) => !prepared.has(name));
+}
+
+function bodyFromHeadingSlice(section, source, headings, selectedIndex) {
+  const start = headings[selectedIndex].contentStart;
+  const end = selectedIndex + 1 < headings.length ? headings[selectedIndex + 1].wrapperStart : source.html.length;
+  if (start >= end) {
+    return {
+      body: null,
+      reason: "empty-official-heading",
+      sourceHTMLPath: relative(constructionContentRoot, source.path)
+    };
+  }
+  const html = source.html.slice(start, end).trim();
+  const plainText = decodedPlainText(html);
+  if (!html || !plainText) {
+    return {
+      body: null,
+      reason: "empty-official-heading",
+      sourceHTMLPath: relative(constructionContentRoot, source.path)
+    };
+  }
+  return {
+    reason: null,
+    body: {
+      schemaVersion: 2,
+      sectionID: Number(section.id),
+      chapterID: Number(section.chapterID),
+      chapterNumber: section.chapterNumber,
+      sectionNumber: section.sectionNumber,
+      title: section.title,
+      sourceHTMLPath: relative(constructionContentRoot, source.path),
+      blocks: [{
+        id: `${section.id}-html-1`,
+        kind: "html",
+        html,
+        plainText
+      }]
+    }
+  };
 }
 
 export async function constructionChapterHeadingNumbers(codePrefix, chapterNumber) {
@@ -188,50 +263,27 @@ export async function constructionHTMLBodyStatusForSection(section) {
     : candidates.length === 1
       ? candidates[0]
       : null;
-  const index = selected?.index ?? -1;
-  if (index < 0) {
-    return {
-      body: null,
-      reason: candidates.length ? "ambiguous-official-heading" : "no-official-heading",
-      sourceHTMLPath: relative(constructionContentRoot, source.path),
-      headingCount: candidates.length
-    };
+  if (selected) {
+    return bodyFromHeadingSlice(section, source, headings, selected.index);
   }
-  const start = headings[index].contentStart;
-  const end = index + 1 < headings.length ? headings[index + 1].wrapperStart : source.html.length;
-  if (start >= end) {
-    return {
-      body: null,
-      reason: "empty-official-heading",
-      sourceHTMLPath: relative(constructionContentRoot, source.path)
-    };
-  }
-  const html = source.html.slice(start, end).trim();
-  const plainText = decodedPlainText(html);
-  if (!html || !plainText) {
-    return {
-      body: null,
-      reason: "empty-official-heading",
-      sourceHTMLPath: relative(constructionContentRoot, source.path)
-    };
-  }
-  return {
-    reason: null,
-    body: {
-    schemaVersion: 2,
-    sectionID: Number(section.id),
-    chapterID: Number(section.chapterID),
-    chapterNumber: section.chapterNumber,
-    sectionNumber: section.sectionNumber,
-    title: section.title,
-    sourceHTMLPath: relative(constructionContentRoot, source.path),
-    blocks: [{
-      id: `${section.id}-html-1`,
-      kind: "html",
-      html,
-      plainText
-    }]
+
+  // Numbered headings miss lettered appendix titles such as "Appendix A: ...".
+  // Only fall back when a catalog title uniquely matches one official h6.
+  if (expectedTitle) {
+    const titledHeadings = allChapterHeadings(source);
+    const uniqueTitle = titledHeadings
+      .map((heading, index) => ({ heading, index }))
+      .filter(({ heading }) => heading.normalizedHeadingTitle === expectedTitle);
+    if (uniqueTitle.length === 1) {
+      return bodyFromHeadingSlice(section, source, titledHeadings, uniqueTitle[0].index);
     }
+  }
+
+  return {
+    body: null,
+    reason: candidates.length ? "ambiguous-official-heading" : "no-official-heading",
+    sourceHTMLPath: relative(constructionContentRoot, source.path),
+    headingCount: candidates.length
   };
 }
 

@@ -880,12 +880,44 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         _ contentBlocks: [CodeContentBlock],
         for indexed: IndexedSection
     ) -> [CodeContentBlock] {
+        let publishedBlocks = synthesizedContentBlocks(for: indexed)
+        if Self.containsUnboundPublishedImages(prepared: contentBlocks, published: publishedBlocks) {
+            return publishedBlocks
+        }
         guard !Self.containsRichSource(contentBlocks),
               Self.referencesRichSource(contentBlocks) else {
             return contentBlocks
         }
-        let publishedBlocks = synthesizedContentBlocks(for: indexed)
         return Self.containsRichSource(publishedBlocks) ? publishedBlocks : contentBlocks
+    }
+
+    private static func imageAssetNames(in blocks: [CodeContentBlock]) -> Set<String> {
+        var names = Set<String>()
+        let pattern = #"<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']"#
+        for block in blocks {
+            if let imageID = block.imageID?.trimmingCharacters(in: .whitespacesAndNewlines), !imageID.isEmpty {
+                names.insert(URL(fileURLWithPath: imageID).lastPathComponent)
+            }
+            guard let html = block.html else { continue }
+            guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else { continue }
+            let range = NSRange(html.startIndex..<html.endIndex, in: html)
+            for match in regex.matches(in: html, options: [], range: range) {
+                guard match.numberOfRanges > 1,
+                      let sourceRange = Range(match.range(at: 1), in: html) else { continue }
+                let source = String(html[sourceRange]).split(separator: "?").first.map(String.init) ?? ""
+                if source.isEmpty || source.lowercased().hasPrefix("data:") { continue }
+                names.insert(URL(fileURLWithPath: source.removingPercentEncoding ?? source).lastPathComponent)
+            }
+        }
+        return names
+    }
+
+    private static func containsUnboundPublishedImages(
+        prepared: [CodeContentBlock],
+        published: [CodeContentBlock]
+    ) -> Bool {
+        let preparedNames = imageAssetNames(in: prepared)
+        return !imageAssetNames(in: published).subtracting(preparedNames).isEmpty
     }
 
     private static func containsRichSource(_ blocks: [CodeContentBlock]) -> Bool {

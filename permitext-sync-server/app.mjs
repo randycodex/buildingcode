@@ -185,7 +185,6 @@ import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
 import {
   isZoningChapterID,
   isZoningSectionID,
-  zoningAssetFilePath,
   zoningChapter,
   zoningChapterIndex,
   zoningCodePrefix,
@@ -226,7 +225,11 @@ import {
   isEnactedNavigationChapterID
 } from "./enacted-code-content.mjs";
 import { applyVisibleSectionNumber } from "./code-navigation-hierarchy.mjs";
-import { constructionHTMLBodyForSection } from "./construction-html-content.mjs";
+import {
+  constructionHTMLBodyForSection,
+  officialBodyHasUnboundImages
+} from "./construction-html-content.mjs";
+import { codeAssetContentType, resolveCodeAsset } from "./code-asset-store.mjs";
 import {
   collaborationSchemaVersion,
   latestReviewThreadUpdatedAt,
@@ -5736,11 +5739,14 @@ function bodyReferencesRichSource(body) {
 }
 
 async function bodyEnrichedWithOfficialRichSource(body, sectionID) {
+  const summary = await sectionSummaryByID(sectionID);
+  const htmlBody = await constructionHTMLBodyForSection(summary);
+  if (officialBodyHasUnboundImages(body, htmlBody)) {
+    return htmlBody;
+  }
   if (bodyContainsRichSource(body) || !bodyReferencesRichSource(body)) {
     return body;
   }
-  const summary = await sectionSummaryByID(sectionID);
-  const htmlBody = await constructionHTMLBodyForSection(summary);
   return bodyContainsRichSource(htmlBody) ? htmlBody : body;
 }
 
@@ -15036,14 +15042,18 @@ async function handleInternalStatic(request, path, response) {
 
 async function handleCodeAsset(path, response) {
   const fileName = decodeURIComponent(path.replace(/^code\/assets\//, ""));
-  if (!/^[a-zA-Z0-9._-]+$/.test(fileName)) {
+  const resolved = await resolveCodeAsset(fileName);
+  if (!resolved.path) {
     sendNotFound(response);
     return;
   }
   try {
-    const zoningPath = fileName.startsWith("zr-") ? await zoningAssetFilePath(fileName) : null;
-    const filePath = zoningPath || join(assetContentPath, fileName);
-    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), codeAssetCacheControl);
+    sendStatic(
+      response,
+      codeAssetContentType(fileName) || contentTypeForPath(resolved.path),
+      await readFile(resolved.path),
+      codeAssetCacheControl
+    );
   } catch (error) {
     if (error.code === "ENOENT") {
       sendNotFound(response);
