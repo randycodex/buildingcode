@@ -9304,6 +9304,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: var(--menu-subtle-surface);
 }
 
+.saved-folder-context.is-project .saved-project-facts-section.is-open,
+.saved-folder-context.is-project .saved-project-structured-section.is-open,
+.saved-folder-context.is-project .saved-project-evidence-section.is-open,
+.saved-folder-context.is-project .saved-project-research-answers.is-open {
+  padding-top: var(--space-3);
+}
+
 .saved-folder-context.is-project .saved-project-facts-section.is-open > .project-section-motion-body,
 .saved-folder-context.is-project .saved-project-structured-section.is-open > .project-section-motion-body,
 .saved-folder-context.is-project .saved-project-evidence-section.is-open > .project-section-motion-body,
