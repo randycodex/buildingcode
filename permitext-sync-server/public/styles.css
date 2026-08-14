@@ -1703,7 +1703,8 @@ body.is-detached-workboard-window .detached-workboard-error p {
   text-decoration: none;
 }
 
-.topbar .toolbar-button[aria-pressed="true"] {
+.topbar .toolbar-button[aria-pressed="true"],
+.topbar #add-reader.has-open-reader {
   background: color-mix(in srgb, var(--code-accent) 20%, transparent);
   color: var(--toolbar-active-text);
 }

@@ -3862,6 +3862,7 @@ function applyPaneWeight(panel, paneID) {
 
 function setUtilityButtonStates() {
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
+  addReaderButton.classList.toggle("has-open-reader", state.readers.length > 0);
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
