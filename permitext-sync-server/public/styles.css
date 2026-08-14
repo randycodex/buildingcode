@@ -5532,7 +5532,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 .research-evidence-reviewed-body {
   display: grid;
   gap: var(--space-3);
-  padding: var(--space-2) 0 var(--space-1);
+  margin-top: var(--space-1);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: calc(var(--radius-card) + 2px);
+  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+  box-shadow: none;
 }
 
 .research-answer-details {
