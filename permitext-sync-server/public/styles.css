@@ -586,7 +586,7 @@ textarea:focus-visible {
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 7%, transparent);
   color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.72);
+  font-size: 12px;
   font-weight: 650;
   white-space: nowrap;
 }
@@ -698,7 +698,7 @@ textarea:focus-visible {
   align-items: center;
   padding: 0 11px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .workspace-tab span {

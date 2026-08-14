@@ -316,5 +316,7 @@ assert.match(clientSource, /openResearchSourceInSectionDetail\(source, options\.
 assert.match(clientSource, /function openResearchSourceInSectionDetail\(item, anchorPaneID\)[\s\S]*?resolveInlineCodeSection\(codePrefix, sectionNumber\)[\s\S]*?newUtilityInstance\("sdc"\)[\s\S]*?openSectionDetail\(detailOwner\.id, searchResultDetail\(navigationItem\), \{ anchorPaneID \}\)/, "Answer sources do not resolve and open the compact detail column beside Research.");
 assert.match(stylesSource, /\.research-answer-source-list \.research-source-card \+ \.research-source-card \{[\s\S]*?border-top: 0;/, "Answer source rows still render divider lines.");
 assert.match(clientSource, /if \(!options\.openInReader\) toggle\.append\(disclosure\)/, "Direct-opening answer sources still render disclosure chevrons.");
+assert.match(stylesSource, /\.workspace-tab \{[\s\S]*?font-size: 12px;/, "Workspace tab labels are not 12px.");
+assert.match(stylesSource, /\.connection-status \{[\s\S]*?font-size: 12px;/, "Connection status labels are not 12px.");
 
 console.log("permitext research list summary contract passed");
