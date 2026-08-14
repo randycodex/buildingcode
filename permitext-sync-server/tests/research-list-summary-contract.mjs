@@ -327,6 +327,9 @@ assert.match(stylesSource, /\.reader-notes-research-action \{[\s\S]*?border-radi
 assert.match(stylesSource, /\.research-selection-menu \{[\s\S]*?border: 0;/, "The enacted-text Research selection menu still renders a thin edge.");
 assert.match(clientSource, /projectPicker\.className = "research-selection-project-picker"[\s\S]*?projectList\.hidden = !willOpen;[\s\S]*?projectTrigger\.setAttribute\("aria-expanded", String\(willOpen\)\)/, "The selection-menu Project picker does not expand inline with its card.");
 assert.match(stylesSource, /\.research-selection-menu \.research-selection-project-option \+ \.research-selection-project-option \{[\s\S]*?border-top: 1px solid var\(--border\);/, "The inline Research Project choices are not separated by thin dividers.");
+assert.match(clientSource, /analyzeButton\.className = "research-selection-start-action"/, "The Start Research action lacks its scoped visual hook.");
+assert.match(stylesSource, /\.research-selection-actions \{[\s\S]*?justify-content: center;/, "The Research selection action is not centered.");
+assert.match(stylesSource, /\.research-selection-menu \.research-selection-start-action \{[\s\S]*?background: #000;[\s\S]*?color: #fff;[\s\S]*?opacity: 0\.58;/, "The Start Research action does not match its annotated treatment.");
 assert.match(clientSource, /const preservedTargetOffset = preservedTarget[\s\S]*?menu\.scrollTop \+= nextTargetOffset - preservedTargetOffset;[\s\S]*?focusTarget\?\.focus\(\{ preventScroll: true \}\)/, "Expanding a Reader chapter does not preserve its viewport position.");
 assert.match(clientSource, /if \(readerCodeMenu\) \{[\s\S]*?event\.key !== "Escape" \|\| menu\.hidden[\s\S]*?closeMenu\(\);[\s\S]*?trigger\.focus\(\{ preventScroll: true \}\)/, "Escape does not close the Reader code menu and restore trigger focus.");
 

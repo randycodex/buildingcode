@@ -18339,6 +18339,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   }
   const analyzeButton = document.createElement("button");
   analyzeButton.type = "button";
+  analyzeButton.className = "research-selection-start-action";
   analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research";
   analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
   actions.append(analyzeButton);

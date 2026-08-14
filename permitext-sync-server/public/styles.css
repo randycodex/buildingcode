@@ -7844,6 +7844,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .research-selection-actions {
   display: flex;
+  justify-content: center;
   gap: 4px;
   flex-wrap: wrap;
 }
@@ -7904,6 +7905,19 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .research-selection-menu button:hover,
 .research-selection-menu button:focus-visible {
   background: var(--toolbar-active);
+}
+
+.research-selection-menu .research-selection-start-action {
+  background: #000;
+  color: #fff;
+  opacity: 0.58;
+}
+
+.research-selection-menu .research-selection-start-action:hover,
+.research-selection-menu .research-selection-start-action:focus-visible {
+  background: #000;
+  color: #fff;
+  opacity: 0.58;
 }
 
 .research-selection-status:not(:empty) {
