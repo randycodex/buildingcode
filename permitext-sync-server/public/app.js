@@ -17389,6 +17389,7 @@ function renderReaderResearchOrigin(conversation, sources, anchorPaneID) {
   list.className = "research-reader-origin-list";
   sources.forEach((source) => {
     const passage = document.createElement("article");
+    passage.classList.add(`code-theme-${codeTheme(source.codePrefix || "BC")}`);
     const passageHeader = document.createElement("div");
     const reference = document.createElement("strong");
     const prefix = String(source.codePrefix || "").trim();
