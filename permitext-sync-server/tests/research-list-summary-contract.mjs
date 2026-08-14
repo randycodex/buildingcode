@@ -334,6 +334,7 @@ assert.match(clientSource, /panel\.classList\.add\("analysis-panel", "research-l
 assert.match(clientSource, /function renderNewResearchComposer\(container, researchEnabled\)[\s\S]*?input\.rows = 3;[\s\S]*?container\.append\(form\);/, "The Research history composer does not match the conversation composer height or mount directly in the panel.");
 assert.match(clientSource, /renderNewResearchComposer\(panel, researchEnabled\)/, "The Research history composer still scrolls inside the history content.");
 assert.match(stylesSource, /\.analysis-panel\.has-research-composer > \.research-composer \{[\s\S]*?padding: var\(--space-3\) 0 var\(--panel-padding\);/, "The Research history composer does not share the conversation composer's bottom position.");
+assert.match(stylesSource, /\.research-composer \.research-question-input \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);[\s\S]*?color: #ffffff;/, "Research composer textareas do not share the annotated fill and text color.");
 assert.match(clientSource, /const preservedTargetOffset = preservedTarget[\s\S]*?menu\.scrollTop \+= nextTargetOffset - preservedTargetOffset;[\s\S]*?focusTarget\?\.focus\(\{ preventScroll: true \}\)/, "Expanding a Reader chapter does not preserve its viewport position.");
 assert.match(clientSource, /if \(readerCodeMenu\) \{[\s\S]*?event\.key !== "Escape" \|\| menu\.hidden[\s\S]*?closeMenu\(\);[\s\S]*?trigger\.focus\(\{ preventScroll: true \}\)/, "Escape does not close the Reader code menu and restore trigger focus.");
 

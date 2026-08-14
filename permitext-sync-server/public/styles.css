@@ -7790,7 +7790,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   padding: var(--space-3) var(--space-3) calc(42px + var(--space-3));
   border: 0;
   border-radius: inherit;
-  background: transparent;
+  background: rgb(246 244 241 / 10%);
+  color: #ffffff;
   overflow-y: hidden;
   outline: 0;
 }
