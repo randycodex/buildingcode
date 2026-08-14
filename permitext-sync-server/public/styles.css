@@ -2363,8 +2363,7 @@ label {
 }
 
 .reader-code-select-menu .custom-select-option[aria-selected="true"],
-.reader-chapter-select-menu .custom-select-option[aria-selected="true"],
-.reader-chapter-select-menu [role="treeitem"][aria-selected="true"] {
+.reader-chapter-select-menu .custom-select-option[aria-selected="true"] {
   background: color-mix(in srgb, var(--code-accent) 12%, transparent);
   color: var(--text-primary);
   font-weight: 650;
@@ -2402,15 +2401,20 @@ label {
   cursor: pointer;
 }
 
+.reader-nav-chapter-row {
+  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
+  color: var(--text-primary);
+  font-weight: 650;
+}
+
 .reader-nav-chapter-row:hover,
 .reader-nav-section:hover {
   background: color-mix(in srgb, var(--code-accent) 8%, transparent);
   color: var(--text-primary);
 }
 
-.reader-nav-chapter[aria-selected="true"] > .reader-nav-chapter-row,
 .reader-nav-section[aria-selected="true"] {
-  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
+  background: transparent;
   color: var(--text-primary);
   font-weight: 650;
 }

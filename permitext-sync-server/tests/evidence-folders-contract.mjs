@@ -471,6 +471,9 @@ assert.match(stylesSource, /\.saved-project-tile\.is-selected \.saved-project-co
 assert.match(stylesSource, /\.saved-projects-section\.is-selecting \.saved-project-tile\[data-bulk-selectable="true"\] \{[\s\S]*?opacity: 0\.58;/);
 assert.match(stylesSource, /\.saved-project-tile\.is-bulk-selected \{[\s\S]*?opacity: 1 !important;[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.workspace-add-button \{[\s\S]*?font-size: 20px;[\s\S]*?line-height: 1;/);
+assert.doesNotMatch(stylesSource, /\.reader-chapter-select-menu \[role="treeitem"\]\[aria-selected="true"\]/);
+assert.match(stylesSource, /\.reader-nav-chapter-row \{[^}]*background: color-mix\(in srgb, var\(--code-accent\) 12%, transparent\);/);
+assert.match(stylesSource, /\.reader-nav-section\[aria-selected="true"\] \{[^}]*background: transparent;/);
 assert.match(stylesSource, /\.saved-panel \.saved-content\[hidden\] \{[\s\S]*?display: none;/, "Deactivating a Project must hide its Saved Evidence list.");
 assert.match(stylesSource, /\.saved-project-fact-description \{[\s\S]*?height: 112px;[\s\S]*?max-height: min\(70vh, 760px\);[\s\S]*?overflow-y: auto;[\s\S]*?resize: none;/);
 assert.match(appSource, /descriptionResizeHandle\.className = "saved-project-fact-resize-handle"[\s\S]*?descriptionResizeHandle\.setPointerCapture\(event\.pointerId\)[\s\S]*?event\.key !== "ArrowUp" && event\.key !== "ArrowDown"/);
