@@ -9246,19 +9246,21 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-folder-context.is-project {
-  gap: 0;
+  --saved-project-row-gap: calc(var(--space-2) + var(--space-3));
+  gap: var(--saved-project-row-gap);
+  margin-top: var(--saved-project-row-gap);
   padding: 0 0 var(--space-4);
   border-radius: 0;
   background: transparent;
 }
 
 .saved-folder-context.is-project > .saved-project-summary {
-  margin-top: var(--space-3);
+  margin-top: 0;
 }
 
 .saved-project-summary {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--saved-project-row-gap, var(--space-1));
 }
 
 .saved-folder-context.is-project .saved-project-facts-section,
@@ -9545,7 +9547,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
   width: 100%;
-  padding-top: var(--space-3);
+  padding-top: 0;
 }
 
 .saved-folder-context.is-project .saved-project-tool-controls button {
@@ -9555,7 +9557,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-folder-context.is-project > .project-studio-section {
-  margin-top: var(--space-1);
+  margin-top: 0;
   padding-top: 0;
 }
 
