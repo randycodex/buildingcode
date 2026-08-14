@@ -2843,6 +2843,19 @@ function researchSourceCitation(source) {
   ].filter(Boolean).join(" / ");
 }
 
+function researchAnswerSourceCitation(source) {
+  const edition = [
+    String(source?.codeEdition || ""),
+    String(source?.codeVersion || "")
+  ].find((value) => /\b(?:19|20)\d{2}\b/.test(value)) || "";
+  const year = edition.match(/\b((?:19|20)\d{2})\b/)?.[1] || "2022";
+  const codePrefix = String(source?.codePrefix || "BC").trim().toUpperCase();
+  const sectionNumber = String(source?.sectionNumber || "").trim();
+  return [`NYC ${year}`, [codePrefix, sectionNumber].filter(Boolean).join(" ")]
+    .filter(Boolean)
+    .join(" / ");
+}
+
 function paneIDForReader(reader, options = {}) {
   return options.isSearchResult ? "reader:search-result" : `reader:${reader.id}`;
 }
@@ -17133,7 +17146,9 @@ function renderResearchSource(source, options = {}) {
   const supportingSource = ["official_guidance", "technical_source", "secondary_source", "web"].includes(sourceKind);
   citation.textContent = supportingSource
     ? String(source.title || source.publisher || source.sourceURL || source.url || "Supporting source")
-    : researchSourceCitation(source);
+    : options.openInReader
+      ? researchAnswerSourceCitation(source)
+      : researchSourceCitation(source);
   const disclosure = document.createElement("span");
   disclosure.className = "research-source-disclosure";
   disclosure.setAttribute("aria-hidden", "true");

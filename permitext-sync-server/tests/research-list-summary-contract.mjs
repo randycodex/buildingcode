@@ -330,6 +330,9 @@ assert.match(clientSource, /renderSourceGroup\("Cited in this answer", cited, "i
 assert.match(clientSource, /renderSourceGroup\("Reviewed for context — not cited", reviewed, "is-reviewed"\)/, "Reviewed-only sources do not have a distinct labeled group.");
 assert.match(clientSource, /answerQuality\.citedSourceIDs[\s\S]*?answerQuality\.reviewedOnlySourceIDs[\s\S]*?sourceIsReviewedOnly[\s\S]*?sources\.filter\(\(source\) => !sourceIsReviewedOnly\(source\) && sourceIsCited\(source\)\)/, "Answer sources are not split using their saved citation identities.");
 assert.match(stylesSource, /\.research-answer-source-group\.is-cited \{[\s\S]*?background: color-mix\(in srgb, var\(--text-primary\) 5%, transparent\);/, "Cited sources do not have a quiet visual grouping distinct from reviewed-only sources.");
+assert.match(clientSource, /function researchAnswerSourceCitation\(source\)[\s\S]*?`NYC \$\{year\}`[\s\S]*?\[codePrefix, sectionNumber\][\s\S]*?join\(" \/ "\)/, "Answer-source citations are not reduced to year, code prefix, and section number.");
+assert.match(clientSource, /options\.openInReader[\s\S]*?researchAnswerSourceCitation\(source\)/, "Direct-opening answer sources do not use the compact citation format.");
+assert.match(stylesSource, /\.research-answer-source-list \.research-source-toggle > strong \{[\s\S]*?font-weight: 400;/, "Answer-source citations remain bold.");
 assert.match(clientSource, /if \(!options\.openInReader\) toggle\.append\(disclosure\)/, "Direct-opening answer sources still render disclosure chevrons.");
 assert.match(stylesSource, /\.workspace-tab \{[\s\S]*?font-size: 12px;/, "Workspace tab labels are not 12px.");
 assert.match(stylesSource, /\.connection-status \{[\s\S]*?font-size: 12px;/, "Connection status labels are not 12px.");

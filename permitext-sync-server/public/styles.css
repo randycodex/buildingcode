@@ -7756,6 +7756,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   border-top: 0;
 }
 
+.research-answer-source-list .research-source-toggle > strong {
+  font-weight: 400;
+}
+
 .research-conversation-header-project {
   max-width: 180px;
   min-height: 28px;
