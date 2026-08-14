@@ -124,7 +124,8 @@ assert.match(clientSource, /summary\.textContent = "Facts used in this answer"/,
 assert.match(clientSource, /appendGroup\("Project context", projectContext\)/, "Research answers do not identify facts sourced from Project context.");
 assert.match(clientSource, /appendGroup\("Research conversation", conversation\)/, "Research answers do not identify facts extracted from the conversation.");
 assert.match(stylesSource, /\.research-feedback-actions \.ghost-button \{[\s\S]*?border: 0;[\s\S]*?box-shadow: none;/, "Research feedback actions retain outlined or highlighted button chrome.");
-assert.match(stylesSource, /\.research-feedback-actions \.research-feedback-cancel \{[\s\S]*?background: transparent;/, "Research feedback Cancel action is not visually quiet.");
+assert.match(stylesSource, /\.research-feedback-choice \{[\s\S]*?border: 0;[\s\S]*?background: color-mix\(in srgb, var\(--text-primary\) 9%, transparent\);[\s\S]*?box-shadow: none;/, "Research feedback choices do not match the flat Update feedback action.");
+assert.match(stylesSource, /\.research-feedback-actions \.research-feedback-cancel \{[\s\S]*?background: color-mix\(in srgb, var\(--text-primary\) 9%, transparent\);[\s\S]*?color: var\(--text-primary\);/, "Research feedback Cancel does not match the Update feedback action.");
 assert.match(clientSource, /professionalRole\.className = "research-feedback-role-select"[\s\S]*?enhanceSelect\(professionalRole\)/, "Professional role does not use the shared floating-card select behavior.");
 assert.match(stylesSource, /\.research-feedback-role-select-menu \{[\s\S]*?border-radius:[\s\S]*?background: var\(--menu-surface\)/, "Professional-role options do not open in the standard rounded floating card.");
 assert.match(stylesSource, /\.saved-project-structured-fact \{[\s\S]*?background:/, "Structured Project facts have no distinct review surface.");

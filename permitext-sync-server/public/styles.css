@@ -5688,19 +5688,26 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-feedback-choice {
-  min-height: 30px;
-  padding: 0 9px;
-  border: 1px solid var(--border);
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border: 0;
   border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--text-primary) 9%, transparent);
+  color: var(--text-primary);
+  box-shadow: none;
   font-size: calc(var(--chrome-font-size) * 0.74) !important;
+  font-weight: 600;
+}
+
+.research-feedback-choice:hover,
+.research-feedback-choice:focus-visible {
+  background: color-mix(in srgb, var(--text-primary) 15%, transparent);
+  box-shadow: none;
 }
 
 .research-feedback-choice[aria-pressed="true"] {
-  border-color: var(--text-primary);
-  background: var(--text-primary);
-  color: var(--surface);
+  background: color-mix(in srgb, var(--code-accent) 22%, transparent);
+  color: var(--text-primary);
 }
 
 .research-feedback-context {
@@ -5749,8 +5756,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-feedback-actions .research-feedback-cancel {
-  background: transparent;
-  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--text-primary) 9%, transparent);
+  color: var(--text-primary);
 }
 
 .research-feedback-actions .ghost-button:hover {
