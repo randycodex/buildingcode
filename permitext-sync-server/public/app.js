@@ -5541,6 +5541,18 @@ function enhanceSelect(select) {
     trigger.setAttribute("aria-expanded", "false");
   });
 
+  if (readerCodeMenu) {
+    const closeCodeMenuOnEscape = (event) => {
+      if (event.key !== "Escape" || menu.hidden) return;
+      event.preventDefault();
+      event.stopPropagation();
+      closeMenu();
+      trigger.focus({ preventScroll: true });
+    };
+    trigger.addEventListener("keydown", closeCodeMenuOnEscape);
+    menu.addEventListener("keydown", closeCodeMenuOnEscape);
+  }
+
   select.addEventListener("change", () => {
     syncTrigger();
     renderOptions();
