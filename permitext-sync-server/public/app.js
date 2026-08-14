@@ -4245,6 +4245,92 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
   return setExpanded;
 }
 
+function wireResearchDetailsMotion(details, body) {
+  const summary = details.querySelector(":scope > summary");
+  if (!summary || !body) return;
+
+  details.classList.add("research-details-motion");
+  body.classList.add("research-details-motion-body");
+  let expanded = details.open;
+  let settleTimer = null;
+
+  const finish = (nextExpanded) => {
+    window.clearTimeout(settleTimer);
+    body.removeEventListener("transitionend", onTransitionEnd);
+    if (nextExpanded) {
+      body.style.maxHeight = "none";
+      body.style.opacity = "1";
+    } else {
+      details.open = false;
+      body.style.maxHeight = "";
+      body.style.opacity = "";
+    }
+  };
+  const onTransitionEnd = (event) => {
+    if (event.target !== body || event.propertyName !== "max-height") return;
+    finish(expanded);
+  };
+  const settleLater = () => {
+    window.clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(() => finish(expanded), 500);
+  };
+  const contentObserver = new MutationObserver(() => {
+    if (!expanded || !details.open || body.style.maxHeight === "none") return;
+    requestAnimationFrame(() => {
+      if (!expanded || body.style.maxHeight === "none") return;
+      body.style.maxHeight = `${body.scrollHeight}px`;
+      settleLater();
+    });
+  });
+  contentObserver.observe(body, { childList: true, subtree: true });
+  const setExpanded = (nextExpanded, options = {}) => {
+    nextExpanded = Boolean(nextExpanded);
+    window.clearTimeout(settleTimer);
+    body.removeEventListener("transitionend", onTransitionEnd);
+    expanded = nextExpanded;
+    summary.setAttribute("aria-expanded", String(expanded));
+
+    if (options.instant) {
+      details.open = expanded;
+      body.style.maxHeight = expanded ? "none" : "";
+      body.style.opacity = expanded ? "1" : "";
+      return;
+    }
+
+    if (expanded) {
+      if (details.open && body.style.maxHeight === "none") return;
+      details.open = true;
+      body.style.maxHeight = "0px";
+      body.style.opacity = "0";
+      void body.offsetHeight;
+      requestAnimationFrame(() => {
+        if (!expanded) return;
+        body.style.maxHeight = `${body.scrollHeight}px`;
+        body.style.opacity = "1";
+      });
+    } else {
+      if (!details.open) return;
+      body.style.maxHeight = `${body.scrollHeight}px`;
+      body.style.opacity = "1";
+      void body.offsetHeight;
+      requestAnimationFrame(() => {
+        if (expanded) return;
+        body.style.maxHeight = "0px";
+        body.style.opacity = "0";
+      });
+    }
+    body.addEventListener("transitionend", onTransitionEnd);
+    settleLater();
+  };
+
+  summary.addEventListener("click", (event) => {
+    event.preventDefault();
+    setExpanded(!expanded);
+  });
+  details.setResearchExpanded = setExpanded;
+  setExpanded(expanded, { instant: true });
+}
+
 async function api(path) {
   let response;
   try {
@@ -14034,6 +14120,7 @@ function appendResearchProjectContextDisclosure(container, result) {
   appendGroup("Still needed", needed);
   details.append(summary, body);
   container.append(details);
+  wireResearchDetailsMotion(details, body);
 }
 
 function appendResearchSupportedPoints(container, points) {
@@ -14308,7 +14395,8 @@ function renderResearchInterpretation(container, result, options = {}) {
       citationButton.addEventListener("click", () => {
         const sourceDetails = container.querySelector(".research-answer-source-text");
         if (!sourceDetails) return;
-        sourceDetails.open = true;
+        if (sourceDetails.setResearchExpanded) sourceDetails.setResearchExpanded(true);
+        else sourceDetails.open = true;
         sourceDetails.scrollIntoView({ block: "nearest", behavior: "smooth" });
       });
       citationRow.append(citationButton);
@@ -14397,9 +14485,11 @@ function renderResearchInterpretation(container, result, options = {}) {
   }
   details.append(summary, detailsBody);
   evidenceReviewedBody.append(details);
+  wireResearchDetailsMotion(details, detailsBody);
   evidenceReviewed.append(evidenceReviewedSummary, evidenceReviewedBody);
   card.append(evidenceReviewed);
   container.append(card);
+  wireResearchDetailsMotion(evidenceReviewed, evidenceReviewedBody);
   if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
 }
 
@@ -17229,6 +17319,7 @@ function renderResearchAnswerSources(conversation, message) {
     }
   });
   details.append(summary, list);
+  wireResearchDetailsMotion(details, list);
   return details;
 }
 

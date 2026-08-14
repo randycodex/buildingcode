@@ -306,5 +306,10 @@ assert.match(appSource, /projectFactsUsed\.maxItems = 0/, "The evidence-analysis
 assert.match(appSource, /max_output_tokens: 6_000,/, "The evidence-analysis model can still be cut off before returning its structured legal-research map.");
 assert.match(appSource, /max_output_tokens: 2_000,/, "The Research verifier can still be cut off before returning its structured result.");
 assert.match(appSource, /maximumResearchVerificationAttempts = 3/, "Research does not preserve two bounded correction opportunities behind the verifier gate.");
+assert.match(clientSource, /function wireResearchDetailsMotion\(details, body\)/, "Research disclosures do not share the standard collapsible motion helper.");
+assert.match(clientSource, /wireResearchDetailsMotion\(evidenceReviewed, evidenceReviewedBody\)/, "Evidence reviewed does not use the shared disclosure motion.");
+assert.match(clientSource, /wireResearchDetailsMotion\(details, detailsBody\)/, "The nested evidence details do not use the shared disclosure motion.");
+assert.match(clientSource, /wireResearchDetailsMotion\(details, list\)/, "The sources-used submenu does not use the shared disclosure motion.");
+assert.match(stylesSource, /\.research-details-motion > \.research-details-motion-body \{[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/, "Research disclosures do not match the standard 420ms collapsible transition.");
 
 console.log("permitext research list summary contract passed");

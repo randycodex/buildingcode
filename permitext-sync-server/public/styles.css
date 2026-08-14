@@ -5460,6 +5460,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   display: inline-block;
   line-height: 1;
   transform-origin: center;
+  transition: transform 260ms ease;
 }
 
 .research-project-context-used[open] > summary::after {
@@ -5522,6 +5523,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   display: inline-block;
   line-height: 1;
   transform-origin: center;
+  transition: transform 260ms ease;
 }
 
 .research-evidence-reviewed[open] > summary::after {
@@ -5543,6 +5545,21 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   border-radius: calc(var(--radius-card) + 2px);
   background: color-mix(in srgb, var(--text-primary) 5%, transparent);
   box-shadow: none;
+}
+
+.research-details-motion > .research-details-motion-body {
+  overflow: hidden;
+  transition:
+    max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-details-motion > .research-details-motion-body,
+  .research-project-context-used > summary::after,
+  .research-evidence-reviewed > summary::after {
+    transition: none;
+  }
 }
 
 .research-answer-details {
