@@ -4257,8 +4257,7 @@ select option:checked {
 }
 
 @media (prefers-color-scheme: dark) {
-  .search-box,
-  .research-start-composer .research-composer-box {
+  .search-box {
     background: #111111;
   }
 }
@@ -6904,7 +6903,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .analysis-panel.has-research-composer > .research-composer {
-  padding: var(--space-3) 0 0;
+  padding: var(--space-3) 0 var(--panel-padding);
 }
 
 .research-selected-evidence-notices {

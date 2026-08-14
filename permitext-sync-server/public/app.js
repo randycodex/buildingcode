@@ -16236,15 +16236,13 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
 }
 
 function renderNewResearchComposer(container, researchEnabled) {
-  const section = document.createElement("section");
-  section.className = "research-chat-start";
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
   input.className = "research-question-input";
-  input.rows = 2;
+  input.rows = 3;
   input.maxLength = 2000;
   input.placeholder = researchChatPlaceholder;
   input.value = researchQuestionDraft;
@@ -16323,13 +16321,12 @@ function renderNewResearchComposer(container, researchEnabled) {
   });
   composerBox.append(input, sendButton);
   form.append(composerBox, status);
-  section.append(form);
-  container.append(section);
+  container.append(form);
 }
 
 async function renderResearch(paneID = "utility:analysis") {
   const panel = renderUtility(analysisTemplate, paneID);
-  panel.classList.add("analysis-panel", "research-list-panel");
+  panel.classList.add("analysis-panel", "research-list-panel", "has-research-composer");
   const projectScopedResearch = Boolean(activeProjectIDForCodeQuestions());
   panel.classList.toggle("is-project-scoped", projectScopedResearch);
   panel.querySelector(".utility-close")?.addEventListener("click", closeResearchWorkspace);
@@ -16544,7 +16541,7 @@ async function renderResearch(paneID = "utility:analysis") {
     content.append(decisionResearch);
   }
 
-  renderNewResearchComposer(content, researchEnabled);
+  renderNewResearchComposer(panel, researchEnabled);
 
   if (!researchConversationList.length) {
     const empty = document.createElement("div");

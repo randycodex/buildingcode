@@ -225,7 +225,7 @@ assert.match(clientSource, /if \(!releaseSurfaceVisibility\.researchHistoryManag
 assert.doesNotMatch(clientSource, /Ask naturally\. Permitext will research/, "The redundant Research start helper sentence is still visible.");
 assert.doesNotMatch(clientSource, /Project context \(optional\)/i, "The redundant Project context caption is still visible above the Research selector.");
 assert.match(stylesSource, /\.research-composer\.research-start-composer \{[\s\S]*?background: transparent;/, "The Research start composer still renders a tinted outer block.");
-assert.match(stylesSource, /\.search-box,[\s\S]*?\.research-start-composer \.research-composer-box \{[\s\S]*?background: #111111;/, "The dark Research chat box does not match the Search pill surface.");
+assert.doesNotMatch(stylesSource, /\.research-start-composer \.research-composer-box/, "The Research history composer overrides the shared conversation composer surface.");
 assert.match(clientSource, /selectHistoryButton\.innerHTML = selectionModeIconSVG\(\)/, "Research history does not expose its selection icon.");
 assert.match(clientSource, /cancelSelectionButton\.textContent = "Cancel"[\s\S]*?selectAllButton\.textContent = "Select all"/, "Research selection mode is missing Cancel or Select all.");
 assert.match(clientSource, /if \(selectingConversations\)[\s\S]*?toggleConversationSelection\(conversation\.id\)/, "Conversation rows do not toggle selection instead of opening while selection mode is active.");
@@ -330,6 +330,10 @@ assert.match(stylesSource, /\.research-selection-menu \.research-selection-proje
 assert.match(clientSource, /analyzeButton\.className = "research-selection-start-action"/, "The Start Research action lacks its scoped visual hook.");
 assert.match(stylesSource, /\.research-selection-actions \{[\s\S]*?justify-content: center;/, "The Research selection action is not centered.");
 assert.match(stylesSource, /\.research-selection-menu \.research-selection-start-action \{[\s\S]*?background: #000;[\s\S]*?color: #fff;[\s\S]*?opacity: 0\.58;/, "The Start Research action does not match its annotated treatment.");
+assert.match(clientSource, /panel\.classList\.add\("analysis-panel", "research-list-panel", "has-research-composer"\)/, "The Research history panel does not reserve a fixed composer row.");
+assert.match(clientSource, /function renderNewResearchComposer\(container, researchEnabled\)[\s\S]*?input\.rows = 3;[\s\S]*?container\.append\(form\);/, "The Research history composer does not match the conversation composer height or mount directly in the panel.");
+assert.match(clientSource, /renderNewResearchComposer\(panel, researchEnabled\)/, "The Research history composer still scrolls inside the history content.");
+assert.match(stylesSource, /\.analysis-panel\.has-research-composer > \.research-composer \{[\s\S]*?padding: var\(--space-3\) 0 var\(--panel-padding\);/, "The Research history composer does not share the conversation composer's bottom position.");
 assert.match(clientSource, /const preservedTargetOffset = preservedTarget[\s\S]*?menu\.scrollTop \+= nextTargetOffset - preservedTargetOffset;[\s\S]*?focusTarget\?\.focus\(\{ preventScroll: true \}\)/, "Expanding a Reader chapter does not preserve its viewport position.");
 assert.match(clientSource, /if \(readerCodeMenu\) \{[\s\S]*?event\.key !== "Escape" \|\| menu\.hidden[\s\S]*?closeMenu\(\);[\s\S]*?trigger\.focus\(\{ preventScroll: true \}\)/, "Escape does not close the Reader code menu and restore trigger focus.");
 
