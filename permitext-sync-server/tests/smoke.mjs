@@ -3295,6 +3295,42 @@ async function main() {
       "Zoning map asset returned the wrong media."
     );
 
+    const fireChapters = await request("/code/chapters?code=FC");
+    assert(fireChapters.response.ok, "Fire Code chapter index did not load.");
+    assert(
+      fireChapters.json.chapters.length === 50 &&
+        fireChapters.json.chapters.every((chapter) => chapter.codePrefix === "FC"),
+      "Fire Code did not expose its logical navigation chapters."
+    );
+    const fireAdministration = fireChapters.json.chapters.find((chapter) =>
+      chapter.fullTitle === "Chapter 1: Administration"
+    );
+    assert(fireAdministration, "Fire Code omitted Chapter 1: Administration.");
+    const fireAdministrationDetail = await request(`/code/chapters/${fireAdministration.id}`);
+    assert(fireAdministrationDetail.response.ok, "Fire Code Administration chapter did not load.");
+    const fireAdministrationNumbers = (fireAdministrationDetail.json.chapter.sections || []).map((section) =>
+      section.sectionNumber
+    );
+    assert(
+      ["FC 101", "FC 102", "FC 103", "FC 104"].every((number) => fireAdministrationNumbers.includes(number)),
+      "Fire Code Administration omitted FC 101-104."
+    );
+    const fireReserved = await request("/code/sections/31004665");
+    assert(fireReserved.response.ok, "FC 103 did not load.");
+    assert(
+      fireReserved.json.section.id === 31_004_665 &&
+        fireReserved.json.section.sectionNumber === "FC 103" &&
+        fireReserved.json.section.navigationChapterID === fireAdministration.id,
+      "FC 103 lost its canonical ID, visible number, or navigation chapter."
+    );
+    const fuelGasChapters = await request("/code/chapters?code=FGC");
+    assert(fuelGasChapters.response.ok, "Fuel Gas Code chapter index did not load.");
+    assert(
+      fuelGasChapters.json.chapters.length === 15 &&
+        fuelGasChapters.json.chapters.every((chapter) => chapter.codePrefix === "FGC"),
+      "Fuel Gas Code chapter count changed."
+    );
+
     const duplicateNumberChapter = await request("/code/chapters/47");
     assert(duplicateNumberChapter.response.ok, "Duplicate-number appendix chapter did not load.");
     const duplicateNumberSections = duplicateNumberChapter.json.chapter.sections.filter((section) =>

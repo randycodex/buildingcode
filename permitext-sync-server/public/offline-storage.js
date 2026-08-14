@@ -823,7 +823,7 @@ function compareChapterNumbers(left, right) {
 export function compareOfflineChapters(left, right) {
   return String(left?.codePrefix || "").localeCompare(String(right?.codePrefix || "")) ||
     compareChapterNumbers(left?.chapterNumber, right?.chapterNumber) ||
-    Number(left?.id) - Number(right?.id);
+    String(left?.id || "").localeCompare(String(right?.id || ""), undefined, { numeric: true });
 }
 
 async function offlineSearch(installID, url) {
@@ -888,6 +888,11 @@ export async function offlineAPI(path) {
           displayTitle: chapter.displayTitle,
           fullTitle: chapter.fullTitle,
           title: chapter.title,
+          sourceChapterID: chapter.sourceChapterID || chapter.id,
+          sourceChapterNumber: chapter.sourceChapterNumber || chapter.chapterNumber,
+          hierarchyKind: chapter.hierarchyKind || "source-chapter",
+          navigationChapterID: chapter.navigationChapterID || chapter.id,
+          groupID: chapter.groupID || null,
           groupCount: chapter.groups?.length || 0,
           sectionCount: chapter.sections?.length || 0
         };

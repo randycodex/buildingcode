@@ -211,17 +211,21 @@ import {
 } from "./existing-building-content.mjs";
 import {
   enactedChapter,
+  enactedChapterByAnyID,
   enactedChapterIndex,
   enactedCodePrefixes,
   enactedContentMetadata,
+  enactedNavigationChapterIndex,
   enactedSearchIndex,
   enactedSection,
   enactedSectionCatalog,
   enactedSectionSummary,
   enactedSyncCodeVersionForPrefix,
   isEnactedCodeChapterID,
-  isEnactedCodeSectionID
+  isEnactedCodeSectionID,
+  isEnactedNavigationChapterID
 } from "./enacted-code-content.mjs";
+import { applyVisibleSectionNumber } from "./code-navigation-hierarchy.mjs";
 import { constructionHTMLBodyForSection } from "./construction-html-content.mjs";
 import {
   collaborationSchemaVersion,
@@ -15072,6 +15076,17 @@ async function handleCodeLibraries(_request, response) {
   });
 }
 
+function withNavigationHierarchy(chapter) {
+  return {
+    ...chapter,
+    sourceChapterID: chapter.sourceChapterID || chapter.id,
+    sourceChapterNumber: chapter.sourceChapterNumber || chapter.chapterNumber,
+    hierarchyKind: chapter.hierarchyKind || "source-chapter",
+    navigationChapterID: chapter.navigationChapterID || chapter.id,
+    groupID: chapter.groupID || null
+  };
+}
+
 async function handleCodeChapters(request, response) {
   const codePrefix = requestURL(request).searchParams.get("code")?.trim().toUpperCase();
   const chapters = [
@@ -15079,8 +15094,8 @@ async function handleCodeChapters(request, response) {
       enactedCodePrefixes.has(codePrefix) ? [] : await chapterIndex()),
     ...(codePrefix && codePrefix !== zoningCodePrefix ? [] : await zoningChapterIndex()),
     ...(codePrefix && codePrefix !== existingBuildingCodePrefix ? [] : await existingBuildingChapterIndex()),
-    ...(codePrefix && !enactedCodePrefixes.has(codePrefix) ? [] : await enactedChapterIndex())
-  ];
+    ...(codePrefix && !enactedCodePrefixes.has(codePrefix) ? [] : await enactedNavigationChapterIndex())
+  ].map(withNavigationHierarchy);
   sendJSON(response, 200, {
     chapters: codePrefix ? chapters.filter((chapter) => chapter.codePrefix === codePrefix) : chapters
   });
@@ -15137,18 +15152,21 @@ async function handleCodeChapter(request, path, response) {
     sendError(response, 400, "Invalid chapter ID.");
     return;
   }
-  if (isEnactedCodeChapterID(chapterID)) {
-    const [chapter, chapterSummary] = await Promise.all([
-      enactedChapter(chapterID),
-      enactedChapterIndex().then((entries) =>
-        entries.find((entry) => String(entry.id) === chapterID)
-      )
-    ]);
-    if (!chapter || !chapterSummary) {
+  if (isEnactedCodeChapterID(chapterID) || isEnactedNavigationChapterID(chapterID)) {
+    const resolved = await enactedChapterByAnyID(chapterID);
+    if (!resolved?.chapter || !resolved.summary) {
       sendNotFound(response);
       return;
     }
-    const sections = flattenChapterSections(chapter);
+    const { chapter, summary, sourceSummary } = resolved;
+    const sections = flattenChapterSections(chapter).map((section) => ({
+      ...applyVisibleSectionNumber(section),
+      chapterID: sourceSummary?.id || summary.sourceChapterID || chapter.chapterID,
+      sourceChapterID: sourceSummary?.id || summary.sourceChapterID || chapter.chapterID,
+      sourceChapterNumber: sourceSummary?.chapterNumber || summary.sourceChapterNumber || chapter.chapterNumber,
+      navigationChapterID: summary.id,
+      navigationChapterNumber: summary.chapterNumber
+    }));
     const hydrated = await chapterSectionsWithRequestedBodies(
       request,
       sections,
@@ -15156,13 +15174,18 @@ async function handleCodeChapter(request, path, response) {
     );
     sendJSON(response, 200, {
       chapter: {
-        id: chapter.chapterID,
-        codePrefix: chapterSummary.codePrefix,
-        codeSectionID: chapterSummary.codeSectionID,
-        codeVersion: chapterSummary.codeVersion,
-        chapterNumber: chapter.chapterNumber,
-        displayTitle: chapterSummary.displayTitle,
-        fullTitle: chapterSummary.fullTitle,
+        id: summary.id,
+        sourceChapterID: summary.sourceChapterID || chapter.chapterID,
+        sourceChapterNumber: summary.sourceChapterNumber || chapter.chapterNumber,
+        hierarchyKind: summary.hierarchyKind || "source-chapter",
+        navigationChapterID: summary.id,
+        groupID: summary.groupID || null,
+        codePrefix: summary.codePrefix,
+        codeSectionID: summary.codeSectionID,
+        codeVersion: summary.codeVersion,
+        chapterNumber: summary.chapterNumber,
+        displayTitle: summary.displayTitle,
+        fullTitle: summary.fullTitle,
         groups: chapter.groups || [],
         sections: hydrated.sections,
         ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
@@ -15289,12 +15312,23 @@ async function handleCodeSection(path, response) {
     sendJSON(response, 200, {
       section: {
         ...body,
+        ...applyVisibleSectionNumber({
+          ...summary,
+          sectionNumber: summary.sectionNumber || body.sectionNumber
+        }),
         chapterID: summary.chapterID,
         chapterNumber: summary.chapterNumber,
+        sourceChapterID: summary.sourceChapterID || summary.chapterID,
+        sourceChapterNumber: summary.sourceChapterNumber || summary.chapterNumber,
+        navigationChapterID: summary.navigationChapterID || summary.chapterID,
+        navigationChapterNumber: summary.navigationChapterNumber || summary.chapterNumber,
         codePrefix: summary.codePrefix,
         codeVersion: summary.codeVersion,
         sectionID: Number(summary.id),
-        sectionNumber: summary.sectionNumber,
+        sectionNumber: applyVisibleSectionNumber({
+          ...summary,
+          sectionNumber: summary.sectionNumber || body.sectionNumber
+        }).sectionNumber,
         title: summary.title,
         webSectionID: null
       }
@@ -15632,6 +15666,8 @@ async function handleCodeSearch(request, response) {
     return {
       id: section.id,
       chapterID: section.chapterID,
+      sourceChapterID: section.sourceChapterID || section.chapterID,
+      navigationChapterID: section.navigationChapterID || section.chapterID,
       codePrefix: section.codePrefix,
       codeVersion: section.codeVersion ||
         (section.codePrefix === zoningCodePrefix

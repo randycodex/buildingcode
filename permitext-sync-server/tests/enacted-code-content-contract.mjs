@@ -4,6 +4,7 @@ import {
   enactedChapterIndex,
   enactedCodePrefixes,
   enactedContentMetadata,
+  enactedNavigationChapterIndex,
   enactedSearchIndex,
   enactedSection,
   enactedSectionCatalog,
@@ -44,6 +45,12 @@ assert.match(metadata[1].extractionBoundary, /NFPA 70|amendments/i);
 
 const chapters = await enactedChapterIndex();
 assert.equal(chapters.length, 156);
+const navigationChapters = await enactedNavigationChapterIndex();
+assert.equal(navigationChapters.filter((chapter) => chapter.codePrefix === "FC").length, 50);
+assert.equal(
+  navigationChapters.some((chapter) => chapter.fullTitle === "Chapter 1: Administration"),
+  true
+);
 assert(chapters.every((chapter) => chapter.sectionCount > 0));
 assert(chapters.every((chapter) => enactedCodePrefixes.has(chapter.codePrefix)));
 assert(chapters.every((chapter) => isEnactedCodeChapterID(chapter.id)));
@@ -66,6 +73,7 @@ const samples = [
   ["HMC", "27-2001", "housing maintenance code"],
   ["T28", "28-101.1", "administration"],
   ["FC", "29-101", "fire code"],
+  ["FC", "FC 103", "reserved"],
   ["ECC", "101", "energy conservation"],
   ["EC", "110.2", "electrical"]
 ];

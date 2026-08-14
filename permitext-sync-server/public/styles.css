@@ -2314,10 +2314,106 @@ label {
 }
 
 .reader-code-select-menu .custom-select-option[aria-selected="true"],
-.reader-chapter-select-menu .custom-select-option[aria-selected="true"] {
+.reader-chapter-select-menu .custom-select-option[aria-selected="true"],
+.reader-chapter-select-menu [role="treeitem"][aria-selected="true"] {
   background: color-mix(in srgb, var(--code-accent) 12%, transparent);
   color: var(--text-primary);
   font-weight: 650;
+}
+
+.reader-nav-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  outline: 0;
+}
+
+.reader-nav-chapter {
+  min-width: 0;
+}
+
+.reader-nav-chapter-row,
+.reader-nav-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-height: 26px;
+  padding: 4px var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  line-height: 1.25;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.reader-nav-chapter-row:hover,
+.reader-nav-section:hover {
+  background: color-mix(in srgb, var(--code-accent) 8%, transparent);
+  color: var(--text-primary);
+}
+
+.reader-nav-chapter[aria-selected="true"] > .reader-nav-chapter-row,
+.reader-nav-section[aria-selected="true"] {
+  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
+  color: var(--text-primary);
+  font-weight: 650;
+}
+
+.reader-nav-chapter:focus,
+.reader-nav-chapter:focus-visible,
+.reader-nav-section:focus,
+.reader-nav-section:focus-visible,
+.reader-nav-tree:focus-visible {
+  outline: 0;
+}
+
+.reader-nav-chapter:focus-visible > .reader-nav-chapter-row,
+.reader-nav-section:focus-visible {
+  background: color-mix(in srgb, var(--code-accent) 18%, transparent);
+  color: var(--text-primary);
+}
+
+.reader-nav-chevron {
+  display: inline-flex;
+  flex: 0 0 16px;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 1.25em;
+  color: var(--text-tertiary);
+}
+
+.reader-nav-chevron svg {
+  width: 12px;
+  height: 12px;
+  transition: transform 140ms ease;
+}
+
+.reader-nav-chapter[aria-expanded="true"] .reader-nav-chevron svg {
+  transform: rotate(90deg);
+}
+
+.reader-nav-chapter-label {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.reader-nav-section-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 1px 0 6px;
+}
+
+.reader-nav-section {
+  padding-left: calc(var(--space-2) + 24px);
 }
 
 .custom-select-option {

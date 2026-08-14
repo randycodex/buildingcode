@@ -1,6 +1,12 @@
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  applyVisibleSectionNumber,
+  decorateSectionForNavigation,
+  filterChapterToNavigation,
+  projectSourceChapterToNavigation
+} from "./code-navigation-hierarchy.mjs";
 import { normalizedSortedPostingList } from "./search-postings.mjs";
 
 const serverRoot = dirname(fileURLToPath(import.meta.url));
@@ -54,6 +60,10 @@ export const enactedCodePrefixes = new Set([
 
 const packageCaches = new Map();
 let mergedSearchIndexPromise = null;
+let cachedNavigationIndex = null;
+let cachedNavigationIndexPromise = null;
+let cachedDecoratedCatalog = null;
+let cachedDecoratedCatalogPromise = null;
 
 function cacheFor(definition) {
   if (!packageCaches.has(definition.id)) {
@@ -104,7 +114,7 @@ async function packageCatalog(definition) {
   const cache = cacheFor(definition);
   if (!cache.catalog) {
     const payload = await readJSON(join(definition.root, "prepared", "sectionCatalog.json"));
-    cache.catalog = payload.sections || [];
+    cache.catalog = (payload.sections || []).map((section) => applyVisibleSectionNumber(section));
   }
   return cache.catalog;
 }
@@ -202,6 +212,69 @@ export async function enactedChapterIndex() {
   return results;
 }
 
+export async function enactedNavigationChapterIndex() {
+  if (cachedNavigationIndex) return cachedNavigationIndex;
+  if (cachedNavigationIndexPromise) return cachedNavigationIndexPromise;
+  cachedNavigationIndexPromise = (async () => {
+    const sourceChapters = await enactedChapterIndex();
+    const projected = [];
+    for (const summary of sourceChapters) {
+      const prepared = await enactedChapter(summary.id);
+      const projectedChapters = projectSourceChapterToNavigation(summary, prepared);
+      for (const navigation of projectedChapters) {
+        const groups = navigation.hierarchyKind === "logical-chapter"
+          ? (prepared.groups || []).filter((group) => String(group.id) === String(navigation.groupID))
+          : prepared.groups || [];
+        navigation.sectionIDs = groups.flatMap((group) =>
+          (group.sections || []).map((section) => String(section.id))
+        );
+        projected.push(navigation);
+      }
+    }
+    cachedNavigationIndex = projected;
+    return projected;
+  })().catch((error) => {
+    cachedNavigationIndexPromise = null;
+    throw error;
+  });
+  try {
+    return await cachedNavigationIndexPromise;
+  } finally {
+    cachedNavigationIndexPromise = null;
+  }
+}
+
+export function isEnactedNavigationChapterID(value) {
+  return /^enacted-\d+-group-\d+$/.test(String(value || "").trim());
+}
+
+export async function enactedChapterByAnyID(chapterID) {
+  const key = String(chapterID || "").trim();
+  if (!key) return null;
+  const navigationIndex = await enactedNavigationChapterIndex();
+  const navigationSummary = navigationIndex.find((entry) => String(entry.id) === key) || null;
+  const sourceID = navigationSummary?.sourceChapterID || (isEnactedCodeChapterID(key) ? key : "");
+  if (!sourceID) return null;
+  const [prepared, sourceIndex] = await Promise.all([
+    enactedChapter(sourceID),
+    enactedChapterIndex()
+  ]);
+  if (!prepared) return null;
+  const sourceSummary = sourceIndex.find((entry) => String(entry.id) === String(sourceID)) || navigationSummary;
+  const summary = navigationSummary || {
+    ...sourceSummary,
+    sourceChapterID: sourceSummary?.id,
+    sourceChapterNumber: sourceSummary?.chapterNumber,
+    hierarchyKind: "source-chapter",
+    navigationChapterID: sourceSummary?.id
+  };
+  return {
+    summary,
+    sourceSummary,
+    chapter: filterChapterToNavigation(prepared, summary)
+  };
+}
+
 export async function enactedChapter(chapterID) {
   const definition = definitionForID(chapterID, "chapterRange");
   if (!definition) return null;
@@ -216,12 +289,46 @@ export async function enactedChapter(chapterID) {
   return cache.chapters.get(key);
 }
 
-export async function enactedSectionCatalog() {
+async function rawEnactedSectionCatalog() {
   const results = [];
   for (const definition of packageDefinitions) {
     results.push(...await packageCatalog(definition));
   }
   return results;
+}
+
+export async function enactedSectionCatalog() {
+  if (cachedDecoratedCatalog) return cachedDecoratedCatalog;
+  if (cachedDecoratedCatalogPromise) return cachedDecoratedCatalogPromise;
+  cachedDecoratedCatalogPromise = (async () => {
+    const [raw, navigationIndex, sourceChapters] = await Promise.all([
+      rawEnactedSectionCatalog(),
+      enactedNavigationChapterIndex(),
+      enactedChapterIndex()
+    ]);
+    const navigationBySection = new Map();
+    for (const navigation of navigationIndex) {
+      for (const sectionID of navigation.sectionIDs || []) {
+        navigationBySection.set(String(sectionID), navigation);
+      }
+    }
+    const sourceByID = new Map(sourceChapters.map((chapter) => [String(chapter.id), chapter]));
+    cachedDecoratedCatalog = raw.map((section) => decorateSectionForNavigation(
+      section,
+      navigationBySection.get(String(section.id)),
+      sourceByID.get(String(section.chapterID))
+    ));
+    return cachedDecoratedCatalog;
+  })().catch((error) => {
+    cachedDecoratedCatalogPromise = null;
+    cachedDecoratedCatalog = null;
+    throw error;
+  });
+  try {
+    return await cachedDecoratedCatalogPromise;
+  } finally {
+    cachedDecoratedCatalogPromise = null;
+  }
 }
 
 export async function enactedSectionSummary(sectionID) {
