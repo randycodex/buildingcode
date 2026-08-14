@@ -2750,6 +2750,10 @@ select option:checked {
   background: var(--search-detail-background);
 }
 
+.section-detail-panel.project-derived-panel {
+  background: color-mix(in srgb, var(--project-color) 8%, var(--surface-raised));
+}
+
 .section-detail-chrome {
   display: grid;
   grid-template-columns: var(--panel-title-control-size) var(--panel-title-control-size);

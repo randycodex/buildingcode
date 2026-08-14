@@ -13782,6 +13782,8 @@ async function renderSectionDetail(searchID, detail) {
   panel.className = "workspace-panel section-detail-panel";
   panel.dataset.paneId = paneIDForSectionDetail(searchID);
   panel.classList.add(`code-theme-${codeTheme(detail.codePrefix || "BC")}`);
+  const detailOwner = (state.utilityInstances || []).find((instance) => instance.id === searchID);
+  applyProjectDerivedPaneTheme(panel, detailOwner?.projectID);
   applyPaneWeight(panel, paneIDForSectionDetail(searchID));
 
   const { chapter, section } = await resolveSectionDetail(detail);
@@ -17011,7 +17013,7 @@ function renderResearchSource(source, options = {}) {
     toggle.addEventListener("click", () => {
       const sourceURL = String(source.sourceURL || source.url || "").trim();
       if (source.sectionID || (!sourceURL && source.id)) {
-        void openResearchSourceInSectionDetail(source, options.anchorPaneID);
+        void openResearchSourceInSectionDetail(source, options.anchorPaneID, options.projectID);
       } else if (sourceURL) {
         window.open(sourceURL, "_blank", "noopener,noreferrer");
       }
@@ -17276,7 +17278,11 @@ function renderResearchAnswerSources(conversation, message, anchorPaneID) {
   const renderSources = (sources) => {
     clear(list);
     sources.forEach((source) => {
-      const card = renderResearchSource(source, { openInReader: true, anchorPaneID });
+      const card = renderResearchSource(source, {
+        openInReader: true,
+        anchorPaneID,
+        projectID: conversation.primaryProjectID || ""
+      });
       list.append(card);
     });
   };
@@ -26044,7 +26050,7 @@ async function openDeepLinkedSectionInReader(item) {
   scrollPaneIntoView(paneID);
 }
 
-async function openResearchSourceInSectionDetail(item, anchorPaneID) {
+async function openResearchSourceInSectionDetail(item, anchorPaneID, projectID = "") {
   const codePrefix = String(item.codePrefix || "BC").toUpperCase();
   const sectionNumber = String(item.sectionNumber || "").trim();
   const resolvedSection = sectionNumber
@@ -26076,6 +26082,7 @@ async function openResearchSourceInSectionDetail(item, anchorPaneID) {
     detailOwner = newUtilityInstance("sdc");
     state.utilityInstances = [...(state.utilityInstances || []), detailOwner];
   }
+  detailOwner.projectID = String(projectID || "");
   await openSectionDetail(detailOwner.id, searchResultDetail(navigationItem), { anchorPaneID });
 }
 
