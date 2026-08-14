@@ -9545,6 +9545,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   font: inherit;
 }
 
+.saved-project-structured-fact-value {
+  text-align: right;
+}
+
 .saved-project-structured-fact-value:focus-visible,
 .saved-project-structured-fact-label-input:focus-visible {
   box-shadow: inset 0 -1px 0 var(--project-color, var(--accent));
