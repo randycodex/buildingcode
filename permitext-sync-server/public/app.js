@@ -10498,6 +10498,7 @@ function projectLinkForAnnotationTarget(project, target) {
 
 function renderAnnotationProjectEditor(container, target, sectionPayload, options = {}) {
   if (!container || !target?.sectionID) return;
+  const projectListWasOpen = container.dataset.projectListOpen === "true";
   clear(container);
 
   const label = document.createElement("p");
@@ -10507,9 +10508,37 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
   header.className = "annotation-projects-header";
   header.append(label);
 
+  const projectListMotion = document.createElement("div");
+  projectListMotion.className = "annotation-project-list-motion";
   const chips = document.createElement("div");
-  chips.className = "annotation-project-chips";
+  chips.className = "annotation-project-chips annotation-project-list";
+  chips.id = `annotation-project-list-${crypto.randomUUID()}`;
+  projectListMotion.append(chips);
   const projects = activeFolderRecords(currentContentSummary().projects || []);
+  const selectedProjectCount = projects.filter((project) => projectLinkForAnnotationTarget(project, target)).length;
+
+  const setProjectListOpen = (open, { focusToggle = false } = {}) => {
+    container.dataset.projectListOpen = String(open);
+    projectListMotion.classList.toggle("is-open", open);
+    projectListToggle.setAttribute("aria-expanded", String(open));
+    projectListToggle.textContent = open
+      ? "Hide projects"
+      : selectedProjectCount
+        ? `${selectedProjectCount} selected`
+        : "Choose projects";
+    chips.inert = !open;
+    chips.setAttribute("aria-hidden", String(!open));
+    if (focusToggle) projectListToggle.focus({ preventScroll: true });
+  };
+
+  const projectListToggle = document.createElement("button");
+  projectListToggle.type = "button";
+  projectListToggle.className = "annotation-project-list-toggle";
+  projectListToggle.setAttribute("aria-controls", chips.id);
+  projectListToggle.addEventListener("click", () => {
+    setProjectListOpen(!projectListMotion.classList.contains("is-open"));
+  });
+  header.append(projectListToggle);
 
   if (container.classList.contains("section-detail-projects")) {
     const addButton = document.createElement("button");
@@ -10557,7 +10586,13 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
         "aria-label",
         `${existingLink ? "Remove from" : "Add to"} ${project.name || project.title || "project"}`
       );
-      button.textContent = project.name || project.title || "Project";
+      const projectName = document.createElement("span");
+      projectName.textContent = project.name || project.title || "Project";
+      const selectedMark = document.createElement("span");
+      selectedMark.className = "annotation-project-selected-mark";
+      selectedMark.setAttribute("aria-hidden", "true");
+      selectedMark.textContent = existingLink ? "✓" : "";
+      button.append(projectName, selectedMark);
       button.title = folderTypeLabel(project);
       if (!existingLink && folderIsProject(project) && !hasCapability("projects")) {
         button.disabled = true;
@@ -10580,6 +10615,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
             syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
             await persistSectionInProject(project, { ...sectionPayload, ...target });
           }
+          container.dataset.projectListOpen = "true";
           renderAnnotationProjectEditor(container, target, sectionPayload, options);
           options.onChange?.();
         } finally {
@@ -10590,7 +10626,14 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
     });
   }
 
-  container.append(header, chips);
+  projectListToggle.hidden = !projects.length;
+  setProjectListOpen(projectListWasOpen && projects.length > 0);
+  chips.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    setProjectListOpen(false, { focusToggle: true });
+  });
+  container.append(header, projectListMotion);
 }
 
 function refreshOpenAnnotationProjectEditors() {
@@ -25074,6 +25117,25 @@ async function resolveSavedSearchPage(options = {}) {
   };
 }
 
+function animateSavedMembershipUpdate(content, previousHeight) {
+  if (
+    !content ||
+    !Number.isFinite(previousHeight) ||
+    previousHeight <= 0 ||
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  ) return;
+  const nextHeight = content.getBoundingClientRect().height;
+  if (!Number.isFinite(nextHeight) || Math.abs(nextHeight - previousHeight) < 1) return;
+  content.getAnimations?.().forEach((animation) => animation.cancel());
+  content.animate([
+    { height: `${previousHeight}px`, overflow: "clip" },
+    { height: `${nextHeight}px`, overflow: "clip" }
+  ], {
+    duration: 420,
+    easing: "cubic-bezier(0.22, 1, 0.36, 1)"
+  });
+}
+
 async function performSavedPanelHydration(panel, savedInstance, paneID, options = {}) {
   const content = panel.querySelector(".saved-content");
   const data = await loadSyncedContent();
@@ -25085,9 +25147,27 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     await reconcileProjectStudioWithSavedFolders(workspaceProjects);
   }
   if (!panel.isConnected) return;
-  const selectedFolder = await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
+  const preserveProjectChrome = options.preserveProjectChrome === true;
+  const selectedFolder = preserveProjectChrome
+    ? workspaceProjects.find((project) =>
+        projectRecordID(project) === String(savedInstance.selectedFolderID || "")
+      ) || null
+    : await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
   if (!panel.isConnected) return;
-  renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
+  if (preserveProjectChrome) {
+    panel.querySelectorAll(".saved-project-tile[data-project-id]").forEach((tile) => {
+      const project = workspaceProjects.find((item) => projectRecordID(item) === tile.dataset.projectId);
+      if (!project) return;
+      const count = projectEvidenceCount(summary.projectSections || [], project);
+      const countLabel = tile.querySelector(".saved-project-count");
+      if (!countLabel) return;
+      countLabel.textContent = String(count);
+      countLabel.title = count === 1 ? "1 saved section" : `${count} saved sections`;
+      countLabel.setAttribute("aria-label", countLabel.title);
+    });
+  } else {
+    renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
+  }
   if (!selectedFolder) return;
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
@@ -25243,6 +25323,9 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     if (generation !== viewGeneration || !panel.isConnected) return;
     const filteredItems = resolvedItems.filter((item) => matchesView(item));
     const orderedItems = sortSavedItems(filteredItems, "codeOrder");
+    const previousContentHeight = options.animateContentUpdate
+      ? content.getBoundingClientRect().height
+      : 0;
     clear(content);
     content.setAttribute("aria-busy", "false");
     if (orderedItems.length > 0) {
@@ -25286,6 +25369,9 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       footer.append(status, button);
       content.append(footer);
     }
+    if (options.animateContentUpdate) {
+      animateSavedMembershipUpdate(content, previousContentHeight);
+    }
     if (scrollContainer) scrollContainer.scrollTop = preservedScrollTop;
   };
   panel.__applySavedView = applySavedView;
@@ -25295,7 +25381,9 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
   });
   await applySavedView();
   panel.__refreshProjectMembership = () => refreshSavedPanelInPlace(paneID, {
-    reconcileProjectStudio: false
+    reconcileProjectStudio: false,
+    preserveProjectChrome: true,
+    animateContentUpdate: true
   });
 }
 

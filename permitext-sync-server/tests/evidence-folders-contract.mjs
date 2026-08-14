@@ -496,6 +496,9 @@ assert.match(appSource, /showWebNotice\("Project context not saved", error\.mess
 assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?font-weight: 400;/);
 assert.match(stylesSource, /\.project-research-history-card:hover,[\s\S]*?\.project-research-history-card:focus-visible \{[\s\S]*?background: transparent;[\s\S]*?color: var\(--project-color\);/, "Project Research history hover should color the text without filling the row.");
 assert.match(stylesSource, /\.project-research-history-card:hover :is\(strong, p, span\),[\s\S]*?color: inherit;/, "Project Research history child text does not follow the row hover color.");
+assert.match(clientSource, /function animateSavedMembershipUpdate\(content, previousHeight\)[\s\S]*?duration: 420,[\s\S]*?cubic-bezier\(0\.22, 1, 0\.36, 1\)/, "Saved Evidence membership updates do not animate their height with the standard disclosure motion.");
+assert.match(clientSource, /const preserveProjectChrome = options\.preserveProjectChrome === true;[\s\S]*?if \(preserveProjectChrome\) \{[\s\S]*?\.saved-project-count[\s\S]*?renderSavedProjects/, "Saved Evidence membership updates still rebuild the Project card instead of updating its count in place.");
+assert.match(clientSource, /panel\.__refreshProjectMembership = \(\) => refreshSavedPanelInPlace\(paneID, \{[\s\S]*?preserveProjectChrome: true,[\s\S]*?animateContentUpdate: true/, "Project-chip changes do not use the non-blinking Saved Evidence refresh path.");
 const projectResearchSource = functionSource(appSource, "appendSavedProjectResearchConversations");
 assert.match(projectResearchSource, /title\.className = "section-label saved-project-research-toggle"/);
 assert.match(projectResearchSource, /body\.className = "project-studio-collapsible-body saved-project-research-body"/);
@@ -571,6 +574,12 @@ assert.match(
 assert.match(appSource, /function renameAnnotationTag\([\s\S]*?normalizeAnnotationTags/);
 assert.match(appSource, /function wireCodeFilterMenu\([\s\S]*?"ArrowDown"[\s\S]*?"Home"[\s\S]*?"End"[\s\S]*?"Escape"/);
 assert.match(stylesSource, /\.reader-notes-project-options \{[\s\S]*?max-height:[\s\S]*?overflow-y: auto;[\s\S]*?scrollbar-gutter: stable;/);
+assert.match(appSource, /function renderAnnotationProjectEditor[\s\S]*?projectListToggle\.textContent = open[\s\S]*?chips\.inert = !open;/);
+assert.match(appSource, /container\.dataset\.projectListOpen = "true";[\s\S]*?renderAnnotationProjectEditor\(container, target, sectionPayload, options\);/);
+assert.match(stylesSource, /\.annotation-project-list-motion \{[\s\S]*?grid-template-rows: 0fr;[\s\S]*?420ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
+assert.match(stylesSource, /\.annotation-project-list-motion\.is-open \{[\s\S]*?grid-template-rows: 1fr;[\s\S]*?opacity: 1;/);
+assert.match(stylesSource, /\.annotation-project-chip \+ \.annotation-project-chip \{[\s\S]*?border-top: 1px solid/);
+assert.match(stylesSource, /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.annotation-project-list-motion \{[\s\S]*?transition: none;/);
 assert.match(stylesSource, /\.saved-projects-menu\.is-open \.saved-project-list \{[\s\S]*?max-height:[\s\S]*?overflow-y: auto;/);
 assert.match(stylesSource, /\.settings-project-archive-label \{[\s\S]*?text-transform: none;/);
 

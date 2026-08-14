@@ -2704,7 +2704,9 @@ async function main() {
         workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&
         workspaceScript.text.includes('label.textContent = "Projects";') &&
         workspaceScript.text.includes("normalizeAnnotationBlockID(candidate.blockID) === blockID") &&
-        workspaceStyles.text.match(/\.annotation-project-chip,[\s\S]*?border-radius: var\(--radius-pill\);/),
+        workspaceScript.text.includes('projectListToggle.textContent = open') &&
+        workspaceStyles.text.includes(".annotation-project-list-motion.is-open") &&
+        workspaceStyles.text.match(/\.annotation-project-chip \+ \.annotation-project-chip \{[\s\S]*?border-top:/),
       "Reader paragraph cards no longer toggle by target or expose Comments, Projects, and Tags organization."
     );
     assert(

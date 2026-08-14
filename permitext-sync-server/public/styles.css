@@ -3639,33 +3639,90 @@ select option:checked {
   margin-bottom: calc(-1 * var(--space-2));
 }
 
+.annotation-project-list-toggle {
+  min-height: 28px;
+  margin-left: auto;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.annotation-project-list-toggle:hover {
+  background: color-mix(in srgb, var(--text-primary) 15%, transparent);
+}
+
+.annotation-project-list-toggle:focus-visible {
+  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline-offset: 2px;
+}
+
+.annotation-project-list-motion {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease;
+}
+
+.annotation-project-list-motion.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
 .annotation-project-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  display: grid;
+  min-height: 0;
+  max-height: 240px;
   min-width: 0;
+  overflow-y: auto;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
 }
 
 .annotation-project-chip,
 .annotation-projects-empty {
-  display: inline-flex;
-  min-height: 26px;
+  display: flex;
+  width: 100%;
+  min-height: 36px;
   align-items: center;
+  justify-content: space-between;
   padding: 0 var(--space-3);
   border: 0;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--project-color, var(--text-primary)) 18%, transparent);
+  border-radius: 0;
+  background: transparent;
   color: var(--text-primary);
   font-size: 0.75rem;
   line-height: 1.2;
+  text-align: left;
 }
 
 .annotation-project-chip {
   cursor: pointer;
 }
 
+.annotation-project-chip + .annotation-project-chip {
+  border-top: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
+}
+
+.annotation-project-chip:hover {
+  color: var(--project-color, var(--text-primary));
+}
+
 .annotation-project-chip.is-selected {
-  background: color-mix(in srgb, var(--project-color) 44%, transparent);
+  background: color-mix(in srgb, var(--project-color) 18%, transparent);
+  color: var(--project-color, var(--text-primary));
+}
+
+.annotation-project-selected-mark {
+  min-width: 1em;
+  color: currentColor;
+  text-align: right;
 }
 
 .annotation-project-chip:disabled {
@@ -3674,8 +3731,13 @@ select option:checked {
 }
 
 .annotation-projects-empty {
-  background: color-mix(in srgb, var(--code-accent) 14%, var(--surface-muted));
   color: var(--text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .annotation-project-list-motion {
+    transition: none;
+  }
 }
 
 .annotation-tags-label {
