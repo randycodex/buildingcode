@@ -10511,6 +10511,13 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
   chips.id = `annotation-project-list-${crypto.randomUUID()}`;
   projectListMotion.append(chips);
   const projects = activeFolderRecords(currentContentSummary().projects || []);
+  const selectedProjects = projects.filter((project) => projectLinkForAnnotationTarget(project, target));
+  const primarySelectedProjectName = selectedProjects[0]?.name || selectedProjects[0]?.title || "Project";
+  const projectListLabel = selectedProjects.length === 0
+    ? "Projects"
+    : selectedProjects.length === 1
+      ? primarySelectedProjectName
+      : `${primarySelectedProjectName} +${selectedProjects.length - 1}`;
 
   const setProjectListOpen = (open, { focusToggle = false } = {}) => {
     container.dataset.projectListOpen = String(open);
@@ -10525,7 +10532,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
   const projectListToggle = document.createElement("button");
   projectListToggle.type = "button";
   projectListToggle.className = "annotation-project-list-toggle annotation-tags-label";
-  projectListToggle.textContent = "Projects";
+  projectListToggle.textContent = projectListLabel;
   projectListToggle.setAttribute("aria-controls", chips.id);
   projectListToggle.addEventListener("click", () => {
     setProjectListOpen(!projectListMotion.classList.contains("is-open"));
