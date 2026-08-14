@@ -9243,6 +9243,45 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   padding: var(--space-2) 0 var(--space-3);
 }
 
+.saved-project-structured-groups,
+.saved-project-structured-group,
+.saved-project-structured-group-body {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.saved-project-structured-group-heading {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+}
+
+.saved-project-structured-group-toggle {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.saved-project-structured-group-toggle:hover,
+.saved-project-structured-group-toggle:focus-visible {
+  color: var(--text-primary);
+}
+
+.saved-project-structured-custom-title {
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.saved-project-structured-custom-title[hidden] {
+  display: none;
+}
+
 .saved-project-structured-facts-help,
 .saved-project-structured-facts-empty {
   margin: 0;

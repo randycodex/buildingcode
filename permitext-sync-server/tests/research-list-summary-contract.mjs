@@ -85,20 +85,37 @@ const structuredProjectInformation = researchProjectInformation("project-structu
     { id: "project-fact:stories", key: "stories", label: "Stories", value: "6", status: "stated", source: "description" },
     { id: "project-fact:sprinkler", key: "sprinkler", label: "Sprinkler status", value: "Unknown", status: "unknown", source: "user" },
     { id: "project-fact:type", key: "type", label: "Construction type", value: "Type IIB", status: "rejected", source: "user" },
-    { id: "project-fact:floor", key: "floor-affected", label: "Floor affected", value: "Third floor", status: "stated", source: "user" }
+    { id: "project-fact:floor", key: "floor-affected", label: "Floor affected", value: "Third floor", status: "stated", source: "user" },
+    { id: "project-fact:lots", key: "tax-lots", label: "Tax Lot(s)", value: "52, 53, 54, 55", status: "stated", source: "user" },
+    { id: "project-fact:lot-composition", key: "zoning-lot-composition", label: "Zoning Lot Composition", value: "Tax Lots 52, 53, 54 and 55 comprise one zoning lot.", status: "stated", source: "user" },
+    { id: "project-fact:districts", key: "zoning-districts", label: "Zoning District(s)", value: "C4-4D, R7-2", status: "stated", source: "user" },
+    { id: "project-fact:frontages", key: "street-frontages", label: "Street Frontage(s)", value: "Third Avenue — Wide Street; East 120th Street — Narrow Street", status: "stated", source: "user" },
+    { id: "project-fact:travel", key: "travel-distance", label: "Travel Distance", value: "95 feet", status: "stated", source: "user" }
   ]
 });
 assert.deepEqual(structuredProjectInformation.facts, [
-  "Project address: 214 West 118th Street",
-  "Occupancy: Group R-2 (user-provided; not independently verified)",
-  "Stories: 6 (user-provided; not independently verified)",
+  "Building / Code Fact — Occupancy: Group R-2 (user-confirmed; not independently verified)",
+  "Building / Code Fact — Stories Above Grade: 6 (user-confirmed; not independently verified)",
+  "Zoning Fact — Address: 214 West 118th Street (user-confirmed; not independently verified)",
+  "Zoning Fact — Tax Lot(s): 52, 53, 54, 55 (user-confirmed; not independently verified)",
+  "Zoning Fact — Zoning Lot Composition: Tax Lots 52, 53, 54 and 55 comprise one zoning lot. (user-confirmed; not independently verified)",
+  "Zoning Fact — Zoning District(s): C4-4D, R7-2 (user-confirmed; not independently verified)",
+  "Zoning Fact — Street Frontage(s): Third Avenue — Wide Street; East 120th Street — Narrow Street (user-confirmed; not independently verified)",
+  "Custom Fact — Travel Distance: 95 feet (user-confirmed; not independently verified)",
   "Additional Project facts: An existing six-story Group R-2 building of Type IIIA construction."
 ]);
-assert.equal(structuredProjectInformation.structuredFacts.length, 5);
+assert.equal(structuredProjectInformation.structuredFacts.length, 10);
 assert.equal(structuredProjectInformation.structuredFacts[0].usedInResearch, true);
 assert.equal(structuredProjectInformation.structuredFacts[2].usedInResearch, false);
-assert.equal(structuredProjectInformation.facts.some((fact) => fact.startsWith("Floor affected:")), false);
+assert.equal(structuredProjectInformation.facts.some((fact) => fact.includes("Floor affected:")), false);
+assert.equal(structuredProjectInformation.buildingCodeFacts.length, 2);
+assert.equal(structuredProjectInformation.zoningFacts.length, 5);
+assert.equal(structuredProjectInformation.customFacts.length, 1);
+assert.equal(structuredProjectInformation.missingFactsAreUnknown, true);
+assert.equal(structuredProjectInformation.facts.some((fact) => fact.includes("Commercial Overlay")), false);
+assert.notEqual(structuredProjectInformation.zoningFacts.find((fact) => fact.key === "tax-lots")?.value, structuredProjectInformation.zoningFacts.find((fact) => fact.key === "zoning-lot-composition")?.value);
 assert.equal(structuredProjectInformation.facts.at(-1).startsWith("Additional Project facts:"), true);
+assert.match(appSource, /A missing fact is unknown, not false, none, or inapplicable\. Identify a material missing fact instead of guessing it\./);
 assert.match(clientSource, /structuredFacts: projectStructuredFacts\(project\)/, "Project mutations do not preserve structured facts.");
 assert.doesNotMatch(clientSource, /Research may use as user-provided context\. Blank fields are ignored\./, "The removed Structured Facts helper text returned.");
 assert.match(clientSource, /appendResearchProjectContextDisclosure\(card, result\)/, "Research answers do not disclose the Project context used.");

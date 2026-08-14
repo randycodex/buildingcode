@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260813-manual-structured-facts-v129";
+} from "./offline-storage.js?v=20260813-building-zoning-facts-v130";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -8970,17 +8970,80 @@ function projectStructuredFacts(project) {
     .filter(Boolean);
 }
 
-const projectStructuredFactFields = [
-  ["occupancy", "Occupancy"],
-  ["construction-type", "Construction type"],
-  ["stories", "Stories"],
-  ["building-height", "Building height"],
-  ["sprinkler-status", "Sprinkler status"],
-  ["work-type", "Work type"],
-  ["travel-distance", "Travel distance"],
-  ["exit-separation", "Exit separation"],
-  ["dead-end-length", "Dead-end length"]
+const projectStructuredFactGroups = [
+  {
+    key: "buildingCode",
+    label: "Building / Code Facts",
+    fields: [
+      { key: "occupancy", label: "Occupancy" },
+      { key: "construction-type", label: "Construction Type" },
+      { key: "stories-above-grade", label: "Stories Above Grade" },
+      { key: "levels-below-grade", label: "Levels Below Grade", suggestions: ["None", "1 Cellar", "1 Basement", "Multiple levels below grade", "Unknown"] },
+      { key: "building-height", label: "Building Height" },
+      { key: "sprinkler-protection", label: "Sprinkler Protection", suggestions: ["None", "Partial", "NFPA 13", "NFPA 13R", "Other", "Unknown"] },
+      { key: "project-status", label: "Project Status", suggestions: ["New Building", "Existing Building", "Unknown"] },
+      { key: "work-filing-type", label: "Work / Filing Type", suggestions: ["New Building", "Alteration", "Alteration-CO", "Renovation", "Addition / Enlargement", "Change of Use / Occupancy", "Repair", "Other", "Unknown"] },
+      { key: "code-basis", label: "Code Basis", suggestions: ["Current Code", "Prior-Code Building", "Unknown"] },
+      { key: "building-area", label: "Building Area" }
+    ]
+  },
+  {
+    key: "zoning",
+    label: "Zoning Facts",
+    fields: [
+      { key: "address", label: "Address", projectAddress: true },
+      { key: "borough", label: "Borough", suggestions: ["Bronx", "Brooklyn", "Manhattan", "Queens", "Staten Island", "Unknown"] },
+      { key: "block", label: "Block" },
+      { key: "tax-lots", label: "Tax Lot(s)" },
+      { key: "zoning-lot-composition", label: "Zoning Lot Composition" },
+      { key: "zoning-districts", label: "Zoning District(s)" },
+      { key: "commercial-overlays", label: "Commercial Overlay(s)", suggestions: ["None", "Unknown"] },
+      { key: "special-purpose-district", label: "Special Purpose District / Subdistrict / Subarea", suggestions: ["None", "Unknown"] },
+      { key: "zoning-map", label: "Zoning Map" },
+      { key: "community-district", label: "Community District" },
+      { key: "zoning-lot-area", label: "Zoning Lot Area" },
+      { key: "lot-width", label: "Lot Width" },
+      { key: "lot-depth", label: "Lot Depth" },
+      { key: "lot-type", label: "Lot Type", suggestions: ["Interior", "Corner", "Through", "Other / Multiple Condition", "Unknown"] },
+      { key: "street-frontages", label: "Street Frontage(s)" },
+      { key: "mih-area-options", label: "MIH Area / Applicable Option(s)", suggestions: ["Not in MIH Area", "MIH Area", "Unknown"] },
+      { key: "affordable-housing-zoning-status", label: "Affordable Housing Zoning Status", suggestions: ["Standard / None", "MIH", "UAP", "Qualifying Affordable Housing", "Multiple / Other", "Unknown"] },
+      { key: "transit-zone", label: "Transit Zone", suggestions: ["Inner Transit Zone", "Outer Transit Zone", "Beyond Greater Transit Zone", "Unknown"] },
+      { key: "limited-height-district", label: "Limited Height District", suggestions: ["None", "LH-1", "LH-1A", "LH-2", "LH-3", "Unknown"] },
+      { key: "waterfront-status", label: "Waterfront Status / Waterfront Access Plan", suggestions: ["Not Waterfront", "Waterfront Area", "Waterfront Block", "Waterfront Zoning Lot", "Other", "Unknown"] },
+      { key: "lower-density-growth-management-area", label: "Lower Density Growth Management Area", suggestions: ["Yes", "No", "Unknown"] }
+    ]
+  }
 ];
+
+const projectStructuredFactAliases = new Map([
+  ["stories", ["stories-above-grade", "Stories Above Grade"]],
+  ["sprinkler-status", ["sprinkler-protection", "Sprinkler Protection"]],
+  ["work-type", ["work-filing-type", "Work / Filing Type"]]
+]);
+
+function migratedProjectStructuredFacts(project) {
+  const facts = projectStructuredFacts(project);
+  const migrated = [];
+  const seenKeys = new Set();
+  const canonicalKeys = new Set(facts.filter((fact) => !projectStructuredFactAliases.has(fact.key)).map((fact) => fact.key));
+  facts.forEach((fact) => {
+    const [key, label] = projectStructuredFactAliases.get(fact.key) || [fact.key, fact.label];
+    if (key !== fact.key && canonicalKeys.has(key)) return;
+    if (seenKeys.has(key)) return;
+    seenKeys.add(key);
+    migrated.push({
+      ...fact,
+      id: key === fact.key ? fact.id : `project-fact:${key}`,
+      key,
+      label,
+      status: fact.status,
+      source: fact.source,
+      sourceText: fact.sourceText
+    });
+  });
+  return migrated;
+}
 
 function projectMutationForRecord(project, accountOverride = null) {
   const account = accountOverride || activeAccount();
@@ -23595,9 +23658,9 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   });
 
   const storedStructuredFacts = projectStructuredFacts(folder);
-  let structuredFacts = storedStructuredFacts
-    .filter((fact) => fact.key !== "floor-affected" && (fact.status === "stated" || fact.status === "confirmed"))
-    .map((fact) => ({ ...fact, status: "stated", source: "user", sourceText: "" }));
+  const legacyAddressFact = storedStructuredFacts.find((fact) => fact.key === "address");
+  if (!address.value.trim() && legacyAddressFact?.value) address.value = legacyAddressFact.value;
+  let structuredFacts = migratedProjectStructuredFacts({ structuredFacts: storedStructuredFacts });
   let saved = {
     address: address.value,
     description: description.value,
@@ -23651,13 +23714,18 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   structuredHeading.append(structuredToggle, structuredChevron);
   const structuredBody = document.createElement("section");
   structuredBody.className = "saved-project-structured-facts";
-  const structuredList = document.createElement("div");
-  structuredList.className = "saved-project-structured-facts-list";
+  const structuredGroups = document.createElement("div");
+  structuredGroups.className = "saved-project-structured-groups";
+  const customTitle = document.createElement("strong");
+  customTitle.className = "saved-project-structured-custom-title section-label";
+  customTitle.textContent = "Custom Facts";
+  const customList = document.createElement("div");
+  customList.className = "saved-project-structured-facts-list saved-project-structured-custom-list";
   const addFact = document.createElement("button");
   addFact.type = "button";
   addFact.className = "saved-project-structured-fact-add";
   addFact.textContent = "Add another fact";
-  structuredBody.append(structuredList, addFact);
+  structuredBody.append(structuredGroups, customTitle, customList, addFact);
   structuredSection.append(structuredHeading, structuredBody);
 
   const factKey = (label) => String(label || "")
@@ -23665,7 +23733,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  const fixedFactKeys = new Set(projectStructuredFactFields.map(([key]) => key));
+  const fixedFactKeys = new Set(projectStructuredFactGroups.flatMap((group) => group.fields.map((field) => field.key)));
   const replaceFact = (key, label, value, id = `project-fact:${key}`) => {
     structuredFacts = structuredFacts.filter((fact) => fact.key !== key);
     const normalized = normalizeProjectStructuredFact({
@@ -23681,32 +23749,88 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     if (normalized) structuredFacts.push(normalized);
   };
 
-  const renderStructuredFacts = () => {
-    clear(structuredList);
-    const factsByKey = new Map(structuredFacts.map((fact) => [fact.key, fact]));
-    projectStructuredFactFields.forEach(([key, fieldLabel]) => {
-      const row = document.createElement("article");
-      row.className = "saved-project-structured-fact";
-      const label = document.createElement("label");
-      label.className = "saved-project-structured-fact-label";
-      label.textContent = fieldLabel;
-      const value = document.createElement("input");
-      value.type = "text";
-      value.className = "saved-project-structured-fact-value";
-      value.value = factsByKey.get(key)?.value || "";
-      value.placeholder = "Add value";
-      value.setAttribute("aria-label", fieldLabel);
-      label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
-      value.addEventListener("input", () => {
-        replaceFact(key, fieldLabel, value.value);
-        scheduleStructuredSave();
+  const appendDefaultFactField = (list, field, factsByKey) => {
+    const { key, label: fieldLabel, suggestions = [], projectAddress = false } = field;
+    const row = document.createElement("article");
+    row.className = "saved-project-structured-fact";
+    const label = document.createElement("label");
+    label.className = "saved-project-structured-fact-label";
+    label.textContent = fieldLabel;
+    const value = document.createElement("input");
+    value.type = "text";
+    value.className = "saved-project-structured-fact-value";
+    value.value = projectAddress ? address.value : factsByKey.get(key)?.value || "";
+    value.placeholder = "Add value";
+    value.setAttribute("aria-label", fieldLabel);
+    label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
+    if (suggestions.length) {
+      const choices = document.createElement("datalist");
+      choices.id = `${value.id}-choices`;
+      suggestions.forEach((suggestion) => {
+        const option = document.createElement("option");
+        option.value = suggestion;
+        choices.append(option);
       });
-      value.addEventListener("blur", save);
-      if (identity.sharedOnly) value.disabled = true;
+      value.setAttribute("list", choices.id);
+      row.append(label, value, choices);
+    } else {
       row.append(label, value);
-      structuredList.append(row);
+    }
+    value.addEventListener("input", () => {
+      if (projectAddress) address.value = value.value;
+      else replaceFact(key, fieldLabel, value.value);
+      scheduleStructuredSave();
     });
-    structuredFacts.filter((fact) => !fixedFactKeys.has(fact.key)).forEach((fact) => {
+    value.addEventListener("blur", save);
+    if (identity.sharedOnly) value.disabled = true;
+    list.append(row);
+  };
+
+  const groupLists = new Map();
+  projectStructuredFactGroups.forEach((group, groupIndex) => {
+    const groupSection = document.createElement("section");
+    groupSection.className = `saved-project-structured-group is-${group.key}`;
+    const groupHeading = document.createElement("div");
+    groupHeading.className = "saved-project-structured-group-heading";
+    const groupToggle = document.createElement("button");
+    groupToggle.type = "button";
+    groupToggle.className = "saved-project-structured-group-toggle section-label";
+    groupToggle.textContent = group.label;
+    const groupChevron = document.createElement("button");
+    groupChevron.type = "button";
+    groupChevron.className = "project-section-toggle-chevron saved-project-structured-group-chevron";
+    groupChevron.innerHTML = researchChevronIconsSVG();
+    groupHeading.append(groupToggle, groupChevron);
+    const groupBody = document.createElement("section");
+    groupBody.className = "saved-project-structured-group-body";
+    const groupList = document.createElement("div");
+    groupList.className = "saved-project-structured-facts-list";
+    groupBody.append(groupList);
+    groupSection.append(groupHeading, groupBody);
+    structuredGroups.append(groupSection);
+    groupLists.set(group.key, groupList);
+    wireProjectSectionMotion(
+      groupSection,
+      groupBody,
+      [groupToggle, groupChevron],
+      group.label,
+      projectSectionExpanded(identity, `structuredFacts:${group.key}`, groupIndex === 0),
+      {
+        onChange(expanded) {
+          persistProjectSectionExpansion(identity, `structuredFacts:${group.key}`, expanded);
+        }
+      }
+    );
+  });
+
+  const renderStructuredFacts = () => {
+    groupLists.forEach((list) => clear(list));
+    clear(customList);
+    const factsByKey = new Map(structuredFacts.map((fact) => [fact.key, fact]));
+    projectStructuredFactGroups.forEach((group) => {
+      group.fields.forEach((field) => appendDefaultFactField(groupLists.get(group.key), field, factsByKey));
+    });
+    structuredFacts.filter((fact) => fact.key !== "floor-affected" && !fixedFactKeys.has(fact.key)).forEach((fact) => {
       const row = document.createElement("article");
       row.className = "saved-project-structured-fact is-custom";
       const label = document.createElement("input");
@@ -23749,8 +23873,9 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       });
       if (identity.sharedOnly) label.disabled = value.disabled = remove.disabled = true;
       row.append(label, value, remove);
-      structuredList.append(row);
+      customList.append(row);
     });
+    customTitle.hidden = customList.childElementCount === 0;
   };
   renderStructuredFacts();
   if (
@@ -23764,6 +23889,10 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     control.blur();
   };
 
+  address.addEventListener("input", () => {
+    const zoningAddress = structuredBody.querySelector('input[aria-label="Address"]');
+    if (zoningAddress && zoningAddress !== document.activeElement) zoningAddress.value = address.value;
+  });
   address.addEventListener("blur", save);
   description.addEventListener("blur", save);
   address.addEventListener("keydown", (event) => {
@@ -23795,7 +23924,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     const id = `project-fact:custom:${globalThis.crypto?.randomUUID?.() || Date.now()}`;
     structuredFacts.push({ id, key: id, label: "", value: "", status: "stated", source: "user", sourceText: "", updatedAt: null });
     renderStructuredFacts();
-    structuredList.querySelector(".saved-project-structured-fact.is-custom:last-child .saved-project-structured-fact-label-input")?.focus();
+    customList.querySelector(".saved-project-structured-fact.is-custom:last-child .saved-project-structured-fact-label-input")?.focus();
   });
   body.append(address, description, descriptionResizeHandle);
   factsSection.append(heading, body);

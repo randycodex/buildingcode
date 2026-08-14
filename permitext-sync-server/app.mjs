@@ -6025,7 +6025,11 @@ function researchPrompt(question, evidence, options = {}) {
     `QUESTION\n${question}`,
     codeBasis,
     projectFacts
-      ? `USER-PROVIDED PROJECT FACTS FOR CONTEXT ONLY — NOT CODE AUTHORITY\n${projectFacts}`
+      ? [
+          "USER-PROVIDED PROJECT FACTS FOR CONTEXT ONLY — NOT CODE AUTHORITY",
+          "A missing fact is unknown, not false, none, or inapplicable. Identify a material missing fact instead of guessing it.",
+          projectFacts
+        ].join("\n")
       : "",
     establishedConversationFacts
       ? [
@@ -8031,6 +8035,29 @@ async function ownedProjectRecord(userID, projectID) {
 }
 
 const researchProjectFactStatuses = new Set(["stated", "confirmed", "unknown", "rejected"]);
+const researchProjectFactAliases = new Map([
+  ["stories", ["stories-above-grade", "Stories Above Grade"]],
+  ["sprinkler-status", ["sprinkler-protection", "Sprinkler Protection"]],
+  ["work-type", ["work-filing-type", "Work / Filing Type"]]
+]);
+const researchBuildingCodeFactKeys = new Set([
+  "occupancy", "construction-type", "stories-above-grade", "levels-below-grade",
+  "building-height", "sprinkler-protection", "project-status", "work-filing-type",
+  "code-basis", "building-area"
+]);
+const researchZoningFactKeys = new Set([
+  "address", "borough", "block", "tax-lots", "zoning-lot-composition", "zoning-districts",
+  "commercial-overlays", "special-purpose-district", "zoning-map", "community-district",
+  "zoning-lot-area", "lot-width", "lot-depth", "lot-type", "street-frontages",
+  "mih-area-options", "affordable-housing-zoning-status", "transit-zone",
+  "limited-height-district", "waterfront-status", "lower-density-growth-management-area"
+]);
+
+function researchProjectFactGroup(key) {
+  if (researchBuildingCodeFactKeys.has(key)) return "buildingCode";
+  if (researchZoningFactKeys.has(key)) return "zoning";
+  return "custom";
+}
 
 function normalizedResearchProjectStructuredFacts(project) {
   return (Array.isArray(project?.structuredFacts) ? project.structuredFacts : []).flatMap((fact) => {
@@ -8039,17 +8066,19 @@ function normalizedResearchProjectStructuredFacts(project) {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
-    const label = normalizedResearchText(fact.label, 160);
+    const [canonicalKey, canonicalLabel] = researchProjectFactAliases.get(key) || [key, fact.label];
+    const label = normalizedResearchText(canonicalLabel, 160);
     const value = normalizedResearchText(fact.value, 1_000);
     if (!key || !label || !value) return [];
     const status = researchProjectFactStatuses.has(String(fact.status || "").toLowerCase())
       ? String(fact.status).toLowerCase()
       : "stated";
     return [{
-      id: normalizedResearchText(fact.id || `project-fact:${key}`, 200),
-      key,
+      id: normalizedResearchText(fact.id || `project-fact:${canonicalKey}`, 200),
+      key: canonicalKey,
       label,
       value,
+      group: researchProjectFactGroup(canonicalKey),
       status,
       source: normalizedResearchText(fact.source || "description", 100),
       sourceText: normalizedResearchText(fact.sourceText || "", 500),
@@ -8066,11 +8095,30 @@ export function researchProjectInformation(projectID, project) {
   const codeVersion = String(project.codeVersion || "").trim() || null;
   const structuredFacts = normalizedResearchProjectStructuredFacts(project);
   const usableStructuredFacts = structuredFacts.filter((fact) => fact.usedInResearch && fact.key !== "floor-affected");
-  const facts = [];
-  if (address) facts.push(`Project address: ${normalizedResearchText(address, 1_000)}`);
-  usableStructuredFacts.forEach((fact) => {
-    facts.push(`${fact.label}: ${fact.value} (user-provided; not independently verified)`);
-  });
+  const addressFact = address ? {
+    id: "project-address",
+    key: "address",
+    label: "Address",
+    value: normalizedResearchText(address, 1_000),
+    group: "zoning",
+    status: "stated",
+    source: "project-record",
+    sourceText: "",
+    updatedAt: project.updatedAt || null,
+    usedInResearch: true
+  } : null;
+  const buildingCodeFacts = usableStructuredFacts.filter((fact) => fact.group === "buildingCode");
+  const zoningFacts = [
+    ...(addressFact ? [addressFact] : []),
+    ...usableStructuredFacts.filter((fact) => fact.group === "zoning" && (!addressFact || fact.key !== "address"))
+  ];
+  const customFacts = usableStructuredFacts.filter((fact) => fact.group === "custom");
+  const factLine = (groupLabel, fact) => `${groupLabel} — ${fact.label}: ${fact.value} (user-confirmed; not independently verified)`;
+  const facts = [
+    ...buildingCodeFacts.map((fact) => factLine("Building / Code Fact", fact)),
+    ...zoningFacts.map((fact) => factLine("Zoning Fact", fact)),
+    ...customFacts.map((fact) => factLine("Custom Fact", fact))
+  ];
   if (description) {
     facts.push(`Additional Project facts: ${normalizedResearchText(description, 4_000)}`);
   }
@@ -8079,6 +8127,10 @@ export function researchProjectInformation(projectID, project) {
     address,
     description,
     structuredFacts,
+    buildingCodeFacts,
+    zoningFacts,
+    customFacts,
+    missingFactsAreUnknown: true,
     codeVersion,
     canonicalCodeVersion: codeVersion ? canonicalCodeVersion(codeVersion) : null,
     facts,

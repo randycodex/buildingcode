@@ -78,6 +78,19 @@ const normalizeProjectStructuredFact = new Function(
   "projectStructuredFactStatuses",
   `${functionSource(appSource, "normalizeProjectStructuredFact")}; return normalizeProjectStructuredFact;`
 )(new Set(["stated", "confirmed", "unknown", "rejected"]));
+const projectStructuredFacts = new Function(
+  "normalizeProjectStructuredFact",
+  `${functionSource(appSource, "projectStructuredFacts")}; return projectStructuredFacts;`
+)(normalizeProjectStructuredFact);
+const migratedProjectStructuredFacts = new Function(
+  "projectStructuredFacts",
+  "projectStructuredFactAliases",
+  `${functionSource(appSource, "migratedProjectStructuredFacts")}; return migratedProjectStructuredFacts;`
+)(projectStructuredFacts, new Map([
+  ["stories", ["stories-above-grade", "Stories Above Grade"]],
+  ["sprinkler-status", ["sprinkler-protection", "Sprinkler Protection"]],
+  ["work-type", ["work-filing-type", "Work / Filing Type"]]
+]));
 assert.deepEqual(
   normalizeProjectStructuredFact({ key: "occupancy", label: "Occupancy", value: "Group R-2", source: "user" }),
   {
@@ -91,6 +104,26 @@ assert.deepEqual(
     updatedAt: null
   },
   "Manually entered structured facts must normalize into the Project record."
+);
+const migratedFacts = migratedProjectStructuredFacts({
+  structuredFacts: [
+    { key: "stories", label: "Stories", value: "6", status: "stated" },
+    { key: "travel-distance", label: "Travel Distance", value: "95 feet", status: "stated" },
+    { key: "exit-separation", label: "Exit Separation", value: "112 feet", status: "stated" },
+    { key: "dead-end-length", label: "Dead-End Length", value: "27 feet", status: "stated" },
+    { key: "floor-affected", label: "Floor affected", value: "Third floor", status: "stated" }
+  ]
+});
+assert.deepEqual(
+  migratedFacts.map(({ key, label, value }) => [key, label, value]),
+  [
+    ["stories-above-grade", "Stories Above Grade", "6"],
+    ["travel-distance", "Travel Distance", "95 feet"],
+    ["exit-separation", "Exit Separation", "112 feet"],
+    ["dead-end-length", "Dead-End Length", "27 feet"],
+    ["floor-affected", "Floor affected", "Third floor"]
+  ],
+  "Legacy Structured Facts did not migrate without data loss."
 );
 
 assert.match(appSource, /function persistSectionFolderSelection\([\s\S]*?if \(!selectedByID\.size\) return/);
@@ -382,14 +415,22 @@ assert.match(appSource, /wireProjectSectionMotion\([\s\S]*?codeGroup,[\s\S]*?cod
 assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle-chevron/);
 assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body[\s\S]*?max-height 420ms cubic-bezier/);
 const projectFactEditorSource = functionSource(appSource, "appendSavedProjectFactEditor");
+const structuredFactGroupsSource = appSource.match(/const projectStructuredFactGroups = \[[\s\S]*?\n\];/)?.[0] || "";
 assert.match(projectFactEditorSource, /toggle\.textContent = "Project facts"/);
 assert.match(projectFactEditorSource, /address\.setAttribute\("aria-label", "Project address"\)/);
 assert.match(projectFactEditorSource, /description\.setAttribute\("aria-label", "Project description and facts"\)/);
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "projectFacts", false\)/);
 assert.match(projectFactEditorSource, /structuredToggle\.textContent = "Structured facts"/);
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "structuredFacts", false\)/);
-assert.match(projectFactEditorSource, /projectStructuredFactFields\.forEach/);
-assert.doesNotMatch(appSource.match(/const projectStructuredFactFields = \[[\s\S]*?\];/)?.[0] || "", /floor-affected/);
+assert.match(projectFactEditorSource, /projectStructuredFactGroups\.forEach/);
+assert.match(structuredFactGroupsSource, /label: "Building \/ Code Facts"[\s\S]*?Stories Above Grade[\s\S]*?Levels Below Grade[\s\S]*?Building Area/);
+assert.match(structuredFactGroupsSource, /label: "Zoning Facts"[\s\S]*?Tax Lot\(s\)[\s\S]*?Zoning Lot Composition[\s\S]*?Zoning District\(s\)[\s\S]*?Street Frontage\(s\)/);
+assert.doesNotMatch(structuredFactGroupsSource, /Travel Distance|Exit Separation|Dead-End Length|Floor affected/);
+assert.match(appSource, /\["stories", \["stories-above-grade", "Stories Above Grade"\]\]/);
+assert.match(appSource, /\["sprinkler-status", \["sprinkler-protection", "Sprinkler Protection"\]\]/);
+assert.match(appSource, /\["work-type", \["work-filing-type", "Work \/ Filing Type"\]\]/);
+assert.match(projectFactEditorSource, /structuredFacts\.filter\(\(fact\) => fact\.key !== "floor-affected" && !fixedFactKeys\.has\(fact\.key\)\)/);
+assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, `structuredFacts:\$\{group\.key\}`, groupIndex === 0\)/);
 assert.match(projectFactEditorSource, /addFact\.textContent = "Add another fact"/);
 assert.doesNotMatch(appSource, /function extractedProjectStructuredFacts/);
 assert.doesNotMatch(projectFactEditorSource, /Proposed from the narrative|saved-project-structured-fact-status/);
