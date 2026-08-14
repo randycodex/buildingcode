@@ -24110,7 +24110,6 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     value.type = "text";
     value.className = "saved-project-structured-fact-value";
     value.value = projectAddress ? address.value : factsByKey.get(key)?.value || "";
-    value.placeholder = "Add value";
     value.setAttribute("aria-label", fieldLabel);
     label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
     row.append(label, value);
@@ -24269,7 +24268,6 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       value.type = "text";
       value.className = "saved-project-structured-fact-value";
       value.value = fact.value;
-      value.placeholder = "Add value";
       value.setAttribute("aria-label", `${fact.label || "Additional fact"} value`);
       const remove = document.createElement("button");
       remove.type = "button";
