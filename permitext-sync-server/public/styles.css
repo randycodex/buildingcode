@@ -5439,12 +5439,31 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 }
 
 .research-project-context-used > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   width: fit-content;
   padding: var(--space-1) 0;
+  list-style: none;
   color: var(--text-secondary);
   cursor: pointer;
   font-size: 14px;
   line-height: 1.25;
+}
+
+.research-project-context-used > summary::-webkit-details-marker {
+  display: none;
+}
+
+.research-project-context-used > summary::after {
+  content: "›";
+  display: inline-block;
+  line-height: 1;
+  transform-origin: center;
+}
+
+.research-project-context-used[open] > summary::after {
+  transform: rotate(90deg);
 }
 
 .research-project-context-used > summary:focus-visible {
