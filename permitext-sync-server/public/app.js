@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260813-structured-fact-menus-v131";
+} from "./offline-storage.js?v=20260813-recent-preview-hydration-v132";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -4849,12 +4849,25 @@ function snippetWithoutDuplicateTitle(result) {
   if (!snippet) return "";
   snippet = stripLeadingSectionNumber(snippet, result?.sectionNumber);
   const title = String(result?.title || result?.headingLine || "").trim();
+  const titleWithoutNumber = stripLeadingSectionNumber(title, result?.sectionNumber);
   const displayedTitle = sectionDisplayTitle(result?.sectionNumber, title, "").trim();
-  [displayedTitle, title].filter(Boolean).forEach((candidate) => {
+  [displayedTitle, title, titleWithoutNumber].filter(Boolean).forEach((candidate) => {
     const pattern = new RegExp(`^(?:\\.\\.\\.\\s*)?${escapeRegExp(candidate)}(?:\\s+|$)`, "i");
     snippet = snippet.replace(pattern, (match) => match.startsWith("...") ? "..." : "").trim();
   });
   return snippet;
+}
+
+function recentlyViewedPreviewHasEnactedText(entry) {
+  const previewText = String(entry?.previewText || "").trim();
+  if (!previewText) return false;
+  if (entry?.isNestedListParagraph) return true;
+  return Boolean(snippetWithoutDuplicateTitle({
+    sectionNumber: entry?.sectionNumber,
+    title: entry?.title,
+    headingLine: entry?.headingLine,
+    snippet: previewText
+  }));
 }
 
 function searchResultMatchesExactQuery(result, query) {
@@ -12493,7 +12506,7 @@ function updateSearchDock(panel, instance, resultCount = null) {
 
 async function hydrateSearchRecentlyViewedEntries(entries, options = {}) {
   const hydratedEntries = await Promise.all(entries.map(async (entry) => {
-    if (String(entry?.previewText || "").trim()) return entry;
+    if (recentlyViewedPreviewHasEnactedText(entry)) return entry;
     try {
       const detail = { ...entry };
       const { chapter, section } = await resolveSectionDetail(detail);

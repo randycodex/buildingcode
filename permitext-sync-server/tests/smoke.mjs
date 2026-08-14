@@ -1341,7 +1341,8 @@ async function main() {
         workspaceScript.text.includes("function updateVisibleSearchHistoryEntry(panel, entry)") &&
         workspaceScript.text.includes("options.onEntry?.(hydratedEntry)") &&
         workspaceScript.text.includes("tile.dataset.recentViewIdentity = recentViewIdentity(entry)") &&
-        workspaceScript.text.includes('if (String(entry?.previewText || "").trim()) return entry;') &&
+        workspaceScript.text.includes("function recentlyViewedPreviewHasEnactedText(entry)") &&
+        workspaceScript.text.includes("if (recentlyViewedPreviewHasEnactedText(entry)) return entry;") &&
         workspaceScript.text.includes("const syncPromise = loadSyncedContent();\n    await renderSearchResults(panel, searchInstance);") &&
         workspaceScript.text.includes("if (attempt < 120)") &&
         workspaceScript.text.includes("requestAnimationFrame(() => hydrateSearchPanelWhenConnected(panel, searchInstance))") &&
@@ -1431,7 +1432,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260813-structured-fact-menus-v131'),
+        webRoot.text.includes('/web/app.js?v=20260813-recent-preview-hydration-v132'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1581,7 +1582,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260813-structured-fact-menus-v131'),
+      webRoot.text.includes('/web/styles.css?v=20260813-recent-preview-hydration-v132'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1855,7 +1856,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260813-structured-fact-menus-v131'),
+      webRoot.text.includes('/web/styles.css?v=20260813-recent-preview-hydration-v132'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

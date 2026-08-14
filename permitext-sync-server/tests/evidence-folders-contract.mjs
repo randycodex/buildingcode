@@ -49,6 +49,25 @@ function functionSource(source, name) {
   throw new Error(`Could not parse ${name}.`);
 }
 
+const recentlyViewedPreviewHasEnactedText = new Function(
+  `${functionSource(appSource, "escapeRegExp")};\n` +
+  `${functionSource(appSource, "sectionDisplayTitle")};\n` +
+  `${functionSource(appSource, "stripLeadingSectionNumber")};\n` +
+  `${functionSource(appSource, "snippetWithoutDuplicateTitle")};\n` +
+  `${functionSource(appSource, "recentlyViewedPreviewHasEnactedText")};\n` +
+  "return recentlyViewedPreviewHasEnactedText;"
+)();
+assert.equal(
+  recentlyViewedPreviewHasEnactedText({ sectionNumber: "101.4", title: "101.4 Referenced codes.", previewText: "Referenced codes." }),
+  false,
+  "A Recently Viewed preview that only repeats the title must be rehydrated from enacted text."
+);
+assert.equal(
+  recentlyViewedPreviewHasEnactedText({ sectionNumber: "101.4", title: "101.4 Referenced codes.", previewText: "The other codes listed in Sections 101.4.1 through 101.4.6 apply." }),
+  true,
+  "A Recently Viewed preview containing enacted body text must not be fetched again."
+);
+
 const folderType = new Function(`${functionSource(appSource, "folderType")}; return folderType;`)();
 assert.equal(folderType({}), "project", "Legacy folders must default to Project.");
 assert.equal(folderType({ folderType: "reference" }), "reference");
