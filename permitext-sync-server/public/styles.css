@@ -9538,7 +9538,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-structured-fact + .saved-project-structured-fact {
-  border-top: 0;
+  border-top: 1px solid var(--border);
 }
 
 .saved-project-structured-fact.is-custom {
@@ -9546,7 +9546,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-structured-fact.is-custom + .saved-project-structured-fact.is-custom {
-  border-top: 0;
+  border-top: 1px solid var(--border);
 }
 
 .saved-project-structured-fact-label {
@@ -9565,7 +9565,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin: 0;
   border: 0;
   outline: 0;
-  background: #080808;
+  background: transparent;
   color: var(--text-primary);
   font: inherit;
 }

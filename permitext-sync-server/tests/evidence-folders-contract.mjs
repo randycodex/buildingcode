@@ -463,11 +463,11 @@ assert.match(projectFactEditorSource, /description\.addEventListener\("blur", sa
 assert.match(projectFactEditorSource, /updateProjectFolder\(folder,/);
 assert.match(stylesSource, /\.saved-project-fact-input \{[^}]*background: transparent;[^}]*font: inherit;/);
 assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: none;/);
-assert.match(stylesSource, /\.saved-project-structured-fact-value,[\s\S]*?\.saved-project-structured-fact-label-input \{[^}]*background: #080808;/);
+assert.match(stylesSource, /\.saved-project-structured-fact-value,[\s\S]*?\.saved-project-structured-fact-label-input \{[^}]*background: transparent;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*text-align: right;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*min-width: 144px;[^}]*max-width: 100%;[^}]*justify-self: end;[^}]*field-sizing: content;/);
-assert.match(stylesSource, /\.saved-project-structured-fact \+ \.saved-project-structured-fact \{[^}]*border-top: 0;/);
-assert.match(stylesSource, /\.saved-project-structured-fact\.is-custom \+ \.saved-project-structured-fact\.is-custom \{[^}]*border-top: 0;/);
+assert.match(stylesSource, /\.saved-project-structured-fact \+ \.saved-project-structured-fact \{[^}]*border-top: 1px solid var\(--border\);/);
+assert.match(stylesSource, /\.saved-project-structured-fact\.is-custom \+ \.saved-project-structured-fact\.is-custom \{[^}]*border-top: 1px solid var\(--border\);/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value:focus-visible,[^}]*box-shadow: none;/);
 assert.match(stylesSource, /\.saved-evidence-heading-actions button,[\s\S]*?button\[aria-pressed="true"\] \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.saved-project-list:has\(\.saved-project-tile\.is-selected\) \.saved-project-tile:not\(\.is-selected\) \{[\s\S]*?opacity: 0\.58;/);
