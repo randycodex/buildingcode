@@ -9538,7 +9538,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-structured-fact + .saved-project-structured-fact {
-  border-top: 1px solid var(--border);
+  border-top: 0;
 }
 
 .saved-project-structured-fact.is-custom {
