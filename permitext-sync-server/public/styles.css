@@ -8390,17 +8390,21 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   display: grid;
   gap: 4px;
   width: 100%;
-  padding: var(--space-3);
+  padding: var(--space-3) 0;
   border: 0;
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--project-color) 10%, var(--surface));
+  border-radius: 0;
+  background: transparent;
   color: var(--text-primary);
   text-align: left;
 }
 
+.project-research-history-card + .project-research-history-card {
+  border-top: 1px solid var(--border);
+}
+
 .project-research-history-card:hover,
 .project-research-history-card:focus-visible {
-  background: color-mix(in srgb, var(--project-color) 24%, var(--surface));
+  background: color-mix(in srgb, var(--project-color) 12%, transparent);
 }
 
 .project-research-history-card strong {
@@ -8429,7 +8433,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-project-research-body {
   display: grid;
-  gap: var(--space-2);
+  gap: 0;
 }
 
 .project-research-history-card p {
@@ -9257,6 +9261,39 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   gap: var(--space-1);
 }
 
+.saved-folder-context.is-project .saved-project-facts-section,
+.saved-folder-context.is-project .saved-project-structured-section,
+.saved-folder-context.is-project .saved-project-evidence-section,
+.saved-folder-context.is-project .saved-project-research-answers {
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+  transition:
+    border-radius 260ms ease,
+    background 260ms ease;
+}
+
+.saved-folder-context.is-project .saved-project-facts-section.is-open,
+.saved-folder-context.is-project .saved-project-structured-section.is-open,
+.saved-folder-context.is-project .saved-project-evidence-section.is-open,
+.saved-folder-context.is-project .saved-project-research-answers.is-open {
+  border-radius: var(--radius-card);
+}
+
+.saved-folder-context.is-project .saved-project-facts-section.is-open > .project-section-motion-body,
+.saved-folder-context.is-project .saved-project-structured-section.is-open > .project-section-motion-body,
+.saved-folder-context.is-project .saved-project-evidence-section.is-open > .project-section-motion-body,
+.saved-folder-context.is-project .saved-project-research-answers.is-open > .project-section-motion-body {
+  padding-bottom: var(--space-3);
+}
+
+.saved-folder-context.is-project .saved-project-facts-section > .saved-project-facts-heading .project-section-toggle-chevron,
+.saved-folder-context.is-project .saved-project-structured-section > .saved-project-facts-heading .project-section-toggle-chevron,
+.saved-folder-context.is-project .saved-project-evidence-section > .saved-evidence-heading .project-section-toggle-chevron,
+.saved-folder-context.is-project .saved-project-research-answers > .project-studio-section-heading .project-section-toggle-chevron {
+  background: transparent;
+}
+
 .saved-project-facts-heading {
   display: flex;
   align-items: center;
@@ -9391,7 +9428,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-project-structured-facts-list {
   display: grid;
-  gap: var(--space-2);
+  gap: 0;
 }
 
 .saved-project-structured-fact {
@@ -9400,9 +9437,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   gap: var(--space-2);
   align-items: center;
   min-width: 0;
-  padding: var(--space-2);
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--project-color, var(--accent)) 12%, var(--surface-muted));
+  padding: var(--space-2) 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.saved-project-structured-fact + .saved-project-structured-fact {
+  border-top: 1px solid var(--border);
 }
 
 .saved-project-structured-fact.is-custom {
