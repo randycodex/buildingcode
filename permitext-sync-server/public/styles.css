@@ -2158,6 +2158,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
   width: auto;
   max-width: none;
   margin: 0;
+  border-radius: var(--radius-pill);
 }
 
 .reader-internal-search[hidden] {

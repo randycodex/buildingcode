@@ -228,6 +228,7 @@ assert.doesNotMatch(clientSource, /Project context \(optional\)/i, "The redundan
 assert.match(stylesSource, /\.research-composer\.research-start-composer \{[\s\S]*?background: transparent;/, "The Research start composer still renders a tinted outer block.");
 assert.doesNotMatch(stylesSource, /\.research-start-composer \.research-composer-box/, "The Research history composer overrides the shared conversation composer surface.");
 assert.match(stylesSource, /@media \(prefers-color-scheme: dark\) \{[\s\S]*?\.search-box \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);/, "The dark Search field does not use the annotated warm-white fill.");
+assert.match(stylesSource, /\.reader-internal-search\.search-box \{[\s\S]*?border-radius: var\(--radius-pill\);/, "The Reader search does not use fully rounded ends.");
 assert.match(clientSource, /selectHistoryButton\.innerHTML = selectionModeIconSVG\(\)/, "Research history does not expose its selection icon.");
 assert.match(clientSource, /cancelSelectionButton\.textContent = "Cancel"[\s\S]*?selectAllButton\.textContent = "Select all"/, "Research selection mode is missing Cancel or Select all.");
 assert.match(clientSource, /if \(selectingConversations\)[\s\S]*?toggleConversationSelection\(conversation\.id\)/, "Conversation rows do not toggle selection instead of opening while selection mode is active.");
