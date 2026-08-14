@@ -2452,8 +2452,8 @@ label {
 }
 
 .reader-nav-chapter-row {
-  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
-  color: var(--text-primary);
+  background: transparent;
+  color: var(--text-secondary);
   font-weight: 650;
 }
 

@@ -322,5 +322,6 @@ assert.match(stylesSource, /\.research-answer-source-list \.research-source-card
 assert.match(clientSource, /if \(!options\.openInReader\) toggle\.append\(disclosure\)/, "Direct-opening answer sources still render disclosure chevrons.");
 assert.match(stylesSource, /\.workspace-tab \{[\s\S]*?font-size: 12px;/, "Workspace tab labels are not 12px.");
 assert.match(stylesSource, /\.connection-status \{[\s\S]*?font-size: 12px;/, "Connection status labels are not 12px.");
+assert.match(stylesSource, /\.reader-nav-chapter-row \{[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/, "Reader chapter rows retain a persistent highlight instead of highlighting on hover.");
 
 console.log("permitext research list summary contract passed");
