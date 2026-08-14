@@ -280,6 +280,7 @@ if (toggleWorkboardButton) {
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
+const mobileMoreButton = document.querySelector("#mobile-more");
 const workspaceTabs = document.querySelector("#workspace-tabs");
 const addWorkspaceButton = document.querySelector("#add-workspace");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
@@ -400,6 +401,7 @@ let suppressReaderScrollRestore = false;
 let draggedWorkspaceID = "";
 let draggedToolbarButtonID = "";
 let workspaceContextMenu = null;
+let mobileMoreSheet = null;
 let workspaceLongPressTimer = null;
 const codeQuestionListHydrationByProject = new Map();
 const codeQuestionStateHydrationByQuestion = new Map();
@@ -1204,9 +1206,23 @@ function commitWorkspaceRename(workspaceID, name) {
 
 function beginWorkspaceRename(workspaceID) {
   closeWorkspaceContextMenu();
-  const tab = workspaceTabs?.querySelector(`[data-workspace-id="${CSS.escape(workspaceID)}"]`);
   const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
-  if (!tab || !workspace) return;
+  if (!workspace) return;
+  if (window.matchMedia("(max-width: 760px)").matches) {
+    void openWebTextPrompt({
+      title: "Rename workspace",
+      message: "Choose a short name for this workspace.",
+      label: "Workspace name",
+      defaultValue: workspace.name,
+      confirmLabel: "Save",
+      required: true
+    }).then((name) => {
+      if (name !== null) commitWorkspaceRename(workspaceID, name);
+    });
+    return;
+  }
+  const tab = workspaceTabs?.querySelector(`[data-workspace-id="${CSS.escape(workspaceID)}"]`);
+  if (!tab) return;
   const input = document.createElement("input");
   input.className = "workspace-name-input";
   input.value = workspace.name;
@@ -1321,6 +1337,106 @@ function closeWorkspaceContextMenu() {
   workspaceContextMenu?.remove();
   workspaceContextMenu = null;
   workspaceActionsButton?.setAttribute("aria-expanded", "false");
+}
+
+function closeMobileMoreSheet({ restoreFocus = true } = {}) {
+  mobileMoreSheet?.remove();
+  mobileMoreSheet = null;
+  mobileMoreButton?.setAttribute("aria-expanded", "false");
+  if (restoreFocus) mobileMoreButton?.focus({ preventScroll: true });
+}
+
+function mobileMoreAction(label, run, options = {}) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "mobile-more-action";
+  button.classList.toggle("is-danger", options.danger === true);
+  button.textContent = label;
+  if (options.current) button.setAttribute("aria-current", "true");
+  if (options.disabled) button.disabled = true;
+  button.addEventListener("click", () => {
+    closeMobileMoreSheet({ restoreFocus: false });
+    run();
+  });
+  return button;
+}
+
+function openMobileMoreSheet() {
+  if (mobileMoreSheet) {
+    closeMobileMoreSheet();
+    return;
+  }
+  closeWorkspaceContextMenu();
+  const backdrop = document.createElement("div");
+  backdrop.className = "mobile-more-backdrop";
+  const sheet = document.createElement("section");
+  sheet.className = "mobile-more-sheet";
+  sheet.setAttribute("role", "dialog");
+  sheet.setAttribute("aria-modal", "true");
+  sheet.setAttribute("aria-label", "More workspace controls");
+  const header = document.createElement("header");
+  const title = document.createElement("strong");
+  title.textContent = "More";
+  const closeButton = document.createElement("button");
+  closeButton.type = "button";
+  closeButton.className = "mobile-more-close";
+  closeButton.setAttribute("aria-label", "Close More");
+  closeButton.textContent = "×";
+  closeButton.addEventListener("click", () => closeMobileMoreSheet());
+  header.append(title, closeButton);
+
+  const workspaceSection = document.createElement("section");
+  workspaceSection.className = "mobile-more-section";
+  const workspaceLabel = document.createElement("p");
+  workspaceLabel.className = "mobile-more-section-label";
+  workspaceLabel.textContent = "Workspaces";
+  const workspaceList = document.createElement("div");
+  workspaceList.className = "mobile-more-workspaces";
+  (workspaceRegistry?.workspaces || []).forEach((workspace) => {
+    workspaceList.append(mobileMoreAction(
+      workspace.name,
+      () => void switchWorkspace(workspace.id, { focus: false }),
+      { current: workspace.id === activeWorkspaceID }
+    ));
+  });
+  workspaceList.append(mobileMoreAction("Create workspace", () => void createNewWorkspace()));
+  workspaceSection.append(workspaceLabel, workspaceList);
+
+  const activeWorkspace = activeWorkspaceRecord();
+  const workspaceActions = document.createElement("section");
+  workspaceActions.className = "mobile-more-section";
+  const actionsLabel = document.createElement("p");
+  actionsLabel.className = "mobile-more-section-label";
+  actionsLabel.textContent = activeWorkspace ? `${activeWorkspace.name} actions` : "Workspace actions";
+  const actions = document.createElement("div");
+  actions.className = "mobile-more-actions";
+  if (activeWorkspace) {
+    const activeIndex = workspaceRegistry.workspaces.findIndex((workspace) => workspace.id === activeWorkspace.id);
+    actions.append(
+      mobileMoreAction("Rename workspace", () => beginWorkspaceRename(activeWorkspace.id)),
+      mobileMoreAction("Duplicate workspace", () => void duplicateNamedWorkspace(activeWorkspace.id)),
+      mobileMoreAction("Move workspace left", () => moveNamedWorkspace(activeWorkspace.id, -1), { disabled: activeIndex <= 0 }),
+      mobileMoreAction("Move workspace right", () => moveNamedWorkspace(activeWorkspace.id, 1), { disabled: activeIndex >= workspaceRegistry.workspaces.length - 1 }),
+      mobileMoreAction("Delete workspace", () => void removeNamedWorkspace(activeWorkspace.id), { danger: true })
+    );
+  }
+  actions.append(mobileMoreAction("Settings", () => toggleUtilityPane("settings")));
+  workspaceActions.append(actionsLabel, actions);
+
+  sheet.append(header, workspaceSection, workspaceActions);
+  backdrop.append(sheet);
+  backdrop.addEventListener("click", (event) => {
+    if (event.target === backdrop) closeMobileMoreSheet();
+  });
+  sheet.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    closeMobileMoreSheet();
+  });
+  document.body.append(backdrop);
+  mobileMoreSheet = backdrop;
+  mobileMoreButton?.setAttribute("aria-expanded", "true");
+  closeButton.focus({ preventScroll: true });
 }
 
 function openWorkspaceContextMenu(workspaceID, anchor) {
@@ -32484,6 +32600,10 @@ async function start() {
       return;
     }
     openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
+  });
+  mobileMoreButton?.addEventListener("click", openMobileMoreSheet);
+  window.matchMedia("(max-width: 760px)").addEventListener("change", (event) => {
+    if (!event.matches) closeMobileMoreSheet({ restoreFocus: false });
   });
   fitColumnsButton.addEventListener("click", () => {
     resetVisibleColumnWidths();

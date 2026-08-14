@@ -10,10 +10,11 @@ import {
 } from "../app.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const [appSource, clientSource, stylesSource] = await Promise.all([
+const [appSource, clientSource, stylesSource, indexSource] = await Promise.all([
   readFile(join(root, "../app.mjs"), "utf8"),
   readFile(join(root, "../public/app.js"), "utf8"),
-  readFile(join(root, "../public/styles.css"), "utf8")
+  readFile(join(root, "../public/styles.css"), "utf8"),
+  readFile(join(root, "../public/index.html"), "utf8")
 ]);
 
 const hugeVisual = "data:image/png;base64," + "A".repeat(50_000);
@@ -335,6 +336,12 @@ assert.match(clientSource, /function renderNewResearchComposer\(container, resea
 assert.match(clientSource, /renderNewResearchComposer\(panel, researchEnabled\)/, "The Research history composer still scrolls inside the history content.");
 assert.match(stylesSource, /\.analysis-panel\.has-research-composer > \.research-composer \{[\s\S]*?padding: var\(--space-3\) 0 var\(--panel-padding\);/, "The Research history composer does not share the conversation composer's bottom position.");
 assert.match(stylesSource, /\.research-composer \.research-question-input \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);[\s\S]*?color: #ffffff;/, "Research composer textareas do not share the annotated fill and text color.");
+assert.match(indexSource, /id="add-reader"[^>]*data-mobile-label="Reader"/, "The mobile Reader action lacks its compact label.");
+assert.match(indexSource, /id="toggle-saved"[^>]*data-mobile-label="Projects"/, "The mobile Projects action lacks its compact label.");
+assert.match(indexSource, /id="mobile-more"[\s\S]*?aria-haspopup="dialog"[\s\S]*?data-mobile-label="More"/, "The mobile dock lacks its More action.");
+assert.match(stylesSource, /@media \(max-width: 760px\) \{[\s\S]*?grid-template-columns: repeat\(5, minmax\(0, 1fr\)\);[\s\S]*?#toggle-saved \{ order: 1; \}[\s\S]*?#mobile-more \{ order: 5; \}/, "The mobile dock is not a five-action layout.");
+assert.match(stylesSource, /\.topbar #fit-columns,[\s\S]*?\.topbar #collapse-readers,[\s\S]*?display: none !important;/, "Desktop column-layout controls remain visible in the mobile dock.");
+assert.match(clientSource, /function openMobileMoreSheet\(\)[\s\S]*?workspace\.name[\s\S]*?"Create workspace"[\s\S]*?"Rename workspace"[\s\S]*?"Settings"/, "The mobile More sheet does not contain workspace switching and management controls.");
 assert.match(clientSource, /const preservedTargetOffset = preservedTarget[\s\S]*?menu\.scrollTop \+= nextTargetOffset - preservedTargetOffset;[\s\S]*?focusTarget\?\.focus\(\{ preventScroll: true \}\)/, "Expanding a Reader chapter does not preserve its viewport position.");
 assert.match(clientSource, /if \(readerCodeMenu\) \{[\s\S]*?event\.key !== "Escape" \|\| menu\.hidden[\s\S]*?closeMenu\(\);[\s\S]*?trigger\.focus\(\{ preventScroll: true \}\)/, "Escape does not close the Reader code menu and restore trigger focus.");
 
