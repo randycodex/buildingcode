@@ -9304,18 +9304,19 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: var(--menu-subtle-surface);
 }
 
-.saved-folder-context.is-project .saved-project-facts-section.is-open,
-.saved-folder-context.is-project .saved-project-structured-section.is-open,
-.saved-folder-context.is-project .saved-project-evidence-section.is-open,
-.saved-folder-context.is-project .saved-project-research-answers.is-open {
-  padding-top: var(--space-3);
-}
-
 .saved-folder-context.is-project .saved-project-facts-section.is-open > .project-section-motion-body,
 .saved-folder-context.is-project .saved-project-structured-section.is-open > .project-section-motion-body,
 .saved-folder-context.is-project .saved-project-evidence-section.is-open > .project-section-motion-body,
 .saved-folder-context.is-project .saved-project-research-answers.is-open > .project-section-motion-body {
   padding-bottom: var(--space-3);
+}
+
+.saved-folder-context.is-project .saved-project-facts-section > .saved-project-facts-heading,
+.saved-folder-context.is-project .saved-project-structured-section > .saved-project-facts-heading,
+.saved-folder-context.is-project .saved-project-evidence-section > .saved-evidence-heading,
+.saved-folder-context.is-project .saved-project-research-answers > .project-studio-section-heading {
+  height: 30px;
+  min-height: 30px;
 }
 
 .saved-folder-context.is-project .saved-project-facts-section > .saved-project-facts-heading .project-section-toggle-chevron,
