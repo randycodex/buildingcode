@@ -465,6 +465,7 @@ assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?b
 assert.match(stylesSource, /\.saved-panel \.saved-content\[hidden\] \{[\s\S]*?display: none;/, "Deactivating a Project must hide its Saved Evidence list.");
 assert.match(stylesSource, /\.saved-project-fact-description \{[\s\S]*?height: 112px;[\s\S]*?max-height: min\(70vh, 760px\);[\s\S]*?overflow-y: auto;[\s\S]*?resize: none;/);
 assert.match(appSource, /descriptionResizeHandle\.className = "saved-project-fact-resize-handle"[\s\S]*?descriptionResizeHandle\.setPointerCapture\(event\.pointerId\)[\s\S]*?event\.key !== "ArrowUp" && event\.key !== "ArrowDown"/);
+assert.match(stylesSource, /\.saved-project-fact-resize-handle::after \{[\s\S]*?left: 50%;[\s\S]*?width: 36px;[\s\S]*?height: 2px;[\s\S]*?transform: translateX\(-50%\);/);
 assert.doesNotMatch(appSource, /description\.addEventListener\("input", resizeDescription\)/);
 assert.doesNotMatch(appSource, /saved-project-facts-status/);
 assert.doesNotMatch(appSource.match(/function appendSavedProjectFactEditor[\s\S]*?async function appendSavedProjectResearchConversations/)?.[0] || "", /status\.textContent = "Saving…"|status\.textContent = "Saved"/);
@@ -473,6 +474,8 @@ assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?fon
 const projectResearchSource = functionSource(appSource, "appendSavedProjectResearchConversations");
 assert.match(projectResearchSource, /title\.className = "section-label saved-project-research-toggle"/);
 assert.match(projectResearchSource, /body\.className = "project-studio-collapsible-body saved-project-research-body"/);
+assert.doesNotMatch(projectResearchSource, /projectSectionCount\(conversations\.length/);
+assert.match(projectResearchSource, /itemNumber\.className = "project-research-history-index"[\s\S]*?itemNumber\.textContent = String\(index \+ 1\)[\s\S]*?card\.append\(itemNumber, question\)/);
 assert.match(projectResearchSource, /projectSectionExpanded\(identity, "research", false\)/);
 assert.match(stylesSource, /\.project-studio-section-heading > \.saved-project-research-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);

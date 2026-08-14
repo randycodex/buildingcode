@@ -24411,20 +24411,23 @@ async function appendSavedProjectResearchConversations(container, identity) {
   toggle.type = "button";
   toggle.className = "project-section-toggle-chevron saved-project-research-chevron";
   toggle.innerHTML = researchChevronIconsSVG();
-  headingActions.append(projectSectionCount(conversations.length, "Research conversations"), toggle);
+  headingActions.append(toggle);
   heading.append(title, headingActions);
   const body = document.createElement("section");
   body.className = "project-studio-collapsible-body saved-project-research-body";
   section.append(heading, body);
 
-  conversations.slice(0, 12).forEach((conversation) => {
+  conversations.slice(0, 12).forEach((conversation, index) => {
     const card = document.createElement("button");
     card.className = "project-research-history-card";
     card.type = "button";
     card.dataset.researchConversationId = conversation.id;
+    const itemNumber = document.createElement("span");
+    itemNumber.className = "project-research-history-index";
+    itemNumber.textContent = String(index + 1);
     const question = document.createElement("strong");
     question.textContent = conversation.starterQuestion;
-    card.append(question);
+    card.append(itemNumber, question);
     card.addEventListener("click", () => {
       if (state.utilities.analysis && researchConversationPaneIsOpen()) {
         void openSupplementalResearchConversation(conversation.id);
