@@ -9545,6 +9545,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   grid-template-columns: minmax(92px, 0.85fr) minmax(100px, 1.15fr) auto;
 }
 
+.saved-project-structured-fact.is-custom + .saved-project-structured-fact.is-custom {
+  border-top: 0;
+}
+
 .saved-project-structured-fact-label {
   overflow: hidden;
   color: var(--text-secondary);
