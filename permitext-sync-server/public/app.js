@@ -17440,9 +17440,13 @@ function renderReaderResearchOrigin(conversation, sources, anchorPaneID) {
       .filter(Boolean)
       .join(" ") || source.title || "Selected code passage";
     reference.setAttribute("aria-label", `Open ${reference.textContent}`);
-    reference.addEventListener("click", () => openSectionDetailForExistingSearch(source, {
-      anchorPaneID
-    }));
+    reference.addEventListener("click", () => {
+      void openResearchSourceInSectionDetail(
+        source,
+        anchorPaneID,
+        conversation.primaryProjectID || ""
+      );
+    });
     passageHeader.append(reference);
     const excerpt = document.createElement("blockquote");
     excerpt.textContent = researchOriginExcerpt(source);
