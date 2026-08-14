@@ -10535,7 +10535,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
     ? "Projects"
     : selectedProjects.length === 1
       ? primarySelectedProjectName
-      : `${primarySelectedProjectName} +${selectedProjects.length - 1}`;
+      : "MULTIPLE PROJECTS";
 
   const setProjectListOpen = (open, { focusToggle = false } = {}) => {
     container.dataset.projectListOpen = String(open);

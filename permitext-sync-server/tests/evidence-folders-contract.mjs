@@ -583,6 +583,7 @@ assert.match(stylesSource, /--reader-notes-comment-text: #ffffff;/);
 assert.match(stylesSource, /\.reader-notes-input \{[\s\S]*?background: var\(--reader-notes-comment-surface\);[\s\S]*?color: var\(--reader-notes-comment-text\);/);
 assert.match(stylesSource, /\.reader-notes-tags \.annotation-tag-input \{[\s\S]*?border: 0;[\s\S]*?box-shadow: none;/);
 assert.match(appSource, /function renderAnnotationProjectEditor[\s\S]*?const projectListLabel = selectedProjects\.length === 0[\s\S]*?projectListToggle\.textContent = projectListLabel[\s\S]*?chips\.inert = !open;/);
+assert.match(appSource, /selectedProjects\.length === 1[\s\S]*?primarySelectedProjectName[\s\S]*?: "MULTIPLE PROJECTS";/, "Multi-project Reader notes should use a stable MULTIPLE PROJECTS disclosure label.");
 assert.match(stylesSource, /\.annotation-project-list-toggle\[aria-expanded="true"\]::after \{[\s\S]*?transform: rotate\(90deg\);/);
 assert.match(appSource, /container\.dataset\.projectListOpen = "true";[\s\S]*?renderAnnotationProjectEditor\(container, target, sectionPayload, options\);/);
 assert.match(stylesSource, /\.annotation-project-list-motion \{[\s\S]*?grid-template-rows: 0fr;[\s\S]*?420ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
