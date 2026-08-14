@@ -16924,13 +16924,15 @@ function renderResearchSource(source) {
     relationship.textContent = "Suggested because it is explicitly referenced by this enacted section. Open it and select the relevant passage to include it in analysis.";
     body.append(label, relationship);
   } else if (["enacted_permitext_discovered", "permitext_discovered", "permitext_cross_reference"].includes(sourceKind)) {
-    const label = document.createElement("p");
-    label.className = "section-label";
-    label.textContent = source.evidencePriority?.evidenceRole === "contextual" ||
+    if (
+      source.evidencePriority?.evidenceRole === "contextual" ||
       source.provenance?.evidenceRole === "contextual"
-      ? "Contextual enacted source — does not govern this answer"
-      : "Permitext enacted source";
-    body.append(label);
+    ) {
+      const label = document.createElement("p");
+      label.className = "section-label";
+      label.textContent = "Contextual enacted source — does not govern this answer";
+      body.append(label);
+    }
   } else if (["enacted_user_pinned", "user_pinned"].includes(sourceKind)) {
     const label = document.createElement("p");
     label.className = "section-label";
@@ -17168,16 +17170,7 @@ function renderResearchAnswerSources(conversation, message) {
       setResearchSourceCardExpanded(card, false, { instant: true });
       const body = card.querySelector(".research-source-body");
       const sourceURL = String(source.sourceURL || source.url || "").trim();
-      if (source.sectionID) {
-        const openButton = document.createElement("button");
-        openButton.type = "button";
-        openButton.className = "ghost-button research-answer-open-source";
-        openButton.textContent = "Open source";
-        openButton.addEventListener("click", () => openSectionDetailForExistingSearch(source, {
-          anchorPaneID: "utility:analysis"
-        }));
-        body?.append(openButton);
-      } else if (sourceURL) {
+      if (!source.sectionID && sourceURL) {
         const openLink = document.createElement("a");
         openLink.className = "research-answer-open-source";
         openLink.href = sourceURL;

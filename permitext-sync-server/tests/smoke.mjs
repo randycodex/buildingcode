@@ -1589,7 +1589,7 @@ async function main() {
       !researchSourceRendererSource.includes('"Selected passage"') &&
         researchSourceRendererSource.includes('label.textContent = "Pinned enacted source"') &&
         researchSourceRendererSource.includes('"Contextual enacted source — does not govern this answer"') &&
-        researchSourceRendererSource.includes(': "Permitext enacted source"') &&
+        !researchSourceRendererSource.includes(': "Permitext enacted source"') &&
         researchConversationRendererSource.includes('.filter((source) => source.kind === "selection")') &&
         researchConversationRendererSource.includes(
           "const projectContextSection = renderResearchProjectContext(evidenceScroll, conversation);"
