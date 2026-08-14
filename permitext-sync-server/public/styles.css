@@ -7876,11 +7876,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: var(--surface-muted);
 }
 
-.research-composer-box:has(.research-question-input:focus-visible) {
-  outline: 2px solid var(--text-secondary);
-  outline-offset: -2px;
-}
-
 .research-composer .research-question-input {
   display: block;
   min-height: 78px;
