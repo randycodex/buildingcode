@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "policies": [
+    {
+      "id": "nyc-2022-construction-codes",
+      "packageID": "nyc-2022-construction-codes",
+      "officialSource": "https://www.nyc.gov/site/buildings/codes/2022-construction-codes.page",
+      "rightsState": "approved",
+      "notes": "Official DOB 2022 Construction Code figures already stored in the authored asset directory."
+    },
+    {
+      "id": "nyc-zoning-resolution",
+      "packageID": "nyc-zoning-resolution",
+      "officialSource": "https://zr.planning.nyc.gov/",
+      "rightsState": "approved",
+      "notes": "Existing zr-* files are locally mirrored from DCP. Embedded data URIs stay embedded."
+    },
+    {
+      "id": "nyc-enacted-administrative-code",
+      "packageID": "nyc-enacted-administrative-code",
+      "officialSource": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/overview",
+      "rightsState": "pending-review",
+      "notes": "source-manifest verificationStatus requires republication-rights review before production publication. Do not scrape AmLegal graphics."
+    },
+    {
+      "id": "nyc-fire-code",
+      "packageID": "nyc-enacted-administrative-code",
+      "codePrefix": "FC",
+      "officialSource": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/overview",
+      "rightsState": "pending-review",
+      "notes": "Fire Code is Title 29 in the AmLegal enacted-admin package. Pilot figures 503.2.7.2.1, 503.2.9, and 503.4.1 stay unbound until rights are approved."
+    },
+    {
+      "id": "nyc-2025-specialty-codes",
+      "packageID": "nyc-2025-specialty-codes",
+      "officialSource": "https://www.nyc.gov/site/buildings/codes/2025-energy-conservation-code.page",
+      "rightsState": "pending-review",
+      "notes": "ECC figures exist in official DOB PDFs. Confirm figure republication before extraction. Electrical corpus is NYC amendments only."
+    },
+    {
+      "id": "nfpa-70",
+      "packageID": "nyc-2025-specialty-codes",
+      "codePrefix": "EC",
+      "rightsState": "prohibited",
+      "notes": "Do not obtain or reproduce NFPA 70 figures without an appropriate license."
+    },
+    {
+      "id": "nyc-existing-building-code",
+      "packageID": "nyc-existing-building-code",
+      "officialSource": "https://legistar.council.nyc.gov/View.ashx?GUID=90ED7A3B-B000-43BE-ACC0-117D267BFBDE&ID=15436471&M=F",
+      "rightsState": "pending-review",
+      "notes": "Local Law 33 of 2026 PDF. Confirm figure republication before extracting Figure A1-1 or Equation 3-1."
+    }
+  ]
+}

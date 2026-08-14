@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "permitext://visual-manifest.schema.v1.json",
+  "title": "Permitext visual asset manifest",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAt", "records"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string" },
+    "contentVersion": { "type": ["string", "null"] },
+    "notes": { "type": "string" },
+    "records": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/record" }
+    }
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "required": [
+        "id",
+        "packageID",
+        "codePrefix",
+        "edition",
+        "canonicalSectionID",
+        "sectionNumber",
+        "visualIdentifier",
+        "rightsState",
+        "bindingState"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "packageID": { "type": "string" },
+        "codePrefix": { "type": "string" },
+        "edition": { "type": "string" },
+        "canonicalSectionID": { "type": ["integer", "string", "null"] },
+        "sectionNumber": { "type": "string" },
+        "sectionTitle": { "type": ["string", "null"] },
+        "visualIdentifier": { "type": "string" },
+        "caption": { "type": ["string", "null"] },
+        "assetFileName": { "type": ["string", "null"] },
+        "assetMimeType": { "type": ["string", "null"] },
+        "officialSourceURL": { "type": ["string", "null"] },
+        "officialSourceDocument": { "type": ["string", "null"] },
+        "sourcePage": { "type": ["integer", "null"] },
+        "sourceHash": { "type": ["string", "null"] },
+        "assetHash": { "type": ["string", "null"] },
+        "acquisitionMethod": {
+          "type": ["string", "null"],
+          "enum": [
+            "extracted-embedded-image",
+            "rendered-pdf-region",
+            "official-html-download",
+            "embedded-data-uri",
+            "manually-supplied",
+            null
+          ]
+        },
+        "rightsState": {
+          "enum": ["approved", "pending-review", "prohibited", "unknown"]
+        },
+        "deliveryState": {
+          "type": "array",
+          "items": {
+            "enum": ["local", "web-served", "offline-cacheable", "ios-packaged"]
+          }
+        },
+        "bindingState": {
+          "enum": ["bound", "unbound", "text-implied-only", "intentionally-omitted"]
+        },
+        "verifiedAt": { "type": ["string", "null"] },
+        "notes": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}
