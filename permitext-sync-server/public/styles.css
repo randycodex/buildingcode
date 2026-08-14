@@ -9412,7 +9412,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-fact-input:focus-visible {
-  box-shadow: inset 0 -1px 0 var(--project-color, var(--accent));
+  box-shadow: none;
 }
 
 .saved-project-fact-description {

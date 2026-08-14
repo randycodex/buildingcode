@@ -461,7 +461,7 @@ assert.match(projectFactEditorSource, /address\.addEventListener\("blur", save\)
 assert.match(projectFactEditorSource, /description\.addEventListener\("blur", save\)/);
 assert.match(projectFactEditorSource, /updateProjectFolder\(folder,/);
 assert.match(stylesSource, /\.saved-project-fact-input \{[\s\S]*?background: transparent;[\s\S]*?font: inherit;/);
-assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: inset 0 -1px 0 var\(--project-color, var\(--accent\)\);/);
+assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value \{[\s\S]*?text-align: right;/);
 assert.match(stylesSource, /\.saved-evidence-heading-actions button,[\s\S]*?button\[aria-pressed="true"\] \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.saved-project-list:has\(\.saved-project-tile\.is-selected\) \.saved-project-tile:not\(\.is-selected\) \{[\s\S]*?opacity: 0\.58;/);
