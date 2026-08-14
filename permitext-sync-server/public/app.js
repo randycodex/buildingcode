@@ -10373,7 +10373,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
 
   const label = document.createElement("p");
   label.className = "annotation-tags-label";
-  label.textContent = "Folders";
+  label.textContent = "Projects";
   const header = document.createElement("div");
   header.className = "annotation-projects-header";
   header.append(label);

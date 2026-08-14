@@ -2702,7 +2702,7 @@ async function main() {
         workspaceScript.text.includes("notes.append(notesHeader, textareaWrap, projectsHost, tagsHost)") &&
         workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
         workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&
-        workspaceScript.text.includes('label.textContent = "Folders";') &&
+        workspaceScript.text.includes('label.textContent = "Projects";') &&
         workspaceScript.text.includes("normalizeAnnotationBlockID(candidate.blockID) === blockID") &&
         workspaceStyles.text.match(/\.annotation-project-chip,[\s\S]*?border-radius: var\(--radius-pill\);/),
       "Reader paragraph cards no longer toggle by target or expose Comments, Projects, and Tags organization."
