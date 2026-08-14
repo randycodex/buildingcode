@@ -9445,7 +9445,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   overflow: hidden;
   color: var(--text-secondary);
   font-size: 0.8em;
+  letter-spacing: 0;
   text-overflow: ellipsis;
+  text-transform: none;
   white-space: nowrap;
 }
 
@@ -9468,6 +9470,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .saved-project-structured-fact-label-input {
   color: var(--text-secondary);
   font-size: 0.8em;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .saved-project-structured-suggestion-menu {
