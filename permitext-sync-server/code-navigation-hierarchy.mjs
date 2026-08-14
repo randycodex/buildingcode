@@ -10,6 +10,38 @@ export function isPlaceholderSectionNumber(value) {
   return PLACEHOLDER_SECTION_NUMBERS.has(compactText(value).toLowerCase());
 }
 
+export function isReaderNavigationSection(section, chapterContext = {}) {
+  const number = compactText(section?.sectionNumber);
+  if (!number) return false;
+  const compact = number.replace(/\s+/g, "");
+  const stripped = compact.replace(/\.$/, "");
+  const chapterNumber = compactText(chapterContext.chapterNumber || section?.chapterNumber);
+  const prefix = compactText(chapterContext.codePrefix || section?.codePrefix).toUpperCase();
+
+  if (prefix === "AC") {
+    return /^28-/i.test(stripped);
+  }
+
+  if (/^\d+$/.test(chapterNumber)) {
+    if (!/^\d+(?:\.\d+)*$/.test(stripped)) return true;
+    const width = chapterNumber.length === 1 ? 3 : 4;
+    const official = new RegExp(`^${chapterNumber}\\d{${width - chapterNumber.length}}(?:\\.\\d+)*$`);
+    return official.test(stripped);
+  }
+
+  if (/^[A-Z]$/i.test(chapterNumber)) {
+    return new RegExp(`^${chapterNumber}\\d`, "i").test(stripped);
+  }
+
+  if (/^[A-Z]+\d+$/i.test(chapterNumber)) {
+    const letter = chapterNumber.replace(/\d+$/, "");
+    if (new RegExp(`^${letter}\\d`, "i").test(stripped)) return true;
+    return !/\.$/.test(compact);
+  }
+
+  return true;
+}
+
 export function parseLogicalChapterHeading(headerLine) {
   const value = compactText(headerLine);
   const match = value.match(LOGICAL_HEADING);

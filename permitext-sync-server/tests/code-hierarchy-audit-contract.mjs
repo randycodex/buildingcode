@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
   applyVisibleSectionNumber,
+  isReaderNavigationSection,
   projectSourceChapterToNavigation,
   shouldPromoteGroupsToNavigationChapters,
   visibleSectionNumber
@@ -126,6 +127,45 @@ assert.equal(
     title: "Short title."
   }).sectionNumber,
   "29-101"
+);
+
+assert.equal(
+  isReaderNavigationSection({ sectionNumber: "402.6.2", title: "402.6.2 Kiosks." }, { chapterNumber: "4", codePrefix: "BC" }),
+  true
+);
+assert.equal(
+  isReaderNavigationSection({
+    sectionNumber: "1.1.",
+    title: "1.1. Fire-retardant-treated wood complying with Section 2303.2."
+  }, { chapterNumber: "4", codePrefix: "BC" }),
+  false
+);
+assert.equal(
+  isReaderNavigationSection({
+    sectionNumber: "1.2.",
+    title: "1.2. Foam plastics having a maximum heat release rate"
+  }, { chapterNumber: "4", codePrefix: "BC" }),
+  false
+);
+assert.equal(
+  isReaderNavigationSection({ sectionNumber: "8.5", title: "8.5 Hydraulic elevators." }, { chapterNumber: "K1", codePrefix: "BC" }),
+  true
+);
+assert.equal(
+  isReaderNavigationSection({ sectionNumber: "G101.1", title: "G101.1 Purpose." }, { chapterNumber: "G", codePrefix: "BC" }),
+  true
+);
+assert.equal(
+  isReaderNavigationSection({ sectionNumber: "5.1", title: "5.1 Fire protection systems and equipment." }, { chapterNumber: "G", codePrefix: "BC" }),
+  false
+);
+assert.equal(
+  isReaderNavigationSection({ sectionNumber: "28-101.1", title: "28-101.1 Title." }, { chapterNumber: "1", codePrefix: "AC" }),
+  true
+);
+assert.equal(
+  isReaderNavigationSection({ sectionNumber: "FC 103", title: "FC 103: Reserved" }, { chapterNumber: "1", codePrefix: "FC" }),
+  true
 );
 
 const appSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");

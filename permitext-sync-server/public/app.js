@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260814-reader-nav-toggle-v133";
+} from "./offline-storage.js?v=20260814-reader-nav-filter-v134";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -4711,6 +4711,47 @@ function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function isReaderNavigationSection(section, chapterContext = {}) {
+  const number = String(section?.sectionNumber || "").replace(/\s+/g, " ").trim();
+  if (!number) return false;
+  const compact = number.replace(/\s+/g, "");
+  const stripped = compact.replace(/\.$/, "");
+  const chapterNumber = String(chapterContext.chapterNumber || section?.chapterNumber || "").trim();
+  const prefix = String(chapterContext.codePrefix || section?.codePrefix || "").trim().toUpperCase();
+
+  if (prefix === "AC") {
+    return /^28-/i.test(stripped);
+  }
+
+  if (/^\d+$/.test(chapterNumber)) {
+    if (!/^\d+(?:\.\d+)*$/.test(stripped)) return true;
+    const width = chapterNumber.length === 1 ? 3 : 4;
+    const official = new RegExp(`^${chapterNumber}\\d{${width - chapterNumber.length}}(?:\\.\\d+)*$`);
+    return official.test(stripped);
+  }
+
+  if (/^[A-Z]$/i.test(chapterNumber)) {
+    return new RegExp(`^${chapterNumber}\\d`, "i").test(stripped);
+  }
+
+  if (/^[A-Z]+\d+$/i.test(chapterNumber)) {
+    const letter = chapterNumber.replace(/\d+$/, "");
+    if (new RegExp(`^${letter}\\d`, "i").test(stripped)) return true;
+    return !/\.$/.test(compact);
+  }
+
+  return true;
+}
+
+function readerNavigationSections(chapter) {
+  return (chapter?.sections || []).filter((section) =>
+    isReaderNavigationSection(section, {
+      chapterNumber: chapter?.chapterNumber,
+      codePrefix: section?.codePrefix || chapter?.codePrefix
+    })
+  );
+}
+
 function sectionDisplayTitle(sectionNumber, title, fallback = "Section") {
   const number = String(sectionNumber || "").trim();
   const cleanTitle = String(title || "").trim();
@@ -5161,7 +5202,7 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
   if (expandedChapterID) {
     try {
       const chapter = await fetchChapter(expandedChapterID);
-      sections = chapter.sections || [];
+      sections = readerNavigationSections(chapter);
     } catch {
       sections = [];
     }
@@ -10599,7 +10640,7 @@ async function populateReaderSelectors(panel, reader) {
   blankSection.value = "";
   blankSection.textContent = "Select a section";
   sectionSelect.append(blankSection);
-  chapter.sections.forEach((section) => {
+  readerNavigationSections(chapter).forEach((section) => {
     const option = document.createElement("option");
     option.value = section.id;
     option.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
