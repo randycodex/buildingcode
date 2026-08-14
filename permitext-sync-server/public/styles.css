@@ -9438,10 +9438,18 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-structured-groups,
-.saved-project-structured-group,
 .saved-project-structured-group-body {
   display: grid;
   gap: var(--space-2);
+}
+
+.saved-project-structured-group {
+  display: grid;
+  gap: 0;
+}
+
+.saved-project-structured-group.project-section-motion.is-open > .saved-project-structured-group-body {
+  padding-top: 2px;
 }
 
 .saved-project-structured-group-heading {
