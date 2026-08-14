@@ -11131,13 +11131,6 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   headingRow.append(sectionHeading, savedMarker);
   sectionWrapper.append(headingRow);
 
-  const projectContext = document.createElement("div");
-  projectContext.className = "reader-section-project-context";
-  projectContext.dataset.researchSelectionExclude = "true";
-  projectContext.__readerProjectContext = { section, reader, panel };
-  renderReaderSectionProjectContext(projectContext, section, reader, panel);
-  sectionWrapper.append(projectContext);
-
   blocks.forEach((block, index) => {
     const target = annotationTargetForBlock(section, block, reader, index);
     sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
@@ -11868,7 +11861,6 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
       sheet.dispatchEvent(new CustomEvent("permitext-folder-save", {
         detail: { saved: true, folders: selectedFolders }
       }));
-      refreshReaderSectionProjectContexts(sectionPayload.sectionID);
       refreshOpenAnnotationProjectEditors();
       window.setTimeout(() => removeReaderNotesProjectPicker(sheet), 900);
     } catch (error) {

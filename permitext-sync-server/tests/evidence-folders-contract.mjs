@@ -492,6 +492,7 @@ assert.match(stylesSource, /\.saved-project-fact-resize-handle::after \{[\s\S]*?
 assert.match(appSource, /noteResizeHandle\.className = "section-detail-note-resize-handle"[\s\S]*?noteResizeHandle\.setPointerCapture\(event\.pointerId\)[\s\S]*?event\.key !== "ArrowUp" && event\.key !== "ArrowDown"/);
 assert.match(stylesSource, /\.section-detail-note-box textarea \{[\s\S]*?max-height: min\(70vh, 760px\);[\s\S]*?resize: none;/);
 assert.match(stylesSource, /\.section-detail-note-resize-handle::after \{[\s\S]*?left: 50%;[\s\S]*?width: 36px;[\s\S]*?height: 2px;[\s\S]*?transform: translateX\(-50%\);/);
+assert.doesNotMatch(functionSource(appSource, "renderReaderChapterSection"), /reader-section-project-context|renderReaderSectionProjectContext/);
 assert.doesNotMatch(appSource, /description\.addEventListener\("input", resizeDescription\)/);
 assert.doesNotMatch(appSource, /saved-project-facts-status/);
 assert.doesNotMatch(appSource.match(/function appendSavedProjectFactEditor[\s\S]*?async function appendSavedProjectResearchConversations/)?.[0] || "", /status\.textContent = "Saving…"|status\.textContent = "Saved"/);
