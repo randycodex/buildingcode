@@ -9247,7 +9247,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-folder-context.is-project {
   gap: 0;
-  padding: 0 var(--space-3) var(--space-4);
+  padding: 0 0 var(--space-4);
   border-radius: 0;
   background: transparent;
 }
