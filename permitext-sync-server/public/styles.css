@@ -7128,17 +7128,6 @@ body.is-resizing-research-evidence * {
   color: var(--text-secondary);
 }
 
-.research-source-disclosure.is-direct-open {
-  font-size: 18px;
-  line-height: 1;
-  transition: transform 180ms ease;
-}
-
-.research-source-card.is-direct-open .research-source-toggle:hover .research-source-disclosure,
-.research-source-card.is-direct-open .research-source-toggle:focus-visible .research-source-disclosure {
-  transform: translateX(2px);
-}
-
 .research-source-disclosure svg {
   grid-area: 1 / 1;
   width: 18px;
@@ -7603,6 +7592,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .research-answer-source-list .research-source-card {
   padding-block: var(--space-2);
+}
+
+.research-answer-source-list .research-source-card + .research-source-card {
+  border-top: 0;
 }
 
 .research-conversation-header-project {

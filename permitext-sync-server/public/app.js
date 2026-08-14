@@ -16998,16 +16998,13 @@ function renderResearchSource(source, options = {}) {
   const disclosure = document.createElement("span");
   disclosure.className = "research-source-disclosure";
   disclosure.setAttribute("aria-hidden", "true");
-  if (options.openInReader) {
-    card.classList.add("is-direct-open");
-    disclosure.classList.add("is-direct-open");
-    disclosure.textContent = "›";
-  } else {
+  if (!options.openInReader) {
     disclosure.innerHTML = researchChevronIconsSVG();
   }
   const body = document.createElement("div");
   body.className = "research-source-body";
-  toggle.append(citation, disclosure);
+  toggle.append(citation);
+  if (!options.openInReader) toggle.append(disclosure);
   if (options.openInReader) {
     toggle.removeAttribute("aria-expanded");
     toggle.setAttribute("aria-label", `Open ${citation.textContent} in source column`);
