@@ -6937,6 +6937,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 
 .research-conversation-panel {
   --pane-min-width: clamp(360px, 34vw, 560px);
+  --research-conversation-background: #000000;
   background: var(--research-conversation-background);
 }
 
@@ -7515,8 +7516,9 @@ body.is-resizing-research-evidence * {
   max-width: 86%;
   padding: var(--space-3) var(--space-4);
   border-radius: 18px 18px 5px 18px;
-  background: #000;
+  background: rgb(246 244 241 / 10%);
   color: #fff;
+  opacity: 1;
   line-height: var(--reader-line-height);
 }
 
