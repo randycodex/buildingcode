@@ -5621,7 +5621,7 @@ function enhanceSelect(select) {
     const viewportPadding = 8;
     const panel = trigger.closest(".workspace-panel");
     const panelRect = panel?.getBoundingClientRect();
-    const panelInset = panel?.classList.contains("reader-panel")
+    const panelInset = panel?.classList.contains("reader-panel") || researchProjectMenu
       ? Number.parseFloat(getComputedStyle(panel).paddingLeft) || 0
       : 0;
     const boundaryLeft = Math.max(viewportPadding, (panelRect?.left ?? viewportPadding) + panelInset);
@@ -5630,8 +5630,22 @@ function enhanceSelect(select) {
       (panelRect?.right ?? window.innerWidth - viewportPadding) - panelInset
     );
     const boundaryWidth = Math.max(rect.width, boundaryRight - boundaryLeft);
-    const optionWidths = Array.from(menu.children).map((item) => item.scrollWidth);
-    const naturalWidth = Math.max(rect.width, ...optionWidths);
+    const menuStyles = getComputedStyle(menu);
+    const menuHorizontalPadding = (Number.parseFloat(menuStyles.paddingLeft) || 0) +
+      (Number.parseFloat(menuStyles.paddingRight) || 0);
+    const optionWidths = Array.from(menu.children).map((item) => {
+      if (!researchProjectMenu) return item.scrollWidth;
+      const range = document.createRange();
+      range.selectNodeContents(item);
+      const textWidth = range.getBoundingClientRect().width;
+      range.detach();
+      const itemStyles = getComputedStyle(item);
+      return textWidth +
+        (Number.parseFloat(itemStyles.paddingLeft) || 0) +
+        (Number.parseFloat(itemStyles.paddingRight) || 0) +
+        menuHorizontalPadding;
+    });
+    const naturalWidth = Math.ceil(Math.max(rect.width, ...optionWidths));
     const menuWidth = readerTopMenu ? boundaryWidth : Math.min(naturalWidth, boundaryWidth);
     const left = readerTopMenu
       ? boundaryLeft
