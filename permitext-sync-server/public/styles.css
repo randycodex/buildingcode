@@ -9429,12 +9429,26 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  font-size: calc(var(--chrome-font-size) * 0.9) !important;
+  font-weight: 600;
+  letter-spacing: 0;
   text-align: left;
+  text-transform: none;
 }
 
 .saved-project-structured-group-toggle:hover,
 .saved-project-structured-group-toggle:focus-visible {
+  color: var(--text-primary);
+}
+
+.saved-project-structured-group-chevron {
+  background: transparent;
+  color: var(--text-tertiary);
+}
+
+.saved-project-structured-group-chevron:hover,
+.saved-project-structured-group-chevron:focus-visible {
   color: var(--text-primary);
 }
 

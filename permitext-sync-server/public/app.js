@@ -9298,7 +9298,7 @@ function projectStructuredFacts(project) {
 const projectStructuredFactGroups = [
   {
     key: "buildingCode",
-    label: "Building / Code Facts",
+    label: "Building & code",
     fields: [
       { key: "occupancy", label: "Occupancy" },
       { key: "construction-type", label: "Construction Type" },
@@ -9314,7 +9314,7 @@ const projectStructuredFactGroups = [
   },
   {
     key: "zoning",
-    label: "Zoning Facts",
+    label: "Zoning",
     fields: [
       { key: "address", label: "Address", projectAddress: true },
       { key: "borough", label: "Borough", suggestions: ["Bronx", "Brooklyn", "Manhattan", "Queens", "Staten Island", "Unknown"] },
@@ -24058,7 +24058,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   const customToggle = document.createElement("button");
   customToggle.type = "button";
   customToggle.className = "saved-project-structured-group-toggle section-label";
-  customToggle.textContent = "Custom Facts";
+  customToggle.textContent = "Custom";
   const customChevron = document.createElement("button");
   customChevron.type = "button";
   customChevron.className = "project-section-toggle-chevron saved-project-structured-group-chevron";
@@ -24234,7 +24234,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     customSection,
     customBody,
     [customToggle, customChevron],
-    "Custom Facts",
+    "Custom",
     projectSectionExpanded(identity, "structuredFacts:custom", true),
     {
       onChange(expanded) {
