@@ -467,6 +467,8 @@ assert.match(stylesSource, /\.saved-evidence-heading-actions button,[\s\S]*?butt
 assert.match(stylesSource, /\.saved-project-list:has\(\.saved-project-tile\.is-selected\) \.saved-project-tile:not\(\.is-selected\) \{[\s\S]*?opacity: 0\.58;/);
 assert.match(stylesSource, /\.saved-project-tile\.is-selected \{[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.saved-project-tile\.is-selected \.saved-project-count \{[\s\S]*?color: #ffffff;/);
+assert.match(stylesSource, /\.saved-projects-section\.is-selecting \.saved-project-tile\[data-bulk-selectable="true"\] \{[\s\S]*?opacity: 0\.58;/);
+assert.match(stylesSource, /\.saved-project-tile\.is-bulk-selected \{[\s\S]*?opacity: 1 !important;[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.saved-panel \.saved-content\[hidden\] \{[\s\S]*?display: none;/, "Deactivating a Project must hide its Saved Evidence list.");
 assert.match(stylesSource, /\.saved-project-fact-description \{[\s\S]*?height: 112px;[\s\S]*?max-height: min\(70vh, 760px\);[\s\S]*?overflow-y: auto;[\s\S]*?resize: none;/);
 assert.match(appSource, /descriptionResizeHandle\.className = "saved-project-fact-resize-handle"[\s\S]*?descriptionResizeHandle\.setPointerCapture\(event\.pointerId\)[\s\S]*?event\.key !== "ArrowUp" && event\.key !== "ArrowDown"/);

@@ -9103,6 +9103,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .saved-projects-section.is-selecting .saved-project-tile[data-bulk-selectable="true"] {
   grid-template-columns: minmax(0, 1fr) auto auto;
   cursor: pointer;
+  opacity: 0.58;
 }
 
 .saved-projects-section.is-selecting .saved-project-tile[data-bulk-selectable="false"] {
@@ -9111,7 +9112,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-tile.is-bulk-selected {
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--project-color) 76%, var(--text-primary));
+  opacity: 1 !important;
+  box-shadow: none;
 }
 
 .saved-projects-bulk-bar {
