@@ -9561,13 +9561,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin: 0;
   border: 0;
   outline: 0;
-  background: transparent;
+  background: #080808;
   color: var(--text-primary);
   font: inherit;
 }
 
 .saved-project-structured-fact-value {
-  background: #080808;
   text-align: right;
 }
 
