@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260813-recent-preview-hydration-v132";
+} from "./offline-storage.js?v=20260814-reader-nav-toggle-v133";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -5199,15 +5199,12 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
     label.textContent = chapter.title;
     row.append(chevron, label);
     row.addEventListener("click", (event) => {
-      const onChevron = event.target.closest(".reader-nav-chevron");
-      if (onChevron) {
-        void renderReaderChapterNavigationMenu(menu, select, {
-          expandedChapterID: expanded ? "" : chapter.id,
-          focusID: item.id
-        });
-        return;
-      }
-      void selectReaderNavigation(panel, reader, { chapterID: chapter.id });
+      event.preventDefault();
+      event.stopPropagation();
+      void renderReaderChapterNavigationMenu(menu, select, {
+        expandedChapterID: expanded ? "" : chapter.id,
+        focusID: item.id
+      });
     });
     item.append(row);
 

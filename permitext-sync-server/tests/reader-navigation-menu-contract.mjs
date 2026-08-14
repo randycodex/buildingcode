@@ -22,6 +22,11 @@ assert(app.includes("ArrowRight"), "Chapter menu does not expand with ArrowRight
 assert(app.includes("ArrowLeft"), "Chapter menu does not collapse with ArrowLeft.");
 assert(app.includes("Escape"), "Chapter menu does not close on Escape.");
 assert(app.includes("fetchChapter(expandedChapterID)"), "Chapter expansion must use the chapter-detail endpoint.");
+assert(
+  app.includes("expandedChapterID: expanded ? \"\" : chapter.id") &&
+    !/reader-nav-chapter-row[\s\S]*selectReaderNavigation\(panel, reader, \{ chapterID: chapter.id \}\)/.test(app),
+  "Clicking a chapter title must toggle disclosure instead of navigating away."
+);
 assert(!app.includes("nested <option"), "Do not attempt nested native options.");
 assert(app.includes("navigationChapterID"), "Reader does not preserve navigation chapter identity.");
 assert(styles.includes(".reader-nav-tree"), "Tree menu styles are missing.");
