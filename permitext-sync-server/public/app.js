@@ -5267,6 +5267,13 @@ function bindReaderNavigationKeyboard(menu, select, tree) {
 }
 
 async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
+  const preservedTarget = options.focusID
+    ? menu.querySelector(`#${CSS.escape(options.focusID)}`)
+    : null;
+  const preservedTargetOffset = preservedTarget
+    ? preservedTarget.getBoundingClientRect().top - menu.getBoundingClientRect().top
+    : null;
+  const preservedScrollTop = menu.scrollTop;
   const panel = select.closest(".workspace-panel");
   const reader = readerForPanel(panel);
   const sectionSelect = panel?.querySelector(".section-select");
@@ -5371,7 +5378,12 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
     : tree.querySelector('[aria-selected="true"]') ||
       tree.querySelector(`[data-nav-kind="chapter"][data-chapter-id="${CSS.escape(expandedChapterID)}"]`) ||
       tree.querySelector('[role="treeitem"]');
-  focusTarget?.focus();
+  menu.scrollTop = preservedScrollTop;
+  if (focusTarget && preservedTargetOffset !== null) {
+    const nextTargetOffset = focusTarget.getBoundingClientRect().top - menu.getBoundingClientRect().top;
+    menu.scrollTop += nextTargetOffset - preservedTargetOffset;
+  }
+  focusTarget?.focus({ preventScroll: true });
   requestAnimationFrame(() => activeCustomSelect?.positionMenu());
 }
 
