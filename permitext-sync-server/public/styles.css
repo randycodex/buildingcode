@@ -9646,6 +9646,18 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-primary);
 }
 
+.saved-evidence-search-toggle,
+.saved-evidence-search-toggle:hover,
+.saved-evidence-search-toggle:focus-visible,
+.saved-evidence-search-toggle[aria-pressed="true"] {
+  border-radius: 0;
+  background: transparent;
+}
+
+.saved-evidence-search-toggle:focus-visible {
+  box-shadow: inset 0 -1px 0 var(--project-color, var(--accent));
+}
+
 .saved-evidence-search-toggle svg,
 .saved-evidence-select-toggle svg,
 .saved-evidence-delete-selection svg,
