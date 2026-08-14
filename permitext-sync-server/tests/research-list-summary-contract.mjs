@@ -312,8 +312,8 @@ assert.match(clientSource, /wireResearchDetailsMotion\(details, detailsBody\)/, 
 assert.match(clientSource, /wireResearchDetailsMotion\(details, list\)/, "The sources-used submenu does not use the shared disclosure motion.");
 assert.match(stylesSource, /\.research-details-motion > \.research-details-motion-body \{[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/, "Research disclosures do not match the standard 420ms collapsible transition.");
 assert.match(clientSource, /renderResearchSource\(source, \{ openInReader: true, anchorPaneID \}\)/, "Answer source rows do not open directly in a source column.");
-assert.match(clientSource, /openResearchSourceInReader\(source, options\.anchorPaneID\)/, "Answer source rows do not use the search-free reader path.");
-assert.match(clientSource, /function openResearchSourceInReader\(item, anchorPaneID\)[\s\S]*?placePaneAfter\(anchorPaneID, paneID\)/, "Answer source readers do not remain anchored beside their Research conversation.");
+assert.match(clientSource, /openResearchSourceInSectionDetail\(source, options\.anchorPaneID\)/, "Answer source rows do not use the search-free section-detail path.");
+assert.match(clientSource, /function openResearchSourceInSectionDetail\(item, anchorPaneID\)[\s\S]*?resolveInlineCodeSection\(codePrefix, sectionNumber\)[\s\S]*?newUtilityInstance\("sdc"\)[\s\S]*?openSectionDetail\(detailOwner\.id, searchResultDetail\(navigationItem\), \{ anchorPaneID \}\)/, "Answer sources do not resolve and open the compact detail column beside Research.");
 assert.match(stylesSource, /\.research-answer-source-list \.research-source-card \+ \.research-source-card \{[\s\S]*?border-top: 0;/, "Answer source rows still render divider lines.");
 assert.match(clientSource, /if \(!options\.openInReader\) toggle\.append\(disclosure\)/, "Direct-opening answer sources still render disclosure chevrons.");
 

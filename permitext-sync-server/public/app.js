@@ -17011,7 +17011,7 @@ function renderResearchSource(source, options = {}) {
     toggle.addEventListener("click", () => {
       const sourceURL = String(source.sourceURL || source.url || "").trim();
       if (source.sectionID || (!sourceURL && source.id)) {
-        void openResearchSourceInReader(source, options.anchorPaneID);
+        void openResearchSourceInSectionDetail(source, options.anchorPaneID);
       } else if (sourceURL) {
         window.open(sourceURL, "_blank", "noopener,noreferrer");
       }
@@ -26044,42 +26044,39 @@ async function openDeepLinkedSectionInReader(item) {
   scrollPaneIntoView(paneID);
 }
 
-async function openResearchSourceInReader(item, anchorPaneID) {
-  const detail = searchResultDetail(item);
-  let reader = (state.readers || []).find((candidate) =>
-    candidate.researchSourceAnchorPaneID === anchorPaneID
+async function openResearchSourceInSectionDetail(item, anchorPaneID) {
+  const codePrefix = String(item.codePrefix || "BC").toUpperCase();
+  const sectionNumber = String(item.sectionNumber || "").trim();
+  const resolvedSection = sectionNumber
+    ? await resolveInlineCodeSection(codePrefix, sectionNumber)
+    : null;
+  const navigationItem = resolvedSection
+    ? {
+        ...item,
+        ...resolvedSection,
+        sectionID: resolvedSection.sectionID || resolvedSection.id
+      }
+    : item;
+  const legacyReaderIDs = new Set((state.readers || [])
+    .filter((reader) => reader.researchSourceAnchorPaneID === anchorPaneID)
+    .map((reader) => reader.id));
+  legacyReaderIDs.forEach((readerID) => {
+    const paneID = paneIDForReader({ id: readerID });
+    delete state.paneWeights[paneID];
+    state.paneOrder = (state.paneOrder || []).filter((candidate) => candidate !== paneID);
+  });
+  state.readers = (state.readers || []).filter((reader) => !legacyReaderIDs.has(reader.id));
+
+  const anchoredOwnerID = Object.entries(sectionDetailAnchorsBySearch())
+    .find(([, candidateAnchorPaneID]) => candidateAnchorPaneID === anchorPaneID)?.[0] || "";
+  let detailOwner = (state.utilityInstances || []).find((instance) =>
+    instance.key === "sdc" && instance.id === anchoredOwnerID
   );
-  const canAddReader = isProAccount() || state.readers.length < 2;
-  if (!reader && canAddReader) {
-    reader = newReaderState({
-      ...readerFieldsForSectionDetail(detail),
-      researchSourceAnchorPaneID: anchorPaneID
-    });
-    state.readers.push(reader);
-  } else {
-    reader = reader || state.readers.at(-1);
-    if (!reader) {
-      reader = newReaderState();
-      state.readers.push(reader);
-    }
-    Object.assign(reader, readerFieldsForSectionDetail(detail), {
-      researchSourceAnchorPaneID: anchorPaneID,
-      referenceSourceReaderID: "",
-      savedSourcePaneID: "",
-      projectSavedSourceKey: ""
-    });
-    Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
-      if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
-    });
+  if (!detailOwner) {
+    detailOwner = newUtilityInstance("sdc");
+    state.utilityInstances = [...(state.utilityInstances || []), detailOwner];
   }
-  const paneID = paneIDForReader(reader);
-  placePaneAfter(anchorPaneID, paneID);
-  if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
-  scheduleContinuitySync(reader);
-  saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-  if (reader.sectionID) alignReaderSectionAfterLayout(reader);
-  scrollPaneIntoView(paneID);
+  await openSectionDetail(detailOwner.id, searchResultDetail(navigationItem), { anchorPaneID });
 }
 
 function closeSavedItemDetailsForPane(savedPaneID) {
