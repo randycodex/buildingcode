@@ -325,7 +325,11 @@ assert.match(clientSource, /openResearchSourceInSectionDetail\(source, options\.
 assert.match(clientSource, /function openResearchSourceInSectionDetail\(item, anchorPaneID, projectID = ""\)[\s\S]*?resolveInlineCodeSection\(codePrefix, sectionNumber\)[\s\S]*?newUtilityInstance\("sdc"\)[\s\S]*?openSectionDetail\(detailOwner\.id, searchResultDetail\(navigationItem\), \{ anchorPaneID \}\)/, "Answer sources do not resolve and open the compact detail column beside Research.");
 assert.match(clientSource, /detailOwner\.projectID = String\(projectID \|\| ""\)/, "Research source details do not retain their Project theme identity.");
 assert.match(stylesSource, /\.section-detail-panel\.project-derived-panel \{[\s\S]*?background: color-mix\(in srgb, var\(--project-color\) 8%, var\(--surface-raised\)\);/, "Project Research source details do not share the conversation background treatment.");
-assert.match(stylesSource, /\.research-answer-source-list \.research-source-card \+ \.research-source-card \{[\s\S]*?border-top: 0;/, "Answer source rows still render divider lines.");
+assert.match(stylesSource, /\.research-answer-source-group-items \.research-source-card \+ \.research-source-card \{[\s\S]*?border-top: 0;/, "Answer source rows still render divider lines.");
+assert.match(clientSource, /renderSourceGroup\("Cited in this answer", cited, "is-cited"\)/, "Cited answer sources do not have a distinct labeled group.");
+assert.match(clientSource, /renderSourceGroup\("Reviewed for context — not cited", reviewed, "is-reviewed"\)/, "Reviewed-only sources do not have a distinct labeled group.");
+assert.match(clientSource, /answerQuality\.citedSourceIDs[\s\S]*?answerQuality\.reviewedOnlySourceIDs[\s\S]*?sourceIsReviewedOnly[\s\S]*?sources\.filter\(\(source\) => !sourceIsReviewedOnly\(source\) && sourceIsCited\(source\)\)/, "Answer sources are not split using their saved citation identities.");
+assert.match(stylesSource, /\.research-answer-source-group\.is-cited \{[\s\S]*?background: color-mix\(in srgb, var\(--text-primary\) 5%, transparent\);/, "Cited sources do not have a quiet visual grouping distinct from reviewed-only sources.");
 assert.match(clientSource, /if \(!options\.openInReader\) toggle\.append\(disclosure\)/, "Direct-opening answer sources still render disclosure chevrons.");
 assert.match(stylesSource, /\.workspace-tab \{[\s\S]*?font-size: 12px;/, "Workspace tab labels are not 12px.");
 assert.match(stylesSource, /\.connection-status \{[\s\S]*?font-size: 12px;/, "Connection status labels are not 12px.");

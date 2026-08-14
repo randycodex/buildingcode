@@ -17412,18 +17412,62 @@ function renderResearchAnswerSources(conversation, message, anchorPaneID) {
   summary.textContent = sourceSummaryText();
   const list = document.createElement("section");
   list.className = "research-answer-source-list";
-  const renderSources = (sources) => {
-    clear(list);
+  const renderSourceGroup = (label, sources, className) => {
+    if (!sources.length) return;
+    const group = document.createElement("section");
+    group.className = `research-answer-source-group ${className}`;
+    const heading = document.createElement("header");
+    heading.className = "research-answer-source-group-heading";
+    const title = document.createElement("strong");
+    title.textContent = label;
+    const count = document.createElement("span");
+    count.textContent = String(sources.length);
+    heading.append(title, count);
+    const items = document.createElement("section");
+    items.className = "research-answer-source-group-items";
     sources.forEach((source) => {
       const card = renderResearchSource(source, {
         openInReader: true,
         anchorPaneID,
         projectID: conversation.primaryProjectID || ""
       });
-      list.append(card);
+      items.append(card);
     });
+    group.append(heading, items);
+    list.append(group);
   };
-  renderSources(answerSources);
+  const renderSourceGroups = ({ cited = [], reviewed = [] }) => {
+    clear(list);
+    renderSourceGroup("Cited in this answer", cited, "is-cited");
+    renderSourceGroup("Reviewed for context — not cited", reviewed, "is-reviewed");
+  };
+  const splitSourcesByCitation = (sources, answer = {}) => {
+    const answerQuality = answer.answerQuality || answer.quality || {};
+    const citedSourceIDs = new Set([
+      ...(answerQuality.citedSourceIDs || []),
+      ...(answer.citations || []).flatMap((citation) => citation.sourceIDs || [])
+    ].filter(Boolean).map(String));
+    const reviewedSourceIDs = new Set((answerQuality.reviewedOnlySourceIDs || [])
+      .filter(Boolean)
+      .map(String));
+    const citedSections = new Set((answer.citations || [])
+      .map((citation) => citation.sectionID)
+      .filter(Boolean)
+      .map(String));
+    if (!citedSourceIDs.size && !citedSections.size) return { cited: sources, reviewed: [] };
+    const sourceIsCited = (source) => citedSourceIDs.size
+      ? citedSourceIDs.has(String(source.id || "")) ||
+        citedSourceIDs.has(String(source.sourceID || ""))
+      : citedSections.has(String(source.sectionID || ""));
+    const sourceIsReviewedOnly = (source) =>
+      reviewedSourceIDs.has(String(source.id || "")) ||
+      reviewedSourceIDs.has(String(source.sourceID || ""));
+    return {
+      cited: sources.filter((source) => !sourceIsReviewedOnly(source) && sourceIsCited(source)),
+      reviewed: sources.filter((source) => sourceIsReviewedOnly(source) || !sourceIsCited(source))
+    };
+  };
+  renderSourceGroups(splitSourcesByCitation(answerSources, message?.answer));
   let loaded = false;
   details.addEventListener("toggle", async () => {
     if (!details.open || loaded || !message?.id) return;
@@ -17454,15 +17498,16 @@ function renderResearchAnswerSources(conversation, message, anchorPaneID) {
       const supportingSources = answerRecord.answer?.supportingSources || answerRecord.supportingSources || [];
       const exactSources = researchDisplaySources([...enactedSources, ...supportingSources]);
       if (exactSources.length) {
-        renderSources(exactSources);
+        const exactAnswer = answerRecord.answer || {};
+        renderSourceGroups(splitSourcesByCitation(exactSources, exactAnswer));
         summary.textContent = sourceSummaryText();
       } else {
-        renderSources(answerSources);
+        renderSourceGroups({ cited: answerSources });
         if (!answerSources.length) list.textContent = "The exact source record is unavailable.";
       }
     } catch (error) {
       loaded = false;
-      renderSources(answerSources);
+      renderSourceGroups({ cited: answerSources });
       const failure = document.createElement("p");
       failure.className = "research-list-status is-error";
       failure.textContent = error.message || "The exact source record could not be loaded.";
