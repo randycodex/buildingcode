@@ -9572,7 +9572,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-project-structured-fact-value {
   width: auto;
-  min-width: 72px;
+  min-width: 144px;
   max-width: 100%;
   justify-self: end;
   padding-inline: 6px;

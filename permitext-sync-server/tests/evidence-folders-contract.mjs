@@ -464,7 +464,7 @@ assert.match(stylesSource, /\.saved-project-fact-input \{[^}]*background: transp
 assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value,[\s\S]*?\.saved-project-structured-fact-label-input \{[^}]*background: #080808;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*text-align: right;/);
-assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*min-width: 72px;[^}]*max-width: 100%;[^}]*justify-self: end;[^}]*field-sizing: content;/);
+assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*min-width: 144px;[^}]*max-width: 100%;[^}]*justify-self: end;[^}]*field-sizing: content;/);
 assert.match(stylesSource, /\.saved-project-structured-fact \+ \.saved-project-structured-fact \{[^}]*border-top: 0;/);
 assert.match(stylesSource, /\.saved-project-structured-fact\.is-custom \+ \.saved-project-structured-fact\.is-custom \{[^}]*border-top: 0;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value:focus-visible,[^}]*box-shadow: none;/);
