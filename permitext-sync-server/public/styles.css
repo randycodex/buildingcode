@@ -2223,6 +2223,56 @@ label {
   box-shadow: none;
 }
 
+.research-feedback-role-select-menu {
+  box-sizing: border-box;
+  padding: clamp(14px, 2vw, 20px);
+  border-radius: clamp(22px, 4vw, 30px);
+  background: var(--menu-surface);
+  box-shadow: none;
+}
+
+.research-feedback-role-custom-select,
+.research-feedback-role-custom-select .custom-select-trigger {
+  width: 100%;
+}
+
+.research-feedback-role-custom-select .custom-select-trigger {
+  justify-content: space-between;
+  min-height: 38px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--text-primary) 7%, transparent);
+  color: var(--text-primary);
+  box-shadow: none;
+  text-align: left;
+}
+
+.research-feedback-role-custom-select .custom-select-trigger::after {
+  content: "⌄";
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.research-feedback-role-select-menu .custom-select-option {
+  width: 100%;
+  min-height: 34px;
+  padding: 6px var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+  text-align: left;
+}
+
+.research-feedback-role-select-menu .custom-select-option:hover,
+.research-feedback-role-select-menu .custom-select-option:focus-visible,
+.research-feedback-role-select-menu .custom-select-option[aria-selected="true"] {
+  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
+  color: var(--text-primary);
+}
+
 .research-project-custom-select {
   flex: 0 1 auto;
   width: max-content;

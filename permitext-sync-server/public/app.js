@@ -5309,6 +5309,7 @@ function enhanceSelect(select) {
   const readerChapterMenu = select.classList.contains("chapter-select");
   const reportDraftMenu = select.classList.contains("report-draft-select");
   const researchProjectMenu = select.classList.contains("research-conversation-header-project");
+  const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select");
   const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
@@ -5316,7 +5317,9 @@ function enhanceSelect(select) {
   menu.classList.toggle("reader-chapter-select-menu", readerChapterMenu);
   menu.classList.toggle("report-draft-select-menu", reportDraftMenu);
   menu.classList.toggle("research-project-select-menu", researchProjectMenu);
+  menu.classList.toggle("research-feedback-role-select-menu", researchFeedbackRoleMenu);
   custom.classList.toggle("research-project-custom-select", researchProjectMenu);
+  custom.classList.toggle("research-feedback-role-custom-select", researchFeedbackRoleMenu);
   menu.dataset.floatingSelect = "true";
   menu.hidden = true;
   select._customSelectMenu = menu;
@@ -14150,6 +14153,7 @@ function renderResearchFeedback(container, message, conversationID) {
   const optionalSummary = document.createElement("summary");
   optionalSummary.textContent = "Add supporting context (optional)";
   const professionalRole = document.createElement("select");
+  professionalRole.className = "research-feedback-role-select";
   professionalRole.setAttribute("aria-label", "Professional role");
   [
     ["", "Professional role (optional)"],
@@ -14228,6 +14232,7 @@ function renderResearchFeedback(container, message, conversationID) {
   helpfulButton.addEventListener("click", () => {
     comment.value = "";
     professionalRole.value = "";
+    professionalRole._syncCustomSelect?.();
     supportingReference.value = "";
     void saveFeedback("helpful", { comment: "", professionalRole: "", supportingReference: "" });
   });
@@ -14252,6 +14257,7 @@ function renderResearchFeedback(container, message, conversationID) {
     form.append(compact, details);
     container.append(form);
   }
+  enhanceSelect(professionalRole);
   syncCompactState();
 }
 
