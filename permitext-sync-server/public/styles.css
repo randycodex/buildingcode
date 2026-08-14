@@ -1509,6 +1509,10 @@ body.is-detached-workboard-window .detached-workboard-error p {
   transition: transform 50ms linear;
 }
 
+.reader-panel:has(.reader-internal-search:not([hidden])) .reader-reading-progress {
+  display: none;
+}
+
 .reader-to-top {
   position: absolute;
   right: var(--panel-padding);
