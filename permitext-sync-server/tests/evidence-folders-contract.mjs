@@ -435,9 +435,9 @@ assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle
 assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body[\s\S]*?max-height 420ms cubic-bezier/);
 const projectFactEditorSource = functionSource(appSource, "appendSavedProjectFactEditor");
 const structuredFactGroupsSource = appSource.match(/const projectStructuredFactGroups = \[[\s\S]*?\n\];/)?.[0] || "";
-assert.match(projectFactEditorSource, /toggle\.textContent = "Project facts"/);
+assert.match(projectFactEditorSource, /toggle\.textContent = "Project context"/);
 assert.match(projectFactEditorSource, /address\.setAttribute\("aria-label", "Project address"\)/);
-assert.match(projectFactEditorSource, /description\.setAttribute\("aria-label", "Project description and facts"\)/);
+assert.match(projectFactEditorSource, /description\.setAttribute\("aria-label", "Project context"\)/);
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "projectFacts", false\)/);
 assert.match(projectFactEditorSource, /structuredToggle\.textContent = "Structured facts"/);
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "structuredFacts", false\)/);
@@ -468,7 +468,7 @@ assert.match(appSource, /descriptionResizeHandle\.className = "saved-project-fac
 assert.doesNotMatch(appSource, /description\.addEventListener\("input", resizeDescription\)/);
 assert.doesNotMatch(appSource, /saved-project-facts-status/);
 assert.doesNotMatch(appSource.match(/function appendSavedProjectFactEditor[\s\S]*?async function appendSavedProjectResearchConversations/)?.[0] || "", /status\.textContent = "Saving…"|status\.textContent = "Saved"/);
-assert.match(appSource, /showWebNotice\("Project facts not saved", error\.message \|\| "Could not save Project facts"\)/);
+assert.match(appSource, /showWebNotice\("Project context not saved", error\.message \|\| "Could not save Project context"\)/);
 assert.match(stylesSource, /\.project-research-history-card strong \{[\s\S]*?font-weight: 400;/);
 const projectResearchSource = functionSource(appSource, "appendSavedProjectResearchConversations");
 assert.match(projectResearchSource, /title\.className = "section-label saved-project-research-toggle"/);

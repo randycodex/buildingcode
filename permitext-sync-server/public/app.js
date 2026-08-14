@@ -23936,7 +23936,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   const toggle = document.createElement("button");
   toggle.type = "button";
   toggle.className = "saved-project-facts-toggle section-label";
-  toggle.textContent = "Project facts";
+  toggle.textContent = "Project context";
   const chevron = document.createElement("button");
   chevron.type = "button";
   chevron.className = "project-section-toggle-chevron saved-project-facts-chevron";
@@ -23957,13 +23957,13 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   const description = document.createElement("textarea");
   description.className = "saved-project-fact-input saved-project-fact-description";
   description.value = String(folder.description || identity.description || "");
-  description.placeholder = "Add occupancy, construction type, height, existing conditions, proposed work, relevant dates, and other Project facts";
+  description.placeholder = "Add existing conditions, proposed work, relevant dates, constraints, assumptions, and other Project context";
   description.rows = 2;
-  description.setAttribute("aria-label", "Project description and facts");
+  description.setAttribute("aria-label", "Project context");
   const descriptionResizeHandle = document.createElement("div");
   descriptionResizeHandle.className = "saved-project-fact-resize-handle";
   descriptionResizeHandle.setAttribute("role", "separator");
-  descriptionResizeHandle.setAttribute("aria-label", "Resize Project description and facts");
+  descriptionResizeHandle.setAttribute("aria-label", "Resize Project context");
   descriptionResizeHandle.setAttribute("aria-orientation", "horizontal");
   descriptionResizeHandle.tabIndex = 0;
   const resizeDescriptionTo = (height) => {
@@ -24024,7 +24024,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       });
       saved = next;
     }).catch((error) => {
-      void showWebNotice("Project facts not saved", error.message || "Could not save Project facts");
+      void showWebNotice("Project context not saved", error.message || "Could not save Project context");
     });
     return saveSequence;
   };
@@ -24341,7 +24341,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   if (identity.sharedOnly) {
     address.disabled = true;
     description.disabled = true;
-    address.title = description.title = "Project facts are read-only in this shared Project";
+    address.title = description.title = "Project context is read-only in this shared Project";
   }
   addFact.disabled = identity.sharedOnly;
   addFact.addEventListener("click", () => {
@@ -24357,7 +24357,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     factsSection,
     body,
     [toggle, chevron],
-    "Project facts",
+    "Project context",
     projectSectionExpanded(identity, "projectFacts", false),
     {
       onChange(expanded) {
