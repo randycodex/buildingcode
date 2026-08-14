@@ -312,6 +312,7 @@ assert.match(clientSource, /wireResearchDetailsMotion\(details, detailsBody\)/, 
 assert.match(clientSource, /wireResearchDetailsMotion\(details, list\)/, "The sources-used submenu does not use the shared disclosure motion.");
 assert.match(stylesSource, /\.research-details-motion > \.research-details-motion-body \{[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/, "Research disclosures do not match the standard 420ms collapsible transition.");
 assert.match(clientSource, /renderResearchSource\(source, \{ openInReader: true, anchorPaneID \}\)/, "Answer source rows do not open directly in a source column.");
-assert.match(clientSource, /openSectionDetailForExistingSearch\(source, \{ anchorPaneID: options\.anchorPaneID \}\)/, "Answer source rows do not preserve their Research-column anchor.");
+assert.match(clientSource, /openResearchSourceInReader\(source, options\.anchorPaneID\)/, "Answer source rows do not use the search-free reader path.");
+assert.match(clientSource, /function openResearchSourceInReader\(item, anchorPaneID\)[\s\S]*?placePaneAfter\(anchorPaneID, paneID\)/, "Answer source readers do not remain anchored beside their Research conversation.");
 
 console.log("permitext research list summary contract passed");

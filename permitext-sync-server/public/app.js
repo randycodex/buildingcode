@@ -17014,7 +17014,7 @@ function renderResearchSource(source, options = {}) {
     toggle.addEventListener("click", () => {
       const sourceURL = String(source.sourceURL || source.url || "").trim();
       if (source.sectionID || (!sourceURL && source.id)) {
-        void openSectionDetailForExistingSearch(source, { anchorPaneID: options.anchorPaneID });
+        void openResearchSourceInReader(source, options.anchorPaneID);
       } else if (sourceURL) {
         window.open(sourceURL, "_blank", "noopener,noreferrer");
       }
@@ -26044,6 +26044,44 @@ async function openDeepLinkedSectionInReader(item) {
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
   alignReaderSectionAfterLayout(reader);
+  scrollPaneIntoView(paneID);
+}
+
+async function openResearchSourceInReader(item, anchorPaneID) {
+  const detail = searchResultDetail(item);
+  let reader = (state.readers || []).find((candidate) =>
+    candidate.researchSourceAnchorPaneID === anchorPaneID
+  );
+  const canAddReader = isProAccount() || state.readers.length < 2;
+  if (!reader && canAddReader) {
+    reader = newReaderState({
+      ...readerFieldsForSectionDetail(detail),
+      researchSourceAnchorPaneID: anchorPaneID
+    });
+    state.readers.push(reader);
+  } else {
+    reader = reader || state.readers.at(-1);
+    if (!reader) {
+      reader = newReaderState();
+      state.readers.push(reader);
+    }
+    Object.assign(reader, readerFieldsForSectionDetail(detail), {
+      researchSourceAnchorPaneID: anchorPaneID,
+      referenceSourceReaderID: "",
+      savedSourcePaneID: "",
+      projectSavedSourceKey: ""
+    });
+    Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
+      if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
+    });
+  }
+  const paneID = paneIDForReader(reader);
+  placePaneAfter(anchorPaneID, paneID);
+  if (reader.sectionID) updateBrowserSectionURL(reader.sectionID);
+  scheduleContinuitySync(reader);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  if (reader.sectionID) alignReaderSectionAfterLayout(reader);
   scrollPaneIntoView(paneID);
 }
 
