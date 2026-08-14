@@ -6311,7 +6311,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   display: flex;
   align-items: center;
   min-height: 38px;
-  border-top: 1px solid var(--border);
 }
 
 .research-history-group-label {
