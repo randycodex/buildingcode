@@ -9344,6 +9344,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   padding: var(--space-2) 0 var(--space-3);
 }
 
+.saved-project-structured-section.project-section-motion:not(.is-open) > .saved-project-structured-facts {
+  padding-bottom: 0;
+}
+
 .saved-project-structured-groups,
 .saved-project-structured-group,
 .saved-project-structured-group-body {
