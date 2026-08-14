@@ -10501,12 +10501,8 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
   const projectListWasOpen = container.dataset.projectListOpen === "true";
   clear(container);
 
-  const label = document.createElement("p");
-  label.className = "annotation-tags-label";
-  label.textContent = "Projects";
   const header = document.createElement("div");
   header.className = "annotation-projects-header";
-  header.append(label);
 
   const projectListMotion = document.createElement("div");
   projectListMotion.className = "annotation-project-list-motion";
@@ -10515,17 +10511,12 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
   chips.id = `annotation-project-list-${crypto.randomUUID()}`;
   projectListMotion.append(chips);
   const projects = activeFolderRecords(currentContentSummary().projects || []);
-  const selectedProjectCount = projects.filter((project) => projectLinkForAnnotationTarget(project, target)).length;
 
   const setProjectListOpen = (open, { focusToggle = false } = {}) => {
     container.dataset.projectListOpen = String(open);
     projectListMotion.classList.toggle("is-open", open);
     projectListToggle.setAttribute("aria-expanded", String(open));
-    projectListToggle.textContent = open
-      ? "Hide projects"
-      : selectedProjectCount
-        ? `${selectedProjectCount} selected`
-        : "Choose projects";
+    projectListToggle.setAttribute("aria-label", `${open ? "Hide" : "Show"} projects`);
     chips.inert = !open;
     chips.setAttribute("aria-hidden", String(!open));
     if (focusToggle) projectListToggle.focus({ preventScroll: true });
@@ -10533,7 +10524,8 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
 
   const projectListToggle = document.createElement("button");
   projectListToggle.type = "button";
-  projectListToggle.className = "annotation-project-list-toggle";
+  projectListToggle.className = "annotation-project-list-toggle annotation-tags-label";
+  projectListToggle.textContent = "Projects";
   projectListToggle.setAttribute("aria-controls", chips.id);
   projectListToggle.addEventListener("click", () => {
     setProjectListOpen(!projectListMotion.classList.contains("is-open"));

@@ -3644,20 +3644,34 @@ select option:checked {
 }
 
 .annotation-project-list-toggle {
-  min-height: 28px;
-  margin-left: auto;
-  padding: 0 var(--space-3);
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
   border: 0;
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
-  color: var(--text-primary);
-  font-size: 0.75rem;
-  font-weight: 500;
+  border-radius: 0;
+  background: transparent;
   cursor: pointer;
 }
 
 .annotation-project-list-toggle:hover {
-  background: color-mix(in srgb, var(--text-primary) 15%, transparent);
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.annotation-project-list-toggle::after {
+  content: "›";
+  display: inline-block;
+  font-size: 0.95em;
+  line-height: 1;
+  transform-origin: center;
+  transition: transform 260ms ease;
+}
+
+.annotation-project-list-toggle[aria-expanded="true"]::after {
+  transform: rotate(90deg);
 }
 
 .annotation-project-list-toggle:focus-visible {
@@ -3739,7 +3753,8 @@ select option:checked {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .annotation-project-list-motion {
+  .annotation-project-list-motion,
+  .annotation-project-list-toggle::after {
     transition: none;
   }
 }
