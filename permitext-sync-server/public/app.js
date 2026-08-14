@@ -18272,25 +18272,63 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   status.className = "research-selection-status";
   const projects = researchProjects();
   if (activeAccount() && projects.length) {
-    const projectSelect = createResearchProjectSelect({
-      value: preferredResearchProjectID(),
-      unassignedLabel: "Unassigned — no Project context",
-      ariaLabel: "Project for new Research"
+    const preferredProjectID = preferredResearchProjectID();
+    const projectChoices = researchProjectChoices({
+      value: preferredProjectID,
+      includeUnassigned: true,
+      unassignedLabel: "Unassigned — no Project context"
     });
-    projectSelect.classList.add("research-selection-project");
-    pendingResearchSelection.projectID = projectSelect.value;
-    projectSelect.addEventListener("change", () => {
-      if (pendingResearchSelection) pendingResearchSelection.projectID = projectSelect.value;
-      window.setTimeout(() => {
-        researchSelectionMenuInteracting = false;
-      }, 0);
+    const selectedProjectChoice = projectChoices.find((choice) => choice.value === preferredProjectID) || projectChoices[0];
+    const projectPicker = document.createElement("div");
+    projectPicker.className = "research-selection-project-picker";
+    const projectTrigger = document.createElement("button");
+    projectTrigger.type = "button";
+    projectTrigger.className = "research-selection-project-trigger";
+    projectTrigger.setAttribute("aria-label", "Project for new Research");
+    projectTrigger.setAttribute("aria-haspopup", "listbox");
+    projectTrigger.setAttribute("aria-expanded", "false");
+    projectTrigger.textContent = selectedProjectChoice?.label || "Unassigned — no Project context";
+    const projectList = document.createElement("div");
+    projectList.className = "research-selection-project-list";
+    projectList.setAttribute("role", "listbox");
+    projectList.setAttribute("aria-label", "Project for new Research");
+    projectList.hidden = true;
+    const chooseProject = (choice, option) => {
+      if (pendingResearchSelection) pendingResearchSelection.projectID = choice.value;
+      projectTrigger.textContent = choice.label;
+      projectList.querySelectorAll("[role='option']").forEach((item) => {
+        item.setAttribute("aria-selected", String(item === option));
+      });
+      projectList.hidden = true;
+      projectTrigger.setAttribute("aria-expanded", "false");
+      researchSelectionMenuInteracting = false;
+    };
+    projectChoices.forEach((choice) => {
+      const option = document.createElement("button");
+      option.type = "button";
+      option.className = "research-selection-project-option";
+      option.setAttribute("role", "option");
+      option.setAttribute("aria-selected", String(choice.value === selectedProjectChoice?.value));
+      option.textContent = choice.label;
+      option.addEventListener("click", () => chooseProject(choice, option));
+      projectList.append(option);
     });
-    projectSelect.addEventListener("blur", () => {
-      window.setTimeout(() => {
-        researchSelectionMenuInteracting = false;
-      }, 0);
+    projectTrigger.addEventListener("click", () => {
+      const willOpen = projectList.hidden;
+      projectList.hidden = !willOpen;
+      projectTrigger.setAttribute("aria-expanded", String(willOpen));
+      researchSelectionMenuInteracting = willOpen;
     });
-    menu.append(projectSelect);
+    projectTrigger.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || projectList.hidden) return;
+      event.preventDefault();
+      projectList.hidden = true;
+      projectTrigger.setAttribute("aria-expanded", "false");
+      researchSelectionMenuInteracting = false;
+    });
+    projectPicker.append(projectTrigger, projectList);
+    pendingResearchSelection.projectID = selectedProjectChoice?.value || "";
+    menu.append(projectPicker);
   }
   if (state.researchConversationID && activeAccount()) {
     const addButton = document.createElement("button");

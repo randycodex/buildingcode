@@ -7848,16 +7848,46 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   flex-wrap: wrap;
 }
 
-.research-selection-project {
-  min-height: 34px;
+.research-selection-project-picker {
+  display: grid;
+  overflow: hidden;
   border-radius: calc(var(--radius-card) - 3px);
   background: color-mix(in srgb, var(--text-primary) 8%, var(--surface));
-  color: inherit;
 }
 
-.research-selection-project option {
-  background: var(--surface);
-  color: var(--text-primary);
+.research-selection-menu .research-selection-project-trigger,
+.research-selection-menu .research-selection-project-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.research-selection-project-trigger::after {
+  content: "⌄";
+  margin-left: auto;
+  color: var(--text-secondary);
+}
+
+.research-selection-project-trigger[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.research-selection-project-list {
+  display: grid;
+}
+
+.research-selection-project-list[hidden] {
+  display: none;
+}
+
+.research-selection-menu .research-selection-project-option {
+  border-radius: 0;
+}
+
+.research-selection-menu .research-selection-project-option + .research-selection-project-option {
+  border-top: 1px solid var(--border);
 }
 
 .research-selection-menu button {
