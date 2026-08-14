@@ -18447,14 +18447,14 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   const status = document.createElement("span");
   status.className = "research-selection-status";
   const projects = researchProjects();
+  const initialProjectID = String(captured.projectID || "").trim();
   if (activeAccount() && projects.length) {
-    const preferredProjectID = preferredResearchProjectID();
     const projectChoices = researchProjectChoices({
-      value: preferredProjectID,
+      value: initialProjectID,
       includeUnassigned: true,
       unassignedLabel: "Unassigned — no Project context"
     });
-    const selectedProjectChoice = projectChoices.find((choice) => choice.value === preferredProjectID) || projectChoices[0];
+    const selectedProjectChoice = projectChoices.find((choice) => choice.value === initialProjectID) || projectChoices[0];
     const projectPicker = document.createElement("div");
     projectPicker.className = "research-selection-project-picker";
     const projectTrigger = document.createElement("button");
@@ -18517,6 +18517,8 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   analyzeButton.type = "button";
   analyzeButton.className = "research-selection-start-action";
   analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research";
+  analyzeButton.disabled = false;
+  analyzeButton.title = "A Project is optional. You can assign this Research conversation later.";
   analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
   actions.append(analyzeButton);
   menu.append(actions, status);
