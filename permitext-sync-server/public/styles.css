@@ -9566,9 +9566,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-evidence-heading-actions .saved-evidence-collapse-toggle {
-  width: 28px;
-  height: 28px;
-  flex-basis: 28px;
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
+  flex-basis: var(--panel-title-control-size);
+}
+
+.saved-project-evidence-section.project-section-motion:not(.is-open) .saved-evidence-search-toggle,
+.saved-project-evidence-section.project-section-motion:not(.is-open) .saved-evidence-select-toggle,
+.saved-project-research-answers.project-section-motion:not(.is-open) .project-section-count {
+  display: none;
 }
 
 .saved-evidence-collapse-toggle[aria-expanded="true"] .research-chevron-up,
