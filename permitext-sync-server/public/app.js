@@ -9304,12 +9304,12 @@ const projectStructuredFactGroups = [
       { key: "occupancy", label: "Occupancy" },
       { key: "construction-type", label: "Construction Type" },
       { key: "stories-above-grade", label: "Stories Above Grade" },
-      { key: "levels-below-grade", label: "Levels Below Grade", suggestions: ["None", "1 Cellar", "1 Basement", "Multiple levels below grade", "Unknown"] },
+      { key: "levels-below-grade", label: "Levels Below Grade" },
       { key: "building-height", label: "Building Height" },
-      { key: "sprinkler-protection", label: "Sprinkler Protection", suggestions: ["None", "Partial", "NFPA 13", "NFPA 13R", "Other", "Unknown"] },
-      { key: "project-status", label: "Project Status", suggestions: ["New Building", "Existing Building", "Unknown"] },
-      { key: "work-filing-type", label: "Work / Filing Type", suggestions: ["New Building", "Alteration", "Alteration-CO", "Renovation", "Addition / Enlargement", "Change of Use / Occupancy", "Repair", "Other", "Unknown"] },
-      { key: "code-basis", label: "Code Basis", suggestions: ["Current Code", "Prior-Code Building", "Unknown"] },
+      { key: "sprinkler-protection", label: "Sprinkler Protection" },
+      { key: "project-status", label: "Project Status" },
+      { key: "work-filing-type", label: "Work / Filing Type" },
+      { key: "code-basis", label: "Code Basis" },
       { key: "building-area", label: "Building Area" }
     ]
   },
@@ -9318,26 +9318,26 @@ const projectStructuredFactGroups = [
     label: "Zoning",
     fields: [
       { key: "address", label: "Address", projectAddress: true },
-      { key: "borough", label: "Borough", suggestions: ["Bronx", "Brooklyn", "Manhattan", "Queens", "Staten Island", "Unknown"] },
+      { key: "borough", label: "Borough" },
       { key: "block", label: "Block" },
       { key: "tax-lots", label: "Tax Lot(s)" },
       { key: "zoning-lot-composition", label: "Zoning Lot Composition" },
       { key: "zoning-districts", label: "Zoning District(s)" },
-      { key: "commercial-overlays", label: "Commercial Overlay(s)", suggestions: ["None", "Unknown"] },
-      { key: "special-purpose-district", label: "Special Purpose District / Subdistrict / Subarea", suggestions: ["None", "Unknown"] },
+      { key: "commercial-overlays", label: "Commercial Overlay(s)" },
+      { key: "special-purpose-district", label: "Special Purpose District / Subdistrict / Subarea" },
       { key: "zoning-map", label: "Zoning Map" },
       { key: "community-district", label: "Community District" },
       { key: "zoning-lot-area", label: "Zoning Lot Area" },
       { key: "lot-width", label: "Lot Width" },
       { key: "lot-depth", label: "Lot Depth" },
-      { key: "lot-type", label: "Lot Type", suggestions: ["Interior", "Corner", "Through", "Other / Multiple Condition", "Unknown"] },
+      { key: "lot-type", label: "Lot Type" },
       { key: "street-frontages", label: "Street Frontage(s)" },
-      { key: "mih-area-options", label: "MIH Area / Applicable Option(s)", suggestions: ["Not in MIH Area", "MIH Area", "Unknown"] },
-      { key: "affordable-housing-zoning-status", label: "Affordable Housing Zoning Status", suggestions: ["Standard / None", "MIH", "UAP", "Qualifying Affordable Housing", "Multiple / Other", "Unknown"] },
-      { key: "transit-zone", label: "Transit Zone", suggestions: ["Inner Transit Zone", "Outer Transit Zone", "Beyond Greater Transit Zone", "Unknown"] },
-      { key: "limited-height-district", label: "Limited Height District", suggestions: ["None", "LH-1", "LH-1A", "LH-2", "LH-3", "Unknown"] },
-      { key: "waterfront-status", label: "Waterfront Status / Waterfront Access Plan", suggestions: ["Not Waterfront", "Waterfront Area", "Waterfront Block", "Waterfront Zoning Lot", "Other", "Unknown"] },
-      { key: "lower-density-growth-management-area", label: "Lower Density Growth Management Area", suggestions: ["Yes", "No", "Unknown"] }
+      { key: "mih-area-options", label: "MIH Area / Applicable Option(s)" },
+      { key: "affordable-housing-zoning-status", label: "Affordable Housing Zoning Status" },
+      { key: "transit-zone", label: "Transit Zone" },
+      { key: "limited-height-district", label: "Limited Height District" },
+      { key: "waterfront-status", label: "Waterfront Status / Waterfront Access Plan" },
+      { key: "lower-density-growth-management-area", label: "Lower Density Growth Management Area" }
     ]
   }
 ];
@@ -24100,7 +24100,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   };
 
   const appendDefaultFactField = (list, field, factsByKey) => {
-    const { key, label: fieldLabel, suggestions = [], projectAddress = false } = field;
+    const { key, label: fieldLabel, projectAddress = false } = field;
     const row = document.createElement("article");
     row.className = "saved-project-structured-fact";
     const label = document.createElement("label");
@@ -24113,77 +24113,6 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     value.setAttribute("aria-label", fieldLabel);
     label.htmlFor = value.id = `project-structured-${safeAnnotationIDPart(projectRecordID(folder))}-${key}`;
     row.append(label, value);
-    if (suggestions.length) {
-      const menu = document.createElement("div");
-      menu.className = "custom-select-menu reader-chapter-select-menu saved-project-structured-suggestion-menu";
-      menu.dataset.floatingSelect = "true";
-      menu.hidden = true;
-      suggestions.forEach((suggestion) => {
-        const option = document.createElement("button");
-        option.type = "button";
-        option.className = "custom-select-option";
-        option.textContent = suggestion;
-        option.setAttribute("aria-selected", String(value.value === suggestion));
-        option.addEventListener("mousedown", (event) => event.preventDefault());
-        option.addEventListener("click", () => {
-          value.value = suggestion;
-          value.dispatchEvent(new Event("input", { bubbles: true }));
-          menu.querySelectorAll(".custom-select-option").forEach((candidate) => {
-            candidate.setAttribute("aria-selected", String(candidate === option));
-          });
-          closeActiveCustomSelect();
-          value.focus();
-        });
-        menu.append(option);
-      });
-      const closeMenu = () => {
-        menu.hidden = true;
-        value.setAttribute("aria-expanded", "false");
-        if (activeCustomSelect?.menu === menu) activeCustomSelect = null;
-      };
-      const positionMenu = () => {
-        const rect = row.getBoundingClientRect();
-        const viewportPadding = 8;
-        const left = Math.max(viewportPadding, rect.left);
-        const width = Math.min(rect.width, window.innerWidth - left - viewportPadding);
-        const top = value.getBoundingClientRect().bottom + 6;
-        menu.style.setProperty("--select-menu-top", `${top}px`);
-        menu.style.setProperty("--select-menu-left", `${left}px`);
-        menu.style.setProperty("--select-menu-width", `${width}px`);
-        menu.style.setProperty("--select-menu-max-height", `${Math.max(0, window.innerHeight - top - viewportPadding)}px`);
-      };
-      const openMenu = () => {
-        if (identity.sharedOnly) return;
-        closeActiveCustomSelect();
-        menu.querySelectorAll(".custom-select-option").forEach((option) => {
-          option.setAttribute("aria-selected", String(option.textContent === value.value));
-        });
-        menu.hidden = false;
-        value.setAttribute("aria-expanded", "true");
-        activeCustomSelect = { custom: row, menu, trigger: value, positionMenu, panel: null };
-        positionMenu();
-      };
-      value.setAttribute("role", "combobox");
-      value.setAttribute("aria-autocomplete", "list");
-      value.setAttribute("aria-haspopup", "listbox");
-      value.setAttribute("aria-expanded", "false");
-      value.addEventListener("focus", openMenu);
-      value.addEventListener("click", (event) => {
-        event.stopPropagation();
-        openMenu();
-      });
-      value.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && !menu.hidden) {
-          event.preventDefault();
-          closeMenu();
-        } else if (event.key === "ArrowDown" && menu.hidden) {
-          event.preventDefault();
-          openMenu();
-        }
-      });
-      document.body.append(menu);
-      structuredSuggestionMenus.push(menu);
-    }
     value.addEventListener("input", () => {
       if (projectAddress) address.value = value.value;
       else replaceFact(key, fieldLabel, value.value);
@@ -24243,12 +24172,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     }
   );
 
-  const structuredSuggestionMenus = [];
   const renderStructuredFacts = () => {
-    structuredSuggestionMenus.splice(0).forEach((menu) => {
-      if (activeCustomSelect?.menu === menu) closeActiveCustomSelect();
-      menu.remove();
-    });
     groupLists.forEach((list) => clear(list));
     clear(customList);
     const factsByKey = new Map(structuredFacts.map((fact) => [fact.key, fact]));

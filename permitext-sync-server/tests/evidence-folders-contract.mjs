@@ -442,8 +442,9 @@ assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "projec
 assert.match(projectFactEditorSource, /structuredToggle\.textContent = "Structured facts"/);
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, "structuredFacts", false\)/);
 assert.match(projectFactEditorSource, /projectStructuredFactGroups\.forEach/);
-assert.match(projectFactEditorSource, /saved-project-structured-suggestion-menu/);
-assert.match(projectFactEditorSource, /reader-chapter-select-menu/);
+assert.doesNotMatch(projectFactEditorSource, /saved-project-structured-suggestion-menu|structuredSuggestionMenus/);
+assert.doesNotMatch(projectFactEditorSource, /setAttribute\("role", "combobox"\)|aria-autocomplete|aria-haspopup/);
+assert.doesNotMatch(projectFactEditorSource, /suggestions/);
 assert.doesNotMatch(projectFactEditorSource, /createElement\("datalist"\)/);
 assert.match(structuredFactGroupsSource, /label: "Building & code"[\s\S]*?Stories Above Grade[\s\S]*?Levels Below Grade[\s\S]*?Building Area/);
 assert.match(structuredFactGroupsSource, /label: "Zoning"[\s\S]*?Tax Lot\(s\)[\s\S]*?Zoning Lot Composition[\s\S]*?Zoning District\(s\)[\s\S]*?Street Frontage\(s\)/);
