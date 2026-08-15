@@ -33,8 +33,8 @@ import {
 const allowedBlockTypeSet = new Set(notebookBlockTypes);
 
 const notebookNumericSizes = Object.freeze([
-  { label: "14", value: "" },
   { label: "12", value: "12px" },
+  { label: "14", value: "" },
   { label: "16", value: "16px" },
   { label: "18", value: "18px" },
   { label: "24", value: "24px" },

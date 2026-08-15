@@ -40,6 +40,11 @@ assert(
     notebookEditor.indexOf('React.createElement(FontSizeSelect, { key: "line-spacing-select" })'),
   "Notebook text size must appear before line spacing in the formatting toolbar."
 );
+assert(
+  notebookEditor.indexOf('{ label: "12", value: "12px" }') <
+    notebookEditor.indexOf('{ label: "14", value: "" }'),
+  "Notebook text-size and line-spacing menus must list 12 before the default 14 option."
+);
 assert.equal(notebookSchema.includes("tiptapDocumentToBlockNote"), true);
 assert.equal(notebookSchema.includes('notebookSchemaVersion = 2'), true);
 assert.equal(packageManifest.dependencies["@tiptap/core"], undefined);
@@ -58,7 +63,7 @@ assert(
 assert(
   webClient.includes('uploadNotebookAsset(projectID, file, cardID = "")') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL)") &&
-    webClient.includes('notebookClientVersion = "20260801-notebook-toolbar-order-v11"'),
+    webClient.includes('notebookClientVersion = "20260815-notebook-size-order-v12"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 

@@ -50221,12 +50221,12 @@ function DX(e) {
 //#region src/notebook-editor.js
 var OX = new Set(xX), kX = Object.freeze([
 	{
-		label: "14",
-		value: ""
-	},
-	{
 		label: "12",
 		value: "12px"
+	},
+	{
+		label: "14",
+		value: ""
 	},
 	{
 		label: "16",
