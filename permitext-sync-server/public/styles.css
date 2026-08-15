@@ -7806,6 +7806,16 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   min-height: 34px;
 }
 
+.research-progress-actions .research-progress-retry {
+  min-height: 42px;
+  padding-inline: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #000;
+  color: #fff;
+  box-shadow: none;
+}
+
 @keyframes research-progress-pixel {
   0%, 100% { opacity: 0.2; transform: scale(0.82); }
   45% { opacity: 1; transform: scale(1); }

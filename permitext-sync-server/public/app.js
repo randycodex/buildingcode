@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-selection-anchor-v244";
+} from "./offline-storage.js?v=20260815-research-retry-v245";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -16526,7 +16526,7 @@ function renderResearchProgressCard(progress, { completed = false } = {}) {
       actions.append(cancel);
     } else if (typeof progress.retry === "function") {
       const retry = document.createElement("button");
-      retry.className = "ghost-button";
+      retry.className = "ghost-button research-progress-retry";
       retry.type = "button";
       retry.textContent = "Retry";
       retry.addEventListener("click", progress.retry);
