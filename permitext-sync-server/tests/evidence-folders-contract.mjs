@@ -110,8 +110,8 @@ assert.match(
 const sectionDetailSource = functionSource(appSource, "renderSectionDetail");
 assert.match(
   sectionDetailSource,
-  /data-annotation-block-id[\s\S]*?sectionTarget\.blockID[\s\S]*?markNotebookEvidenceRange/,
-  "Source Detail must render the whole subsection and highlight only the saved paragraph."
+  /sectionTarget\.blockID && detailBlocks\.length > 1[\s\S]*?data-annotation-block-id[\s\S]*?markNotebookEvidenceRange/,
+  "Source Detail must highlight the saved paragraph only when the subsection has multiple saveable blocks."
 );
 const projectEvidenceCountSource = functionSource(appSource, "projectEvidenceCount");
 assert.match(

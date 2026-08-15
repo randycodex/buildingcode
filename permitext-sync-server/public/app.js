@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-project-source-highlight-v248";
+} from "./offline-storage.js?v=20260815-conditional-source-highlight-v249";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14236,8 +14236,8 @@ async function renderSectionDetail(searchID, detail) {
     codeVersion: sectionPayload.codeVersion,
     sourceLibraryVersion: detail.evidenceAnchor?.source?.sourceLibraryVersion || ""
   });
-  if (section?.blocks?.length) {
-    const detailBlocks = annotatedBlocksForSection(section);
+  const detailBlocks = section?.blocks?.length ? annotatedBlocksForSection(section) : [];
+  if (detailBlocks.length) {
     detailBlocks.forEach((block, index) => {
       const blockTarget = annotationTargetForBlock(section, block, sectionPayload, index);
       const renderedBlock = renderCodeBlock(block);
@@ -14258,7 +14258,7 @@ async function renderSectionDetail(searchID, detail) {
 
   if (detail.evidenceAnchor) {
     requestAnimationFrame(() => revealNotebookEvidencePassages(body, detail.evidenceAnchor));
-  } else if (sectionTarget.blockID) {
+  } else if (sectionTarget.blockID && detailBlocks.length > 1) {
     requestAnimationFrame(() => {
       const savedBlock = body.querySelector(
         `[data-annotation-block-id="${CSS.escape(sectionTarget.blockID)}"]`
