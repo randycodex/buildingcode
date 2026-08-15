@@ -89,6 +89,43 @@ assert.notEqual(
   "Two selected paragraphs in the same section must remain independent saved records."
 );
 
+const readerChapterSectionSource = functionSource(appSource, "renderReaderChapterSection");
+assert.match(
+  readerChapterSectionSource,
+  /savedSectionRecord\(\{[\s\S]*?sectionID: target\.sectionID,[\s\S]*?codeVersion: target\.codeVersion,[\s\S]*?blockID: target\.blockID[\s\S]*?\}\)/,
+  "Each Reader block must resolve its bookmark state using its own block identity."
+);
+assert.doesNotMatch(
+  readerChapterSectionSource,
+  /blocks\[0\].*block-1/,
+  "A subsection-level bookmark must never be guessed to belong to the first paragraph."
+);
+
+const sectionDetailPayloadSource = functionSource(appSource, "makeSectionPayloadFromDetail");
+assert.match(
+  sectionDetailPayloadSource,
+  /blockID: normalizeAnnotationBlockID\(detail\.blockID \|\| detail\.annotationBlockID \|\| detail\.contentBlockID\)/,
+  "Source Detail must retain the saved paragraph identity."
+);
+const sectionDetailSource = functionSource(appSource, "renderSectionDetail");
+assert.match(
+  sectionDetailSource,
+  /data-annotation-block-id[\s\S]*?sectionTarget\.blockID[\s\S]*?markNotebookEvidenceRange/,
+  "Source Detail must render the whole subsection and highlight only the saved paragraph."
+);
+const projectEvidenceCountSource = functionSource(appSource, "projectEvidenceCount");
+assert.match(
+  projectEvidenceCountSource,
+  /savedTargets[\s\S]*?savedEvidenceKey\(item\)[\s\S]*?savedTargets\.has\(key\)/,
+  "Project counts must ignore stale subsection links that have no exact saved target."
+);
+const projectDetailSource = functionSource(appSource, "renderProjectDetail");
+assert.match(
+  projectDetailSource,
+  /savedByTarget\.get\(savedEvidenceKey\(link\)\)[\s\S]*?if \(!savedItem\) return null/,
+  "Project detail must not revive a stale subsection link when only paragraph saves exist."
+);
+
 const normalizeAnnotationTags = new Function(
   `${functionSource(appSource, "normalizeAnnotationTags")}; return normalizeAnnotationTags;`
 )();

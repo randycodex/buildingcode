@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-research-retry-v245";
+} from "./offline-storage.js?v=20260815-paragraph-bookmark-v247";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -3728,6 +3728,8 @@ function searchResultDetail(result) {
     sectionID: result.id || result.sectionID,
     sectionNumber: result.sectionNumber || "",
     title: result.title || result.headingLine || "Section",
+    blockID: normalizeAnnotationBlockID(result.blockID || result.annotationBlockID || result.contentBlockID),
+    blockLabel: result.blockLabel || "",
     headerLine: result.headerLine || "",
     headingLine: result.headingLine || ""
   };
@@ -9396,11 +9398,12 @@ function savedEvidenceKey(value, codeVersion = "") {
   return `${version}:${sectionID}:${blockID}`;
 }
 
-function projectEvidenceCount(projectSections, project) {
+function projectEvidenceCount(projectSections, project, savedItems = currentContentSummary().savedItems || []) {
+  const savedTargets = new Set((savedItems || []).map((item) => savedEvidenceKey(item)));
   return new Set((projectSections || [])
     .filter((item) => projectSectionBelongsToProject(item, project))
     .map((item) => savedEvidenceKey(item))
-    .filter(Boolean)).size;
+    .filter((key) => key && savedTargets.has(key))).size;
 }
 
 function projectSectionRecordForSection(project, sectionPayload) {
@@ -11182,10 +11185,12 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   headingRow.className = "reader-section-heading-row";
   headingRow.dataset.researchSelectionExclude = "true";
   const blocks = annotatedBlocksForSection(section);
-  const savedRecord = savedSectionRecord({ sectionID: section.id, codeVersion: reader.codeVersion });
-  const savedBlockID = normalizeAnnotationBlockID(savedRecord?.blockID) ||
-    (savedRecord ? normalizeAnnotationBlockID(blocks[0]?.id || blocks[0]?.tableID || blocks[0]?.imageID || "block-1") : "");
-  const savedSection = Boolean(savedRecord && !savedBlockID);
+  const savedWholeSectionRecord = savedSectionRecord({
+    sectionID: section.id,
+    codeVersion: reader.codeVersion,
+    blockID: ""
+  });
+  const savedSection = Boolean(savedWholeSectionRecord);
   const savedMarker = document.createElement("span");
   savedMarker.className = "reader-section-saved-marker";
   savedMarker.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Bookmarked</span>`;
@@ -11197,8 +11202,13 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
 
   blocks.forEach((block, index) => {
     const target = annotationTargetForBlock(section, block, reader, index);
+    const savedBlockRecord = savedSectionRecord({
+      sectionID: target.sectionID,
+      codeVersion: target.codeVersion,
+      blockID: target.blockID
+    });
     sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
-      showBookmark: Boolean(savedRecord && savedBlockID === target.blockID)
+      showBookmark: Boolean(savedBlockRecord)
     }));
   });
   linkInlineCodeReferences(sectionWrapper, panel, reader);
@@ -13784,6 +13794,8 @@ async function openSectionDetail(searchID, section, options = {}) {
     sectionID,
     sectionNumber: section.sectionNumber || "",
     title: section.title || "Section",
+    blockID: normalizeAnnotationBlockID(section.blockID || section.annotationBlockID || section.contentBlockID),
+    blockLabel: section.blockLabel || "",
     headerLine: section.headerLine || "",
     headingLine: section.headingLine || "",
     evidenceAnchor: options.evidenceAnchor || null
@@ -14032,7 +14044,9 @@ function makeSectionPayloadFromDetail(detail, section) {
     chapterNumber: detail.chapterNumber || section?.chapterNumber || "",
     sectionID: detail.sectionID,
     sectionNumber: section?.sectionNumber || detail.sectionNumber || "",
-    title: section?.title || detail.title || "Section"
+    title: section?.title || detail.title || "Section",
+    blockID: normalizeAnnotationBlockID(detail.blockID || detail.annotationBlockID || detail.contentBlockID),
+    blockLabel: detail.blockLabel || ""
   };
 }
 
@@ -14042,7 +14056,9 @@ function notebookEvidenceTextMap(root) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-      if (node.parentElement?.closest("button, input, textarea, script, style, [data-research-selection-exclude='true']")) {
+      if (node.parentElement?.closest(
+        "button:not(.inline-code-reference), input, textarea, script, style, [data-research-selection-exclude='true']"
+      )) {
         return NodeFilter.FILTER_REJECT;
       }
       return NodeFilter.FILTER_ACCEPT;
@@ -14159,9 +14175,9 @@ async function renderSectionDetail(searchID, detail) {
   sectionPayload.chapterNumber ||= chapter?.chapterNumber || "";
   const sectionTarget = {
     ...sectionPayload,
-    blockID: ""
+    blockID: normalizeAnnotationBlockID(sectionPayload.blockID)
   };
-  const saved = isSectionSaved(sectionPayload);
+  const saved = isSectionSaved(sectionTarget);
   const noteBody = noteValueForTarget(sectionTarget);
   const bodyText = sectionPlainText(section);
 
@@ -14221,7 +14237,13 @@ async function renderSectionDetail(searchID, detail) {
     sourceLibraryVersion: detail.evidenceAnchor?.source?.sourceLibraryVersion || ""
   });
   if (section?.blocks?.length) {
-    section.blocks.forEach((block) => body.append(renderCodeBlock(block)));
+    const detailBlocks = annotatedBlocksForSection(section);
+    detailBlocks.forEach((block, index) => {
+      const blockTarget = annotationTargetForBlock(section, block, sectionPayload, index);
+      const renderedBlock = renderCodeBlock(block);
+      renderedBlock.dataset.annotationBlockId = blockTarget.blockID;
+      body.append(renderedBlock);
+    });
   } else if (bodyText) {
     const normalizedBodyText = bodyText.replace(/\s+/g, " ").trim().toLocaleLowerCase();
     const normalizedTitles = [section?.title, detail.title]
@@ -14236,6 +14258,19 @@ async function renderSectionDetail(searchID, detail) {
 
   if (detail.evidenceAnchor) {
     requestAnimationFrame(() => revealNotebookEvidencePassages(body, detail.evidenceAnchor));
+  } else if (sectionTarget.blockID) {
+    requestAnimationFrame(() => {
+      const savedBlock = body.querySelector(
+        `[data-annotation-block-id="${CSS.escape(sectionTarget.blockID)}"]`
+      );
+      if (!savedBlock) {
+        revealNotebookEvidencePassages(body, { passages: [] });
+        return;
+      }
+      const exact = normalizedPassageAnchorText(savedBlock.textContent);
+      const marks = exact ? markNotebookEvidenceRange(savedBlock, { exact }) : [];
+      if (marks.length) marks[0].scrollIntoView({ block: "center", behavior: "smooth" });
+    });
   }
 
   const notes = document.createElement("section");
@@ -23797,10 +23832,11 @@ async function renderProjectDetail(detail) {
   const projectSections = summary.projectSections || [];
   const savedItems = summary.savedItems || [];
   const sectionLinks = projectSections.filter((item) => projectSectionBelongsToProject(item, identity));
-  const savedBySectionID = new Map(savedItems.map((item) => [String(item.sectionID || item.id || ""), item]));
+  const savedByTarget = new Map(savedItems.map((item) => [savedEvidenceKey(item), item]));
   const linkedSavedItems = sectionLinks
     .map((link) => {
-      const savedItem = savedBySectionID.get(String(link.sectionID || link.savedSectionID || link.itemID || "")) || {};
+      const savedItem = savedByTarget.get(savedEvidenceKey(link));
+      if (!savedItem) return null;
       return {
         ...link,
         ...savedItem,
