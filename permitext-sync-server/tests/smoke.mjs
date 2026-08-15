@@ -2319,6 +2319,7 @@ async function main() {
         workspaceScript.text.includes("savedContentComparisonText") &&
         workspaceScript.text.includes("previewText: savedContentComparisonText.slice(0, 240)") &&
         workspaceScript.text.includes("selectedFolderSectionEvidenceKeys") &&
+        workspaceScript.text.includes('!normalizeAnnotationBlockID(item.blockID)') &&
         workspaceScript.text.includes('projectSavedScope: "section"') &&
         workspaceScript.text.includes('item.projectSavedScope === "section"') &&
         workspaceScript.text.includes("/code/sections/${encodeURIComponent(detail.sectionID)}") &&
@@ -2355,8 +2356,10 @@ async function main() {
         workspaceScript.text.includes('function savedSectionRecord(section, codeVersion = "")') &&
         workspaceScript.text.includes('blockID: normalizeAnnotationBlockID(section.blockID)') &&
         workspaceScript.text.includes('const savedTargetChanged = wasSaved') &&
-        workspaceScript.text.includes('const savedRecord = savedSectionRecord(sectionPayload)') &&
-        workspaceScript.text.includes('if (saved && blockID && normalizeAnnotationBlockID(savedRecord?.blockID) !== blockID)') &&
+        workspaceScript.text.includes('const savedRecord = savedSectionRecord(target)') &&
+        workspaceScript.text.includes('normalizeAnnotationBlockID(savedRecord.blockID) !== targetBlockID') &&
+        !workspaceScript.text.includes('if (saved && blockID && normalizeAnnotationBlockID(savedRecord?.blockID) !== blockID)') &&
+        !workspaceScript.text.includes('className = "saved-section-status"') &&
         workspaceScript.text.includes('const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false })') &&
         !workspaceScript.text.includes('if (!isSectionSaved(sectionPayload)) {\n              const saved = await persistSectionBookmark') &&
         workspaceScript.text.includes('(savedRecord ? normalizeAnnotationBlockID(blocks[0]?.id') &&

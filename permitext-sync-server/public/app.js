@@ -10529,6 +10529,12 @@ function renderAnnotationTagEditor(container, target, options = {}) {
 
 function projectLinkForAnnotationTarget(project, target) {
   const sectionID = String(target.sectionID || "");
+  const targetBlockID = normalizeAnnotationBlockID(target.blockID);
+  const savedRecord = savedSectionRecord(target);
+  if (
+    (!savedRecord && targetBlockID) ||
+    (savedRecord && normalizeAnnotationBlockID(savedRecord.blockID) !== targetBlockID)
+  ) return null;
   return currentContentSummary().projectSections.find((item) =>
     String(item.sectionID || item.savedSectionID || item.itemID || "") === sectionID &&
     syncCodeVersion(item.codeVersion) === syncCodeVersion(target.codeVersion) &&
@@ -12035,11 +12041,6 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
     blockID,
     blockLabel: target.blockLabel || ""
   };
-  const savedRecord = savedSectionRecord(sectionPayload);
-  if (saved && blockID && normalizeAnnotationBlockID(savedRecord?.blockID) !== blockID) {
-    void persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
-    syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
-  }
   if (researchButton) {
     researchButton.disabled = !sectionWrapper ||
       String(reader?.codePrefix || "").toUpperCase() === zoningCodePrefix;
@@ -25916,6 +25917,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         .filter((item) => selectedFolderEvidenceKeys.has(savedEvidenceKey(item)))
         .map((item) =>
           item.savedColumnKind === "bookmark" &&
+          !normalizeAnnotationBlockID(item.blockID) &&
           selectedFolderSectionEvidenceKeys.has(savedEvidenceKey(item))
           ? { ...item, projectSavedScope: "section" }
           : item
@@ -26946,23 +26948,14 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           : item.kind === "textBlock"
             ? ["Text Block", sectionNumber].filter(Boolean).join(" · ")
           : sectionNumber;
-        const status = document.createElement("span");
-        status.className = "saved-section-status";
         const annotation = annotationForTarget(item);
         const notePreview = String(item.noteBody || annotation.noteBody || "").trim();
-        if (notePreview) {
-          const noteIcon = document.createElement("span");
-          noteIcon.setAttribute("aria-label", "Has note");
-          noteIcon.innerHTML = `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"></path><path d="M8 9h8M8 13h6"></path></svg>`;
-          status.append(noteIcon);
-        }
         const title = document.createElement(item.isNestedListParagraph ? "span" : "strong");
         title.className = "saved-section-title";
         title.textContent = titleText;
         const metaLine = document.createElement("span");
         metaLine.className = "saved-section-meta-line";
         metaLine.append(meta);
-        if (status.childElementCount) metaLine.append(status);
         heading.append(metaLine, title);
         openButton.append(heading);
         if (item.previewText) {

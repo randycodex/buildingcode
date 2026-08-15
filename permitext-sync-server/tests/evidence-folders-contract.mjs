@@ -452,7 +452,10 @@ assert.deepEqual(
   "Saved search should stop scanning once it has a visible page plus a has-more sentinel."
 );
 assert.doesNotMatch(appSource, /bookmarkIcon\.setAttribute\("aria-label", "Bookmarked"\)/);
-assert.match(appSource, /if \(status\.childElementCount\) metaLine\.append\(status\)/);
+assert.doesNotMatch(appSource, /className = "saved-section-status"/);
+assert.match(appSource, /function projectLinkForAnnotationTarget[\s\S]*?const savedRecord = savedSectionRecord\(target\)[\s\S]*?normalizeAnnotationBlockID\(savedRecord\.blockID\) !== targetBlockID/);
+assert.doesNotMatch(appSource, /if \(saved && blockID && normalizeAnnotationBlockID\(savedRecord\?\.blockID\) !== blockID\)/);
+assert.match(appSource, /item\.savedColumnKind === "bookmark" &&[\s\S]*?!normalizeAnnotationBlockID\(item\.blockID\)[\s\S]*?projectSavedScope: "section"/);
 assert.match(appSource, /if \(searchActive\) return;[\s\S]*?savedInstance\.collapsedCodePrefixes/);
 assert.match(appSource, /function createSavedEvidenceHeading\([\s\S]*?saved-evidence-search-toggle[\s\S]*?Search saved evidence/);
 assert.match(indexSource, /class="saved-evidence-search"[\s\S]*?class="saved-evidence-search-input"[\s\S]*?class="saved-evidence-search-close"/);
