@@ -7805,6 +7805,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   min-height: 34px;
 }
 
+.research-progress-actions .research-progress-cancel,
 .research-progress-actions .research-progress-retry {
   min-height: 42px;
   padding-inline: var(--space-3);

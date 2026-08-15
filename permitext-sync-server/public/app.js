@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-note-role-cleanup-v250";
+} from "./offline-storage.js?v=20260815-progress-cancel-v251";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -16565,7 +16565,7 @@ function renderResearchProgressCard(progress, { completed = false } = {}) {
     actions.className = "research-progress-actions";
     if (["active", "retrying"].includes(progress.status)) {
       const cancel = document.createElement("button");
-      cancel.className = "ghost-button";
+      cancel.className = "ghost-button research-progress-cancel";
       cancel.type = "button";
       cancel.textContent = "Cancel";
       cancel.addEventListener("click", () => progress.controller.abort());
