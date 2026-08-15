@@ -11162,7 +11162,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   justify-content: space-between;
   gap: var(--space-2);
   width: 100%;
-  padding: var(--space-2) 0;
+  padding: var(--space-1) 0;
   border: 0;
   background: transparent;
   text-align: left;
@@ -11185,11 +11185,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-code-group.is-collapsed .saved-code-toggle-chevron {
   transform: rotate(0deg);
-}
-
-.saved-panel .saved-code-group.is-collapsed .saved-code-toggle {
-  margin: 0;
-  padding-block: var(--space-1);
 }
 
 .saved-code-group.project-section-motion.is-open > .saved-code-group-body {
