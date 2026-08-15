@@ -1434,7 +1434,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260815-project-selection-actions-v257'),
+        webRoot.text.includes('/web/app.js?v=20260815-folders-radius-v258'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1480,7 +1480,7 @@ async function main() {
         workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu,\n.report-draft-select-menu {\n  box-sizing: border-box;\n  padding: clamp(14px, 2vw, 20px);\n  border-radius: clamp(22px, 4vw, 30px);") &&
         workspaceStyles.text.includes("--menu-surface: #121213;") &&
         workspaceStyles.text.includes("--menu-subtle-surface: #121213;") &&
-        workspaceStyles.text.includes("--saved-projects-card-radius: 22px;") &&
+        workspaceStyles.text.includes("--saved-projects-card-radius: 12px;") &&
         workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu,\n.report-draft-select-menu {") &&
         workspaceStyles.text.includes("background: var(--menu-surface);") &&
         workspaceStyles.text.includes(".reader-code-select-menu .custom-select-group-label {") &&
@@ -1595,7 +1595,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-project-selection-actions-v257'),
+      webRoot.text.includes('/web/styles.css?v=20260815-folders-radius-v258'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1869,7 +1869,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-project-selection-actions-v257'),
+      webRoot.text.includes('/web/styles.css?v=20260815-folders-radius-v258'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

@@ -9492,7 +9492,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-projects-section {
-  --saved-projects-card-radius: 22px;
+  --saved-projects-card-radius: 12px;
   display: grid;
   gap: 0;
   margin-top: var(--space-2);
