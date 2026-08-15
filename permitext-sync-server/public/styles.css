@@ -12365,7 +12365,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) + var(--space-3));
   min-height: 0;
   padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
 }

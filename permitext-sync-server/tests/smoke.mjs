@@ -1434,7 +1434,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260815-research-selection-header-v253'),
+        webRoot.text.includes('/web/app.js?v=20260815-settings-card-gap-v254'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1595,7 +1595,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-research-selection-header-v253'),
+      webRoot.text.includes('/web/styles.css?v=20260815-settings-card-gap-v254'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1869,7 +1869,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-research-selection-header-v253'),
+      webRoot.text.includes('/web/styles.css?v=20260815-settings-card-gap-v254'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2641,6 +2641,10 @@ async function main() {
         serverSource.includes("async function handleOrganizationDelete") &&
         serverSource.includes('"organizations/delete": handleOrganizationDelete'),
       "Owners no longer have a confirmed, server-authorized Firm Workspace deletion path."
+    );
+    assert(
+      workspaceStyles.text.match(/\.settings-scroll \{[\s\S]*?gap: calc\(var\(--space-2\) \+ var\(--space-3\)\);/),
+      "Settings cards no longer use the same vertical gap as the Project card stack."
     );
     assert(
       workspaceStyles.text.match(/\.settings-panel \.settings-primary-button,[\s\S]*?\.settings-panel \.settings-mini-button \{[\s\S]*?justify-self: center;[\s\S]*?width: 60%;[\s\S]*?margin-inline: auto;[\s\S]*?border-radius: var\(--radius-pill\);/),
