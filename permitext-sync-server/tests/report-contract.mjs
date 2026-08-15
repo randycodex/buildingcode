@@ -54,6 +54,45 @@ assert.equal(draft.schemaVersion, 1);
 assert.equal(draft.blocks.length, 3);
 assert.equal(draft.blocks[0].sourceClassification, "user-authored");
 
+const promotedNoteDraft = normalizeReportDraftPayload({
+  title: "Promoted Note",
+  reportDate: createdAt,
+  blocks: [{
+    id: "note-snapshot-1",
+    kind: "paragraph",
+    text: "The Project note remains editable after promotion.",
+    derivedFrom: {
+      kind: "notebookCard",
+      id: "notebook-card-1",
+      title: "Scope note",
+      version: 4
+    },
+    sourceSnapshotAt: generatedAt,
+    evidenceLinks: [{
+      id: "evidence-link-1",
+      label: "BC § 101.2 · Scope",
+      relationshipRole: "supports",
+      projectID: "project-1",
+      notebookCardID: "notebook-card-1",
+      source: {
+        codePrefix: "BC",
+        sectionID: "2",
+        sectionNumber: "101.2",
+        sectionTitle: "Scope."
+      },
+      passages: [{ exact: "The provisions of this code shall apply" }],
+      createdAt: generatedAt
+    }]
+  }],
+  createdBy: "user-1",
+  updatedBy: "user-1"
+});
+assert.equal(promotedNoteDraft.blocks[0].derivedFrom.id, "notebook-card-1");
+assert.equal(promotedNoteDraft.blocks[0].evidenceLinks[0].source.sectionID, "2");
+assert.equal(promotedNoteDraft.blocks[0].evidenceLinks[0].label, "BC § 101.2 · Scope");
+assert.equal(promotedNoteDraft.blocks[0].evidenceLinks[0].relationshipRole, "supports");
+assert.equal(promotedNoteDraft.blocks[0].text, "The Project note remains editable after promotion.");
+
 const clientDraft = reportDraftForClient({
   envelope: {
     id: "draft-1",

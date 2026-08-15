@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { normalizeNotebookEvidenceLinks } from "./notebook-contract.mjs";
 
 export const reportDraftSchemaVersion = 1;
 export const reportDraftSchemaVersionV2 = 2;
@@ -119,6 +120,28 @@ function stableValue(value) {
   );
 }
 
+function normalizePromotedNoteProvenance(block) {
+  if (!block?.derivedFrom) return {};
+  if (block.derivedFrom.kind !== "notebookCard") {
+    throw new Error("Unsupported Report paragraph provenance.");
+  }
+  const rawEvidenceLinks = Array.isArray(block.evidenceLinks) ? block.evidenceLinks : [];
+  if (rawEvidenceLinks.length > 100 || JSON.stringify(rawEvidenceLinks).length > 1_000_000) {
+    throw new Error("Report paragraph evidence provenance is too large.");
+  }
+  const evidenceLinks = normalizeNotebookEvidenceLinks(rawEvidenceLinks);
+  return {
+    derivedFrom: {
+      kind: "notebookCard",
+      id: requiredText(block.derivedFrom.id, "source Notebook card ID", 256),
+      title: requiredText(block.derivedFrom.title, "source Notebook card title", 300),
+      version: positiveInteger(block.derivedFrom.version, "source Notebook card version")
+    },
+    sourceSnapshotAt: requiredISO(block.sourceSnapshotAt, "Report source snapshot date"),
+    evidenceLinks
+  };
+}
+
 export function stableReportJSON(value) {
   return JSON.stringify(stableValue(value));
 }
@@ -136,7 +159,8 @@ function normalizeAuthoredBlock(block, kind) {
       block.text,
       kind === "heading" ? "Report heading" : "Report paragraph",
       kind === "heading" ? 500 : maximumAuthoredTextLength
-    )
+    ),
+    ...(kind === "paragraph" ? normalizePromotedNoteProvenance(block) : {})
   };
 }
 

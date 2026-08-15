@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260814-multiple-projects-label-v228";
+} from "./offline-storage.js?v=20260815-notebook-evidence-links-v235";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -11096,9 +11096,20 @@ function selectReaderSectionForResearch(sectionWrapper) {
     title: sectionWrapper.dataset.researchSectionTitle,
     codePrefix: sectionWrapper.dataset.researchCodePrefix,
     savedItemID: sectionWrapper.dataset.researchSavedItemId || "",
-    selectedText
+    selectedText,
+    codeVersion: sectionWrapper.dataset.researchCodeVersion || "",
+    sourceLibraryVersion: sectionWrapper.dataset.researchSourceLibraryVersion || "",
+    prefix: "",
+    suffix: "",
+    start: 0,
+    end: normalizedPassageAnchorText(selectedText).length
   };
-  showResearchSelectionMenu({ ...passage, passages: [passage], rect }, { pinned: true });
+  showResearchSelectionMenu({
+    ...passage,
+    passages: [passage],
+    projectID: sectionWrapper.closest(".workspace-panel")?.dataset.projectId || "",
+    rect
+  }, { pinned: true });
 }
 
 function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSection) {
@@ -11115,7 +11126,9 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
     sectionNumber: section.sectionNumber,
     title: section.title,
     codePrefix: reader.codePrefix,
-    chapterID: reader.chapterID
+    chapterID: reader.chapterID,
+    codeVersion: sectionWrapper.dataset.codeVersion,
+    sourceLibraryVersion: sectionWrapper.dataset.codeVersion
   });
 
   const groupLabel = groupLabelsByFirstSection.get(String(section.id));
@@ -12421,6 +12434,10 @@ function markResearchSelectable(element, source = {}) {
   element.dataset.researchSectionNumber = String(source.sectionNumber || "");
   element.dataset.researchSectionTitle = String(source.title || "Section");
   element.dataset.researchCodePrefix = String(source.codePrefix || "BC");
+  element.dataset.researchCodeVersion = String(
+    source.codeVersion || syncCodeVersionForPrefix(source.codePrefix || "BC") || ""
+  );
+  element.dataset.researchSourceLibraryVersion = String(source.sourceLibraryVersion || "");
   element.dataset.researchChapterId = String(source.chapterID || "");
   if (source.researchSavedItemID) {
     element.dataset.researchSavedItemId = String(source.researchSavedItemID);
@@ -13732,7 +13749,8 @@ async function openSectionDetail(searchID, section, options = {}) {
     sectionNumber: section.sectionNumber || "",
     title: section.title || "Section",
     headerLine: section.headerLine || "",
-    headingLine: section.headingLine || ""
+    headingLine: section.headingLine || "",
+    evidenceAnchor: options.evidenceAnchor || null
   };
   if (options.anchorPaneID) {
     anchors[searchID] = options.anchorPaneID;
@@ -13982,12 +14000,120 @@ function makeSectionPayloadFromDetail(detail, section) {
   };
 }
 
+function notebookEvidenceTextMap(root) {
+  const chars = [];
+  const map = [];
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      if (node.parentElement?.closest("button, input, textarea, script, style, [data-research-selection-exclude='true']")) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  let node;
+  while ((node = walker.nextNode())) {
+    if (chars.length && chars.at(-1) !== " ") {
+      chars.push(" ");
+      map.push({ node, offset: 0 });
+    }
+    let pendingSpace = false;
+    for (let offset = 0; offset < node.nodeValue.length; offset += 1) {
+      const character = node.nodeValue[offset];
+      if (/\s/.test(character)) {
+        pendingSpace = chars.length > 0 && chars.at(-1) !== " ";
+        continue;
+      }
+      if (pendingSpace) {
+        chars.push(" ");
+        map.push({ node, offset: Math.max(0, offset - 1) });
+        pendingSpace = false;
+      }
+      chars.push(character);
+      map.push({ node, offset });
+    }
+  }
+  while (chars.at(-1) === " ") {
+    chars.pop();
+    map.pop();
+  }
+  return { text: chars.join(""), map };
+}
+
+function notebookEvidenceMatchIndex(text, selector) {
+  const exact = normalizedPassageAnchorText(selector?.normalizedExact || selector?.exact);
+  if (!exact) return -1;
+  const candidates = [];
+  let cursor = text.indexOf(exact);
+  while (cursor >= 0) {
+    candidates.push(cursor);
+    cursor = text.indexOf(exact, cursor + 1);
+  }
+  if (!candidates.length) return -1;
+  const prefix = normalizedPassageAnchorText(selector?.prefix).slice(-120);
+  const suffix = normalizedPassageAnchorText(selector?.suffix).slice(0, 120);
+  const scored = candidates.map((index) => {
+    const before = text.slice(Math.max(0, index - prefix.length), index);
+    const after = text.slice(index + exact.length, index + exact.length + suffix.length);
+    let score = 0;
+    if (prefix && before.endsWith(prefix)) score += 2;
+    if (suffix && after.startsWith(suffix)) score += 2;
+    if (Number.isInteger(selector?.start)) score -= Math.min(1, Math.abs(selector.start - index) / 10_000);
+    return { index, score };
+  }).sort((left, right) => right.score - left.score);
+  if (scored.length > 1 && scored[0].score === scored[1].score) return -1;
+  return scored[0].index;
+}
+
+function markNotebookEvidenceRange(root, selector) {
+  const { text, map } = notebookEvidenceTextMap(root);
+  const exact = normalizedPassageAnchorText(selector?.normalizedExact || selector?.exact);
+  const start = notebookEvidenceMatchIndex(text, selector);
+  if (start < 0 || !exact) return [];
+  const selectedMap = map.slice(start, start + exact.length);
+  const byNode = new Map();
+  selectedMap.forEach(({ node, offset }) => {
+    if (!byNode.has(node)) byNode.set(node, []);
+    byNode.get(node).push(offset);
+  });
+  const marks = [];
+  [...byNode.entries()].reverse().forEach(([textNode, offsets]) => {
+    const from = Math.min(...offsets);
+    const to = Math.max(...offsets) + 1;
+    if (to <= from || to > textNode.nodeValue.length) return;
+    const range = document.createRange();
+    range.setStart(textNode, from);
+    range.setEnd(textNode, to);
+    const mark = document.createElement("mark");
+    mark.className = "notebook-evidence-highlight";
+    range.surroundContents(mark);
+    marks.push(mark);
+  });
+  return marks.reverse();
+}
+
+function revealNotebookEvidencePassages(root, evidenceLink) {
+  const marks = (evidenceLink?.passages || []).flatMap((selector) =>
+    markNotebookEvidenceRange(root, selector)
+  );
+  if (marks.length) {
+    marks[0].scrollIntoView({ block: "center", behavior: "smooth" });
+    return;
+  }
+  const status = document.createElement("p");
+  status.className = "section-detail-evidence-status";
+  status.textContent = "The linked passage could not be relocated safely. The enacted section is shown without a passage highlight.";
+  root.before(status);
+}
+
 async function renderSectionDetail(searchID, detail) {
   const panel = document.createElement("article");
   panel.className = "workspace-panel section-detail-panel";
   panel.dataset.paneId = paneIDForSectionDetail(searchID);
   panel.classList.add(`code-theme-${codeTheme(detail.codePrefix || "BC")}`);
   const detailOwner = (state.utilityInstances || []).find((instance) => instance.id === searchID);
+  panel.dataset.projectId = String(detailOwner?.projectID || "");
   applyProjectDerivedPaneTheme(panel, detailOwner?.projectID);
   applyPaneWeight(panel, paneIDForSectionDetail(searchID));
 
@@ -14054,7 +14180,9 @@ async function renderSectionDetail(searchID, detail) {
     sectionNumber: sectionPayload.sectionNumber,
     title: sectionPayload.title,
     codePrefix: sectionPayload.codePrefix,
-    chapterID: sectionPayload.chapterID
+    chapterID: sectionPayload.chapterID,
+    codeVersion: sectionPayload.codeVersion,
+    sourceLibraryVersion: detail.evidenceAnchor?.source?.sourceLibraryVersion || ""
   });
   if (section?.blocks?.length) {
     section.blocks.forEach((block) => body.append(renderCodeBlock(block)));
@@ -14068,6 +14196,10 @@ async function renderSectionDetail(searchID, detail) {
       paragraph.textContent = bodyText;
       body.append(paragraph);
     }
+  }
+
+  if (detail.evidenceAnchor) {
+    requestAnimationFrame(() => revealNotebookEvidencePassages(body, detail.evidenceAnchor));
   }
 
   const notes = document.createElement("section");
@@ -18405,6 +18537,32 @@ function researchSelectionTextFromRange(selection, range) {
     .trim();
 }
 
+function normalizedPassageAnchorText(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function researchPassageLocator(source, range, selection) {
+  const fullRange = document.createRange();
+  fullRange.selectNodeContents(source);
+  const beforeRange = fullRange.cloneRange();
+  const afterRange = fullRange.cloneRange();
+  try {
+    beforeRange.setEnd(range.startContainer, range.startOffset);
+    afterRange.setStart(range.endContainer, range.endOffset);
+  } catch {
+    return { prefix: "", suffix: "", start: null, end: null };
+  }
+  const before = normalizedPassageAnchorText(researchSelectionTextFromRange(selection, beforeRange));
+  const exact = normalizedPassageAnchorText(researchSelectionTextFromRange(selection, range));
+  const after = normalizedPassageAnchorText(researchSelectionTextFromRange(selection, afterRange));
+  return {
+    prefix: before.slice(-240),
+    suffix: after.slice(0, 240),
+    start: before.length,
+    end: before.length + exact.length
+  };
+}
+
 function researchSelectionFromWindow() {
   const selection = window.getSelection?.();
   if (!selection || selection.rangeCount !== 1 || selection.isCollapsed) return null;
@@ -18436,13 +18594,17 @@ function researchSelectionFromWindow() {
       sourceRange.setEnd(range.endContainer, range.endOffset);
     }
     const selectedText = researchSelectionTextFromRange(selection, sourceRange);
+    const locator = researchPassageLocator(source, sourceRange, selection);
     return {
       sectionID: source.dataset.researchSectionId,
       sectionNumber: source.dataset.researchSectionNumber,
       title: source.dataset.researchSectionTitle,
       codePrefix: source.dataset.researchCodePrefix,
       savedItemID: source.dataset.researchSavedItemId || "",
-      selectedText
+      selectedText,
+      codeVersion: source.dataset.researchCodeVersion || "",
+      sourceLibraryVersion: source.dataset.researchSourceLibraryVersion || "",
+      ...locator
     };
   }).filter((passage) => passage.sectionID && passage.selectedText.length >= 2);
   if (!passages.length) return null;
@@ -18451,8 +18613,99 @@ function researchSelectionFromWindow() {
   return {
     ...passages[0],
     passages,
+    projectID: panel.dataset.projectId || "",
     rect
   };
+}
+
+function notebookEvidenceLinksFromSelection(selection, context = {}) {
+  const grouped = new Map();
+  (selection?.passages || []).forEach((passage) => {
+    const sectionID = String(passage.sectionID || "").trim();
+    if (!sectionID) return;
+    const key = [String(passage.codePrefix || "BC").toUpperCase(), sectionID].join(":");
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(passage);
+  });
+  return [...grouped.values()].map((passages) => {
+    const source = passages[0];
+    const sectionTitle = sectionTitleWithoutNumber({
+      sectionNumber: source.sectionNumber,
+      title: source.title || "Section"
+    }).replace(/[.\s]+$/, "");
+    const codePrefix = String(source.codePrefix || "BC").toUpperCase();
+    const citation = `${codePrefix} § ${source.sectionNumber || "Section"}`;
+    return {
+      id: crypto.randomUUID(),
+      relationshipRole: selection.evidenceRelationshipRole || "context",
+      label: [citation, sectionTitle].filter(Boolean).join(" · "),
+      projectID: String(context.projectID || selection.projectID || ""),
+      notebookCardID: String(context.cardID || ""),
+      source: {
+        jurisdiction: "New York City",
+        codePrefix,
+        codeEdition: "2022",
+        codeVersion: source.codeVersion || "",
+        sourceID: source.sectionID,
+        sectionID: source.sectionID,
+        sectionNumber: source.sectionNumber || "Section",
+        sectionTitle: source.title || sectionTitle || "Section",
+        sourceLibraryVersion: source.sourceLibraryVersion || source.codeVersion || ""
+      },
+      passages: passages.map((passage) => ({
+        exact: passage.selectedText,
+        normalizedExact: normalizedPassageAnchorText(passage.selectedText),
+        prefix: passage.prefix || "",
+        suffix: passage.suffix || "",
+        start: Number.isInteger(passage.start) ? passage.start : null,
+        end: Number.isInteger(passage.end) ? passage.end : null
+      })),
+      createdAt: new Date().toISOString(),
+      noteTarget: { scope: "card", blockID: "", exact: "" }
+    };
+  });
+}
+
+function appendNotebookEvidenceReferences(documentValue, evidenceLinks) {
+  const document = structuredClone(documentValue || emptyNotebookDocument());
+  const blocks = Array.isArray(document.document) ? document.document : [];
+  evidenceLinks.forEach((link) => {
+    blocks.push({
+      type: "paragraph",
+      content: [{
+        type: "permitextReference",
+        props: {
+          referenceKind: "selectedPassage",
+          referenceID: link.id,
+          label: link.label
+        }
+      }]
+    });
+  });
+  document.document = blocks.length ? blocks : emptyNotebookDocument().document;
+  return document;
+}
+
+async function linkResearchSelectionToNotebookCard(projectID, cardID, selection) {
+  const evidenceLinks = notebookEvidenceLinksFromSelection(selection, { projectID, cardID });
+  if (!evidenceLinks.length) throw new Error("Select enacted text before linking evidence.");
+  const mounted = notebookMounts.get(projectID);
+  if (mounted?.linkEvidence) {
+    await mounted.linkEvidence(cardID, evidenceLinks);
+    return;
+  }
+  const payload = await postResearch("/notebook/cards/get", { projectID, cardID });
+  const card = payload.card;
+  const saved = await postResearch("/notebook/cards/save", {
+    projectID,
+    cardID: card.id,
+    expectedVersion: card.version,
+    cardType: card.cardType,
+    title: card.title,
+    document: appendNotebookEvidenceReferences(card.document, evidenceLinks),
+    evidenceLinks: [...(card.evidenceLinks || []), ...evidenceLinks]
+  });
+  await saveNotebookCardSnapshot(activeAccount().userID, projectID, saved.card).catch(() => {});
 }
 
 async function saveResearchSelection(mode, button, status) {
@@ -18533,6 +18786,10 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   actions.className = "research-selection-actions";
   const status = document.createElement("span");
   status.className = "research-selection-status";
+  const noteChooser = document.createElement("div");
+  noteChooser.className = "research-selection-note-list research-details-motion-body";
+  noteChooser.hidden = true;
+  let positionMenu = () => {};
   const projects = researchProjects();
   const initialProjectID = String(captured.projectID || "").trim();
   if (activeAccount() && projects.length) {
@@ -18563,8 +18820,11 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
         item.setAttribute("aria-selected", String(item === option));
       });
       projectList.hidden = true;
+      noteChooser.hidden = true;
+      noteChooser.replaceChildren();
       projectTrigger.setAttribute("aria-expanded", "false");
       researchSelectionMenuInteracting = false;
+      requestAnimationFrame(positionMenu);
     };
     projectChoices.forEach((choice) => {
       const option = document.createElement("button");
@@ -18600,6 +18860,95 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
     addButton.addEventListener("click", () => saveResearchSelection("current", addButton, status));
     actions.append(addButton);
   }
+  if (activeAccount()) {
+    const linkButton = document.createElement("button");
+    linkButton.type = "button";
+    linkButton.className = "research-selection-link-note-action";
+    linkButton.textContent = "Link to Note";
+    linkButton.title = "Link the selected enacted passage to a Project Note";
+    linkButton.addEventListener("click", async () => {
+      const projectID = String(pendingResearchSelection?.projectID || "").trim();
+      if (!projectID) {
+        status.textContent = "Choose a Project before linking this passage to a Note.";
+        return;
+      }
+      linkButton.disabled = true;
+      status.textContent = "Loading Project Notes…";
+      try {
+        const payload = await postResearch("/notebook/cards/list", { projectID });
+        const cards = (payload.cards || []).filter((card) => !card.archivedAt);
+        noteChooser.replaceChildren();
+        const rolePicker = document.createElement("div");
+        rolePicker.className = "research-selection-evidence-role";
+        [
+          ["context", "Context"],
+          ["supports", "Supports"],
+          ["conflicts", "Conflicts"],
+          ["unresolved", "Unresolved"]
+        ].forEach(([value, label]) => {
+          const role = document.createElement("button");
+          role.type = "button";
+          role.textContent = label;
+          role.setAttribute("aria-pressed", String(
+            (pendingResearchSelection.evidenceRelationshipRole || "context") === value
+          ));
+          role.addEventListener("click", () => {
+            pendingResearchSelection.evidenceRelationshipRole = value;
+            rolePicker.querySelectorAll("button").forEach((candidate) => {
+              candidate.setAttribute("aria-pressed", String(candidate === role));
+            });
+          });
+          rolePicker.append(role);
+        });
+        noteChooser.append(rolePicker);
+        if (!cards.length) {
+          const empty = document.createElement("p");
+          empty.textContent = "Create a Note in this Project before linking evidence.";
+          noteChooser.append(empty);
+        } else {
+          cards.forEach((card) => {
+            const option = document.createElement("button");
+            option.type = "button";
+            option.className = "research-selection-note-option";
+            option.textContent = card.title;
+            option.addEventListener("click", async () => {
+              option.disabled = true;
+              status.textContent = `Linking evidence to ${card.title}…`;
+              try {
+                await linkResearchSelectionToNotebookCard(
+                  projectID,
+                  card.id,
+                  pendingResearchSelection
+                );
+                closeResearchSelectionMenu();
+                window.getSelection?.().removeAllRanges();
+                const project = researchProjects().find((candidate) =>
+                  projectDetailKey(projectIdentity(candidate)) === projectID
+                );
+                if (project) {
+                  pendingNotebookCardByProject.set(projectID, card.id);
+                  await openProjectNotebook(projectIdentity(project));
+                }
+              } catch (error) {
+                option.disabled = false;
+                status.textContent = error.message;
+              }
+            });
+            noteChooser.append(option);
+          });
+        }
+        noteChooser.hidden = false;
+        status.textContent = cards.length ? "Choose the Note to link." : "";
+        researchSelectionMenuInteracting = true;
+        requestAnimationFrame(positionMenu);
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        linkButton.disabled = false;
+      }
+    });
+    actions.append(linkButton);
+  }
   const analyzeButton = document.createElement("button");
   analyzeButton.type = "button";
   analyzeButton.className = "research-selection-start-action";
@@ -18608,16 +18957,22 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   analyzeButton.title = "A Project is optional. You can assign this Research conversation later.";
   analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
   actions.append(analyzeButton);
-  menu.append(actions, status);
+  menu.append(noteChooser, actions, status);
   document.body.append(menu);
-  const menuRect = menu.getBoundingClientRect();
-  const left = Math.min(
-    window.innerWidth - menuRect.width - 12,
-    Math.max(12, captured.rect.left + captured.rect.width / 2 - menuRect.width / 2)
-  );
-  const top = Math.max(12, captured.rect.top - menuRect.height - 10);
-  menu.style.left = `${left}px`;
-  menu.style.top = `${top}px`;
+  positionMenu = () => {
+    const menuRect = menu.getBoundingClientRect();
+    const left = Math.min(
+      window.innerWidth - menuRect.width - 12,
+      Math.max(12, captured.rect.left + captured.rect.width / 2 - menuRect.width / 2)
+    );
+    const preferredTop = captured.rect.top - menuRect.height - 10;
+    const top = preferredTop >= 12
+      ? preferredTop
+      : Math.min(window.innerHeight - menuRect.height - 12, captured.rect.bottom + 10);
+    menu.style.left = `${left}px`;
+    menu.style.top = `${Math.max(12, top)}px`;
+  };
+  positionMenu();
 }
 
 function bindResearchTextSelection() {
@@ -19194,6 +19549,17 @@ async function notebookReferenceCandidates(project, foundation, cards) {
 }
 
 async function openNotebookReference(project, foundation, reference, selectCard, anchorPaneID, projectID) {
+  if (reference.referenceKind === "selectedPassage") {
+    const evidenceLink = reference.evidenceLink;
+    if (!evidenceLink?.source?.sectionID) {
+      throw new Error("This passage link is missing its enacted-source locator.");
+    }
+    await openResearchSourceInSectionDetail({
+      ...evidenceLink.source,
+      title: evidenceLink.source.sectionTitle
+    }, anchorPaneID, projectID, evidenceLink);
+    return;
+  }
   if (reference.referenceKind === "canonicalSection") {
     const savedItem = (currentContentSummary().savedItems || [])
       .find((item) => String(item.sectionID) === String(reference.referenceID));
@@ -19548,7 +19914,8 @@ async function renderProjectNotebook(project) {
           projectID,
           cardID: cardAtStart.id,
           title,
-          document: documentAtStart
+          document: documentAtStart,
+          evidenceLinks: cardAtStart.evidenceLinks || []
         });
         dirty = false;
         return true;
@@ -19561,14 +19928,21 @@ async function renderProjectNotebook(project) {
             expectedVersion: cardAtStart.version || 0,
             cardType: cardAtStart.cardType,
             title,
-            document: documentAtStart
+            document: documentAtStart,
+            evidenceLinks: cardAtStart.evidenceLinks || []
           });
           if (disposed || activeCard !== cardAtStart) return true;
           const changedDuringSave = notebookRevision !== revisionAtStart;
           const localTitle = activeCard.title;
           const localDocument = draftDocument;
+          const localEvidenceLinks = activeCard.evidenceLinks || [];
           activeCard = changedDuringSave
-            ? { ...payload.card, title: localTitle, document: localDocument }
+            ? {
+                ...payload.card,
+                title: localTitle,
+                document: localDocument,
+                evidenceLinks: localEvidenceLinks
+              }
             : payload.card;
           draftDocument = changedDuringSave ? localDocument : payload.card.document;
           dirty = changedDuringSave;
@@ -19668,11 +20042,27 @@ async function renderProjectNotebook(project) {
       const localDraft = await loadNotebookDraft(activeAccount().userID, projectID, cardID).catch(() => null);
       const useLocalDraft = localDraft && String(localDraft.updatedAt) > String(activeCard.updatedAt || "");
       draftDocument = await reconcileNotebookDocumentAssets(useLocalDraft ? localDraft.document : activeCard.document);
-      if (useLocalDraft && localDraft.title) activeCard.title = localDraft.title;
+      if (useLocalDraft) {
+        if (localDraft.title) activeCard.title = localDraft.title;
+        activeCard.evidenceLinks = localDraft.evidenceLinks || activeCard.evidenceLinks || [];
+      }
       dirty = useLocalDraft;
       renderCardList();
       await renderFocusedCard();
     }
+
+    mountState.linkEvidence = async (cardID, evidenceLinks) => {
+      if (dirty && activeCard && !(await flushNotebookAutosave())) {
+        throw new Error("Save the current Note before linking evidence to another Note.");
+      }
+      if (activeCard?.id !== cardID) await loadCard(cardID);
+      if (!activeCard || activeCard.id !== cardID) throw new Error("The selected Note is unavailable.");
+      activeCard.evidenceLinks = [...(activeCard.evidenceLinks || []), ...evidenceLinks];
+      draftDocument = appendNotebookEvidenceReferences(draftDocument, evidenceLinks);
+      markNotebookDirty();
+      await renderFocusedCard();
+      if (!(await flushNotebookAutosave())) throw new Error("The evidence link could not be saved.");
+    };
 
     async function deleteNotebookCard(card, trigger, options = {}) {
       let target = card;
@@ -19877,7 +20267,7 @@ async function renderProjectNotebook(project) {
       referenceToggle.type = "button";
       const referenceLabel = document.createElement("span");
       referenceLabel.className = "code-filter-menu-label";
-      referenceLabel.textContent = "Insert reference";
+      referenceLabel.textContent = "Link evidence";
       const referenceIcon = document.createElement("span");
       referenceIcon.className = "code-filter-menu-icon";
       referenceIcon.setAttribute("aria-hidden", "true");
@@ -19932,7 +20322,7 @@ async function renderProjectNotebook(project) {
       const referenceMenuOptions = {
         stateKey: "referenceMenuOpen",
         menuName: "Notebook references",
-        label: "Insert reference"
+        label: "Link evidence"
       };
       wireCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
       referenceToggle.disabled = notebookReadOnly || !candidates.length;
@@ -19945,10 +20335,12 @@ async function renderProjectNotebook(project) {
       const editorElement = document.createElement("div");
       editorElement.className = "notebook-editor-surface";
       const activateFocusedReference = (referenceElement) => {
+        const referenceID = referenceElement.dataset.referenceId;
         void openNotebookReference(identity, foundation, {
           referenceKind: referenceElement.dataset.referenceKind,
-          referenceID: referenceElement.dataset.referenceId,
-          label: referenceElement.dataset.referenceLabel || referenceElement.textContent || "Linked item"
+          referenceID,
+          label: referenceElement.dataset.referenceLabel || referenceElement.textContent || "Linked item",
+          evidenceLink: (activeCard.evidenceLinks || []).find((link) => link.id === referenceID) || null
         }, loadCard, paneID, projectID).catch((error) => showWebNotice("Linked item not opened", error.message));
       };
       editorElement.addEventListener("click", (event) => {
@@ -19975,6 +20367,23 @@ async function renderProjectNotebook(project) {
       researchButton.textContent = "Start Research";
       researchButton.title = "Use this card as the starting point for a new evidence-selected Research question";
       researchButton.hidden = true;
+      const reportButton = document.createElement("button");
+      reportButton.className = "notebook-secondary-action notebook-add-to-report";
+      reportButton.type = "button";
+      reportButton.textContent = "Add to Report";
+      reportButton.title = "Copy this Note into the Project Report as an independent editable snapshot";
+      reportButton.disabled = notebookReadOnly || !activeCard.id;
+      reportButton.addEventListener("click", async () => {
+        reportButton.disabled = true;
+        try {
+          if (!(await flushNotebookAutosave())) return;
+          await promoteNotebookCardToReport(identity, activeCard);
+        } catch (error) {
+          await showWebNotice("Note not added to Report", error.message);
+        } finally {
+          reportButton.disabled = notebookReadOnly || !activeCard?.id;
+        }
+      });
       const coordinateButton = document.createElement("button");
       coordinateButton.className = "notebook-secondary-action";
       coordinateButton.type = "button";
@@ -19994,7 +20403,7 @@ async function renderProjectNotebook(project) {
           snapshot: { label: `Notebook: ${activeCard.title || "Untitled card"}` }
         });
       });
-      footerActions.append(researchButton, coordinateButton);
+      footerActions.append(reportButton, researchButton, coordinateButton);
       footer.append(footerActions);
       focus.append(fields, toolbar, editorElement, footer);
 
@@ -20026,7 +20435,8 @@ async function renderProjectNotebook(project) {
             projectID,
             cardID: activeCard.id,
             title: activeCard.title,
-            document
+            document,
+            evidenceLinks: activeCard.evidenceLinks || []
           }).catch(() => {});
           void pruneUnusedPendingNotebookImages(
             activeAccount().userID,
@@ -20133,7 +20543,8 @@ async function renderProjectNotebook(project) {
         cardType: "finding",
         title: "",
         plainText: "",
-        references: []
+        references: [],
+        evidenceLinks: []
       };
       draftDocument = emptyNotebookDocument();
       dirty = false;
@@ -20152,7 +20563,8 @@ async function renderProjectNotebook(project) {
         cardType: "finding",
         title: unsavedDraft.title || "",
         plainText: "",
-        references: []
+        references: [],
+        evidenceLinks: unsavedDraft.evidenceLinks || []
       };
       draftDocument = await reconcileNotebookDocumentAssets(unsavedDraft.document);
       dirty = true;
@@ -20183,6 +20595,40 @@ function emptyProjectReportDraft(project) {
     introduction: "",
     blocks: []
   };
+}
+
+async function promoteNotebookCardToReport(project, card) {
+  const identity = projectIdentity(project);
+  const projectID = projectDetailKey(identity);
+  const payload = await postResearch("/reports/drafts/list", { projectID });
+  const draft = structuredClone(payload.drafts?.[0] || emptyProjectReportDraft(identity));
+  const promotedBlock = {
+    id: crypto.randomUUID(),
+    kind: "paragraph",
+    sourceClassification: "user-authored",
+    text: String(card.plainText || "").trim(),
+    derivedFrom: {
+      kind: "notebookCard",
+      id: card.id,
+      title: card.title,
+      version: card.version
+    },
+    sourceSnapshotAt: new Date().toISOString(),
+    evidenceLinks: structuredClone(card.evidenceLinks || [])
+  };
+  if (!promotedBlock.text) throw new Error("Write the Note before adding it to a Report.");
+  draft.blocks = [...(draft.blocks || []), promotedBlock];
+  const saved = await postResearch("/reports/drafts/save", {
+    projectID,
+    draftID: draft.id,
+    expectedVersion: draft.version || 0,
+    title: draft.title,
+    reportDate: draft.reportDate,
+    introduction: draft.introduction,
+    blocks: draft.blocks
+  });
+  pendingReportDraftByProject.set(projectID, saved.draft.id);
+  await openProjectReportDraft(identity);
 }
 
 function reportSourceClassificationLabel(value) {
@@ -20299,6 +20745,15 @@ function printReportManifestAsPDF(manifest) {
         const paragraph = documentRoot.createElement("p");
         paragraph.textContent = item.text;
         main.append(paragraph);
+        appendReportPDFList(
+          documentRoot,
+          main,
+          item.derivedFrom?.kind === "notebookCard" ? `Evidence linked to ${item.derivedFrom.title}` : "",
+          (item.evidenceLinks || []).map((link) => link.label || [
+            link.source?.codePrefix,
+            link.source?.sectionNumber
+          ].filter(Boolean).join(" § "))
+        );
         return;
       }
       if (item.kind === "list") {
@@ -20734,6 +21189,30 @@ async function renderProjectReportDraft(project) {
           setDirty();
         });
         row.append(textarea);
+        if (block.derivedFrom?.kind === "notebookCard") {
+          const provenance = document.createElement("section");
+          provenance.className = "report-note-provenance";
+          const provenanceLabel = document.createElement("p");
+          provenanceLabel.textContent = `Snapshot of Note: ${block.derivedFrom.title}`;
+          provenance.append(provenanceLabel);
+          (block.evidenceLinks || []).forEach((evidenceLink) => {
+            const sourceButton = document.createElement("button");
+            sourceButton.type = "button";
+            sourceButton.className = `report-note-evidence code-theme-${codeTheme(evidenceLink.source?.codePrefix)}`;
+            sourceButton.textContent = evidenceLink.label || [
+              evidenceLink.source?.codePrefix,
+              evidenceLink.source?.sectionNumber
+            ].filter(Boolean).join(" § ");
+            sourceButton.addEventListener("click", () => {
+              void openResearchSourceInSectionDetail({
+                ...evidenceLink.source,
+                title: evidenceLink.source?.sectionTitle
+              }, paneID, projectID, evidenceLink);
+            });
+            provenance.append(sourceButton);
+          });
+          row.append(provenance);
+        }
       } else if (block.kind === "list") {
         const textarea = document.createElement("textarea");
         textarea.value = (block.items || []).join("\n");
@@ -26456,7 +26935,7 @@ async function openDeepLinkedSectionInReader(item) {
   scrollPaneIntoView(paneID);
 }
 
-async function openResearchSourceInSectionDetail(item, anchorPaneID, projectID = "") {
+async function openResearchSourceInSectionDetail(item, anchorPaneID, projectID = "", evidenceAnchor = null) {
   const codePrefix = String(item.codePrefix || "BC").toUpperCase();
   const sectionNumber = String(item.sectionNumber || "").trim();
   const resolvedSection = sectionNumber
@@ -26489,7 +26968,10 @@ async function openResearchSourceInSectionDetail(item, anchorPaneID, projectID =
     state.utilityInstances = [...(state.utilityInstances || []), detailOwner];
   }
   detailOwner.projectID = String(projectID || "");
-  await openSectionDetail(detailOwner.id, searchResultDetail(navigationItem), { anchorPaneID });
+  await openSectionDetail(detailOwner.id, searchResultDetail(navigationItem), {
+    anchorPaneID,
+    evidenceAnchor
+  });
 }
 
 function closeSavedItemDetailsForPane(savedPaneID) {

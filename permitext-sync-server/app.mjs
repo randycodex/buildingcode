@@ -11020,11 +11020,16 @@ async function retryPendingNotebookImageDeletions(userID) {
   }
 }
 
-async function validateNotebookReferences(userID, references) {
+async function validateNotebookReferences(userID, references, evidenceLinks = []) {
   if (references.length > 100) {
     throw new Error("Notebook cards are limited to 100 linked references.");
   }
+  const embeddedPassageIDs = new Set((evidenceLinks || []).map((link) => link.id));
   for (const reference of references) {
+    if (
+      reference.referenceKind === "selectedPassage" &&
+      embeddedPassageIDs.has(reference.referenceID)
+    ) continue;
     if (!await ownedProjectTargetExists(
       userID,
       reference.referenceKind,
@@ -11146,10 +11151,11 @@ async function handleNotebookCardSave(request, response) {
       cardType: context.body.cardType,
       title: context.body.title,
       document: context.body.document,
+      evidenceLinks: context.body.evidenceLinks,
       createdBy: existing?.payload?.createdBy || context.userID,
       updatedBy: context.userID
     });
-    await validateNotebookReferences(storageOwnerUserID, payload.references);
+    await validateNotebookReferences(storageOwnerUserID, payload.references, payload.evidenceLinks);
     await validateNotebookImageAssets(storageOwnerUserID, projectID, payload.imageAssets);
     const artifact = {
       envelope: artifactEnvelope({

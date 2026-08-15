@@ -226,6 +226,73 @@ assert.equal(payload.references[0].referenceKind, "canonicalSection");
 assert(payload.renderedHTML.includes("notebook-reference-chip"));
 assert.deepEqual(payload.imageAssets, []);
 
+const passageLinkID = "evidence-link-1";
+const passageDocument = {
+  ...emptyNotebookDocument(),
+  document: [{
+    type: "paragraph",
+    content: [{
+      type: "permitextReference",
+      props: {
+        referenceKind: "selectedPassage",
+        referenceID: passageLinkID,
+        label: "BC § 101.2 · Scope"
+      }
+    }]
+  }]
+};
+const evidenceLinks = [{
+  id: passageLinkID,
+  label: "BC § 101.2 · Scope",
+  relationshipRole: "context",
+  projectID: "project-1",
+  notebookCardID: "notebook-card-1",
+  source: {
+    jurisdiction: "New York City",
+    codePrefix: "BC",
+    codeEdition: "2022",
+    codeVersion: "2022-construction-codes",
+    sourceID: "2",
+    sectionID: "2",
+    sectionNumber: "101.2",
+    sectionTitle: "Scope.",
+    sourceLibraryVersion: "2022-construction-codes#1"
+  },
+  passages: [{
+    exact: "The provisions of this code shall apply",
+    prefix: "Scope.",
+    suffix: "to the construction",
+    start: 7,
+    end: 47
+  }],
+  createdAt: "2026-08-15T12:00:00.000Z",
+  noteTarget: { scope: "card", blockID: "", exact: "" }
+}];
+const passagePayload = normalizeNotebookCardPayload({
+  cardType: "finding",
+  title: "Scope note",
+  document: passageDocument,
+  evidenceLinks,
+  createdBy: "apple:notebook-test",
+  updatedBy: "apple:notebook-test"
+});
+assert.equal(passagePayload.evidenceLinks[0].source.sectionNumber, "101.2");
+assert.equal(passagePayload.evidenceLinks[0].projectID, "project-1");
+assert.equal(passagePayload.evidenceLinks[0].notebookCardID, "notebook-card-1");
+assert.equal(passagePayload.evidenceLinks[0].label, "BC § 101.2 · Scope");
+assert.equal(passagePayload.evidenceLinks[0].passages[0].exactHash.length, 64);
+assert.throws(
+  () => normalizeNotebookCardPayload({
+    cardType: "finding",
+    title: "Broken passage link",
+    document: passageDocument,
+    evidenceLinks: [],
+    createdBy: "apple:notebook-test",
+    updatedBy: "apple:notebook-test"
+  }),
+  /missing its evidence locator/
+);
+
 assert.throws(
   () => validateNotebookDocument({
     ...emptyNotebookDocument(),

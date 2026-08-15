@@ -325,6 +325,26 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
         .font("Helvetica")
         .fontSize(10)
         .text(item.text, { lineGap: 2, paragraphGap: 10 });
+      if (item.derivedFrom?.kind === "notebookCard" && item.evidenceLinks?.length) {
+        document
+          .fillColor(colors.muted)
+          .font("Helvetica-Bold")
+          .fontSize(8)
+          .text(`Evidence linked to ${item.derivedFrom.title}`, { paragraphGap: 3 });
+        item.evidenceLinks.forEach((link) => {
+          const citation = link.label || [
+            link.source?.codePrefix,
+            link.source?.sectionNumber
+          ].filter(Boolean).join(" § ");
+          if (!citation) return;
+          document
+            .fillColor(colors.muted)
+            .font("Helvetica")
+            .fontSize(8)
+            .text(`- ${citation}`, { indent: 8, paragraphGap: 2 });
+        });
+        document.moveDown(0.5);
+      }
       return;
     }
     if (item.kind === "list") {

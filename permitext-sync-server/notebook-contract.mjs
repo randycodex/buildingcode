@@ -8,6 +8,7 @@ import {
   plainTextToBlockNote,
   tiptapDocumentToBlockNote
 } from "./src/notebook-schema.js";
+import { createHash } from "node:crypto";
 
 export { notebookSchemaName, notebookSchemaVersion };
 
@@ -52,6 +53,9 @@ const permittedStyleNames = new Set([
   "textSize"
 ]);
 const permittedNotebookNumericStyles = new Set(["12px", "16px", "18px", "24px", "32px"]);
+const notebookEvidenceRoles = new Set(["context", "supports", "conflicts", "unresolved"]);
+const maximumNotebookEvidenceLinks = 100;
+const maximumNotebookEvidencePassages = 24;
 
 function requiredText(value, label, maximum = 500) {
   const normalized = String(value || "").trim();
@@ -67,6 +71,92 @@ function optionalText(value, label, maximum = 500) {
     throw new Error(`Invalid ${label}.`);
   }
   return normalized;
+}
+
+function optionalInteger(value, label) {
+  if (value === null || value === undefined || value === "") return null;
+  const normalized = Number(value);
+  if (!Number.isSafeInteger(normalized) || normalized < 0) {
+    throw new Error(`Invalid ${label}.`);
+  }
+  return normalized;
+}
+
+function normalizedEvidenceText(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function canonicalNotebookEvidencePassage(passage) {
+  const exact = requiredText(
+    passage?.exact || passage?.selectedText,
+    "Notebook evidence passage",
+    50_000
+  );
+  const normalizedExact = normalizedEvidenceText(exact);
+  const start = optionalInteger(passage?.start, "Notebook evidence start offset");
+  const end = optionalInteger(passage?.end, "Notebook evidence end offset");
+  if ((start === null) !== (end === null) || (start !== null && end < start)) {
+    throw new Error("Invalid Notebook evidence passage offsets.");
+  }
+  return {
+    exact,
+    normalizedExact,
+    prefix: optionalText(passage?.prefix, "Notebook evidence prefix", 500),
+    suffix: optionalText(passage?.suffix, "Notebook evidence suffix", 500),
+    start,
+    end,
+    exactHash: createHash("sha256").update(normalizedExact).digest("hex")
+  };
+}
+
+export function normalizeNotebookEvidenceLinks(input) {
+  const links = Array.isArray(input) ? input : [];
+  if (links.length > maximumNotebookEvidenceLinks) {
+    throw new Error(`Notebook cards are limited to ${maximumNotebookEvidenceLinks} evidence links.`);
+  }
+  const seen = new Set();
+  return links.map((link) => {
+    const id = requiredText(link?.id, "Notebook evidence link ID", 256);
+    if (seen.has(id)) throw new Error("Notebook evidence link IDs must be unique.");
+    seen.add(id);
+    const relationshipRole = String(link?.relationshipRole || "context").trim();
+    if (!notebookEvidenceRoles.has(relationshipRole)) {
+      throw new Error("Unsupported Notebook evidence relationship.");
+    }
+    const source = link?.source || {};
+    const passages = (Array.isArray(link?.passages) ? link.passages : [])
+      .map(canonicalNotebookEvidencePassage);
+    if (!passages.length || passages.length > maximumNotebookEvidencePassages) {
+      throw new Error("Notebook evidence links require 1 to 24 passages.");
+    }
+    return {
+      id,
+      label: optionalText(link?.label, "Notebook evidence label", 1_000),
+      relationshipRole,
+      projectID: optionalText(link?.projectID, "Notebook evidence Project ID", 256),
+      notebookCardID: optionalText(link?.notebookCardID, "Notebook evidence Note ID", 256),
+      source: {
+        jurisdiction: optionalText(source.jurisdiction || "New York City", "Notebook evidence jurisdiction", 256),
+        codePrefix: requiredText(source.codePrefix, "Notebook evidence code", 64),
+        codeEdition: optionalText(source.codeEdition || "2022", "Notebook evidence edition", 256),
+        codeVersion: optionalText(source.codeVersion, "Notebook evidence code version", 1_024),
+        sourceID: requiredText(source.sourceID || source.sectionID, "Notebook evidence source ID", 256),
+        sectionID: requiredText(source.sectionID, "Notebook evidence section ID", 256),
+        sectionNumber: requiredText(source.sectionNumber, "Notebook evidence section number", 256),
+        sectionTitle: requiredText(source.sectionTitle || source.title || "Section", "Notebook evidence section title", 1_000),
+        sourceLibraryVersion: optionalText(source.sourceLibraryVersion || source.codeVersion, "Notebook evidence source-library version", 1_024)
+      },
+      passages,
+      createdAt: requiredText(link?.createdAt, "Notebook evidence creation date", 64),
+      noteTarget: link?.noteTarget && typeof link.noteTarget === "object" && !Array.isArray(link.noteTarget)
+        ? {
+            scope: optionalText(link.noteTarget.scope || "card", "Notebook evidence Note scope", 64),
+            blockID: optionalText(link.noteTarget.blockID, "Notebook evidence Note block", 256),
+            exact: optionalText(link.noteTarget.exact, "Notebook evidence Note text", 5_000)
+          }
+        : { scope: "card", blockID: "", exact: "" }
+    };
+  });
 }
 
 function canonicalColor(value, label) {
@@ -500,12 +590,29 @@ export function notebookManifestItem({ cardID, cardType, title, document }) {
   };
 }
 
-export function normalizeNotebookCardPayload({ cardType, title, document, createdBy, updatedBy }) {
+export function normalizeNotebookCardPayload({
+  cardType,
+  title,
+  document,
+  evidenceLinks = [],
+  createdBy,
+  updatedBy
+}) {
   const normalizedCardType = requiredText(cardType, "Notebook card type", 64);
   if (!notebookCardTypeSet.has(normalizedCardType)) {
     throw new Error("Notebook card type is unsupported.");
   }
   const validated = validateNotebookDocument(document);
+  const normalizedEvidenceLinks = normalizeNotebookEvidenceLinks(evidenceLinks);
+  const passageReferenceIDs = new Set(
+    validated.references
+      .filter((reference) => reference.referenceKind === "selectedPassage")
+      .map((reference) => reference.referenceID)
+  );
+  const evidenceLinkIDs = new Set(normalizedEvidenceLinks.map((link) => link.id));
+  if ([...passageReferenceIDs].some((id) => !evidenceLinkIDs.has(id))) {
+    throw new Error("A Notebook passage reference is missing its evidence locator.");
+  }
   const plainText = notebookPlainText(validated.document);
   return {
     schemaVersion: notebookSchemaVersion,
@@ -513,6 +620,7 @@ export function normalizeNotebookCardPayload({ cardType, title, document, create
     title: requiredText(title, "Notebook card title", 300),
     document: validated.document,
     references: validated.references,
+    evidenceLinks: normalizedEvidenceLinks,
     imageAssets: validated.imageAssets,
     plainText,
     renderedHTML: renderNotebookDocumentHTML(validated.document),
