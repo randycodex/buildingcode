@@ -351,7 +351,8 @@ assert.match(indexSource, /saved-projects-add-button[\s\S]*?saved-projects-archi
 assert.match(functionSource(appSource, "renderSavedProjects"), /selectButton\.onclick = \(\) => setSelecting\(!selecting\)/);
 const savedProjectsSource = functionSource(appSource, "renderSavedProjects");
 assert.match(savedProjectsSource, /archiveSelectedButton\.onclick[\s\S]*?archiveProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)/);
-assert.match(savedProjectsSource, /selectionActions\.append\(archiveSelectedButton, deleteSelectedButton\)[\s\S]*?bulkBar\.append\(cancelSelectionButton, selectionActions\)[\s\S]*?section\.insertBefore\(bulkBar, list\)/);
+assert.match(savedProjectsSource, /selectionActions\.append\(cancelSelectionButton, archiveSelectedButton, deleteSelectedButton\)[\s\S]*?headingActions\.append\(selectionActions\)/);
+assert.doesNotMatch(savedProjectsSource, /saved-projects-bulk-bar|section\.insertBefore\(bulkBar, list\)/);
 assert.doesNotMatch(savedProjectsSource, /saved-projects-bulk-count|selectionCount/);
 assert.doesNotMatch(savedProjectsSource, /selectAllButton|"Select all"|"Clear all"/);
 assert.match(savedProjectsSource, /if \(showingArchived\) \{[\s\S]*?restoreArchivedProject\(project\)/);
@@ -364,8 +365,8 @@ assert.match(stylesSource, /\.saved-projects-add-button\[hidden\],[\s\S]*?\.save
 assert.match(functionSource(appSource, "refreshProjectOverviewPreservingSavedPanes"), /savedPaneIDs\(\)[\s\S]*?refreshSavedPanelInPlace[\s\S]*?failedSavedIDs[\s\S]*?transitionWorkspace/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /archiveSelectedButton\.innerHTML = showingArchived \? archiveRestoreIconSVG\(\) : archiveIconSVG\(\)/);
 assert.match(stylesSource, /\.saved-project-tile-edit \{[\s\S]*?width: 22px;[\s\S]*?background: transparent;/);
-assert.match(stylesSource, /\.saved-projects-selection-actions \{[\s\S]*?display: flex;[\s\S]*?justify-self: end;[\s\S]*?gap: var\(--space-1\);/);
-assert.match(stylesSource, /\.saved-projects-bulk-link \{[\s\S]*?justify-self: start;[\s\S]*?text-align: left;/);
+assert.match(stylesSource, /\.saved-projects-selection-actions \{[\s\S]*?display: flex;[\s\S]*?gap: var\(--space-1\);/);
+assert.match(stylesSource, /\.saved-projects-selection-cancel \{[\s\S]*?width: auto;[\s\S]*?font-size:/);
 assert.match(stylesSource, /\.saved-projects-selection-action \{[\s\S]*?width: 24px;[\s\S]*?background: transparent;/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /project\.sharedOnly[\s\S]*?return/);
 assert.match(savedFolderContextSource, /state\.projectHostPaneID = paneID[\s\S]*?await (?:closeTool|openTool)/);
@@ -393,7 +394,7 @@ assert.ok(
 );
 assert.match(
   functionSource(appSource, "renderSavedProjects"),
-  /section\.querySelector\("\.saved-projects-bulk-bar"\)\?\.remove\(\)/,
+  /headingActions\.querySelector\("\.saved-projects-selection-actions"\)\?\.remove\(\)/,
   "Refreshing cached Projects should replace the existing bulk-selection controls instead of duplicating them."
 );
 [

@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-settings-radius-v255";
+} from "./offline-storage.js?v=20260815-project-selection-actions-v257";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -26208,17 +26208,20 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const selectButton = panel.querySelector(".saved-projects-select-button");
   const addButton = panel.querySelector(".saved-projects-add-button");
   const archiveButton = panel.querySelector(".saved-projects-archive-button");
-  section.querySelector(".saved-projects-bulk-bar")?.remove();
+  const headingActions = panel.querySelector(".saved-projects-actions");
+  headingActions.querySelector(".saved-projects-selection-actions")?.remove();
   let showingArchived = Boolean(instance.projectsArchiveMode);
   let selecting = false;
   let selectionBusy = false;
   const selectedProjectIDs = new Set();
-  const bulkBar = document.createElement("section");
-  bulkBar.className = "saved-projects-bulk-bar";
-  bulkBar.hidden = true;
-  bulkBar.setAttribute("aria-label", "Folder selection");
   const selectionActions = document.createElement("div");
   selectionActions.className = "saved-projects-selection-actions";
+  selectionActions.hidden = true;
+  selectionActions.setAttribute("aria-label", "Folder selection");
+  const cancelSelectionButton = document.createElement("button");
+  cancelSelectionButton.type = "button";
+  cancelSelectionButton.className = "saved-projects-selection-action saved-projects-selection-cancel";
+  cancelSelectionButton.textContent = "Cancel";
   const archiveSelectedButton = document.createElement("button");
   archiveSelectedButton.type = "button";
   archiveSelectedButton.className = "saved-projects-selection-action saved-projects-selection-archive";
@@ -26228,13 +26231,8 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   deleteSelectedButton.title = "Delete selected folders";
   deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
   deleteSelectedButton.innerHTML = trashIconSVG();
-  selectionActions.append(archiveSelectedButton, deleteSelectedButton);
-  const cancelSelectionButton = document.createElement("button");
-  cancelSelectionButton.type = "button";
-  cancelSelectionButton.className = "saved-projects-bulk-link";
-  cancelSelectionButton.textContent = "Cancel";
-  bulkBar.append(cancelSelectionButton, selectionActions);
-  section.insertBefore(bulkBar, list);
+  selectionActions.append(cancelSelectionButton, archiveSelectedButton, deleteSelectedButton);
+  headingActions.append(selectionActions);
   const projectsMenuLabel = (savedInstance) => {
     if (savedInstance.projectsMenuOpen) return "";
     if (savedInstance.projectsArchiveMode) return "Archived Projects";
@@ -26283,7 +26281,8 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     selectButton.setAttribute("aria-pressed", String(selecting));
     selectButton.title = selecting ? "Cancel folder selection" : "Select folders";
     selectButton.setAttribute("aria-label", selectButton.title);
-    bulkBar.hidden = !selecting;
+    selectButton.hidden = selecting;
+    selectionActions.hidden = !selecting;
     const selectedCount = selectedProjectIDs.size;
     archiveSelectedButton.title = showingArchived ? "Restore selected folders" : "Archive selected folders";
     archiveSelectedButton.setAttribute("aria-label", archiveSelectedButton.title);

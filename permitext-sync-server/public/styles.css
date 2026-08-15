@@ -9652,9 +9652,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-projects-section.is-selecting .saved-projects-add-button,
-.saved-projects-section.is-selecting .saved-projects-archive-button {
-  opacity: 0.34;
-  pointer-events: none;
+.saved-projects-section.is-selecting .saved-projects-archive-button,
+.saved-projects-section.is-selecting .saved-projects-select-button {
+  display: none !important;
 }
 
 .saved-projects-section.is-selecting .saved-project-tile[data-bulk-selectable="true"] {
@@ -9673,39 +9673,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   box-shadow: none;
 }
 
-.saved-projects-bulk-bar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-2);
-  margin: var(--space-2);
-  padding: 0;
-}
-
-.saved-projects-bulk-bar[hidden] {
-  display: none;
-}
-
-.saved-projects-bulk-link {
-  font-size: calc(var(--chrome-font-size) * 0.66) !important;
-  font-weight: 400;
-}
-
-.saved-projects-bulk-link {
-  min-height: 28px;
-  justify-self: start;
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-pill);
-  text-align: left;
-}
-
-.saved-projects-bulk-link {
-  border: 0;
-  background: transparent;
-  color: var(--text-secondary);
-}
-
-.saved-projects-bulk-link:disabled,
 .saved-projects-selection-action:disabled {
   opacity: 0.42;
 }
@@ -9713,8 +9680,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .saved-projects-selection-actions {
   display: flex;
   align-items: center;
-  justify-self: end;
   gap: var(--space-1);
+}
+
+.saved-projects-selection-actions[hidden] {
+  display: none;
 }
 
 .saved-projects-selection-action {
@@ -9731,6 +9701,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .saved-projects-selection-action svg {
   width: 13px;
   height: 13px;
+}
+
+.saved-projects-selection-cancel {
+  width: auto;
+  padding-inline: var(--space-1);
+  font-size: calc(var(--chrome-font-size) * 0.66);
+  font-weight: 400;
 }
 
 .saved-projects-selection-delete:not(:disabled):hover,
