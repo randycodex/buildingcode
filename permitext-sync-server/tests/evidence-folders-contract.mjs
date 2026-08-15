@@ -125,6 +125,12 @@ assert.match(
   /savedByTarget\.get\(savedEvidenceKey\(link\)\)[\s\S]*?if \(!savedItem\) return null/,
   "Project detail must not revive a stale subsection link when only paragraph saves exist."
 );
+const openSavedItemSource = functionSource(appSource, "openSavedItemInSDC");
+assert.match(
+  openSavedItemSource,
+  /selectedFolderID[\s\S]*?sdcOwner\.projectID = selectedProject \? researchProjectID\(selectedProject\) : ""/,
+  "A saved Project passage must carry its Project color into Source Detail highlighting."
+);
 
 const normalizeAnnotationTags = new Function(
   `${functionSource(appSource, "normalizeAnnotationTags")}; return normalizeAnnotationTags;`

@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-paragraph-bookmark-v247";
+} from "./offline-storage.js?v=20260815-project-source-highlight-v248";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -27173,6 +27173,11 @@ function closeSavedItemDetailsForPane(savedPaneID) {
 async function openSavedItemInSDC(item, savedPaneID) {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
   if (!sectionID) return;
+  const savedOwner = (state.utilityInstances || []).find((instance) =>
+    instance.key === "saved" && paneIDForUtilityInstance(instance) === savedPaneID
+  );
+  const selectedProject = visibleProjectRecords(currentContentSummary().projects || [])
+    .find((project) => projectRecordID(project) === String(savedOwner?.selectedFolderID || ""));
   const anchoredOwnerID = Object.entries(sectionDetailAnchorsBySearch())
     .find(([, anchorPaneID]) => anchorPaneID === savedPaneID)?.[0] || "";
   let sdcOwner = (state.utilityInstances || []).find((instance) =>
@@ -27183,6 +27188,7 @@ async function openSavedItemInSDC(item, savedPaneID) {
     sdcOwner = newUtilityInstance("sdc");
     state.utilityInstances = [...(state.utilityInstances || []), sdcOwner];
   }
+  sdcOwner.projectID = selectedProject ? researchProjectID(selectedProject) : "";
   closeLinkedReaderForSavedPane(savedPaneID);
   await openSectionDetail(sdcOwner.id, searchResultDetail({
     ...item,
