@@ -6839,12 +6839,22 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   color: var(--text-primary);
 }
 
+.research-history-select-button[hidden],
+.research-history-delete-button[hidden] {
+  display: none;
+}
+
 .research-history-delete-button:not(:disabled) {
   color: var(--text-primary);
 }
 
 .research-list-panel .panel-actions {
   align-items: center;
+}
+
+.research-list-panel.is-research-history-selecting .utility-close,
+.research-list-panel.is-research-history-selecting .pane-drag-handle {
+  display: none;
 }
 
 .research-conversation-row {

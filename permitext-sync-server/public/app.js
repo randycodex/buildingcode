@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-research-delete-action-v252";
+} from "./offline-storage.js?v=20260815-research-selection-header-v253";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -3051,15 +3051,13 @@ function clearProjectSpecificResearch(project) {
   pendingResearchSelection = null;
   const conversationID = String(state.researchConversationID || "").trim();
   const conversationPaneID = paneIDForResearchConversation(conversationID);
-  state.utilities.analysis = false;
   state.researchConversationID = "";
   activeResearchConversation = null;
-  delete state.paneWeights["utility:analysis"];
   if (conversationPaneID) {
     delete state.paneWeights[conversationPaneID];
   }
   state.paneOrder = (state.paneOrder || []).filter((id) =>
-    id !== "utility:analysis" && id !== conversationPaneID && !id.startsWith("research:conversation:")
+    id !== conversationPaneID && !id.startsWith("research:conversation:")
   );
 }
 
