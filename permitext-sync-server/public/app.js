@@ -19193,18 +19193,18 @@ async function notebookReferenceCandidates(project, foundation, cards) {
     .sort(compareNotebookReferences);
 }
 
-async function openNotebookReference(project, foundation, reference, selectCard) {
+async function openNotebookReference(project, foundation, reference, selectCard, anchorPaneID, projectID) {
   if (reference.referenceKind === "canonicalSection") {
     const savedItem = (currentContentSummary().savedItems || [])
       .find((item) => String(item.sectionID) === String(reference.referenceID));
-    await openSectionDetailForExistingSearch({
+    await openResearchSourceInSectionDetail({
       sectionID: reference.referenceID,
       codePrefix: savedItem?.codePrefix || "BC",
       chapterID: savedItem?.chapterID || "",
       chapterNumber: savedItem?.chapterNumber || "",
       sectionNumber: savedItem?.sectionNumber || "",
       title: savedItem?.title || reference.label
-    });
+    }, anchorPaneID, projectID);
     return;
   }
   if (reference.referenceKind === "researchAnswer") {
@@ -19949,7 +19949,7 @@ async function renderProjectNotebook(project) {
           referenceKind: referenceElement.dataset.referenceKind,
           referenceID: referenceElement.dataset.referenceId,
           label: referenceElement.dataset.referenceLabel || referenceElement.textContent || "Linked item"
-        }, loadCard).catch((error) => showWebNotice("Linked item not opened", error.message));
+        }, loadCard, paneID, projectID).catch((error) => showWebNotice("Linked item not opened", error.message));
       };
       editorElement.addEventListener("click", (event) => {
         const referenceElement = event.target.closest?.("[data-permitext-reference]");
