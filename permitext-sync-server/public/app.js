@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-settings-left-of-projects-v238";
+} from "./offline-storage.js?v=20260815-clear-all-projects-v239";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -28184,6 +28184,7 @@ function renderSettings() {
   const projectEmpty = panel.querySelector(".settings-projects-empty");
   const projectSelectAll = panel.querySelector(".settings-project-select-all");
   const projectDelete = panel.querySelector(".settings-project-delete");
+  const projectClearAll = panel.querySelector(".settings-project-clear-all");
   const status = panel.querySelector(".settings-status-message");
   firmCard.hidden = !releaseSurfaceVisibility.firmCollaboration;
 
@@ -28271,6 +28272,7 @@ function renderSettings() {
     projectSelectAll.textContent = count === settingsProjects.length && count > 0 ? "Clear All" : "Select All";
     projectSelectAll.disabled = settingsProjects.length === 0;
     projectDelete.disabled = count === 0;
+    projectClearAll.disabled = settingsProjects.length === 0;
     projectDelete.textContent = count > 0 ? `Delete ${count} Selected` : "Delete Selected";
     projectCheckboxes.forEach((checkbox, id) => {
       checkbox.checked = selectedProjectIDs.has(id);
@@ -28330,6 +28332,27 @@ function renderSettings() {
     } catch (error) {
       setStatus(error.message || "Could not delete the selected projects.", true);
       projectDelete.disabled = false;
+    }
+  });
+  projectClearAll.addEventListener("click", async () => {
+    const count = settingsProjects.length;
+    if (!count) return;
+    const confirmed = await confirmWebWarning(
+      "Clear all Projects?",
+      `This will permanently delete all ${count} ${count === 1 ? "Project" : "Projects"}, including archived Projects, from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
+      { confirmLabel: "Clear All Projects" }
+    );
+    if (!confirmed) return;
+    projectClearAll.disabled = true;
+    try {
+      for (const project of settingsProjects) {
+        await deleteArchivedProjectData(project);
+      }
+      setStatus(`${count} ${count === 1 ? "Project" : "Projects"} deleted.`);
+      await renderWorkspace();
+    } catch (error) {
+      setStatus(error.message || "Could not clear all Projects.", true);
+      projectClearAll.disabled = false;
     }
   });
   updateProjectSelection();

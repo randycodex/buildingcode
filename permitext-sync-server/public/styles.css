@@ -12757,6 +12757,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   border-bottom: 0;
 }
 
+.settings-panel .settings-danger-button:disabled {
+  color: var(--text-secondary);
+  cursor: default;
+  opacity: 0.58;
+}
+
 .settings-panel .settings-danger-button > span {
   color: inherit;
   font-size: 10pt !important;

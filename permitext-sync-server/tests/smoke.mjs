@@ -414,13 +414,14 @@ async function main() {
         !settingsTemplateSource.includes("All browser changes are synced."),
       "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
-    ["Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
+    ["Clear All Projects", "Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
     assert(
       settingsTemplateSource.includes('class="settings-project-list"') &&
         settingsTemplateSource.includes('class="settings-link-button settings-project-select-all"') &&
-        settingsTemplateSource.includes('class="settings-secondary-button settings-project-delete"'),
+        settingsTemplateSource.includes('class="settings-secondary-button settings-project-delete"') &&
+        settingsTemplateSource.includes('class="settings-danger-button settings-project-clear-all"'),
       "Web Settings omitted project selection or bulk deletion controls."
     );
     assert(
@@ -1432,7 +1433,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260815-settings-left-of-projects-v238'),
+        webRoot.text.includes('/web/app.js?v=20260815-clear-all-projects-v239'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
