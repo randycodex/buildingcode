@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-conditional-source-highlight-v249";
+} from "./offline-storage.js?v=20260815-note-role-cleanup-v250";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19033,7 +19033,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
         }
         noteChooser.hidden = false;
         noteChooser.removeAttribute("aria-busy");
-        status.textContent = cards.length && !selectedNotebookCardID ? "Choose the Note to link." : "";
+        status.textContent = "";
         researchSelectionMenuInteracting = true;
         requestAnimationFrame(positionMenu);
       } catch (error) {
@@ -19048,7 +19048,6 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
         return;
       }
       if (!selectedNotebookCardID) {
-        status.textContent = "Choose the Note to link.";
         return;
       }
       linkButton.disabled = true;
