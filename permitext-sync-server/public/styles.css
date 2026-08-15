@@ -13099,6 +13099,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: color-mix(in srgb, var(--project-color) 18%, var(--surface));
 }
 
+.notebook-add-to-report.is-in-report {
+  background: color-mix(in srgb, var(--project-color) 28%, var(--surface));
+}
+
 .notebook-primary-action {
   background: color-mix(in srgb, var(--project-color) 68%, var(--surface));
   color: color-mix(in srgb, var(--text-primary) 94%, #000);

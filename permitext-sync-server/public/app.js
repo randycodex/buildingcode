@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-notebook-source-edition-v236";
+} from "./offline-storage.js?v=20260815-notebook-report-update-v237";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -20387,8 +20387,12 @@ async function renderProjectNotebook(project) {
       const reportButton = document.createElement("button");
       reportButton.className = "notebook-secondary-action notebook-add-to-report";
       reportButton.type = "button";
-      reportButton.textContent = "Add to Report";
-      reportButton.title = "Copy this Note into the Project Report as an independent editable snapshot";
+      const existingReportBlock = await notebookCardReportBlock(identity, activeCard.id).catch(() => null);
+      reportButton.classList.toggle("is-in-report", Boolean(existingReportBlock));
+      reportButton.textContent = existingReportBlock ? "Update in Report" : "Add to Report";
+      reportButton.title = existingReportBlock
+        ? "Update this Note's existing Report item with a new independent snapshot"
+        : "Copy this Note into the Project Report as an independent editable snapshot";
       reportButton.disabled = notebookReadOnly || !activeCard.id;
       reportButton.addEventListener("click", async () => {
         reportButton.disabled = true;
@@ -20396,7 +20400,7 @@ async function renderProjectNotebook(project) {
           if (!(await flushNotebookAutosave())) return;
           await promoteNotebookCardToReport(identity, activeCard);
         } catch (error) {
-          await showWebNotice("Note not added to Report", error.message);
+          await showWebNotice(existingReportBlock ? "Report item not updated" : "Note not added to Report", error.message);
         } finally {
           reportButton.disabled = notebookReadOnly || !activeCard?.id;
         }
@@ -20614,13 +20618,27 @@ function emptyProjectReportDraft(project) {
   };
 }
 
+async function notebookCardReportBlock(project, cardID) {
+  const projectID = projectDetailKey(projectIdentity(project));
+  const payload = await postResearch("/reports/drafts/list", { projectID });
+  const draft = payload.drafts?.[0] || null;
+  if (!draft) return null;
+  return (draft.blocks || []).find((block) =>
+    block.derivedFrom?.kind === "notebookCard" && block.derivedFrom.id === cardID
+  ) || null;
+}
+
 async function promoteNotebookCardToReport(project, card) {
   const identity = projectIdentity(project);
   const projectID = projectDetailKey(identity);
   const payload = await postResearch("/reports/drafts/list", { projectID });
   const draft = structuredClone(payload.drafts?.[0] || emptyProjectReportDraft(identity));
+  const existingBlockIndex = (draft.blocks || []).findIndex((block) =>
+    block.derivedFrom?.kind === "notebookCard" && block.derivedFrom.id === card.id
+  );
+  const existingBlock = existingBlockIndex >= 0 ? draft.blocks[existingBlockIndex] : null;
   const promotedBlock = {
-    id: crypto.randomUUID(),
+    id: existingBlock?.id || crypto.randomUUID(),
     kind: "paragraph",
     sourceClassification: "user-authored",
     text: String(card.plainText || "").trim(),
@@ -20634,7 +20652,11 @@ async function promoteNotebookCardToReport(project, card) {
     evidenceLinks: structuredClone(card.evidenceLinks || [])
   };
   if (!promotedBlock.text) throw new Error("Write the Note before adding it to a Report.");
-  draft.blocks = [...(draft.blocks || []), promotedBlock];
+  if (existingBlockIndex >= 0) {
+    draft.blocks[existingBlockIndex] = promotedBlock;
+  } else {
+    draft.blocks = [...(draft.blocks || []), promotedBlock];
+  }
   const saved = await postResearch("/reports/drafts/save", {
     projectID,
     draftID: draft.id,
