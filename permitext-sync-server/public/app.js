@@ -7554,13 +7554,14 @@ function currentContentSummary() {
     .filter((item) => item && item.sectionID && !item.deletedAt &&
       recordSurvivesBulkClear(item, clearRecords, ["bookmarks", "folders"]))
     .map((item) => ({
-      id: `web-saved-${safeAnnotationIDPart(syncCodeVersion(item.codeVersion))}-${item.sectionID}`,
+      id: `web-saved-${safeAnnotationIDPart(syncCodeVersion(item.codeVersion))}-${item.sectionID}${normalizeAnnotationBlockID(item.blockID) ? `-${safeAnnotationIDPart(normalizeAnnotationBlockID(item.blockID))}` : ""}`,
       userID: item.userID || "local-web",
       codeVersion: syncCodeVersion(item.codeVersion),
       codePrefix: item.codePrefix || "BC",
       chapterID: item.chapterID || "",
       chapterNumber: item.chapterNumber || "",
       sectionID: Number(item.sectionID),
+      blockID: normalizeAnnotationBlockID(item.blockID),
       sectionNumber: item.sectionNumber || "",
       title: item.title || "Section",
       updatedAt: item.updatedAt || new Date().toISOString()
@@ -8541,8 +8542,9 @@ function discardLocalMutationOverlay(mutation) {
       String(item.id || "") !== String(record.id || "") &&
       savedEvidenceKey(item) !== savedEvidenceKey(record)
     );
+    const localSavedKey = savedEvidenceKey(record);
     state.localSavedSectionIDs = (state.localSavedSectionIDs || [])
-      .filter((sectionID) => String(sectionID) !== String(record.sectionID || ""));
+      .filter((sectionID) => String(sectionID) !== localSavedKey && String(sectionID) !== String(record.id || ""));
   } else if (kind === "annotation") {
     state.localAnnotations = (state.localAnnotations || []).filter((item) =>
       String(item.id || "") !== String(record.id || "") &&
@@ -9367,15 +9369,19 @@ function savedMutationForSection(section) {
 
 function savedRecordForSection(section, userID = "local-web", updatedAt = new Date().toISOString()) {
   const codePrefix = section.codePrefix || "BC";
+  const codeVersion = syncCodeVersion(section.codeVersion || syncCodeVersionForPrefix(codePrefix));
+  const blockID = normalizeAnnotationBlockID(section.blockID);
   return {
-    id: `web-saved-${section.sectionID}`,
+    id: blockID
+      ? `web-saved-${safeAnnotationIDPart(codeVersion)}-${section.sectionID}-${safeAnnotationIDPart(blockID)}`
+      : `web-saved-${section.sectionID}`,
     userID,
-    codeVersion: syncCodeVersion(section.codeVersion || syncCodeVersionForPrefix(codePrefix)),
+    codeVersion,
     codePrefix,
     chapterID: section.chapterID || "",
     chapterNumber: section.chapterNumber || "",
     sectionID: Number(section.sectionID),
-    blockID: normalizeAnnotationBlockID(section.blockID),
+    blockID,
     sectionNumber: section.sectionNumber,
     title: section.title,
     updatedAt
@@ -9386,7 +9392,8 @@ function savedEvidenceKey(value, codeVersion = "") {
   const record = value && typeof value === "object" ? value : { sectionID: value, codeVersion };
   const sectionID = String(record.sectionID || record.savedSectionID || record.itemID || "");
   const version = syncCodeVersion(record.codeVersion || codeVersion || defaultSyncCodeVersion);
-  return `${version}:${sectionID}`;
+  const blockID = normalizeAnnotationBlockID(record.blockID || record.anchorID || record.contentBlockID);
+  return `${version}:${sectionID}:${blockID}`;
 }
 
 function projectEvidenceCount(projectSections, project) {
@@ -9400,9 +9407,7 @@ function projectSectionRecordForSection(project, sectionPayload) {
   const account = activeAccount();
   const now = new Date().toISOString();
   const sectionID = String(sectionPayload.sectionID || "");
-  // Folder membership is section-level. Paragraph-specific context remains in
-  // annotations and Project Foundation links so web and native sync agree.
-  const blockID = "";
+  const blockID = normalizeAnnotationBlockID(sectionPayload.blockID);
   const folderClientID = project.clientID || project.id || project.localFolderID || "";
   return {
     id: `web-project-section-${folderClientID}-${sectionID}${blockID ? `-${safeAnnotationIDPart(blockID)}` : ""}`,
@@ -9477,10 +9482,11 @@ function deletedSavedMutationForSection(section, existingRecord = null) {
   const existing = existingRecord || savedItemForSection(section) || {};
   return {
     savedItem: {
-      id: existing.id || `web-saved-${safeAnnotationIDPart(syncCodeVersion(section.codeVersion))}-${section.sectionID}`,
+      id: existing.id || savedRecordForSection(section, account?.userID || existing.userID || "local-web", now).id,
       userID: account?.userID || existing.userID || "local-web",
       codeVersion: syncCodeVersion(existing.codeVersion || section.codeVersion),
       sectionID: Number(section.sectionID),
+      blockID: normalizeAnnotationBlockID(existing.blockID || section.blockID) || null,
       sectionNumber: section.sectionNumber || existing.sectionNumber || "",
       title: section.title || existing.title || "Section",
       updatedAt: now,
@@ -9979,15 +9985,16 @@ function savedSectionRecord(section, codeVersion = "") {
   return savedItems.find((item) => savedEvidenceKey(item) === sectionKey) || null;
 }
 
-function setLocalSectionSaved(sectionID, saved, codeVersion = defaultSyncCodeVersion) {
-  const sectionKey = String(sectionID || "");
+function setLocalSectionSaved(section, saved, codeVersion = defaultSyncCodeVersion) {
+  const record = section && typeof section === "object" ? section : { sectionID: section, codeVersion };
+  const sectionKey = String(record.sectionID || "");
   if (!sectionKey) return;
   const current = new Set((state.localSavedSectionIDs || []).map(String));
-  const exactKey = savedEvidenceKey({ sectionID: sectionKey, codeVersion });
+  const exactKey = savedEvidenceKey(record, codeVersion);
   if (saved) current.add(exactKey);
   else {
     current.delete(exactKey);
-    current.delete(sectionKey);
+    if (!normalizeAnnotationBlockID(record.blockID)) current.delete(sectionKey);
   }
   state.localSavedSectionIDs = Array.from(current);
   saveWorkspaceState();
@@ -10011,7 +10018,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     await removeSectionFromAllProjects(sectionPayload);
   }
   if (syncCodeVersion(sectionPayload.codeVersion) === defaultSyncCodeVersion) {
-    setLocalSectionSaved(sectionPayload.sectionID, saved, sectionPayload.codeVersion);
+    setLocalSectionSaved(sectionPayload, saved, sectionPayload.codeVersion);
   }
   const sectionKey = savedEvidenceKey(sectionPayload);
   const record = saved
@@ -10112,7 +10119,7 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
       savedRecord
     ];
     if (!wasSaved && syncCodeVersion(sectionPayload.codeVersion) === defaultSyncCodeVersion) {
-      setLocalSectionSaved(sectionPayload.sectionID, true, sectionPayload.codeVersion);
+      setLocalSectionSaved(sectionPayload, true, sectionPayload.codeVersion);
     }
     mutations.push(savedMutationForSection(sectionPayload));
   }
@@ -10530,14 +10537,10 @@ function renderAnnotationTagEditor(container, target, options = {}) {
 function projectLinkForAnnotationTarget(project, target) {
   const sectionID = String(target.sectionID || "");
   const targetBlockID = normalizeAnnotationBlockID(target.blockID);
-  const savedRecord = savedSectionRecord(target);
-  if (
-    (!savedRecord && targetBlockID) ||
-    (savedRecord && normalizeAnnotationBlockID(savedRecord.blockID) !== targetBlockID)
-  ) return null;
   return currentContentSummary().projectSections.find((item) =>
     String(item.sectionID || item.savedSectionID || item.itemID || "") === sectionID &&
     syncCodeVersion(item.codeVersion) === syncCodeVersion(target.codeVersion) &&
+    normalizeAnnotationBlockID(item.blockID || item.anchorID || item.contentBlockID) === targetBlockID &&
     projectSectionBelongsToProject(item, project)
   );
 }
@@ -12101,14 +12104,17 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
   const sectionKey = sectionNoteKey(sectionID);
   if (!sectionKey) return;
   const exactCodeVersion = syncCodeVersion(codeVersion);
-  const savedRecord = saved ? savedSectionRecord({ sectionID, codeVersion: exactCodeVersion }) : null;
   const wrappers = Array.from(track.querySelectorAll(`.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"]`))
     .filter((wrapper) => wrapper.dataset.commentCodeVersion === exactCodeVersion);
-  const savedBlockID = normalizeAnnotationBlockID(savedRecord?.blockID) ||
-    (savedRecord ? normalizeAnnotationBlockID(wrappers[0]?.dataset.commentBlockId) : "");
   wrappers.forEach((wrapper) => {
+    const wrapperBlockID = normalizeAnnotationBlockID(wrapper.dataset.commentBlockId);
+    const savedRecord = savedSectionRecord({
+      sectionID,
+      codeVersion: exactCodeVersion,
+      blockID: wrapperBlockID
+    });
     const button = wrapper.querySelector(".inline-bookmark-toggle");
-    const showBookmark = Boolean(savedRecord && savedBlockID && wrapper.dataset.commentBlockId === savedBlockID);
+    const showBookmark = Boolean(savedRecord && wrapperBlockID);
     wrapper.classList.toggle("has-saved-section", showBookmark);
     if (!button) return;
     button.classList.toggle("is-saved", showBookmark);
@@ -12121,7 +12127,11 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
     if (section.dataset.codeVersion !== exactCodeVersion) return;
     const marker = section.querySelector(".reader-section-saved-marker");
     if (!marker) return;
-    const showSectionMarker = Boolean(savedRecord && !savedBlockID);
+    const showSectionMarker = Boolean(savedSectionRecord({
+      sectionID,
+      codeVersion: exactCodeVersion,
+      blockID: ""
+    }));
     marker.hidden = !showSectionMarker;
     marker.setAttribute("aria-hidden", showSectionMarker ? "false" : "true");
   });
@@ -26671,7 +26681,8 @@ function mergeEquivalentSavedColumnRows(items = []) {
     .trim();
   const targetKey = (item) => [
     syncCodeVersion(item?.codeVersion),
-    String(item?.sectionID || "")
+    String(item?.sectionID || ""),
+    normalizeAnnotationBlockID(item?.blockID || item?.anchorID || item?.contentBlockID)
   ].join(":");
   const bookmarksByTarget = new Map(
     items

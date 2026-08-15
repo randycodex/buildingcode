@@ -16818,7 +16818,13 @@ function canonicalMutationRecordID(kind, record) {
   const codeVersion = canonicalCodeVersion(record.codeVersion);
   const sectionID = record.sectionID;
   if (kind === "savedItem") {
-    return [userID, "saved", codeVersion, sectionID].join(":");
+    return [
+      userID,
+      "saved",
+      codeVersion,
+      sectionID,
+      normalizedBlockID(record.blockID) || null
+    ].filter(Boolean).join(":");
   }
   if (kind === "annotation") {
     return [
@@ -16922,7 +16928,7 @@ async function canonicalizeSectionRecord(kind, record) {
       ? record.webSectionID || record.sectionID
       : record.webSectionID
   };
-  if (kind === "annotation" || kind === "projectSection") {
+  if (kind === "savedItem" || kind === "annotation" || kind === "projectSection") {
     normalized.blockID = await canonicalBlockIDFor(normalized.sectionID, normalized.blockID);
   }
   const nextID = canonicalMutationRecordID(kind, normalized);

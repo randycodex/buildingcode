@@ -102,7 +102,9 @@ export function syncMutationRecordID(mutation) {
   const sectionID = nonEmpty(record.sectionID);
 
   if (kind === "savedItem") {
-    return sectionID ? [userID, "saved", codeVersion, sectionID].join(":") : null;
+    return sectionID
+      ? [userID, "saved", codeVersion, sectionID, nonEmpty(record.blockID)].filter(Boolean).join(":")
+      : null;
   }
   if (kind === "annotation") {
     if (!sectionID) return null;

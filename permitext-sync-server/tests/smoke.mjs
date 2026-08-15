@@ -2355,16 +2355,17 @@ async function main() {
         workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
         workspaceScript.text.includes('function savedSectionRecord(section, codeVersion = "")') &&
         workspaceScript.text.includes('blockID: normalizeAnnotationBlockID(section.blockID)') &&
+        workspaceScript.text.includes('return `${version}:${sectionID}:${blockID}`') &&
+        workspaceScript.text.includes('const blockID = normalizeAnnotationBlockID(sectionPayload.blockID)') &&
         workspaceScript.text.includes('const savedTargetChanged = wasSaved') &&
-        workspaceScript.text.includes('const savedRecord = savedSectionRecord(target)') &&
-        workspaceScript.text.includes('normalizeAnnotationBlockID(savedRecord.blockID) !== targetBlockID') &&
+        workspaceScript.text.includes('normalizeAnnotationBlockID(item.blockID || item.anchorID || item.contentBlockID) === targetBlockID') &&
         !workspaceScript.text.includes('if (saved && blockID && normalizeAnnotationBlockID(savedRecord?.blockID) !== blockID)') &&
         !workspaceScript.text.includes('className = "saved-section-status"') &&
         workspaceScript.text.includes('const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false })') &&
         !workspaceScript.text.includes('if (!isSectionSaved(sectionPayload)) {\n              const saved = await persistSectionBookmark') &&
         workspaceScript.text.includes('(savedRecord ? normalizeAnnotationBlockID(blocks[0]?.id') &&
-        workspaceScript.text.includes('(savedRecord ? normalizeAnnotationBlockID(wrappers[0]?.dataset.commentBlockId)') &&
-        workspaceScript.text.includes('showBookmark: Boolean(savedRecord && savedBlockID === target.blockID)') &&
+        workspaceScript.text.includes('const wrapperBlockID = normalizeAnnotationBlockID(wrapper.dataset.commentBlockId)') &&
+        workspaceScript.text.includes('const showBookmark = Boolean(savedRecord && wrapperBlockID)') &&
         workspaceScript.text.includes('sectionWrapper.dataset.codeVersion = syncCodeVersion') &&
         workspaceScript.text.includes('wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion)') &&
         workspaceScript.text.includes('wrapper.classList.toggle("has-saved-section", showBookmark)') &&

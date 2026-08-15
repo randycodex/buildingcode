@@ -76,12 +76,17 @@ assert.equal(folderType({ folderType: "invalid" }), "project");
 const savedEvidenceKey = new Function(
   "syncCodeVersion",
   "defaultSyncCodeVersion",
-  `${functionSource(appSource, "savedEvidenceKey")}; return savedEvidenceKey;`
+  `${functionSource(appSource, "normalizeAnnotationBlockID")};\n${functionSource(appSource, "savedEvidenceKey")}; return savedEvidenceKey;`
 )((value) => value || "default-library", "default-library");
 assert.notEqual(
   savedEvidenceKey({ codeVersion: "library-a", sectionID: 101 }),
   savedEvidenceKey({ codeVersion: "library-b", sectionID: 101 }),
   "The same numeric section in two libraries must remain two canonical saved records."
+);
+assert.notEqual(
+  savedEvidenceKey({ codeVersion: "library-a", sectionID: 101, blockID: "paragraph-1" }),
+  savedEvidenceKey({ codeVersion: "library-a", sectionID: 101, blockID: "paragraph-2" }),
+  "Two selected paragraphs in the same section must remain independent saved records."
 );
 
 const normalizeAnnotationTags = new Function(
@@ -453,7 +458,9 @@ assert.deepEqual(
 );
 assert.doesNotMatch(appSource, /bookmarkIcon\.setAttribute\("aria-label", "Bookmarked"\)/);
 assert.doesNotMatch(appSource, /className = "saved-section-status"/);
-assert.match(appSource, /function projectLinkForAnnotationTarget[\s\S]*?const savedRecord = savedSectionRecord\(target\)[\s\S]*?normalizeAnnotationBlockID\(savedRecord\.blockID\) !== targetBlockID/);
+assert.match(appSource, /function projectLinkForAnnotationTarget[\s\S]*?normalizeAnnotationBlockID\(item\.blockID \|\| item\.anchorID \|\| item\.contentBlockID\) === targetBlockID/);
+assert.match(appSource, /function projectSectionRecordForSection[\s\S]*?const blockID = normalizeAnnotationBlockID\(sectionPayload\.blockID\)/);
+assert.match(appSource, /function savedEvidenceKey[\s\S]*?return `\$\{version\}:\$\{sectionID\}:\$\{blockID\}`/);
 assert.doesNotMatch(appSource, /if \(saved && blockID && normalizeAnnotationBlockID\(savedRecord\?\.blockID\) !== blockID\)/);
 assert.match(appSource, /item\.savedColumnKind === "bookmark" &&[\s\S]*?!normalizeAnnotationBlockID\(item\.blockID\)[\s\S]*?projectSavedScope: "section"/);
 assert.match(appSource, /if \(searchActive\) return;[\s\S]*?savedInstance\.collapsedCodePrefixes/);

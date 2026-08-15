@@ -57,6 +57,18 @@ assert.equal(
 assert.equal(
   syncMutationRecordID({
     savedItem: {
+      id: "web-saved-101-paragraph-2",
+      userID,
+      codeVersion: "nyc-2022",
+      sectionID: 101,
+      blockID: "paragraph-2"
+    }
+  }),
+  `${userID}:saved:${defaultSyncCodeVersion}:101:paragraph-2`
+);
+assert.equal(
+  syncMutationRecordID({
+    savedItem: {
       id: "web-saved-zr-20018521",
       userID,
       codeVersion: "nyc-zoning-resolution",
