@@ -7084,6 +7084,22 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   background: var(--research-conversation-background);
 }
 
+.research-conversation-panel > .panel-header,
+.research-conversation-panel > .panel-header .panel-actions,
+.research-conversation-panel > .panel-header > div:first-child {
+  align-items: center;
+}
+
+.research-conversation-panel > .panel-header > div:first-child {
+  display: flex;
+  min-height: 28px;
+}
+
+.research-conversation-panel > .panel-header .panel-kind {
+  margin-bottom: 0;
+  line-height: 1;
+}
+
 .analysis-panel.project-derived-panel,
 .research-conversation-panel.project-derived-panel {
   --research-conversation-background: color-mix(in srgb, var(--project-color) 8%, var(--surface-raised));
