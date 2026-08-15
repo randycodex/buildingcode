@@ -1526,7 +1526,8 @@ async function main() {
         workspaceStyles.text.includes('[data-text-size="24px"] { --notebook-text-size: 24px; font-size: 24px !important; }') &&
         workspaceStyles.text.includes("line-height: max(var(--notebook-line-spacing, 0px), calc(var(--notebook-text-size) * 1.2)) !important;") &&
         workspaceStyles.text.includes(".notebook-editor-surface [data-text-size] * {\n  font-size: inherit !important;") &&
-        workspaceStyles.text.includes("border: 0;\n  border-radius: 0;") &&
+        workspaceStyles.text.includes("border: 0;\n  border-radius: 22px;") &&
+        workspaceStyles.text.includes(".notebook-editor-surface .bn-container {\n  min-height: 100%;\n  border-radius: inherit;") &&
         workspaceStyles.text.includes(".notebook-editor-surface,\n  .notebook-editor-surface .bn-container,\n  .notebook-editor-surface .bn-editor {\n    background: var(--menu-surface);\n    color: var(--text-primary);") &&
         workspaceStyles.text.includes("border-color: #fff !important;") &&
         workspaceStyles.text.includes(".notebook-editor-surface:not(.project-note-editor-surface) .bn-editor {\n  padding-inline-start: calc(var(--space-4) + 32px);") &&

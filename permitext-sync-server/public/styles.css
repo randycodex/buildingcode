@@ -13458,7 +13458,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   min-height: 0;
   overflow-y: auto;
   border: 0;
-  border-radius: 0;
+  border-radius: 22px;
   background: var(--menu-surface);
   box-shadow: none;
 }
@@ -13469,6 +13469,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .notebook-editor-surface .bn-container {
   min-height: 100%;
+  border-radius: inherit;
   background: var(--menu-surface);
   color: var(--text-primary);
   font-size: 15px;
@@ -13478,6 +13479,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-editor-surface .bn-editor {
   min-height: 100%;
   padding: var(--space-4);
+  border-radius: inherit;
   background: var(--menu-surface);
   color: var(--text-primary);
   font-family: inherit;
