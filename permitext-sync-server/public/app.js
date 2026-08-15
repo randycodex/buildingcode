@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-notebook-size-order-v243";
+} from "./offline-storage.js?v=20260815-selection-anchor-v244";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -496,6 +496,8 @@ const dismissedLinkedResearchDecisionKeys = new Set();
 const codeDecisionResearchNoticesByQuestion = new Map();
 let researchSelectionMenuInteracting = false;
 let researchSelectionMenuPinned = false;
+let activeResearchSelectionMenuPositioner = null;
+let researchSelectionMenuPositionFrame = 0;
 let activeWebWarningClose = null;
 const webWarningPositionCleanups = new WeakMap();
 let activeWorkspaceIssueAction = null;
@@ -11129,7 +11131,8 @@ function selectReaderSectionForResearch(sectionWrapper) {
     ...passage,
     passages: [passage],
     projectID: sectionWrapper.closest(".workspace-panel")?.dataset.projectId || "",
-    rect
+    rect,
+    anchorElement: sectionWrapper.querySelector(".reader-section-title") || sectionWrapper
   }, { pinned: true });
 }
 
@@ -18557,6 +18560,9 @@ function closeResearchSelectionMenu() {
   pendingResearchSelection = null;
   researchSelectionMenuInteracting = false;
   researchSelectionMenuPinned = false;
+  activeResearchSelectionMenuPositioner = null;
+  window.cancelAnimationFrame(researchSelectionMenuPositionFrame);
+  researchSelectionMenuPositionFrame = 0;
 }
 
 function researchSelectionTextFromRange(selection, range) {
@@ -18655,7 +18661,8 @@ function researchSelectionFromWindow() {
     ...passages[0],
     passages,
     projectID: panel.dataset.projectId || "",
-    rect
+    rect,
+    anchorRange: range.cloneRange()
   };
 }
 
@@ -18923,12 +18930,13 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
       if (!projectID) {
         noteChooser.hidden = true;
         noteChooser.replaceChildren();
+        noteChooser.removeAttribute("aria-busy");
         selectedNotebookCardID = "";
         selectedNotebookCardTitle = "";
         requestAnimationFrame(positionMenu);
         return;
       }
-      status.textContent = "Loading Project Notes…";
+      noteChooser.setAttribute("aria-busy", "true");
       try {
         const payload = await postResearch("/notebook/cards/list", { projectID });
         if (String(pendingResearchSelection?.projectID || "") !== projectID) return;
@@ -18985,10 +18993,12 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
           });
         }
         noteChooser.hidden = false;
+        noteChooser.removeAttribute("aria-busy");
         status.textContent = cards.length && !selectedNotebookCardID ? "Choose the Note to link." : "";
         researchSelectionMenuInteracting = true;
         requestAnimationFrame(positionMenu);
       } catch (error) {
+        noteChooser.removeAttribute("aria-busy");
         status.textContent = error.message;
       }
     };
@@ -19040,19 +19050,42 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   if (initialProjectID && activeAccount()) {
     void refreshNoteChooser(initialProjectID, initialNotebookCardID);
   }
+  let positioningInitialized = false;
+  let anchorOffsetLeft = 0;
+  let anchorOffsetTop = 0;
+  const liveAnchorRect = () => {
+    if (captured.anchorElement?.isConnected) {
+      return captured.anchorElement.getBoundingClientRect();
+    }
+    try {
+      const rect = captured.anchorRange?.getBoundingClientRect?.();
+      if (rect && (rect.width || rect.height)) return rect;
+    } catch {
+      // The selected node left the document; retain the last usable rectangle.
+    }
+    return captured.rect;
+  };
   positionMenu = () => {
+    if (!menu.isConnected) return;
+    const anchorRect = liveAnchorRect();
     const menuRect = menu.getBoundingClientRect();
+    if (!positioningInitialized) {
+      const initialLeft = anchorRect.left + anchorRect.width / 2 - menuRect.width / 2;
+      const preferredTop = anchorRect.top - menuRect.height - 10;
+      const initialTop = preferredTop >= 12 ? preferredTop : anchorRect.bottom + 10;
+      anchorOffsetLeft = initialLeft - anchorRect.left;
+      anchorOffsetTop = initialTop - anchorRect.top;
+      positioningInitialized = true;
+    }
     const left = Math.min(
       window.innerWidth - menuRect.width - 12,
-      Math.max(12, captured.rect.left + captured.rect.width / 2 - menuRect.width / 2)
+      Math.max(12, anchorRect.left + anchorOffsetLeft)
     );
-    const preferredTop = captured.rect.top - menuRect.height - 10;
-    const top = preferredTop >= 12
-      ? preferredTop
-      : Math.min(window.innerHeight - menuRect.height - 12, captured.rect.bottom + 10);
+    const top = Math.max(12, anchorRect.top + anchorOffsetTop);
     menu.style.left = `${left}px`;
-    menu.style.top = `${Math.max(12, top)}px`;
+    menu.style.top = `${top}px`;
   };
+  activeResearchSelectionMenuPositioner = positionMenu;
   positionMenu();
 }
 
@@ -19076,8 +19109,15 @@ function bindResearchTextSelection() {
       closeResearchSelectionMenu();
     }
   });
-  window.addEventListener("scroll", closeResearchSelectionMenu, true);
-  window.addEventListener("resize", closeResearchSelectionMenu);
+  const scheduleSelectionMenuPosition = () => {
+    if (!activeResearchSelectionMenuPositioner || researchSelectionMenuPositionFrame) return;
+    researchSelectionMenuPositionFrame = window.requestAnimationFrame(() => {
+      researchSelectionMenuPositionFrame = 0;
+      activeResearchSelectionMenuPositioner?.();
+    });
+  };
+  window.addEventListener("scroll", scheduleSelectionMenuPosition, true);
+  window.addEventListener("resize", scheduleSelectionMenuPosition);
 }
 
 function createProjectBulkSelectionController(panel, projects, mode) {
