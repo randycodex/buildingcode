@@ -13203,12 +13203,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .notebook-card-list-resize-handle::after {
   position: absolute;
-  right: var(--space-3);
-  bottom: 0;
-  left: var(--space-3);
-  height: 1px;
-  background: var(--border);
+  bottom: 3px;
+  left: 50%;
+  width: 36px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--text-secondary);
   content: "";
+  opacity: 0.7;
+  transform: translateX(-50%);
 }
 
 .notebook-card-list-empty {
@@ -14240,6 +14243,35 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-introduction-section textarea {
   background: var(--menu-surface);
+  resize: none;
+}
+
+.report-introduction-resize-handle {
+  position: relative;
+  z-index: 1;
+  height: 14px;
+  margin-top: -14px;
+  cursor: row-resize;
+  touch-action: none;
+}
+
+.report-introduction-resize-handle::after {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 36px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--text-secondary);
+  content: "";
+  opacity: 0.7;
+  transform: translateX(-50%);
+}
+
+.report-introduction-resize-handle:focus-visible,
+.notebook-card-list-resize-handle:focus-visible {
+  outline: 2px solid var(--project-color, var(--text-primary));
+  outline-offset: -2px;
 }
 
 .report-introduction-label {

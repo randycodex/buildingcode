@@ -1559,6 +1559,7 @@ async function main() {
         workspaceStyles.text.includes("background-color: var(--menu-surface);\n  background-image: none;") &&
         workspaceStyles.text.includes(".notebook-card-menu.is-open .notebook-card-list {\n  height: min(var(--notebook-card-list-height, 156px), 70vh);\n  max-height: min(var(--notebook-card-list-height, 156px), 70vh);") &&
         workspaceScript.text.includes('cardListResizeHandle.className = "notebook-card-list-resize-handle"') &&
+        workspaceStyles.text.includes(".notebook-card-list-resize-handle::after") &&
         workspaceScript.text.includes("const minimumCardListHeight = 156") &&
         workspaceScript.text.includes("Math.max(minimumCardListHeight, last.bottom - first.top)") &&
         workspaceScript.text.includes("requestAnimationFrame(sizeCardListForThreeRows)") &&
@@ -1567,6 +1568,9 @@ async function main() {
         workspaceStyles.text.includes("max-height: min(var(--code-filter-menu-height, 240px), 52vh, 360px);") &&
         workspaceStyles.text.includes("overflow-y: auto;\n  overscroll-behavior-y: contain;\n  scrollbar-gutter: stable;") &&
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
+        workspaceScript.text.includes('introductionResizeHandle.className = "report-introduction-resize-handle"') &&
+        workspaceScript.text.includes("introductionResizeHandle.setPointerCapture(event.pointerId)") &&
+        workspaceStyles.text.includes(".report-introduction-resize-handle::after") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
         !workspaceScript.text.includes('list.addEventListener("animationend", finishSwitch, { once: true })') &&

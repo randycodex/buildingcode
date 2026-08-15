@@ -21137,9 +21137,42 @@ async function renderProjectReportDraft(project) {
       activeDraft.introduction = introduction.value;
       setDirty();
     });
+    const introductionResizeHandle = document.createElement("div");
+    introductionResizeHandle.className = "report-introduction-resize-handle";
+    introductionResizeHandle.setAttribute("role", "separator");
+    introductionResizeHandle.setAttribute("aria-label", "Resize Report introduction");
+    introductionResizeHandle.setAttribute("aria-orientation", "horizontal");
+    introductionResizeHandle.tabIndex = 0;
+    const resizeIntroductionTo = (height) => {
+      const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
+      introduction.style.height = `${Math.max(82, Math.min(maximumHeight, height))}px`;
+    };
+    introductionResizeHandle.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      const startY = event.clientY;
+      const startHeight = introduction.getBoundingClientRect().height;
+      introductionResizeHandle.setPointerCapture(event.pointerId);
+      const resize = (moveEvent) => resizeIntroductionTo(startHeight + moveEvent.clientY - startY);
+      const finish = () => {
+        window.removeEventListener("pointermove", resize);
+        window.removeEventListener("pointerup", finish);
+        window.removeEventListener("pointercancel", finish);
+      };
+      window.addEventListener("pointermove", resize);
+      window.addEventListener("pointerup", finish);
+      window.addEventListener("pointercancel", finish);
+    });
+    introductionResizeHandle.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+      event.preventDefault();
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      resizeIntroductionTo(
+        introduction.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16)
+      );
+    });
     introductionHeading.append(introductionLabel);
     if (introductionInfo) introductionHeading.append(introductionInfo);
-    introductionSection.append(introductionHeading, introduction);
+    introductionSection.append(introductionHeading, introduction, introductionResizeHandle);
     metadata.append(introductionSection);
 
     const addControls = document.createElement("div");
