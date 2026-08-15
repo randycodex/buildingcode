@@ -70,11 +70,9 @@ assert.equal(
   "List projection still embeds full passage text."
 );
 
-assert.match(clientSource, /if \(originSurface === "reader"\) return "Started from Reader";/, "Reader-started Research does not identify its origin inside the conversation.");
-assert.match(clientSource, /\? "Started from selected code"/, "Legacy selected-code conversations overstate an unrecorded Reader origin.");
 assert.match(clientSource, /originSurface: "reader"/, "Reader selections do not persist their conversation origin.");
 assert.match(clientSource, /originSurface: "evidenceDiscovery"/, "Evidence Discovery selections are not distinguished from Reader origins.");
-assert.match(clientSource, /sources\.length === 1 \? "passage" : "passages"/, "Reader origins do not summarize multiple selected passages.");
+assert.doesNotMatch(clientSource, /Started from Reader|Started from selected code/, "Reader-origin evidence still renders a redundant origin message.");
 assert.match(clientSource, /reference\.textContent = \[prefix, sectionDisplayTitle\(sectionNumber, source\.title, "Selected code passage"\)\]/, "Reader-origin links omit the complete section subtitle.");
 assert.match(clientSource, /reference\.addEventListener\("click", \(\) => \{[\s\S]*?openResearchSourceInSectionDetail\([\s\S]*?conversation\.primaryProjectID \|\| ""/, "Reader-origin subtitles should open the Project-aware source column without creating Search.");
 assert.match(clientSource, /passageHeader\.append\(reference\);/, "Reader-origin passages still expose a separate source action.");

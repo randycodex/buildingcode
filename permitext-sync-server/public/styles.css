@@ -7260,7 +7260,6 @@ body.is-resizing-research-evidence * {
   background: transparent;
 }
 
-.research-reader-origin > header,
 .research-reader-origin-list article > div {
   display: flex;
   align-items: center;

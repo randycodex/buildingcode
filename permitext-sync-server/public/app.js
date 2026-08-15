@@ -17572,15 +17572,13 @@ function researchDisplaySources(sources = []) {
   return displayed;
 }
 
-function researchConversationSelectionOriginLabel(conversation) {
+function researchConversationHasSelectionOrigin(conversation) {
   const originKind = String(conversation?.origin?.kind || "");
   const originSurface = String(conversation?.origin?.surface || "");
-  if (originSurface === "reader") return "Started from Reader";
-  if (originSurface) return "";
+  if (originSurface === "reader") return true;
+  if (originSurface) return false;
   // Older selection-origin records did not preserve which surface created them.
-  return originKind === "selectedPassage" || originKind === "selectedPassages"
-    ? "Started from selected code"
-    : "";
+  return originKind === "selectedPassage" || originKind === "selectedPassages";
 }
 
 function researchOriginExcerpt(source, limit = 280) {
@@ -17591,15 +17589,10 @@ function researchOriginExcerpt(source, limit = 280) {
 }
 
 function renderReaderResearchOrigin(conversation, sources, anchorPaneID) {
-  const originLabel = researchConversationSelectionOriginLabel(conversation);
-  if (!originLabel || !sources.length) return null;
+  if (!researchConversationHasSelectionOrigin(conversation) || !sources.length) return null;
   const origin = document.createElement("section");
   origin.className = "research-reader-origin";
   origin.setAttribute("aria-label", "Research started from Reader evidence");
-  const header = document.createElement("header");
-  const title = document.createElement("strong");
-  title.textContent = `${originLabel} · ${sources.length} ${sources.length === 1 ? "passage" : "passages"}`;
-  header.append(title);
   const list = document.createElement("section");
   list.className = "research-reader-origin-list";
   sources.forEach((source) => {
@@ -17628,7 +17621,7 @@ function renderReaderResearchOrigin(conversation, sources, anchorPaneID) {
     passage.append(passageHeader, excerpt);
     list.append(passage);
   });
-  origin.append(header, list);
+  origin.append(list);
   return origin;
 }
 
