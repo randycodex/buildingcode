@@ -7811,7 +7811,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   padding-inline: var(--space-3);
   border: 0;
   border-radius: var(--radius-pill);
-  background: #000;
+  background: rgb(246 244 241 / 10%);
   color: #fff;
   box-shadow: none;
 }

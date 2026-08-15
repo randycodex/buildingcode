@@ -90,7 +90,7 @@ assert(!clientSource.includes('className = "research-progress-details"'), "Resea
 assert(!clientSource.includes('className = "research-progress-tasks"'), "Research progress task rows are still rendered.");
 assert.match(styleSource, /\.research-progress-card\s*\{[\s\S]*?padding: 0;[\s\S]*?border: 0;[\s\S]*?background: transparent;/);
 assert.match(clientSource, /retry\.className = "ghost-button research-progress-retry"/);
-assert.match(styleSource, /\.research-progress-actions \.research-progress-retry \{[\s\S]*?min-height: 42px;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?background: #000;[\s\S]*?color: #fff;/);
+assert.match(styleSource, /\.research-progress-actions \.research-progress-retry \{[\s\S]*?min-height: 42px;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?background: rgb\(246 244 241 \/ 10%\);[\s\S]*?color: #fff;/);
 assert.match(styleSource, /workspace-panel:not\(\.reader-panel\) \.research-progress-loading-label\s*\{[\s\S]*?font-size: 14px !important;[\s\S]*?font-weight: 400;/);
 assert.match(styleSource, /workspace-panel:not\(\.reader-panel\) \.research-progress-elapsed\s*\{[\s\S]*?font-size: 14px !important;[\s\S]*?font-weight: 400;/);
 assert(styleSource.includes("grid-template-columns: repeat(3, 2px)"));
