@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-notebook-report-update-v237";
+} from "./offline-storage.js?v=20260815-settings-left-of-projects-v238";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -3445,6 +3445,7 @@ function isProjectToolPaneID(paneID) {
 }
 
 function pinCriticalWorkflowPanesToLeft(paneIDs) {
+  const settingsPaneID = state.utilities.settings ? "utility:settings" : "";
   const projectsPaneIDs = new Set(savedPaneIDs());
   const researchPaneIDs = new Set(
     [
@@ -3453,9 +3454,14 @@ function pinCriticalWorkflowPanesToLeft(paneIDs) {
     ].filter(Boolean)
   );
   return [
+    ...paneIDs.filter((paneID) => paneID === settingsPaneID),
     ...paneIDs.filter((paneID) => projectsPaneIDs.has(paneID)),
     ...paneIDs.filter((paneID) => researchPaneIDs.has(paneID)),
-    ...paneIDs.filter((paneID) => !projectsPaneIDs.has(paneID) && !researchPaneIDs.has(paneID))
+    ...paneIDs.filter((paneID) =>
+      paneID !== settingsPaneID &&
+      !projectsPaneIDs.has(paneID) &&
+      !researchPaneIDs.has(paneID)
+    )
   ];
 }
 

@@ -258,6 +258,36 @@ assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHos
 const pinnedWorkflowSource = functionSource(appSource, "pinCriticalWorkflowPanesToLeft");
 assert.match(pinnedWorkflowSource, /new Set\(savedPaneIDs\(\)\)/);
 assert.match(pinnedWorkflowSource, /state\.utilities\.analysis \? "utility:analysis" : ""[\s\S]*?\.\.\.openResearchConversationPaneIDs\(\)/);
+assert.match(pinnedWorkflowSource, /settingsPaneID = state\.utilities\.settings \? "utility:settings" : ""/);
+assert.match(pinnedWorkflowSource, /return \[[\s\S]*?paneID === settingsPaneID[\s\S]*?projectsPaneIDs\.has\(paneID\)[\s\S]*?researchPaneIDs\.has\(paneID\)/, "Settings must be the only pane pinned to the left of Projects.");
+assert.match(pinnedWorkflowSource, /paneID !== settingsPaneID[\s\S]*?!projectsPaneIDs\.has\(paneID\)[\s\S]*?!researchPaneIDs\.has\(paneID\)/, "Settings must not be duplicated in the ordinary pane sequence.");
+const pinCriticalWorkflowPanesToLeft = new Function(
+  "state",
+  "savedPaneIDs",
+  "openResearchConversationPaneIDs",
+  `${pinnedWorkflowSource}; return pinCriticalWorkflowPanesToLeft;`
+)(
+  { utilities: { settings: true, analysis: true } },
+  () => ["utility:saved:projects"],
+  () => ["research:conversation:one"]
+);
+assert.deepEqual(
+  pinCriticalWorkflowPanesToLeft([
+    "reader:one",
+    "utility:analysis",
+    "utility:saved:projects",
+    "utility:settings",
+    "utility:search:one"
+  ]),
+  [
+    "utility:settings",
+    "utility:saved:projects",
+    "utility:analysis",
+    "reader:one",
+    "utility:search:one"
+  ],
+  "Settings must remain left of Projects while every ordinary pane remains to the right."
+);
 assert.match(functionSource(appSource, "activePaneIDs"), /pinCriticalWorkflowPanesToLeft\(paired\)/);
 assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
