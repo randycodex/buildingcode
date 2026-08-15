@@ -1457,6 +1457,7 @@ async function main() {
         !workspaceStyles.text.includes("saved-project-mode-enter") &&
         workspaceStyles.text.includes("@container (min-width: 580px) {\n  .saved-project-list {\n    grid-template-columns: repeat(3, minmax(0, 1fr));") &&
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"]:hover') &&
+        workspaceStyles.text.includes(".saved-projects-menu-toggle {\n  flex: 1 1 auto;\n  border-radius: var(--radius-control);") &&
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden],") &&
@@ -1526,7 +1527,7 @@ async function main() {
         workspaceStyles.text.includes('[data-text-size="24px"] { --notebook-text-size: 24px; font-size: 24px !important; }') &&
         workspaceStyles.text.includes("line-height: max(var(--notebook-line-spacing, 0px), calc(var(--notebook-text-size) * 1.2)) !important;") &&
         workspaceStyles.text.includes(".notebook-editor-surface [data-text-size] * {\n  font-size: inherit !important;") &&
-        workspaceStyles.text.includes("border: 0;\n  border-radius: 22px;") &&
+        workspaceStyles.text.includes("border: 0;\n  border-radius: var(--radius-control);") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-container {\n  min-height: 100%;\n  border-radius: inherit;") &&
         workspaceStyles.text.includes(".notebook-editor-surface,\n  .notebook-editor-surface .bn-container,\n  .notebook-editor-surface .bn-editor {\n    background: var(--menu-surface);\n    color: var(--text-primary);") &&
         workspaceStyles.text.includes("border-color: #fff !important;") &&
@@ -1557,6 +1558,7 @@ async function main() {
         workspaceStyles.text.includes(".notebook-card-rail.is-open {\n  padding-bottom: 0;") &&
         workspaceStyles.text.includes(".notebook-card-menu-toggle {\n  width: 100%;\n  min-height: 40px;\n  background: var(--menu-surface);") &&
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-flow: row;") &&
+        workspaceStyles.text.includes("padding-inline: var(--space-3);\n  border-radius: var(--radius-control);\n  background-color: var(--menu-surface);") &&
         workspaceStyles.text.includes("background-color: var(--menu-surface);\n  background-image: none;") &&
         workspaceStyles.text.includes(".notebook-card-menu.is-open .notebook-card-list {\n  height: min(var(--notebook-card-list-height, 156px), 70vh);\n  max-height: min(var(--notebook-card-list-height, 156px), 70vh);") &&
         workspaceScript.text.includes('cardListResizeHandle.className = "notebook-card-list-resize-handle"') &&
@@ -1572,6 +1574,7 @@ async function main() {
         workspaceScript.text.includes('introductionResizeHandle.className = "report-introduction-resize-handle"') &&
         workspaceScript.text.includes("introductionResizeHandle.setPointerCapture(event.pointerId)") &&
         workspaceStyles.text.includes(".report-introduction-resize-handle::after") &&
+        workspaceStyles.text.includes("background: color-mix(in srgb, var(--project-color) 9%, var(--surface-muted));\n  font-size: 12px;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
         !workspaceScript.text.includes('list.addEventListener("animationend", finishSwitch, { once: true })') &&
