@@ -6817,7 +6817,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   color: var(--text-primary);
 }
 
-.research-history-select-button {
+.research-history-select-button,
+.research-history-delete-button {
   width: var(--panel-title-control-size);
   height: var(--panel-title-control-size);
   padding: 0;
@@ -6828,12 +6829,17 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   box-shadow: none;
 }
 
-.research-history-select-button svg {
+.research-history-select-button svg,
+.research-history-delete-button svg {
   width: var(--panel-title-icon-size);
   height: var(--panel-title-icon-size);
 }
 
 .research-history-select-button[aria-pressed="true"] {
+  color: var(--text-primary);
+}
+
+.research-history-delete-button:not(:disabled) {
   color: var(--text-primary);
 }
 

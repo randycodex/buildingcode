@@ -261,7 +261,11 @@ assert.match(
   "Research history selection control has no dedicated header styling."
 );
 assert.match(stylesSource, /\.research-conversation-row\.is-selected \{[\s\S]*?background:/, "Selected Research rows do not visibly change color.");
-assert.match(stylesSource, /\.research-history-select-button \{[\s\S]*?border: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "The Research selection icon does not match Permitext's bare column-header controls.");
+assert.match(stylesSource, /\.research-history-select-button,[\s\S]*?\.research-history-delete-button \{[\s\S]*?border: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "The Research selection and delete icons do not match Permitext's bare column-header controls.");
+assert.match(clientSource, /deleteSelectedButton\.className = "icon-button research-history-delete-button"[\s\S]*?deleteSelectedButton\.innerHTML = trashIconSVG\(\)/, "Research selection mode is missing its dedicated delete icon.");
+assert.match(clientSource, /panelActions\?\.prepend\(cancelSelectionButton, selectAllButton, deleteSelectedButton, selectHistoryButton\)/, "Research selection-mode actions are not ordered Cancel, Clear all, Delete.");
+assert.match(clientSource, /deleteSelectedButton\.hidden = !selectingConversations;[\s\S]*?selectHistoryButton\.hidden = selectingConversations/, "The checkmark remains visible instead of yielding to Delete during selection mode.");
+assert.match(clientSource, /deleteSelectedButton\.addEventListener\("click", async \(\) => \{[\s\S]*?clearResearchConversationHistory\(deleteSelectedButton, selectedConversations\)/, "The dedicated delete icon does not remove the selected conversations.");
 assert.match(appSource, /requestedConversationIDs[\s\S]*?allConversations\.filter\(\(conversation\) => requestedConversationIDs\.has\(conversation\.id\)\)/, "The server does not scope Research history removal to the selected IDs.");
 assert.match(appSource, /conversation\?\.primaryProjectID[\s\S]*historyHiddenAt/, "Project conversations are not preserved when history is cleared.");
 assert.match(appSource, /filter\(\(conversation\) => !conversation\.historyHiddenAt\)/, "Hidden Project conversations still appear in the main history.");

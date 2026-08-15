@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-progress-cancel-v251";
+} from "./offline-storage.js?v=20260815-research-delete-action-v252";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -16786,7 +16786,14 @@ async function renderResearch(paneID = "utility:analysis") {
   selectHistoryButton.setAttribute("aria-pressed", "false");
   selectHistoryButton.innerHTML = selectionModeIconSVG();
   selectHistoryButton.hidden = true;
-  panelActions?.prepend(cancelSelectionButton, selectAllButton, selectHistoryButton);
+  const deleteSelectedButton = document.createElement("button");
+  deleteSelectedButton.className = "icon-button research-history-delete-button";
+  deleteSelectedButton.type = "button";
+  deleteSelectedButton.title = "Delete selected conversations";
+  deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
+  deleteSelectedButton.innerHTML = trashIconSVG();
+  deleteSelectedButton.hidden = true;
+  panelActions?.prepend(cancelSelectionButton, selectAllButton, deleteSelectedButton, selectHistoryButton);
   const content = panel.querySelector(".analysis-content");
 
   const updateConversationSelection = () => {
@@ -16794,17 +16801,19 @@ async function renderResearch(paneID = "utility:analysis") {
     selectHistoryButton.setAttribute("aria-pressed", String(selectingConversations));
     cancelSelectionButton.hidden = !selectingConversations;
     selectAllButton.hidden = !selectingConversations;
+    deleteSelectedButton.hidden = !selectingConversations;
+    selectHistoryButton.hidden = selectingConversations || researchConversationList.length === 0;
     const allSelected = researchConversationList.length > 0 &&
       selectedConversationIDs.size === researchConversationList.length;
     selectAllButton.textContent = allSelected ? "Clear all" : "Select all";
-    selectHistoryButton.title = selectingConversations
-      ? selectedConversationIDs.size
-        ? `Remove ${selectedConversationIDs.size} selected ${selectedConversationIDs.size === 1 ? "conversation" : "conversations"}`
-        : "Select one or more conversations"
-      : "Select Research conversations";
+    selectHistoryButton.title = "Select Research conversations";
     selectHistoryButton.setAttribute("aria-label", selectHistoryButton.title);
-    selectHistoryButton.disabled = clearingSelectedConversations ||
-      (selectingConversations && selectedConversationIDs.size === 0);
+    selectHistoryButton.disabled = clearingSelectedConversations;
+    deleteSelectedButton.title = selectedConversationIDs.size
+      ? `Delete ${selectedConversationIDs.size} selected ${selectedConversationIDs.size === 1 ? "conversation" : "conversations"}`
+      : "Delete selected conversations";
+    deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
+    deleteSelectedButton.disabled = clearingSelectedConversations || selectedConversationIDs.size === 0;
     cancelSelectionButton.disabled = clearingSelectedConversations;
     selectAllButton.disabled = clearingSelectedConversations;
     conversationRows.forEach((row, conversationID) => {
@@ -16826,18 +16835,15 @@ async function renderResearch(paneID = "utility:analysis") {
     else selectedConversationIDs.add(conversationID);
     updateConversationSelection();
   };
-  selectHistoryButton.addEventListener("click", async () => {
-    if (!selectingConversations) {
-      setConversationSelectionActive(true);
-      return;
-    }
+  selectHistoryButton.addEventListener("click", () => setConversationSelectionActive(true));
+  deleteSelectedButton.addEventListener("click", async () => {
     const selectedConversations = researchConversationList.filter((conversation) =>
       selectedConversationIDs.has(conversation.id)
     );
     if (!selectedConversations.length) return;
     clearingSelectedConversations = true;
     updateConversationSelection();
-    const cleared = await clearResearchConversationHistory(selectHistoryButton, selectedConversations);
+    const cleared = await clearResearchConversationHistory(deleteSelectedButton, selectedConversations);
     if (!cleared && panel.isConnected) {
       clearingSelectedConversations = false;
       updateConversationSelection();
