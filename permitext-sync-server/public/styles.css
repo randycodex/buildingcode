@@ -2728,7 +2728,7 @@ select option:checked {
 
 .reader-content,
 .reader-comments,
-.settings-panel,
+.settings-scroll,
 .saved-content,
 .analysis-content,
 .section-detail-content,
@@ -2749,7 +2749,7 @@ select option:checked {
 
 .reader-content::-webkit-scrollbar,
 .reader-comments::-webkit-scrollbar,
-.settings-panel::-webkit-scrollbar,
+.settings-scroll::-webkit-scrollbar,
 .saved-content::-webkit-scrollbar,
 .analysis-content::-webkit-scrollbar,
 .section-detail-content::-webkit-scrollbar,
@@ -2761,7 +2761,7 @@ select option:checked {
 
 .reader-content::-webkit-scrollbar-track,
 .reader-comments::-webkit-scrollbar-track,
-.settings-panel::-webkit-scrollbar-track,
+.settings-scroll::-webkit-scrollbar-track,
 .saved-content::-webkit-scrollbar-track,
 .analysis-content::-webkit-scrollbar-track,
 .section-detail-content::-webkit-scrollbar-track,
@@ -2778,7 +2778,7 @@ select option:checked {
 
 .reader-content::-webkit-scrollbar-thumb,
 .reader-comments::-webkit-scrollbar-thumb,
-.settings-panel::-webkit-scrollbar-thumb,
+.settings-scroll::-webkit-scrollbar-thumb,
 .saved-content::-webkit-scrollbar-thumb,
 .analysis-content::-webkit-scrollbar-thumb,
 .section-detail-content::-webkit-scrollbar-thumb,
@@ -2815,6 +2815,7 @@ select option:checked {
   display: flex;
   flex-direction: column;
   gap: 0;
+  overflow: hidden;
 }
 
 .settings-panel .panel-header {
@@ -2822,11 +2823,11 @@ select option:checked {
   margin-bottom: 0;
 }
 
-.settings-panel > .settings-list {
+.settings-scroll > .settings-list {
   margin-top: var(--space-3);
 }
 
-.settings-panel > .settings-card {
+.settings-scroll > .settings-card {
   margin-top: var(--card-stack-gap);
 }
 
@@ -12319,17 +12320,25 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   --settings-card-surface: color-mix(in srgb, var(--text-primary) 4.5%, var(--surface));
   --settings-inset-surface: color-mix(in srgb, var(--text-primary) 3%, var(--surface));
   --settings-danger: #e2574c;
-  gap: var(--space-2);
-  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  gap: 0;
   overflow-x: hidden;
 }
 
 .settings-panel .panel-header {
-  margin-bottom: 2px;
+  margin-bottom: var(--space-3);
 }
 
-.settings-panel > .settings-list,
-.settings-panel > .settings-card {
+.settings-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+}
+
+.settings-scroll > .settings-list,
+.settings-scroll > .settings-card {
   margin-top: 0;
 }
 

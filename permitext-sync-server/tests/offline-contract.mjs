@@ -195,8 +195,8 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260815-clear-all-projects-v239"));
-assert(shellPrecacheURLs.includes("/web/styles.css?v=20260815-notebook-evidence-links-v235"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260815-settings-fixed-header-v241"));
+assert(shellPrecacheURLs.includes("/web/styles.css?v=20260815-settings-fixed-header-v241"));
 assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260813-research-reader-spacing-v120"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260811-research-columns-v3"));

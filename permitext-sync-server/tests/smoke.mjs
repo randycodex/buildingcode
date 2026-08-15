@@ -418,6 +418,7 @@ async function main() {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
     assert(
+      settingsTemplateSource.includes('class="settings-scroll"') &&
       settingsTemplateSource.includes('class="settings-project-list"') &&
         settingsTemplateSource.includes('class="settings-link-button settings-project-select-all"') &&
         settingsTemplateSource.includes('class="settings-secondary-button settings-project-delete"') &&
@@ -1433,7 +1434,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260815-clear-all-projects-v239'),
+        webRoot.text.includes('/web/app.js?v=20260815-settings-fixed-header-v241'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1594,7 +1595,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-notebook-evidence-links-v235'),
+      webRoot.text.includes('/web/styles.css?v=20260815-settings-fixed-header-v241'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1868,7 +1869,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-notebook-evidence-links-v235'),
+      webRoot.text.includes('/web/styles.css?v=20260815-settings-fixed-header-v241'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
