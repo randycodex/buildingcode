@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-settings-fixed-header-v241";
+} from "./offline-storage.js?v=20260815-research-context-defaults-v242";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15446,6 +15446,24 @@ function preferredResearchProjectID(conversation = activeResearchConversation) {
   ) || "";
 }
 
+function selectedOpenProjectID() {
+  const projects = researchProjects();
+  return openProjectDetails().map((detail) => projectDetailKey(detail)).find((projectID) =>
+    projects.some((project) => researchProjectID(project) === projectID)
+  ) || "";
+}
+
+function activeNotebookSelectionContext(projectID = "") {
+  const expectedProjectID = String(projectID || "").trim();
+  for (const [candidateProjectID, mounted] of notebookMounts.entries()) {
+    if (expectedProjectID && candidateProjectID !== expectedProjectID) continue;
+    if (!mounted.panel?.isConnected) continue;
+    const cardID = String(mounted.activeCardID?.() || "").trim();
+    if (cardID) return { projectID: candidateProjectID, cardID };
+  }
+  return null;
+}
+
 function researchProjectChoices({
   value = "",
   includeUnassigned = true,
@@ -18812,9 +18830,19 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   const noteChooser = document.createElement("div");
   noteChooser.className = "research-selection-note-list research-details-motion-body";
   noteChooser.hidden = true;
+  let selectedNotebookCardID = "";
+  let selectedNotebookCardTitle = "";
+  let refreshNoteChooser = async () => {};
   let positionMenu = () => {};
   const projects = researchProjects();
-  const initialProjectID = String(captured.projectID || "").trim();
+  const openProjectID = selectedOpenProjectID();
+  const openNotebookContext = activeNotebookSelectionContext(openProjectID);
+  const initialProjectID = String(
+    openProjectID || openNotebookContext?.projectID || ""
+  ).trim();
+  const initialNotebookCardID = openNotebookContext?.projectID === initialProjectID
+    ? openNotebookContext.cardID
+    : "";
   if (activeAccount() && projects.length) {
     const projectChoices = researchProjectChoices({
       value: initialProjectID,
@@ -18843,10 +18871,11 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
         item.setAttribute("aria-selected", String(item === option));
       });
       projectList.hidden = true;
-      noteChooser.hidden = true;
-      noteChooser.replaceChildren();
+      selectedNotebookCardID = "";
+      selectedNotebookCardTitle = "";
       projectTrigger.setAttribute("aria-expanded", "false");
       researchSelectionMenuInteracting = false;
+      void refreshNoteChooser(choice.value);
       requestAnimationFrame(positionMenu);
     };
     projectChoices.forEach((choice) => {
@@ -18889,16 +18918,20 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
     linkButton.className = "research-selection-link-note-action";
     linkButton.textContent = "Link to Note";
     linkButton.title = "Link the selected enacted passage to a Project Note";
-    linkButton.addEventListener("click", async () => {
-      const projectID = String(pendingResearchSelection?.projectID || "").trim();
+    refreshNoteChooser = async (projectID, preferredCardID = "") => {
+      projectID = String(projectID || "").trim();
       if (!projectID) {
-        status.textContent = "Choose a Project before linking this passage to a Note.";
+        noteChooser.hidden = true;
+        noteChooser.replaceChildren();
+        selectedNotebookCardID = "";
+        selectedNotebookCardTitle = "";
+        requestAnimationFrame(positionMenu);
         return;
       }
-      linkButton.disabled = true;
       status.textContent = "Loading Project Notes…";
       try {
         const payload = await postResearch("/notebook/cards/list", { projectID });
+        if (String(pendingResearchSelection?.projectID || "") !== projectID) return;
         const cards = (payload.cards || []).filter((card) => !card.archivedAt);
         noteChooser.replaceChildren();
         const rolePicker = document.createElement("div");
@@ -18934,40 +18967,62 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
             option.type = "button";
             option.className = "research-selection-note-option";
             option.textContent = card.title;
-            option.addEventListener("click", async () => {
-              option.disabled = true;
-              status.textContent = `Linking evidence to ${card.title}…`;
-              try {
-                await linkResearchSelectionToNotebookCard(
-                  projectID,
-                  card.id,
-                  pendingResearchSelection
-                );
-                closeResearchSelectionMenu();
-                window.getSelection?.().removeAllRanges();
-                const project = researchProjects().find((candidate) =>
-                  projectDetailKey(projectIdentity(candidate)) === projectID
-                );
-                if (project) {
-                  pendingNotebookCardByProject.set(projectID, card.id);
-                  await openProjectNotebook(projectIdentity(project));
-                }
-              } catch (error) {
-                option.disabled = false;
-                status.textContent = error.message;
-              }
+            const isSelected = card.id === preferredCardID;
+            option.setAttribute("aria-pressed", String(isSelected));
+            if (isSelected) {
+              selectedNotebookCardID = card.id;
+              selectedNotebookCardTitle = card.title;
+            }
+            option.addEventListener("click", () => {
+              selectedNotebookCardID = card.id;
+              selectedNotebookCardTitle = card.title;
+              noteChooser.querySelectorAll(".research-selection-note-option").forEach((candidate) => {
+                candidate.setAttribute("aria-pressed", String(candidate === option));
+              });
+              status.textContent = "";
             });
             noteChooser.append(option);
           });
         }
         noteChooser.hidden = false;
-        status.textContent = cards.length ? "Choose the Note to link." : "";
+        status.textContent = cards.length && !selectedNotebookCardID ? "Choose the Note to link." : "";
         researchSelectionMenuInteracting = true;
         requestAnimationFrame(positionMenu);
       } catch (error) {
         status.textContent = error.message;
-      } finally {
+      }
+    };
+    linkButton.addEventListener("click", async () => {
+      const projectID = String(pendingResearchSelection?.projectID || "").trim();
+      if (!projectID) {
+        status.textContent = "Choose a Project before linking this passage to a Note.";
+        return;
+      }
+      if (!selectedNotebookCardID) {
+        status.textContent = "Choose the Note to link.";
+        return;
+      }
+      linkButton.disabled = true;
+      status.textContent = `Linking evidence to ${selectedNotebookCardTitle}…`;
+      try {
+        await linkResearchSelectionToNotebookCard(
+          projectID,
+          selectedNotebookCardID,
+          pendingResearchSelection
+        );
+        const linkedCardID = selectedNotebookCardID;
+        closeResearchSelectionMenu();
+        window.getSelection?.().removeAllRanges();
+        const project = researchProjects().find((candidate) =>
+          projectDetailKey(projectIdentity(candidate)) === projectID
+        );
+        if (project) {
+          pendingNotebookCardByProject.set(projectID, linkedCardID);
+          await openProjectNotebook(projectIdentity(project));
+        }
+      } catch (error) {
         linkButton.disabled = false;
+        status.textContent = error.message;
       }
     });
     actions.append(linkButton);
@@ -18982,6 +19037,9 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   actions.append(analyzeButton);
   menu.append(noteChooser, actions, status);
   document.body.append(menu);
+  if (initialProjectID && activeAccount()) {
+    void refreshNoteChooser(initialProjectID, initialNotebookCardID);
+  }
   positionMenu = () => {
     const menuRect = menu.getBoundingClientRect();
     const left = Math.min(
@@ -19672,6 +19730,9 @@ async function renderProjectNotebook(project) {
 
   const mountState = {
     panel,
+    activeCardID() {
+      return activeCard?.id || "";
+    },
     async confirmDiscardIfNeeded() {
       if (!dirty || !activeCard) return true;
       if (await flushNotebookAutosave()) return true;
