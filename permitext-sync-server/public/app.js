@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-notebook-evidence-links-v235";
+} from "./offline-storage.js?v=20260815-notebook-source-edition-v236";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -323,6 +323,20 @@ const codeOptions = [
   { prefix: "LL", label: "Construction-Related Local Laws", theme: "local-law", group: "Local Laws" },
   { prefix: "ZR", label: "Zoning Resolution", theme: "zoning", group: "Land Use and Zoning" }
 ];
+
+function researchCodeEdition(source = {}) {
+  const explicit = String(source.codeEdition || "").trim();
+  if (explicit) return explicit;
+  const codePrefix = String(source.codePrefix || "").trim().toUpperCase();
+  if (codePrefix === "BC68") return "1968";
+  const option = codeOptions.find((candidate) => candidate.prefix === codePrefix);
+  const candidates = [option?.label, option?.group, source.codeVersion, source.sourceLibraryVersion];
+  for (const candidate of candidates) {
+    const match = String(candidate || "").match(/\b(?:19|20)\d{2}\b/);
+    if (match) return match[0];
+  }
+  return "Current";
+}
 const zoningCodePrefix = "ZR";
 const existingBuildingCodePrefix = "EBC";
 const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
@@ -11097,6 +11111,7 @@ function selectReaderSectionForResearch(sectionWrapper) {
     codePrefix: sectionWrapper.dataset.researchCodePrefix,
     savedItemID: sectionWrapper.dataset.researchSavedItemId || "",
     selectedText,
+    codeEdition: sectionWrapper.dataset.researchCodeEdition || "",
     codeVersion: sectionWrapper.dataset.researchCodeVersion || "",
     sourceLibraryVersion: sectionWrapper.dataset.researchSourceLibraryVersion || "",
     prefix: "",
@@ -12437,6 +12452,7 @@ function markResearchSelectable(element, source = {}) {
   element.dataset.researchCodeVersion = String(
     source.codeVersion || syncCodeVersionForPrefix(source.codePrefix || "BC") || ""
   );
+  element.dataset.researchCodeEdition = researchCodeEdition(source);
   element.dataset.researchSourceLibraryVersion = String(source.sourceLibraryVersion || "");
   element.dataset.researchChapterId = String(source.chapterID || "");
   if (source.researchSavedItemID) {
@@ -18602,6 +18618,7 @@ function researchSelectionFromWindow() {
       codePrefix: source.dataset.researchCodePrefix,
       savedItemID: source.dataset.researchSavedItemId || "",
       selectedText,
+      codeEdition: source.dataset.researchCodeEdition || "",
       codeVersion: source.dataset.researchCodeVersion || "",
       sourceLibraryVersion: source.dataset.researchSourceLibraryVersion || "",
       ...locator
@@ -18644,7 +18661,7 @@ function notebookEvidenceLinksFromSelection(selection, context = {}) {
       source: {
         jurisdiction: "New York City",
         codePrefix,
-        codeEdition: "2022",
+        codeEdition: source.codeEdition || researchCodeEdition(source),
         codeVersion: source.codeVersion || "",
         sourceID: source.sectionID,
         sectionID: source.sectionID,

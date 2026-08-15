@@ -1432,7 +1432,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260815-notebook-evidence-links-v235'),
+        webRoot.text.includes('/web/app.js?v=20260815-notebook-source-edition-v236'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
