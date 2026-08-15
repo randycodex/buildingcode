@@ -1509,6 +1509,7 @@ async function main() {
         workspaceStyles.text.includes(".project-section-count {") &&
         workspaceStyles.text.includes(".notebook-toolbar {\n  display: block;") &&
         workspaceStyles.text.includes(".notebook-reference-menu {\n  display: grid;") &&
+        workspaceStyles.text.includes(".notebook-toolbar .notebook-reference-menu-toggle {\n  min-height: 40px;\n  border-radius: var(--radius-pill);\n  background: var(--menu-surface);") &&
         workspaceStyles.text.includes(".notebook-reference-list {\n  display: block;") &&
         workspaceStyles.text.includes("overflow-wrap: anywhere;") &&
         workspaceStyles.text.includes(".notebook-reference-group-title {") &&
@@ -1526,7 +1527,7 @@ async function main() {
         workspaceStyles.text.includes("line-height: max(var(--notebook-line-spacing, 0px), calc(var(--notebook-text-size) * 1.2)) !important;") &&
         workspaceStyles.text.includes(".notebook-editor-surface [data-text-size] * {\n  font-size: inherit !important;") &&
         workspaceStyles.text.includes("border: 0;\n  border-radius: 0;") &&
-        workspaceStyles.text.includes(".notebook-editor-surface,\n  .notebook-editor-surface .bn-container,\n  .notebook-editor-surface .bn-editor {\n    background: var(--surface-raised);\n    color: var(--text-primary);") &&
+        workspaceStyles.text.includes(".notebook-editor-surface,\n  .notebook-editor-surface .bn-container,\n  .notebook-editor-surface .bn-editor {\n    background: var(--menu-surface);\n    color: var(--text-primary);") &&
         workspaceStyles.text.includes("border-color: #fff !important;") &&
         workspaceStyles.text.includes(".notebook-editor-surface:not(.project-note-editor-surface) .bn-editor {\n  padding-inline-start: calc(var(--space-4) + 32px);") &&
         workspaceStyles.text.includes(".project-note-block-editor {\n  position: relative;\n  height: 260px;") &&
@@ -1553,7 +1554,9 @@ async function main() {
         workspaceScript.text.includes("closeButton.innerHTML = circleXIconSVG();") &&
         workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);") &&
         workspaceStyles.text.includes(".notebook-card-rail.is-open {\n  padding-bottom: 0;") &&
+        workspaceStyles.text.includes(".notebook-card-menu-toggle {\n  width: 100%;\n  min-height: 40px;\n  background: var(--menu-surface);") &&
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-flow: row;") &&
+        workspaceStyles.text.includes("background-color: var(--menu-surface);\n  background-image: none;") &&
         workspaceStyles.text.includes(".notebook-card-menu.is-open .notebook-card-list {\n  height: min(var(--notebook-card-list-height, 156px), 70vh);\n  max-height: min(var(--notebook-card-list-height, 156px), 70vh);") &&
         workspaceScript.text.includes('cardListResizeHandle.className = "notebook-card-list-resize-handle"') &&
         workspaceScript.text.includes("const minimumCardListHeight = 156") &&

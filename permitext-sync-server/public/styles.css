@@ -13091,7 +13091,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-card-menu-toggle {
   width: 100%;
   min-height: 40px;
-  background: transparent;
+  background: var(--menu-surface);
+}
+
+.notebook-card-menu-toggle:hover,
+.notebook-card-menu-toggle:focus-visible {
+  background: var(--menu-surface);
 }
 
 .notebook-card-rail-actions {
@@ -13172,6 +13177,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   min-height: 0;
   overflow-y: auto;
   padding-inline: var(--space-3);
+  background-color: var(--menu-surface);
   background-image: none;
 }
 
@@ -13330,14 +13336,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-toolbar .notebook-reference-menu-toggle {
   min-height: 40px;
   border-radius: var(--radius-pill);
-  background: transparent;
+  background: var(--menu-surface);
   font-size: 12px !important;
   font-weight: 400;
 }
 
 .notebook-toolbar .notebook-reference-menu-toggle:hover,
 .notebook-toolbar .notebook-reference-menu-toggle:focus-visible {
-  background: transparent;
+  background: var(--menu-surface);
 }
 
 .notebook-reference-list {
@@ -13450,7 +13456,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   overflow-y: auto;
   border: 0;
   border-radius: 0;
-  background: transparent;
+  background: var(--menu-surface);
   box-shadow: none;
 }
 
@@ -13460,7 +13466,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .notebook-editor-surface .bn-container {
   min-height: 100%;
-  background: transparent;
+  background: var(--menu-surface);
   color: var(--text-primary);
   font-size: 15px;
   line-height: 1.55;
@@ -13469,7 +13475,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-editor-surface .bn-editor {
   min-height: 100%;
   padding: var(--space-4);
-  background: transparent;
+  background: var(--menu-surface);
   color: var(--text-primary);
   font-family: inherit;
 }
@@ -13547,7 +13553,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   .notebook-editor-surface,
   .notebook-editor-surface .bn-container,
   .notebook-editor-surface .bn-editor {
-    background: var(--surface-raised);
+    background: var(--menu-surface);
     color: var(--text-primary);
   }
 
