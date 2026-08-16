@@ -11593,20 +11593,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   padding: 3px 7px;
   border: 0;
   border-radius: 1000px;
-  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  background: transparent;
   color: var(--text-secondary);
   font-family: var(--chrome-font-family);
   font-size: calc(var(--saved-font-size) * 0.72) !important;
   font-weight: 400;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 140ms ease, background-color 140ms ease, color 140ms ease;
-}
-
-.saved-section-row:hover .saved-row-actions button,
-.saved-section-row:focus-within .saved-row-actions button {
-  opacity: 1;
-  pointer-events: auto;
+  transition: background-color 140ms ease, color 140ms ease;
 }
 
 .saved-row-actions button:hover,
