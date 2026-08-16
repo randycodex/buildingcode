@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260815-saved-code-header-stability-v260";
+} from "./offline-storage.js?v=20260815-topbar-workspace-actions-v261";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -226,9 +226,7 @@ const defaultToolbarButtonIDs = Object.freeze([
   "add-reader",
   "toggle-search",
   "toggle-saved",
-  "toggle-analysis",
-  "fit-columns",
-  "collapse-readers"
+  "toggle-analysis"
 ]);
 const workspaceStateKeyPrefix = "permitext:webWorkspace:v2:";
 const activeWorkspaceSessionKey = "permitext:webWorkspaceActive:v2";

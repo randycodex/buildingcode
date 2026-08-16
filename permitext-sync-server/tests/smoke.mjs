@@ -364,13 +364,16 @@ async function main() {
       'id="toggle-search"',
       'id="toggle-saved"',
       'id="toggle-analysis"',
-      'id="fit-columns"',
       'class="topbar-workspaces"',
+      'class="topbar-layout-actions"',
+      'id="fit-columns"',
+      'id="collapse-readers"',
+      'id="toggle-settings"',
       'class="topbar-brand"'
     ].map((marker) => topbarSource.indexOf(marker));
     assert(
       topbarGroupOrder.every((index, position) => index >= 0 && (position === 0 || index > topbarGroupOrder[position - 1])),
-      "Web topbar tools are no longer draggable on the left with workspaces and the brand on the right."
+      "Web topbar tools or right-side workspace controls are no longer in their intended order."
     );
     assert(
       topbarSource.includes('id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false" data-icon-only>'),
@@ -527,6 +530,8 @@ async function main() {
         !webRoot.text.includes(">One Reader</button>") &&
         workspaceScript.text.includes('const workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
         workspaceScript.text.includes('const toolbarOrderKey = "permitext:webToolbarOrder:v1"') &&
+        workspaceScript.text.match(/const defaultToolbarButtonIDs = Object\.freeze\(\[[\s\S]*?"toggle-analysis"[\s\S]*?\]\);/) &&
+        !workspaceScript.text.match(/const defaultToolbarButtonIDs = Object\.freeze\(\[[\s\S]*?"fit-columns"[\s\S]*?\]\);/) &&
         workspaceScript.text.includes("function bindToolbarReordering()") &&
         workspaceScript.text.includes('event.dataTransfer.setData("application/x-permitext-toolbar", button.id)') &&
         workspaceScript.text.includes("localStorage.setItem(toolbarOrderKey") &&
@@ -1434,7 +1439,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260815-saved-code-header-stability-v260'),
+        webRoot.text.includes('/web/app.js?v=20260815-topbar-workspace-actions-v261'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1595,7 +1600,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-saved-code-header-stability-v260'),
+      webRoot.text.includes('/web/styles.css?v=20260815-topbar-workspace-actions-v261'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1869,7 +1874,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-saved-code-header-stability-v260'),
+      webRoot.text.includes('/web/styles.css?v=20260815-topbar-workspace-actions-v261'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
