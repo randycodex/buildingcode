@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-reader-static-text-v295";
+} from "./offline-storage.js?v=20260816-reader-single-research-v296";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -11429,22 +11429,6 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   });
 
   wrapper.append(bookmarkButton, researchButton);
-  if (currentResearchLabel) {
-    const newResearchButton = document.createElement("button");
-    newResearchButton.type = "button";
-    newResearchButton.className = "inline-research-toggle inline-new-research-toggle";
-    newResearchButton.innerHTML = researchActionIconSVG({ createNew: true });
-    newResearchButton.setAttribute("aria-label", "Start new Research with this passage");
-    newResearchButton.title = "Start a new Research conversation with this passage";
-    newResearchButton.addEventListener("click", async () => {
-      const sectionWrapper = newResearchButton.closest(".chapter-section");
-      if (!sectionWrapper || newResearchButton.disabled) return;
-      newResearchButton.disabled = true;
-      const started = await selectReaderSectionForResearch(sectionWrapper);
-      if (!started) newResearchButton.disabled = false;
-    });
-    wrapper.append(newResearchButton);
-  }
   return wrapper;
 }
 
@@ -13805,11 +13789,10 @@ function selectionIndicatorIconSVG() {
   `;
 }
 
-function researchActionIconSVG(options = {}) {
+function researchActionIconSVG() {
   return `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12.983 21.186a1 1 0 0 1-1.966 0 10 10 0 0 0-8.203-8.203 1 1 0 0 1 0-1.966 10 10 0 0 0 8.203-8.203 1 1 0 0 1 1.966 0 10 10 0 0 0 8.203 8.203 1 1 0 0 1 0 1.966 10 10 0 0 0-8.203 8.203"></path>
-      ${options.createNew ? '<path d="M19 9v5"></path><path d="M16.5 11.5h5"></path>' : ""}
     </svg>
   `;
 }
