@@ -1431,7 +1431,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-reader-direct-note-link-v292'),
+        webRoot.text.includes('/web/app.js?v=20260816-reader-save-research-v293'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1592,7 +1592,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-direct-note-link-v292'),
+      webRoot.text.includes('/web/styles.css?v=20260816-reader-save-research-v293'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1857,7 +1857,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-direct-note-link-v292'),
+      webRoot.text.includes('/web/styles.css?v=20260816-reader-save-research-v293'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2326,19 +2326,19 @@ async function main() {
       "Saved rows no longer match the iOS code, chapter, and code-order structure."
     );
     assert(
-      workspaceScript.text.includes("async function saveReaderPassage(panel, section, reader, target, options = {})") &&
+      workspaceScript.text.includes("async function saveReaderPassage(panel, section, reader, target)") &&
         workspaceScript.text.includes("await persistSectionBookmark(payload, true, { refreshSavedPanes: false })") &&
         workspaceScript.text.includes("project = activeProjectForReaderSave()") &&
         workspaceScript.text.includes("await persistSectionInProject(project, payload)") &&
-        workspaceScript.text.includes('addNote.textContent = "Link to Note"') &&
-        workspaceScript.text.includes('showResearchSelectionMenu(selection, { pinned: true, noteOnly: true })'),
-      "Reader passage saving is no longer immediate, Project-aware, and followed by an optional Note-link action."
+        workspaceScript.text.includes("showReaderSaveConfirmation(panel, section, reader, target, project)") &&
+        !workspaceScript.text.includes('addNote.textContent = "Link to Note"'),
+      "Reader passage saving is no longer immediate and Project-aware."
     );
     assert(
         workspaceScript.text.includes('if (window.getSelection && String(window.getSelection()).trim()) return;') &&
         workspaceScript.text.includes('wrapper.classList.toggle("is-actions-active")') &&
-        workspaceScript.text.includes('await saveReaderPassage(panel, section, reader, target, { silent: true })') &&
-        workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
+        !workspaceScript.text.includes('className = "inline-comment-toggle"') &&
+        !workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
         workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", saved ? "Saved passage" : "Save passage")') &&
         workspaceScript.text.includes('savedMarker.className = "reader-section-saved-marker"') &&
         workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
@@ -2694,8 +2694,8 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.annotated-code-block \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
-        workspaceStyles.text.match(/\.inline-comment-toggle,[\s\S]*?\.inline-bookmark-toggle,[\s\S]*?\.inline-research-toggle \{[\s\S]*?display: inline-flex;/),
-      "Reader passage actions no longer use the compact inline Save, Note, and Research row."
+        workspaceStyles.text.match(/\.inline-bookmark-toggle,[\s\S]*?\.inline-research-toggle \{[\s\S]*?display: inline-flex;/),
+      "Reader passage actions no longer use the compact inline Save and Research row."
     );
     assert(
       workspaceStyles.text.match(/\.section-detail-heading span \{[^}]*font-weight: 400;/) &&

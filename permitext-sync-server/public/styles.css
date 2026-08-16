@@ -3265,7 +3265,6 @@ select option:checked {
   pointer-events: auto;
 }
 
-.inline-comment-toggle,
 .inline-bookmark-toggle,
 .inline-research-toggle {
   display: inline-flex;
@@ -3300,17 +3299,12 @@ select option:checked {
   opacity: 0.64;
 }
 
-.inline-comment-toggle svg,
 .inline-bookmark-toggle svg,
 .inline-research-toggle svg {
   width: 15px;
   height: 15px;
 }
 
-.inline-comment-toggle:hover,
-.inline-comment-toggle:focus-visible,
-.inline-comment-toggle[aria-expanded="true"],
-.inline-comment-toggle.has-comment,
 .inline-bookmark-toggle:hover,
 .inline-bookmark-toggle:focus-visible,
 .inline-bookmark-toggle.is-saved,
@@ -3320,11 +3314,6 @@ select option:checked {
   outline: 0;
 }
 
-.inline-comment-toggle.has-comment svg {
-  fill: currentColor;
-}
-
-.inline-comment-toggle.has-comment,
 .inline-bookmark-toggle.is-saved,
 .inline-bookmark-toggle.has-error {
   color: var(--text-secondary);

@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-reader-direct-note-link-v292";
+} from "./offline-storage.js?v=20260816-reader-save-research-v293";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -10870,40 +10870,6 @@ function readerSectionResearchSelection(sectionWrapper) {
   };
 }
 
-function readerPassageResearchSelection(wrapper, target, anchorElement = null) {
-  const sectionWrapper = wrapper?.closest(".chapter-section");
-  const source = wrapper?.querySelector(".section-block, .section-html, .code-table") || wrapper;
-  if (!sectionWrapper || !source) return null;
-  const range = document.createRange();
-  range.selectNodeContents(source);
-  const selectedText = researchSelectionTextFromRange("", range);
-  if (!selectedText) return null;
-  const passage = {
-    sectionID: String(target.sectionID || sectionWrapper.dataset.researchSectionId || ""),
-    sectionNumber: target.sectionNumber || sectionWrapper.dataset.researchSectionNumber || "",
-    title: target.title || sectionWrapper.dataset.researchSectionTitle || "",
-    codePrefix: target.codePrefix || sectionWrapper.dataset.researchCodePrefix || "BC",
-    savedItemID: sectionWrapper.dataset.researchSavedItemId || "",
-    selectedText,
-    codeEdition: sectionWrapper.dataset.researchCodeEdition || "",
-    codeVersion: target.codeVersion || sectionWrapper.dataset.researchCodeVersion || "",
-    sourceLibraryVersion: sectionWrapper.dataset.researchSourceLibraryVersion || target.codeVersion || "",
-    prefix: "",
-    suffix: "",
-    start: 0,
-    end: normalizedPassageAnchorText(selectedText).length
-  };
-  const panel = wrapper.closest(".workspace-panel");
-  return {
-    ...passage,
-    passages: [passage],
-    projectID: selectedOpenProjectID() || panel?.dataset.projectId || "",
-    originPaneID: panel?.dataset.paneId || "",
-    anchorElement,
-    rect: anchorElement?.getBoundingClientRect?.() || wrapper.getBoundingClientRect()
-  };
-}
-
 function currentResearchConversationLabel() {
   const conversationID = String(state.researchConversationID || "").trim();
   if (!conversationID) return "";
@@ -11391,19 +11357,12 @@ function showReaderSaveConfirmation(panel, section, reader, target, project = nu
   message.textContent = project
     ? `Saved to ${project.name || project.title || "Project"}`
     : "Saved";
-  const addNote = document.createElement("button");
-  addNote.type = "button";
-  addNote.textContent = "Link to Note";
-  addNote.addEventListener("click", () => {
-    openReaderPassageNoteLinker(panel, target, addNote);
-    confirmation.remove();
-  });
-  confirmation.append(message, addNote);
+  confirmation.append(message);
   panel.append(confirmation);
   window.setTimeout(() => confirmation.remove(), 4200);
 }
 
-async function saveReaderPassage(panel, section, reader, target, options = {}) {
+async function saveReaderPassage(panel, section, reader, target) {
   const payload = readerPassagePayload(section, reader, target);
   const alreadySaved = isSectionSaved(payload);
   let project = null;
@@ -11420,49 +11379,19 @@ async function saveReaderPassage(panel, section, reader, target, options = {}) {
   } else {
     project = activeProjectForReaderSave();
   }
-  if (!options.silent) {
-    showReaderSaveConfirmation(panel, section, reader, target, project);
-  }
-  return true;
-}
-
-function openReaderPassageNoteLinker(panel, target, anchorElement) {
-  const blockID = normalizeAnnotationBlockID(target.blockID);
-  const wrapper = anchorElement?.closest(".annotated-code-block") ||
-    panel?.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(blockID)}"]`);
-  const selection = readerPassageResearchSelection(wrapper, target, anchorElement);
-  if (!selection) return false;
-  showResearchSelectionMenu(selection, { pinned: true, noteOnly: true });
+  showReaderSaveConfirmation(panel, section, reader, target, project);
   return true;
 }
 
 function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader), options = {}) {
-  const noteBody = noteValueForTarget(target.sectionID, target.blockID);
   const saved = Boolean(options.showBookmark);
   const wrapper = document.createElement("section");
   wrapper.className = "inline-comment";
-  wrapper.classList.toggle("has-note", Boolean(noteBody.trim()));
   wrapper.classList.toggle("has-saved-section", saved);
   wrapper.dataset.commentSectionId = String(section.id);
   wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion);
   wrapper.dataset.commentBlockId = target.blockID || "";
   wrapper.dataset.researchSelectionExclude = "true";
-
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "inline-comment-toggle";
-  button.innerHTML = noteActionIconSVG();
-  button.setAttribute("aria-label", "Link passage to Note");
-  button.title = "Link passage to Note";
-  button.classList.toggle("has-comment", Boolean(noteBody.trim()));
-  button.addEventListener("click", async () => {
-    const panel = button.closest(".reader-panel");
-    const selection = readerPassageResearchSelection(button.closest(".annotated-code-block"), target, button);
-    if (!selection) return;
-    const savedPassage = await saveReaderPassage(panel, section, reader, target, { silent: true });
-    if (!savedPassage) return;
-    showResearchSelectionMenu(selection, { pinned: true, noteOnly: true });
-  });
 
   const bookmarkButton = document.createElement("button");
   bookmarkButton.type = "button";
@@ -11518,7 +11447,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     researchButton.disabled = false;
   });
 
-  wrapper.append(bookmarkButton, button, researchButton);
+  wrapper.append(bookmarkButton, researchButton);
   if (currentResearchLabel) {
     const newResearchButton = document.createElement("button");
     newResearchButton.type = "button";
@@ -13893,10 +13822,6 @@ function selectionIndicatorIconSVG() {
       <path class="project-selection-checkmark" d="m8 12 3 3 5-6"></path>
     </svg>
   `;
-}
-
-function noteActionIconSVG() {
-  return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>`;
 }
 
 function researchActionIconSVG(options = {}) {
@@ -18917,7 +18842,6 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   closeResearchSelectionMenu();
   pendingResearchSelection = captured;
   researchSelectionMenuPinned = options.pinned === true;
-  const noteOnly = options.noteOnly === true;
   const menu = document.createElement("div");
   menu.className = "research-selection-menu";
   menu.setAttribute("role", "toolbar");
@@ -19021,7 +18945,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
     pendingResearchSelection.projectID = selectedProjectChoice?.value || "";
     menu.append(projectPicker);
   }
-  if (!noteOnly && state.researchConversationID && activeAccount()) {
+  if (state.researchConversationID && activeAccount()) {
     const addButton = document.createElement("button");
     addButton.type = "button";
     addButton.textContent = "Add as supporting evidence";
@@ -19032,7 +18956,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
     const linkButton = document.createElement("button");
     linkButton.type = "button";
     linkButton.className = "research-selection-link-note-action";
-    linkButton.textContent = noteOnly ? "Link passage" : "Link to Note";
+    linkButton.textContent = "Link to Note";
     linkButton.title = "Link the selected enacted passage to a Project Note";
     refreshNoteChooser = async (projectID, preferredCardID = "") => {
       projectID = String(projectID || "").trim();
@@ -19167,16 +19091,14 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
     });
     actions.append(linkButton);
   }
-  if (!noteOnly) {
-    const analyzeButton = document.createElement("button");
-    analyzeButton.type = "button";
-    analyzeButton.className = "research-selection-start-action";
-    analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research";
-    analyzeButton.disabled = false;
-    analyzeButton.title = "A Project is optional. You can assign this Research conversation later.";
-    analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
-    actions.append(analyzeButton);
-  }
+  const analyzeButton = document.createElement("button");
+  analyzeButton.type = "button";
+  analyzeButton.className = "research-selection-start-action";
+  analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research";
+  analyzeButton.disabled = false;
+  analyzeButton.title = "A Project is optional. You can assign this Research conversation later.";
+  analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
+  actions.append(analyzeButton);
   menu.append(noteChooser, actions, status);
   document.body.append(menu);
   if (initialProjectID && activeAccount()) {
@@ -27252,19 +27174,13 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
         if (!options.selectionController?.isActive()) {
           const actions = document.createElement("div");
           actions.className = "saved-row-actions";
-          const noteButton = document.createElement("button");
-          noteButton.type = "button";
-          noteButton.textContent = "Note";
-          noteButton.addEventListener("click", () => {
-            void runSavedItemReaderAction(item, paneID, ".inline-comment-toggle");
-          });
           const researchButton = document.createElement("button");
           researchButton.type = "button";
           researchButton.textContent = "Research";
           researchButton.addEventListener("click", () => {
             void runSavedItemReaderAction(item, paneID, ".inline-research-toggle");
           });
-          actions.append(noteButton, researchButton);
+          actions.append(researchButton);
           if (item.savedColumnKind === "bookmark") {
             const removeItemButton = document.createElement("button");
             removeItemButton.type = "button";
