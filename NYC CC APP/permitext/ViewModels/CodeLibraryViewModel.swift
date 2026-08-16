@@ -224,6 +224,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
     private var activeExportTask: Task<Void, Never>?
     private var userContentAutoSyncTask: Task<Void, Never>?
+    private var savedPresentationRefreshTask: Task<Void, Never>?
     private var foregroundAutomaticSyncTask: Task<Void, Never>?
     private var storeKitUpdatesTask: Task<Void, Never>?
     private let networkMonitor = NWPathMonitor()
@@ -310,6 +311,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     deinit {
         userContentAutoSyncTask?.cancel()
+        savedPresentationRefreshTask?.cancel()
         foregroundAutomaticSyncTask?.cancel()
         storeKitUpdatesTask?.cancel()
         startupWarmupTask?.cancel()
@@ -2038,7 +2040,6 @@ final class CodeLibraryViewModel: ObservableObject {
                 codeVersion: selectedVersion.codeVersion
             )
             refreshBookmarks()
-            refreshFolders()
             scheduleUserContentAutoSync()
             return isBookmarked(sectionID: sectionID)
         } catch {
@@ -2614,6 +2615,15 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    private func scheduleSavedPresentationRefresh() {
+        savedPresentationRefreshTask?.cancel()
+        savedPresentationRefreshTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 650_000_000)
+            guard !Task.isCancelled, let self else { return }
+            self.refreshBookmarks()
+        }
+    }
+
     private func scheduleUserContentAutoSync() {
         guard signedInAccount != nil else { return }
         // Keep sign-out safety current even when the device is offline and
@@ -2827,7 +2837,6 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             try await syncEngine.resolveRejectedConflict(conflict, account: signedInAccount, keepLocal: keepLocal)
             refreshBookmarks()
-            refreshFolders()
             refreshPendingUserContentSyncCount()
             refreshUserContentSyncCheckpoint()
             statusMessage = keepLocal ? "Kept this device's version and synced it." : "Applied the server version."
@@ -3051,7 +3060,6 @@ final class CodeLibraryViewModel: ObservableObject {
         UserDefaults.standard.removeObject(forKey: pinnedSearchesDefaultsKey)
         persistRecentlyViewedSections()
         refreshBookmarks()
-        refreshFolders()
         refreshPendingUserContentSyncCount()
         if statusMessage?.contains("on-device") != true {
             statusMessage = "Your Permitext account and synced data were deleted."
@@ -3447,14 +3455,12 @@ final class CodeLibraryViewModel: ObservableObject {
                     )
                 }
             }
-            // Note edits do not change the bookmark set, so we skip the heavy
-            // `refreshBookmarks` pass that previously fired on every keystroke.
-            // BookmarksView re-reads notes from disk on appear, and the note
-            // editor re-reads via `noteBody(sectionID:)` when it opens.
+            // Persist every edit immediately, but debounce the heavier Saved
+            // and Project evidence rebuild until typing pauses. This keeps
+            // visible rows, counts, previews, and Reader decorations current
+            // without rebuilding them for every keystroke.
             try userContentRepository.saveNote(sectionID: sectionID, blockID: normalizedBlockID, codeVersion: selectedVersion.codeVersion, body: body)
-            if !normalizedBlockID.isEmpty {
-                bookmarkRevision &+= 1
-            }
+            scheduleSavedPresentationRefresh()
             scheduleUserContentAutoSync()
             return .saved
         } catch {
@@ -3524,9 +3530,6 @@ final class CodeLibraryViewModel: ObservableObject {
                 codeVersion: selectedVersion.codeVersion
             )
             refreshBookmarks()
-            if !blockID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                bookmarkRevision &+= 1
-            }
             scheduleUserContentAutoSync()
             return true
         } catch {

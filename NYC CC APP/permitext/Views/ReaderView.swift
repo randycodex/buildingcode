@@ -165,6 +165,9 @@ struct ReaderView: View {
             }
             await loadContent()
         }
+        .onChange(of: library.bookmarkRevision) { _, _ in
+            syncUserContentState()
+        }
         .onDisappear {
             noteSaveResetTask?.cancel()
         }
@@ -610,6 +613,23 @@ struct ReaderView: View {
         noteBody = persistedNoteBody
         sectionTags = library.tags(sectionID: sectionID)
         noteSaveState = .idle
+    }
+
+    private func syncUserContentState() {
+        isBookmarked = library.isBookmarked(sectionID: sectionID)
+        if !isTagComposerFocused {
+            sectionTags = library.tags(sectionID: sectionID)
+        }
+        if !isFolderPickerOpen {
+            pendingFolderIDs = Set(library.folderMembership[sectionID] ?? [])
+        }
+        if !isNotesFieldFocused {
+            let nextPersistedNoteBody = library.noteBody(sectionID: sectionID)
+            persistedNoteBody = nextPersistedNoteBody
+            if noteBody != nextPersistedNoteBody {
+                noteBody = nextPersistedNoteBody
+            }
+        }
     }
 
     private func openFolderPicker() {
