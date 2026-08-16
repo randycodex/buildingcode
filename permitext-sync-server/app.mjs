@@ -4354,6 +4354,41 @@ function projectArtifactRevisionChange(projectID, domains) {
   return { projects: [{ projectID, domains }] };
 }
 
+async function bumpResearchArtifactRevisions(userID, projects = []) {
+  const projectChanges = normalizedArtifactProjectChanges(projects);
+  const changesByStorageOwner = new Map([[userID, {
+    accountDomains: ["research"],
+    projects: []
+  }]]);
+  for (const project of projectChanges) {
+    const access = await projectAccessForUser(userID, project.projectID);
+    if (!access?.permissions.includes(organizationPermissions.projectView)) {
+      const error = new Error("Research Project access changed before artifact revisions could be recorded.");
+      error.code = "RESEARCH_PROJECT_ACCESS_CHANGED";
+      throw error;
+    }
+    const existing = changesByStorageOwner.get(access.storageOwnerUserID) || {
+      accountDomains: [],
+      projects: []
+    };
+    existing.projects.push(project);
+    changesByStorageOwner.set(access.storageOwnerUserID, existing);
+  }
+  const states = await Promise.all(Array.from(changesByStorageOwner, async ([storageOwnerUserID, changes]) => ({
+    storageOwnerUserID,
+    state: await bumpStoredArtifactRevisions(storageOwnerUserID, changes)
+  })));
+  const accountState = states.find(({ storageOwnerUserID }) => storageOwnerUserID === userID)?.state.account || null;
+  return {
+    schemaVersion: 1,
+    account: accountState ? { ...accountState, storageOwnerUserID: userID } : null,
+    projects: states.flatMap(({ storageOwnerUserID, state }) => state.projects.map((project) => ({
+      ...project,
+      storageOwnerUserID
+    })))
+  };
+}
+
 async function mutationsAfterSyncEventID(userID, sinceEventID) {
   const adapter = await storeAdapter();
   if (typeof adapter.mutationsAfterEventID !== "function") {
@@ -12765,13 +12800,14 @@ async function handleProjectHubBootstrap(request, response) {
 async function handleProjectArtifactCheckpoint(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
+  const includeAccountResearch = context.body.includeAccountResearch === true;
   const projectIDs = Array.from(new Set((Array.isArray(context.body.projectIDs)
     ? context.body.projectIDs
     : [context.body.projectID])
     .map((value) => String(value || "").trim())
     .filter(Boolean)));
-  if (!projectIDs.length || projectIDs.length > 50) {
-    sendError(response, 400, "Provide between 1 and 50 Project IDs.");
+  if ((!projectIDs.length && !includeAccountResearch) || projectIDs.length > 50) {
+    sendError(response, 400, "Provide between 1 and 50 Project IDs, or request the account Research revision.");
     return;
   }
   const accesses = [];
@@ -12790,9 +12826,14 @@ async function handleProjectArtifactCheckpoint(request, response) {
       access.projectID
     ]);
   }
-  const states = await Promise.all(Array.from(projectIDsByStorageOwner, ([storageOwnerUserID, ids]) =>
-    storedArtifactRevisionState(storageOwnerUserID, { projectIDs: ids })
-  ));
+  const [states, accountState] = await Promise.all([
+    Promise.all(Array.from(projectIDsByStorageOwner, ([storageOwnerUserID, ids]) =>
+      storedArtifactRevisionState(storageOwnerUserID, { projectIDs: ids })
+    )),
+    includeAccountResearch
+      ? storedArtifactRevisionState(context.userID, { account: true })
+      : Promise.resolve(null)
+  ]);
   const revisionsByProjectID = new Map(states.flatMap((state) =>
     state.projects.map((project) => [project.projectID, {
       ...project,
@@ -12802,6 +12843,11 @@ async function handleProjectArtifactCheckpoint(request, response) {
   sendJSON(response, 200, {
     schemaVersion: 1,
     checkedAt: new Date().toISOString(),
+    ...(includeAccountResearch ? {
+      account: accountState?.account
+        ? { ...accountState.account, storageOwnerUserID: context.userID }
+        : { revision: 0, domains: [], updatedAt: null, storageOwnerUserID: context.userID }
+    } : {}),
     projects: projectIDs.map((projectID) => revisionsByProjectID.get(projectID))
   });
 }
@@ -13150,11 +13196,17 @@ async function handleResearchConversationRename(request, response) {
     ? updatedAt
     : new Date(Date.parse(conversation.updatedAt) + 1).toISOString();
   await saveStoredResearchConversation(context.userID, conversation);
+  const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+    conversation.primaryProjectID
+      ? [{ projectID: conversation.primaryProjectID, domains: ["research"] }]
+      : []
+  );
   sendJSON(response, 200, {
     conversation: await researchConversationForClient(conversation, {
       checkSources: true,
       userID: context.userID
-    })
+    }),
+    artifactRevisions
   });
 }
 
@@ -13492,10 +13544,21 @@ async function handleResearchConversationAssignProject(request, response) {
   conversation.movedAt = now;
   conversation.updatedAt = now;
   await saveStoredResearchConversation(context.userID, conversation);
+  const artifactRevisions = await bumpResearchArtifactRevisions(context.userID, [
+    ...(currentProjectID ? [{
+      projectID: currentProjectID,
+      domains: ["activity", "foundation", "research"]
+    }] : []),
+    ...(targetProjectID ? [{
+      projectID: targetProjectID,
+      domains: ["activity", "foundation", "research"]
+    }] : [])
+  ]);
   sendJSON(response, 200, {
     conversation: await researchConversationForClient(conversation, { userID: context.userID }),
     moved: true,
-    contextReviewRequired: conversation.projectContextReviewRequired
+    contextReviewRequired: conversation.projectContextReviewRequired,
+    artifactRevisions
   });
 }
 
@@ -13554,9 +13617,14 @@ async function handleResearchConversationProjectContext(request, response) {
     metadata: { factCount: facts.length }
   });
   await saveStoredActivityEvent(context.userID, event);
+  const artifactRevisions = await bumpResearchArtifactRevisions(context.userID, [{
+    projectID,
+    domains: ["activity", "foundation", "research"]
+  }]);
   sendJSON(response, 200, {
     conversation: await researchConversationForClient(conversation, { userID: context.userID }),
-    activity: event
+    activity: event,
+    artifactRevisions
   });
 }
 
@@ -13689,8 +13757,13 @@ async function handleResearchConversationReuseEvidence(request, response) {
     "item.linked",
     now
   );
+  const artifactRevisions = await bumpResearchArtifactRevisions(context.userID, [{
+    projectID,
+    domains: ["activity", "foundation", "research"]
+  }]);
   sendJSON(response, 201, {
-    conversation: await researchConversationForClient(conversation, { userID: context.userID })
+    conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+    artifactRevisions
   });
 }
 
@@ -13760,8 +13833,14 @@ async function handleResearchConversationCreate(request, response) {
         now
       );
     }
+    const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+      projectID
+        ? [{ projectID, domains: ["activity", "foundation", "research"] }]
+        : []
+    );
     sendJSON(response, 201, {
-      conversation: await researchConversationForClient(conversation, { userID: context.userID })
+      conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+      artifactRevisions
     });
   } catch (error) {
     if ([
@@ -13827,10 +13906,16 @@ async function handleResearchConversationEvidence(request, response) {
     conversation.updatedAt = new Date().toISOString();
     conversation.sourceStatus = "current";
     await saveStoredResearchConversation(context.userID, conversation);
+    const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+      conversation.primaryProjectID
+        ? [{ projectID: conversation.primaryProjectID, domains: ["foundation", "research"] }]
+        : []
+    );
     sendJSON(response, 200, {
       conversation: await researchConversationForClient(conversation, { userID: context.userID }),
       replayed: false,
-      addedSelectionCount
+      addedSelectionCount,
+      artifactRevisions
     });
   } catch (error) {
     if ([
@@ -13900,8 +13985,14 @@ async function handleResearchConversationRefresh(request, response) {
   conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
   conversation.updatedAt = new Date().toISOString();
   await saveStoredResearchConversation(context.userID, conversation);
+  const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+    conversation.primaryProjectID
+      ? [{ projectID: conversation.primaryProjectID, domains: ["foundation", "research"] }]
+      : []
+  );
   sendJSON(response, 200, {
-    conversation: await researchConversationForClient(conversation, { userID: context.userID })
+    conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+    artifactRevisions
   });
 }
 
@@ -14062,6 +14153,11 @@ async function handleResearchFeedback(request, response) {
     updatedAt: now
   };
   await saveStoredResearchFeedback(context.userID, feedback);
+  const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+    conversation.primaryProjectID
+      ? [{ projectID: conversation.primaryProjectID, domains: ["research"] }]
+      : []
+  );
   sendJSON(response, existing ? 200 : 201, {
     feedback: {
       id: feedback.id,
@@ -14071,7 +14167,8 @@ async function handleResearchFeedback(request, response) {
       professionalRole: feedback.professionalRole,
       supportingReference: feedback.supportingReference,
       updatedAt: feedback.userUpdatedAt
-    }
+    },
+    artifactRevisions
   });
 }
 
@@ -14993,6 +15090,14 @@ async function handleResearchConversationMessage(request, response) {
       events: activityEvents
     });
     researchReservationCompleted = !mockMode && Boolean(researchReservationID);
+    const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+      conversation.primaryProjectID
+        ? [{
+            projectID: conversation.primaryProjectID,
+            domains: ["activity", "foundation", "research"]
+          }]
+        : []
+    );
     console.info(JSON.stringify({
       event: "research_conversation_message",
       user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
@@ -15012,7 +15117,8 @@ async function handleResearchConversationMessage(request, response) {
           estimatedCostUSD: estimatedCost.estimatedUSD,
           pricingVersion: estimatedCost.pricingVersion
         }
-      ], { mockMode, entitlement: context.authContext.entitlement })
+      ], { mockMode, entitlement: context.authContext.entitlement }),
+      artifactRevisions
     });
   } catch (error) {
     if (researchReservationID && !researchReservationCompleted) {
@@ -15118,7 +15224,15 @@ async function handleResearchConversationDelete(request, response) {
     sendError(response, 409, "Research conversation changed before it could be deleted. Refresh and try again.");
     return;
   }
-  sendJSON(response, 200, { deleted: true });
+  const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+    conversation.primaryProjectID
+      ? [{
+          projectID: conversation.primaryProjectID,
+          domains: ["activity", "foundation", "research"]
+        }]
+      : []
+  );
+  sendJSON(response, 200, { deleted: true, artifactRevisions });
 }
 
 async function handleResearchConversationClearHistory(request, response) {
@@ -15146,11 +15260,15 @@ async function handleResearchConversationClearHistory(request, response) {
       deletedConversationCount += 1;
     }
   }
+  const artifactRevisions = conversations.length
+    ? await bumpResearchArtifactRevisions(context.userID)
+    : null;
   sendJSON(response, 200, {
     cleared: true,
     hiddenProjectConversationCount,
     deletedConversationCount,
-    totalCount: conversations.length
+    totalCount: conversations.length,
+    ...(artifactRevisions ? { artifactRevisions } : {})
   });
 }
 
@@ -15288,13 +15406,18 @@ async function handleResearchCandidateDisposition(request, response) {
       });
       return;
     }
+    const artifactRevisions = await bumpResearchArtifactRevisions(context.userID, [{
+      projectID,
+      domains: ["research"]
+    }]);
     sendJSON(response, 200, {
       conversation: await researchConversationForClient(updatedConversation, {
         userID: context.userID,
         projectLink: currentProjectLink
       }),
       candidateID,
-      disposition
+      disposition,
+      artifactRevisions
     });
   } catch (error) {
     sendJSON(response, 400, {
