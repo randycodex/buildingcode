@@ -52,8 +52,8 @@ Retire ordinary UI terms such as Folder, Code Question, Code Decision, Evidence 
 Reader remains the authoritative reading surface. From a specific passage, the user can:
 
 - Save it
-- Add a comment
-- Assign it to a Project
+- Add or open a note
+- Change its Project when needed
 - Link it to a Notebook note
 - Start Research
 - Open a cited cross-reference
@@ -77,7 +77,7 @@ Saved collects unassigned or recently captured material: things the user preserv
 
 From Saved, users can:
 
-- Open the source
+- Open the exact passage in Reader
 - Assign it to a Project
 - Start Research
 - Link it to a note
@@ -87,17 +87,17 @@ Once assigned, the item also appears under that Project's Saved Evidence.
 
 ### 6. Keep Search separate from Reader navigation
 
-Search finds candidate provisions across the enacted library. Selecting a result opens Reader without automatically opening additional unnecessary columns.
+Search finds candidate provisions across the enacted library. Selecting a result opens or reuses a Reader at the exact provision without automatically opening additional unnecessary columns.
 
 - Search finds provisions.
 - Reader examines provisions.
 - Source Detail temporarily inspects a provision in context.
 
-### 7. Use Source Detail as a contextual inspector
+### 7. Use Reader for every enacted-code source
 
-Use **Source Detail** as the explicit internal and accessible name for the blue or Project-colored contextual source column.
+Retire Source Detail from the ordinary workflow. Reader is the single authoritative surface for enacted-code text.
 
-It is not a primary destination. It opens temporarily when the user selects:
+Open or reuse an adjacent Reader when the user selects:
 
 - Saved evidence
 - A Notebook reference
@@ -105,7 +105,7 @@ It is not a primary destination. It opens temporarily when the user selects:
 - A Report citation
 - A cross-reference
 
-It shows the complete provision, relevant highlight, notes, Project assignment, and tags. Opening Source Detail should not automatically open Search.
+Reader shows the complete provision and highlights the exact passage when available. It retains passage actions for Save, Note, Research, and Project context. Opening a source should preserve the originating Saved, Research, Notebook, or Report column and should not automatically open Search.
 
 ### 8. Make Research one conversational system
 
@@ -302,4 +302,3 @@ Work through this plan one numbered step at a time. Before changing a step:
 4. Implement the smallest coherent change.
 5. Verify the complete rendered interaction locally.
 6. Commit the verified step independently before continuing.
-

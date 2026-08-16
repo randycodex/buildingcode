@@ -1318,7 +1318,7 @@ async function main() {
         !workspaceScript.text.includes('function openSearchResultInNewReader') &&
         !workspaceScript.text.includes('newReaderButton') &&
         !workspaceScript.text.includes('New reader') &&
-        workspaceScript.text.includes('openSectionDetail(searchInstance.id, detail);') &&
+        workspaceScript.text.includes('void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance));') &&
         workspaceScript.text.includes("function updateSearchDock") &&
         workspaceScript.text.includes("summary.hidden = !query;") &&
         workspaceScript.text.includes('`Searching in ${scope}`') &&
@@ -1334,13 +1334,12 @@ async function main() {
         workspaceScript.text.includes("state.recentSearchHistory = normalizeRecentSearchHistory([") &&
         workspaceScript.text.includes('label.textContent = "Recently Viewed"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
-        workspaceScript.text.includes("async function openRecentlyViewedInSDC(searchInstance, entry)") &&
-        workspaceScript.text.includes("closeLinkedReaderForSearch(searchInstance.id)") &&
-        workspaceScript.text.includes("await openSectionDetail(searchInstance.id, searchResultDetail(entry))") &&
+        workspaceScript.text.includes("async function openRecentlyViewedInReader(searchInstance, entry)") &&
+        workspaceScript.text.includes("await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance))") &&
         workspaceScript.text.includes('console.warn("Could not open recently viewed section.", error)') &&
         workspaceScript.text.includes('presentWorkspaceIssue(error?.message || "This section could not be loaded. Try opening it again.")') &&
         workspaceScript.text.includes("for (let attempt = 0; attempt < 3 && !section; attempt += 1)") &&
-        workspaceScript.text.includes("void openRecentlyViewedInSDC(instance, entry)") &&
+        workspaceScript.text.includes("void openRecentlyViewedInReader(instance, entry)") &&
         workspaceScript.text.includes("await renderSearchHistory(panel, searchInstance, { hydrate: false });") &&
         workspaceScript.text.includes("function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0)") &&
         workspaceScript.text.includes("function mergeRecentlyViewedDetails(entries, options = {})") &&
@@ -1439,7 +1438,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-reader-workspace-v268'),
+        webRoot.text.includes('/web/app.js?v=20260816-saved-reader-v269'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1600,7 +1599,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-workspace-v268'),
+      webRoot.text.includes('/web/styles.css?v=20260816-saved-reader-v269'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1657,22 +1656,14 @@ async function main() {
       "Closing a Search section-detail column should also close only its linked Reader."
     );
     assert(
-      workspaceScript.text.includes("async function openSavedItemInSDC(item, savedPaneID)") &&
-        workspaceScript.text.includes("void openSavedItemInSDC(openItem, paneID)") &&
-        workspaceScript.text.includes("const anchoredOwnerID = Object.entries(sectionDetailAnchorsBySearch())") &&
-        workspaceScript.text.includes('instance.key === "sdc" && instance.id === anchoredOwnerID') &&
-        workspaceScript.text.includes('sdcOwner = newUtilityInstance("sdc")') &&
-        workspaceScript.text.includes('.filter((instance) => instance.key === "search" || instance.key === "sdc")') &&
-        workspaceScript.text.includes("const existing = updateLinkedReaderForSearch(searchID, detail, overrides)") &&
-        workspaceScript.text.includes("closeSavedItemDetailsForPane(savedPaneID)") &&
-        workspaceScript.text.includes("function closeLinkedReaderForSavedPane(savedPaneID)") &&
-        workspaceScript.text.includes("closeLinkedReaderForSavedPane(savedPaneID)") &&
-        workspaceScript.text.includes("await openSectionDetail(sdcOwner.id, searchResultDetail({") &&
-        workspaceScript.text.includes("anchorPaneID: savedPaneID") &&
-        workspaceScript.text.includes('if (instance.key !== "sdc") ids.push(paneIDForUtilityInstance(instance))') &&
-        workspaceScript.text.includes('instance.key === "search" || instance.key === "sdc"') &&
-        !workspaceScript.text.includes("function openSavedItemInReader(item, savedPaneID"),
-      "Saved Evidence items should open an independently owned SDC beside Projects."
+      workspaceScript.text.includes("async function openSavedItemInReader(item, savedPaneID)") &&
+        workspaceScript.text.includes("void openSavedItemInReader(openItem, paneID)") &&
+        workspaceScript.text.includes("async function openSourceInReader(item, anchorPaneID = \"\", options = {})") &&
+        workspaceScript.text.includes("readerMatchesSource(candidate, detail)") &&
+        workspaceScript.text.includes("candidate.sourceAnchorPaneID === anchorPaneID") &&
+        workspaceScript.text.includes("placePaneAfter(anchorPaneID, paneID)") &&
+        workspaceScript.text.includes("revealReaderSourceTarget(reader, navigationItem, options.evidenceAnchor)"),
+      "Saved Evidence items should open or reuse an exact-passage Reader beside Saved."
     );
     assert(
       savedTemplateSource.includes('<p class="eyebrow panel-kind">Projects</p>') &&
@@ -1804,10 +1795,9 @@ async function main() {
     );
     assert(
       !workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
-        workspaceScript.text.includes("async function openRecentlyViewedInSDC(searchInstance, entry)") &&
-        workspaceScript.text.includes("closeLinkedReaderForSearch(searchInstance.id)") &&
-        workspaceScript.text.includes("await openSectionDetail(searchInstance.id, searchResultDetail(entry))"),
-      "Recently Viewed should open the Section Detail column instead of a linked Reader."
+        workspaceScript.text.includes("async function openRecentlyViewedInReader(searchInstance, entry)") &&
+        workspaceScript.text.includes("await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance))"),
+      "Recently Viewed should open an exact-passage Reader."
     );
     const readerHeaderStyleSource =
       workspaceStyles.text.match(/\.reader-panel::before \{[\s\S]*?\n\}/)?.[0] || "";
@@ -1874,7 +1864,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-workspace-v268'),
+      webRoot.text.includes('/web/styles.css?v=20260816-saved-reader-v269'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

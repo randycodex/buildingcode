@@ -3155,6 +3155,11 @@ select option:checked {
   background: color-mix(in srgb, var(--code-accent) 6%, transparent);
 }
 
+.annotated-code-block.is-source-target,
+.chapter-section.is-source-target {
+  background: color-mix(in srgb, var(--code-accent) 10%, transparent);
+}
+
 .annotated-code-block.is-notes-active :where(
   .section-block,
   .section-html,
@@ -11416,6 +11421,42 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   min-height: 18px;
   padding: 0 var(--space-1);
   font-size: calc(var(--saved-font-size) * 0.704) !important;
+}
+
+.saved-row-projects {
+  display: block;
+  margin-top: 5px;
+  color: var(--code-accent);
+  font-size: calc(var(--saved-font-size) * 0.72) !important;
+  font-weight: 600;
+}
+
+.saved-row-projects.is-unassigned {
+  color: var(--text-tertiary);
+}
+
+.saved-row-actions {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.saved-row-actions button {
+  min-height: 26px;
+  padding: 3px 7px;
+  border: 0;
+  border-radius: var(--radius-tile);
+  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  color: var(--text-secondary);
+  font-family: var(--chrome-font-family);
+  font-size: calc(var(--saved-font-size) * 0.72) !important;
+  font-weight: 600;
+}
+
+.saved-row-actions button:hover,
+.saved-row-actions button:focus-visible {
+  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
+  color: var(--code-accent);
 }
 
 .saved-row-remove {
