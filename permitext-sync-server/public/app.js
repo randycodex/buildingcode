@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-research-context-v271";
+} from "./offline-storage.js?v=20260816-reader-research-direct-v272";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -11109,17 +11109,12 @@ function refreshReaderSectionProjectContexts(sectionID = "") {
   });
 }
 
-function selectReaderSectionForResearch(sectionWrapper) {
-  const selection = window.getSelection?.();
-  if (!selection || !sectionWrapper) return;
+async function selectReaderSectionForResearch(sectionWrapper) {
+  if (!sectionWrapper) return;
   const range = document.createRange();
   range.selectNodeContents(sectionWrapper);
-  selection.removeAllRanges();
-  selection.addRange(range);
-  const selectedText = researchSelectionTextFromRange(selection, range);
+  const selectedText = researchSelectionTextFromRange("", range);
   if (!selectedText) return;
-  const rect = sectionWrapper.querySelector(".reader-section-title")?.getBoundingClientRect() ||
-    sectionWrapper.getBoundingClientRect();
   const passage = {
     sectionID: sectionWrapper.dataset.researchSectionId,
     sectionNumber: sectionWrapper.dataset.researchSectionNumber,
@@ -11135,13 +11130,17 @@ function selectReaderSectionForResearch(sectionWrapper) {
     start: 0,
     end: normalizedPassageAnchorText(selectedText).length
   };
-  showResearchSelectionMenu({
-    ...passage,
-    passages: [passage],
-    projectID: sectionWrapper.closest(".workspace-panel")?.dataset.projectId || "",
-    rect,
-    anchorElement: sectionWrapper.querySelector(".reader-section-title") || sectionWrapper
-  }, { pinned: true });
+  const projectID = selectedOpenProjectID() ||
+    sectionWrapper.closest(".workspace-panel")?.dataset.projectId || "";
+  try {
+    await startNewResearchFromSelection({
+      ...passage,
+      passages: [passage],
+      projectID
+    });
+  } catch (error) {
+    await showWebNotice("Research not started", error.message);
+  }
 }
 
 function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSection) {
@@ -18978,6 +18977,39 @@ async function saveResearchSelection(mode, button, status) {
     button.disabled = false;
     status.textContent = error.message;
   }
+}
+
+async function startNewResearchFromSelection(selection) {
+  if (!activeAccount()) {
+    await focusUtility("settings");
+    return null;
+  }
+  if (!hasCapability("research")) {
+    await presentPlanLimitNotice(
+      "Research Add-On required",
+      isProAccount()
+        ? "Add Research to start cited conversations grounded in enacted text."
+        : "Upgrade to Pro first, then add Research for cited enacted-code conversations."
+    );
+    return null;
+  }
+  const passages = selection.passages || [selection];
+  const payload = await postResearch("/research/conversations/create", {
+    selections: passages.map(({ sectionID, selectedText, savedItemID }) => ({
+      sectionID,
+      selectedText,
+      savedItemID
+    })),
+    projectID: selection.projectID || "",
+    savedItemID: selection.savedItemID || "",
+    originSurface: "reader"
+  });
+  activeResearchConversation = payload.conversation;
+  closeResearchSelectionMenu();
+  window.getSelection?.().removeAllRanges();
+  await refreshResearchConversationList();
+  await openResearchConversation(payload.conversation.id, { refreshList: true });
+  return payload.conversation;
 }
 
 function showResearchSelectionMenu(selectionOverride = null, options = {}) {
