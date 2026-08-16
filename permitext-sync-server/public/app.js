@@ -3620,10 +3620,12 @@ async function refreshProjectMembershipPanes(project) {
       : null));
 }
 
-async function refreshProjectSourceConsumers(projects = []) {
+async function refreshProjectSourceConsumers(projects = [], options = {}) {
   const requestedProjects = (Array.isArray(projects) ? projects : [projects]).filter(Boolean);
   const projectIDs = new Set(
-    requestedProjects.map((project) => projectDetailKey(projectIdentity(project))).filter(Boolean)
+    requestedProjects.map((project) => typeof project === "string"
+      ? project
+      : projectDetailKey(projectIdentity(project))).filter(Boolean)
   );
   if (!projectIDs.size) {
     notebookMounts.forEach((_mounted, projectID) => projectIDs.add(projectID));
@@ -3633,7 +3635,9 @@ async function refreshProjectSourceConsumers(projects = []) {
   projectIDs.forEach((projectID) => {
     const notebook = notebookMounts.get(projectID);
     if (typeof notebook?.refreshReferenceSources === "function") {
-      refreshes.push(notebook.refreshReferenceSources());
+      refreshes.push(notebook.refreshReferenceSources({
+        refreshFoundation: options.refreshNotebookFoundation === true
+      }));
     }
     const report = reportDraftMounts.get(projectID);
     if (typeof report?.refreshSources === "function") {
@@ -15614,8 +15618,14 @@ async function deleteResearchConversationFromList(conversation, button) {
         )
       ]);
     }
+    await refreshProjectSourceConsumers([conversation.primaryProjectID], {
+      refreshNotebookFoundation: true
+    });
     saveWorkspaceState();
-    await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+    const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
+    await transitionWorkspace("utility", {
+      refreshPaneIDs: ["utility:analysis", ...projectPaneIDs]
+    });
   } catch (error) {
     button.disabled = false;
     await showWebNotice("Conversation not deleted", error.message);
@@ -16746,6 +16756,9 @@ function renderNewResearchComposer(container, researchEnabled) {
       await runResearchProgressSession(progress, {
         onSuccess: async (result) => {
           activeResearchConversation = result.conversation;
+          await refreshProjectSourceConsumers([result.conversation.primaryProjectID], {
+            refreshNotebookFoundation: true
+          });
           await refreshResearchConversationList();
           await openResearchConversation(conversationID, { refreshList: true });
         }
@@ -17199,6 +17212,9 @@ async function renderResearch(paneID = "utility:analysis") {
             if (previousProjectID) {
               await hydrateCodeQuestionList(previousProjectID, { force: true, render: false });
             }
+            await refreshProjectSourceConsumers([previousProjectID, targetProjectID], {
+              refreshNotebookFoundation: true
+            });
             const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
             await transitionWorkspace("utility", {
               refreshPaneIDs: [
@@ -18361,6 +18377,9 @@ async function renderResearchConversation(conversationID, options = {}) {
         researchConversationList = researchConversationList.map((item) =>
           item.id === conversation.id ? { ...item, ...conversation } : item
         );
+        await refreshProjectSourceConsumers([previousProjectID, targetProjectID], {
+          refreshNotebookFoundation: true
+        });
         const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
         await transitionWorkspace("utility", {
           refreshPaneIDs: ["utility:analysis", paneID, ...projectPaneIDs]
@@ -18604,6 +18623,9 @@ async function renderResearchConversation(conversationID, options = {}) {
         if (supplemental) supplementalResearchConversations.set(conversationID, result.conversation);
         else activeResearchConversation = result.conversation;
         researchQuestionDraft = "";
+        await refreshProjectSourceConsumers([result.conversation.primaryProjectID], {
+          refreshNotebookFoundation: true
+        });
         await refreshResearchConversationList();
         if (supplemental) await openSupplementalResearchConversation(conversationID);
         else await openResearchConversation(conversationID, { refreshList: true });
