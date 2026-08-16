@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-report-title-v332";
+} from "./offline-storage.js?v=20260816-project-tool-transfer-v333";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -2926,26 +2926,78 @@ async function activateProjectStudio(project, options = {}) {
     return false;
   }
 
+  if (current && !(await confirmNotebookDiscard(current))) {
+    if (options.outcome) options.outcome.value = "cancelled";
+    return false;
+  }
+  if (
+    transitionGeneration !== projectStudioTransitionGeneration ||
+    activeWorkspaceID !== expectedWorkspaceID ||
+    (current && !openProjectDetails().some((detail) => projectDetailMatches(current, detail)))
+  ) {
+    if (options.outcome) options.outcome.value = "stale";
+    return false;
+  }
+  if (current && !(await confirmReportDraftDiscard(current))) {
+    if (options.outcome) options.outcome.value = "cancelled";
+    return false;
+  }
+  if (
+    transitionGeneration !== projectStudioTransitionGeneration ||
+    activeWorkspaceID !== expectedWorkspaceID ||
+    (current && !openProjectDetails().some((detail) => projectDetailMatches(current, detail)))
+  ) {
+    if (options.outcome) options.outcome.value = "stale";
+    return false;
+  }
+
   const openDetails = openProjectDetails();
   const openNotebookRecords = openNotebooks();
   const openReportRecords = openReportDrafts();
   const openCoordinationRecords = openCoordinations();
   const keepGenericWorkboardOpen = genericWorkboardIsOpen();
+  const replaceCurrentProjectOwner = (records) => records.map((item) =>
+    current && projectDetailMatches(current, item) ? identity : item
+  );
+  const remapProjectPane = (oldPaneID, nextPaneID) => {
+    if (!oldPaneID || oldPaneID === nextPaneID) return;
+    state.paneOrder = (state.paneOrder || []).map((paneID) => paneID === oldPaneID ? nextPaneID : paneID);
+    const priorWeight = state.paneWeights[oldPaneID];
+    if (Number.isFinite(priorWeight) && !Number.isFinite(state.paneWeights[nextPaneID])) {
+      state.paneWeights[nextPaneID] = priorWeight;
+    }
+    delete state.paneWeights[oldPaneID];
+  };
+  if (current) {
+    remapProjectPane(paneIDForProjectNotebook(current), paneIDForProjectNotebook(identity));
+    remapProjectPane(paneIDForProjectReportDraft(current), paneIDForProjectReportDraft(identity));
+    remapProjectPane(paneIDForProjectCoordination(current), paneIDForProjectCoordination(identity));
+    const currentProjectID = projectDetailKey(current);
+    notebookMounts.get(currentProjectID)?.dispose?.();
+    notebookMounts.delete(currentProjectID);
+    reportDraftMounts.get(currentProjectID)?.dispose?.();
+    reportDraftMounts.delete(currentProjectID);
+  }
   setOpenProjectDetails([
     identity,
-    ...openDetails.filter((detail) => !projectDetailMatches(identity, detail))
+    ...openDetails.filter((detail) =>
+      !projectDetailMatches(identity, detail) && (!current || !projectDetailMatches(current, detail))
+    )
   ]);
-  state.notebooks = options.openNotebook && !openNotebookRecords.some((item) => projectDetailMatches(identity, item))
-    ? [...openNotebookRecords, identity]
-    : openNotebookRecords;
+  const reassignedNotebookRecords = replaceCurrentProjectOwner(openNotebookRecords);
+  state.notebooks = options.openNotebook && !reassignedNotebookRecords.some((item) => projectDetailMatches(identity, item))
+    ? [...reassignedNotebookRecords, identity]
+    : reassignedNotebookRecords;
   state.workboards = keepGenericWorkboardOpen ? [genericWorkboardIdentity] : [];
-  state.reportDrafts = options.openReportDraft && !openReportRecords.some((item) => projectDetailMatches(identity, item))
-    ? [...openReportRecords, identity]
-    : openReportRecords;
+  const reassignedReportRecords = replaceCurrentProjectOwner(openReportRecords);
+  state.reportDrafts = options.openReportDraft && !reassignedReportRecords.some((item) => projectDetailMatches(identity, item))
+    ? [...reassignedReportRecords, identity]
+    : reassignedReportRecords;
+  const reassignedCoordinationRecords = replaceCurrentProjectOwner(openCoordinationRecords);
   state.coordinations = releaseSurfaceVisibility.coordination && options.openCoordination &&
-    !openCoordinationRecords.some((item) => projectDetailMatches(identity, item))
-      ? [...openCoordinationRecords, identity]
-      : openCoordinationRecords;
+    !reassignedCoordinationRecords.some((item) => projectDetailMatches(identity, item))
+      ? [...reassignedCoordinationRecords, identity]
+      : reassignedCoordinationRecords;
   // Project switch replaces Project-owned Code Question context (no cross-project leak).
   if (codeQuestionWorkspaceEnabled()) {
     ensureCodeQuestionShellForProject(identity);

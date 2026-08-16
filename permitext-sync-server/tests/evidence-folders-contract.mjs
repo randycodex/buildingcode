@@ -261,9 +261,10 @@ assert.ok(
   "Project deactivation must confirm Notebook edits before changing workspace state."
 );
 const activateProjectStudioSource = functionSource(appSource, "activateProjectStudio");
-assert.doesNotMatch(activateProjectStudioSource, /confirmNotebookDiscard|confirmReportDraftDiscard/);
-assert.match(activateProjectStudioSource, /\.\.\.openDetails\.filter\(\(detail\) => !projectDetailMatches\(identity, detail\)\)/);
-assert.match(activateProjectStudioSource, /openNotebookRecords[\s\S]*?openReportRecords/);
+assert.match(activateProjectStudioSource, /confirmNotebookDiscard\(current\)[\s\S]*?confirmReportDraftDiscard\(current\)/);
+assert.match(activateProjectStudioSource, /replaceCurrentProjectOwner[\s\S]*?reassignedNotebookRecords[\s\S]*?reassignedReportRecords/);
+assert.match(activateProjectStudioSource, /remapProjectPane\(paneIDForProjectNotebook\(current\), paneIDForProjectNotebook\(identity\)\)[\s\S]*?remapProjectPane\(paneIDForProjectReportDraft\(current\), paneIDForProjectReportDraft\(identity\)\)/);
+assert.match(activateProjectStudioSource, /!projectDetailMatches\(identity, detail\) && \(!current \|\| !projectDetailMatches\(current, detail\)\)/);
 assert.match(functionSource(appSource, "openProjectNotebook"), /openNotebooks\(\)\.filter/);
 assert.match(functionSource(appSource, "openProjectReportDraft"), /openReportDrafts\(\)\.filter/);
 assert.ok(
