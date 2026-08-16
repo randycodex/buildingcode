@@ -454,6 +454,7 @@ let projectStudioFolderReconcilePromise = null;
 let projectStudioTransitionGeneration = 0;
 let workspaceRenderGeneration = 0;
 let projectTransitionHubEntry = null;
+const projectSelectionControllers = new Map();
 const pendingNotebookCardByProject = new Map();
 const pendingReportDraftByProject = new Map();
 const reportDraftFocusResultByProject = new Map();
@@ -2863,7 +2864,7 @@ async function deactivateProjectStudio(project = openProjectDetails()[0] || null
     if (options.outcome) options.outcome.value = "applied";
     return true;
   }
-  if (!(await confirmNotebookDiscard(current))) {
+  if (!options.skipDiscardConfirmation && !(await confirmNotebookDiscard(current))) {
     if (options.outcome) options.outcome.value = "cancelled";
     return false;
   }
@@ -2875,7 +2876,7 @@ async function deactivateProjectStudio(project = openProjectDetails()[0] || null
     if (options.outcome) options.outcome.value = "stale";
     return false;
   }
-  if (!(await confirmReportDraftDiscard(current))) {
+  if (!options.skipDiscardConfirmation && !(await confirmReportDraftDiscard(current))) {
     if (options.outcome) options.outcome.value = "cancelled";
     return false;
   }
@@ -2928,7 +2929,7 @@ async function activateProjectStudio(project, options = {}) {
     return false;
   }
 
-  if (current && !(await confirmNotebookDiscard(current))) {
+  if (current && !options.skipDiscardConfirmation && !(await confirmNotebookDiscard(current))) {
     if (options.outcome) options.outcome.value = "cancelled";
     return false;
   }
@@ -2940,7 +2941,7 @@ async function activateProjectStudio(project, options = {}) {
     if (options.outcome) options.outcome.value = "stale";
     return false;
   }
-  if (current && !(await confirmReportDraftDiscard(current))) {
+  if (current && !options.skipDiscardConfirmation && !(await confirmReportDraftDiscard(current))) {
     if (options.outcome) options.outcome.value = "cancelled";
     return false;
   }
@@ -26624,6 +26625,181 @@ async function transitionProjectSelection(paneID) {
   }
 }
 
+function projectSelectionControllerKey(workspaceID, paneID) {
+  return `${String(workspaceID || "")}::${String(paneID || "")}`;
+}
+
+function projectSelectionInstance(controller) {
+  if (activeWorkspaceID !== controller.workspaceID) return null;
+  return (state.utilityInstances || []).find((instance) =>
+    instance.id === controller.instanceID &&
+    instance.key === "saved" &&
+    paneIDForUtilityInstance(instance) === controller.paneID
+  ) || null;
+}
+
+function projectSelectionIntentTargetsProject(intent, project) {
+  return Boolean(
+    intent?.kind === "project" &&
+    intent.project &&
+    project &&
+    projectDetailMatches(intent.project, project)
+  );
+}
+
+function takeLatestProjectSelectionIntent(controller, fallbackIntent) {
+  const intent = controller.pending || fallbackIntent;
+  controller.pending = null;
+  controller.activeIntent = intent;
+  syncProjectSelectionControllerUI(controller);
+  return intent;
+}
+
+function syncProjectSelectionControllerUI(controller) {
+  if (activeWorkspaceID !== controller.workspaceID) return;
+  const panel = track.querySelector(
+    `.saved-panel[data-pane-id="${CSS.escape(controller.paneID)}"]`
+  );
+  if (!panel) return;
+  const intent = controller.pending || controller.activeIntent;
+  const busy = Boolean(controller.running || intent);
+  panel.classList.toggle("is-project-selection-busy", busy);
+  panel.querySelectorAll(".saved-project-tile").forEach((tile) => {
+    tile.classList.remove("is-opening");
+    tile.removeAttribute("aria-busy");
+    delete tile.dataset.opening;
+  });
+  if (!busy || !intent) return;
+  let tile = null;
+  if (intent.kind === "project" && intent.folderID) {
+    tile = panel.querySelector(
+      `.saved-project-tile[data-project-id="${CSS.escape(String(intent.folderID))}"]`
+    );
+  } else if (intent.kind === "unassigned") {
+    tile = panel.querySelector(".saved-project-tile.is-unassigned-saved");
+  } else {
+    tile = panel.querySelector(".saved-project-tile.is-selected");
+  }
+  if (!tile) return;
+  tile.dataset.opening = "true";
+  tile.classList.add("is-opening");
+  tile.setAttribute("aria-busy", "true");
+}
+
+async function confirmLatestProjectSelectionIntent(controller, requestedIntent) {
+  let intent = takeLatestProjectSelectionIntent(controller, requestedIntent);
+  while (projectSelectionInstance(controller)) {
+    const current = openProjectDetails()[0] || null;
+    if (!current || projectSelectionIntentTargetsProject(intent, current)) {
+      return { confirmed: true, intent };
+    }
+    if (!(await confirmNotebookDiscard(current))) {
+      return { confirmed: false, intent };
+    }
+    if (!projectSelectionInstance(controller)) return { confirmed: false, stale: true, intent };
+    if (!openProjectDetails().some((project) => projectDetailMatches(project, current))) {
+      intent = takeLatestProjectSelectionIntent(controller, intent);
+      continue;
+    }
+    intent = takeLatestProjectSelectionIntent(controller, intent);
+    if (projectSelectionIntentTargetsProject(intent, current)) {
+      return { confirmed: true, intent };
+    }
+    if (!(await confirmReportDraftDiscard(current))) {
+      return { confirmed: false, intent };
+    }
+    if (!projectSelectionInstance(controller)) return { confirmed: false, stale: true, intent };
+    if (!openProjectDetails().some((project) => projectDetailMatches(project, current))) {
+      intent = takeLatestProjectSelectionIntent(controller, intent);
+      continue;
+    }
+    return {
+      confirmed: true,
+      intent: takeLatestProjectSelectionIntent(controller, intent)
+    };
+  }
+  return { confirmed: false, stale: true, intent };
+}
+
+async function applyProjectSelectionIntent(controller, requestedIntent) {
+  const instance = projectSelectionInstance(controller);
+  if (!instance) return false;
+  const intent = takeLatestProjectSelectionIntent(controller, requestedIntent);
+  if (intent.kind === "project") {
+    if (!intent.project || !folderIsProject(intent.project)) return false;
+    const activated = await activateProjectStudio(intent.project, {
+      sourcePaneID: controller.paneID,
+      focusSaved: false,
+      transition: false,
+      skipDiscardConfirmation: true
+    });
+    if (!activated) return false;
+  } else {
+    const deactivated = await deactivateProjectStudio(openProjectDetails()[0], {
+      transition: false,
+      skipDiscardConfirmation: true
+    });
+    if (!deactivated) return false;
+  }
+  const liveInstance = projectSelectionInstance(controller);
+  if (!liveInstance) return false;
+  state.projectHostPaneID = controller.paneID;
+  liveInstance.selectedFolderID = intent.kind === "project" ? intent.folderID : "";
+  liveInstance.organizeUnassigned = intent.kind === "unassigned";
+  liveInstance.showAllSaved = false;
+  liveInstance.folderQuery = "";
+  liveInstance.evidenceSearchOpen = false;
+  saveWorkspaceState();
+  await transitionProjectSelection(controller.paneID);
+  return true;
+}
+
+async function drainProjectSelectionController(controller) {
+  controller.running = true;
+  try {
+    while (controller.pending) {
+      let intent = takeLatestProjectSelectionIntent(controller, controller.pending);
+      const result = await confirmLatestProjectSelectionIntent(controller, intent);
+      if (!result.confirmed) {
+        controller.pending = null;
+        break;
+      }
+      intent = takeLatestProjectSelectionIntent(controller, result.intent);
+      if (!(await applyProjectSelectionIntent(controller, intent)) && !controller.pending) break;
+    }
+  } finally {
+    controller.running = false;
+    controller.activeIntent = null;
+    syncProjectSelectionControllerUI(controller);
+    if (projectSelectionControllers.get(controller.key) === controller) {
+      projectSelectionControllers.delete(controller.key);
+    }
+  }
+}
+
+function requestProjectSelection(paneID, instanceID, intent) {
+  const workspaceID = activeWorkspaceID;
+  const key = projectSelectionControllerKey(workspaceID, paneID);
+  let controller = projectSelectionControllers.get(key);
+  if (!controller) {
+    controller = {
+      key,
+      workspaceID,
+      paneID,
+      instanceID,
+      pending: null,
+      activeIntent: null,
+      running: false,
+      promise: null
+    };
+    projectSelectionControllers.set(key, controller);
+  }
+  controller.pending = { ...intent, workspaceID, paneID, instanceID };
+  syncProjectSelectionControllerUI(controller);
+  if (!controller.running) controller.promise = drainProjectSelectionController(controller);
+  return controller.promise;
+}
+
 function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 0) {
   if (!panel.isConnected) {
     if (attempt < 120) {
@@ -26874,7 +27050,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
         editProjectButton.addEventListener("keydown", (event) => event.stopPropagation());
         tile.append(editProjectButton);
       }
-      const open = async () => {
+      const open = () => {
         if (selecting) {
           const id = projectRecordID(project);
           if (!id || project.sharedOnly || selectionBusy) return;
@@ -26883,39 +27059,14 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
           updateSelectionControls();
           return;
         }
-        if (panel.dataset.folderTransition === "true") return;
-        panel.dataset.folderTransition = "true";
-        tile.dataset.opening = "true";
-        tile.classList.add("is-opening");
-        tile.setAttribute("aria-busy", "true");
         const nextFolderID = projectRecordID(project) === String(instance.selectedFolderID || "")
           ? ""
           : projectRecordID(project);
-        try {
-          if (nextFolderID && folderIsProject(project)) {
-            const activated = await activateProjectStudio(project, {
-              sourcePaneID: paneID,
-              focusSaved: false,
-              transition: false
-            });
-            if (!activated) return;
-          } else if (!(await deactivateProjectStudio(openProjectDetails()[0], { transition: false }))) {
-            return;
-          }
-          state.projectHostPaneID = paneID;
-          instance.selectedFolderID = nextFolderID;
-          instance.organizeUnassigned = false;
-          instance.showAllSaved = false;
-          instance.folderQuery = "";
-          instance.evidenceSearchOpen = false;
-          saveWorkspaceState();
-          await transitionProjectSelection(paneID);
-        } finally {
-          tile.classList.remove("is-opening");
-          tile.removeAttribute("aria-busy");
-          delete tile.dataset.opening;
-          delete panel.dataset.folderTransition;
-        }
+        void requestProjectSelection(paneID, instance.id, {
+          kind: nextFolderID ? "project" : "none",
+          folderID: nextFolderID,
+          project: nextFolderID ? project : null
+        });
       };
       tile.addEventListener("pointerdown", (event) => {
         if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
@@ -27029,22 +27180,14 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
       unassignedCountLabel.title = unassignedCount === 1 ? "1 unassigned saved section" : `${unassignedCount} unassigned saved sections`;
       unassignedCountLabel.setAttribute("aria-label", unassignedCountLabel.title);
       unassignedTile.append(unassignedHeading, unassignedCountLabel);
-      const openUnassigned = async () => {
-        if (selecting || selectionBusy || panel.dataset.folderTransition === "true") return;
-        panel.dataset.folderTransition = "true";
-        try {
-          if (!(await deactivateProjectStudio(openProjectDetails()[0], { transition: false }))) return;
-          state.projectHostPaneID = paneID;
-          instance.selectedFolderID = "";
-          instance.organizeUnassigned = !instance.organizeUnassigned;
-          instance.showAllSaved = false;
-          instance.folderQuery = "";
-          instance.evidenceSearchOpen = false;
-          saveWorkspaceState();
-          await transitionProjectSelection(paneID);
-        } finally {
-          delete panel.dataset.folderTransition;
-        }
+      const openUnassigned = () => {
+        if (selecting || selectionBusy) return;
+        const organizeUnassigned = !instance.organizeUnassigned;
+        void requestProjectSelection(paneID, instance.id, {
+          kind: organizeUnassigned ? "unassigned" : "none",
+          folderID: "",
+          project: null
+        });
       };
       unassignedTile.addEventListener("click", () => void openUnassigned());
       unassignedTile.addEventListener("keydown", (event) => {

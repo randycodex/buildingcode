@@ -262,6 +262,8 @@ assert.ok(
 );
 const activateProjectStudioSource = functionSource(appSource, "activateProjectStudio");
 assert.match(activateProjectStudioSource, /confirmNotebookDiscard\(current\)[\s\S]*?confirmReportDraftDiscard\(current\)/);
+assert.match(deactivateProjectStudioSource, /!options\.skipDiscardConfirmation && !\(await confirmNotebookDiscard\(current\)\)/);
+assert.match(activateProjectStudioSource, /!options\.skipDiscardConfirmation && !\(await confirmNotebookDiscard\(current\)\)/);
 assert.match(activateProjectStudioSource, /replaceCurrentProjectOwner[\s\S]*?reassignedNotebookRecords[\s\S]*?reassignedReportRecords/);
 assert.match(activateProjectStudioSource, /remapProjectPane\(paneIDForProjectNotebook\(current\), paneIDForProjectNotebook\(identity\)\)[\s\S]*?remapProjectPane\(paneIDForProjectReportDraft\(current\), paneIDForProjectReportDraft\(identity\)\)/);
 assert.match(activateProjectStudioSource, /!projectDetailMatches\(identity, detail\) && \(!current \|\| !projectDetailMatches\(current, detail\)\)/);
@@ -276,6 +278,22 @@ assert.match(
   functionSource(appSource, "transitionProjectSelection"),
   /settleSavedPanelAfterProjectTransition/
 );
+assert.match(appSource, /const projectSelectionControllers = new Map\(\)/);
+const requestProjectSelectionSource = functionSource(appSource, "requestProjectSelection");
+assert.match(requestProjectSelectionSource, /controller\.pending = \{ \.\.\.intent, workspaceID, paneID, instanceID \}/);
+assert.match(requestProjectSelectionSource, /if \(!controller\.running\) controller\.promise = drainProjectSelectionController\(controller\)/);
+assert.match(functionSource(appSource, "syncProjectSelectionControllerUI"), /activeWorkspaceID !== controller\.workspaceID/);
+const confirmLatestProjectSelectionSource = functionSource(appSource, "confirmLatestProjectSelectionIntent");
+assert.ok(
+  confirmLatestProjectSelectionSource.indexOf("confirmNotebookDiscard(current)") <
+    confirmLatestProjectSelectionSource.indexOf("confirmReportDraftDiscard(current)"),
+  "Serialized Project selection must confirm Notebook before Report without mutating Project ownership."
+);
+assert.match(confirmLatestProjectSelectionSource, /takeLatestProjectSelectionIntent\(controller, intent\)[\s\S]*?confirmReportDraftDiscard\(current\)[\s\S]*?takeLatestProjectSelectionIntent\(controller, intent\)/);
+const applyProjectSelectionSource = functionSource(appSource, "applyProjectSelectionIntent");
+assert.match(applyProjectSelectionSource, /activateProjectStudio\(intent\.project,[\s\S]*?skipDiscardConfirmation: true/);
+assert.match(applyProjectSelectionSource, /deactivateProjectStudio\(openProjectDetails\(\)\[0\],[\s\S]*?skipDiscardConfirmation: true/);
+assert.match(applyProjectSelectionSource, /liveInstance\.selectedFolderID = intent\.kind === "project" \? intent\.folderID : "";[\s\S]*?liveInstance\.organizeUnassigned = intent\.kind === "unassigned"/);
 assert.match(
   functionSource(appSource, "settleSavedPanelAfterProjectTransition"),
   /refreshSavedPanelInPlace/
@@ -402,6 +420,9 @@ assert.match(functionSource(appSource, "renderSavedProjects"), /addButton\.oncli
 assert.match(indexSource, /saved-projects-add-button[\s\S]*?saved-projects-archive-button[\s\S]*?saved-projects-select-button/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /selectButton\.onclick = \(\) => setSelecting\(!selecting\)/);
 const savedProjectsSource = functionSource(appSource, "renderSavedProjects");
+assert.doesNotMatch(savedProjectsSource, /folderTransition/);
+assert.match(savedProjectsSource, /void requestProjectSelection\(paneID, instance\.id, \{[\s\S]*?kind: nextFolderID \? "project" : "none"/);
+assert.match(savedProjectsSource, /const organizeUnassigned = !instance\.organizeUnassigned;[\s\S]*?void requestProjectSelection\(paneID, instance\.id, \{[\s\S]*?kind: organizeUnassigned \? "unassigned" : "none"/);
 assert.match(savedProjectsSource, /archiveSelectedButton\.onclick[\s\S]*?archiveProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)/);
 assert.match(savedProjectsSource, /selectionActions\.append\(cancelSelectionButton, archiveSelectedButton, deleteSelectedButton\)[\s\S]*?headingActions\.append\(selectionActions\)/);
 assert.doesNotMatch(savedProjectsSource, /saved-projects-bulk-bar|section\.insertBefore\(bulkBar, list\)/);
