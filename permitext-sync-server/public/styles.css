@@ -6780,6 +6780,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   display: grid;
 }
 
+.research-list-panel .research-conversation-list {
+  width: calc(100% + (2 * var(--panel-padding)));
+  margin-inline: calc(-1 * var(--panel-padding));
+}
+
 .research-history-group {
   display: grid;
 }
@@ -6788,6 +6793,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   display: flex;
   align-items: center;
   min-height: 38px;
+  padding-inline: var(--panel-padding);
 }
 
 .research-history-group-label {
@@ -6996,7 +7002,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   display: grid;
   gap: var(--space-3);
   min-width: 0;
-  padding: var(--space-4) 0;
+  padding: var(--space-4) var(--panel-padding);
   text-align: left;
 }
 
@@ -7044,6 +7050,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   display: flex;
   align-items: center;
   gap: var(--space-1);
+  margin-right: var(--panel-padding);
 }
 
 .research-conversation-project-picker {
