@@ -11584,6 +11584,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   display: flex;
   justify-content: flex-end;
   gap: var(--space-1);
+  min-height: 26px;
   margin-top: var(--space-2);
 }
 
@@ -11596,7 +11597,16 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-secondary);
   font-family: var(--chrome-font-family);
   font-size: calc(var(--saved-font-size) * 0.72) !important;
-  font-weight: 600;
+  font-weight: 400;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease, background-color 140ms ease, color 140ms ease;
+}
+
+.saved-section-row:hover .saved-row-actions button,
+.saved-section-row:focus-within .saved-row-actions button {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .saved-row-actions button:hover,
