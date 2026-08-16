@@ -11594,7 +11594,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   border: 0;
   border-radius: 1000px;
   background: transparent;
-  color: var(--text-secondary);
+  color: #404040;
   font-family: var(--chrome-font-family);
   font-size: calc(var(--saved-font-size) * 0.72) !important;
   font-weight: 400;
