@@ -4048,12 +4048,9 @@ final class CodeLibraryViewModel: ObservableObject {
         }.value
 
         await prewarmStartupPriorityChapters(chapters)
-
-        let chapterIDs = chapters.map(\.id)
-        let sectionIDs = await Task.detached(priority: .utility) {
-            store.firstSectionIDs(chapterIDs: chapterIDs)
-        }.value
-        await prewarmSectionDetails(sectionIDs)
+        // Do not sweep the first section of every chapter here. Missing prepared
+        // blocks can make that background pass synthesize whole-chapter HTML,
+        // keeping the app CPU-bound long after its first usable content appears.
     }
 
     private func prewarmSQLiteContent(chapters: [CodeChapter]) async {
