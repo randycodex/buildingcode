@@ -510,6 +510,12 @@ assert.match(appSource, /item\.savedColumnKind === "bookmark" &&[\s\S]*?!normali
 assert.match(appSource, /if \(searchActive\) return;[\s\S]*?savedInstance\.collapsedCodePrefixes/);
 assert.match(appSource, /function createSavedEvidenceHeading\([\s\S]*?saved-evidence-search-toggle[\s\S]*?Search saved evidence/);
 assert.match(indexSource, /class="saved-evidence-search"[\s\S]*?class="saved-evidence-search-input"[\s\S]*?class="saved-evidence-search-close"/);
+assert.match(indexSource, /class="saved-projects-section[^>]*aria-label="Projects"/);
+assert.match(indexSource, /class="code-filter-menu-toggle saved-projects-menu-toggle"[^>]*aria-label="Expand Projects"/);
+assert.match(appSource, /heading\.textContent = showingArchived \? "Archived saved collections" : "Saved collections"/);
+assert.match(appSource, /visibleRecords\.filter\(folderIsProject\)[\s\S]*?visibleRecords\.filter\(\(record\) => !folderIsProject\(record\)\)/);
+assert.match(appSource, /folderType\(visibleProjects\[sourceIndex\]\) !== folderType\(visibleProjects\[targetIndex\]\)/);
+assert.match(stylesSource, /\.saved-collections-section \{[\s\S]*?border-top: 1px solid var\(--border\);/);
 assert.doesNotMatch(indexSource, /class="code-filter-menu saved-code-filter-menu"/);
 assert.match(appSource, /control\.setAttribute\("aria-expanded", String\(nextExpanded\)\)/);
 assert.match(appSource, /if \(!expanded\) body\.hidden = true/);
@@ -620,7 +626,9 @@ assert.match(stylesSource, /\.saved-panel \.saved-code-toggle \{[\s\S]*?padding:
 assert.doesNotMatch(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \.saved-code-toggle/, "Saved Evidence code headers should not change spacing between collapsed and expanded states.");
 assert.doesNotMatch(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \+ \.saved-code-group\.is-collapsed/, "Collapsed Saved Evidence groups should not override the standard inter-group spacing.");
 assert.match(stylesSource, /\.saved-panel \.saved-code-group \+ \.saved-code-group \{[\s\S]*?margin-top: var\(--space-2\);/, "Saved Evidence code-group spacing should remain stable in every expanded state.");
-assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Folder type"\)/);
+assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Record type"\)/);
+assert.match(appSource, /\["reference", "Saved collection", "Reusable research that is not attached to a job yet"\]/);
+assert.match(appSource, /nameInput\.placeholder = selectedFolderType === "reference" \? "Saved collection name" : "Project Name"/);
 assert.match(appSource, /addressLabel\.hidden = selectedFolderType === "reference"/);
 assert.match(appSource, /sheet\.classList\.toggle\("is-reference-folder", selectedFolderType === "reference"\)/);
 assert.match(appSource, /address: selectedFolderType === "reference" \? "" : addressInput\.value/);

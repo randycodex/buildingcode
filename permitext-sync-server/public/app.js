@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-topbar-words-v263";
+} from "./offline-storage.js?v=20260816-projects-context-v265";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -9525,7 +9525,7 @@ function folderType(folder) {
 }
 
 function folderTypeLabel(folder) {
-  return folderType(folder) === "reference" ? "Reference folder" : "Project";
+  return folderType(folder) === "reference" ? "Saved collection" : "Project";
 }
 
 function folderIsProject(folder) {
@@ -24373,7 +24373,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     : "project";
   const overlay = document.createElement("section");
   overlay.className = "project-sheet-overlay";
-  overlay.setAttribute("aria-label", isEditing ? `Edit ${folderTypeLabel(project)}` : "New folder");
+  overlay.setAttribute("aria-label", isEditing ? `Edit ${folderTypeLabel(project)}` : "New Project or saved collection");
 
   const sheet = document.createElement("form");
   sheet.className = "project-create-sheet";
@@ -24391,7 +24391,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
 
   const typeGroup = document.createElement("fieldset");
   typeGroup.className = "project-folder-type";
-  typeGroup.setAttribute("aria-label", "Folder type");
+  typeGroup.setAttribute("aria-label", "Record type");
   const typeChoices = document.createElement("div");
   const syncFolderTypeControls = () => {
     sheet.classList.toggle("is-reference-folder", selectedFolderType === "reference");
@@ -24399,13 +24399,14 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       button.setAttribute("aria-pressed", String(button.dataset.folderType === selectedFolderType));
     });
     addressLabel.hidden = selectedFolderType === "reference";
+    nameInput.placeholder = selectedFolderType === "reference" ? "Saved collection name" : "Project Name";
     descriptionInput.placeholder = selectedFolderType === "reference"
       ? "Reference notes: purpose, topic, or how this collection should be used"
       : "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
   };
   [
     ["project", "Project", "A job, property, address, or professional matter"],
-    ["reference", "Reference", "Reusable research that is not attached to a job yet"]
+    ["reference", "Saved collection", "Reusable research that is not attached to a job yet"]
   ].forEach(([value, label, description]) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -24513,7 +24514,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     } catch (error) {
       saveButton.disabled = false;
       const content = panel.querySelector(".projects-content, .saved-project-list");
-      if (content) appendMutedRow(content, "Project not synced", error.message || "Could not save the project folder.");
+      if (content) appendMutedRow(content, "Item not synced", error.message || "Could not save the Project or saved collection.");
     }
   });
 
@@ -26215,7 +26216,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const selectionActions = document.createElement("div");
   selectionActions.className = "saved-projects-selection-actions";
   selectionActions.hidden = true;
-  selectionActions.setAttribute("aria-label", "Folder selection");
+  selectionActions.setAttribute("aria-label", "Project and saved collection selection");
   const cancelSelectionButton = document.createElement("button");
   cancelSelectionButton.type = "button";
   cancelSelectionButton.className = "saved-projects-selection-action saved-projects-selection-cancel";
@@ -26226,7 +26227,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const deleteSelectedButton = document.createElement("button");
   deleteSelectedButton.type = "button";
   deleteSelectedButton.className = "saved-projects-selection-action saved-projects-selection-delete";
-  deleteSelectedButton.title = "Delete selected folders";
+  deleteSelectedButton.title = "Delete selected Projects and saved collections";
   deleteSelectedButton.setAttribute("aria-label", deleteSelectedButton.title);
   deleteSelectedButton.innerHTML = trashIconSVG();
   selectionActions.append(cancelSelectionButton, archiveSelectedButton, deleteSelectedButton);
@@ -26234,10 +26235,11 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const projectsMenuLabel = (savedInstance) => {
     if (savedInstance.projectsMenuOpen) return "";
     if (savedInstance.projectsArchiveMode) return "Archived Projects";
-    const selectedFolder = projects.find((project) =>
+    const selectedProject = projects.find((project) =>
+      folderIsProject(project) &&
       projectRecordID(project) === String(savedInstance.selectedFolderID || "")
     );
-    return selectedFolder?.name || selectedFolder?.title || "Projects";
+    return selectedProject?.name || selectedProject?.title || "Projects";
   };
   addButton.onclick = () => showProjectCreateSheet(panel);
   wireCodeFilterMenu(list, instance, {
@@ -26277,12 +26279,14 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     });
     section.classList.toggle("is-selecting", selecting);
     selectButton.setAttribute("aria-pressed", String(selecting));
-    selectButton.title = selecting ? "Cancel folder selection" : "Select folders";
+    selectButton.title = selecting ? "Cancel selection" : "Select Projects and saved collections";
     selectButton.setAttribute("aria-label", selectButton.title);
     selectButton.hidden = selecting;
     selectionActions.hidden = !selecting;
     const selectedCount = selectedProjectIDs.size;
-    archiveSelectedButton.title = showingArchived ? "Restore selected folders" : "Archive selected folders";
+    archiveSelectedButton.title = showingArchived
+      ? "Restore selected Projects and saved collections"
+      : "Archive selected Projects and saved collections";
     archiveSelectedButton.setAttribute("aria-label", archiveSelectedButton.title);
     archiveSelectedButton.innerHTML = showingArchived ? archiveRestoreIconSVG() : archiveIconSVG();
     archiveSelectedButton.disabled = selectedCount === 0 || selectionBusy;
@@ -26299,10 +26303,10 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       tile.classList.toggle("is-bulk-selected", selected);
       if (selecting && eligible) {
         tile.setAttribute("aria-pressed", String(selected));
-        tile.setAttribute("aria-label", `${selected ? "Deselect" : "Select"} ${tile.dataset.projectName || "folder"}`);
+        tile.setAttribute("aria-label", `${selected ? "Deselect" : "Select"} ${tile.dataset.projectName || "item"}`);
       } else {
         tile.removeAttribute("aria-pressed");
-        tile.setAttribute("aria-label", tile.dataset.defaultAriaLabel || "Open folder");
+        tile.setAttribute("aria-label", tile.dataset.defaultAriaLabel || "Open item");
       }
       const editProjectButton = tile.querySelector(".saved-project-tile-edit");
       if (editProjectButton) {
@@ -26319,16 +26323,20 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   };
 
   const renderProjectCards = () => {
-    const visibleProjects = showingArchived
+    const visibleRecords = showingArchived
       ? archivedProjectRecords(projects)
       : activeFolderRecords(projects);
+    const visibleProjects = [
+      ...visibleRecords.filter(folderIsProject),
+      ...visibleRecords.filter((record) => !folderIsProject(record))
+    ];
     clear(list);
     list.classList.toggle("is-showing-archive", showingArchived);
     if (!visibleProjects.length) {
       if (!showingArchived) {
         const empty = document.createElement("p");
         empty.className = "saved-projects-empty";
-        empty.textContent = "No folders yet. Use + to create a Project or Reference folder.";
+        empty.textContent = "No Projects or saved collections yet. Use New to create one.";
         list.append(empty);
       }
       updateCodeFilterMenu(list, instance, {
@@ -26338,6 +26346,28 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       return;
     }
+
+    if (!visibleProjects.some(folderIsProject)) {
+      const emptyProjects = document.createElement("p");
+      emptyProjects.className = "saved-projects-empty";
+      emptyProjects.textContent = showingArchived ? "No archived Projects." : "No Projects yet.";
+      list.append(emptyProjects);
+    }
+
+    let savedCollectionsList = null;
+    const ensureSavedCollectionsList = () => {
+      if (savedCollectionsList) return savedCollectionsList;
+      const collections = document.createElement("section");
+      collections.className = "saved-collections-section";
+      const heading = document.createElement("h3");
+      heading.className = "saved-collections-heading";
+      heading.textContent = showingArchived ? "Archived saved collections" : "Saved collections";
+      savedCollectionsList = document.createElement("div");
+      savedCollectionsList.className = "saved-collections-list";
+      collections.append(heading, savedCollectionsList);
+      list.append(collections);
+      return savedCollectionsList;
+    };
 
     let draggedProjectID = "";
     const clearDropIndicators = () => {
@@ -26350,6 +26380,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       const sourceIndex = visibleProjects.findIndex((project) => projectRecordID(project) === sourceID);
       const targetIndex = visibleProjects.findIndex((project) => projectRecordID(project) === targetID);
       if (sourceIndex === -1 || targetIndex === -1 || sourceIndex === targetIndex) return;
+      if (folderType(visibleProjects[sourceIndex]) !== folderType(visibleProjects[targetIndex])) return;
       const reordered = [...visibleProjects];
       const [movedProject] = reordered.splice(sourceIndex, 1);
       let insertionIndex = targetIndex - (sourceIndex < targetIndex ? 1 : 0);
@@ -26369,9 +26400,10 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor));
       tile.tabIndex = 0;
       tile.setAttribute("role", "button");
-      tile.setAttribute("aria-label", `Open ${project.name || project.title || "folder"}`);
+      tile.setAttribute("aria-label", `Open ${project.name || project.title || (folderIsProject(project) ? "Project" : "saved collection")}`);
       tile.dataset.projectId = projectRecordID(project);
-      tile.dataset.projectName = project.name || project.title || "folder";
+      tile.dataset.projectName = project.name || project.title || (folderIsProject(project) ? "Project" : "saved collection");
+      tile.dataset.folderType = folderType(project);
       tile.dataset.defaultAriaLabel = tile.getAttribute("aria-label");
       tile.dataset.bulkSelectable = String(!project.sharedOnly);
       const selected = !showingArchived && projectRecordID(project) === String(instance.selectedFolderID || "");
@@ -26380,7 +26412,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       if (!showingArchived && !project.sharedOnly) {
         tile.dataset.draggable = "true";
         tile.draggable = true;
-        tile.title = "Drag to reorder · Alt+Arrow keys also move this folder";
+        tile.title = `Drag to reorder · Alt+Arrow keys also move this ${folderIsProject(project) ? "Project" : "saved collection"}`;
         tile.setAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
       }
       const heading = document.createElement("strong");
@@ -26396,7 +26428,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
         const editProjectButton = document.createElement("button");
         editProjectButton.type = "button";
         editProjectButton.className = "saved-project-tile-edit";
-        editProjectButton.title = `Edit ${project.name || project.title || "folder"}`;
+        editProjectButton.title = `Edit ${project.name || project.title || (folderIsProject(project) ? "Project" : "saved collection")}`;
         editProjectButton.setAttribute("aria-label", editProjectButton.title);
         editProjectButton.innerHTML = pencilIconSVG();
         editProjectButton.hidden = !selecting;
@@ -26479,7 +26511,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
           );
           const nextIndex = currentIndex + (event.key === "ArrowUp" ? -1 : 1);
           const target = visibleProjects[nextIndex];
-          if (target) {
+          if (target && folderType(target) === folderType(project)) {
             void reorderProject(
               projectRecordID(project),
               projectRecordID(target),
@@ -26510,6 +26542,8 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       tile.addEventListener("dragover", (event) => {
         const sourceID = draggedProjectID || event.dataTransfer.getData("text/plain");
         if (!sourceID || sourceID === tile.dataset.projectId || tile.dataset.draggable !== "true") return;
+        const sourceProject = visibleProjects.find((candidate) => projectRecordID(candidate) === sourceID);
+        if (!sourceProject || folderType(sourceProject) !== folderType(project)) return;
         event.preventDefault();
         event.dataTransfer.dropEffect = "move";
         const bounds = tile.getBoundingClientRect();
@@ -26539,7 +26573,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
           tile.dataset.justDragged = "false";
         });
       });
-      list.append(tile);
+      (folderIsProject(project) ? list : ensureSavedCollectionsList()).append(tile);
     });
     updateSelectionControls();
     updateCodeFilterMenu(list, instance, {
