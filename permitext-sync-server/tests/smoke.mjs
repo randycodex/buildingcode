@@ -771,7 +771,7 @@ async function main() {
       "Saved and Projects no longer follow the combined iOS hierarchy."
     );
     assert(
-      workspaceScript.text.includes("function renderSavedProjects(panel, instance, paneID, projects, projectSections)") &&
+      workspaceScript.text.includes("function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = [])") &&
         workspaceScript.text.includes("function projectForegroundColor(color)") &&
         workspaceScript.text.includes('tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor))') &&
         workspaceScript.text.includes("async function persistProjectOrder(projects, paneID)") &&
@@ -1431,7 +1431,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-reader-single-research-v296'),
+        webRoot.text.includes('/web/app.js?v=20260816-unassigned-saved-v297'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1592,7 +1592,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-single-research-v296'),
+      webRoot.text.includes('/web/styles.css?v=20260816-unassigned-saved-v297'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1857,7 +1857,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-single-research-v296'),
+      webRoot.text.includes('/web/styles.css?v=20260816-unassigned-saved-v297'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

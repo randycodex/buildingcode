@@ -214,7 +214,7 @@ assert.match(
   /async function persistSectionFolderSelection\([\s\S]*?saveWorkspaceState\(\);[\s\S]*?await refreshProjectMembershipPanes\([\s\S]*?await pushMutationBatch\(mutations\)/,
   "Saving evidence to a Project must update open Project columns before the network round-trip."
 );
-assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?Nothing is moved or deleted automatically\./);
+assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?These passages are saved safely without a Project\./);
 assert(!appSource.includes("No archived folders."), "An empty archive should not render a redundant placeholder row.");
 const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");
 assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
@@ -378,9 +378,9 @@ assert.match(functionSource(appSource, "researchSelectionFromWindow"), /originPa
 assert.match(functionSource(appSource, "activePaneIDs"), /pinCriticalWorkflowPanesToLeft\(paired\)/);
 assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
-assert.match(savedFolderContextSource, /if \(!folder\)[\s\S]*?inlineFilters\.hidden = true;[\s\S]*?savedContent\.hidden = true;/);
+assert.match(savedFolderContextSource, /if \(!folder\)[\s\S]*?inlineFilters\.hidden = !savedInstance\.organizeUnassigned;[\s\S]*?savedContent\.hidden = !savedInstance\.organizeUnassigned;/);
 assert.match(savedFolderContextSource, /inlineFilters\.hidden = false;[\s\S]*?savedContent\.hidden = false;/);
-assert.match(functionSource(appSource, "performSavedPanelHydration"), /renderSavedProjects[\s\S]*?if \(!selectedFolder\) return;/);
+assert.match(functionSource(appSource, "performSavedPanelHydration"), /renderSavedProjects[\s\S]*?const showingUnassigned = !selectedFolder && savedInstance\.organizeUnassigned;[\s\S]*?if \(!selectedFolder && !showingUnassigned\) return;/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /outcome\.value === "cancelled"[\s\S]*?expectedHostPaneID[\s\S]*?expectedSelectedFolderID/);
 assert.doesNotMatch(savedFolderContextSource, /loadProjectCoordinationFoundation/);
 assert.match(savedFolderContextSource, /previousContext\.replaceWith\(context\)/);

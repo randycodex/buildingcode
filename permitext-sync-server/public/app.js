@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-reader-single-research-v296";
+} from "./offline-storage.js?v=20260816-unassigned-saved-v297";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -25538,8 +25538,8 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
   projectsSection.hidden = false;
   if (!folder) {
     projectsSection.after(inlineFilters, planUsage, savedContent);
-    inlineFilters.hidden = true;
-    savedContent.hidden = true;
+    inlineFilters.hidden = !savedInstance.organizeUnassigned;
+    savedContent.hidden = !savedInstance.organizeUnassigned;
     previousContext?.remove();
     panel.querySelector(".saved-unassigned-notice")?.remove();
     if (savedInstance.selectedFolderID) savedInstance.selectedFolderID = "";
@@ -25778,23 +25778,18 @@ async function reconcileProjectStudioWithSavedFolders(folders) {
 function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems, projectSections, selectedFolder) {
   panel.querySelector(".saved-unassigned-notice")?.remove();
   if (selectedFolder) return new Set();
-  const linkedSectionIDs = new Set((projectSections || []).map((item) =>
-    savedEvidenceKey(item)
-  ));
-  const unassignedIDs = new Set((savedItems || [])
-    .map((item) => savedEvidenceKey(item))
-    .filter((sectionID) => !sectionID.endsWith(":") && !linkedSectionIDs.has(sectionID)));
+  const unassignedIDs = unassignedSavedEvidenceKeys(savedItems, projectSections);
   if (!unassignedIDs.size && !savedInstance.organizeUnassigned) return unassignedIDs;
 
   const notice = document.createElement("section");
   notice.className = "saved-unassigned-notice";
   const heading = document.createElement("strong");
   heading.textContent = savedInstance.organizeUnassigned
-    ? "Organize existing evidence"
+    ? `Unassigned Saved · ${unassignedIDs.size}`
     : `${unassignedIDs.size} saved ${unassignedIDs.size === 1 ? "section needs" : "sections need"} a destination`;
   const copy = document.createElement("p");
   copy.textContent = savedInstance.organizeUnassigned
-    ? "Open each section below and use Save to choose one or more destinations. Nothing is moved or deleted automatically."
+    ? "These passages are saved safely without a Project. Open one to read it, or use Save to add it to a Project or saved collection."
     : "Older saved evidence is kept safely until you choose a Project or saved collection.";
   const action = document.createElement("button");
   action.type = "button";
@@ -25807,6 +25802,13 @@ function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems
   notice.append(heading, copy, action);
   panel.querySelector(".saved-inline-filters")?.before(notice);
   return unassignedIDs;
+}
+
+function unassignedSavedEvidenceKeys(savedItems, projectSections) {
+  const linkedSectionIDs = new Set((projectSections || []).map((item) => savedEvidenceKey(item)));
+  return new Set((savedItems || [])
+    .map((item) => savedEvidenceKey(item))
+    .filter((sectionID) => !sectionID.endsWith(":") && !linkedSectionIDs.has(sectionID)));
 }
 
 function savedEvidenceMatchesQuery(item, query) {
@@ -25917,10 +25919,30 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       countLabel.title = count === 1 ? "1 saved section" : `${count} saved sections`;
       countLabel.setAttribute("aria-label", countLabel.title);
     });
+    const unassignedCountLabel = panel.querySelector(".is-unassigned-saved .saved-project-count");
+    if (unassignedCountLabel) {
+      const unassignedCount = unassignedSavedEvidenceKeys(
+        summary.savedItems || [],
+        summary.projectSections || []
+      ).size;
+      unassignedCountLabel.textContent = String(unassignedCount);
+      unassignedCountLabel.title = unassignedCount === 1
+        ? "1 unassigned saved section"
+        : `${unassignedCount} unassigned saved sections`;
+      unassignedCountLabel.setAttribute("aria-label", unassignedCountLabel.title);
+    }
   } else {
-    renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
+    renderSavedProjects(
+      panel,
+      savedInstance,
+      paneID,
+      workspaceProjects,
+      summary.projectSections || [],
+      summary.savedItems || []
+    );
   }
-  if (!selectedFolder) return;
+  const showingUnassigned = !selectedFolder && savedInstance.organizeUnassigned;
+  if (!selectedFolder && !showingUnassigned) return;
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     clear(content);
@@ -26226,14 +26248,15 @@ async function renderSaved(instance) {
     savedInstance,
     paneID,
     mergeProjectsWithOrganizationAccess(summary.projects || []),
-    summary.projectSections || []
+    summary.projectSections || [],
+    summary.savedItems || []
   );
   requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID));
 
   return panel;
 }
 
-function renderSavedProjects(panel, instance, paneID, projects, projectSections) {
+function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = []) {
   const list = panel.querySelector(".saved-project-list");
   const section = panel.querySelector(".saved-projects-section");
   const selectButton = panel.querySelector(".saved-projects-select-button");
@@ -26371,15 +26394,9 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
         empty.textContent = "No Projects or saved collections yet. Use New to create one.";
         list.append(empty);
       }
-      updateCodeFilterMenu(list, instance, {
-        stateKey: "projectsMenuOpen",
-        menuName: "projects",
-        label: projectsMenuLabel
-      });
-      return;
     }
 
-    if (!visibleProjects.some(folderIsProject)) {
+    if (visibleProjects.length && !visibleProjects.some(folderIsProject)) {
       const emptyProjects = document.createElement("p");
       emptyProjects.className = "saved-projects-empty";
       emptyProjects.textContent = showingArchived ? "No archived Projects." : "No Projects yet.";
@@ -26607,6 +26624,51 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       (folderIsProject(project) ? list : ensureSavedCollectionsList()).append(tile);
     });
+    if (!showingArchived) {
+      const unassignedCount = unassignedSavedEvidenceKeys(savedItems, projectSections).size;
+      const unassignedTile = document.createElement("article");
+      unassignedTile.className = "saved-project-tile is-reference is-unassigned-saved";
+      unassignedTile.tabIndex = 0;
+      unassignedTile.setAttribute("role", "button");
+      unassignedTile.setAttribute("aria-label", "Open Unassigned Saved");
+      unassignedTile.dataset.projectName = "Unassigned Saved";
+      unassignedTile.dataset.defaultAriaLabel = "Open Unassigned Saved";
+      unassignedTile.dataset.bulkSelectable = "false";
+      unassignedTile.classList.toggle("is-selected", instance.organizeUnassigned);
+      if (instance.organizeUnassigned) unassignedTile.setAttribute("aria-current", "true");
+      const unassignedHeading = document.createElement("strong");
+      unassignedHeading.textContent = "Unassigned Saved";
+      const unassignedCountLabel = document.createElement("span");
+      unassignedCountLabel.className = "saved-project-count";
+      unassignedCountLabel.textContent = String(unassignedCount);
+      unassignedCountLabel.title = unassignedCount === 1 ? "1 unassigned saved section" : `${unassignedCount} unassigned saved sections`;
+      unassignedCountLabel.setAttribute("aria-label", unassignedCountLabel.title);
+      unassignedTile.append(unassignedHeading, unassignedCountLabel);
+      const openUnassigned = async () => {
+        if (selecting || selectionBusy || panel.dataset.folderTransition === "true") return;
+        panel.dataset.folderTransition = "true";
+        try {
+          if (!(await deactivateProjectStudio(openProjectDetails()[0], { transition: false }))) return;
+          state.projectHostPaneID = paneID;
+          instance.selectedFolderID = "";
+          instance.organizeUnassigned = !instance.organizeUnassigned;
+          instance.showAllSaved = false;
+          instance.folderQuery = "";
+          instance.evidenceSearchOpen = false;
+          saveWorkspaceState();
+          await transitionProjectSelection(paneID);
+        } finally {
+          delete panel.dataset.folderTransition;
+        }
+      };
+      unassignedTile.addEventListener("click", () => void openUnassigned());
+      unassignedTile.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        void openUnassigned();
+      });
+      ensureSavedCollectionsList().append(unassignedTile);
+    }
     updateSelectionControls();
     updateCodeFilterMenu(list, instance, {
       stateKey: "projectsMenuOpen",
