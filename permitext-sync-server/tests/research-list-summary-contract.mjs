@@ -17,6 +17,44 @@ const [appSource, clientSource, stylesSource, indexSource] = await Promise.all([
   readFile(join(root, "../public/index.html"), "utf8")
 ]);
 
+function functionSource(source, name) {
+  const asyncStart = source.indexOf(`async function ${name}(`);
+  const start = asyncStart >= 0 ? asyncStart : source.indexOf(`function ${name}(`);
+  assert.notEqual(start, -1, `${name} must exist.`);
+  const parametersStart = source.indexOf("(", start);
+  let parameterDepth = 0;
+  let parametersEnd = -1;
+  for (let index = parametersStart; index < source.length; index += 1) {
+    if (source[index] === "(") parameterDepth += 1;
+    if (source[index] === ")") parameterDepth -= 1;
+    if (parameterDepth === 0) {
+      parametersEnd = index;
+      break;
+    }
+  }
+  const bodyStart = source.indexOf("{", parametersEnd);
+  let depth = 0;
+  let quote = "";
+  let escaped = false;
+  for (let index = bodyStart; index < source.length; index += 1) {
+    const character = source[index];
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (character === "\\") escaped = true;
+      else if (character === quote) quote = "";
+      continue;
+    }
+    if (character === '"' || character === "'" || character === "`") {
+      quote = character;
+      continue;
+    }
+    if (character === "{") depth += 1;
+    if (character === "}") depth -= 1;
+    if (depth === 0) return source.slice(start, index + 1);
+  }
+  throw new Error(`Could not parse ${name}.`);
+}
+
 const hugeVisual = "data:image/png;base64," + "A".repeat(50_000);
 const conversation = {
   id: "conv-list-1",
@@ -429,7 +467,14 @@ assert.match(stylesSource, /\.saved-project-tile\.is-unassigned-saved \{[\s\S]*?
 assert.match(stylesSource, /\.saved-projects-actions \.saved-projects-selection-cancel \{[\s\S]*?width: auto;[\s\S]*?padding-inline: var\(--space-1\);/, "The Projects selection Cancel label must reserve its text width beside the action icons.");
 assert.match(clientSource, /function animateSavedRowRemoval\(row\)[\s\S]*?height: "0px"[\s\S]*?duration: 220[\s\S]*?row\.remove\(\);/, "Saved evidence removal must collapse the row smoothly before removing it from the DOM.");
 assert.match(clientSource, /removeItemButton\.addEventListener\("click", async \(\) => \{[\s\S]*?animateSavedItemRemoval\(row\)[\s\S]*?refreshSavedPanes: false,[\s\S]*?refreshProjectPanes: false[\s\S]*?onSavedItemRemoved\(item\)/, "Single saved-item removal must animate locally before hydrating the settled evidence list.");
+assert.doesNotMatch(functionSource(clientSource, "createSavedBulkSelectionController"), /renderWorkspace\(/, "Bulk evidence deletion must not rebuild dirty Notebook or Report editors.");
+assert.match(functionSource(clientSource, "createSavedBulkSelectionController"), /refreshOpenSavedPanes\(\)[\s\S]*?refreshVisibleSyncedDerivedState\(\)/, "Bulk evidence deletion must refresh Saved and visible bookmark controls in place.");
+assert.match(clientSource, /unlinkEvidenceFromFolder\([\s\S]*?\{ refreshPanes: false \}[\s\S]*?await refreshOpenSavedPanes\(\)/, "Bulk Project evidence deletion must batch membership updates before one visible refresh.");
 assert.match(clientSource, /state\.localSavedItems = \[[\s\S]*?saveWorkspaceState\(\);[\s\S]*?if \(!saved\) \{[\s\S]*?syncReaderNoteBookmarkButtons\(sectionPayload\.sectionID, false, sectionPayload\.codeVersion\);/, "Deleting saved evidence must immediately reset matching bookmark controls in every open Reader.");
+assert.doesNotMatch(functionSource(clientSource, "renderSectionDetail"), /persistSectionBookmark\(sectionPayload, false\)[\s\S]*?renderWorkspace\(/, "Section-detail deletion must not rebuild dirty Notebook or Report editors.");
+assert.match(functionSource(clientSource, "renderSectionDetail"), /persistSectionBookmark\(sectionPayload, false\)[\s\S]*?refreshVisibleSyncedDerivedState\(\)/, "Section-detail deletion must update its bookmark state without replacing unrelated panes.");
+assert.match(functionSource(clientSource, "scheduleAnnotationPush"), /record\.syncFields[\s\S]*?includes\("noteBody"\)[\s\S]*?refreshOpenSavedPanes\(\)[\s\S]*?refreshVisibleSyncedDerivedState\(\)/, "Debounced note saves must refresh every repeatable Saved column and visible note control.");
+assert.doesNotMatch(functionSource(clientSource, "scheduleAnnotationPush"), /state\.utilities\.saved|renderWorkspace\(/, "Note propagation must not depend on the retired Saved boolean or rebuild dirty editors.");
 assert.match(clientSource, /async function clearResearchConversationHistory\(button,[\s\S]*?"Remove selected Research history\?"[\s\S]*?container: button\.closest\("\.workspace-panel"\)/, "Bulk Research-history removal must keep its confirmation inside the Research column.");
 assert.match(clientSource, /unassignedHeading\.textContent = "Unassigned Saved"[\s\S]*?unassignedCountLabel\.textContent = String\(unassignedCount\)[\s\S]*?instance\.organizeUnassigned = !instance\.organizeUnassigned[\s\S]*?transitionProjectSelection\(paneID\)/, "The Projects menu does not expose a counted Unassigned Saved destination that opens its filtered evidence view.");
 assert.match(clientSource, /const showingUnassigned = !selectedFolder && savedInstance\.organizeUnassigned;[\s\S]*?if \(!selectedFolder && !showingUnassigned\) return;/, "The Saved panel still prevents the Unassigned Saved view from rendering without a Project.");

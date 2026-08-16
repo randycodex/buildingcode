@@ -10017,7 +10017,7 @@ async function removeSectionFromProject(project, item, options = {}) {
   }
 }
 
-async function unlinkEvidenceFromFolder(folder, item, container = null) {
+async function unlinkEvidenceFromFolder(folder, item, container = null, options = {}) {
   const remainingLinks = (currentContentSummary().projectSections || []).filter((candidate) =>
     savedEvidenceKey(candidate) === savedEvidenceKey(item) &&
     !projectSectionBelongsToProject(candidate, folder)
@@ -10030,10 +10030,16 @@ async function unlinkEvidenceFromFolder(folder, item, container = null) {
       container
     });
     if (!confirmed) return false;
-    await removeSectionFromProject(folder, item, { removeBookmark: true });
+    await removeSectionFromProject(folder, item, {
+      removeBookmark: true,
+      refreshPanes: options.refreshPanes !== false
+    });
     return true;
   }
-  await removeSectionFromProject(folder, item, { removeBookmark: false });
+  await removeSectionFromProject(folder, item, {
+    removeBookmark: false,
+    refreshPanes: options.refreshPanes !== false
+  });
   return true;
 }
 
@@ -10217,11 +10223,14 @@ function scheduleAnnotationPush(record) {
         String(item.id || "") !== timerKey || String(item.updatedAt || "") !== String(record.updatedAt || "")
       );
       saveWorkspaceState();
-      if (state.utilities.saved) await renderWorkspace();
     } catch {
       // The local annotation and durable outbox entry remain available for retry.
     } finally {
       annotationPushTimers.delete(timerKey);
+      if ((record.syncFields || []).includes("noteBody")) {
+        await refreshOpenSavedPanes().catch(() => {});
+        refreshVisibleSyncedDerivedState();
+      }
     }
   }, 650));
 }
@@ -14309,7 +14318,7 @@ async function renderSectionDetail(searchID, detail) {
       if (persisted === false) {
         return;
       }
-      await renderWorkspace();
+      refreshVisibleSyncedDerivedState();
     } catch (error) {
       saveButton.classList.add("has-error");
       const message = error.message || "Could not update this saved section.";
@@ -26223,7 +26232,8 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
             savedEvidenceKey(link) === savedEvidenceKey(item) &&
             projectSectionBelongsToProject(link, selectedFolder)
           ) || item,
-          panel
+          panel,
+          { refreshPanes: false }
         )
       })
     : null;
@@ -27238,7 +27248,8 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
         "Saved evidence deleted",
         `${removedCount} saved ${removedCount === 1 ? "item was" : "items were"} deleted.`
       );
-      await renderWorkspace();
+      await refreshOpenSavedPanes();
+      refreshVisibleSyncedDerivedState();
     } catch (error) {
       await showWebNotice(
         "Could not remove saved items",
