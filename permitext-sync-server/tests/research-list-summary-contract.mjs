@@ -198,8 +198,9 @@ const newResearchComposerStart = clientSource.indexOf("function renderNewResearc
 const newResearchComposerEnd = clientSource.indexOf("\nasync function renderResearch(", newResearchComposerStart);
 const newResearchComposerSource = clientSource.slice(newResearchComposerStart, newResearchComposerEnd);
 assert.ok(newResearchComposerStart >= 0 && newResearchComposerEnd > newResearchComposerStart, "New Research composer source was not found.");
-assert.doesNotMatch(newResearchComposerSource, /createResearchProjectSelect|research-start-project|projectSelect/, "New Research chats should not show a Project context selector.");
-assert.match(newResearchComposerSource, /projectID: ""/, "New Research chats should begin unassigned until saved from the conversation column.");
+assert.match(newResearchComposerSource, /const initialProjectID = preferredResearchProjectID\(\)[\s\S]*?createResearchProjectSelect[\s\S]*?projectID: projectSelect\.value/, "New Research does not inherit the active Project while remaining editable.");
+assert.match(newResearchComposerSource, /research-composer-context[\s\S]*?researchProjectContextSummary\(projectSelect\.value\)/, "New Research does not summarize its inherited Project context.");
+assert.doesNotMatch(newResearchComposerSource, /section\.append\(renderResearchProgressCard\(progress\)\)/, "The new Research composer still targets a removed progress container.");
 assert.doesNotMatch(newResearchComposerSource, /What would you like to research\?|createElement\("h3"\)/, "The new Research composer should begin directly with the chat box.");
 assert.match(clientSource, /monthFormatter\.format\(created\)[\s\S]*?`year-\$\{created\.getFullYear\(\)\}`/, "Older Research history is not grouped by calendar month and year.");
 assert.match(clientSource, /researchConversationHistoryGroups\(researchConversationList\)\.forEach\(\(historyGroup\)/, "Previous chats are not rendered through the time groups.");
@@ -378,6 +379,7 @@ assert.match(clientSource, /projectPicker\.className = "research-selection-proje
 assert.match(stylesSource, /\.research-selection-menu \.research-selection-project-option \+ \.research-selection-project-option \{[\s\S]*?border-top: 1px solid var\(--border\);/, "The inline Research Project choices are not separated by thin dividers.");
 assert.match(clientSource, /analyzeButton\.className = "research-selection-start-action"/, "The Start Research action lacks its scoped visual hook.");
 assert.match(clientSource, /const initialProjectID = String\([\s\S]*?openProjectID \|\| openNotebookContext\?\.projectID \|\| ""[\s\S]*?value: initialProjectID,[\s\S]*?selectedProjectChoice = projectChoices\.find\(\(choice\) => choice\.value === initialProjectID\)/, "Reader evidence selection does not inherit the actively selected Notebook or Project context.");
+assert.match(clientSource, /research-selection-context-summary[\s\S]*?passageCount: pendingResearchSelection\?\.passages\?\.length \|\| 1[\s\S]*?updateSelectionContextSummary\(choice\.value\)/, "Reader-origin Research does not summarize both selected passages and editable Project context.");
 assert.match(clientSource, /analyzeButton\.disabled = false;[\s\S]*?A Project is optional\. You can assign this Research conversation later\./, "Unassigned Reader evidence does not expose an enabled Start Research action.");
 assert.match(clientSource, /projectID: selection\.projectID \|\| ""/, "Unassigned Reader evidence is not submitted as an unassigned Research conversation.");
 assert.match(clientSource, /researchButton\.onclick = \(\) => selectReaderSectionForResearch\(sectionWrapper\)/, "The Reader comment card does not use the shared Research selection flow.");
