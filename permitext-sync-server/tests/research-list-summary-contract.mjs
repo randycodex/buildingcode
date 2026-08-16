@@ -253,7 +253,7 @@ assert.match(
 );
 assert.match(
   clientSource,
-  /Saved Research answers and governed Code Decision records will remain/,
+  /Saved Research answers and professional analysis records will remain/,
   "Research history clearing does not disclose the preserved evidence boundary."
 );
 assert.match(

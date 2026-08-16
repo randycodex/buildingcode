@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-saved-language-v266";
+} from "./offline-storage.js?v=20260816-workflow-language-v267";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -1103,7 +1103,7 @@ function workspaceTransitionPaneLabel(paneID) {
   if (paneID.startsWith("research:conversation:")) return "Research conversation";
   if (paneID.startsWith("section:detail:")) return "Code section";
   if (paneID.startsWith("project:notebook:")) return "Notebook";
-  if (paneID.startsWith("project:report-draft:")) return "Report draft";
+  if (paneID.startsWith("project:report-draft:")) return "Report";
   if (paneID.startsWith("project:workboard:")) return "Workboard";
   if (paneID.startsWith("project:coordination-thread:")) return "Coordination thread";
   if (paneID.startsWith("project:coordination:")) return "Coordination";
@@ -6033,8 +6033,8 @@ function setCodeDecisionResearchNotice(projectID, questionID, message) {
   const key = codeDecisionResearchNoticeKey(projectID, questionID);
   if (!key) return;
   codeDecisionResearchNoticesByQuestion.set(key, {
-    title: "Code Decision saved",
-    message: String(message || "Linked Research did not finish opening. The Working Code Decision was preserved.")
+    title: "Analysis saved",
+    message: String(message || "Linked Research did not finish opening. Your analysis record was preserved.")
   });
 }
 
@@ -6138,9 +6138,9 @@ async function selectCodeDecisionFromIndex(question) {
 async function startLinkedResearchForCodeDecision(questionID, options = {}) {
   const projectID = activeProjectIDForCodeQuestions();
   const qid = String(questionID || "").trim();
-  if (!projectID || !qid) throw new Error("Open a Project Code Decision before starting Research.");
+  if (!projectID || !qid) throw new Error("Open a Project question before starting Research.");
   if (!codeQuestionIsOnline()) {
-    const error = new Error("Reconnect to create or restore the private Research conversation. The Code Decision remains available offline.");
+    const error = new Error("Reconnect to create or restore the private Research conversation. The analysis record remains available offline.");
     error.code = "CODE_QUESTION_RESEARCH_ONLINE_REQUIRED";
     throw error;
   }
@@ -6194,10 +6194,10 @@ async function linkResearchConversationToActiveCodeDecision(conversation) {
   const projectID = activeProjectIDForCodeQuestions();
   const questionID = String(codeQuestionWorkspaceState().activeQuestionID || "").trim();
   if (!projectID || !questionID || conversation?.primaryProjectID !== projectID) {
-    throw new Error("Assign this Research conversation to the active Code Decision’s Project first.");
+    throw new Error("Assign this Research conversation to the active question’s Project first.");
   }
   if (!codeQuestionIsOnline()) {
-    throw new Error("Reconnect before changing a Research ↔ Code Decision link.");
+    throw new Error("Reconnect before changing a Research link.");
   }
   const linkingAccount = activeAccount();
   const linkingContext = {
@@ -6223,12 +6223,12 @@ async function linkResearchConversationToActiveCodeDecision(conversation) {
   }
   if (sourceRelinkRequired || targetReplacementRequired) {
     const relationshipChanges = [
-      sourceRelinkRequired ? "this Research conversation will leave its current Code Decision" : "",
-      targetReplacementRequired ? "the active Code Decision’s current Research conversation will be replaced" : ""
+      sourceRelinkRequired ? "this Research conversation will leave its current question" : "",
+      targetReplacementRequired ? "the active question’s current Research conversation will be replaced" : ""
     ].filter(Boolean).join(" and ");
     const confirmed = await confirmWebWarning(
       "Change the linked Research conversation?",
-      `If you continue, ${relationshipChanges}. The conversations and Code Decisions will be preserved. Governed evidence, analysis, and conclusions are not copied.`,
+      `If you continue, ${relationshipChanges}. The conversations and analysis records will be preserved. Approved evidence, analysis, and conclusions are not copied.`,
       { confirmLabel: "Change link" }
     );
     if (!confirmed) return null;
@@ -6389,7 +6389,7 @@ function getDefinitionForQuestion(questionID) {
   if (existing) return normalizeDefinitionRecord(existing, id);
   const listItem = questionsForActiveProject().find((item) => item.id === id);
   return normalizeDefinitionRecord(emptyDefinitionRecord(id, {
-    title: listItem?.title || "New Code Decision",
+    title: listItem?.title || "New question",
     createdBy: state.account?.userID || "local-user"
   }), id);
 }
@@ -6556,7 +6556,7 @@ function postCodeQuestion(path, values = {}) {
 function enqueueCodeQuestionOfflineCommand(path, values = {}, options = {}) {
   const account = activeAccount();
   if (!account) {
-    const error = new Error("Sign in before saving Code Question work offline.");
+    const error = new Error("Sign in before saving this question offline.");
     error.code = "CODE_QUESTION_SIGN_IN_REQUIRED";
     throw error;
   }
@@ -6638,7 +6638,7 @@ function codeQuestionRequestContextIsCurrent(context) {
 }
 
 function codeQuestionContextChangedError() {
-  const error = new Error("The signed-in account or active Project changed before this Code Question action completed.");
+  const error = new Error("The signed-in account or active Project changed before this question update completed.");
   error.code = "CODE_QUESTION_REQUEST_CONTEXT_CHANGED";
   return error;
 }
@@ -6890,7 +6890,7 @@ async function flushCodeQuestionOutbox() {
     if (blockedScopes.has(scope)) {
       markCodeQuestionOfflineCommandConflict(mutation.id, {
         conflictCode: "CODE_QUESTION_DEPENDENCY_CONFLICT",
-        lastError: "A prior queued change for this Code Question conflicted. This dependent change was quarantined without replay."
+        lastError: "A prior queued change for this question conflicted. This dependent change was held without replay."
       });
       continue;
     }
@@ -15605,7 +15605,7 @@ async function assignResearchConversationProject(conversation, targetProjectID, 
 async function deleteResearchConversationFromList(conversation, button) {
   const confirmed = await confirmWebWarning(
     "Delete research conversation?",
-    `“${conversation.title}” and its private message history will be permanently deleted. ${conversation.linkedCodeDecisionID ? "The linked Code Decision, governed evidence, analysis, and conclusions will be preserved." : ""}`,
+    `“${conversation.title}” and its private message history will be permanently deleted. ${conversation.linkedCodeDecisionID ? "The linked analysis record, approved evidence, and conclusions will be preserved." : ""}`,
     { confirmLabel: "Delete" }
   );
   if (!confirmed) return;
@@ -15644,7 +15644,7 @@ async function clearResearchConversationHistory(button, selectedConversations = 
   if (!conversations.length) return;
   const confirmed = await confirmWebWarning(
     "Remove selected Research history?",
-    `${conversations.length} selected ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from this list. Unassigned chats will be deleted. Chats attached to Projects will remain available from their Projects. Saved Research answers and governed Code Decision records will remain.`,
+    `${conversations.length} selected ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from this list. Unassigned chats will be deleted. Chats attached to Projects will remain available from their Projects. Saved Research answers and professional analysis records will remain.`,
     { confirmLabel: conversations.length === 1 ? "Remove conversation" : `Remove ${conversations.length}` }
   );
   if (!confirmed) return false;
@@ -15798,7 +15798,7 @@ async function persistResearchCandidateDisposition(candidate, disposition, quest
   const projectID = activeProjectIDForCodeQuestions();
   const questionID = String(codeQuestionWorkspaceState().activeQuestionID || "").trim();
   if (!projectID || !questionID) {
-    throw new Error("Open a Project Code Decision before saving candidate review choices.");
+    throw new Error("Open a Project question before saving candidate review choices.");
   }
   let conversationID = String(state.researchConversationID || "").trim();
   if (!conversationID) {
@@ -16261,7 +16261,7 @@ function renderEvidenceDiscovery(container) {
       );
       rejectButton.disabled = !candidateDispositionEnabled;
       if (!candidateDispositionEnabled) {
-        rejectButton.title = "Open Research from a Project Code Decision to save rejections.";
+        rejectButton.title = "Open Research from a Project question to save rejections.";
       }
       rejectButton.addEventListener("click", async () => {
         approveButton.disabled = true;
@@ -16359,7 +16359,7 @@ function renderEvidenceDiscovery(container) {
           if (!researchOpenContextIsCurrent(prepareContext)) return;
           targetConversationID = String(linkedConversation?.id || "").trim();
           if (!targetConversationID) {
-            throw new Error("Permitext could not start the Code Decision’s linked Research conversation.");
+            throw new Error("Permitext could not start the question’s linked Research conversation.");
           }
         }
         const selectedPassages = approved.map((candidate) => ({
@@ -17197,7 +17197,7 @@ async function renderResearch(paneID = "utility:analysis") {
         linkDecisionButton.disabled = !researchEnabled ||
           !codeQuestionIsOnline() ||
           !["owner", "editor"].includes(codeQuestionDefineRole());
-        linkDecisionButton.title = "Link this private Research history without copying exploratory content into the governed record";
+        linkDecisionButton.title = "Link this private Research history without copying exploratory content into the professional record";
         linkDecisionButton.addEventListener("click", async () => {
           linkDecisionButton.disabled = true;
           try {
@@ -17347,7 +17347,7 @@ function renderResearchVisualEvidence(sources, options = {}) {
   wrap.className = "research-visual-evidence";
   const heading = document.createElement("strong");
   heading.textContent = options.immutable
-    ? "Immutable official visual evidence"
+    ? "Preserved official visual evidence"
     : "Reviewed official visual evidence";
   const gallery = document.createElement("div");
   gallery.className = "research-visual-evidence-gallery";
@@ -17860,7 +17860,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
   const heading = document.createElement("div");
   heading.className = "research-historical-heading";
   const title = document.createElement("strong");
-  title.textContent = "Immutable Research record";
+  title.textContent = "Saved Research record";
   const meta = document.createElement("span");
   meta.textContent = [
     researchRelativeDate(answerRecord.createdAt),
@@ -17992,7 +17992,7 @@ function renderHistoricalResearchControl(container, message) {
   details.addEventListener("toggle", async () => {
     if (!details.open || loaded) return;
     loaded = true;
-    body.textContent = "Loading the immutable record…";
+    body.textContent = "Loading the saved record…";
     try {
       const payload = await postResearch("/research/answers/get", { answerID: message.id });
       renderHistoricalResearchRecord(body, payload.answer);
@@ -18039,7 +18039,7 @@ function renderResearchMessageCapture(conversation, message) {
   status.setAttribute("aria-live", "polite");
   const canCapture = ["owner", "editor"].includes(codeQuestionDefineRole());
   const label = document.createElement("span");
-  label.textContent = "Capture in Code Decision";
+  label.textContent = "Capture for analysis";
   const actions = document.createElement("div");
   actions.className = "research-message-capture-actions";
   const choices = [
@@ -18052,10 +18052,10 @@ function renderResearchMessageCapture(conversation, message) {
     button.type = "button";
     button.textContent = choice.label;
     button.disabled = !canCapture;
-    if (!canCapture) button.title = "An Owner or Editor can capture governed Code Decision inputs";
+    if (!canCapture) button.title = "An Owner or Editor can capture professional analysis inputs";
     button.addEventListener("click", async () => {
       buttons.forEach((item) => { item.disabled = true; });
-      status.textContent = "Capturing in the governed Code Decision…";
+      status.textContent = "Capturing in the analysis record…";
       const inputID = `research-message:${conversation.id}:${message.id}`;
       const actor = codeQuestionActor();
       try {
@@ -18382,7 +18382,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   sourceDisclosure.innerHTML = researchChevronIconsSVG();
   const sourceLabel = document.createElement("span");
   sourceLabel.textContent = conversation.linkedCodeDecisionID
-    ? "Research evidence · not yet approved for the Code Decision"
+    ? "Research evidence · not yet approved for analysis"
     : "Research evidence";
   sourceToggle.append(sourceDisclosure, sourceLabel);
   const sourceList = document.createElement("section");
@@ -21127,7 +21127,7 @@ async function renderProjectReportDraft(project) {
     "Saved evidence": "Add enacted passages saved to this Project as supporting evidence.",
     Research: "Add the original question and supported conclusion from a Project Research conversation.",
     "Notebook notes": "Add selected Project notes that provide useful context for the Report.",
-    "Immutable Report history": "Open or download previously generated, dated Report versions."
+    "Report history": "Open or download previously generated, dated Report versions."
   });
   const createReportHeaderHelp = (label) => {
     const help = reportHeaderHelp[label];
@@ -21966,7 +21966,7 @@ async function renderProjectReportDraft(project) {
     historyBody.className = "report-history";
     renderHistory(historyBody);
     const historySection = appendOutputDisclosure(
-      "Immutable Report history",
+      "Report history",
       historyBody,
       "report-history-section"
     );
@@ -22523,7 +22523,7 @@ function appendProjectEvidenceReviews(content, identity, foundation) {
   title.textContent = "Evidence review";
   const scope = document.createElement("span");
   scope.className = "project-review-scope";
-  scope.textContent = "Immutable Research evidence";
+  scope.textContent = "Saved Research evidence";
   const headingMeta = document.createElement("div");
   headingMeta.className = "project-section-heading-actions";
   headingMeta.append(scope, projectSectionCount(answers.length, "Evidence reviews"));
@@ -29583,9 +29583,9 @@ function restoreReaderScrollPositions(positions) {
 
 function codeQuestionPaneTitle(paneRole) {
   const labels = {
-    "question-index": "Code Decisions",
+    "question-index": "Questions",
     research: "Research",
-    "decision-record": "Code Decision",
+    "decision-record": "Analysis Record",
     definition: "Definition",
     candidates: "Candidates",
     reader: "Evidence Reader",
@@ -29595,7 +29595,7 @@ function codeQuestionPaneTitle(paneRole) {
     "professional-conclusion": "Professional Conclusion",
     "review-requests": "Review Requests",
     history: "History",
-    "code-memo-draft": "Code Memo Draft",
+    "code-memo-draft": "Report",
     readiness: "Readiness",
     versions: "Versions",
     "working-notes": "Working Notes",
@@ -29783,7 +29783,7 @@ function upsertLocalQuestionFromPromotion(project, questionPayload, questionText
     ...(current || {}),
     id,
     displayID: questionPayload.displayID || current?.displayID || `Q-${String(nextNumber).padStart(3, "0")}`,
-    title: questionPayload.title || source.title || "Promoted Code Decision",
+    title: questionPayload.title || source.title || "Imported question",
     recordState: questionPayload.recordState === "archived" ? "archived" : "active",
     responsibleDisplayName: current?.responsibleDisplayName || codeQuestionActor().displayName,
     reviewState: current?.reviewState || "",
@@ -29849,8 +29849,8 @@ async function linkLegacySourceToQuestion(project, source, questionID, options =
     }
     refreshCodeQuestionLegacyPanes(projectID);
     await showWebNotice(
-      options.recovery ? "Decision link restored" : "Linked to Code Decision",
-      `${source.title} remains unchanged. The link records provenance only; it does not make the source a governed fact or approved evidence.`
+      options.recovery ? "Question link restored" : "Linked to question",
+      `${source.title} remains unchanged. The link records provenance only; it does not make the source a confirmed fact or approved evidence.`
     );
   } catch (error) {
     await showWebNotice("Could not link legacy work", error.message || "The explicit link was not saved.");
@@ -29859,7 +29859,7 @@ async function linkLegacySourceToQuestion(project, source, questionID, options =
 
 async function createQuestionFromLegacySource(project, source) {
   const questionText = await openWebTextPrompt({
-    title: "Create Code Decision from legacy work",
+    title: "Create question from earlier work",
     message: `${legacyGuidanceForSource(source.sourceKind)} Enter the precise question; Permitext will not infer it from the source.`,
     label: "Precise question",
     required: true,
@@ -29872,7 +29872,7 @@ async function createQuestionFromLegacySource(project, source) {
     message: "Use a concise professional title. The original source remains separately available.",
     label: "Title",
     required: true,
-    defaultValue: source.title || "Promoted Code Decision",
+    defaultValue: source.title || "Imported question",
     confirmLabel: "Create and link"
   });
   if (!title) return;
@@ -29908,7 +29908,7 @@ async function createQuestionFromLegacySource(project, source) {
     upsertLocalQuestionFromPromotion(project, questionPayload, questionText, source);
     await renderWorkspace();
     await showWebNotice(
-      "Code Decision created",
+      "Question created",
       `${source.title} remains available in Legacy / Unassigned and is linked as provenance. Its content was not silently promoted into facts, evidence, analysis, or the Code Memo.`
     );
   } catch (error) {
@@ -29938,7 +29938,7 @@ async function unlinkLegacySourcePromotion(project, promotion) {
     refreshCodeQuestionLegacyPanes(projectID);
     await showWebNotice(
       "Question link removed",
-      "Only the relationship was removed. The legacy source and the Code Question remain unchanged and reachable; Restore link is available."
+      "Only the relationship was removed. The earlier source and question remain unchanged and reachable; Restore link is available."
     );
   } catch (error) {
     await showWebNotice("Could not unlink", error.message || "The relationship remains unchanged.");
@@ -29948,7 +29948,7 @@ async function unlinkLegacySourcePromotion(project, promotion) {
 function openQuestionFromLegacy(questionID) {
   const projectID = activeProjectIDForCodeQuestions();
   if (!questionsForActiveProject().some((question) => question.id === questionID)) {
-    void showWebNotice("Decision not in this local view", "Reload the signed-in Project to retrieve this linked Code Decision.");
+    void showWebNotice("Question not in this local view", "Reload the signed-in Project to retrieve this linked question.");
     return;
   }
   setCodeQuestionWorkspaceState(
@@ -30084,7 +30084,7 @@ function renderCodeQuestionLegacyBody(project, options = {}) {
     }));
     const create = document.createElement("button");
     create.type = "button";
-    create.textContent = "Create Code Question…";
+    create.textContent = "Create question…";
     create.addEventListener("click", () => void createQuestionFromLegacySource(project, source));
     actions.append(link, create);
     source.promotions.filter((promotion) => promotion.status === "linked").forEach((promotion) => {
@@ -30253,7 +30253,7 @@ function renderCodeQuestionPane(paneDescriptor) {
     placeholder.className = "code-question-pane-placeholder";
     placeholder.innerHTML = `
       <p class="code-question-pane-status">Stage shell ready</p>
-      <p>This ${codeQuestionPaneTitle(parsed.paneRole)} column is part of the Code Question workspace.
+      <p>This ${codeQuestionPaneTitle(parsed.paneRole)} column is part of the Project analysis workspace.
       Content for this stage arrives in a later phase.
       Stage selection does not change review or issuance state.</p>
     `;
@@ -30367,7 +30367,7 @@ function renderCodeDecisionRecordBody(project, questionID) {
 
   const approved = document.createElement("section");
   approved.className = "code-decision-record-section";
-  approved.innerHTML = `<h4>Approved Evidence</h4><p class="code-question-define-muted">${approvedSet ? `Evidence Set v${escapeHTML(String(approvedSet.version))} · governed underneath` : "Candidate evidence is not included here."}</p>`;
+  approved.innerHTML = `<h4>Approved Evidence</h4><p class="code-question-define-muted">${approvedSet ? `Evidence version ${escapeHTML(String(approvedSet.version))} · preserved in history` : "Candidate evidence is not included here."}</p>`;
   appendCodeDecisionRecordList(approved, (approvedSet?.entries || []).map((entry) => {
     const snapshot = snapshotByID.get(entry.snapshotID);
     return `${snapshot?.passageLocator || entry.snapshotID} · ${entry.role}`;
@@ -30408,7 +30408,7 @@ function renderCodeDecisionRecordBody(project, questionID) {
   memo.className = "code-decision-create-memo";
   memo.textContent = issue.issuedRecords.length ? "Open Code Memo" : "Create Code Memo";
   memo.disabled = !conclusion;
-  memo.title = conclusion ? "Prepare or open the governed Code Memo" : "Finalize a Professional Conclusion first";
+  memo.title = conclusion ? "Prepare or open the Report" : "Finalize a Professional Conclusion first";
   memo.addEventListener("click", async () => {
     try {
       const context = codeMemoContext(project, qid);
@@ -30416,14 +30416,14 @@ function renderCodeDecisionRecordBody(project, questionID) {
         await executeCodeQuestionMutation("/projects/code-questions/memos/prepare", {
           projectID: activeProjectIDForCodeQuestions(),
           questionID: qid,
-          title: `${question.displayID || "Code Decision"} · ${question.title || definition?.title || "Code Memo"}`,
+          title: `${question.displayID || "Question"} · ${question.title || definition?.title || "Analysis"}`,
           narrative: "",
           includeAnalysis: Boolean(run)
         }, { commandKind: "codeQuestion.memo.prepare" });
       }
       await openCodeDecisionDetailPanes(qid, ["code-memo-draft", "readiness", "versions"]);
     } catch (error) {
-      void showWebNotice("Code Memo not created", error.message || "The governed draft was not prepared.");
+      void showWebNotice("Report not created", error.message || "The Report was not prepared.");
     }
   });
   actions.append(details, memo);
@@ -30527,8 +30527,8 @@ function renderCodeQuestionIndexList(project) {
       const restoring = question.recordState === "archived";
       archiveButton.type = "button";
       archiveButton.className = "icon-button code-question-index-archive";
-      archiveButton.title = restoring ? "Restore Code Decision" : "Archive Code Decision";
-      archiveButton.setAttribute("aria-label", `${archiveButton.title}: ${question.displayID || "Code Decision"}`);
+      archiveButton.title = restoring ? "Restore question" : "Archive question";
+      archiveButton.setAttribute("aria-label", `${archiveButton.title}: ${question.displayID || "Question"}`);
       archiveButton.innerHTML = restoring ? archiveRestoreIconSVG() : archiveIconSVG();
       archiveButton.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
       archiveButton.addEventListener("click", async (event) => {
@@ -30564,7 +30564,7 @@ async function createLocalCodeQuestionDraft(project, options = {}) {
   if (!questionText) {
     questionText = await openWebTextPrompt({
       title: "Start Research",
-      message: "Ask the professional question naturally. Permitext will build the governed Code Decision alongside the investigation.",
+        message: "Ask the professional question naturally. Permitext will preserve your evidence and analysis alongside the investigation.",
       label: "What do you need to decide?",
       required: true,
       multiline: true,
@@ -30650,7 +30650,7 @@ async function createLocalCodeQuestionDraft(project, options = {}) {
       setCodeDecisionResearchNotice(
         projectID,
         createdQuestion?.id || id,
-        "Linked Research did not finish opening. The Working Code Decision was preserved. Use the Research action below when you are ready."
+        "Linked Research did not finish opening. Your analysis record was preserved. Use the Research action below when you are ready."
       );
       await renderWorkspace();
       return createdQuestion;
@@ -30665,7 +30665,7 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
   wrap.className = "code-question-define";
   const qid = String(questionID || codeQuestionWorkspaceState().activeQuestionID || "").trim();
   if (!qid || qid === "_") {
-    wrap.innerHTML = `<p class="code-question-define-empty">Open or create a Code Question to edit its definition.</p>`;
+    wrap.innerHTML = `<p class="code-question-define-empty">Open or create a question to edit its definition.</p>`;
     return wrap;
   }
   const definition = getDefinitionForQuestion(qid);
@@ -30719,7 +30719,7 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
 
   const form = document.createElement("form");
   form.className = "code-question-define-form";
-  form.setAttribute("aria-label", "Code Question definition");
+  form.setAttribute("aria-label", "Question definition");
   if (readOnly) form.setAttribute("aria-readonly", "true");
 
   const fields = [
@@ -30875,7 +30875,7 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
     addFr.addEventListener("click", async () => {
       const title = await openWebTextPrompt({
         title: "Fact Request",
-        message: "Open a Fact Request anchored to this Code Question.",
+        message: "Open a Fact Request anchored to this question.",
         label: "Title",
         required: true,
         confirmLabel: "Continue"
@@ -30951,7 +30951,7 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
     replayBtn.textContent = "Replay queue";
     replayBtn.addEventListener("click", async () => {
       if (!codeQuestionIsOnline()) {
-        await showWebNotice("Offline queue", "Reconnect before replaying queued Code Question commands.");
+        await showWebNotice("Offline queue", "Reconnect before replaying queued question updates.");
         return;
       }
       await flushCodeQuestionOutbox();
@@ -31202,7 +31202,7 @@ function renderCodeQuestionCandidatesBody(project, questionID) {
   wrap.className = "code-question-evidence-candidates";
   const qid = String(questionID || codeQuestionWorkspaceState().activeQuestionID || "").trim();
   if (!qid || qid === "_") {
-    wrap.innerHTML = `<p class="code-question-define-empty">Open a Code Question to search candidates for its Evidence stage.</p>`;
+    wrap.innerHTML = `<p class="code-question-define-empty">Open a question to search for supporting evidence.</p>`;
     return wrap;
   }
   let evidence = ensureCodeQuestionEvidenceWorkspace(qid);
@@ -31327,7 +31327,7 @@ function renderCodeQuestionEvidenceReaderBody(project, questionID) {
   wrap.className = "code-question-evidence-reader";
   const qid = String(questionID || codeQuestionWorkspaceState().activeQuestionID || "").trim();
   if (!qid || qid === "_") {
-    wrap.innerHTML = `<p class="code-question-define-empty">Open a Code Question to inspect candidate passages.</p>`;
+    wrap.innerHTML = `<p class="code-question-define-empty">Open a question to inspect candidate passages.</p>`;
     return wrap;
   }
   const evidence = ensureCodeQuestionEvidenceWorkspace(qid);
@@ -31428,8 +31428,8 @@ function renderCodeQuestionEvidenceReaderBody(project, questionID) {
       if (role === "owner") {
         const combined = await confirmWebWarning(
           "Approve immediately?",
-          "As Owner you may propose and approve in one explicit flow. Choose Approve to create Evidence Set vN, or Cancel to leave a proposal only.",
-          { confirmLabel: "Approve into Evidence Set", cancelLabel: "Leave as proposal" }
+          "As Owner you may propose and approve in one explicit flow. Choose Approve to create a new approved evidence version, or Cancel to leave a proposal only.",
+          { confirmLabel: "Approve evidence", cancelLabel: "Leave as proposal" }
         );
         if (combined) {
           const proposal = next.proposals[next.proposals.length - 1];
@@ -31472,7 +31472,7 @@ function renderCodeQuestionEvidenceTrayBody(project, questionID) {
   wrap.className = "code-question-evidence-tray";
   const qid = String(questionID || codeQuestionWorkspaceState().activeQuestionID || "").trim();
   if (!qid || qid === "_") {
-    wrap.innerHTML = `<p class="code-question-define-empty">Open a Code Question to manage its Evidence Tray.</p>`;
+    wrap.innerHTML = `<p class="code-question-define-empty">Open a question to manage its evidence.</p>`;
     return wrap;
   }
   const evidence = ensureCodeQuestionEvidenceWorkspace(qid);
@@ -31578,7 +31578,7 @@ function renderCodeQuestionEvidenceTrayBody(project, questionID) {
   // Approved set
   const approvedSection = document.createElement("section");
   approvedSection.className = "code-question-evidence-approved";
-  approvedSection.innerHTML = `<h4>Approved Evidence Set</h4>`;
+  approvedSection.innerHTML = `<h4>Approved Evidence</h4>`;
   const approvedList = document.createElement("ul");
   approvedList.className = "code-question-evidence-list";
   if (!model.approved.length) {
@@ -31609,7 +31609,7 @@ function renderCodeQuestionEvidenceTrayBody(project, questionID) {
         remove.addEventListener("click", async () => {
           const ok = await confirmWebWarning(
             "Remove approved evidence?",
-            "Removal creates Evidence Set vN+1. Prior versions remain immutable and reconstructable.",
+            "Removal creates a new approved evidence version. Prior versions remain available in history.",
             { confirmLabel: "Remove from set" }
           );
           if (!ok) return;
@@ -31697,7 +31697,7 @@ function renderCodeQuestionApprovedEvidenceBody(_project, questionID) {
   wrap.className = "code-question-analysis-approved";
   const qid = String(questionID || "").trim();
   if (!qid) {
-    wrap.innerHTML = '<p class="code-question-define-empty">Open a Code Question to inspect approved evidence.</p>';
+    wrap.innerHTML = '<p class="code-question-define-empty">Open a question to inspect approved evidence.</p>';
     return wrap;
   }
   try {
@@ -31705,7 +31705,7 @@ function renderCodeQuestionApprovedEvidenceBody(_project, questionID) {
     wrap.innerHTML = `
       <section class="code-question-analysis-binding">
         <p class="code-question-pane-status">Bound server authority</p>
-        <h3>Evidence Set v${escapeHTML(String(binding.evidenceSetVersion))}</h3>
+        <h3>Approved Evidence · Version ${escapeHTML(String(binding.evidenceSetVersion))}</h3>
         <p class="code-question-define-muted">Only these approved, analysis-eligible snapshots may enter Research. Candidates and mutable conversation selections are excluded.</p>
         <dl class="code-question-analysis-hashes">
           <div><dt>Definition</dt><dd title="${escapeHTML(binding.definitionHash)}">r${escapeHTML(String(binding.definitionRevision))} · ${escapeHTML(binding.definitionHash.slice(0, 16))}…</dd></div>
@@ -31741,7 +31741,7 @@ function renderCodeQuestionBoundedAnalysisBody(_project, questionID) {
   wrap.className = "code-question-bounded-analysis";
   const qid = String(questionID || "").trim();
   if (!qid) {
-    wrap.innerHTML = '<p class="code-question-define-empty">Open a Code Question to run bounded analysis.</p>';
+    wrap.innerHTML = '<p class="code-question-define-empty">Open a question to run evidence-bounded analysis.</p>';
     return wrap;
   }
   let binding;
@@ -31758,7 +31758,7 @@ function renderCodeQuestionBoundedAnalysisBody(_project, questionID) {
   intro.className = "code-question-analysis-intro";
   intro.innerHTML = `
     <p class="code-question-pane-status">Selected-evidence-only Research</p>
-    <p>Each run is bound to Definition r${escapeHTML(String(binding.definitionRevision))}, ${escapeHTML(String(binding.inputSnapshotIDs.length))} selected inputs, and Evidence Set v${escapeHTML(String(binding.evidenceSetVersion))}.</p>
+    <p>Each run is bound to Definition r${escapeHTML(String(binding.definitionRevision))}, ${escapeHTML(String(binding.inputSnapshotIDs.length))} selected inputs, and approved evidence version ${escapeHTML(String(binding.evidenceSetVersion))}.</p>
     <p class="code-question-define-muted">AI-generated research assistance, not an official code determination. The professional conclusion is authored separately.</p>`;
   const runButton = document.createElement("button");
   runButton.type = "button";
@@ -32008,7 +32008,7 @@ function codeQuestionReviewTargets(questionID) {
   const analysis = getAnalysisForQuestion(qid);
   const targets = [{
     kind: "codeQuestion", id: qid,
-    label: `${question?.displayID || "Question"} · ${question?.title || definition?.title || "Code Question"}`,
+    label: `${question?.displayID || "Question"} · ${question?.title || definition?.title || "Question"}`,
     anchor: { anchorKind: "question", anchorID: qid, label: "Question definition", snapshotHash: definition?.definitionHash || "" }
   }];
   (definition?.inputs || []).filter((item) => item.state !== "retired").forEach((item) => targets.push({
@@ -32019,8 +32019,8 @@ function codeQuestionReviewTargets(questionID) {
   const set = currentEvidenceSet(evidence);
   if (set) targets.push({
     kind: "questionEvidenceSet", id: set.id,
-    label: `Approved Evidence Set v${set.version}`,
-    anchor: { anchorKind: "evidence-set", anchorID: set.id, label: `Evidence Set v${set.version}`, snapshotHash: set.setHash }
+    label: `Approved Evidence · Version ${set.version}`,
+    anchor: { anchorKind: "evidence-set", anchorID: set.id, label: `Approved Evidence · Version ${set.version}`, snapshotHash: set.setHash }
   });
   const run = latestAnalysisRun(analysis);
   if (run) targets.push({
@@ -32082,7 +32082,7 @@ function renderCodeQuestionReviewRequestsBody(project, questionID) {
   const approvalTitle = document.createElement("h3");
   approvalTitle.textContent = "Professional approval";
   const approvalCopy = document.createElement("p");
-  approvalCopy.textContent = "Approval targets one immutable conclusion revision. Resolving a request never approves the conclusion.";
+  approvalCopy.textContent = "Approval targets one preserved conclusion revision. Resolving a request never approves the conclusion.";
   const basis = document.createElement("textarea");
   basis.rows = 3;
   basis.maxLength = 4_000;
@@ -32264,7 +32264,7 @@ function renderCodeQuestionReviewRequestsBody(project, questionID) {
       const comment = document.createElement("input");
       comment.required = true;
       comment.maxLength = 10_000;
-      comment.placeholder = "Add immutable response";
+      comment.placeholder = "Add response to history";
       comment.setAttribute("aria-label", `Respond to ${request.title}`);
       const post = document.createElement("button");
       post.type = "submit";
@@ -32421,7 +32421,7 @@ function renderCodeMemoDraftBody(project, questionID) {
   const stateLabel = codeMemoDerivedState(context).replaceAll("-", " ");
   const boundary = document.createElement("section");
   boundary.className = "code-memo-boundary";
-  boundary.innerHTML = `<p class="code-question-pane-status">Typed Code Memo · ${escapeHTML(stateLabel)}</p><p>A constrained professional memo assembled from selected versions. Editing creates a new immutable draft revision; the general Report remains available under Add column.</p>`;
+  boundary.innerHTML = `<p class="code-question-pane-status">Report · ${escapeHTML(stateLabel)}</p><p>A professional Report assembled from selected versions. Editing creates a new revision while prior versions remain available in Report history.</p>`;
   wrap.appendChild(boundary);
 
   const form = document.createElement("form");
@@ -32435,7 +32435,7 @@ function renderCodeMemoDraftBody(project, questionID) {
   narrative.rows = 6;
   narrative.maxLength = 20_000;
   narrative.setAttribute("aria-label", "Bounded authored narrative");
-  narrative.placeholder = "Optional professional context, conditions, or implementation note. Source evidence and conclusion remain separate governed sections.";
+  narrative.placeholder = "Optional professional context, conditions, or implementation note. Source evidence and conclusion remain separate sections.";
   narrative.value = context.draft?.sections?.authoredNarrative || "";
   const include = document.createElement("label");
   include.className = "code-memo-analysis-choice";
@@ -32445,7 +32445,7 @@ function renderCodeMemoDraftBody(project, questionID) {
   include.append(includeInput, document.createTextNode(" Include the selected bounded analysis summary"));
   const prepare = document.createElement("button");
   prepare.type = "submit";
-  prepare.textContent = context.draft ? "Prepare new draft revision" : "Prepare Code Memo Draft";
+  prepare.textContent = context.draft ? "Prepare new Report revision" : "Prepare Report";
   form.append(title, narrative, include, prepare);
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -32457,7 +32457,7 @@ function renderCodeMemoDraftBody(project, questionID) {
       }, { commandKind: "codeQuestion.memo.prepare" });
       refreshCodeMemoPanes(context.qid);
     } catch (error) {
-      void showWebNotice("Code Memo Draft not prepared", error.message);
+      void showWebNotice("Report not prepared", error.message);
     }
   });
   wrap.appendChild(form);
@@ -32465,7 +32465,7 @@ function renderCodeMemoDraftBody(project, questionID) {
   if (context.draft) {
     const preview = document.createElement("article");
     preview.className = "code-memo-preview";
-    preview.setAttribute("aria-label", `Code Memo Draft revision ${context.draft.draftRevision}`);
+    preview.setAttribute("aria-label", `Report revision ${context.draft.draftRevision}`);
     const projectInputs = Array.isArray(context.draft.sections?.projectInputs)
       ? context.draft.sections.projectInputs
       : [];
@@ -32493,7 +32493,7 @@ function renderCodeMemoReadinessBody(project, questionID) {
   const wrap = document.createElement("div");
   wrap.className = "code-memo-readiness";
   const state = codeMemoDerivedState(context);
-  wrap.innerHTML = `<section class="code-memo-boundary"><p class="code-question-pane-status">Readiness · ${escapeHTML(state.replaceAll("-", " "))}</p><p>Ready, approval, and issue are separate actions. This checklist is re-evaluated from current governed records.</p></section>`;
+  wrap.innerHTML = `<section class="code-memo-boundary"><p class="code-question-pane-status">Readiness · ${escapeHTML(state.replaceAll("-", " "))}</p><p>Ready, approval, and issue are separate actions. This checklist is re-evaluated from current professional records.</p></section>`;
   const list = document.createElement("ol");
   list.className = "code-memo-readiness-list";
   context.readiness.checks.forEach((check) => {
@@ -32615,7 +32615,7 @@ function renderCodeMemoVersionsBody(project, questionID) {
   wrap.className = "code-memo-versions";
   const state = codeMemoDerivedState(context);
   const issuanceOnline = navigator.onLine !== false && serverReachable;
-  wrap.innerHTML = `<section class="code-memo-boundary"><p class="code-question-pane-status">Issued Records · ${escapeHTML(state.replaceAll("-", " "))}</p><p>Issuance creates an immutable Manifest v3 and exact PDF, HTML, and structured outputs. It is not agency approval or a compliance certificate.</p></section>`;
+  wrap.innerHTML = `<section class="code-memo-boundary"><p class="code-question-pane-status">Issued Records · ${escapeHTML(state.replaceAll("-", " "))}</p><p>Issuance preserves a versioned Manifest v3 and exact PDF, HTML, and structured outputs. It is not agency approval or a compliance certificate.</p></section>`;
   if (!issuanceOnline) {
     const offlineBoundary = document.createElement("p");
     offlineBoundary.className = "code-question-define-stale";
