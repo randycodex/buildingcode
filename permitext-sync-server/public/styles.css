@@ -13239,6 +13239,27 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   align-items: center;
 }
 
+.notebook-heading {
+  display: grid;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.notebook-heading strong {
+  color: var(--text-primary);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.notebook-heading small {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .notebook-card-rail h3,
 .notebook-welcome h3 {
   margin: 0;
@@ -13360,6 +13381,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: transparent;
   color: var(--text-secondary);
   box-shadow: none;
+}
+
+.notebook-card-add-action {
+  display: inline-flex;
+  width: auto;
+  gap: 4px;
+  padding-inline: 4px;
+  font-size: 11px;
+  white-space: nowrap;
 }
 
 .notebook-card-selection-cancel {
@@ -13530,6 +13560,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .notebook-card-fields {
   margin-bottom: var(--space-2);
+}
+
+.notebook-authorship {
+  margin: 6px 2px 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.35;
 }
 
 .notebook-card-title {
@@ -13845,6 +13882,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-1);
+}
+
+.notebook-report-status {
+  margin-right: auto;
+  color: var(--text-secondary);
+  font-size: 11px;
 }
 
 .notebook-research-draft {

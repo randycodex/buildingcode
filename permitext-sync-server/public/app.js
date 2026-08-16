@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-research-direct-actions-v274";
+} from "./offline-storage.js?v=20260816-notebook-professional-analysis-v275";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -20023,6 +20023,13 @@ async function renderProjectNotebook(project) {
 
   const header = document.createElement("header");
   header.className = "notebook-header";
+  const heading = document.createElement("div");
+  heading.className = "notebook-heading";
+  const headingTitle = document.createElement("strong");
+  headingTitle.textContent = "Notebook";
+  const headingContext = document.createElement("small");
+  headingContext.textContent = `${identity.name} · Professional analysis`;
+  heading.append(headingTitle, headingContext);
   const dragHandle = createProjectToolDragHandle(identity);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close notebook-close";
@@ -20033,7 +20040,7 @@ async function renderProjectNotebook(project) {
   closeButton.addEventListener("click", () => {
     void closeProjectNotebook(identity);
   });
-  header.append(closeButton, dragHandle);
+  header.append(heading, closeButton, dragHandle);
 
   const shell = document.createElement("div");
   shell.className = "notebook-shell";
@@ -20162,13 +20169,14 @@ async function renderProjectNotebook(project) {
     const newButton = document.createElement("button");
     newButton.className = "notebook-card-add-action";
     newButton.type = "button";
-    newButton.title = "New card";
-    newButton.setAttribute("aria-label", "New card");
+    newButton.title = "New Note";
+    newButton.setAttribute("aria-label", "New Note");
     newButton.innerHTML = `
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 5v14"></path>
         <path d="M5 12h14"></path>
       </svg>
+      <span>New Note</span>
     `;
     newButton.disabled = notebookReadOnly;
     const archiveButton = document.createElement("button");
@@ -20408,7 +20416,7 @@ async function renderProjectNotebook(project) {
               "Another edit was saved first. Your local draft is preserved; review it before retrying the save."
             );
           } else {
-            await showWebNotice("Card not saved", error.message);
+            await showWebNotice("Note not saved", error.message);
           }
           return false;
         }
@@ -20490,7 +20498,7 @@ async function renderProjectNotebook(project) {
       }
       if (!options.skipConfirmation) {
         const confirmed = await confirmWebWarning(
-          "Delete Notebook card?",
+          "Delete Notebook Note?",
           `“${target.title}” will be removed from its linked Projects. Its tombstone remains in sync history.`,
           { confirmLabel: "Delete card" }
         );
@@ -20526,7 +20534,7 @@ async function renderProjectNotebook(project) {
         return true;
       } catch (error) {
         if (trigger) trigger.disabled = false;
-        await showWebNotice("Card not deleted", error.message);
+        await showWebNotice("Note not deleted", error.message);
         return false;
       }
     }
@@ -20633,7 +20641,7 @@ async function renderProjectNotebook(project) {
             updateNotebookCardManagement();
             return;
           }
-          void loadCard(card.id).catch((error) => showWebNotice("Card not opened", error.message));
+          void loadCard(card.id).catch((error) => showWebNotice("Note not opened", error.message));
         });
         row.append(button);
         cardList.append(row);
@@ -20655,12 +20663,16 @@ async function renderProjectNotebook(project) {
       if (!activeCard) {
         const welcome = document.createElement("div");
         welcome.className = "notebook-welcome";
+        const welcomeTitle = document.createElement("h3");
+        welcomeTitle.textContent = "Write your professional analysis";
+        const welcomeCopy = document.createElement("p");
+        welcomeCopy.textContent = "Develop your reasoning in a Note, link enacted evidence or Research when useful, and add the finished analysis to the Report.";
         const welcomeAction = document.createElement("button");
         welcomeAction.className = "notebook-primary-action";
         welcomeAction.type = "button";
-        welcomeAction.textContent = "Create first card";
+        welcomeAction.textContent = "Create first Note";
         welcomeAction.addEventListener("click", () => newButton.click());
-        welcome.append(welcomeAction);
+        welcome.append(welcomeTitle, welcomeCopy, welcomeAction);
         focus.append(welcome);
         return;
       }
@@ -20671,11 +20683,14 @@ async function renderProjectNotebook(project) {
       titleInput.className = "notebook-card-title";
       titleInput.type = "text";
       titleInput.maxLength = 300;
-      titleInput.placeholder = "Card title";
-      titleInput.setAttribute("aria-label", "Notebook card title");
+      titleInput.placeholder = "Analysis title";
+      titleInput.setAttribute("aria-label", "Notebook Note title");
       titleInput.value = activeCard.title;
       titleInput.disabled = notebookReadOnly;
-      fields.append(titleInput);
+      const authorship = document.createElement("p");
+      authorship.className = "notebook-authorship";
+      authorship.textContent = "Your professional analysis · Work in any order; linked material remains identified as a reference.";
+      fields.append(titleInput, authorship);
 
       const toolbar = document.createElement("div");
       toolbar.className = "notebook-toolbar code-filter-menu notebook-reference-menu";
@@ -20685,7 +20700,7 @@ async function renderProjectNotebook(project) {
       referenceToggle.type = "button";
       const referenceLabel = document.createElement("span");
       referenceLabel.className = "code-filter-menu-label";
-      referenceLabel.textContent = "Link evidence";
+      referenceLabel.textContent = "Insert evidence or Research";
       const referenceIcon = document.createElement("span");
       referenceIcon.className = "code-filter-menu-icon";
       referenceIcon.setAttribute("aria-hidden", "true");
@@ -20702,12 +20717,24 @@ async function renderProjectNotebook(project) {
           reference.referenceID !== activeCard.id
         );
       let activeCodeGroup = "";
+      let activeReferenceKind = "";
       candidates.forEach((reference, index) => {
         if (reference.referenceKind === "canonicalSection" && reference.codePrefix !== activeCodeGroup) {
           activeCodeGroup = reference.codePrefix;
           const groupTitle = document.createElement("h4");
           groupTitle.className = `notebook-reference-group-title code-theme-${codeTheme(reference.codePrefix)}`;
           groupTitle.textContent = notebookReferenceCodeTitle(reference.codePrefix);
+          referenceList.append(groupTitle);
+        }
+        if (reference.referenceKind !== "canonicalSection" && reference.referenceKind !== activeReferenceKind) {
+          activeReferenceKind = reference.referenceKind;
+          const groupTitle = document.createElement("h4");
+          groupTitle.className = "notebook-reference-group-title";
+          groupTitle.textContent = reference.referenceKind === "researchAnswer"
+            ? "Research answers"
+            : reference.referenceKind === "notebookCard"
+              ? "Other Notes"
+              : "Project references";
           referenceList.append(groupTitle);
         }
         const option = document.createElement("button");
@@ -20740,7 +20767,7 @@ async function renderProjectNotebook(project) {
       const referenceMenuOptions = {
         stateKey: "referenceMenuOpen",
         menuName: "Notebook references",
-        label: "Link evidence"
+        label: "Insert evidence or Research"
       };
       wireCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
       referenceToggle.disabled = notebookReadOnly || !candidates.length;
@@ -20789,6 +20816,9 @@ async function renderProjectNotebook(project) {
       reportButton.className = "notebook-secondary-action notebook-add-to-report";
       reportButton.type = "button";
       const existingReportBlock = await notebookCardReportBlock(identity, activeCard.id).catch(() => null);
+      const reportStatus = document.createElement("span");
+      reportStatus.className = "notebook-report-status";
+      reportStatus.textContent = existingReportBlock ? "Report status: Added" : "Report status: Not added";
       reportButton.classList.toggle("is-in-report", Boolean(existingReportBlock));
       reportButton.textContent = existingReportBlock ? "Update in Report" : "Add to Report";
       reportButton.title = existingReportBlock
@@ -20800,6 +20830,10 @@ async function renderProjectNotebook(project) {
         try {
           if (!(await flushNotebookAutosave())) return;
           await promoteNotebookCardToReport(identity, activeCard);
+          reportStatus.textContent = "Report status: Added";
+          reportButton.classList.add("is-in-report");
+          reportButton.textContent = "Update in Report";
+          reportButton.title = "Update this Note's existing Report item with a new independent snapshot";
         } catch (error) {
           await showWebNotice(existingReportBlock ? "Report item not updated" : "Note not added to Report", error.message);
         } finally {
@@ -20826,7 +20860,7 @@ async function renderProjectNotebook(project) {
         });
       });
       footerActions.append(reportButton, researchButton, coordinateButton);
-      footer.append(footerActions);
+      footer.append(reportStatus, footerActions);
       focus.append(fields, toolbar, editorElement, footer);
 
       titleInput.addEventListener("input", () => {
@@ -20926,9 +20960,9 @@ async function renderProjectNotebook(project) {
       const selectedCards = cards.filter((card) => selectedCardIDs.has(card.id));
       if (!selectedCards.length) return;
       const confirmed = await confirmWebWarning(
-        "Delete selected Notebook cards?",
-        `${selectedCards.length} selected ${selectedCards.length === 1 ? "card" : "cards"} will be removed from linked Projects. Tombstones remain in sync history.`,
-        { confirmLabel: selectedCards.length === 1 ? "Delete card" : `Delete ${selectedCards.length}` }
+        "Delete selected Notebook Notes?",
+        `${selectedCards.length} selected ${selectedCards.length === 1 ? "Note" : "Notes"} will be removed from linked Projects. Tombstones remain in sync history.`,
+        { confirmLabel: selectedCards.length === 1 ? "Delete Note" : `Delete ${selectedCards.length}` }
       );
       if (!confirmed) return;
       cardSelectionBusy = true;
