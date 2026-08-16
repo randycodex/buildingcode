@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-desktop-project-continuity-v282";
+} from "./offline-storage.js?v=20260816-search-right-placement-v283";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -33170,14 +33170,14 @@ async function toggleUtilityPane(key) {
     state.utilityInstances = [...(state.utilityInstances || []), instance];
     state.utilities[key] = false;
     state.paneWeights[paneID] = defaultPaneWidthForID(paneID);
-    movePaneToFront(paneID);
+    appendPaneIfMissing(paneID);
     if (key === "search") {
       await transitionWorkspace("utility", { deferStateSave: true });
     } else {
       saveWorkspaceState();
       await transitionWorkspace("utility");
     }
-    track.scrollTo({ left: 0, behavior: key === "search" ? "auto" : "smooth" });
+    scrollPaneIntoView(paneID);
     return;
   }
 

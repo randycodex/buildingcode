@@ -346,6 +346,11 @@ assert.deepEqual(
   ],
   "Settings must remain left of Projects while every ordinary pane remains to the right."
 );
+const toggleUtilityPaneSource = functionSource(appSource, "toggleUtilityPane");
+assert.match(
+  toggleUtilityPaneSource,
+  /repeatableUtilityKeys\.has\(key\)[\s\S]*?appendPaneIfMissing\(paneID\)[\s\S]*?scrollPaneIntoView\(paneID\)[\s\S]*?return;/
+);
 assert.match(functionSource(appSource, "activePaneIDs"), /pinCriticalWorkflowPanesToLeft\(paired\)/);
 assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
