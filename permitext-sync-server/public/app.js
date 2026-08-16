@@ -3620,6 +3620,29 @@ async function refreshProjectMembershipPanes(project) {
       : null));
 }
 
+async function refreshProjectSourceConsumers(projects = []) {
+  const requestedProjects = (Array.isArray(projects) ? projects : [projects]).filter(Boolean);
+  const projectIDs = new Set(
+    requestedProjects.map((project) => projectDetailKey(projectIdentity(project))).filter(Boolean)
+  );
+  if (!projectIDs.size) {
+    notebookMounts.forEach((_mounted, projectID) => projectIDs.add(projectID));
+    reportDraftMounts.forEach((_mounted, projectID) => projectIDs.add(projectID));
+  }
+  const refreshes = [];
+  projectIDs.forEach((projectID) => {
+    const notebook = notebookMounts.get(projectID);
+    if (typeof notebook?.refreshReferenceSources === "function") {
+      refreshes.push(notebook.refreshReferenceSources());
+    }
+    const report = reportDraftMounts.get(projectID);
+    if (typeof report?.refreshSources === "function") {
+      refreshes.push(report.refreshSources());
+    }
+  });
+  await Promise.all(refreshes.map((refresh) => Promise.resolve(refresh).catch(() => false)));
+}
+
 function placeProjectDetailAfterProjects(detail, sourcePaneID = primarySavedPaneID()) {
   const detailID = paneIDForProjectDetail(detail);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== detailID);
@@ -9857,6 +9880,7 @@ async function persistSectionInProject(project, sectionPayload) {
     if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
     // Keep the local project link and queued mutation available while sync recovers.
   }
+  await refreshProjectSourceConsumers([project]);
   return true;
 }
 
@@ -9895,6 +9919,10 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
     const folder = visibleFolders.find((candidate) => projectSectionBelongsToProject(link, candidate));
     return folder && visibleFolderIDs.has(projectRecordID(folder)) && !selectedByID.has(projectRecordID(folder));
   });
+  const touchedProjects = [
+    ...selectedFolders,
+    ...removals.map((link) => visibleFolders.find((candidate) => projectSectionBelongsToProject(link, candidate)))
+  ].filter(Boolean);
   const wasSaved = isSectionSaved(sectionPayload);
   const mutations = [];
 
@@ -9949,6 +9977,7 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
     }
   }
   await refreshOpenSavedPanes();
+  await refreshProjectSourceConsumers(touchedProjects);
   return {
     saved: true,
     changed: !wasSaved || additions.length > 0 || removals.length > 0,
@@ -10015,6 +10044,7 @@ async function removeSectionFromProject(project, item, options = {}) {
     await persistSectionBookmark(item, false, { refreshSavedPanes: false });
     syncReaderNoteBookmarkButtons(sectionID, false, item.codeVersion);
   }
+  if (options.refreshPanes !== false) await refreshProjectSourceConsumers([project]);
 }
 
 async function unlinkEvidenceFromFolder(folder, item, container = null, options = {}) {
@@ -19898,6 +19928,8 @@ async function renderProjectNotebook(project) {
   let notebookIdlePrefetchTimer = null;
   let notebookIdlePrefetchHandle = null;
   let flushNotebookAutosave = async () => !dirty;
+  let refreshNotebookReferenceSources = async () => false;
+  let refreshNotebookReportStatus = async () => false;
   const notebookImageUploaded = (event) => {
     if (event.detail?.projectID !== projectID) return;
     editorMount?.replaceAssetURL?.(event.detail.localURL, event.detail.permanentURL);
@@ -19917,6 +19949,12 @@ async function renderProjectNotebook(project) {
         `Your edits to “${activeCard.title || "Untitled card"}” have not been saved.`,
         { confirmLabel: "Discard changes" }
       );
+    },
+    async refreshReferenceSources(options = {}) {
+      return refreshNotebookReferenceSources(options);
+    },
+    async refreshReportStatus() {
+      return refreshNotebookReportStatus();
     },
     dispose() {
       disposed = true;
@@ -20244,6 +20282,7 @@ async function renderProjectNotebook(project) {
             projectID,
             payload.card
           ).catch(() => {});
+          await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
           renderCardList();
           if (changedDuringSave) {
             scheduleNotebookAutosave(180);
@@ -20419,6 +20458,7 @@ async function renderProjectNotebook(project) {
         } else {
           renderCardList();
         }
+        await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
         return true;
       } catch (error) {
         if (trigger) trigger.disabled = false;
@@ -20542,6 +20582,8 @@ async function renderProjectNotebook(project) {
     async function renderFocusedCard() {
       editorRenderSequence += 1;
       const renderSequence = editorRenderSequence;
+      refreshNotebookReferenceSources = async () => false;
+      refreshNotebookReportStatus = async () => false;
       editorMount?.destroy?.();
       editorMount = null;
       notebookObjectURLs.forEach((url) => URL.revokeObjectURL(url));
@@ -20596,7 +20638,7 @@ async function renderProjectNotebook(project) {
       referenceToggle.append(referenceLabel, referenceIcon);
       const referenceList = document.createElement("div");
       referenceList.className = "notebook-reference-list";
-      const candidates = (await notebookReferenceCandidates(identity, foundation, cards))
+      let candidates = (await notebookReferenceCandidates(identity, foundation, cards))
         .filter((reference) =>
           reference.referenceKind !== "notebookCard" ||
           reference.referenceID !== activeCard.id
@@ -20621,63 +20663,80 @@ async function renderProjectNotebook(project) {
         }
         parent.append(option);
       };
-      const canonicalGroups = new Map();
-      candidates.forEach((reference, index) => {
-        if (reference.referenceKind !== "canonicalSection") return;
-        const codePrefix = reference.codePrefix || "BC";
-        const chapterNumber = String(reference.chapterNumber || "Other").trim() || "Other";
-        if (!canonicalGroups.has(codePrefix)) canonicalGroups.set(codePrefix, new Map());
-        const chapters = canonicalGroups.get(codePrefix);
-        if (!chapters.has(chapterNumber)) chapters.set(chapterNumber, []);
-        chapters.get(chapterNumber).push({ reference, index });
-      });
-      canonicalGroups.forEach((chapters, codePrefix) => {
-        const codeGroup = document.createElement("details");
-        codeGroup.className = `notebook-reference-code-group code-theme-${codeTheme(codePrefix)}`;
-        codeGroup.open = true;
-        const codeSummary = document.createElement("summary");
-        codeSummary.className = "notebook-reference-group-title";
-        codeSummary.textContent = notebookReferenceCodeTitle(codePrefix);
-        const codeBody = document.createElement("div");
-        codeBody.className = "notebook-reference-code-body";
-        chapters.forEach((entries, chapterNumber) => {
-          const chapterGroup = document.createElement("details");
-          chapterGroup.className = "notebook-reference-chapter-group";
-          chapterGroup.open = true;
-          const chapterSummary = document.createElement("summary");
-          chapterSummary.className = "notebook-reference-chapter-title";
-          chapterSummary.textContent = chapterNumber === "Other" ? "Other provisions" : `Chapter ${chapterNumber}`;
-          const chapterBody = document.createElement("div");
-          chapterBody.className = "notebook-reference-chapter-body";
-          entries.forEach(({ reference, index }) => appendReferenceOption(reference, index, chapterBody));
-          chapterGroup.append(chapterSummary, chapterBody);
-          codeBody.append(chapterGroup);
+      const renderReferenceOptions = () => {
+        referenceList.replaceChildren();
+        const canonicalGroups = new Map();
+        candidates.forEach((reference, index) => {
+          if (reference.referenceKind !== "canonicalSection") return;
+          const codePrefix = reference.codePrefix || "BC";
+          const chapterNumber = String(reference.chapterNumber || "Other").trim() || "Other";
+          if (!canonicalGroups.has(codePrefix)) canonicalGroups.set(codePrefix, new Map());
+          const chapters = canonicalGroups.get(codePrefix);
+          if (!chapters.has(chapterNumber)) chapters.set(chapterNumber, []);
+          chapters.get(chapterNumber).push({ reference, index });
         });
-        codeGroup.append(codeSummary, codeBody);
-        referenceList.append(codeGroup);
-      });
-      let activeReferenceKind = "";
-      candidates.forEach((reference, index) => {
-        if (reference.referenceKind === "canonicalSection") return;
-        if (reference.referenceKind !== activeReferenceKind) {
-          activeReferenceKind = reference.referenceKind;
-          const groupTitle = document.createElement("h4");
-          groupTitle.className = "notebook-reference-group-title";
-          groupTitle.textContent = reference.referenceKind === "researchAnswer"
-            ? "Research answers"
-            : reference.referenceKind === "notebookCard"
-              ? "Other Notes"
-              : "Project references";
-          referenceList.append(groupTitle);
+        canonicalGroups.forEach((chapters, codePrefix) => {
+          const codeGroup = document.createElement("details");
+          codeGroup.className = `notebook-reference-code-group code-theme-${codeTheme(codePrefix)}`;
+          codeGroup.open = true;
+          const codeSummary = document.createElement("summary");
+          codeSummary.className = "notebook-reference-group-title";
+          codeSummary.textContent = notebookReferenceCodeTitle(codePrefix);
+          const codeBody = document.createElement("div");
+          codeBody.className = "notebook-reference-code-body";
+          chapters.forEach((entries, chapterNumber) => {
+            const chapterGroup = document.createElement("details");
+            chapterGroup.className = "notebook-reference-chapter-group";
+            chapterGroup.open = true;
+            const chapterSummary = document.createElement("summary");
+            chapterSummary.className = "notebook-reference-chapter-title";
+            chapterSummary.textContent = chapterNumber === "Other" ? "Other provisions" : `Chapter ${chapterNumber}`;
+            const chapterBody = document.createElement("div");
+            chapterBody.className = "notebook-reference-chapter-body";
+            entries.forEach(({ reference, index }) => appendReferenceOption(reference, index, chapterBody));
+            chapterGroup.append(chapterSummary, chapterBody);
+            codeBody.append(chapterGroup);
+          });
+          codeGroup.append(codeSummary, codeBody);
+          referenceList.append(codeGroup);
+        });
+        let activeReferenceKind = "";
+        candidates.forEach((reference, index) => {
+          if (reference.referenceKind === "canonicalSection") return;
+          if (reference.referenceKind !== activeReferenceKind) {
+            activeReferenceKind = reference.referenceKind;
+            const groupTitle = document.createElement("h4");
+            groupTitle.className = "notebook-reference-group-title";
+            groupTitle.textContent = reference.referenceKind === "researchAnswer"
+              ? "Research answers"
+              : reference.referenceKind === "notebookCard"
+                ? "Other Notes"
+                : "Project references";
+            referenceList.append(groupTitle);
+          }
+          appendReferenceOption(reference, index, referenceList);
+        });
+        if (!candidates.length) {
+          const empty = document.createElement("p");
+          empty.className = "notebook-reference-empty";
+          empty.textContent = "No Project references are available yet.";
+          referenceList.append(empty);
         }
-        appendReferenceOption(reference, index, referenceList);
-      });
-      if (!candidates.length) {
-        const empty = document.createElement("p");
-        empty.className = "notebook-reference-empty";
-        empty.textContent = "No Project references are available yet.";
-        referenceList.append(empty);
-      }
+        referenceList.querySelectorAll(".notebook-reference-option").forEach((option) => {
+          option.addEventListener("click", () => {
+            const reference = candidates[Number(option.dataset.referenceIndex)];
+            if (!reference) return;
+            editorMount?.insertReference(reference);
+            referenceMenuState.referenceMenuOpen = false;
+            updateCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
+          });
+        });
+        if (notebookReadOnly) {
+          referenceList.querySelectorAll("button").forEach((control) => {
+            control.disabled = true;
+          });
+        }
+      };
       toolbar.append(referenceToggle, referenceList);
       const referenceMenuState = { referenceMenuOpen: false };
       const referenceMenuOptions = {
@@ -20685,6 +20744,7 @@ async function renderProjectNotebook(project) {
         menuName: "Notebook references",
         label: "Insert evidence or Research"
       };
+      renderReferenceOptions();
       wireCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
       referenceToggle.disabled = notebookReadOnly || !candidates.length;
       if (notebookReadOnly) {
@@ -20692,6 +20752,27 @@ async function renderProjectNotebook(project) {
           control.disabled = true;
         });
       }
+      const focusedCardID = activeCard.id;
+      refreshNotebookReferenceSources = async ({ refreshFoundation = false } = {}) => {
+        if (disposed || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+        if (refreshFoundation) {
+          foundation = identity.sharedOrganizationID
+            ? await postResearch("/organizations/projects/snapshot", { projectID })
+                .then((payload) => payload.project)
+            : await postResearch("/projects/foundation/state", { projectID });
+        }
+        const nextCandidates = (await notebookReferenceCandidates(identity, foundation, cards))
+          .filter((reference) =>
+            reference.referenceKind !== "notebookCard" ||
+            reference.referenceID !== focusedCardID
+          );
+        if (disposed || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+        candidates = nextCandidates;
+        renderReferenceOptions();
+        referenceToggle.disabled = notebookReadOnly || !candidates.length;
+        updateCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
+        return true;
+      };
 
       const editorElement = document.createElement("div");
       editorElement.className = "notebook-editor-surface";
@@ -20734,13 +20815,23 @@ async function renderProjectNotebook(project) {
       const existingReportBlock = await notebookCardReportBlock(identity, activeCard.id).catch(() => null);
       const reportStatus = document.createElement("span");
       reportStatus.className = "notebook-report-status";
-      reportStatus.textContent = existingReportBlock ? "Report status: Added" : "Report status: Not added";
-      reportButton.classList.toggle("is-in-report", Boolean(existingReportBlock));
-      reportButton.textContent = existingReportBlock ? "Update in Report" : "Add to Report";
-      reportButton.title = existingReportBlock
-        ? "Update this Note's existing Report item with a new independent snapshot"
-        : "Copy this Note into the Project Report as an independent editable snapshot";
+      const applyReportStatus = (reportBlock) => {
+        reportStatus.textContent = reportBlock ? "Report status: Added" : "Report status: Not added";
+        reportButton.classList.toggle("is-in-report", Boolean(reportBlock));
+        reportButton.textContent = reportBlock ? "Update in Report" : "Add to Report";
+        reportButton.title = reportBlock
+          ? "Update this Note's existing Report item with a new independent snapshot"
+          : "Copy this Note into the Project Report as an independent editable snapshot";
+      };
+      applyReportStatus(existingReportBlock);
       reportButton.disabled = notebookReadOnly || !activeCard.id;
+      refreshNotebookReportStatus = async () => {
+        if (disposed || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+        const reportBlock = await notebookCardReportBlock(identity, focusedCardID).catch(() => null);
+        if (disposed || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+        applyReportStatus(reportBlock);
+        return true;
+      };
       reportButton.addEventListener("click", async () => {
         reportButton.disabled = true;
         try {
@@ -20820,16 +20911,6 @@ async function renderProjectNotebook(project) {
         },
         onOpenReference: null
       });
-      referenceList.querySelectorAll(".notebook-reference-option").forEach((option) => {
-        option.addEventListener("click", () => {
-          const reference = candidates[Number(option.dataset.referenceIndex)];
-          if (!reference) return;
-          editorMount?.insertReference(reference);
-          referenceMenuState.referenceMenuOpen = false;
-          updateCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
-        });
-      });
-
       researchButton.addEventListener("click", async () => {
         const bodyText = String(editorElement.innerText || activeCard.plainText || "").trim();
         researchQuestionDraft = bodyText || activeCard.title;
@@ -21019,6 +21100,7 @@ async function promoteNotebookCardToReport(project, card) {
     blocks: draft.blocks
   });
   pendingReportDraftByProject.set(projectID, saved.draft.id);
+  await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
   await openProjectReportDraft(identity);
 }
 
@@ -21328,6 +21410,7 @@ async function renderProjectReportDraft(project) {
   let activeDraft = emptyProjectReportDraft(identity);
   let dirty = false;
   let disposed = false;
+  let refreshReportSources = async () => false;
   let draggedReportBlock = null;
   const reportSourceGroupExpanded = new Map();
   const reportHeaderHelp = Object.freeze({
@@ -21367,6 +21450,9 @@ async function renderProjectReportDraft(project) {
         `Your edits to “${activeDraft.title || "Untitled report"}” have not been saved.`,
         { confirmLabel: "Discard changes" }
       );
+    },
+    async refreshSources() {
+      return refreshReportSources();
     },
     dispose() {
       disposed = true;
@@ -21413,6 +21499,7 @@ async function renderProjectReportDraft(project) {
       dirty = false;
       clearStatus();
       renderWorkspaceContent();
+      await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
       return true;
     } catch (error) {
       showStatusError(error.message || "The Report could not be saved.");
@@ -22191,6 +22278,19 @@ async function renderProjectReportDraft(project) {
     );
     enhanceSelect(select);
   }
+
+  refreshReportSources = async () => {
+    if (disposed) return false;
+    const payload = await postResearch("/reports/sources/list", { projectID });
+    if (disposed) return false;
+    sources = payload.sources || [];
+    sourceWarnings = payload.warnings || [];
+    const sourcePalette = panel.querySelector(".report-source-palette");
+    if (!sourcePalette) return false;
+    sourcePalette.replaceChildren();
+    renderSourcePalette(sourcePalette);
+    return true;
+  };
 
   try {
     const historyPayloadPromise = projectTransitionHubPayload(projectID)
@@ -27250,6 +27350,7 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
       );
       await refreshOpenSavedPanes();
       refreshVisibleSyncedDerivedState();
+      await refreshProjectSourceConsumers();
     } catch (error) {
       await showWebNotice(
         "Could not remove saved items",
