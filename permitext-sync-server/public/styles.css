@@ -8293,6 +8293,29 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   padding: 4px;
 }
 
+.research-selection-evidence-role[hidden] {
+  display: none;
+}
+
+.research-selection-relationship-control {
+  display: grid;
+}
+
+.research-selection-menu .research-selection-relationship-trigger {
+  justify-content: flex-start;
+  min-height: 30px;
+  padding: 5px var(--space-3);
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  font-weight: 500;
+}
+
+.research-selection-menu .research-selection-relationship-trigger:hover,
+.research-selection-menu .research-selection-relationship-trigger:focus-visible,
+.research-selection-menu .research-selection-relationship-trigger[aria-expanded="true"] {
+  color: var(--text-primary);
+}
+
 .research-selection-menu .research-selection-evidence-role button {
   min-height: 28px;
   padding-inline: 6px;

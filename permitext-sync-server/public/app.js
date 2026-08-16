@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-notebook-writing-surface-v276";
+} from "./offline-storage.js?v=20260816-optional-evidence-roles-v277";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19107,7 +19107,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   const menu = document.createElement("div");
   menu.className = "research-selection-menu";
   menu.setAttribute("role", "toolbar");
-  menu.setAttribute("aria-label", "Add selected enacted text to Research");
+  menu.setAttribute("aria-label", "Selected passage actions");
   menu.addEventListener("pointerdown", (event) => {
     if (event.target.closest?.("select, option")) {
       researchSelectionMenuInteracting = true;
@@ -19237,8 +19237,23 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
         if (String(pendingResearchSelection?.projectID || "") !== projectID) return;
         const cards = (payload.cards || []).filter((card) => !card.archivedAt);
         noteChooser.replaceChildren();
+        const relationshipControl = document.createElement("div");
+        relationshipControl.className = "research-selection-relationship-control";
+        const relationshipTrigger = document.createElement("button");
+        relationshipTrigger.type = "button";
+        relationshipTrigger.className = "research-selection-relationship-trigger";
+        relationshipTrigger.setAttribute("aria-expanded", "false");
+        relationshipTrigger.textContent = "Relationship: Context";
         const rolePicker = document.createElement("div");
         rolePicker.className = "research-selection-evidence-role";
+        rolePicker.hidden = true;
+        relationshipTrigger.addEventListener("click", () => {
+          const willOpen = rolePicker.hidden;
+          rolePicker.hidden = !willOpen;
+          relationshipTrigger.setAttribute("aria-expanded", String(willOpen));
+          researchSelectionMenuInteracting = willOpen;
+          requestAnimationFrame(positionMenu);
+        });
         [
           ["context", "Context"],
           ["supports", "Supports"],
@@ -19253,13 +19268,19 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
           ));
           role.addEventListener("click", () => {
             pendingResearchSelection.evidenceRelationshipRole = value;
+            relationshipTrigger.textContent = `Relationship: ${label}`;
             rolePicker.querySelectorAll("button").forEach((candidate) => {
               candidate.setAttribute("aria-pressed", String(candidate === role));
             });
+            rolePicker.hidden = true;
+            relationshipTrigger.setAttribute("aria-expanded", "false");
+            researchSelectionMenuInteracting = false;
+            requestAnimationFrame(positionMenu);
           });
           rolePicker.append(role);
         });
-        noteChooser.append(rolePicker);
+        relationshipControl.append(relationshipTrigger, rolePicker);
+        noteChooser.append(relationshipControl);
         if (!cards.length) {
           const empty = document.createElement("p");
           empty.textContent = "Create a Note in this Project before linking evidence.";
