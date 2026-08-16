@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-direct-saved-research-v309";
+} from "./offline-storage.js?v=20260816-clean-research-composer-v310";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15327,25 +15327,6 @@ function researchProjectName(projectID) {
   return project ? readableProjectName(project) : "Unassigned";
 }
 
-function researchProjectContextSummary(projectID, options = {}) {
-  const normalizedProjectID = String(projectID || "").trim();
-  const project = visibleProjectRecords(currentContentSummary().projects || [])
-    .find((item) => researchProjectID(item) === normalizedProjectID);
-  const passageCount = Math.max(0, Number(options.passageCount) || 0);
-  const parts = [];
-  if (passageCount) parts.push(`${passageCount} selected ${passageCount === 1 ? "passage" : "passages"}`);
-  if (project) {
-    const factCount = projectStructuredFacts(project).filter((fact) =>
-      fact.status === "confirmed" || fact.status === "stated"
-    ).length;
-    parts.push(readableProjectName(project));
-    parts.push(`${factCount} Project ${factCount === 1 ? "fact" : "facts"} available`);
-  } else {
-    parts.push("Unassigned Research");
-  }
-  return `Using: ${parts.join(" · ")}`;
-}
-
 function applyProjectDerivedPaneTheme(panel, projectID) {
   const normalizedProjectID = String(projectID || "");
   if (!normalizedProjectID) return false;
@@ -16581,24 +16562,6 @@ function renderNewResearchComposer(container, researchEnabled) {
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
   const initialProjectID = preferredResearchProjectID();
-  const context = document.createElement("div");
-  context.className = "research-composer-context";
-  const contextSummary = document.createElement("span");
-  contextSummary.className = "research-composer-context-summary";
-  const projectSelect = createResearchProjectSelect({
-    value: initialProjectID,
-    includeUnassigned: true,
-    unassignedLabel: "Unassigned"
-  });
-  projectSelect.setAttribute("aria-label", "Project context for new Research");
-  projectSelect.classList.add("research-composer-context-project");
-  const syncContextSummary = () => {
-    contextSummary.textContent = researchProjectContextSummary(projectSelect.value);
-  };
-  projectSelect.addEventListener("change", syncContextSummary);
-  syncContextSummary();
-  context.append(contextSummary, projectSelect);
-  enhanceSelect(projectSelect);
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
@@ -16625,7 +16588,6 @@ function renderNewResearchComposer(container, researchEnabled) {
   bindResearchSendShortcut(input, form);
   if (!researchEnabled) {
     input.disabled = true;
-    projectSelect.disabled = true;
     input.placeholder = "Research Add-On required to start a new chat…";
   }
   updateSendState();
@@ -16642,7 +16604,7 @@ function renderNewResearchComposer(container, researchEnabled) {
     startResearchProgressTimer(progress);
     try {
       const created = await postResearch("/research/conversations/create", {
-        projectID: projectSelect.value
+        projectID: initialProjectID
       });
       const conversation = created.conversation;
       conversationID = String(conversation?.id || "").trim();
@@ -16678,12 +16640,11 @@ function renderNewResearchComposer(container, researchEnabled) {
       }
       status.textContent = error.message || "Permitext could not start this Research chat.";
       input.disabled = false;
-      projectSelect.disabled = false;
       updateSendState();
     }
   });
   composerBox.append(input, sendButton);
-  form.append(context, composerBox, status);
+  form.append(composerBox, status);
   container.append(form);
 }
 

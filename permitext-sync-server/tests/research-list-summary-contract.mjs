@@ -198,8 +198,8 @@ const newResearchComposerStart = clientSource.indexOf("function renderNewResearc
 const newResearchComposerEnd = clientSource.indexOf("\nasync function renderResearch(", newResearchComposerStart);
 const newResearchComposerSource = clientSource.slice(newResearchComposerStart, newResearchComposerEnd);
 assert.ok(newResearchComposerStart >= 0 && newResearchComposerEnd > newResearchComposerStart, "New Research composer source was not found.");
-assert.match(newResearchComposerSource, /const initialProjectID = preferredResearchProjectID\(\)[\s\S]*?createResearchProjectSelect[\s\S]*?projectID: projectSelect\.value/, "New Research does not inherit the active Project while remaining editable.");
-assert.match(newResearchComposerSource, /research-composer-context[\s\S]*?researchProjectContextSummary\(projectSelect\.value\)/, "New Research does not summarize its inherited Project context.");
+assert.match(newResearchComposerSource, /const initialProjectID = preferredResearchProjectID\(\)[\s\S]*?projectID: initialProjectID/, "New Research does not inherit the active Project context.");
+assert.doesNotMatch(newResearchComposerSource, /research-composer-context|createResearchProjectSelect/, "The Research composer must not repeat the conversation's visible Project pill.");
 assert.doesNotMatch(newResearchComposerSource, /section\.append\(renderResearchProgressCard\(progress\)\)/, "The new Research composer still targets a removed progress container.");
 assert.doesNotMatch(newResearchComposerSource, /What would you like to research\?|createElement\("h3"\)/, "The new Research composer should begin directly with the chat box.");
 assert.match(clientSource, /monthFormatter\.format\(created\)[\s\S]*?`year-\$\{created\.getFullYear\(\)\}`/, "Older Research history is not grouped by calendar month and year.");

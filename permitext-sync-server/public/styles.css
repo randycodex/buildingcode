@@ -6857,41 +6857,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   background: transparent;
 }
 
-.research-composer-context {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  margin-bottom: var(--space-2);
-  padding: 7px 9px;
-  border-radius: var(--radius-tile);
-  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
-}
-
-.research-composer-context-summary {
-  min-width: 0;
-  margin: 0;
-  overflow: hidden;
-  color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.74) !important;
-  line-height: 1.3;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.research-composer-context-project {
-  width: auto;
-  max-width: 42%;
-  min-height: 26px;
-  flex: 0 0 auto;
-  border: 0;
-  background: transparent;
-  color: var(--text-primary);
-  font-size: calc(var(--chrome-font-size) * 0.74) !important;
-  font-weight: 650;
-}
-
 .research-start-project {
   display: grid;
   gap: 6px;
