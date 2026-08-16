@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-research-column-warning-v305";
+} from "./offline-storage.js?v=20260816-smooth-research-removal-v306";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15515,7 +15515,7 @@ async function deleteResearchConversationFromList(conversation, button) {
   }
 }
 
-async function clearResearchConversationHistory(button, selectedConversations = researchConversationList) {
+async function clearResearchConversationHistory(button, selectedConversations = researchConversationList, options = {}) {
   const conversations = [...selectedConversations];
   if (!conversations.length) return;
   const confirmed = await confirmWebWarning(
@@ -15530,10 +15530,14 @@ async function clearResearchConversationHistory(button, selectedConversations = 
 
   button.disabled = true;
   button.setAttribute("aria-busy", "true");
+  const removalAnimation = animateResearchConversationRows(options.rows || []);
   try {
-    await postResearch("/research/conversations/clear-history", {
-      conversationIDs: conversations.map((conversation) => conversation.id)
-    });
+    await Promise.all([
+      postResearch("/research/conversations/clear-history", {
+        conversationIDs: conversations.map((conversation) => conversation.id)
+      }),
+      removalAnimation
+    ]);
     const clearedIDs = new Set(conversations.map((conversation) => conversation.id));
     if (clearedIDs.has(String(state.researchConversationID || ""))) {
       researchOpenGeneration += 1;
@@ -15545,14 +15549,46 @@ async function clearResearchConversationHistory(button, selectedConversations = 
     }
     await refreshResearchConversationList();
     saveWorkspaceState();
-    await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+    if (typeof options.onCleared === "function") options.onCleared();
     return true;
   } catch (error) {
     button.disabled = false;
     button.removeAttribute("aria-busy");
-    await showWebNotice("Research history not cleared", error.message);
+    await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+    await showWebNotice("Research history not cleared", error.message, {
+      container: button.closest(".workspace-panel")
+    });
     return false;
   }
+}
+
+async function animateResearchConversationRows(rows) {
+  const connectedRows = [...rows].filter((row) => row?.isConnected);
+  if (!connectedRows.length) return;
+  const panel = connectedRows[0].closest(".research-list-panel");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reducedMotion || connectedRows.some((row) => typeof row.animate !== "function")) {
+    connectedRows.forEach((row) => row.remove());
+  } else {
+    const animations = connectedRows.map((row) => {
+      const height = row.getBoundingClientRect().height;
+      row.style.overflow = "hidden";
+      row.classList.add("is-removing");
+      return row.animate([
+        { height: `${height}px`, opacity: 1, transform: "translateY(0)" },
+        { height: "0px", opacity: 0, transform: "translateY(-6px)" }
+      ], {
+        duration: 240,
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+        fill: "forwards"
+      }).finished.catch(() => {});
+    });
+    await Promise.all(animations);
+    connectedRows.forEach((row) => row.remove());
+  }
+  panel?.querySelectorAll(".research-history-group").forEach((group) => {
+    if (!group.querySelector(".research-conversation-row")) group.remove();
+  });
 }
 
 function evidenceCandidateCitation(candidate) {
@@ -16737,7 +16773,21 @@ async function renderResearch(paneID = "utility:analysis") {
     if (!selectedConversations.length) return;
     clearingSelectedConversations = true;
     updateConversationSelection();
-    const cleared = await clearResearchConversationHistory(deleteSelectedButton, selectedConversations);
+    const cleared = await clearResearchConversationHistory(deleteSelectedButton, selectedConversations, {
+      rows: selectedConversations.map((conversation) => conversationRows.get(conversation.id)).filter(Boolean),
+      onCleared: () => {
+        selectedConversationIDs.clear();
+        selectingConversations = false;
+        clearingSelectedConversations = false;
+        updateConversationSelection();
+        if (!panel.querySelector(".research-conversation-row")) {
+          const empty = document.createElement("div");
+          empty.className = "research-conversation-empty";
+          empty.textContent = "Your previous chats will appear here.";
+          content.querySelector(".research-conversation-list")?.replaceWith(empty);
+        }
+      }
+    });
     if (!cleared && panel.isConnected) {
       clearingSelectedConversations = false;
       updateConversationSelection();
@@ -16912,6 +16962,7 @@ async function renderResearch(paneID = "utility:analysis") {
     let conversation = initialConversation;
     const row = document.createElement("article");
     row.className = "research-conversation-row";
+    row.dataset.conversationId = conversation.id;
     conversationRows.set(conversation.id, row);
     const renderRow = () => {
       clear(row);
