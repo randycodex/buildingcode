@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-smooth-research-removal-v306";
+} from "./offline-storage.js?v=20260816-direct-saved-research-v309";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18827,7 +18827,7 @@ async function startNewResearchFromSelection(selection) {
     })),
     projectID: selection.projectID || "",
     savedItemID: selection.savedItemID || "",
-    originSurface: "reader"
+    originSurface: selection.originSurface || "reader"
   });
   activeResearchConversation = payload.conversation;
   closeResearchSelectionMenu();
@@ -26190,6 +26190,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         removableSavedItems: Boolean(selectionController),
         selectionController,
         projectNamesForItem,
+        researchProjectID: selectedFolder ? projectRecordID(selectedFolder) : "",
         animateSavedItemRemoval: animateSavedRowRemoval,
         onSavedItemRemoved: async () => {
           await performSavedPanelHydration(panel, savedInstance, paneID, {
@@ -27243,8 +27244,17 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           const researchButton = document.createElement("button");
           researchButton.type = "button";
           researchButton.textContent = "Research";
-          researchButton.addEventListener("click", () => {
-            void runSavedItemReaderAction(item, paneID, ".inline-research-toggle");
+          researchButton.addEventListener("click", async () => {
+            researchButton.disabled = true;
+            try {
+              await startFocusedResearchFromSavedItem(item, options.researchProjectID || "");
+            } catch (error) {
+              researchButton.disabled = false;
+              await showWebNotice(
+                "Could not start Research",
+                error.message || "The saved passage could not be added to a new Research conversation."
+              );
+            }
           });
           actions.append(researchButton);
           if (item.savedColumnKind === "bookmark") {
@@ -27479,24 +27489,18 @@ async function openSavedItemInReader(item, savedPaneID) {
   }, savedPaneID);
 }
 
-async function runSavedItemReaderAction(item, savedPaneID, selector) {
-  const reader = await openSourceInReader(item, savedPaneID);
-  if (!reader) return;
-  [80, 220].forEach((delay) => {
-    window.setTimeout(() => {
-      const panel = track.querySelector(
-        `.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`
-      );
-      const target = savedReaderTarget(panel?.querySelector(".reader-content"), item);
-      const wrapper = target?.classList?.contains("annotated-code-block")
-        ? target
-        : target?.closest?.(".annotated-code-block") ||
-          target?.querySelector?.(".annotated-code-block");
-      const action = wrapper?.querySelector(selector);
-      if (!action || action.dataset.savedInboxActivated === "true") return;
-      action.dataset.savedInboxActivated = "true";
-      action.click();
-    }, delay);
+async function startFocusedResearchFromSavedItem(item, projectID = "") {
+  const sectionID = String(item?.sectionID || item?.id || "").trim();
+  const selectedText = String(item?.previewText || item?.selectedText || item?.title || "").trim();
+  if (!sectionID || !selectedText) throw new Error("This saved passage does not have enough source text for Research.");
+  const savedItemID = item?.savedColumnKind === "bookmark" ? String(item.id || "") : "";
+  return startNewResearchFromSelection({
+    sectionID,
+    selectedText,
+    savedItemID,
+    projectID: String(projectID || "").trim(),
+    originPaneID: primarySavedPaneID(),
+    originSurface: "saved"
   });
 }
 
