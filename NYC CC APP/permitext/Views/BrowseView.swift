@@ -1512,33 +1512,6 @@ struct CodeHairline: View {
     }
 }
 
-struct CodeSectionHeader: View {
-    let title: String
-    let subtitle: String?
-    let accent: Color
-
-    init(title: String, subtitle: String? = nil, accent: Color) {
-        self.title = title
-        self.subtitle = subtitle
-        self.accent = accent
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(.primary)
-
-            if let subtitle, !subtitle.isEmpty {
-                Text(subtitle)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
 /// Adaptive greys used for menus, tab-bar icons, navigation chrome, and any
 /// glyph that is *not* tied to a code-section accent color. Designed so the
 /// rendered color is never pure white or pure black in either appearance —
@@ -1613,21 +1586,6 @@ struct CodeStatPill: View {
         .padding(.vertical, 7)
         .background(Color(uiColor: .tertiarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
-    }
-}
-
-struct CodeSuggestionChip: View {
-    let title: String
-    let accent: Color
-
-    var body: some View {
-        Text(title)
-            .font(.footnote.weight(.medium))
-            .foregroundStyle(.primary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .background(Color(uiColor: .tertiarySystemGroupedBackground))
-            .clipShape(Capsule())
     }
 }
 

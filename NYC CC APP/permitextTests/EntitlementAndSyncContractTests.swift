@@ -436,6 +436,12 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(groups.first?.items.first?.noteBody, "Commenting commenting")
     }
 
+    func testLegacyAuthoredMonolithIsNotShippedInAppResources() {
+        XCTAssertNil(
+            Bundle.main.url(forResource: "nyc_code_authored", withExtension: "json")
+        )
+    }
+
     @MainActor
     func testDeepLinksResolveTheirCodeVersionFromBundledSectionMetadata() throws {
         let versions = BundleDatabaseLocator().availableCodeVersions()

@@ -25,7 +25,6 @@
 		A10000000000000000000013 /* ReaderThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* ReaderThemeStore.swift */; };
 		A10000000000000000000015 /* ChapterReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* ChapterReaderView.swift */; };
 		A10000000000000000000016 /* AuthoredCodeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* AuthoredCodeStore.swift */; };
-		A10000000000000000000017 /* nyc_code_authored.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* nyc_code_authored.json */; };
 		A10000000000000000000018 /* AttributedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* AttributedTextView.swift */; };
 		A10000000000000000000019 /* ContentBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* ContentBlockView.swift */; };
 		A1000000000000000000001A /* PublishedHTMLContentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001A /* PublishedHTMLContentStore.swift */; };
@@ -344,7 +343,6 @@
 			files = (
 				A10000000000000000000026 /* AppIcon.icon in Resources */,
 				A10000000000000000000027 /* Assets.xcassets in Resources */,
-				A10000000000000000000017 /* nyc_code_authored.json in Resources */,
 				A1000000000000000000001D /* CodeContent in Resources */,
 				A1000000000000000000002C /* PrivacyInfo.xcprivacy in Resources */,
 			);
