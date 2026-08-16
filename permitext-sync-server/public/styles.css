@@ -3199,8 +3199,8 @@ select option:checked {
 .annotated-code-block {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
 }
 
 .annotated-code-block > :where(.section-block, .section-html, .code-table, .code-media) {
@@ -3233,17 +3233,23 @@ select option:checked {
 
 .inline-comment {
   display: flex;
-  grid-column: 1;
-  grid-row: 2;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
   justify-content: flex-end;
   gap: var(--space-1);
   min-width: 0;
-  width: 100%;
+  width: 60px;
   min-height: 30px;
-  padding-top: var(--space-1);
+  margin-bottom: var(--space-4);
+  padding-left: var(--space-1);
   opacity: 0;
   pointer-events: none;
   transition: opacity 140ms ease;
+}
+
+.reader-panel.code-theme-zoning .inline-comment {
+  margin-bottom: var(--space-2);
 }
 
 .annotated-code-block:hover > .inline-comment,
