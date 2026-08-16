@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-topbar-workspace-menu-v280";
+} from "./offline-storage.js?v=20260816-topbar-unified-pills-v281";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -5642,7 +5642,7 @@ function updateTopbarPlanBadge() {
   if (!topbarBrand || !topbarBrandPlan) return;
   const pro = currentPlan() === "pro";
   topbarBrandPlan.hidden = !pro;
-  topbarBrandPlan.textContent = pro ? "Pro" : "";
+  topbarBrandPlan.textContent = pro ? "PRO" : "";
   topbarBrand.setAttribute("aria-label", pro ? "permitext Pro plan" : "permitext");
   updateReaderPlanControls();
 }

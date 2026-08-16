@@ -591,7 +591,8 @@ textarea:focus-visible {
 .connection-status {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
+  height: 30px;
+  min-height: 30px;
   padding: 0 12px;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 7%, transparent);
@@ -788,7 +789,7 @@ textarea:focus-visible {
 .workspace-add-button,
 .workspace-actions-button,
 .workspace-name-input {
-  min-height: 40px;
+  min-height: 30px;
   border: 0;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 8%, transparent);
@@ -851,6 +852,7 @@ textarea:focus-visible {
 
 .workspace-add-button,
 .workspace-actions-button {
+  height: 30px;
   display: inline-flex;
   width: auto;
   flex: 0 0 auto;
@@ -887,7 +889,7 @@ textarea:focus-visible {
 .topbar-settings-button {
   display: inline-flex;
   width: auto;
-  height: 40px;
+  height: 30px;
   flex: 0 0 auto;
   align-items: center;
   padding: 0 12px;
@@ -897,6 +899,11 @@ textarea:focus-visible {
   color: var(--text-secondary);
   cursor: pointer;
   font-size: 14px;
+}
+
+.topbar-layout-actions .toolbar-button {
+  height: 30px;
+  min-height: 30px;
 }
 
 .topbar-settings-button:hover,
