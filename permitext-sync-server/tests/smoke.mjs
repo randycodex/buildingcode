@@ -1439,7 +1439,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-workflow-language-v267'),
+        webRoot.text.includes('/web/app.js?v=20260816-reader-workspace-v268'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1600,7 +1600,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-workflow-language-v267'),
+      webRoot.text.includes('/web/styles.css?v=20260816-reader-workspace-v268'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1874,7 +1874,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-workflow-language-v267'),
+      webRoot.text.includes('/web/styles.css?v=20260816-reader-workspace-v268'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2343,19 +2343,18 @@ async function main() {
       "Saved rows no longer match the iOS code, chapter, and code-order structure."
     );
     assert(
-      workspaceScript.text.includes("async function openReaderNotesProjectPicker") &&
-        workspaceScript.text.includes("function persistSectionFolderSelection") &&
-        workspaceScript.text.includes('label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save evidence"') &&
-        workspaceScript.text.includes('destinationList.setAttribute("aria-multiselectable", "true")') &&
-        workspaceScript.text.includes("await persistSectionFolderSelection(sectionPayload, selectedFolders, projects)") &&
-        workspaceScript.text.includes("confirmButton.disabled = selected.length === 0"),
-      "Reader save no longer requires confirmed Project or Reference destinations."
+      workspaceScript.text.includes("async function saveReaderPassage(panel, section, reader, target, options = {})") &&
+        workspaceScript.text.includes("await persistSectionBookmark(payload, true, { refreshSavedPanes: false })") &&
+        workspaceScript.text.includes("project = activeProjectForReaderSave()") &&
+        workspaceScript.text.includes("await persistSectionInProject(project, payload)") &&
+        workspaceScript.text.includes('addNote.textContent = noteValueForTarget(target).trim() ? "Open note" : "Add note"'),
+      "Reader passage saving is no longer immediate, Project-aware, and followed by an optional Note action."
     );
     assert(
         workspaceScript.text.includes('if (window.getSelection && String(window.getSelection()).trim()) return;') &&
-        workspaceScript.text.includes('toggleReaderNotesSheet(panel, section, reader, { target });') &&
-        workspaceScript.text.includes('renderAnnotationProjectEditor(projectsHost, target, sectionPayload)') &&
-        workspaceScript.text.includes('button.hidden = !noteBody.trim()') &&
+        workspaceScript.text.includes('wrapper.classList.toggle("is-actions-active")') &&
+        workspaceScript.text.includes('await saveReaderPassage(panel, section, reader, target, { openNote: true })') &&
+        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", saved ? "Saved passage" : "Save passage")') &&
         workspaceScript.text.includes('savedMarker.className = "reader-section-saved-marker"') &&
         workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
         workspaceScript.text.includes('function savedSectionRecord(section, codeVersion = "")') &&
@@ -2374,13 +2373,13 @@ async function main() {
         workspaceScript.text.includes('sectionWrapper.dataset.codeVersion = syncCodeVersion') &&
         workspaceScript.text.includes('wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion)') &&
         workspaceScript.text.includes('wrapper.classList.toggle("has-saved-section", showBookmark)') &&
-        workspaceScript.text.includes('button.hidden = !showBookmark') &&
+        workspaceScript.text.includes('button.setAttribute("aria-label", showBookmark ? "Saved passage" : "Save passage")') &&
         !workspaceScript.text.includes('const bookmarkWrapper = wrappers.find') &&
         workspaceScript.text.includes('marker.hidden = !showSectionMarker') &&
         workspaceStyles.text.includes(".reader-section-saved-marker") &&
         workspaceStyles.text.includes(".reader-section-saved-marker[hidden]") &&
         !workspaceScript.text.includes("restoreReaderNotesSheet"),
-      "Paragraph taps or Reader saved markers no longer match the iOS note-sheet behavior."
+      "Paragraph selection, immediate saving, notes, or Reader saved markers no longer preserve passage identity."
     );
     assert(
       workspaceScript.text.includes("projectSavedSourceKey: projectKey") &&
@@ -2704,15 +2703,14 @@ async function main() {
       "Project selection rows no longer use regular-weight project-colored names without a separate color dot."
     );
     assert(
-      !workspaceStyles.text.includes(".annotated-code-block:hover .inline-comment-toggle") &&
-        !workspaceStyles.text.includes(".annotated-code-block:hover .inline-bookmark-toggle"),
-      "Reader annotation status icons still appear on hover without a saved note or bookmark."
+      workspaceStyles.text.includes(".annotated-code-block:hover > .inline-comment") &&
+        workspaceStyles.text.match(/\.reader-content > \* \{[\s\S]*?width: 100%;[\s\S]*?max-width: 800px;/),
+      "Reader passage actions or the responsive 800-pixel reading measure are missing."
     );
     assert(
-      workspaceStyles.text.match(/\.annotated-code-block \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) 46px;[\s\S]*?column-gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.chapter-section \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) 46px;[\s\S]*?column-gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.inline-comment-toggle \{[\s\S]*?right: 22px;/),
-      "Reader comment and bookmark rail no longer preserves the compact 46-pixel layout."
+      workspaceStyles.text.match(/\.annotated-code-block \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.match(/\.inline-comment-toggle,[\s\S]*?\.inline-bookmark-toggle,[\s\S]*?\.inline-research-toggle \{[\s\S]*?display: inline-flex;/),
+      "Reader passage actions no longer use the compact inline Save, Note, and Research row."
     );
     assert(
       workspaceStyles.text.match(/\.section-detail-heading span \{[^}]*font-weight: 400;/) &&
@@ -2723,7 +2721,7 @@ async function main() {
       "Section Detail should preserve normal Reader text weight while emphasizing only the section number."
     );
     assert(
-        workspaceScript.text.includes("toggleReaderNotesSheet(panel, section, reader, { target });") &&
+        workspaceScript.text.includes("openReaderNotesSheet(panel, section, reader, { target });") &&
         workspaceScript.text.includes("function renderAnnotationProjectEditor(container, target, sectionPayload") &&
         !workspaceScript.text.includes('empty.textContent = "No tags";') &&
         workspaceScript.text.includes('projectsHost.className = "section-detail-projects";') &&
@@ -2736,20 +2734,20 @@ async function main() {
         workspaceStyles.text.match(/\.section-detail-panel \{[\s\S]*?position: relative;/) &&
         workspaceScript.text.includes("notes.append(notesHeader, textareaWrap, projectsHost, tagsHost)") &&
         workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
-        workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&
+        !workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&
         workspaceScript.text.includes('label.textContent = "Projects";') &&
         workspaceScript.text.includes("normalizeAnnotationBlockID(candidate.blockID) === blockID") &&
         workspaceScript.text.includes("projectListToggle.textContent = projectListLabel") &&
         workspaceStyles.text.includes(".annotation-project-list-motion.is-open") &&
         workspaceStyles.text.match(/\.annotation-project-chip \+ \.annotation-project-chip \{[\s\S]*?border-top:/),
-      "Reader paragraph cards no longer toggle by target or expose Comments, Projects, and Tags organization."
+      "Reader notes or Source Detail organization no longer preserve their distinct responsibilities."
     );
     assert(
       workspaceScript.text.includes('sheet.style.setProperty("--reader-notes-input-height", `${inputHeight}px`)') &&
         workspaceScript.text.includes("const nonInputContentHeight = Math.max(0, sheet.scrollHeight - input.offsetHeight)") &&
         workspaceStyles.text.includes("--reader-notes-input-min-height: 64px;") &&
         workspaceStyles.text.includes("flex: 0 0 var(--reader-notes-input-height);"),
-      "Reader note resizing should resize only Comments and keep Projects and Tags visible in place."
+      "Reader note resizing no longer preserves a usable compact composer."
     );
     assert(
       workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),

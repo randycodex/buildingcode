@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-workflow-language-v267";
+} from "./offline-storage.js?v=20260816-reader-workspace-v268";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -10034,7 +10034,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   ];
   saveWorkspaceState();
   if (options.refreshSavedPanes !== false) await refreshOpenSavedPanes();
-  if (!activeAccount()) return;
+  if (!activeAccount()) return true;
   try {
     await pushMutation(saved
       ? savedMutationForSection(sectionPayload)
@@ -10058,7 +10058,7 @@ async function persistSectionInProject(project, sectionPayload) {
   state.localProjectSections = [...current, record];
   saveWorkspaceState();
   await refreshProjectMembershipPanes(project);
-  if (!activeAccount()) return;
+  if (!activeAccount()) return true;
   try {
     await pushMutation(projectSectionMutationForSection(project, sectionPayload));
     state.localProjectSections = (state.localProjectSections || []).filter((item) => item.id !== record.id);
@@ -11549,17 +11549,97 @@ function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) 
   wrapper.dataset.sectionTitle = target.title || "";
   wrapper.dataset.blockId = target.blockID || "";
   wrapper.dataset.blockLabel = target.blockLabel || "";
+  wrapper.tabIndex = 0;
+  wrapper.setAttribute("aria-label", `Passage actions for ${target.blockLabel || sectionDisplayTitle(section.sectionNumber, section.title)}`);
   wrapper.append(renderCodeBlock(block), renderInlineCommentBox(section, reader, target, options));
+  const toggleActions = () => {
+    const panel = wrapper.closest(".reader-panel");
+    panel?.querySelectorAll(".annotated-code-block.is-actions-active").forEach((candidate) => {
+      if (candidate !== wrapper) candidate.classList.remove("is-actions-active");
+    });
+    wrapper.classList.toggle("is-actions-active");
+  };
   wrapper.addEventListener("click", (event) => {
     if (event.target.closest("a, button, input, textarea, select")) return;
     if (window.getSelection && String(window.getSelection()).trim()) return;
-    const panel = wrapper.closest(".reader-panel");
-    toggleReaderNotesSheet(panel, section, reader, { target });
+    toggleActions();
+  });
+  wrapper.addEventListener("keydown", (event) => {
+    if (event.target !== wrapper || !["Enter", " "].includes(event.key)) return;
+    event.preventDefault();
+    toggleActions();
   });
   return wrapper;
 }
 
-function renderInlineCommentBox(section, _reader, target = annotationTargetForSection(section, _reader), options = {}) {
+function activeProjectForReaderSave() {
+  const active = openProjectDetails()[0];
+  if (!active) return null;
+  return activeProjectRecords(currentContentSummary().projects || [])
+    .find((project) => projectDetailMatches(project, active)) || active;
+}
+
+function readerPassagePayload(section, reader, target) {
+  return {
+    codeVersion: target.codeVersion,
+    sectionID: section.id,
+    sectionNumber: section.sectionNumber,
+    title: section.title,
+    codePrefix: reader?.codePrefix || "BC",
+    chapterID: reader?.chapterID || "",
+    chapterNumber: section.chapterNumber || "",
+    blockID: normalizeAnnotationBlockID(target.blockID),
+    blockLabel: target.blockLabel || ""
+  };
+}
+
+function showReaderSaveConfirmation(panel, section, reader, target, project = null) {
+  panel.querySelector(".reader-save-confirmation")?.remove();
+  const confirmation = document.createElement("div");
+  confirmation.className = "reader-save-confirmation";
+  confirmation.setAttribute("role", "status");
+  const message = document.createElement("span");
+  message.textContent = project
+    ? `Saved to ${project.name || project.title || "Project"}`
+    : "Saved";
+  const addNote = document.createElement("button");
+  addNote.type = "button";
+  addNote.textContent = noteValueForTarget(target).trim() ? "Open note" : "Add note";
+  addNote.addEventListener("click", () => {
+    confirmation.remove();
+    openReaderNotesSheet(panel, section, reader, { target });
+  });
+  confirmation.append(message, addNote);
+  panel.append(confirmation);
+  window.setTimeout(() => confirmation.remove(), 4200);
+}
+
+async function saveReaderPassage(panel, section, reader, target, options = {}) {
+  const payload = readerPassagePayload(section, reader, target);
+  const alreadySaved = isSectionSaved(payload);
+  let project = null;
+  if (!alreadySaved) {
+    const saved = await persistSectionBookmark(payload, true, { refreshSavedPanes: false });
+    if (!saved) return false;
+    project = activeProjectForReaderSave();
+    if (project) {
+      const linked = await persistSectionInProject(project, payload);
+      if (!linked) project = null;
+    }
+    await refreshOpenSavedPanes();
+    syncReaderNoteBookmarkButtons(section.id, true, target.codeVersion);
+  } else {
+    project = activeProjectForReaderSave();
+  }
+  if (options.openNote) {
+    openReaderNotesSheet(panel, section, reader, { target });
+  } else {
+    showReaderSaveConfirmation(panel, section, reader, target, project);
+  }
+  return true;
+}
+
+function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader), options = {}) {
   const noteBody = noteValueForTarget(target.sectionID, target.blockID);
   const saved = Boolean(options.showBookmark);
   const wrapper = document.createElement("section");
@@ -11571,28 +11651,51 @@ function renderInlineCommentBox(section, _reader, target = annotationTargetForSe
   wrapper.dataset.commentBlockId = target.blockID || "";
   wrapper.dataset.researchSelectionExclude = "true";
 
-  const button = document.createElement("span");
+  const button = document.createElement("button");
+  button.type = "button";
   button.className = "inline-comment-toggle";
   button.innerHTML = `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
     </svg>
-    <span class="sr-only">Has note</span>
+    <span>Note</span>
   `;
-  button.setAttribute("aria-label", "Has note");
-  button.setAttribute("aria-hidden", noteBody.trim() ? "false" : "true");
-  button.hidden = !noteBody.trim();
+  button.setAttribute("aria-label", noteBody.trim() ? "Open note" : "Add note");
   button.classList.toggle("has-comment", Boolean(noteBody.trim()));
+  button.addEventListener("click", async () => {
+    const panel = button.closest(".reader-panel");
+    await saveReaderPassage(panel, section, reader, target, { openNote: true });
+  });
 
-  const bookmarkButton = document.createElement("span");
+  const bookmarkButton = document.createElement("button");
+  bookmarkButton.type = "button";
   bookmarkButton.className = "inline-bookmark-toggle";
-  bookmarkButton.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Bookmarked</span>`;
-  bookmarkButton.setAttribute("aria-label", "Bookmarked");
-  bookmarkButton.setAttribute("aria-hidden", saved ? "false" : "true");
-  bookmarkButton.hidden = !saved;
+  bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span>${saved ? "Saved" : "Save"}</span>`;
+  bookmarkButton.setAttribute("aria-label", saved ? "Saved passage" : "Save passage");
   bookmarkButton.classList.toggle("is-saved", saved);
 
-  wrapper.append(button, bookmarkButton);
+  bookmarkButton.addEventListener("click", async () => {
+    if (bookmarkButton.disabled || bookmarkButton.classList.contains("is-saved")) return;
+    bookmarkButton.disabled = true;
+    const panel = bookmarkButton.closest(".reader-panel");
+    const savedPassage = await saveReaderPassage(panel, section, reader, target);
+    bookmarkButton.disabled = false;
+    if (!savedPassage) return;
+    bookmarkButton.classList.add("is-saved");
+    bookmarkButton.innerHTML = `${bookmarkIconSVG(true)}<span>Saved</span>`;
+    bookmarkButton.setAttribute("aria-label", "Saved passage");
+  });
+
+  const researchButton = document.createElement("button");
+  researchButton.type = "button";
+  researchButton.className = "inline-research-toggle";
+  researchButton.textContent = "Research";
+  researchButton.addEventListener("click", () => {
+    const sectionWrapper = researchButton.closest(".chapter-section");
+    if (sectionWrapper) selectReaderSectionForResearch(sectionWrapper);
+  });
+
+  wrapper.append(bookmarkButton, button, researchButton);
   return wrapper;
 }
 
@@ -11618,10 +11721,7 @@ function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
     const button = wrapper.querySelector(".inline-comment-toggle");
     wrapper.classList.toggle("has-note", hasNote);
     button?.classList.toggle("has-comment", hasNote);
-    if (button) {
-      button.hidden = !hasNote;
-      button.setAttribute("aria-hidden", hasNote ? "false" : "true");
-    }
+    if (button) button.setAttribute("aria-label", hasNote ? "Open note" : "Add note");
   });
   const bookmarkCodeVersion = options.codeVersion || options.target?.codeVersion || defaultSyncCodeVersion;
   syncReaderNoteBookmarkButtons(sectionID, isSectionSaved({
@@ -11656,11 +11756,15 @@ function ensureReaderNotesSheet(panel, reader) {
   researchButton.type = "button";
   researchButton.textContent = "Add to Research";
 
+  const noteTitle = document.createElement("strong");
+  noteTitle.className = "reader-notes-title";
+  noteTitle.textContent = "Note";
+
   const leadingActions = document.createElement("div");
   leadingActions.className = "reader-notes-leading-actions";
   leadingActions.setAttribute("role", "toolbar");
   leadingActions.setAttribute("aria-label", "Section actions");
-  leadingActions.append(researchButton);
+  leadingActions.append(noteTitle, researchButton);
 
   const doneButton = document.createElement("button");
   doneButton.className = "reader-notes-done";
@@ -11688,18 +11792,8 @@ function ensureReaderNotesSheet(panel, reader) {
     syncReaderNoteControls(sectionID, blockID, input.value, { source: input, target });
   });
 
-  const commentsLabel = document.createElement("p");
-  commentsLabel.className = "annotation-tags-label reader-notes-comments-label";
-  commentsLabel.textContent = "Comments";
-
-  const projectsHost = document.createElement("section");
-  projectsHost.className = "reader-notes-projects";
-
-  const tagsHost = document.createElement("section");
-  tagsHost.className = "reader-notes-tags";
-
   bindReaderNotesResize(resizer, sheet, panel);
-  sheet.append(resizer, header, commentsLabel, input, projectsHost, tagsHost);
+  sheet.append(resizer, header, input);
   panel.append(sheet);
   return sheet;
 }
@@ -12072,8 +12166,8 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   removeReaderNotesProjectPicker(sheet);
   input.value = noteValueForTarget(section.id, blockID);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
-  renderAnnotationProjectEditor(projectsHost, target, sectionPayload);
-  renderAnnotationTagEditor(tagsHost, target, {
+  if (projectsHost) renderAnnotationProjectEditor(projectsHost, target, sectionPayload);
+  if (tagsHost) renderAnnotationTagEditor(tagsHost, target, {
     onChange: () => {
       if (state.utilities.saved) renderWorkspace();
     }
@@ -12124,10 +12218,8 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
     wrapper.classList.toggle("has-saved-section", showBookmark);
     if (!button) return;
     button.classList.toggle("is-saved", showBookmark);
-    button.hidden = !showBookmark;
-    button.setAttribute("aria-hidden", showBookmark ? "false" : "true");
-    button.setAttribute("aria-label", "Bookmarked");
-    button.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Bookmarked</span>`;
+    button.setAttribute("aria-label", showBookmark ? "Saved passage" : "Save passage");
+    button.innerHTML = `${bookmarkIconSVG(showBookmark)}<span>${showBookmark ? "Saved" : "Save"}</span>`;
   });
   track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((section) => {
     if (section.dataset.codeVersion !== exactCodeVersion) return;
