@@ -3217,6 +3217,22 @@ select option:checked {
   box-shadow: none;
 }
 
+.inline-research-toggle {
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inline-new-research-toggle {
+  flex: 0 0 auto;
+  color: var(--text-tertiary);
+}
+
+.inline-research-toggle:disabled {
+  opacity: 0.64;
+}
+
 .inline-comment-toggle svg,
 .inline-bookmark-toggle svg {
   width: 15px;

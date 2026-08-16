@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-reader-research-direct-v272";
+} from "./offline-storage.js?v=20260816-research-direct-actions-v273";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -11109,7 +11109,7 @@ function refreshReaderSectionProjectContexts(sectionID = "") {
   });
 }
 
-async function selectReaderSectionForResearch(sectionWrapper) {
+function readerSectionResearchSelection(sectionWrapper) {
   if (!sectionWrapper) return;
   const range = document.createRange();
   range.selectNodeContents(sectionWrapper);
@@ -11132,14 +11132,39 @@ async function selectReaderSectionForResearch(sectionWrapper) {
   };
   const projectID = selectedOpenProjectID() ||
     sectionWrapper.closest(".workspace-panel")?.dataset.projectId || "";
+  return {
+    ...passage,
+    passages: [passage],
+    projectID
+  };
+}
+
+function currentResearchConversationLabel() {
+  const conversationID = String(state.researchConversationID || "").trim();
+  if (!conversationID || !researchConversationPaneIsOpen()) return "";
+  const conversation = activeResearchConversation?.id === conversationID
+    ? activeResearchConversation
+    : researchConversationList.find((candidate) => candidate.id === conversationID);
+  const label = String(conversation?.title || conversation?.starterQuestion || "Current Research").trim();
+  return label.length > 32 ? `${label.slice(0, 29).trim()}…` : label;
+}
+
+async function selectReaderSectionForResearch(sectionWrapper, options = {}) {
+  const selection = readerSectionResearchSelection(sectionWrapper);
+  if (!selection) return false;
   try {
-    await startNewResearchFromSelection({
-      ...passage,
-      passages: [passage],
-      projectID
-    });
+    if (options.addToCurrent && currentResearchConversationLabel()) {
+      await addResearchSelectionToCurrent(selection);
+    } else {
+      await startNewResearchFromSelection(selection);
+    }
+    return true;
   } catch (error) {
-    await showWebNotice("Research not started", error.message);
+    await showWebNotice(
+      options.addToCurrent ? "Research evidence not added" : "Research not started",
+      error.message
+    );
+    return false;
   }
 }
 
@@ -11688,13 +11713,46 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   const researchButton = document.createElement("button");
   researchButton.type = "button";
   researchButton.className = "inline-research-toggle";
-  researchButton.textContent = "Research";
-  researchButton.addEventListener("click", () => {
+  const currentResearchLabel = currentResearchConversationLabel();
+  researchButton.textContent = currentResearchLabel ? `Add to: ${currentResearchLabel}` : "Research";
+  researchButton.title = currentResearchLabel
+    ? `Add as supporting evidence to “${currentResearchLabel}”`
+    : "Start Research with this passage";
+  researchButton.addEventListener("click", async () => {
     const sectionWrapper = researchButton.closest(".chapter-section");
-    if (sectionWrapper) selectReaderSectionForResearch(sectionWrapper);
+    if (!sectionWrapper || researchButton.disabled) return;
+    researchButton.disabled = true;
+    const added = await selectReaderSectionForResearch(sectionWrapper, {
+      addToCurrent: Boolean(currentResearchLabel)
+    });
+    if (added && currentResearchLabel) {
+      researchButton.textContent = "Added ✓";
+      window.setTimeout(() => {
+        if (!researchButton.isConnected) return;
+        researchButton.textContent = `Add to: ${currentResearchLabel}`;
+        researchButton.disabled = false;
+      }, 1400);
+      return;
+    }
+    researchButton.disabled = false;
   });
 
   wrapper.append(bookmarkButton, button, researchButton);
+  if (currentResearchLabel) {
+    const newResearchButton = document.createElement("button");
+    newResearchButton.type = "button";
+    newResearchButton.className = "inline-research-toggle inline-new-research-toggle";
+    newResearchButton.textContent = "New Research";
+    newResearchButton.title = "Start a new Research conversation with this passage";
+    newResearchButton.addEventListener("click", async () => {
+      const sectionWrapper = newResearchButton.closest(".chapter-section");
+      if (!sectionWrapper || newResearchButton.disabled) return;
+      newResearchButton.disabled = true;
+      const started = await selectReaderSectionForResearch(sectionWrapper);
+      if (!started) newResearchButton.disabled = false;
+    });
+    wrapper.append(newResearchButton);
+  }
   return wrapper;
 }
 
@@ -12144,12 +12202,18 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
     blockLabel: target.blockLabel || ""
   };
   if (researchButton) {
+    const currentResearchLabel = currentResearchConversationLabel();
     researchButton.disabled = !sectionWrapper ||
       String(reader?.codePrefix || "").toUpperCase() === zoningCodePrefix;
+    researchButton.textContent = currentResearchLabel ? `Add to: ${currentResearchLabel}` : "Start Research";
     researchButton.title = researchButton.disabled
       ? "Research requires enacted code text with stable section identifiers"
-      : "Add this section to Research as selected evidence";
-    researchButton.onclick = () => selectReaderSectionForResearch(sectionWrapper);
+      : currentResearchLabel
+        ? `Add as supporting evidence to “${currentResearchLabel}”`
+        : "Start Research with this passage";
+    researchButton.onclick = () => selectReaderSectionForResearch(sectionWrapper, {
+      addToCurrent: Boolean(currentResearchLabel)
+    });
   }
 
   const input = sheet.querySelector(".reader-notes-input");
@@ -19009,6 +19073,25 @@ async function startNewResearchFromSelection(selection) {
   window.getSelection?.().removeAllRanges();
   await refreshResearchConversationList();
   await openResearchConversation(payload.conversation.id, { refreshList: true });
+  return payload.conversation;
+}
+
+async function addResearchSelectionToCurrent(selection) {
+  const conversationID = String(state.researchConversationID || "").trim();
+  if (!conversationID) return startNewResearchFromSelection(selection);
+  const passages = selection.passages || [selection];
+  const payload = await postResearch("/research/conversations/evidence", {
+    conversationID,
+    selections: passages.map(({ sectionID, selectedText, savedItemID }) => ({
+      sectionID,
+      selectedText,
+      savedItemID
+    }))
+  });
+  activeResearchConversation = payload.conversation;
+  window.getSelection?.().removeAllRanges();
+  await refreshResearchConversationList();
+  await openResearchConversation(conversationID, { refreshList: true });
   return payload.conversation;
 }
 
