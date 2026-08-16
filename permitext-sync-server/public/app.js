@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-notebook-reference-groups-v329";
+} from "./offline-storage.js?v=20260816-notebook-title-v330";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19766,9 +19766,7 @@ async function renderProjectNotebook(project) {
   heading.className = "notebook-heading";
   const headingTitle = document.createElement("strong");
   headingTitle.textContent = "Notebook";
-  const headingContext = document.createElement("small");
-  headingContext.textContent = `${identity.name} · Professional analysis`;
-  heading.append(headingTitle, headingContext);
+  heading.append(headingTitle);
   const dragHandle = createProjectToolDragHandle(identity);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close notebook-close";
