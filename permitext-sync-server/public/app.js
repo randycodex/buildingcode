@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-project-tool-transfer-v333";
+} from "./offline-storage.js?v=20260816-performance-pass-v334";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -33658,7 +33658,7 @@ async function start() {
   if (!detachedProjectWindow) {
     bindImmediateUtilityControls();
     const [chapterPayload, libraryPayload] = await Promise.all([
-      api("/code/chapters"),
+      api("/code/chapters?view=startup"),
       api("/code/libraries")
     ]);
     chapters = chapterPayload.chapters || [];

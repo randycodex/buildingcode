@@ -5,6 +5,7 @@ import {
   createRetryableLazyLoader,
   createSingleFlightInitializer,
   setBoundedLRUCacheValue,
+  startupChapterSummary,
   syncBatchIncludesProjectMutation
 } from "../app.mjs";
 import { createPostgresSyncRepository } from "../postgres-sync-repository.mjs";
@@ -85,6 +86,34 @@ const secondCatalog = await allSectionCatalogByID();
 assert(firstCatalog === secondCatalog, "The immutable combined section catalog was rebuilt instead of reused.");
 assert(firstCatalog.size > 10_000, "The combined section catalog omitted published code sections.");
 assert(firstCatalog.get("11909")?.sectionNumber === "403.1", "The cached catalog lost canonical section lookup.");
+
+const startupChapter = startupChapterSummary({
+  id: "chapter-1",
+  codePrefix: "BC",
+  codeSectionID: "building-code",
+  chapterNumber: "1",
+  displayTitle: "Chapter 1",
+  fullTitle: "Chapter 1: Administration",
+  title: "Administration",
+  sections: [{ id: "section-1", blocks: [{ plainText: "Large enacted body" }] }],
+  groups: [{ id: "group-1" }]
+});
+assert(
+  JSON.stringify(Object.keys(startupChapter).sort()) === JSON.stringify([
+    "chapterNumber",
+    "codePrefix",
+    "codeSectionID",
+    "displayTitle",
+    "fullTitle",
+    "id",
+    "title"
+  ]),
+  "The startup chapter projection includes navigation bodies or omits required identity fields."
+);
+assert(
+  !JSON.stringify(startupChapter).includes("Large enacted body"),
+  "The startup chapter projection still transfers enacted section bodies."
+);
 
 const boundedCache = new Map();
 setBoundedLRUCacheValue(boundedCache, "oldest", 1, 2);

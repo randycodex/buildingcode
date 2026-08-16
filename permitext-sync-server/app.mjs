@@ -15133,8 +15133,22 @@ function withNavigationHierarchy(chapter) {
   };
 }
 
+export function startupChapterSummary(chapter) {
+  return {
+    id: chapter.id,
+    codePrefix: chapter.codePrefix,
+    codeSectionID: chapter.codeSectionID,
+    chapterNumber: chapter.chapterNumber,
+    displayTitle: chapter.displayTitle,
+    fullTitle: chapter.fullTitle,
+    title: chapter.title
+  };
+}
+
 async function handleCodeChapters(request, response) {
-  const codePrefix = requestURL(request).searchParams.get("code")?.trim().toUpperCase();
+  const url = requestURL(request);
+  const codePrefix = url.searchParams.get("code")?.trim().toUpperCase();
+  const startupView = url.searchParams.get("view") === "startup";
   const chapters = [
     ...([zoningCodePrefix, existingBuildingCodePrefix].includes(codePrefix) ||
       enactedCodePrefixes.has(codePrefix) ? [] : await chapterIndex()),
@@ -15142,8 +15156,11 @@ async function handleCodeChapters(request, response) {
     ...(codePrefix && codePrefix !== existingBuildingCodePrefix ? [] : await existingBuildingChapterIndex()),
     ...(codePrefix && !enactedCodePrefixes.has(codePrefix) ? [] : await enactedNavigationChapterIndex())
   ].map(withNavigationHierarchy);
+  const selectedChapters = codePrefix
+    ? chapters.filter((chapter) => chapter.codePrefix === codePrefix)
+    : chapters;
   sendJSON(response, 200, {
-    chapters: codePrefix ? chapters.filter((chapter) => chapter.codePrefix === codePrefix) : chapters
+    chapters: startupView ? selectedChapters.map(startupChapterSummary) : selectedChapters
   });
 }
 
