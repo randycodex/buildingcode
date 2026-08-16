@@ -214,7 +214,9 @@ assert.match(
   /async function persistSectionFolderSelection\([\s\S]*?saveWorkspaceState\(\);[\s\S]*?await refreshProjectMembershipPanes\([\s\S]*?await pushMutationBatch\(mutations\)/,
   "Saving evidence to a Project must update open Project columns before the network round-trip."
 );
-assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?These passages are saved safely without a Project\./);
+assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?return selectedFolder \? new Set\(\) : unassignedIDs;/);
+assert.doesNotMatch(appSource, /These passages are saved safely without a Project|Return to All Saved/);
+assert.match(functionSource(appSource, "renderSavedFolderContext"), /is-unassigned-context[\s\S]*?populateSavedEvidenceSection\([\s\S]*?"unassigned-saved"[\s\S]*?savedContent/);
 assert(!appSource.includes("No archived folders."), "An empty archive should not render a redundant placeholder row.");
 const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");
 assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);

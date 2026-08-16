@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-unassigned-inbox-v298";
+} from "./offline-storage.js?v=20260816-unassigned-evidence-card-v299";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -25537,11 +25537,28 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
   const projectsSection = panel.querySelector(".saved-projects-section");
   projectsSection.hidden = false;
   if (!folder) {
-    projectsSection.after(inlineFilters, planUsage, savedContent);
     inlineFilters.hidden = !savedInstance.organizeUnassigned;
     savedContent.hidden = !savedInstance.organizeUnassigned;
     previousContext?.remove();
     panel.querySelector(".saved-unassigned-notice")?.remove();
+    if (savedInstance.organizeUnassigned) {
+      const context = document.createElement("section");
+      context.className = "saved-folder-context is-project is-unassigned-context";
+      const savedSection = document.createElement("section");
+      savedSection.className = "project-studio-section saved-project-evidence-section";
+      populateSavedEvidenceSection(
+        savedSection,
+        savedInstance,
+        { id: "unassigned-saved", name: "Unassigned Saved", folderType: "project" },
+        inlineFilters,
+        planUsage,
+        savedContent
+      );
+      context.append(savedSection);
+      projectsSection.after(context);
+    } else {
+      projectsSection.after(inlineFilters, planUsage, savedContent);
+    }
     if (savedInstance.selectedFolderID) savedInstance.selectedFolderID = "";
     panel.classList.remove("has-selected-project-folder");
     panel.style.removeProperty("--project-color");
@@ -25777,31 +25794,8 @@ async function reconcileProjectStudioWithSavedFolders(folders) {
 
 function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems, projectSections, projects, selectedFolder) {
   panel.querySelector(".saved-unassigned-notice")?.remove();
-  if (selectedFolder) return new Set();
   const unassignedIDs = unassignedSavedEvidenceKeys(savedItems, projectSections, projects);
-  if (!unassignedIDs.size && !savedInstance.organizeUnassigned) return unassignedIDs;
-
-  const notice = document.createElement("section");
-  notice.className = "saved-unassigned-notice";
-  const heading = document.createElement("strong");
-  heading.textContent = savedInstance.organizeUnassigned
-    ? `Unassigned Saved · ${unassignedIDs.size}`
-    : `${unassignedIDs.size} saved ${unassignedIDs.size === 1 ? "section needs" : "sections need"} a destination`;
-  const copy = document.createElement("p");
-  copy.textContent = savedInstance.organizeUnassigned
-    ? "These passages are saved safely without a Project. Open one to read it, or use Save to add it to a Project."
-    : "Older saved evidence is kept safely until you choose a Project.";
-  const action = document.createElement("button");
-  action.type = "button";
-  action.textContent = savedInstance.organizeUnassigned ? "Return to All Saved" : "Organize existing evidence";
-  action.addEventListener("click", () => {
-    savedInstance.organizeUnassigned = !savedInstance.organizeUnassigned;
-    saveWorkspaceState();
-    void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-  });
-  notice.append(heading, copy, action);
-  panel.querySelector(".saved-inline-filters")?.before(notice);
-  return unassignedIDs;
+  return selectedFolder ? new Set() : unassignedIDs;
 }
 
 function unassignedSavedEvidenceKeys(savedItems, projectSections, projects = []) {
