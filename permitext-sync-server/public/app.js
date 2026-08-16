@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-reader-save-research-v293";
+} from "./offline-storage.js?v=20260816-selection-menu-compact-v294";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18873,15 +18873,6 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   const initialNotebookCardID = openNotebookContext?.projectID === initialProjectID
     ? openNotebookContext.cardID
     : "";
-  const selectionContextSummary = document.createElement("p");
-  selectionContextSummary.className = "research-selection-context-summary";
-  const updateSelectionContextSummary = (projectID = pendingResearchSelection?.projectID || initialProjectID) => {
-    selectionContextSummary.textContent = researchProjectContextSummary(projectID, {
-      passageCount: pendingResearchSelection?.passages?.length || 1
-    });
-  };
-  updateSelectionContextSummary(initialProjectID);
-  menu.append(selectionContextSummary);
   if (activeAccount() && projects.length) {
     const projectChoices = researchProjectChoices({
       value: initialProjectID,
@@ -18906,7 +18897,6 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
     const chooseProject = (choice, option) => {
       if (pendingResearchSelection) pendingResearchSelection.projectID = choice.value;
       projectTrigger.textContent = choice.label;
-      updateSelectionContextSummary(choice.value);
       projectList.querySelectorAll("[role='option']").forEach((item) => {
         item.setAttribute("aria-selected", String(item === option));
       });

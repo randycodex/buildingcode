@@ -6881,8 +6881,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   background: color-mix(in srgb, var(--text-primary) 6%, transparent);
 }
 
-.research-composer-context-summary,
-.research-selection-context-summary {
+.research-composer-context-summary {
   min-width: 0;
   margin: 0;
   overflow: hidden;
@@ -6903,10 +6902,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   color: var(--text-primary);
   font-size: calc(var(--chrome-font-size) * 0.74) !important;
   font-weight: 650;
-}
-
-.research-selection-context-summary {
-  padding: 0 var(--space-1);
 }
 
 .research-start-project {
