@@ -13558,6 +13558,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-card-tile:hover,
 .notebook-card-tile[aria-pressed="true"] {
   background: transparent;
+  color: var(--text-primary);
+}
+
+.notebook-card-tile:hover strong,
+.notebook-card-tile[aria-pressed="true"] strong,
+.notebook-card-row.is-selected .notebook-card-tile strong {
   color: var(--project-color);
 }
 
@@ -13582,7 +13588,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .notebook-card-row.is-selected {
-  background: color-mix(in srgb, var(--project-color) 22%, transparent);
+  background: transparent;
 }
 
 .notebook-focus {
