@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-research-full-width-rows-v302";
+} from "./offline-storage.js?v=20260816-research-unassigned-label-v303";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -16927,7 +16927,7 @@ async function renderResearch(paneID = "utility:analysis") {
       projectPill.className = "research-conversation-project-pill";
       projectPill.textContent = conversation.primaryProjectID
         ? researchProjectName(conversation.primaryProjectID)
-        : "Not in a Project";
+        : "Unassigned";
       const conversationProject = researchProjects().find((project) =>
         researchProjectID(project) === String(conversation.primaryProjectID || "")
       );
@@ -18192,14 +18192,14 @@ async function renderResearchConversation(conversationID, options = {}) {
   if (!embedded) {
     const projectSelect = createResearchProjectSelect({
       value: conversation.primaryProjectID || "",
-      unassignedLabel: "Not in a Project",
+      unassignedLabel: "Unassigned",
       ariaLabel: "Project for this Research conversation"
     });
     projectSelect.classList.add("research-conversation-header-project");
     projectSelect.disabled = !hasCapability("research");
     projectSelect.title = conversation.primaryProjectID
       ? `This conversation is in ${researchProjectName(conversation.primaryProjectID)}`
-      : "This conversation is not part of a Project";
+      : "Not assigned to a Project";
     projectSelect.addEventListener("change", async () => {
       const previousProjectID = conversation.primaryProjectID || "";
       const targetProjectID = projectSelect.value;
