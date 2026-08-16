@@ -25,7 +25,8 @@ assert(app.includes("fetchChapter(expandedChapterID)"), "Chapter expansion must 
 assert(
   app.includes('hasOwnProperty.call(menu, "_expandedChapterID")') &&
     app.includes("hasPreservedExpandedChapter") &&
-    app.includes("? menu._expandedChapterID"),
+    app.includes("? menu._expandedChapterID") &&
+    /const expandedChapterID = hasRequestedExpandedChapter[\s\S]*?: "";/.test(app),
   "Closing and reopening the chapter menu must preserve its last disclosure state, including fully collapsed."
 );
 assert(app.includes("function readerNavigationSections"), "Chapter menu does not filter nested list-item catalog rows.");

@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-reader-actions-baseline-v315";
+} from "./offline-storage.js?v=20260816-reader-nav-collapsed-v316";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -5172,7 +5172,7 @@ async function renderReaderChapterNavigationMenu(menu, select, options = {}) {
     ? options.expandedChapterID
     : hasPreservedExpandedChapter
       ? menu._expandedChapterID
-      : activeChapterID || chapters[0]?.id || "";
+      : "";
   menu._expandedChapterID = expandedChapterID;
 
   let sections = [];
