@@ -13562,13 +13562,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin-bottom: var(--space-2);
 }
 
-.notebook-authorship {
-  margin: 6px 2px 0;
-  color: var(--text-secondary);
-  font-size: 11px;
-  line-height: 1.35;
-}
-
 .notebook-card-title {
   min-height: 40px;
   min-width: 0;

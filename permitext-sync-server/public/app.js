@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-notebook-professional-analysis-v275";
+} from "./offline-storage.js?v=20260816-notebook-writing-surface-v276";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -20687,10 +20687,7 @@ async function renderProjectNotebook(project) {
       titleInput.setAttribute("aria-label", "Notebook Note title");
       titleInput.value = activeCard.title;
       titleInput.disabled = notebookReadOnly;
-      const authorship = document.createElement("p");
-      authorship.className = "notebook-authorship";
-      authorship.textContent = "Your professional analysis · Work in any order; linked material remains identified as a reference.";
-      fields.append(titleInput, authorship);
+      fields.append(titleInput);
 
       const toolbar = document.createElement("div");
       toolbar.className = "notebook-toolbar code-filter-menu notebook-reference-menu";
