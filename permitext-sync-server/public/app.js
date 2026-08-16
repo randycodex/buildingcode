@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-selection-menu-compact-v294";
+} from "./offline-storage.js?v=20260816-reader-static-text-v295";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -11304,26 +11304,7 @@ function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) 
   wrapper.dataset.sectionTitle = target.title || "";
   wrapper.dataset.blockId = target.blockID || "";
   wrapper.dataset.blockLabel = target.blockLabel || "";
-  wrapper.tabIndex = 0;
-  wrapper.setAttribute("aria-label", `Passage actions for ${target.blockLabel || sectionDisplayTitle(section.sectionNumber, section.title)}`);
   wrapper.append(renderCodeBlock(block), renderInlineCommentBox(section, reader, target, options));
-  const toggleActions = () => {
-    const panel = wrapper.closest(".reader-panel");
-    panel?.querySelectorAll(".annotated-code-block.is-actions-active").forEach((candidate) => {
-      if (candidate !== wrapper) candidate.classList.remove("is-actions-active");
-    });
-    wrapper.classList.toggle("is-actions-active");
-  };
-  wrapper.addEventListener("click", (event) => {
-    if (event.target.closest("a, button, input, textarea, select")) return;
-    if (window.getSelection && String(window.getSelection()).trim()) return;
-    toggleActions();
-  });
-  wrapper.addEventListener("keydown", (event) => {
-    if (event.target !== wrapper || !["Enter", " "].includes(event.key)) return;
-    event.preventDefault();
-    toggleActions();
-  });
   return wrapper;
 }
 

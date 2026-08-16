@@ -3207,18 +3207,6 @@ select option:checked {
   grid-column: 1;
 }
 
-.annotated-code-block > :where(.section-block, .section-html) {
-  cursor: pointer;
-}
-
-.annotated-code-block:focus {
-  outline: 0;
-}
-
-.annotated-code-block.is-actions-active {
-  background: color-mix(in srgb, var(--code-accent) 6%, transparent);
-}
-
 .annotated-code-block.is-source-target,
 .chapter-section.is-source-target {
   background: color-mix(in srgb, var(--code-accent) 10%, transparent);
@@ -3258,7 +3246,6 @@ select option:checked {
   transition: opacity 140ms ease;
 }
 
-.annotated-code-block.is-actions-active > .inline-comment,
 .annotated-code-block:hover > .inline-comment,
 .annotated-code-block:focus-within > .inline-comment {
   opacity: 1;
