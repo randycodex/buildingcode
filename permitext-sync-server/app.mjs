@@ -8559,12 +8559,19 @@ async function migrateLegacyProjectFoundation(userID) {
       }
     }
   }
-  const checkpoint = {
+  const checkpointCounters = {
     schemaVersion: projectFoundationSchemaVersion,
     migratedProjectSections: Number(existingCheckpoint?.migratedProjectSections || 0) + migratedProjectSections,
     migratedWorkboards: Number(existingCheckpoint?.migratedWorkboards || 0) + migratedWorkboards,
     migratedResearchAnswers: Number(existingCheckpoint?.migratedResearchAnswers || 0) + migratedResearchAnswers,
-    unmigratedResearchAnswers,
+    unmigratedResearchAnswers
+  };
+  const checkpointChanged = !existingCheckpoint || Object.entries(checkpointCounters)
+    .some(([key, value]) => Number(existingCheckpoint?.[key] || 0) !== value);
+  if (!checkpointChanged) return existingCheckpoint;
+
+  const checkpoint = {
+    ...checkpointCounters,
     completedAt: new Date().toISOString()
   };
   await saveStoredMigrationCheckpoint(userID, checkpointName, checkpoint);
