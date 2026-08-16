@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-search-right-placement-v283";
+} from "./offline-storage.js?v=20260816-column-origin-model-v284";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15166,6 +15166,9 @@ async function openResearchConversation(conversationID, options = {}) {
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
   const showResearchList = options.showResearchList !== false;
+  const researchSurfaceWasOpen = Boolean(
+    state.utilities.analysis || openResearchConversationPaneIDs().length
+  );
   const researchListScrollTop = track.querySelector(
     '.workspace-panel[data-pane-id="utility:analysis"] .analysis-content'
   )?.scrollTop ?? 0;
@@ -15233,6 +15236,9 @@ async function openResearchConversation(conversationID, options = {}) {
   state.researchConversationID = normalizedConversationID;
   if (showResearchList) {
     state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
+    if (options.anchorPaneID && !researchSurfaceWasOpen) {
+      placePaneAfter(options.anchorPaneID, "utility:analysis");
+    }
   }
   const conversationPaneID = paneIDForResearchConversation(normalizedConversationID);
   if (previousConversationPaneID && previousConversationPaneID !== conversationPaneID) {
@@ -18625,6 +18631,7 @@ function researchSelectionFromWindow() {
     ...passages[0],
     passages,
     projectID: panel.dataset.projectId || "",
+    originPaneID: panel.dataset.paneId || "",
     rect,
     anchorRange: range.cloneRange()
   };
@@ -18767,7 +18774,10 @@ async function saveResearchSelection(mode, button, status) {
     closeResearchSelectionMenu();
     window.getSelection?.().removeAllRanges();
     await refreshResearchConversationList();
-    await openResearchConversation(payload.conversation.id, { refreshList: true });
+    await openResearchConversation(payload.conversation.id, {
+      refreshList: true,
+      anchorPaneID: selection.originPaneID || ""
+    });
   } catch (error) {
     button.disabled = false;
     status.textContent = error.message;
@@ -18803,7 +18813,10 @@ async function startNewResearchFromSelection(selection) {
   closeResearchSelectionMenu();
   window.getSelection?.().removeAllRanges();
   await refreshResearchConversationList();
-  await openResearchConversation(payload.conversation.id, { refreshList: true });
+  await openResearchConversation(payload.conversation.id, {
+    refreshList: true,
+    anchorPaneID: selection.originPaneID || ""
+  });
   return payload.conversation;
 }
 
@@ -33188,8 +33201,12 @@ async function toggleUtilityPane(key) {
     state.paneWeights[paneID] = defaultPaneWidthForID(paneID);
     if (key === "projects") {
       restoreProjectsStackOrder();
-    } else {
+    } else if (key === "settings") {
       movePaneToFront(paneID);
+    } else if (key === "archive") {
+      placeArchiveAfterProjectsStack();
+    } else {
+      appendPaneIfMissing(paneID);
     }
   } else if (key === "projects") {
     delete state.paneWeights[paneID];
@@ -33229,7 +33246,7 @@ async function toggleUtilityPane(key) {
   saveWorkspaceState();
   await transitionWorkspace("utility");
   if (willOpen) {
-    track.scrollTo({ left: 0, behavior: "smooth" });
+    scrollPaneIntoView(paneID);
   }
 }
 

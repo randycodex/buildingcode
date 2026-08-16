@@ -351,6 +351,15 @@ assert.match(
   toggleUtilityPaneSource,
   /repeatableUtilityKeys\.has\(key\)[\s\S]*?appendPaneIfMissing\(paneID\)[\s\S]*?scrollPaneIntoView\(paneID\)[\s\S]*?return;/
 );
+assert.match(toggleUtilityPaneSource, /key === "settings"[\s\S]*?movePaneToFront\(paneID\)/);
+assert.match(toggleUtilityPaneSource, /key === "archive"[\s\S]*?placeArchiveAfterProjectsStack\(\)/);
+assert.match(toggleUtilityPaneSource, /else \{[\s\S]*?appendPaneIfMissing\(paneID\)/);
+assert.match(toggleUtilityPaneSource, /if \(willOpen\) \{[\s\S]*?scrollPaneIntoView\(paneID\)/);
+const openResearchConversationSource = functionSource(appSource, "openResearchConversation");
+assert.match(openResearchConversationSource, /researchSurfaceWasOpen/);
+assert.match(openResearchConversationSource, /options\.anchorPaneID && !researchSurfaceWasOpen/);
+assert.match(openResearchConversationSource, /placePaneAfter\(options\.anchorPaneID, "utility:analysis"\)/);
+assert.match(functionSource(appSource, "researchSelectionFromWindow"), /originPaneID: panel\.dataset\.paneId/);
 assert.match(functionSource(appSource, "activePaneIDs"), /pinCriticalWorkflowPanesToLeft\(paired\)/);
 assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
