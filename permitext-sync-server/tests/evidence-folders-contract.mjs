@@ -671,6 +671,7 @@ assert.doesNotMatch(stylesSource, /\.saved-panel \.saved-code-group\.is-collapse
 assert.doesNotMatch(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \+ \.saved-code-group\.is-collapsed/, "Collapsed Saved Evidence groups should not override the standard inter-group spacing.");
 assert.match(stylesSource, /\.saved-panel \.saved-code-group \+ \.saved-code-group \{[\s\S]*?margin-top: var\(--space-2\);/, "Saved Evidence code-group spacing should remain stable in every expanded state.");
 assert.match(stylesSource, /\.saved-row-actions button \{[\s\S]*?border-radius: 1000px;/, "Saved Evidence row actions must share the pill shape.");
+assert.match(stylesSource, /\.saved-row-actions \{[\s\S]*?justify-content: flex-end;/, "Saved Evidence row actions must align to the right edge.");
 assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Record type"\)/);
 assert.match(appSource, /\["reference", "Saved collection", "Reusable research that is not attached to a job yet"\]/);
 assert.match(appSource, /nameInput\.placeholder = selectedFolderType === "reference" \? "Saved collection name" : "Project Name"/);

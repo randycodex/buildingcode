@@ -11527,6 +11527,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-row-actions {
   display: flex;
+  justify-content: flex-end;
   gap: var(--space-1);
   margin-top: var(--space-2);
 }
