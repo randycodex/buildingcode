@@ -11588,7 +11588,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   min-height: 26px;
   padding: 3px 7px;
   border: 0;
-  border-radius: var(--radius-tile);
+  border-radius: 1000px;
   background: color-mix(in srgb, var(--text-primary) 6%, transparent);
   color: var(--text-secondary);
   font-family: var(--chrome-font-family);
