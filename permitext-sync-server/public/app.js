@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-selection-escape-v278";
+} from "./offline-storage.js?v=20260816-report-professional-document-v279";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -21394,6 +21394,13 @@ async function renderProjectReportDraft(project) {
 
   const header = document.createElement("header");
   header.className = "report-draft-header";
+  const heading = document.createElement("div");
+  heading.className = "report-heading";
+  const headingTitle = document.createElement("strong");
+  headingTitle.textContent = "Report";
+  const headingContext = document.createElement("small");
+  headingContext.textContent = `${identity.name} · Professional document`;
+  heading.append(headingTitle, headingContext);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close report-draft-close";
   closeButton.type = "button";
@@ -21406,7 +21413,7 @@ async function renderProjectReportDraft(project) {
   const actions = document.createElement("div");
   actions.className = "panel-actions report-draft-header-actions";
   actions.append(closeButton, createProjectToolDragHandle(identity));
-  header.append(actions);
+  header.append(heading, actions);
 
   const shell = document.createElement("div");
   shell.className = "report-draft-shell";
@@ -22217,13 +22224,13 @@ async function renderProjectReportDraft(project) {
     primaryActions.className = "report-draft-primary-actions";
     const save = document.createElement("button");
     save.type = "button";
-    save.textContent = activeDraft.id ? "Save revision" : "Save draft";
+    save.textContent = "Save Report";
     save.addEventListener("click", () => {
       void saveDraft();
     });
     const generate = document.createElement("button");
     generate.type = "button";
-    generate.textContent = "Generate Report PDF";
+    generate.textContent = "Export Report";
     generate.addEventListener("click", () => {
       void generateReport();
     });
@@ -22233,7 +22240,7 @@ async function renderProjectReportDraft(project) {
     coordinate.disabled = !activeDraft.id;
     coordinate.title = activeDraft.id
       ? "Open a coordination item linked to this Report"
-      : "Save this draft before opening a coordination item";
+      : "Save this Report before opening a coordination item";
     coordinate.hidden = !releaseSurfaceVisibility.coordination || !projectCollaborationAccess(identity, "project.review.request");
     coordinate.addEventListener("click", () => {
       void openCoordinationComposer({
@@ -24304,6 +24311,7 @@ async function renderProjectDetail(detail) {
   reportDraftButton.type = "button";
   reportDraftButton.textContent = "Report";
   reportDraftButton.setAttribute("aria-pressed", String(projectHasOpenReportDraft(identity)));
+  reportDraftButton.title = projectHasOpenReportDraft(identity) ? "Close Report" : "Open Report";
   reportDraftButton.hidden = detachedProjectWindow;
   if (identity.sharedOnly) {
     reportDraftButton.disabled = true;
@@ -24312,10 +24320,16 @@ async function renderProjectDetail(detail) {
   reportDraftButton.addEventListener("click", async () => {
     if (projectHasOpenReportDraft(identity)) {
       const closed = await closeProjectReportDraft(identity);
-      if (closed) reportDraftButton.setAttribute("aria-pressed", "false");
+      if (closed) {
+        reportDraftButton.setAttribute("aria-pressed", "false");
+        reportDraftButton.title = "Open Report";
+      }
     } else {
       const opened = await openProjectReportDraft(identity);
-      if (opened) reportDraftButton.setAttribute("aria-pressed", "true");
+      if (opened) {
+        reportDraftButton.setAttribute("aria-pressed", "true");
+        reportDraftButton.title = "Close Report";
+      }
     }
   });
   const coordinationButton = document.createElement("button");
