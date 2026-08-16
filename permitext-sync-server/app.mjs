@@ -389,6 +389,7 @@ const emptyStore = () => ({
   projectLinksByUserID: {},
   researchAnswersByUserID: {},
   activityEventsByUserID: {},
+  artifactRevisionsByUserID: {},
   migrationCheckpointsByUserID: {},
   researchConversationsByUserID: {},
   researchUsageByUserID: {},
@@ -749,6 +750,7 @@ function createFileStoreAdapter() {
       delete store.projectLinksByUserID[userID];
       delete store.researchAnswersByUserID[userID];
       delete store.activityEventsByUserID[userID];
+      delete store.artifactRevisionsByUserID[userID];
       delete store.migrationCheckpointsByUserID[userID];
       delete store.researchConversationsByUserID[userID];
       delete store.researchUsageByUserID[userID];
@@ -1118,6 +1120,54 @@ function createFileStoreAdapter() {
         if (!existing) entries.push(event);
         store.activityEventsByUserID[userID] = entries;
         return existing || event;
+      });
+    },
+    async artifactRevisionState(userID, { account = false, projectIDs = [] } = {}) {
+      const store = await this.read();
+      const state = store.artifactRevisionsByUserID?.[userID] || {};
+      return {
+        storageOwnerUserID: userID,
+        account: account ? state.account || null : null,
+        projects: projectIDs.map((projectID) => state.projects?.[projectID] || {
+          projectID,
+          revision: 0,
+          domains: [],
+          updatedAt: null
+        })
+      };
+    },
+    async bumpArtifactRevisions(userID, { accountDomains = [], projects = [] } = {}) {
+      return this.withMutation((store) => {
+        store.artifactRevisionsByUserID ||= {};
+        const state = store.artifactRevisionsByUserID[userID] || { account: null, projects: {} };
+        state.projects ||= {};
+        const updatedAt = new Date().toISOString();
+        const updateRecord = (existing, domains, extra = {}) => ({
+          ...extra,
+          revision: Number(existing?.revision || 0) + 1,
+          domains: Array.from(new Set([...(existing?.domains || []), ...domains])).sort(),
+          updatedAt
+        });
+        let account = null;
+        const normalizedAccountDomains = normalizedArtifactDomains(accountDomains);
+        if (normalizedAccountDomains.length) {
+          state.account = updateRecord(state.account, normalizedAccountDomains);
+          account = { ...state.account, changedDomains: normalizedAccountDomains };
+        }
+        const changedProjects = [];
+        for (const input of normalizedArtifactProjectChanges(projects)) {
+          state.projects[input.projectID] = updateRecord(
+            state.projects[input.projectID],
+            input.domains,
+            { projectID: input.projectID }
+          );
+          changedProjects.push({
+            ...state.projects[input.projectID],
+            changedDomains: input.domains
+          });
+        }
+        store.artifactRevisionsByUserID[userID] = state;
+        return { storageOwnerUserID: userID, account, projects: changedProjects };
       });
     },
     async commitCodeQuestionIssuance(userID, { artifacts, links, events, pending }) {
@@ -2035,6 +2085,18 @@ async function createPostgresStoreAdapter() {
       )
     `;
     await sql`
+      CREATE TABLE IF NOT EXISTS permitext_artifact_revisions (
+        user_id TEXT NOT NULL,
+        scope_kind TEXT NOT NULL,
+        scope_id TEXT NOT NULL,
+        revision BIGINT NOT NULL DEFAULT 0,
+        domains JSONB NOT NULL DEFAULT '[]'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        PRIMARY KEY (user_id, scope_kind, scope_id),
+        CHECK (scope_kind IN ('account', 'project'))
+      )
+    `;
+    await sql`
       CREATE TABLE IF NOT EXISTS permitext_research_usage (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
@@ -2921,6 +2983,7 @@ async function createPostgresStoreAdapter() {
         sql`DELETE FROM permitext_project_activity WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_project_links WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_foundation_artifacts WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_artifact_revisions WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_migration_checkpoints WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_research_feedback WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_research_usage WHERE user_id = ${userID}`,
@@ -3686,6 +3749,95 @@ async function createPostgresStoreAdapter() {
       }
       return existing;
     },
+    async artifactRevisionState(userID, { account = false, projectIDs = [] } = {}) {
+      await ensureSchema();
+      if (!account && !projectIDs.length) {
+        return { storageOwnerUserID: userID, account: null, projects: [] };
+      }
+      const rows = await sql`
+        SELECT scope_kind, scope_id, revision, domains, updated_at
+        FROM permitext_artifact_revisions
+        WHERE user_id = ${userID}
+          AND (
+            (scope_kind = 'account' AND scope_id = 'account' AND ${account})
+            OR (scope_kind = 'project' AND scope_id = ANY(${projectIDs}::text[]))
+          )
+      `;
+      const byScope = new Map(rows.map((row) => [
+        `${row.scope_kind}:${row.scope_id}`,
+        {
+          ...(row.scope_kind === "project" ? { projectID: row.scope_id } : {}),
+          revision: Number(row.revision || 0),
+          domains: safeJSON(row.domains, []),
+          updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null
+        }
+      ]));
+      return {
+        storageOwnerUserID: userID,
+        account: account ? byScope.get("account:account") || null : null,
+        projects: projectIDs.map((projectID) => byScope.get(`project:${projectID}`) || {
+          projectID,
+          revision: 0,
+          domains: [],
+          updatedAt: null
+        })
+      };
+    },
+    async bumpArtifactRevisions(userID, { accountDomains = [], projects = [] } = {}) {
+      await ensureSchema();
+      const changes = [
+        ...(normalizedArtifactDomains(accountDomains).length ? [{
+          kind: "account",
+          id: "account",
+          domains: normalizedArtifactDomains(accountDomains)
+        }] : []),
+        ...normalizedArtifactProjectChanges(projects).map((project) => ({
+          kind: "project",
+          id: project.projectID,
+          domains: project.domains
+        }))
+      ];
+      if (!changes.length) {
+        return { storageOwnerUserID: userID, account: null, projects: [] };
+      }
+      const results = await sql.transaction(changes.map((change) => sql`
+        INSERT INTO permitext_artifact_revisions (
+          user_id, scope_kind, scope_id, revision, domains, updated_at
+        )
+        VALUES (
+          ${userID}, ${change.kind}, ${change.id}, 1,
+          ${JSON.stringify(change.domains)}::jsonb, now()
+        )
+        ON CONFLICT (user_id, scope_kind, scope_id) DO UPDATE SET
+          revision = permitext_artifact_revisions.revision + 1,
+          domains = (
+            SELECT COALESCE(jsonb_agg(domain ORDER BY domain), '[]'::jsonb)
+            FROM (
+              SELECT DISTINCT value AS domain
+              FROM jsonb_array_elements_text(
+                permitext_artifact_revisions.domains || EXCLUDED.domains
+              )
+            ) AS merged_domains
+          ),
+          updated_at = now()
+        RETURNING revision, domains, updated_at
+      `));
+      const records = changes.map((change, index) => {
+        const row = results[index][0];
+        return {
+          ...(change.kind === "project" ? { projectID: change.id } : {}),
+          revision: Number(row.revision),
+          domains: safeJSON(row.domains, []),
+          changedDomains: change.domains,
+          updatedAt: new Date(row.updated_at).toISOString()
+        };
+      });
+      return {
+        storageOwnerUserID: userID,
+        account: records.find((record, index) => changes[index].kind === "account") || null,
+        projects: records.filter((record, index) => changes[index].kind === "project")
+      };
+    },
     async migrationCheckpoint(userID, checkpointName) {
       await ensureSchema();
       const rows = await sql`
@@ -4151,6 +4303,55 @@ async function latestSyncEventID(userID) {
     return 0;
   }
   return adapter.latestEventID(userID);
+}
+
+const artifactRevisionDomains = new Set([
+  "activity",
+  "foundation",
+  "notebook",
+  "report",
+  "research"
+]);
+
+function normalizedArtifactDomains(domains = []) {
+  return Array.from(new Set((Array.isArray(domains) ? domains : [])
+    .map((domain) => String(domain || "").trim())
+    .filter((domain) => artifactRevisionDomains.has(domain)))).sort();
+}
+
+function normalizedArtifactProjectChanges(projects = []) {
+  const domainsByProjectID = new Map();
+  for (const project of Array.isArray(projects) ? projects : []) {
+    const projectID = String(project?.projectID || "").trim();
+    if (!projectID) continue;
+    const domains = normalizedArtifactDomains(project.domains);
+    if (!domains.length) continue;
+    domainsByProjectID.set(projectID, Array.from(new Set([
+      ...(domainsByProjectID.get(projectID) || []),
+      ...domains
+    ])).sort());
+  }
+  return Array.from(domainsByProjectID, ([projectID, domains]) => ({ projectID, domains }));
+}
+
+async function storedArtifactRevisionState(userID, options = {}) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.artifactRevisionState !== "function") {
+    return { storageOwnerUserID: userID, account: null, projects: [] };
+  }
+  return adapter.artifactRevisionState(userID, options);
+}
+
+async function bumpStoredArtifactRevisions(userID, changes = {}) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.bumpArtifactRevisions !== "function") {
+    return { storageOwnerUserID: userID, account: null, projects: [] };
+  }
+  return adapter.bumpArtifactRevisions(userID, changes);
+}
+
+function projectArtifactRevisionChange(projectID, domains) {
+  return { projects: [{ projectID, domains }] };
 }
 
 async function mutationsAfterSyncEventID(userID, sinceEventID) {
@@ -10810,7 +11011,11 @@ async function handleProjectFoundationLink(request, response) {
     createdAt: now
   });
   await saveStoredActivityEvent(context.userID, event);
-  sendJSON(response, existing ? 200 : 201, { link, activity: event });
+  const artifactRevisions = await bumpStoredArtifactRevisions(
+    context.userID,
+    projectArtifactRevisionChange(projectID, ["foundation", "activity"])
+  );
+  sendJSON(response, existing ? 200 : 201, { link, activity: event, artifactRevisions });
 }
 
 async function handleProjectFoundationUnlink(request, response) {
@@ -10866,7 +11071,11 @@ async function handleProjectFoundationUnlink(request, response) {
     createdAt: now
   });
   await saveStoredActivityEvent(context.userID, event);
-  sendJSON(response, 200, { link, activity: event });
+  const artifactRevisions = await bumpStoredArtifactRevisions(
+    context.userID,
+    projectArtifactRevisionChange(projectID, ["foundation", "activity"])
+  );
+  sendJSON(response, 200, { link, activity: event, artifactRevisions });
 }
 
 function notebookCardForClient(artifact, projectIDs = []) {
@@ -11219,10 +11428,15 @@ async function handleNotebookCardSave(request, response) {
     const removedImageAssets = (existing?.payload?.imageAssets || [])
       .filter((assetID) => !payload.imageAssets.includes(assetID));
     await deleteOrphanedNotebookImageAssets(storageOwnerUserID, projectID, removedImageAssets);
+    const artifactRevisions = await bumpStoredArtifactRevisions(
+      storageOwnerUserID,
+      projectArtifactRevisionChange(projectID, ["notebook", "foundation", "activity"])
+    );
     sendJSON(response, existing ? 200 : 201, {
       card: notebookCardForClient(artifact, [projectID]),
       link,
-      activity: event
+      activity: event,
+      artifactRevisions
     });
   } catch (error) {
     sendJSON(response, 400, {
@@ -11316,10 +11530,17 @@ async function handleNotebookCardDelete(request, response) {
       createdAt: now
     }));
   }
+  const artifactRevisions = await bumpStoredArtifactRevisions(access.storageOwnerUserID, {
+    projects: activeLinks.map((link) => ({
+      projectID: link.projectID,
+      domains: ["notebook", "foundation", "activity"]
+    }))
+  });
   sendJSON(response, 200, {
     cardID: artifact.envelope.id,
     deletedAt: now,
-    unlinkedProjectCount: activeLinks.length
+    unlinkedProjectCount: activeLinks.length,
+    artifactRevisions
   });
 }
 
@@ -11385,9 +11606,14 @@ async function handleNotebookCardArchive(request, response) {
     createdAt: now
   });
   await saveStoredActivityEvent(access.storageOwnerUserID, activity);
+  const artifactRevisions = await bumpStoredArtifactRevisions(
+    access.storageOwnerUserID,
+    projectArtifactRevisionChange(access.projectID, ["notebook", "foundation", "activity"])
+  );
   sendJSON(response, 200, {
     card: notebookCardForClient(updatedArtifact, [access.projectID]),
-    activity
+    activity,
+    artifactRevisions
   });
 }
 
@@ -12045,8 +12271,13 @@ async function handleReportDraftSave(request, response) {
         metadata: { createdWith: "permitext-report-draft" }
       }));
     }
+    const artifactRevisions = await bumpStoredArtifactRevisions(
+      storageOwnerUserID,
+      projectArtifactRevisionChange(access.projectID, ["report", "foundation"])
+    );
     sendJSON(response, existing ? 200 : 201, {
-      draft: reportDraftForClient(artifact, [access.projectID])
+      draft: reportDraftForClient(artifact, [access.projectID]),
+      artifactRevisions
     });
   } catch (error) {
     sendJSON(response, 400, {
@@ -12111,7 +12342,11 @@ async function handleReportDraftDelete(request, response) {
       version: activeLink.version + 1
     }));
   }
-  sendJSON(response, 200, { draftID: artifact.envelope.id, deletedAt: now });
+  const artifactRevisions = await bumpStoredArtifactRevisions(
+    storageOwnerUserID,
+    projectArtifactRevisionChange(access.projectID, ["report", "foundation"])
+  );
+  sendJSON(response, 200, { draftID: artifact.envelope.id, deletedAt: now, artifactRevisions });
 }
 
 function reportManifestItemForDraftBlock(block, sourcesByKey) {
@@ -12411,6 +12646,10 @@ async function handleReportGenerate(request, response) {
       }
     });
     await saveStoredActivityEvent(storageOwnerUserID, event);
+    const artifactRevisions = await bumpStoredArtifactRevisions(
+      storageOwnerUserID,
+      projectArtifactRevisionChange(access.projectID, ["report", "foundation", "activity"])
+    );
     sendJSON(response, 201, {
       manifest,
       generatedReport: {
@@ -12421,7 +12660,8 @@ async function handleReportGenerate(request, response) {
           payload: generatedReport
         })
       },
-      activity: event
+      activity: event,
+      artifactRevisions
     });
   } catch (error) {
     sendJSON(response, 400, {
@@ -12469,7 +12709,7 @@ async function handleProjectHubBootstrap(request, response) {
     hasActiveProEntitlement(context.authContext.entitlement);
   const canDownloadReports = access.permissions.includes(organizationPermissions.reportDownload);
 
-  const [foundation, cards, reports] = await Promise.all([
+  const [foundation, cards, reports, artifactRevisions] = await Promise.all([
     projectFoundationStateForStorageOwner(
       access.storageOwnerUserID,
       access.projectID,
@@ -12480,7 +12720,8 @@ async function handleProjectHubBootstrap(request, response) {
       : Promise.resolve([]),
     canDownloadReports
       ? reportHistorySummariesForProject(access.storageOwnerUserID, access.projectID)
-      : Promise.resolve([])
+      : Promise.resolve([]),
+    storedArtifactRevisionState(access.storageOwnerUserID, { projectIDs: [access.projectID] })
   ]);
   if (!foundation) {
     sendError(response, 404, "Project not found.");
@@ -12506,6 +12747,7 @@ async function handleProjectHubBootstrap(request, response) {
         : null
     },
     foundation,
+    artifactRevisions,
     notebook: {
       schemaVersion: 1,
       cardTypes: notebookCardTypes,
@@ -12517,6 +12759,50 @@ async function handleProjectHubBootstrap(request, response) {
       projectID: access.projectID,
       reports
     }
+  });
+}
+
+async function handleProjectArtifactCheckpoint(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectIDs = Array.from(new Set((Array.isArray(context.body.projectIDs)
+    ? context.body.projectIDs
+    : [context.body.projectID])
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)));
+  if (!projectIDs.length || projectIDs.length > 50) {
+    sendError(response, 400, "Provide between 1 and 50 Project IDs.");
+    return;
+  }
+  const accesses = [];
+  for (const projectID of projectIDs) {
+    const access = await projectAccessForUser(context.userID, projectID);
+    if (!access?.permissions.includes(organizationPermissions.projectView)) {
+      sendError(response, 404, "Project not found.");
+      return;
+    }
+    accesses.push(access);
+  }
+  const projectIDsByStorageOwner = new Map();
+  for (const access of accesses) {
+    projectIDsByStorageOwner.set(access.storageOwnerUserID, [
+      ...(projectIDsByStorageOwner.get(access.storageOwnerUserID) || []),
+      access.projectID
+    ]);
+  }
+  const states = await Promise.all(Array.from(projectIDsByStorageOwner, ([storageOwnerUserID, ids]) =>
+    storedArtifactRevisionState(storageOwnerUserID, { projectIDs: ids })
+  ));
+  const revisionsByProjectID = new Map(states.flatMap((state) =>
+    state.projects.map((project) => [project.projectID, {
+      ...project,
+      storageOwnerUserID: state.storageOwnerUserID
+    }])
+  ));
+  sendJSON(response, 200, {
+    schemaVersion: 1,
+    checkedAt: new Date().toISOString(),
+    projects: projectIDs.map((projectID) => revisionsByProjectID.get(projectID))
   });
 }
 
@@ -12703,9 +12989,14 @@ async function handleReportFileUpload(request, response) {
     }
   });
   await saveStoredActivityEvent(storageOwnerUserID, event);
+  const artifactRevisions = await bumpStoredArtifactRevisions(
+    storageOwnerUserID,
+    projectArtifactRevisionChange(access.projectID, ["report", "foundation", "activity"])
+  );
   sendJSON(response, 201, {
     file: generatedReportFileDescriptor(artifact),
-    activity: event
+    activity: event,
+    artifactRevisions
   });
 }
 
@@ -23515,6 +23806,7 @@ const handlers = {
   "research/conversations/candidate-disposition": handleResearchCandidateDisposition,
   "projects/foundation/state": handleProjectFoundationState,
   "projects/hub/bootstrap": handleProjectHubBootstrap,
+  "projects/artifacts/checkpoint": handleProjectArtifactCheckpoint,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,
   // Code Question routes (Phase 1): gated by permitext:codeQuestionWorkspace (default off).
@@ -23739,6 +24031,7 @@ function requestMutatesFileStore(request) {
   // Long-running external I/O must not hold the process-wide store lock for the whole
   // handler. Adapter-level withMutation() still serializes short JSON RMW sections.
   if (
+    path === "projects/artifacts/checkpoint" ||
     path === "research/interpret" ||
     path === "research/conversations/message" ||
     path === "research/conversations/refresh" ||
