@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-saved-divider-width-v304";
+} from "./offline-storage.js?v=20260816-research-column-warning-v305";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15521,7 +15521,10 @@ async function clearResearchConversationHistory(button, selectedConversations = 
   const confirmed = await confirmWebWarning(
     "Remove selected Research history?",
     `${conversations.length} selected ${conversations.length === 1 ? "conversation" : "conversations"} will disappear from this list. Unassigned chats will be deleted. Chats attached to Projects will remain available from their Projects. Saved Research answers and professional analysis records will remain.`,
-    { confirmLabel: conversations.length === 1 ? "Remove conversation" : `Remove ${conversations.length}` }
+    {
+      confirmLabel: conversations.length === 1 ? "Remove conversation" : `Remove ${conversations.length}`,
+      container: button.closest(".workspace-panel")
+    }
   );
   if (!confirmed) return false;
 
