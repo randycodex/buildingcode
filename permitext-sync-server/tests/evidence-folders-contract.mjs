@@ -679,6 +679,8 @@ assert.match(stylesSource, /\.notebook-reference-chip \{[\s\S]*?display: inline-
 assert.match(stylesSource, /\.notebook-reference-meta \{[\s\S]*?color: var\(--text-tertiary\);[\s\S]*?\.notebook-reference-title \{[\s\S]*?font-weight: 700;[\s\S]*?\.notebook-reference-preview \{[\s\S]*?-webkit-line-clamp: 2;/, "Notebook references must expose a compact source, title, and preview hierarchy.");
 assert.match(stylesSource, /\.notebook-card-tile:hover strong,[\s\S]*?\.notebook-card-row\.is-selected \.notebook-card-tile strong \{[\s\S]*?color: var\(--project-color\);/, "Notebook card selection must change only the title color.");
 assert.match(stylesSource, /\.notebook-card-row\.is-selected \{[\s\S]*?background: transparent;/, "Notebook card selection must not use a filled row highlight.");
+assert.match(stylesSource, /\.workspace-context-menu \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?\.workspace-context-menu button \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;[\s\S]*?max-width: 100%;/, "Workspace menu rows must remain within the menu card.");
+assert.match(stylesSource, /\.workspace-context-menu \.workspace-context-switch \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;[\s\S]*?overflow: hidden;/, "Long workspace names must truncate before the fixed Current label.");
 assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Record type"\)/);
 assert.match(appSource, /\["reference", "Saved collection", "Reusable research that is not attached to a job yet"\]/);
 assert.match(appSource, /nameInput\.placeholder = selectedFolderType === "reference" \? "Saved collection name" : "Project Name"/);
