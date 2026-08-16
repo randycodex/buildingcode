@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-optional-evidence-roles-v277";
+} from "./offline-storage.js?v=20260816-selection-escape-v278";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -19405,6 +19405,13 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
 }
 
 function bindResearchTextSelection() {
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !document.querySelector(".research-selection-menu")) return;
+    event.preventDefault();
+    event.stopPropagation();
+    closeResearchSelectionMenu();
+    window.getSelection?.().removeAllRanges();
+  }, true);
   document.addEventListener("pointerup", (event) => {
     if (
       event.target.closest?.(".research-selection-menu") ||
