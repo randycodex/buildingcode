@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-performance-pass-v334";
+} from "./offline-storage.js?v=20260816-notebook-prefetch-v335";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -346,6 +346,7 @@ const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
 const readerInitialSectionWindowSize = 5;
 const readerProgressiveSectionBatchSize = 12;
+const notebookIdlePrefetchLimit = 2;
 const searchResultPageSize = 25;
 const savedItemsPageSize = 48;
 const recentViewLimit = 50;
@@ -19851,6 +19852,8 @@ async function renderProjectNotebook(project) {
   let disposed = false;
   const notebookObjectURLs = new Set();
   let notebookAutosaveTimer = null;
+  let notebookIdlePrefetchTimer = null;
+  let notebookIdlePrefetchHandle = null;
   let flushNotebookAutosave = async () => !dirty;
   const notebookImageUploaded = (event) => {
     if (event.detail?.projectID !== projectID) return;
@@ -19875,6 +19878,10 @@ async function renderProjectNotebook(project) {
     dispose() {
       disposed = true;
       window.clearTimeout(notebookAutosaveTimer);
+      window.clearTimeout(notebookIdlePrefetchTimer);
+      if (notebookIdlePrefetchHandle !== null && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(notebookIdlePrefetchHandle);
+      }
       editorRenderSequence += 1;
       editorMount?.destroy?.();
       editorMount = null;
@@ -19921,12 +19928,6 @@ async function renderProjectNotebook(project) {
     foundation = foundationPayload;
     cards = cardPayload.cards || [];
     notebookReadOnly = cardPayload.access?.readOnly === true;
-    if (navigator.onLine !== false) {
-      void Promise.allSettled(cards.map(async (card) => {
-        const payload = await postResearch("/notebook/cards/get", { projectID, cardID: card.id });
-        await saveNotebookCardSnapshot(activeAccount().userID, projectID, payload.card);
-      }));
-    }
     shell.replaceChildren();
     if (identity.sharedOrganizationID) {
       const accessNote = document.createElement("p");
@@ -20264,6 +20265,49 @@ async function renderProjectNotebook(project) {
       dirty = useLocalDraft;
       renderCardList();
       await renderFocusedCard();
+    }
+
+    function scheduleIdleNotebookPrefetch() {
+      if (disposed || navigator.onLine === false || cards.length < 2) return;
+      const prefetch = async () => {
+        notebookIdlePrefetchHandle = null;
+        notebookIdlePrefetchTimer = null;
+        if (disposed || navigator.onLine === false) return;
+        const accountUserID = activeAccount()?.userID;
+        if (!accountUserID) return;
+        const cached = await loadNotebookProjectSnapshot(
+          accountUserID,
+          projectID
+        ).catch(() => null);
+        const cachedCardIDs = new Set(Object.keys(cached?.cardDocuments || {}));
+        const pendingCards = cards
+          .filter((card) => card.id !== activeCard?.id && !cachedCardIDs.has(card.id))
+          .slice(0, notebookIdlePrefetchLimit);
+        for (const card of pendingCards) {
+          if (disposed || navigator.onLine === false) return;
+          try {
+            const payload = await postResearch("/notebook/cards/get", {
+              projectID,
+              cardID: card.id
+            });
+            await saveNotebookCardSnapshot(
+              accountUserID,
+              projectID,
+              payload.card
+            );
+          } catch {
+            return;
+          }
+        }
+      };
+      if (typeof window.requestIdleCallback === "function") {
+        notebookIdlePrefetchHandle = window.requestIdleCallback(
+          () => void prefetch(),
+          { timeout: 3000 }
+        );
+      } else {
+        notebookIdlePrefetchTimer = window.setTimeout(() => void prefetch(), 2000);
+      }
     }
 
     mountState.linkEvidence = async (cardID, evidenceLinks) => {
@@ -20848,6 +20892,7 @@ async function renderProjectNotebook(project) {
       const initialCard = cards.find((card) => card.id === pendingCardID) || cards[0];
       pendingNotebookCardByProject.delete(projectID);
       await loadCard(initialCard.id);
+      scheduleIdleNotebookPrefetch();
     } else {
       await renderFocusedCard();
     }

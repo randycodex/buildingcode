@@ -10908,7 +10908,7 @@ async function notebookProjectAccess(context, response, permission) {
 
 async function ownedNotebookArtifact(userID, cardID, options = {}) {
   const normalizedCardID = String(cardID || "").trim();
-  return (await listStoredFoundationArtifacts(userID)).find((artifact) =>
+  return (await listStoredFoundationArtifacts(userID, { ids: [normalizedCardID] })).find((artifact) =>
     artifact.envelope?.id === normalizedCardID &&
     artifact.envelope?.type === "notebookCard" &&
     (options.includeDeleted || !artifact.envelope?.deletedAt)
@@ -11080,7 +11080,9 @@ async function handleNotebookCardGet(request, response) {
     sendError(response, 404, "Notebook card not found.");
     return;
   }
-  const projectIDs = (await listStoredProjectLinks(access.storageOwnerUserID))
+  const projectIDs = (await listStoredProjectLinks(access.storageOwnerUserID, {
+    targetKind: "notebookCard"
+  }))
     .filter((link) =>
       !link.deletedAt &&
       link.targetKind === "notebookCard" &&

@@ -234,6 +234,7 @@ assert(
 );
 
 const appSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
+const webAppSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const postgresAdapterSource = appSource.slice(
   appSource.indexOf("async function createPostgresStoreAdapter()"),
   appSource.indexOf("async function storeAdapter()")
@@ -269,6 +270,15 @@ assert(
   appSource.includes("let cachedStoreAdapterPromise = null;") &&
     appSource.includes("return cachedStoreAdapterPromise;"),
   "Concurrent first requests can initialize duplicate store adapters."
+);
+assert(
+  appSource.includes("listStoredFoundationArtifacts(userID, { ids: [normalizedCardID] })"),
+  "Opening one Notebook Note still scans every foundation artifact."
+);
+assert(
+  !webAppSource.includes("Promise.allSettled(cards.map(async (card) =>") &&
+    webAppSource.includes(".slice(0, notebookIdlePrefetchLimit)"),
+  "Notebook open still downloads every full Note instead of bounded idle snapshots."
 );
 assert(
   syncBatchIncludesProjectMutation([{ project: { id: "project-1" } }]) &&
