@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-projects-context-v265";
+} from "./offline-storage.js?v=20260816-saved-language-v266";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -8427,7 +8427,7 @@ async function pushMutationBatch(mutations, options = {}) {
   const rejected = entries.find((entry) => result.rejectedMutationIDs.includes(entry.recordID));
   if (rejected) {
     const reason = result.payload?.rejectionReasons?.[rejected.recordID];
-    throw new Error(reason?.message || "One or more folder changes could not be synced.");
+    throw new Error(reason?.message || "One or more destination changes could not be synced.");
   }
   entries
     .filter((entry) => result.acceptedMutationIDs.includes(entry.recordID))
@@ -9901,7 +9901,7 @@ async function updateProjectFolder(project, details = {}) {
   if (!id) return;
   const nextFolderType = details.folderType ? folderType(details) : folderType(project);
   if (nextFolderType === "project" && folderType(project) === "reference" && !hasCapability("projects")) {
-    void presentPlanLimitNotice("Projects require Pro", "Upgrade to convert this Reference folder into a Project workspace.");
+    void presentPlanLimitNotice("Projects require Pro", "Upgrade to convert this saved collection into a Project workspace.");
     return false;
   }
   const now = new Date().toISOString();
@@ -10085,7 +10085,7 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
     return { saved: false, changed: false, queued: false };
   }
   if (selectedFolders.some(folderIsProject) && !hasCapability("projects")) {
-    void presentPlanLimitNotice("Projects require Pro", "Use a Reference folder on Free, or upgrade to organize evidence by Project.");
+    void presentPlanLimitNotice("Projects require Pro", "Use a saved collection on Free, or upgrade to organize evidence by Project.");
     return { saved: false, changed: false, queued: false };
   }
 
@@ -10231,8 +10231,8 @@ async function unlinkEvidenceFromFolder(folder, item, container = null) {
   );
   if (!remainingLinks.length) {
     const confirmed = await openWebWarning({
-      title: "Remove final folder?",
-      message: "This is the last folder containing this evidence. Removing it will also delete the saved record. Notes, tags, source metadata, and evidence history are not silently reassigned.",
+      title: "Remove final destination?",
+      message: "This is the last destination containing this evidence. Removing it will also delete the saved record. Notes, tags, source metadata, and evidence history are not silently reassigned.",
       confirmLabel: "Remove and delete",
       container
     });
@@ -10591,8 +10591,8 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
     const addButton = document.createElement("button");
     addButton.type = "button";
     addButton.className = "annotation-project-add";
-    addButton.title = "Create folder";
-    addButton.setAttribute("aria-label", "Create Project or Reference folder");
+    addButton.title = "Create Project or saved collection";
+    addButton.setAttribute("aria-label", "Create Project or saved collection");
     addButton.innerHTML = `
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M12 5v14"></path>
@@ -10618,7 +10618,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
   if (!projects.length) {
     const empty = document.createElement("span");
     empty.className = "annotation-projects-empty";
-    empty.textContent = "No folders";
+    empty.textContent = "No Projects or saved collections";
     chips.append(empty);
   } else {
     projects.forEach((project) => {
@@ -11071,13 +11071,13 @@ function renderReaderSectionProjectContext(host, section, reader, panel) {
   host.hidden = false;
   const label = document.createElement("span");
   label.className = "reader-section-project-context-label";
-  label.textContent = "Folder record";
+  label.textContent = "Saved in";
   host.append(label);
   const hasNote = readerSectionHasNote(section);
   if (!projects.length) {
     const status = document.createElement("span");
     status.className = "reader-section-project-context-status";
-    status.textContent = hasNote ? "Saved evidence · Note" : "Saved evidence · Needs a folder";
+    status.textContent = hasNote ? "Saved evidence · Note" : "Saved evidence · Choose a destination";
     host.append(status);
     return;
   }
@@ -11087,8 +11087,8 @@ function renderReaderSectionProjectContext(host, section, reader, panel) {
     projectButton.className = "reader-section-project-chip";
     projectButton.style.setProperty("--project-color", projectColor(project));
     const archived = projectIsArchived(project);
-    projectButton.textContent = `${project.name || project.title || "Folder"} · ${folderTypeLabel(project)}${archived ? " · Archived" : ""}`;
-    projectButton.title = folderIsProject(project) ? "Open Project record" : "Reference folder";
+    projectButton.textContent = `${project.name || project.title || folderTypeLabel(project)} · ${folderTypeLabel(project)}${archived ? " · Archived" : ""}`;
+    projectButton.title = folderIsProject(project) ? "Open Project" : "Open saved collection";
     projectButton.addEventListener("click", () => {
       if (folderIsProject(project)) void openProjectDetail(project, { sourcePaneID: paneIDForReader(reader) });
     });
@@ -11727,15 +11727,15 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
     .map(projectRecordID));
   const picker = document.createElement("section");
   picker.className = "reader-notes-project-picker";
-  picker.setAttribute("aria-label", "Choose destination folder");
+  picker.setAttribute("aria-label", "Choose save destinations");
 
   const pickerHeader = document.createElement("header");
   pickerHeader.className = "reader-notes-project-picker-header";
   const label = document.createElement("strong");
-  label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save to folders";
+  label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save evidence";
   const instruction = document.createElement("p");
   instruction.className = "reader-notes-project-instruction";
-  instruction.textContent = "Select one or more destinations, add optional tags, then confirm. Permitext keeps one saved record linked to every folder you choose.";
+  instruction.textContent = "Select one or more Projects or saved collections, add optional tags, then confirm. Permitext keeps one saved record linked to every destination you choose.";
   pickerHeader.append(label);
   picker.append(pickerHeader, instruction);
 
@@ -11770,7 +11770,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   const destinationList = document.createElement("div");
   destinationList.className = "reader-notes-project-options";
   destinationList.setAttribute("role", "listbox");
-  destinationList.setAttribute("aria-label", "Destination folders");
+  destinationList.setAttribute("aria-label", "Save destinations");
   destinationList.setAttribute("aria-multiselectable", "true");
 
   const setProjectButtonState = (button, selected) => {
@@ -11788,8 +11788,8 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
     const selected = projects.filter((project) => selectedFolderIDs.has(projectRecordID(project)));
     confirmButton.disabled = selected.length === 0;
     confirmButton.textContent = isSectionSaved(sectionPayload)
-      ? `Update ${selected.length || ""} ${selected.length === 1 ? "folder" : "folders"}`.replace("Update  folders", "Choose a folder")
-      : `Save to ${selected.length || ""} ${selected.length === 1 ? "folder" : "folders"}`.replace("Save to  folders", "Choose a folder");
+      ? `Update ${selected.length || ""} ${selected.length === 1 ? "destination" : "destinations"}`.replace("Update  destinations", "Choose a destination")
+      : `Save to ${selected.length || ""} ${selected.length === 1 ? "destination" : "destinations"}`.replace("Save to  destinations", "Choose a destination");
   };
 
   const appendFolderOption = (project) => {
@@ -11840,7 +11840,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   if (!projects.length) {
     const empty = document.createElement("p");
     empty.className = "reader-notes-project-empty";
-    empty.textContent = "No folders yet. Create a Project or Reference folder below.";
+    empty.textContent = "No Projects or saved collections yet. Create one below.";
     destinationList.append(empty);
   }
   projects.forEach(appendFolderOption);
@@ -11854,8 +11854,8 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
     form.className = "reader-notes-new-project-form";
     const input = document.createElement("input");
     input.type = "text";
-    input.placeholder = folderTypeValue === "reference" ? "Reference folder name" : "Project name";
-    input.setAttribute("aria-label", `New ${folderTypeValue} folder name`);
+    input.placeholder = folderTypeValue === "reference" ? "Saved collection name" : "Project name";
+    input.setAttribute("aria-label", folderTypeValue === "reference" ? "New saved collection name" : "New Project name");
     const createButton = document.createElement("button");
     createButton.type = "submit";
     createButton.textContent = "Create and select";
@@ -11889,7 +11889,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
     picker.append(form);
     input.focus();
   };
-  [["project", "New Project…"], ["reference", "New Reference…"]].forEach(([type, text]) => {
+  [["project", "New Project…"], ["reference", "New saved collection…"]].forEach(([type, text]) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "reader-notes-new-project";
@@ -11926,7 +11926,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
       const tags = normalizeAnnotationTags(optionalTags.value.split(","));
       if (tags.length) setAnnotationTags(sectionPayload, [...tagsForTarget(sectionPayload), ...tags]);
       syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
-      const names = selectedFolders.map((folder) => folder.name || folder.title || "Folder");
+      const names = selectedFolders.map((folder) => folder.name || folder.title || folderTypeLabel(folder));
       status.textContent = `${result.queued ? "Saved locally; sync pending" : "Saved"} to ${new Intl.ListFormat(undefined, { style: "long", type: "conjunction" }).format(names)}.`;
       sheet.dispatchEvent(new CustomEvent("permitext-folder-save", {
         detail: { saved: true, folders: selectedFolders }
@@ -14335,7 +14335,7 @@ async function renderSectionDetail(searchID, detail) {
     const nextSaved = event.detail?.saved === true;
     saveButton.classList.toggle("is-saved", nextSaved);
     saveButton.setAttribute("aria-pressed", String(nextSaved));
-    saveButton.title = nextSaved ? "Manage saved folders" : "Save to a folder";
+    saveButton.title = nextSaved ? "Organize saved evidence" : "Save evidence";
     saveButton.setAttribute("aria-label", saveButton.title);
     saveButton.innerHTML = bookmarkIconSVG(nextSaved);
   });
@@ -14362,7 +14362,7 @@ async function renderSectionDetail(searchID, detail) {
       }
       const confirmed = await openWebWarning({
         title: "Delete saved evidence?",
-        message: "This removes the section from every folder and deletes the canonical saved record. Notes and tags remain available if you save the section again later.",
+        message: "This removes the section from every destination and deletes the canonical saved record. Notes and tags remain available if you save the section again later.",
         confirmLabel: "Delete saved evidence",
         container: panel
       });
@@ -17100,7 +17100,7 @@ async function renderResearch(paneID = "utility:analysis") {
         if (choice.category !== "unassigned" && choice.category !== previousProjectChoiceCategory) {
           const categoryLabel = document.createElement("p");
           categoryLabel.className = "research-conversation-project-category";
-          categoryLabel.textContent = choice.category === "reference" ? "Reference folders" : "Projects";
+          categoryLabel.textContent = choice.category === "reference" ? "Saved collections" : "Projects";
           projectOptions.append(categoryLabel);
         }
         previousProjectChoiceCategory = choice.category;
@@ -19345,7 +19345,7 @@ async function renderProjects() {
   if (data.status === "disconnected") {
     const projects = activeProjectRecords([]);
     if (projects.length === 0) {
-      appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
+      appendProjectEmptyCard(content, "No Projects", "Use the add button to create a Project.");
     } else {
       const selectionController = createProjectBulkSelectionController(panel, projects, "projects");
       renderProjectRows(content, projects, currentContentSummary().projectSections, { mode: "projects", selectionController });
@@ -19360,7 +19360,7 @@ async function renderProjects() {
   const { projects, projectSections } = currentContentSummary();
   const visibleProjects = activeProjectRecords(projects);
   if (visibleProjects.length === 0) {
-    appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
+    appendProjectEmptyCard(content, "No Projects", "Use the add button to create a Project.");
   } else {
     const selectionController = createProjectBulkSelectionController(panel, visibleProjects, "projects");
     renderProjectRows(content, visibleProjects, projectSections, { mode: "projects", selectionController });
@@ -19402,7 +19402,7 @@ async function renderArchive() {
     return panel;
   }
   if (projects.length === 0) {
-    appendProjectEmptyCard(content, "No archived projects", "Archived project folders will appear here.");
+    appendProjectEmptyCard(content, "No archived Projects", "Archived Projects will appear here.");
   } else {
     const selectionController = createProjectBulkSelectionController(panel, projects, "archive");
     renderProjectRows(content, projects, currentContentSummary().projectSections || [], { mode: "archive", selectionController });
@@ -22167,9 +22167,10 @@ async function restoreArchivedProject(project) {
 async function deleteArchivedProject(project) {
   const id = projectRecordID(project);
   if (!id) return;
-  const name = project.name || project.title || "this folder";
+  const recordLabel = folderTypeLabel(project);
+  const name = project.name || project.title || `this ${recordLabel.toLowerCase()}`;
   const confirmed = await confirmWebWarning(
-    "Delete folder",
+    `Delete ${recordLabel}`,
     `This will permanently delete ${name}. This cannot be undone.`,
     { confirmLabel: "Delete" }
   );
@@ -22178,7 +22179,7 @@ async function deleteArchivedProject(project) {
   try {
     await deleteArchivedProjectData(project);
   } catch (error) {
-    await showWebNotice("Could not delete folder", error.message || "The folder could not be deleted.");
+    await showWebNotice(`Could not delete ${recordLabel.toLowerCase()}`, error.message || `The ${recordLabel.toLowerCase()} could not be deleted.`);
     return;
   }
   saveWorkspaceState();
@@ -22191,8 +22192,8 @@ async function deleteArchivedProjects(projects, options = {}) {
   if (!eligibleProjects.length) return false;
   const count = eligibleProjects.length;
   const confirmed = await confirmWebWarning(
-    `Delete ${count === 1 ? "folder" : "folders"}`,
-    `This will permanently delete ${count} ${count === 1 ? "folder" : "folders"}. This cannot be undone.`,
+    `Delete ${count === 1 ? "record" : "records"}`,
+    `This will permanently delete ${count} selected ${count === 1 ? "Project or saved collection" : "Projects or saved collections"}. This cannot be undone.`,
     { confirmLabel: "Delete" }
   );
   if (!confirmed) return false;
@@ -24401,7 +24402,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     addressLabel.hidden = selectedFolderType === "reference";
     nameInput.placeholder = selectedFolderType === "reference" ? "Saved collection name" : "Project Name";
     descriptionInput.placeholder = selectedFolderType === "reference"
-      ? "Reference notes: purpose, topic, or how this collection should be used"
+      ? "Saved collection notes: purpose, topic, or how this collection should be used"
       : "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
   };
   [
@@ -24841,7 +24842,7 @@ function showSavedTagManager(panel, tags, onChange) {
   done.addEventListener("click", () => overlay.remove());
   header.append(title, done);
   const copy = document.createElement("p");
-  copy.textContent = "Rename a tag across every folder. Renaming it to an existing tag merges them without duplicates.";
+  copy.textContent = "Rename a tag across every Project and saved collection. Renaming it to an existing tag merges them without duplicates.";
   sheet.append(header, copy);
   tags.forEach((tag) => {
     const form = document.createElement("form");
@@ -25622,7 +25623,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     convert.addEventListener("click", async () => {
       const confirmed = await openWebWarning({
         title: "Convert to Project?",
-        message: "This keeps every saved section, note, tag, and folder association, then adds Notebook, Report, and Project history.",
+        message: "This keeps every saved section, note, tag, and collection association, then adds Notebook, Report, and Project history.",
         confirmLabel: "Convert",
         container: panel
       });
@@ -25783,11 +25784,11 @@ function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems
   const heading = document.createElement("strong");
   heading.textContent = savedInstance.organizeUnassigned
     ? "Organize existing evidence"
-    : `${unassignedIDs.size} saved ${unassignedIDs.size === 1 ? "section needs" : "sections need"} a folder`;
+    : `${unassignedIDs.size} saved ${unassignedIDs.size === 1 ? "section needs" : "sections need"} a destination`;
   const copy = document.createElement("p");
   copy.textContent = savedInstance.organizeUnassigned
     ? "Open each section below and use Save to choose one or more destinations. Nothing is moved or deleted automatically."
-    : "Older saved evidence is kept safely until you choose a Project or Reference folder.";
+    : "Older saved evidence is kept safely until you choose a Project or saved collection.";
   const action = document.createElement("button");
   action.type = "button";
   action.textContent = savedInstance.organizeUnassigned ? "Return to All Saved" : "Organize existing evidence";
@@ -26092,7 +26093,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       });
     } else if (combinedItems.length > 0) {
       appendEmptySaved(content, "No saved items match", selectedFolder
-        ? "Try another search, code book, or tag filter, or add evidence to this folder."
+        ? "Try another search, code book, or tag filter, or add evidence to this destination."
         : "Try another code book or tag filter.");
     } else {
       appendMutedRow(content, "No saved sections", "Bookmarks, paragraph notes, and tags will appear here.");

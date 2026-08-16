@@ -197,7 +197,7 @@ assert.match(appSource, /function persistSectionFolderSelection\([\s\S]*?if \(!s
 assert.match(appSource, /destinationList\.setAttribute\("aria-multiselectable", "true"\)/);
 assert.match(appSource, /confirmButton\.disabled = selected\.length === 0/);
 assert.match(appSource, /await persistSectionFolderSelection\(sectionPayload, selectedFolders, projects\)/);
-assert.match(appSource, /function unlinkEvidenceFromFolder\([\s\S]*?title: "Remove final folder\?"[\s\S]*?removeBookmark: true/);
+assert.match(appSource, /function unlinkEvidenceFromFolder\([\s\S]*?title: "Remove final destination\?"[\s\S]*?removeBookmark: true/);
 assert.match(appSource, /if \(options\.removeBookmark === true\)/);
 assert.match(
   appSource,

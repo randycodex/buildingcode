@@ -761,7 +761,7 @@ async function main() {
         savedTemplateSource.includes('class="code-filter-menu-toggle saved-projects-menu-toggle"') &&
         !savedTemplateSource.includes('class="saved-project-pages"') &&
         !savedTemplateSource.includes('class="saved-project-page-dots"') &&
-        savedTemplateSource.includes('aria-label="Add Project or Reference folder"') &&
+        savedTemplateSource.includes('aria-label="Add Project or saved collection"') &&
         savedTemplateSource.includes('class="saved-evidence-search"') &&
         savedTemplateSource.includes('class="saved-evidence-search-input"') &&
         savedTemplateSource.includes('class="saved-evidence-search-close"') &&
@@ -1211,7 +1211,7 @@ async function main() {
         workspaceScript.text.includes("selectReaderSectionForResearch(sectionWrapper)") &&
         workspaceScript.text.includes("function readerProjectsForSection") &&
         workspaceScript.text.includes("links.some((link) => projectSectionBelongsToProject(link, project))") &&
-        workspaceScript.text.includes('label.textContent = "Folder record"'),
+        workspaceScript.text.includes('label.textContent = "Saved in"'),
       "Reader trust, note-card actions, or exact Project membership context is no longer wired."
     );
     assert(
@@ -1439,7 +1439,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-projects-context-v265'),
+        webRoot.text.includes('/web/app.js?v=20260816-saved-language-v266'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1600,7 +1600,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-projects-context-v265'),
+      webRoot.text.includes('/web/styles.css?v=20260816-saved-language-v266'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1874,7 +1874,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-projects-context-v265'),
+      webRoot.text.includes('/web/styles.css?v=20260816-saved-language-v266'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1897,7 +1897,7 @@ async function main() {
         workspaceScript.text.includes('projectToggle.className = "code-filter-menu-toggle research-conversation-project-toggle";') &&
         workspaceScript.text.includes('projectOptions.className = "research-conversation-project-options";') &&
         workspaceScript.text.includes('categoryLabel.className = "research-conversation-project-category";') &&
-        workspaceScript.text.includes('categoryLabel.textContent = choice.category === "reference" ? "Reference folders" : "Projects";') &&
+        workspaceScript.text.includes('categoryLabel.textContent = choice.category === "reference" ? "Saved collections" : "Projects";') &&
         workspaceScript.text.includes("folders.filter(folderIsProject).forEach") &&
         workspaceScript.text.includes('category: "reference"') &&
         workspaceScript.text.includes('optionButton.className = "research-conversation-project-option";') &&
@@ -2345,7 +2345,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("async function openReaderNotesProjectPicker") &&
         workspaceScript.text.includes("function persistSectionFolderSelection") &&
-        workspaceScript.text.includes('label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save to folders"') &&
+        workspaceScript.text.includes('label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save evidence"') &&
         workspaceScript.text.includes('destinationList.setAttribute("aria-multiselectable", "true")') &&
         workspaceScript.text.includes("await persistSectionFolderSelection(sectionPayload, selectedFolders, projects)") &&
         workspaceScript.text.includes("confirmButton.disabled = selected.length === 0"),
