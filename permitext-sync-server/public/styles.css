@@ -3209,7 +3209,41 @@ select option:checked {
 
 .annotated-code-block.is-source-target,
 .chapter-section.is-source-target {
-  background: color-mix(in srgb, var(--code-accent) 10%, transparent);
+  background: transparent;
+}
+
+.annotated-code-block.is-source-target :where(
+  .section-block,
+  .section-html,
+  .code-table,
+  p,
+  div,
+  span,
+  strong,
+  em,
+  b,
+  i,
+  li,
+  td,
+  th
+),
+.chapter-section.is-source-target :where(
+  .section-block,
+  .section-html,
+  .code-table,
+  p,
+  div,
+  span,
+  strong,
+  em,
+  b,
+  i,
+  li,
+  td,
+  th
+) {
+  color: var(--reader-notes-active-text) !important;
+  -webkit-text-fill-color: var(--reader-notes-active-text);
 }
 
 .annotated-code-block.is-notes-active :where(
