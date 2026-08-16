@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-research-overflow-v311";
+} from "./offline-storage.js?v=20260816-folder-evidence-labels-v312";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -26151,6 +26151,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         removableSavedItems: Boolean(selectionController),
         selectionController,
         projectNamesForItem,
+        showProjectContext: !selectedFolder,
         researchProjectID: selectedFolder ? projectRecordID(selectedFolder) : "",
         animateSavedItemRemoval: animateSavedRowRemoval,
         onSavedItemRemoved: async () => {
@@ -27173,19 +27174,21 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           });
           openButton.append(tags);
         }
-        const projectNames = typeof options.projectNamesForItem === "function"
-          ? options.projectNamesForItem(item)
-          : [];
-        if (projectNames.length) {
-          const projectContext = document.createElement("span");
-          projectContext.className = "saved-row-projects";
-          projectContext.textContent = projectNames.join(" · ");
-          openButton.append(projectContext);
-        } else {
-          const unassigned = document.createElement("span");
-          unassigned.className = "saved-row-projects is-unassigned";
-          unassigned.textContent = "Unassigned";
-          openButton.append(unassigned);
+        if (options.showProjectContext !== false) {
+          const projectNames = typeof options.projectNamesForItem === "function"
+            ? options.projectNamesForItem(item)
+            : [];
+          if (projectNames.length) {
+            const projectContext = document.createElement("span");
+            projectContext.className = "saved-row-projects";
+            projectContext.textContent = projectNames.join(" · ");
+            openButton.append(projectContext);
+          } else {
+            const unassigned = document.createElement("span");
+            unassigned.className = "saved-row-projects is-unassigned";
+            unassigned.textContent = "Unassigned";
+            openButton.append(unassigned);
+          }
         }
         openButton.addEventListener("click", () => {
           if (window.getSelection && String(window.getSelection()).trim()) return;

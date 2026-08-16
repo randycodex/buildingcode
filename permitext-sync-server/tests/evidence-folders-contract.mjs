@@ -11,6 +11,9 @@ const [appSource, stylesSource, indexSource, serverSource, entitlementSource, sw
   readFile(new URL("../../NYC CC APP/permitext/Data/UserDataStore.swift", import.meta.url), "utf8")
 ]);
 
+assert.match(appSource, /showProjectContext: !selectedFolder/, "Folder-scoped Saved Evidence must suppress redundant Project ownership labels.");
+assert.match(appSource, /if \(options\.showProjectContext !== false\) \{[\s\S]*?projectNamesForItem/, "Combined Saved Evidence must retain useful ownership labels.");
+
 function functionSource(source, name) {
   const asyncStart = source.indexOf(`async function ${name}(`);
   const start = asyncStart >= 0 ? asyncStart : source.indexOf(`function ${name}(`);
