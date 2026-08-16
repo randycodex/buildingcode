@@ -3270,9 +3270,34 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func removeSections(_ sections: [BookmarkedSection], fromFolder folderID: Int64) {
-        guard !sections.isEmpty else { return }
-        sections.forEach { section in
-            removeSection(section.id, fromFolder: folderID, codeVersion: section.codeVersion)
+        guard !sections.isEmpty, let userContentRepository else { return }
+        var removedAnySection = false
+        var firstError: Error?
+
+        for section in sections {
+            do {
+                try userContentRepository.removeSection(
+                    section.id,
+                    fromFolder: folderID,
+                    codeVersion: section.codeVersion
+                )
+                removedAnySection = true
+            } catch {
+                if firstError == nil {
+                    firstError = error
+                }
+            }
+        }
+
+        if removedAnySection {
+            // Publish the final collection once so Project evidence rows keep
+            // stable identities instead of disappearing through intermediate
+            // account-wide rebuilds while a multi-selection is removed.
+            refreshFolders()
+            scheduleUserContentAutoSync()
+        }
+        if let firstError {
+            statusMessage = firstError.localizedDescription
         }
     }
 
