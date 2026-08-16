@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-notebook-prefetch-v335";
+} from "./offline-storage.js?v=20260816-reader-demand-v336";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -11059,8 +11059,9 @@ function collapseRepeatedReaderCatalogAliases(content) {
   });
 }
 
-function nextReaderProgressiveFrame() {
-  return new Promise((resolve) => window.setTimeout(resolve, 16));
+function stopReaderProgressiveHydration(content) {
+  content?._readerProgressiveCleanup?.();
+  if (content) delete content._readerProgressiveCleanup;
 }
 
 async function progressivelyRenderReaderChapter(
@@ -11075,50 +11076,44 @@ async function progressivelyRenderReaderChapter(
 ) {
   let beforeCursor = initialStart;
   let afterCursor = initialEnd;
-  let loadAfter = true;
-  let retryCount = 0;
+  let hydrationInFlight = false;
+  let scrollFrame = 0;
+  let ignoreScrollUntil = 0;
   const status = document.createElement("p");
   status.className = "reader-progressive-status";
   status.dataset.researchSelectionExclude = "true";
   status.setAttribute("role", "status");
-  status.textContent = "Loading the rest of this chapter…";
   content.append(status);
 
-  while (beforeCursor > 0 || afterCursor < sections.length) {
-    await nextReaderProgressiveFrame();
-    if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) {
-      status.remove();
-      return;
-    }
-    const canLoadAfter = afterCursor < sections.length;
-    const canLoadBefore = beforeCursor > 0;
-    const shouldLoadAfter = (loadAfter && canLoadAfter) || !canLoadBefore;
-    const start = shouldLoadAfter
+  const cleanup = () => {
+    content.removeEventListener("scroll", onScroll);
+    if (scrollFrame) cancelAnimationFrame(scrollFrame);
+    scrollFrame = 0;
+  };
+  content._readerProgressiveCleanup = cleanup;
+
+  const updateStatus = (loading = false) => {
+    const loadedCount = afterCursor - beforeCursor;
+    status.textContent = loading
+      ? `Loading nearby sections… ${loadedCount} of ${sections.length} loaded`
+      : `${loadedCount} of ${sections.length} sections loaded · scroll to continue`;
+  };
+
+  const hydrateDirection = async (direction) => {
+    if (hydrationInFlight) return;
+    const loadingAfter = direction === "after";
+    if ((loadingAfter && afterCursor >= sections.length) || (!loadingAfter && beforeCursor <= 0)) return;
+    hydrationInFlight = true;
+    updateStatus(true);
+    const start = loadingAfter
       ? afterCursor
       : Math.max(0, beforeCursor - readerProgressiveSectionBatchSize);
-    const end = shouldLoadAfter
+    const end = loadingAfter
       ? Math.min(sections.length, start + readerProgressiveSectionBatchSize)
       : beforeCursor;
-    let windowChapter;
     try {
-      windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start);
-      retryCount = 0;
-    } catch (error) {
-      if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) {
-        status.remove();
-        return;
-      }
-      retryCount += 1;
-      status.textContent = "Loading the rest of this chapter…";
-      console.warn("Reader chapter hydration will retry.", error);
-      await new Promise((resolve) => window.setTimeout(resolve, Math.min(4000, 250 * (2 ** retryCount))));
-      continue;
-    }
-    if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) {
-      status.remove();
-      return;
-    }
-    try {
+      const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start);
+      if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
       const fragment = document.createDocumentFragment();
       sections.slice(start, end).forEach((section) => {
         fragment.append(
@@ -11130,34 +11125,71 @@ async function progressivelyRenderReaderChapter(
           )
         );
       });
-      if (shouldLoadAfter) {
+      if (loadingAfter) {
         content.insertBefore(fragment, status);
         afterCursor = end;
       } else {
         const previousHeight = content.scrollHeight;
         const previousTop = content.scrollTop;
         content.insertBefore(fragment, content.querySelector(".chapter-section") || status);
+        ignoreScrollUntil = performance.now() + 100;
         content.scrollTop = previousTop + (content.scrollHeight - previousHeight);
         beforeCursor = start;
       }
       collapseRepeatedReaderCatalogAliases(content);
-      status.textContent = `${afterCursor - beforeCursor} of ${sections.length} sections loaded`;
-      loadAfter = !shouldLoadAfter;
+      if (beforeCursor === 0 && afterCursor === sections.length) {
+        status.remove();
+        content.dataset.chapterFullyLoaded = "true";
+        cleanup();
+        delete content._readerProgressiveCleanup;
+      } else {
+        updateStatus();
+      }
       requestAnimationFrame(() => updateReaderScrollIndicator(panel));
     } catch (error) {
-      console.error("Reader chapter hydration could not render a section batch.", error);
+      if (panel.isConnected && panel.dataset.readerRenderToken === renderToken) {
+        status.textContent = "Nearby sections could not be loaded. Scroll again to retry.";
+        console.warn("Reader chapter hydration paused.", error);
+      }
+    } finally {
+      hydrationInFlight = false;
+    }
+  };
+
+  const maybeHydrate = () => {
+    scrollFrame = 0;
+    if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) {
       status.remove();
+      cleanup();
       return;
     }
+    if (hydrationInFlight || performance.now() < ignoreScrollUntil) return;
+    const threshold = Math.max(320, content.clientHeight * 0.6);
+    const distanceToTop = content.scrollTop;
+    const distanceToBottom = content.scrollHeight - content.clientHeight - content.scrollTop;
+    const canLoadBefore = beforeCursor > 0 && distanceToTop <= threshold;
+    const canLoadAfter = afterCursor < sections.length && distanceToBottom <= threshold;
+    if (!canLoadBefore && !canLoadAfter) return;
+    const direction = canLoadBefore && canLoadAfter
+      ? (distanceToTop <= distanceToBottom ? "before" : "after")
+      : canLoadBefore ? "before" : "after";
+    void hydrateDirection(direction);
+  };
+
+  function onScroll() {
+    if (scrollFrame || performance.now() < ignoreScrollUntil) return;
+    scrollFrame = requestAnimationFrame(maybeHydrate);
   }
-  status.remove();
-  content.dataset.chapterFullyLoaded = "true";
-  requestAnimationFrame(() => updateReaderScrollIndicator(panel));
+
+  content.addEventListener("scroll", onScroll, { passive: true });
+  updateStatus();
+  scrollFrame = requestAnimationFrame(maybeHydrate);
 }
 
 async function renderSectionContent(panel, reader) {
   const content = panel.querySelector(".reader-content");
   const commentsList = panel.querySelector(".comments-list");
+  stopReaderProgressiveHydration(content);
   content?.classList.remove("is-searching-reader");
   if (!reader.chapterID) {
     blankReader(content);
@@ -12581,6 +12613,7 @@ function snippetForMatch(value, query) {
 async function renderReaderInternalSearchResults(panel, reader, query) {
   const content = panel.querySelector(".reader-content");
   if (!content) return;
+  stopReaderProgressiveHydration(content);
   clear(content);
   content.classList.add("is-searching-reader");
   content.scrollTop = 0;

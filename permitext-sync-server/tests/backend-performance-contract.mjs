@@ -281,6 +281,11 @@ assert(
   "Notebook open still downloads every full Note instead of bounded idle snapshots."
 );
 assert(
+  !webAppSource.includes("while (beforeCursor > 0 || afterCursor < sections.length)") &&
+    webAppSource.includes("content.addEventListener(\"scroll\", onScroll, { passive: true })"),
+  "Reader progressive hydration still downloads the entire chapter without user demand."
+);
+assert(
   syncBatchIncludesProjectMutation([{ project: { id: "project-1" } }]) &&
     !syncBatchIncludesProjectMutation([{ savedItem: { id: "saved-1" } }]) &&
     !syncBatchIncludesProjectMutation([]),
