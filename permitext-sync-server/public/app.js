@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-project-selection-spacing-v300";
+} from "./offline-storage.js?v=20260816-smooth-saved-removal-v301";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -9744,9 +9744,6 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     );
     return false;
   }
-  if (!saved && options.removeProjectLinks !== false) {
-    await removeSectionFromAllProjects(sectionPayload);
-  }
   if (syncCodeVersion(sectionPayload.codeVersion) === defaultSyncCodeVersion) {
     setLocalSectionSaved(sectionPayload, saved, sectionPayload.codeVersion);
   }
@@ -9764,6 +9761,14 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     localRecord
   ];
   saveWorkspaceState();
+  if (!saved) {
+    syncReaderNoteBookmarkButtons(sectionPayload.sectionID, false, sectionPayload.codeVersion);
+  }
+  if (!saved && options.removeProjectLinks !== false) {
+    await removeSectionFromAllProjects(sectionPayload, {
+      refreshPanes: options.refreshProjectPanes !== false
+    });
+  }
   if (options.refreshSavedPanes !== false) await refreshOpenSavedPanes();
   if (!activeAccount()) return true;
   try {
@@ -9897,7 +9902,7 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
   };
 }
 
-async function removeSectionFromAllProjects(sectionPayload) {
+async function removeSectionFromAllProjects(sectionPayload, options = {}) {
   const sectionID = String(sectionPayload.sectionID || sectionPayload.savedSectionID || sectionPayload.itemID || "");
   if (!sectionID) return;
   const summary = currentContentSummary();
@@ -9911,7 +9916,10 @@ async function removeSectionFromAllProjects(sectionPayload) {
       clientID: link.folderClientID || "",
       localFolderID: link.localFolderID || ""
     };
-    await removeSectionFromProject(project, link, { removeBookmark: false });
+    await removeSectionFromProject(project, link, {
+      removeBookmark: false,
+      refreshPanes: options.refreshPanes !== false
+    });
   }
 }
 
@@ -26127,7 +26135,14 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         },
         removableSavedItems: Boolean(selectionController),
         selectionController,
-        projectNamesForItem
+        projectNamesForItem,
+        animateSavedItemRemoval: animateSavedRowRemoval,
+        onSavedItemRemoved: async () => {
+          await performSavedPanelHydration(panel, savedInstance, paneID, {
+            preserveProjectChrome: true,
+            reconcileProjectStudio: false
+          });
+        }
       };
       if (!selectedFolder && !searchActive && !savedInstance.organizeUnassigned) {
         const unassignedItems = orderedItems.filter((item) => unassignedSectionIDs.has(savedEvidenceKey(item)));
@@ -27190,8 +27205,22 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
               );
               if (!confirmed) return;
               removeItemButton.disabled = true;
-              const removed = await persistSectionBookmark(item, false);
-              if (removed === false && removeItemButton.isConnected) removeItemButton.disabled = false;
+              row.classList.add("is-removing");
+              const removalAnimation = typeof options.animateSavedItemRemoval === "function"
+                ? options.animateSavedItemRemoval(row)
+                : animateSavedRowRemoval(row);
+              const removed = await persistSectionBookmark(item, false, {
+                refreshSavedPanes: false,
+                refreshProjectPanes: false
+              });
+              await removalAnimation;
+              if (removed === false) {
+                await refreshOpenSavedPanes();
+                return;
+              }
+              if (typeof options.onSavedItemRemoved === "function") {
+                await options.onSavedItemRemoved(item);
+              }
             });
             actions.append(removeItemButton);
           }
@@ -27203,6 +27232,30 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
 
     content.append(codeGroup);
   });
+}
+
+async function animateSavedRowRemoval(row) {
+  if (!row?.isConnected) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || typeof row.animate !== "function") {
+    row.remove();
+    return;
+  }
+  const height = row.getBoundingClientRect().height;
+  row.style.overflow = "hidden";
+  const animation = row.animate([
+    { height: `${height}px`, opacity: 1, transform: "translateY(0)" },
+    { height: "0px", opacity: 0, transform: "translateY(-6px)" }
+  ], {
+    duration: 220,
+    easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+    fill: "forwards"
+  });
+  try {
+    await animation.finished;
+  } catch {
+    // A panel refresh may replace the row before its local animation finishes.
+  }
+  row.remove();
 }
 
 function appendSectionLabel(container, label) {

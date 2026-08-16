@@ -1431,7 +1431,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-project-selection-spacing-v300'),
+        webRoot.text.includes('/web/app.js?v=20260816-smooth-saved-removal-v301'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1592,7 +1592,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-project-selection-spacing-v300'),
+      webRoot.text.includes('/web/styles.css?v=20260816-smooth-saved-removal-v301'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1857,7 +1857,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-project-selection-spacing-v300'),
+      webRoot.text.includes('/web/styles.css?v=20260816-smooth-saved-removal-v301'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2390,8 +2390,8 @@ async function main() {
     assert(
       workspaceScript.text.includes("const deletion = deletedProjectSectionMutationForItem(project, item)") &&
         workspaceScript.text.includes("await pushMutation(deletion)") &&
-        workspaceScript.text.includes("await removeSectionFromAllProjects(sectionPayload)") &&
-        workspaceScript.text.includes("await removeSectionFromProject(project, link, { removeBookmark: false })") &&
+        workspaceScript.text.includes("await removeSectionFromAllProjects(sectionPayload, {") &&
+        workspaceScript.text.includes("removeBookmark: false,") &&
         workspaceScript.text.includes("await persistSectionBookmark(item, false, { refreshSavedPanes: false })") &&
         workspaceScript.text.includes("syncReaderNoteBookmarkButtons(sectionID, false, item.codeVersion)"),
       "Removing a saved item no longer clears its bookmark and every project membership like iOS."
