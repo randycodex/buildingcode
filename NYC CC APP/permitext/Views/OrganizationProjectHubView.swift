@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OrganizationProjectHubView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.scenePhase) private var scenePhase
     let organization: PermitextOrganization
     let project: PermitextOrganizationProject
 
@@ -10,6 +11,10 @@ struct OrganizationProjectHubView: View {
     @State private var errorMessage: String?
     @State private var reportShareURL: URL?
     @State private var downloadingReportID: String?
+    @State private var isProjectHubVisible = false
+    @State private var lastSnapshotLoadAt: Date?
+
+    private let automaticSnapshotRefreshInterval: TimeInterval = 30
 
     private var projectAccent: Color {
         Color(
@@ -130,6 +135,16 @@ struct OrganizationProjectHubView: View {
         .tint(Color.appChrome)
         .task {
             await loadSnapshot()
+        }
+        .onAppear {
+            isProjectHubVisible = true
+        }
+        .onDisappear {
+            isProjectHubVisible = false
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active, isProjectHubVisible else { return }
+            Task { await refreshSnapshotAfterForegroundingIfNeeded() }
         }
         .refreshable {
             await loadSnapshot()
@@ -636,6 +651,7 @@ struct OrganizationProjectHubView: View {
 
     private func loadSnapshot() async {
         guard !isLoading else { return }
+        lastSnapshotLoadAt = Date()
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
@@ -645,6 +661,16 @@ struct OrganizationProjectHubView: View {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    @MainActor
+    private func refreshSnapshotAfterForegroundingIfNeeded() async {
+        let now = Date()
+        if let lastSnapshotLoadAt,
+           now.timeIntervalSince(lastSnapshotLoadAt) < automaticSnapshotRefreshInterval {
+            return
+        }
+        await loadSnapshot()
     }
 }
 

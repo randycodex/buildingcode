@@ -1076,6 +1076,7 @@ struct ProjectView: View {
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
     @State private var sortMode: BookmarkSortMode = .codeOrder
     @State private var isSelecting = false
     @State private var selectedBookmarkRowIDs: Set<String> = []
@@ -1084,6 +1085,8 @@ struct ProjectView: View {
     @State private var projectHubSnapshot: ProjectHubSnapshot?
     @State private var isProjectHubLoading = false
     @State private var projectHubError: String?
+    @State private var isProjectHubVisible = false
+    @State private var lastProjectHubLoadAt: Date?
     @State private var projectReportShareURL: URL?
     @State private var isProjectReportBuilding = false
     @State private var projectReportBuildError: String?
@@ -1093,6 +1096,7 @@ struct ProjectView: View {
     @State private var isEvidenceSearchPresented = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
+    private let automaticProjectHubRefreshInterval: TimeInterval = 30
 
     private var folder: CodeFolder? {
         library.folder(id: folderID)
@@ -1242,11 +1246,19 @@ struct ProjectView: View {
             await loadProjectHub()
         }
         .onAppear {
+            isProjectHubVisible = true
             library.refreshBookmarks()
             library.noteProjectOpened(folderID)
         }
+        .onDisappear {
+            isProjectHubVisible = false
+        }
         .task(id: folder?.clientID) {
             await loadProjectHub()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active, isProjectHubVisible else { return }
+            Task { await refreshProjectHubAfterForegroundingIfNeeded() }
         }
         .onChange(of: projectBookmarks) { _, _ in
             selectedBookmarkRowIDs = selectedBookmarkRowIDs.intersection(Set(projectBookmarks.map(\.rowID)))
@@ -1630,6 +1642,7 @@ struct ProjectView: View {
     @MainActor
     private func loadProjectHub() async {
         guard !isProjectHubLoading else { return }
+        lastProjectHubLoadAt = Date()
         isProjectHubLoading = true
         defer { isProjectHubLoading = false }
         do {
@@ -1639,6 +1652,16 @@ struct ProjectView: View {
         } catch {
             projectHubError = error.localizedDescription
         }
+    }
+
+    @MainActor
+    private func refreshProjectHubAfterForegroundingIfNeeded() async {
+        let now = Date()
+        if let lastProjectHubLoadAt,
+           now.timeIntervalSince(lastProjectHubLoadAt) < automaticProjectHubRefreshInterval {
+            return
+        }
+        await loadProjectHub()
     }
 
     private var projectHeader: some View {
