@@ -13888,17 +13888,53 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 }
 
 .notebook-reference-chip {
-  display: inline;
-  padding: 2px 7px;
+  display: inline-grid;
+  gap: 1px;
+  max-width: 100%;
+  padding: 3px 0;
   border: 0;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--project-color) 22%, var(--surface));
+  border-radius: 0;
+  background: transparent;
   color: var(--text-primary);
-  box-decoration-break: clone;
+  box-shadow: none;
   cursor: pointer;
-  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  text-align: left;
+  vertical-align: baseline;
+}
+
+.notebook-reference-chip:hover {
+  background: transparent;
+}
+
+.notebook-reference-meta {
+  color: var(--text-tertiary);
+  font-size: 0.78em;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.notebook-reference-title {
+  color: var(--text-primary);
+  font-size: 0.9em;
   font-weight: 700;
-  -webkit-box-decoration-break: clone;
+  line-height: 1.25;
+}
+
+.notebook-reference-preview {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 0.84em;
+  font-weight: 400;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.notebook-reference-chip:hover .notebook-reference-title,
+.notebook-reference-chip:focus-visible .notebook-reference-title {
+  color: var(--project-color, var(--text-primary));
 }
 
 .notebook-reference-chip:focus-visible,

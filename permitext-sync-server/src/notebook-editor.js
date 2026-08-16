@@ -81,6 +81,44 @@ const PermitextTextSize = createReactStyleSpec(
   }
 );
 
+function notebookReferenceParts(referenceKind, label) {
+  const normalizedLabel = String(label || "Linked item").trim();
+  if (referenceKind === "researchAnswer") {
+    return {
+      meta: "Research",
+      title: "Research answer",
+      preview: normalizedLabel.replace(/^Research:\s*/i, "")
+    };
+  }
+  if (referenceKind === "notebookCard") {
+    return {
+      meta: "Notebook",
+      title: normalizedLabel.replace(/^Notebook:\s*/i, ""),
+      preview: ""
+    };
+  }
+  const parts = normalizedLabel.split(/\s+·\s+/).map((part) => part.trim()).filter(Boolean);
+  if (parts.length > 1) {
+    return {
+      meta: parts.slice(0, -1).join(" · "),
+      title: parts.at(-1),
+      preview: ""
+    };
+  }
+  return { meta: "Linked evidence", title: normalizedLabel, preview: "" };
+}
+
+function notebookReferenceChildren(referenceKind, label) {
+  const parts = notebookReferenceParts(referenceKind, label);
+  return [
+    React.createElement("span", { className: "notebook-reference-meta", key: "meta" }, parts.meta),
+    React.createElement("strong", { className: "notebook-reference-title", key: "title" }, parts.title),
+    parts.preview
+      ? React.createElement("span", { className: "notebook-reference-preview", key: "preview" }, parts.preview)
+      : null
+  ].filter(Boolean);
+}
+
 const PermitextReference = createReactInlineContentSpec(
   {
     type: "permitextReference",
@@ -106,7 +144,7 @@ const PermitextReference = createReactInlineContentSpec(
         "data-reference-label": inlineContent.props.label,
         "aria-label": `Open ${inlineContent.props.label}`
       },
-      inlineContent.props.label
+      ...notebookReferenceChildren(inlineContent.props.referenceKind, inlineContent.props.label)
     ),
     toExternalHTML: ({ inlineContent }) => React.createElement(
       "span",
@@ -117,7 +155,7 @@ const PermitextReference = createReactInlineContentSpec(
         "data-reference-id": inlineContent.props.referenceID,
         "data-reference-label": inlineContent.props.label
       },
-      inlineContent.props.label
+      ...notebookReferenceChildren(inlineContent.props.referenceKind, inlineContent.props.label)
     )
   }
 );

@@ -675,6 +675,8 @@ assert.match(stylesSource, /\.saved-row-actions \{[\s\S]*?justify-content: flex-
 assert.match(stylesSource, /\.search-results \{[\s\S]*?width: calc\(100% \+ \(2 \* var\(--panel-padding\)\)\);[\s\S]*?margin-inline: calc\(-1 \* var\(--panel-padding\)\);[\s\S]*?overflow-x: hidden;/, "Search rows must span the column without horizontal overflow.");
 assert.match(stylesSource, /\.result-row \{[\s\S]*?padding: var\(--space-4\) var\(--panel-padding\);/, "Search result dividers must retain a full-width row with an inner text gutter.");
 assert.match(stylesSource, /\.search-jump-open \{[\s\S]*?padding: var\(--space-1\) var\(--panel-padding\);/, "Recently Viewed rows must retain their inner text gutter.");
+assert.match(stylesSource, /\.notebook-reference-chip \{[\s\S]*?display: inline-grid;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "Notebook links must read as compact evidence previews rather than pills.");
+assert.match(stylesSource, /\.notebook-reference-meta \{[\s\S]*?color: var\(--text-tertiary\);[\s\S]*?\.notebook-reference-title \{[\s\S]*?font-weight: 700;[\s\S]*?\.notebook-reference-preview \{[\s\S]*?-webkit-line-clamp: 2;/, "Notebook references must expose a compact source, title, and preview hierarchy.");
 assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Record type"\)/);
 assert.match(appSource, /\["reference", "Saved collection", "Reusable research that is not attached to a job yet"\]/);
 assert.match(appSource, /nameInput\.placeholder = selectedFolderType === "reference" \? "Saved collection name" : "Project Name"/);
