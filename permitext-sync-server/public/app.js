@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-saved-action-pills-v285";
+} from "./offline-storage.js?v=20260816-reader-hover-icons-v286";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -11409,13 +11409,9 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   const button = document.createElement("button");
   button.type = "button";
   button.className = "inline-comment-toggle";
-  button.innerHTML = `
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
-    </svg>
-    <span>Note</span>
-  `;
+  button.innerHTML = noteActionIconSVG();
   button.setAttribute("aria-label", noteBody.trim() ? "Open note" : "Add note");
+  button.title = noteBody.trim() ? "Open note" : "Add note";
   button.classList.toggle("has-comment", Boolean(noteBody.trim()));
   button.addEventListener("click", async () => {
     const panel = button.closest(".reader-panel");
@@ -11425,8 +11421,9 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   const bookmarkButton = document.createElement("button");
   bookmarkButton.type = "button";
   bookmarkButton.className = "inline-bookmark-toggle";
-  bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span>${saved ? "Saved" : "Save"}</span>`;
+  bookmarkButton.innerHTML = bookmarkIconSVG(saved);
   bookmarkButton.setAttribute("aria-label", saved ? "Saved passage" : "Save passage");
+  bookmarkButton.title = saved ? "Saved passage" : "Save passage";
   bookmarkButton.classList.toggle("is-saved", saved);
 
   bookmarkButton.addEventListener("click", async () => {
@@ -11437,15 +11434,20 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     bookmarkButton.disabled = false;
     if (!savedPassage) return;
     bookmarkButton.classList.add("is-saved");
-    bookmarkButton.innerHTML = `${bookmarkIconSVG(true)}<span>Saved</span>`;
+    bookmarkButton.innerHTML = bookmarkIconSVG(true);
     bookmarkButton.setAttribute("aria-label", "Saved passage");
+    bookmarkButton.title = "Saved passage";
   });
 
   const researchButton = document.createElement("button");
   researchButton.type = "button";
   researchButton.className = "inline-research-toggle";
   const currentResearchLabel = currentResearchConversationLabel();
-  researchButton.textContent = currentResearchLabel ? `Add to: ${currentResearchLabel}` : "Research";
+  const researchActionLabel = currentResearchLabel
+    ? `Add as supporting evidence to ${currentResearchLabel}`
+    : "Start Research with this passage";
+  researchButton.innerHTML = researchActionIconSVG();
+  researchButton.setAttribute("aria-label", researchActionLabel);
   researchButton.title = currentResearchLabel
     ? `Add as supporting evidence to “${currentResearchLabel}”`
     : "Start Research with this passage";
@@ -11457,10 +11459,12 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       addToCurrent: Boolean(currentResearchLabel)
     });
     if (added && currentResearchLabel) {
-      researchButton.textContent = "Added ✓";
+      researchButton.innerHTML = checkActionIconSVG();
+      researchButton.setAttribute("aria-label", "Added to Research");
       window.setTimeout(() => {
         if (!researchButton.isConnected) return;
-        researchButton.textContent = `Add to: ${currentResearchLabel}`;
+        researchButton.innerHTML = researchActionIconSVG();
+        researchButton.setAttribute("aria-label", researchActionLabel);
         researchButton.disabled = false;
       }, 1400);
       return;
@@ -11473,7 +11477,8 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     const newResearchButton = document.createElement("button");
     newResearchButton.type = "button";
     newResearchButton.className = "inline-research-toggle inline-new-research-toggle";
-    newResearchButton.textContent = "New Research";
+    newResearchButton.innerHTML = researchActionIconSVG({ createNew: true });
+    newResearchButton.setAttribute("aria-label", "Start new Research with this passage");
     newResearchButton.title = "Start a new Research conversation with this passage";
     newResearchButton.addEventListener("click", async () => {
       const sectionWrapper = newResearchButton.closest(".chapter-section");
@@ -12013,7 +12018,8 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
     if (!button) return;
     button.classList.toggle("is-saved", showBookmark);
     button.setAttribute("aria-label", showBookmark ? "Saved passage" : "Save passage");
-    button.innerHTML = `${bookmarkIconSVG(showBookmark)}<span>${showBookmark ? "Saved" : "Save"}</span>`;
+    button.innerHTML = bookmarkIconSVG(showBookmark);
+    button.title = showBookmark ? "Saved passage" : "Save passage";
   });
   track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((section) => {
     if (section.dataset.codeVersion !== exactCodeVersion) return;
@@ -13841,6 +13847,27 @@ function selectionIndicatorIconSVG() {
       <path class="project-selection-checkmark" d="m8 12 3 3 5-6"></path>
     </svg>
   `;
+}
+
+function noteActionIconSVG() {
+  return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>`;
+}
+
+function researchActionIconSVG(options = {}) {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m6 18 7.2-7.2"></path>
+      <path d="m9 7 6-5 4 4-5 6z"></path>
+      <path d="M6 18h8"></path>
+      <path d="M3 22h18"></path>
+      <path d="m14 14 4 8"></path>
+      ${options.createNew ? '<path d="M19 9v5"></path><path d="M16.5 11.5h5"></path>' : ""}
+    </svg>
+  `;
+}
+
+function checkActionIconSVG() {
+  return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"></path></svg>`;
 }
 
 function bookmarkIconSVG(saved) {
