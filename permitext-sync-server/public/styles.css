@@ -10270,6 +10270,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .saved-project-structured-facts-list {
   display: grid;
   gap: 0;
+  width: calc(100% + (2 * var(--space-3)));
+  margin-inline: calc(-1 * var(--space-3));
 }
 
 .saved-project-structured-fact {
@@ -10278,7 +10280,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   gap: var(--space-2);
   align-items: center;
   min-width: 0;
-  padding: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
   border-radius: 0;
   background: transparent;
 }

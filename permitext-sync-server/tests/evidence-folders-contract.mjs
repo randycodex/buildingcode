@@ -649,6 +649,8 @@ assert.match(appSource, /let savedSearchContentMinHeight = 0;[\s\S]*?const prese
 assert.match(projectResearchSource, /projectSectionExpanded\(identity, "research", false\)/);
 assert.match(stylesSource, /\.project-studio-section-heading > \.saved-project-research-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/);
 assert.match(stylesSource, /\.saved-project-structured-group \{[\s\S]*?gap: 0;[\s\S]*?\.saved-project-structured-group\.project-section-motion\.is-open > \.saved-project-structured-group-body \{[\s\S]*?padding-top: 2px;/);
+assert.match(stylesSource, /\.saved-project-structured-facts-list \{[^}]*width: calc\(100% \+ \(2 \* var\(--space-3\)\)\);[^}]*margin-inline: calc\(-1 \* var\(--space-3\)\);/);
+assert.match(stylesSource, /\.saved-project-structured-fact \{[^}]*padding: var\(--space-2\) var\(--space-3\);/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-auto-flow: column;[\s\S]*?grid-auto-columns: minmax\(0, 1fr\);[\s\S]*?width: 100%;/);
