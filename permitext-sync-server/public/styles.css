@@ -11360,6 +11360,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   border-bottom: 1px solid var(--border);
 }
 
+.saved-folder-context.is-project .saved-project-evidence-body .saved-code-group .saved-row {
+  width: calc(100% + (2 * var(--space-3)));
+  margin-inline: calc(-1 * var(--space-3));
+  padding-inline: var(--space-3);
+}
+
 .saved-panel .saved-content > .saved-code-group:last-child .saved-row:last-child {
   border-bottom: 0;
 }
