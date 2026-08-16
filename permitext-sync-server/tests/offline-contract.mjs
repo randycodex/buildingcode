@@ -195,8 +195,8 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260816-reader-nav-collapsed-v316"));
-assert(shellPrecacheURLs.includes("/web/styles.css?v=20260816-reader-nav-collapsed-v316"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260816-search-full-width-v317"));
+assert(shellPrecacheURLs.includes("/web/styles.css?v=20260816-search-full-width-v317"));
 assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260813-research-reader-spacing-v120"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260811-research-columns-v3"));

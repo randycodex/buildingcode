@@ -672,6 +672,9 @@ assert.doesNotMatch(stylesSource, /\.saved-panel \.saved-code-group\.is-collapse
 assert.match(stylesSource, /\.saved-panel \.saved-code-group \+ \.saved-code-group \{[\s\S]*?margin-top: var\(--space-2\);/, "Saved Evidence code-group spacing should remain stable in every expanded state.");
 assert.match(stylesSource, /\.saved-row-actions button \{[\s\S]*?border-radius: 1000px;/, "Saved Evidence row actions must share the pill shape.");
 assert.match(stylesSource, /\.saved-row-actions \{[\s\S]*?justify-content: flex-end;/, "Saved Evidence row actions must align to the right edge.");
+assert.match(stylesSource, /\.search-results \{[\s\S]*?width: calc\(100% \+ \(2 \* var\(--panel-padding\)\)\);[\s\S]*?margin-inline: calc\(-1 \* var\(--panel-padding\)\);[\s\S]*?overflow-x: hidden;/, "Search rows must span the column without horizontal overflow.");
+assert.match(stylesSource, /\.result-row \{[\s\S]*?padding: var\(--space-4\) var\(--panel-padding\);/, "Search result dividers must retain a full-width row with an inner text gutter.");
+assert.match(stylesSource, /\.search-jump-open \{[\s\S]*?padding: var\(--space-1\) var\(--panel-padding\);/, "Recently Viewed rows must retain their inner text gutter.");
 assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Record type"\)/);
 assert.match(appSource, /\["reference", "Saved collection", "Reusable research that is not attached to a job yet"\]/);
 assert.match(appSource, /nameInput\.placeholder = selectedFolderType === "reference" \? "Saved collection name" : "Project Name"/);
