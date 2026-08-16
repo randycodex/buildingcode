@@ -14635,14 +14635,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   text-transform: uppercase;
 }
 
-.report-heading small {
-  overflow: hidden;
-  color: var(--text-secondary);
-  font-size: 11px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .report-draft-header h2 {
   margin: 0;
 }

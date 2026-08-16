@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-note-title-alignment-v331";
+} from "./offline-storage.js?v=20260816-report-title-v332";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -21138,9 +21138,7 @@ async function renderProjectReportDraft(project) {
   heading.className = "report-heading";
   const headingTitle = document.createElement("strong");
   headingTitle.textContent = "Report";
-  const headingContext = document.createElement("small");
-  headingContext.textContent = `${identity.name} · Professional document`;
-  heading.append(headingTitle, headingContext);
+  heading.append(headingTitle);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close report-draft-close";
   closeButton.type = "button";
