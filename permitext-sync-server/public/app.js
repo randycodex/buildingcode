@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-research-direct-actions-v273";
+} from "./offline-storage.js?v=20260816-research-direct-actions-v274";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -11141,7 +11141,7 @@ function readerSectionResearchSelection(sectionWrapper) {
 
 function currentResearchConversationLabel() {
   const conversationID = String(state.researchConversationID || "").trim();
-  if (!conversationID || !researchConversationPaneIsOpen()) return "";
+  if (!conversationID) return "";
   const conversation = activeResearchConversation?.id === conversationID
     ? activeResearchConversation
     : researchConversationList.find((candidate) => candidate.id === conversationID);
