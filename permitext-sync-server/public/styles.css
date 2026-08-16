@@ -497,6 +497,7 @@ textarea:focus-visible {
 }
 
 .topbar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -566,11 +567,16 @@ textarea:focus-visible {
 }
 
 .topbar-brand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   display: grid;
   grid-template-columns: auto auto;
   align-items: baseline;
-  justify-self: end;
+  justify-self: auto;
   gap: var(--space-2);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
   white-space: nowrap;
 }
 
@@ -746,14 +752,12 @@ textarea:focus-visible {
 }
 
 .topbar-workspaces {
-  display: grid;
+  display: flex;
   flex: 0 1 auto;
-  grid-template-columns: minmax(0, max-content) auto auto;
   align-items: center;
   min-width: 0;
-  max-width: min(440px, 38vw);
+  max-width: min(220px, 24vw);
   margin-left: auto;
-  gap: 6px;
 }
 
 .topbar-workspaces[hidden] {
@@ -857,6 +861,29 @@ textarea:focus-visible {
   font-weight: 600;
 }
 
+.workspace-actions-button {
+  max-width: 220px;
+  gap: 7px;
+}
+
+.workspace-actions-button .workspace-current-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-actions-button svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  transition: transform 140ms ease;
+}
+
+.workspace-actions-button[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
 .topbar-settings-button {
   display: inline-flex;
   width: auto;
@@ -896,12 +923,26 @@ textarea:focus-visible {
   position: fixed;
   z-index: 1800;
   display: grid;
-  width: 172px;
-  padding: 6px;
-  border: 1px solid var(--border);
+  width: min(260px, calc(100vw - 16px));
+  padding: 8px;
+  border: 0;
   border-radius: var(--radius-card);
   background: var(--menu-surface);
   box-shadow: var(--shadow-panel);
+}
+
+.workspace-context-heading {
+  padding: 8px 10px 6px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workspace-context-divider {
+  height: 1px;
+  margin: 6px 8px;
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
 }
 
 .workspace-context-menu button {
@@ -912,6 +953,33 @@ textarea:focus-visible {
   background: transparent;
   color: var(--text-primary);
   text-align: left;
+}
+
+.workspace-context-menu .workspace-context-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.workspace-context-switch > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-context-current {
+  flex: 0 0 auto;
+  color: var(--code-accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.workspace-context-switch[aria-checked="true"] {
+  background: color-mix(in srgb, var(--code-accent) 16%, transparent);
 }
 
 .workspace-context-menu button:hover,
@@ -1759,26 +1827,15 @@ body.is-detached-workboard-window .detached-workboard-error p {
   box-shadow: none;
 }
 
+.topbar-actions > .toolbar-button {
+  width: 88px;
+  flex: 0 0 88px;
+  justify-content: center;
+}
+
 .topbar .toolbar-button > svg,
 .topbar .mobile-more-button > svg {
   display: none;
-}
-
-.topbar .toolbar-button[draggable="true"] {
-  cursor: grab;
-}
-
-.topbar .toolbar-button.is-dragging {
-  cursor: grabbing;
-  opacity: 0.45;
-}
-
-.topbar .toolbar-button.is-drop-before {
-  transform: translateX(3px);
-}
-
-.topbar .toolbar-button.is-drop-after {
-  transform: translateX(-3px);
 }
 
 .topbar .toolbar-button:hover {

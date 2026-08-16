@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-report-professional-document-v279";
+} from "./offline-storage.js?v=20260816-topbar-workspace-menu-v280";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -221,13 +221,6 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
 const tabWorkspaceKey = "permitext:webWorkspaceTab:v1";
 const workspaceRegistryKey = "permitext:webWorkspaces:v2";
-const toolbarOrderKey = "permitext:webToolbarOrder:v1";
-const defaultToolbarButtonIDs = Object.freeze([
-  "add-reader",
-  "toggle-search",
-  "toggle-saved",
-  "toggle-analysis"
-]);
 const workspaceStateKeyPrefix = "permitext:webWorkspace:v2:";
 const activeWorkspaceSessionKey = "permitext:webWorkspaceActive:v2";
 const detachedWorkboardPath = "/detached-workboard";
@@ -273,8 +266,6 @@ const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
 const mobileMoreButton = document.querySelector("#mobile-more");
-const workspaceTabs = document.querySelector("#workspace-tabs");
-const addWorkspaceButton = document.querySelector("#add-workspace");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
 const connectionStatus = document.querySelector("#connection-status");
 const workspaceIssue = document.querySelector("#workspace-issue");
@@ -403,11 +394,8 @@ let codeTrustProfiles = [];
 let workspaceRegistry = null;
 let activeWorkspaceID = "";
 let suppressReaderScrollRestore = false;
-let draggedWorkspaceID = "";
-let draggedToolbarButtonID = "";
 let workspaceContextMenu = null;
 let mobileMoreSheet = null;
-let workspaceLongPressTimer = null;
 const codeQuestionListHydrationByProject = new Map();
 const codeQuestionStateHydrationByQuestion = new Map();
 const codeQuestionAccessByProject = new Map();
@@ -1215,46 +1203,16 @@ function beginWorkspaceRename(workspaceID) {
   closeWorkspaceContextMenu();
   const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
   if (!workspace) return;
-  if (window.matchMedia("(max-width: 760px)").matches) {
-    void openWebTextPrompt({
-      title: "Rename workspace",
-      message: "Choose a short name for this workspace.",
-      label: "Workspace name",
-      defaultValue: workspace.name,
-      confirmLabel: "Save",
-      required: true
-    }).then((name) => {
-      if (name !== null) commitWorkspaceRename(workspaceID, name);
-    });
-    return;
-  }
-  const tab = workspaceTabs?.querySelector(`[data-workspace-id="${CSS.escape(workspaceID)}"]`);
-  if (!tab) return;
-  const input = document.createElement("input");
-  input.className = "workspace-name-input";
-  input.value = workspace.name;
-  input.maxLength = 40;
-  input.setAttribute("aria-label", `Rename ${workspace.name}`);
-  tab.replaceWith(input);
-  let finished = false;
-  const finish = (commit) => {
-    if (finished) return;
-    finished = true;
-    if (commit) commitWorkspaceRename(workspaceID, input.value);
-    else renderWorkspaceTabs();
-  };
-  input.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      finish(true);
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      finish(false);
-    }
+  void openWebTextPrompt({
+    title: "Rename workspace",
+    message: "Choose a short name for this workspace.",
+    label: "Workspace name",
+    defaultValue: workspace.name,
+    confirmLabel: "Save",
+    required: true
+  }).then((name) => {
+    if (name !== null) commitWorkspaceRename(workspaceID, name);
   });
-  input.addEventListener("blur", () => finish(true), { once: true });
-  input.focus();
-  input.select();
 }
 
 async function duplicateNamedWorkspace(workspaceID) {
@@ -1455,15 +1413,44 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu";
   menu.setAttribute("role", "menu");
-  menu.setAttribute("aria-label", `${workspace.name} actions`);
+  menu.setAttribute("aria-label", "Workspace menu");
+  const heading = document.createElement("strong");
+  heading.className = "workspace-context-heading";
+  heading.textContent = "Workspaces";
+  menu.append(heading);
+  workspaces.forEach((candidate) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("role", "menuitemradio");
+    button.setAttribute("aria-checked", String(candidate.id === activeWorkspaceID));
+    button.className = "workspace-context-switch";
+    const label = document.createElement("span");
+    label.textContent = candidate.name;
+    const mark = document.createElement("span");
+    mark.className = "workspace-context-current";
+    mark.textContent = candidate.id === activeWorkspaceID ? "Current" : "";
+    button.append(label, mark);
+    button.addEventListener("click", () => {
+      closeWorkspaceContextMenu();
+      void switchWorkspace(candidate.id, { focus: false });
+    });
+    menu.append(button);
+  });
+  const divider = document.createElement("div");
+  divider.className = "workspace-context-divider";
+  menu.append(divider);
   const actions = [
-    { label: "Rename", run: () => beginWorkspaceRename(workspaceID) },
-    { label: "Duplicate", run: () => void duplicateNamedWorkspace(workspaceID) },
-    { label: "Move left", disabled: index <= 0, run: () => moveNamedWorkspace(workspaceID, -1) },
-    { label: "Move right", disabled: index >= workspaces.length - 1, run: () => moveNamedWorkspace(workspaceID, 1) },
-    { label: "Delete", danger: true, run: () => void removeNamedWorkspace(workspaceID) }
+    { label: "New workspace", run: () => void createNewWorkspace() },
+    { label: "Rename workspace", run: () => beginWorkspaceRename(workspaceID) },
+    { label: "Duplicate workspace", run: () => void duplicateNamedWorkspace(workspaceID) },
+    { label: "Delete workspace", danger: true, separated: true, run: () => void removeNamedWorkspace(workspaceID) }
   ];
   actions.forEach((action) => {
+    if (action.separated) {
+      const actionDivider = document.createElement("div");
+      actionDivider.className = "workspace-context-divider";
+      menu.append(actionDivider);
+    }
     const button = document.createElement("button");
     button.type = "button";
     button.setAttribute("role", "menuitem");
@@ -1493,212 +1480,19 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
 
 function focusActiveWorkspaceTab() {
   requestAnimationFrame(() => {
-    const tab = workspaceTabs?.querySelector(`[data-workspace-id="${CSS.escape(activeWorkspaceID)}"]`);
-    tab?.scrollIntoView({ inline: "nearest", block: "nearest" });
-    tab?.focus({ preventScroll: true });
-  });
-}
-
-function normalizedToolbarOrder(value) {
-  const requested = Array.isArray(value) ? value.map(String) : [];
-  const valid = new Set(defaultToolbarButtonIDs);
-  const ordered = requested.filter((id, index) => valid.has(id) && requested.indexOf(id) === index);
-  defaultToolbarButtonIDs.forEach((id) => {
-    if (!ordered.includes(id)) ordered.push(id);
-  });
-  return ordered;
-}
-
-function storedToolbarOrder() {
-  try {
-    return normalizedToolbarOrder(JSON.parse(localStorage.getItem(toolbarOrderKey) || "null"));
-  } catch {
-    return normalizedToolbarOrder([]);
-  }
-}
-
-function applyToolbarOrder(order) {
-  if (!topbarActions) return;
-  normalizedToolbarOrder(order).forEach((id) => {
-    const button = document.getElementById(id);
-    if (button) topbarActions.append(button);
-  });
-}
-
-function persistToolbarOrder() {
-  if (!topbarActions) return;
-  const order = Array.from(topbarActions.querySelectorAll(":scope > .toolbar-button"))
-    .map((button) => button.id)
-    .filter(Boolean);
-  localStorage.setItem(toolbarOrderKey, JSON.stringify(normalizedToolbarOrder(order)));
-}
-
-function clearToolbarDropIndicators() {
-  topbarActions?.querySelectorAll(".toolbar-button").forEach((button) => {
-    button.classList.remove("is-drop-before", "is-drop-after");
-  });
-}
-
-function reorderToolbarButton(sourceID, targetID, position = "before") {
-  if (!topbarActions || sourceID === targetID) return false;
-  const source = document.getElementById(sourceID);
-  const target = document.getElementById(targetID);
-  if (!source?.classList.contains("toolbar-button") || !target?.classList.contains("toolbar-button")) return false;
-  target.insertAdjacentElement(position === "after" ? "afterend" : "beforebegin", source);
-  persistToolbarOrder();
-  return true;
-}
-
-function bindToolbarReordering() {
-  if (!topbarActions || topbarActions.dataset.reorderBound === "true") return;
-  topbarActions.dataset.reorderBound = "true";
-  applyToolbarOrder(storedToolbarOrder());
-  const buttons = Array.from(topbarActions.querySelectorAll(":scope > .toolbar-button"));
-  buttons.forEach((button) => {
-    button.draggable = true;
-    button.setAttribute("aria-keyshortcuts", "Alt+ArrowLeft Alt+ArrowRight");
-    button.title = `${button.title || button.textContent.trim()}. Drag to reorder.`;
-    button.addEventListener("dragstart", (event) => {
-      draggedToolbarButtonID = button.id;
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("application/x-permitext-toolbar", button.id);
-      event.dataTransfer.setData("text/plain", button.id);
-      button.classList.add("is-dragging");
-    });
-    button.addEventListener("dragend", () => {
-      draggedToolbarButtonID = "";
-      button.classList.remove("is-dragging");
-      clearToolbarDropIndicators();
-    });
-    button.addEventListener("dragover", (event) => {
-      if (!draggedToolbarButtonID || draggedToolbarButtonID === button.id) return;
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
-      const rect = button.getBoundingClientRect();
-      const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
-      clearToolbarDropIndicators();
-      button.classList.add(position === "after" ? "is-drop-after" : "is-drop-before");
-    });
-    button.addEventListener("dragleave", () => clearToolbarDropIndicators());
-    button.addEventListener("drop", (event) => {
-      const sourceID = draggedToolbarButtonID || event.dataTransfer.getData("application/x-permitext-toolbar");
-      if (!sourceID || sourceID === button.id) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const rect = button.getBoundingClientRect();
-      const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
-      reorderToolbarButton(sourceID, button.id, position);
-      clearToolbarDropIndicators();
-      document.getElementById(sourceID)?.focus({ preventScroll: true });
-    });
-    button.addEventListener("keydown", (event) => {
-      if (!event.altKey || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
-      const orderedButtons = Array.from(topbarActions.querySelectorAll(":scope > .toolbar-button:not([hidden])"));
-      const index = orderedButtons.indexOf(button);
-      const target = orderedButtons[index + (event.key === "ArrowLeft" ? -1 : 1)];
-      if (!target) return;
-      event.preventDefault();
-      reorderToolbarButton(button.id, target.id, event.key === "ArrowLeft" ? "before" : "after");
-      button.focus({ preventScroll: true });
-    });
-  });
-  topbarActions.addEventListener("dragover", (event) => {
-    if (!draggedToolbarButtonID || event.target.closest(".toolbar-button")) return;
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  });
-  topbarActions.addEventListener("drop", (event) => {
-    if (!draggedToolbarButtonID || event.target.closest(".toolbar-button")) return;
-    event.preventDefault();
-    const source = document.getElementById(draggedToolbarButtonID);
-    if (source) topbarActions.append(source);
-    persistToolbarOrder();
-    clearToolbarDropIndicators();
+    workspaceActionsButton?.focus({ preventScroll: true });
   });
 }
 
 function renderWorkspaceTabs() {
-  const container = workspaceTabs?.closest(".topbar-workspaces");
-  if (!workspaceTabs || !container) return;
+  const container = workspaceActionsButton?.closest(".topbar-workspaces");
+  if (!workspaceActionsButton || !container) return;
   container.hidden = detachedProjectWindow;
   if (detachedProjectWindow) return;
-  clear(workspaceTabs);
-  (workspaceRegistry?.workspaces || []).forEach((workspace) => {
-    const tab = document.createElement("button");
-    tab.type = "button";
-    tab.className = "workspace-tab";
-    tab.dataset.workspaceId = workspace.id;
-    tab.setAttribute("role", "tab");
-    tab.setAttribute("aria-selected", String(workspace.id === activeWorkspaceID));
-    tab.tabIndex = workspace.id === activeWorkspaceID ? 0 : -1;
-    tab.title = `${workspace.name}. Double-click to rename; right-click for actions.`;
-    const label = document.createElement("span");
-    label.textContent = workspace.name;
-    tab.append(label);
-    tab.draggable = true;
-    tab.addEventListener("click", () => void switchWorkspace(workspace.id));
-    tab.addEventListener("dblclick", (event) => {
-      event.preventDefault();
-      beginWorkspaceRename(workspace.id);
-    });
-    tab.addEventListener("contextmenu", (event) => {
-      event.preventDefault();
-      openWorkspaceContextMenu(workspace.id, tab);
-    });
-    tab.addEventListener("keydown", (event) => {
-      if (event.key === "F2") {
-        event.preventDefault();
-        beginWorkspaceRename(workspace.id);
-      } else if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
-        event.preventDefault();
-        openWorkspaceContextMenu(workspace.id, tab);
-      } else if (["ArrowLeft", "ArrowRight"].includes(event.key)) {
-        const tabs = Array.from(workspaceTabs.querySelectorAll(".workspace-tab"));
-        const currentIndex = tabs.indexOf(tab);
-        const direction = event.key === "ArrowLeft" ? -1 : 1;
-        const next = tabs[(currentIndex + direction + tabs.length) % tabs.length];
-        if (next) {
-          event.preventDefault();
-          next.focus();
-        }
-      }
-    });
-    tab.addEventListener("pointerdown", (event) => {
-      if (event.pointerType === "mouse") return;
-      clearTimeout(workspaceLongPressTimer);
-      workspaceLongPressTimer = window.setTimeout(() => openWorkspaceContextMenu(workspace.id, tab), 520);
-    });
-    ["pointerup", "pointercancel", "pointerleave"].forEach((eventName) => {
-      tab.addEventListener(eventName, () => clearTimeout(workspaceLongPressTimer));
-    });
-    tab.addEventListener("dragstart", (event) => {
-      draggedWorkspaceID = workspace.id;
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", workspace.id);
-      tab.classList.add("is-dragging");
-    });
-    tab.addEventListener("dragend", () => {
-      draggedWorkspaceID = "";
-      tab.classList.remove("is-dragging");
-    });
-    tab.addEventListener("dragover", (event) => {
-      if (!draggedWorkspaceID || draggedWorkspaceID === workspace.id) return;
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
-    });
-    tab.addEventListener("drop", (event) => {
-      const sourceID = draggedWorkspaceID || event.dataTransfer.getData("text/plain");
-      if (!sourceID || sourceID === workspace.id) return;
-      event.preventDefault();
-      const rect = tab.getBoundingClientRect();
-      const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
-      workspaceRegistry = reorderWorkspace(workspaceRegistry, sourceID, workspace.id, position);
-      persistWorkspaceRegistry();
-      renderWorkspaceTabs();
-      focusActiveWorkspaceTab();
-    });
-    workspaceTabs.append(tab);
-  });
+  const workspace = activeWorkspaceRecord();
+  const label = workspaceActionsButton.querySelector(".workspace-current-name");
+  if (label) label.textContent = workspace?.name || "Workspace";
+  workspaceActionsButton.title = workspace ? `${workspace.name} workspace` : "Workspaces";
   workspaceActionsButton.disabled = !activeWorkspaceRecord();
 }
 
@@ -33760,7 +33554,6 @@ async function start() {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
   }
   if (!detachedProjectWindow) {
-    bindToolbarReordering();
     bindImmediateUtilityControls();
     const [chapterPayload, libraryPayload] = await Promise.all([
       api("/code/chapters"),
@@ -33966,9 +33759,6 @@ async function start() {
   });
   toggleSettingsButton.addEventListener("click", () => {
     toggleUtilityPane("settings");
-  });
-  addWorkspaceButton?.addEventListener("click", () => {
-    void createNewWorkspace();
   });
   workspaceActionsButton?.addEventListener("click", () => {
     if (workspaceContextMenu) {

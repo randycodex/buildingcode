@@ -566,8 +566,8 @@ assert.match(stylesSource, /\.saved-project-tile\.is-selected \{[\s\S]*?box-shad
 assert.match(stylesSource, /\.saved-project-tile\.is-selected \.saved-project-count \{[\s\S]*?color: #ffffff;/);
 assert.match(stylesSource, /\.saved-projects-section\.is-selecting \.saved-project-tile\[data-bulk-selectable="true"\] \{[\s\S]*?opacity: 0\.58;/);
 assert.match(stylesSource, /\.saved-project-tile\.is-bulk-selected \{[\s\S]*?opacity: 1 !important;[\s\S]*?box-shadow: none;/);
-assert.match(indexSource, /id="add-workspace"[^>]*>New<\/button>/);
-assert.match(indexSource, /id="workspace-actions"[^>]*>Manage<\/button>/);
+assert.match(indexSource, /id="workspace-actions"[^>]*aria-label="Open workspace menu"/);
+assert.doesNotMatch(indexSource, /id="add-workspace"/);
 assert.match(stylesSource, /\.workspace-add-button,[\s\S]*?\.workspace-actions-button \{[\s\S]*?display: inline-flex;[\s\S]*?padding: 0 11px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-notebook-button,[\s\S]*?\.project-report-draft-button \{[^}]*height: 40px;[^}]*min-height: 40px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading,[\s\S]*?\.saved-project-research-answers > \.project-studio-section-heading \{[^}]*height: 40px;[^}]*min-height: 40px;/);

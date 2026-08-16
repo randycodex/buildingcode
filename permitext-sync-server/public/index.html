@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/web/styles.css?v=20260816-report-professional-document-v279">
+    <link rel="stylesheet" href="/web/styles.css?v=20260816-topbar-workspace-menu-v280">
   </head>
   <body>
     <main class="workspace-shell">
@@ -59,9 +59,12 @@
           </button>
         </nav>
         <div class="topbar-workspaces" aria-label="Workspaces">
-          <div class="workspace-tabs" id="workspace-tabs" role="tablist" aria-label="Workspaces"></div>
-          <button class="workspace-add-button" id="add-workspace" type="button" aria-label="Create workspace" title="Create workspace">New</button>
-          <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Workspace actions" title="Workspace actions" aria-haspopup="menu">Manage</button>
+          <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Open workspace menu" title="Workspaces" aria-haspopup="menu" aria-expanded="false">
+            <span class="workspace-current-name">Main</span>
+            <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m4 6 4 4 4-4"></path>
+            </svg>
+          </button>
         </div>
         <div class="topbar-layout-actions" aria-label="Column layout">
           <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset workspace" title="Reset column widths">Reset workspace</button>
@@ -574,6 +577,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260816-report-professional-document-v279" type="module"></script>
+    <script src="/web/app.js?v=20260816-topbar-workspace-menu-v280" type="module"></script>
   </body>
 </html>

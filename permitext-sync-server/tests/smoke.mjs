@@ -521,18 +521,15 @@ async function main() {
     );
     assert(workspaceStateScript.response.ok, "Named workspace state module did not load.");
     assert(
-      webRoot.text.includes('id="workspace-tabs"') &&
-        webRoot.text.includes('id="add-workspace"') &&
-        webRoot.text.includes('id="workspace-actions"') &&
+      webRoot.text.includes('id="workspace-actions"') &&
+        webRoot.text.includes('class="workspace-current-name">Main</span>') &&
+        !webRoot.text.includes('id="add-workspace"') &&
         webRoot.text.includes('id="collapse-readers" type="button" aria-label="Close all columns" title="Close all columns">Close all</button>') &&
         !webRoot.text.includes(">One Reader</button>") &&
         workspaceScript.text.includes('const workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
-        workspaceScript.text.includes('const toolbarOrderKey = "permitext:webToolbarOrder:v1"') &&
-        workspaceScript.text.match(/const defaultToolbarButtonIDs = Object\.freeze\(\[[\s\S]*?"toggle-analysis"[\s\S]*?\]\);/) &&
-        !workspaceScript.text.match(/const defaultToolbarButtonIDs = Object\.freeze\(\[[\s\S]*?"fit-columns"[\s\S]*?\]\);/) &&
-        workspaceScript.text.includes("function bindToolbarReordering()") &&
-        workspaceScript.text.includes('event.dataTransfer.setData("application/x-permitext-toolbar", button.id)') &&
-        workspaceScript.text.includes("localStorage.setItem(toolbarOrderKey") &&
+        !workspaceScript.text.includes("toolbarOrderKey") &&
+        !workspaceScript.text.includes("bindToolbarReordering") &&
+        !workspaceScript.text.includes("application/x-permitext-toolbar") &&
         workspaceScript.text.includes("function renderWorkspaceTabs()") &&
         workspaceScript.text.includes("async function switchWorkspace") &&
         workspaceScript.text.includes('function startPaneEdgeResize(event, paneID, edgeSide = "right")') &&
@@ -553,12 +550,12 @@ async function main() {
         workspaceScript.text.includes("fitColumnsButton.hidden = !hasColumns") &&
         workspaceScript.text.includes("collapseReadersButton.hidden = !hasColumns") &&
         workspaceScript.text.includes("async function openDeepLinkedSectionInReader") &&
-        workspaceStyles.text.match(/\.topbar-workspaces\s*\{[^}]*flex:\s*0 1 auto;[^}]*grid-template-columns:\s*minmax\(0, max-content\) auto auto;[^}]*margin-left:\s*auto;/) &&
-        workspaceStyles.text.match(/\.workspace-tabs\s*\{[^}]*width:\s*max-content;[^}]*max-width:\s*100%;[^}]*justify-content:\s*flex-end;/) &&
-        workspaceStyles.text.includes('.topbar .toolbar-button[draggable="true"]') &&
-        workspaceStyles.text.match(/\.workspace-tab\s*\{[^}]*font-size:\s*14px;/) &&
+        workspaceStyles.text.match(/\.topbar-workspaces\s*\{[^}]*display:\s*flex;[^}]*flex:\s*0 1 auto;[^}]*margin-left:\s*auto;/) &&
+        workspaceStyles.text.includes('.workspace-actions-button .workspace-current-name') &&
+        workspaceStyles.text.includes('.workspace-context-switch[aria-checked="true"]') &&
+        workspaceStyles.text.match(/\.topbar-brand\s*\{[^}]*position:\s*absolute;[^}]*left:\s*50%;[^}]*top:\s*50%;[^}]*transform:\s*translate\(-50%, -50%\);/) &&
+        workspaceStyles.text.match(/\.topbar-actions > \.toolbar-button\s*\{[^}]*width:\s*88px;[^}]*flex:\s*0 0 88px;[^}]*justify-content:\s*center;/) &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button\s*\{[^}]*font-size:\s*14px !important;/) &&
-        workspaceStyles.text.match(/\.workspace-tab:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
         workspaceStyles.text.includes(".workspace-empty-state {") &&
         workspaceStyles.text.includes(".pane-edge-resizer {") &&
@@ -794,7 +791,7 @@ async function main() {
         workspaceScript.text.includes("const orderedAnchorID = firstDetailIndex > 0 ? ordered[firstDetailIndex - 1] :") &&
         workspaceScript.text.includes('sourcePaneID === "utility:projects" || savedIDs.includes(sourcePaneID)') &&
         workspaceScript.text.includes("tile.append(heading, countLabel)") &&
-        workspaceScript.text.includes("selectionActions.append(archiveSelectedButton, deleteSelectedButton)") &&
+        workspaceScript.text.includes("selectionActions.append(cancelSelectionButton, archiveSelectedButton, deleteSelectedButton)") &&
         workspaceScript.text.includes('editProjectButton.className = "saved-project-tile-edit"') &&
         workspaceScript.text.includes("showProjectCreateSheet(panel, project)") &&
         !workspaceScript.text.includes('typeBadge.className = "saved-folder-type"') &&
@@ -916,7 +913,6 @@ async function main() {
         workspaceScript.text.includes('.forEach((panel) => panel.style.setProperty("--project-color", color))') &&
         workspaceScript.text.includes("function applyProjectDerivedPaneTheme(panel, projectID)") &&
         workspaceScript.text.includes('panel.classList.add("project-derived-panel")') &&
-        workspaceScript.text.includes("applyProjectDerivedPaneTheme(panel, preferredResearchProjectID())") &&
         workspaceScript.text.includes("applyProjectDerivedPaneTheme(panel, conversation.primaryProjectID)") &&
         workspaceStyles.text.includes(".analysis-panel.project-derived-panel,\n.research-conversation-panel.project-derived-panel {") &&
         workspaceStyles.text.includes("background: color-mix(in srgb, var(--project-color) 8%, var(--surface-raised));") &&
@@ -935,7 +931,7 @@ async function main() {
         workspaceScript.text.includes('referenceToggle.className = "code-filter-menu-toggle notebook-reference-menu-toggle"') &&
         workspaceScript.text.includes('referenceList.className = "notebook-reference-list"') &&
         workspaceScript.text.includes('option.className = "notebook-reference-option"') &&
-        workspaceScript.text.includes('label: "Insert reference"') &&
+        workspaceScript.text.includes('label: "Insert evidence or Research"') &&
         workspaceScript.text.includes("async function notebookReferenceCandidates") &&
         workspaceScript.text.includes("function compareNotebookReferences(left, right)") &&
         workspaceScript.text.includes(".sort(compareNotebookReferences)") &&
@@ -1435,7 +1431,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-report-professional-document-v279'),
+        webRoot.text.includes('/web/app.js?v=20260816-topbar-workspace-menu-v280'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1596,7 +1592,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-report-professional-document-v279'),
+      webRoot.text.includes('/web/styles.css?v=20260816-topbar-workspace-menu-v280'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1861,7 +1857,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-report-professional-document-v279'),
+      webRoot.text.includes('/web/styles.css?v=20260816-topbar-workspace-menu-v280'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
