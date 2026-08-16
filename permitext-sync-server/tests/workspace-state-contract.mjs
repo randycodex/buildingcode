@@ -176,6 +176,21 @@ assert.deepEqual(conflictingProjectTools.workboards, []);
 assert.equal(conflictingProjectTools.coordinations[0].id, "project-2");
 assert.deepEqual(conflictingProjectTools.coordinationThreads, []);
 
+const preservedProjectOwnedColumns = normalizeWorkspaceLayout({
+  projectDetails: [
+    { id: "project-2", name: "Project 2" },
+    { id: "project-1", name: "Project 1" }
+  ],
+  notebooks: [{ id: "project-1", name: "Project 1" }],
+  reportDrafts: [
+    { id: "project-1", name: "Project 1" },
+    { id: "project-2", name: "Project 2" }
+  ]
+});
+assert.deepEqual(preservedProjectOwnedColumns.projectDetails.map((project) => project.id), ["project-2", "project-1"]);
+assert.deepEqual(preservedProjectOwnedColumns.notebooks.map((project) => project.id), ["project-1"]);
+assert.deepEqual(preservedProjectOwnedColumns.reportDrafts.map((project) => project.id), ["project-2", "project-1"]);
+
 let registry = blankRegistry;
 const created = createWorkspace(registry, options);
 registry = created.registry;

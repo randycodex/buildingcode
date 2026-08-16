@@ -255,6 +255,12 @@ assert.ok(
     deactivateProjectStudioSource.indexOf("closeProjectDetailForProject"),
   "Project deactivation must confirm Notebook edits before changing workspace state."
 );
+const activateProjectStudioSource = functionSource(appSource, "activateProjectStudio");
+assert.doesNotMatch(activateProjectStudioSource, /confirmNotebookDiscard|confirmReportDraftDiscard/);
+assert.match(activateProjectStudioSource, /\.\.\.openDetails\.filter\(\(detail\) => !projectDetailMatches\(identity, detail\)\)/);
+assert.match(activateProjectStudioSource, /openNotebookRecords[\s\S]*?openReportRecords/);
+assert.match(functionSource(appSource, "openProjectNotebook"), /openNotebooks\(\)\.filter/);
+assert.match(functionSource(appSource, "openProjectReportDraft"), /openReportDrafts\(\)\.filter/);
 assert.ok(
   deactivateProjectStudioSource.indexOf("confirmReportDraftDiscard") <
     deactivateProjectStudioSource.indexOf("closeProjectDetailForProject"),
@@ -305,24 +311,27 @@ assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordi
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
 const pinnedWorkflowSource = functionSource(appSource, "pinCriticalWorkflowPanesToLeft");
 assert.match(pinnedWorkflowSource, /new Set\(savedPaneIDs\(\)\)/);
-assert.match(pinnedWorkflowSource, /state\.utilities\.analysis \? "utility:analysis" : ""[\s\S]*?\.\.\.openResearchConversationPaneIDs\(\)/);
+assert.match(pinnedWorkflowSource, /openProjectDetails\(\)\.flatMap\(projectWorkspacePaneIDs\)/);
 assert.match(pinnedWorkflowSource, /settingsPaneID = state\.utilities\.settings \? "utility:settings" : ""/);
-assert.match(pinnedWorkflowSource, /return \[[\s\S]*?paneID === settingsPaneID[\s\S]*?projectsPaneIDs\.has\(paneID\)[\s\S]*?researchPaneIDs\.has\(paneID\)/, "Settings must be the only pane pinned to the left of Projects.");
-assert.match(pinnedWorkflowSource, /paneID !== settingsPaneID[\s\S]*?!projectsPaneIDs\.has\(paneID\)[\s\S]*?!researchPaneIDs\.has\(paneID\)/, "Settings must not be duplicated in the ordinary pane sequence.");
+assert.match(pinnedWorkflowSource, /return \[[\s\S]*?paneID === settingsPaneID[\s\S]*?projectsPaneIDs\.has\(paneID\)[\s\S]*?projectOwnedPaneIDs\.has\(paneID\)/, "Settings must be the only pane pinned to the left of Projects, followed by Project-owned work.");
+assert.match(pinnedWorkflowSource, /paneID !== settingsPaneID[\s\S]*?!projectsPaneIDs\.has\(paneID\)[\s\S]*?!projectOwnedPaneIDs\.has\(paneID\)/, "Pinned panes must not be duplicated in the ordinary pane sequence.");
 const pinCriticalWorkflowPanesToLeft = new Function(
   "state",
   "savedPaneIDs",
-  "openResearchConversationPaneIDs",
+  "openProjectDetails",
+  "projectWorkspacePaneIDs",
   `${pinnedWorkflowSource}; return pinCriticalWorkflowPanesToLeft;`
 )(
   { utilities: { settings: true, analysis: true } },
   () => ["utility:saved:projects"],
-  () => ["research:conversation:one"]
+  () => [{ id: "project-1" }],
+  () => ["project:notebook:project-1"]
 );
 assert.deepEqual(
   pinCriticalWorkflowPanesToLeft([
     "reader:one",
     "utility:analysis",
+    "project:notebook:project-1",
     "utility:saved:projects",
     "utility:settings",
     "utility:search:one"
@@ -330,8 +339,9 @@ assert.deepEqual(
   [
     "utility:settings",
     "utility:saved:projects",
-    "utility:analysis",
+    "project:notebook:project-1",
     "reader:one",
+    "utility:analysis",
     "utility:search:one"
   ],
   "Settings must remain left of Projects while every ordinary pane remains to the right."

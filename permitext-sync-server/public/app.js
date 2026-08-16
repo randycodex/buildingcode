@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-topbar-unified-pills-v281";
+} from "./offline-storage.js?v=20260816-desktop-project-continuity-v282";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -1860,7 +1860,10 @@ async function openProjectNotebook(project) {
     const activated = await activateProjectStudio(identity, { transition: false });
     if (!activated) return false;
   }
-  state.notebooks = [identity];
+  state.notebooks = [
+    ...openNotebooks().filter((item) => !projectDetailMatches(identity, item)),
+    identity
+  ];
   const notebookID = paneIDForProjectNotebook(identity);
   state.paneWeights[notebookID] ||= defaultNotebookPaneWidth;
   if (!wasOpen) placeProjectToolPaneLast(identity, notebookID);
@@ -1890,7 +1893,10 @@ async function openProjectReportDraft(project) {
     const activated = await activateProjectStudio(identity, { transition: false });
     if (!activated) return false;
   }
-  state.reportDrafts = [identity];
+  state.reportDrafts = [
+    ...openReportDrafts().filter((item) => !projectDetailMatches(identity, item)),
+    identity
+  ];
   const reportDraftID = paneIDForProjectReportDraft(identity);
   state.paneWeights[reportDraftID] ||= defaultReportDraftPaneWidth;
   if (!wasOpen) placeProjectToolPaneLast(identity, reportDraftID);
@@ -2771,14 +2777,14 @@ function setOpenProjectDetails(details) {
   (details || []).filter(Boolean).forEach((detail) => {
     uniqueDetails.set(projectDetailKey(detail), detail);
   });
-  state.projectDetails = Array.from(uniqueDetails.values()).slice(0, 1);
+  state.projectDetails = Array.from(uniqueDetails.values()).slice(0, 8);
   state.projectDetail = state.projectDetails[0] || null;
 }
 
 function reconcileOpenProjectToolState() {
-  const current = openProjectDetails()[0] || null;
+  const details = openProjectDetails();
   const keepGenericWorkboard = genericWorkboardIsOpen();
-  if (!current) {
+  if (!details.length) {
     state.workboards = keepGenericWorkboard ? [genericWorkboardIdentity] : [];
     state.notebooks = [];
     state.reportDrafts = [];
@@ -2786,20 +2792,21 @@ function reconcileOpenProjectToolState() {
     state.coordinationThreads = [];
     return;
   }
-  const identity = projectIdentity(current);
   state.workboards = keepGenericWorkboard ? [genericWorkboardIdentity] : [];
-  state.notebooks = openNotebooks().some((item) => projectDetailMatches(current, item)) ? [identity] : [];
-  state.reportDrafts = openReportDrafts().some((item) => projectDetailMatches(current, item)) ? [identity] : [];
-  state.coordinations = releaseSurfaceVisibility.coordination &&
-    openCoordinations().some((item) => projectDetailMatches(current, item))
-      ? [identity]
-      : [];
-  const thread = state.coordinations.length
-    ? openCoordinationThreads().find((item) => projectDetailMatches(current, item))
-    : null;
-  state.coordinationThreads = thread
-    ? [{ ...identity, threadID: String(thread.threadID) }]
+  state.notebooks = openNotebooks().filter((item) =>
+    details.some((detail) => projectDetailMatches(detail, item))
+  );
+  state.reportDrafts = openReportDrafts().filter((item) =>
+    details.some((detail) => projectDetailMatches(detail, item))
+  );
+  state.coordinations = releaseSurfaceVisibility.coordination
+    ? openCoordinations().filter((item) =>
+      details.some((detail) => projectDetailMatches(detail, item))
+    )
     : [];
+  state.coordinationThreads = openCoordinationThreads().filter((item) =>
+    state.coordinations.some((coordination) => projectDetailMatches(coordination, item))
+  );
 }
 
 async function confirmNotebookDiscard(project) {
@@ -2908,24 +2915,6 @@ async function activateProjectStudio(project, options = {}) {
     if (options.outcome) options.outcome.value = "applied";
     return true;
   }
-  if (current && !(await confirmNotebookDiscard(current))) {
-    if (options.outcome) options.outcome.value = "cancelled";
-    return false;
-  }
-  if (
-    transitionGeneration !== projectStudioTransitionGeneration ||
-    activeWorkspaceID !== expectedWorkspaceID ||
-    (current
-      ? !openProjectDetails().some((detail) => projectDetailMatches(current, detail))
-      : openProjectDetails().length > 0)
-  ) {
-    if (options.outcome) options.outcome.value = "stale";
-    return false;
-  }
-  if (current && !(await confirmReportDraftDiscard(current))) {
-    if (options.outcome) options.outcome.value = "cancelled";
-    return false;
-  }
   if (
     transitionGeneration !== projectStudioTransitionGeneration ||
     activeWorkspaceID !== expectedWorkspaceID ||
@@ -2937,75 +2926,35 @@ async function activateProjectStudio(project, options = {}) {
     return false;
   }
 
-  const keepNotebookOpen = current ? projectHasOpenNotebook(current) : Boolean(options.openNotebook);
+  const openDetails = openProjectDetails();
+  const openNotebookRecords = openNotebooks();
+  const openReportRecords = openReportDrafts();
+  const openCoordinationRecords = openCoordinations();
   const keepGenericWorkboardOpen = genericWorkboardIsOpen();
-  const keepReportDraftOpen = current
-    ? projectHasOpenReportDraft(current)
-    : Boolean(options.openReportDraft);
-  const keepCoordinationOpen = releaseSurfaceVisibility.coordination && (current
-    ? projectHasOpenCoordination(current)
-    : Boolean(options.openCoordination));
-  const currentCoordinationThread = current ? openCoordinationThreadForProject(current) : null;
-  const currentDetailID = current ? paneIDForProjectDetail(current) : "";
-  const currentNotebookID = current ? paneIDForProjectNotebook(current) : "";
-  const currentReportDraftID = current ? paneIDForProjectReportDraft(current) : "";
-  const currentCoordinationID = current ? paneIDForProjectCoordination(current) : "";
-  const currentCoordinationThreadID = currentCoordinationThread
-    ? paneIDForProjectCoordinationThread(current, currentCoordinationThread.threadID)
-    : "";
-  const notebookWidth = currentNotebookID ? state.paneWeights[currentNotebookID] : null;
-  const reportDraftWidth = currentReportDraftID ? state.paneWeights[currentReportDraftID] : null;
-  const coordinationWidth = currentCoordinationID ? state.paneWeights[currentCoordinationID] : null;
-
-  if (current) {
-    clearProjectSpecificReaders(current);
-    clearProjectSpecificResearch(current);
-    [
-      currentDetailID,
-      currentNotebookID,
-      currentReportDraftID,
-      currentCoordinationID,
-      currentCoordinationThreadID
-    ].forEach((paneID) => {
-      delete state.paneWeights[paneID];
-    });
-    state.paneOrder = (state.paneOrder || []).filter((paneID) =>
-      paneID !== currentDetailID &&
-      paneID !== currentNotebookID &&
-      paneID !== currentReportDraftID &&
-      paneID !== currentCoordinationID &&
-      paneID !== currentCoordinationThreadID
-    );
-  }
-
-  setOpenProjectDetails([identity]);
-  state.notebooks = keepNotebookOpen ? [identity] : [];
+  setOpenProjectDetails([
+    identity,
+    ...openDetails.filter((detail) => !projectDetailMatches(identity, detail))
+  ]);
+  state.notebooks = options.openNotebook && !openNotebookRecords.some((item) => projectDetailMatches(identity, item))
+    ? [...openNotebookRecords, identity]
+    : openNotebookRecords;
   state.workboards = keepGenericWorkboardOpen ? [genericWorkboardIdentity] : [];
-  state.reportDrafts = keepReportDraftOpen ? [identity] : [];
-  state.coordinations = keepCoordinationOpen ? [identity] : [];
-  state.coordinationThreads = [];
+  state.reportDrafts = options.openReportDraft && !openReportRecords.some((item) => projectDetailMatches(identity, item))
+    ? [...openReportRecords, identity]
+    : openReportRecords;
+  state.coordinations = releaseSurfaceVisibility.coordination && options.openCoordination &&
+    !openCoordinationRecords.some((item) => projectDetailMatches(identity, item))
+      ? [...openCoordinationRecords, identity]
+      : openCoordinationRecords;
   // Project switch replaces Project-owned Code Question context (no cross-project leak).
   if (codeQuestionWorkspaceEnabled()) {
     ensureCodeQuestionShellForProject(identity);
   } else if (state.codeQuestionWorkspace) {
     state.codeQuestionWorkspace = emptyCodeQuestionWorkspaceState();
   }
-  const notebookID = paneIDForProjectNotebook(identity);
-  const reportDraftID = paneIDForProjectReportDraft(identity);
-  const coordinationID = paneIDForProjectCoordination(identity);
-  if (keepNotebookOpen) {
-    state.paneWeights[notebookID] = Number(notebookWidth) > 40 ? notebookWidth : defaultNotebookPaneWidth;
-  }
-  if (keepReportDraftOpen) {
-    state.paneWeights[reportDraftID] = Number(reportDraftWidth) > 40
-      ? reportDraftWidth
-      : defaultReportDraftPaneWidth;
-  }
-  if (keepCoordinationOpen) {
-    state.paneWeights[coordinationID] = Number(coordinationWidth) > 40
-      ? coordinationWidth
-      : defaultCoordinationPaneWidth;
-  }
+  if (options.openNotebook) state.paneWeights[paneIDForProjectNotebook(identity)] ||= defaultNotebookPaneWidth;
+  if (options.openReportDraft) state.paneWeights[paneIDForProjectReportDraft(identity)] ||= defaultReportDraftPaneWidth;
+  if (options.openCoordination) state.paneWeights[paneIDForProjectCoordination(identity)] ||= defaultCoordinationPaneWidth;
   placeProjectDetailAfterProjects(identity, options.sourcePaneID);
   restoreProjectsStackOrder(options.sourcePaneID);
   if (current) syncProjectToolButtonStates(current);
@@ -3232,20 +3181,15 @@ function isProjectToolPaneID(paneID) {
 function pinCriticalWorkflowPanesToLeft(paneIDs) {
   const settingsPaneID = state.utilities.settings ? "utility:settings" : "";
   const projectsPaneIDs = new Set(savedPaneIDs());
-  const researchPaneIDs = new Set(
-    [
-      state.utilities.analysis ? "utility:analysis" : "",
-      ...openResearchConversationPaneIDs()
-    ].filter(Boolean)
-  );
+  const projectOwnedPaneIDs = new Set(openProjectDetails().flatMap(projectWorkspacePaneIDs));
   return [
     ...paneIDs.filter((paneID) => paneID === settingsPaneID),
     ...paneIDs.filter((paneID) => projectsPaneIDs.has(paneID)),
-    ...paneIDs.filter((paneID) => researchPaneIDs.has(paneID)),
+    ...paneIDs.filter((paneID) => projectOwnedPaneIDs.has(paneID)),
     ...paneIDs.filter((paneID) =>
       paneID !== settingsPaneID &&
       !projectsPaneIDs.has(paneID) &&
-      !researchPaneIDs.has(paneID)
+      !projectOwnedPaneIDs.has(paneID)
     )
   ];
 }

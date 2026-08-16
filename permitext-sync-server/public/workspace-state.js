@@ -50,11 +50,11 @@ function projectRecordsMatch(left, right) {
   return Boolean(leftName && rightName && leftName === rightName);
 }
 
-function activeProjectToolState(records, activeProject) {
-  if (!activeProject || !Array.isArray(records)) return [];
-  return records.some((record) => projectRecordsMatch(record, activeProject))
-    ? [copy(activeProject)]
-    : [];
+function openProjectToolState(records, openProjects) {
+  if (!Array.isArray(records) || !Array.isArray(openProjects)) return [];
+  return openProjects
+    .filter((project) => records.some((record) => projectRecordsMatch(record, project)))
+    .map(copy);
 }
 
 function genericWorkboardState(records) {
@@ -241,7 +241,7 @@ export function normalizeWorkspaceLayout(value = {}) {
     ? source.projectDetails
     : source.projectDetail && typeof source.projectDetail === "object" ? [source.projectDetail] : [])
     .filter((detail) => detail && typeof detail === "object")
-    .slice(0, 1)
+    .slice(0, 8)
     .map(copy);
   layout.projectDetail = layout.projectDetails[0] || null;
   layout.utilityInstances = Array.isArray(source.utilityInstances)
@@ -302,20 +302,19 @@ export function normalizeWorkspaceLayout(value = {}) {
   );
   const activeProject = layout.projectDetails[0] || null;
   layout.workboards = genericWorkboardState(source.workboards);
-  layout.notebooks = activeProjectToolState(source.notebooks, activeProject);
-  layout.reportDrafts = activeProjectToolState(source.reportDrafts, activeProject);
-  layout.coordinations = activeProjectToolState(source.coordinations, activeProject);
-  const coordinationThread = activeProject && layout.coordinations.length && Array.isArray(source.coordinationThreads)
-    ? source.coordinationThreads.find((thread) =>
+  layout.notebooks = openProjectToolState(source.notebooks, layout.projectDetails);
+  layout.reportDrafts = openProjectToolState(source.reportDrafts, layout.projectDetails);
+  layout.coordinations = openProjectToolState(source.coordinations, layout.projectDetails);
+  layout.coordinationThreads = Array.isArray(source.coordinationThreads)
+    ? source.coordinationThreads
+      .filter((thread) =>
         thread &&
         typeof thread === "object" &&
         typeof thread.threadID === "string" &&
         thread.threadID &&
-        projectRecordsMatch(thread, activeProject)
+        layout.coordinations.some((coordination) => projectRecordsMatch(thread, coordination))
       )
-    : null;
-  layout.coordinationThreads = coordinationThread
-    ? [{ ...copy(activeProject), threadID: coordinationThread.threadID }]
+      .map(copy)
     : [];
   layout.coordinationFilters = source.coordinationFilters && typeof source.coordinationFilters === "object"
     ? Object.fromEntries(
