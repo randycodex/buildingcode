@@ -3,12 +3,13 @@ export const notebookSchemaVersion = 2;
 export const notebookDocumentFormat = "blocknote-json";
 
 export const notebookReferenceKinds = Object.freeze([
+  // Legacy only: existing Notes may still contain links to retired Workboards.
+  "workboard",
   "canonicalSection",
   "selectedPassage",
   "researchAnswer",
   "notebookCard",
   "attachment",
-  "workboard",
   "reportDraft"
 ]);
 

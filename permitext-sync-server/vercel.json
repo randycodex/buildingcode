@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run verify:deploy-content && npm run build:workboard",
+  "buildCommand": "npm run verify:deploy-content && npm run build:clients",
   "outputDirectory": "public",
   "headers": [
     {
@@ -91,10 +91,6 @@
     },
     {
       "source": "/web/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/detached-workboard",
       "destination": "/index.html"
     },
     {

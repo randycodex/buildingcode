@@ -64,20 +64,6 @@ const functionSource = (name, nextName) => workspaceApp.slice(
   workspaceApp.indexOf(name),
   workspaceApp.indexOf(nextName, workspaceApp.indexOf(name) + name.length)
 );
-const workboardStyleLoader = functionSource(
-  "function loadWorkboardStyles()",
-  "function loadNotebookModule()"
-);
-assert(
-  workboardStyleLoader.includes('link[href*="/web/workboard-assets/workboard.css"]') &&
-    workboardStyleLoader.includes("let settled = false") &&
-    workboardStyleLoader.indexOf('link.addEventListener("load", handleLoad)') <
-      workboardStyleLoader.indexOf("if (link.sheet) settle(resolve)") &&
-    workboardStyleLoader.includes('link.removeEventListener("load", handleLoad)') &&
-    workboardStyleLoader.includes('link.removeEventListener("error", handleError)'),
-  "The lazy Workboard stylesheet loader must reuse an existing link without missing its load event or settling twice."
-);
-
 const syncReconciliation = functionSource(
   "async function refreshSyncedWorkspaceInPlace(options = {})",
   "function canRunForegroundSync()"

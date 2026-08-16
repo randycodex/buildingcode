@@ -78,7 +78,6 @@ function isPublicAppNavigation(url) {
   return url.pathname === "/" ||
     url.pathname === "/web" ||
     url.pathname === "/web/" ||
-    url.pathname === "/detached-workboard" ||
     url.pathname.startsWith("/open/section/");
 }
 

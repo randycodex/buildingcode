@@ -172,9 +172,7 @@ async function main() {
     join(evaluationResultsPath, "smoke-run.json"),
     `${JSON.stringify(evaluationRun, null, 2)}\n`
   );
-  const workboardSource = await readFile(new URL("../src/workboard.jsx", import.meta.url), "utf8");
   const notebookEditorSource = await readFile(new URL("../src/notebook-editor.js", import.meta.url), "utf8");
-  const workboardStyleSource = await readFile(new URL("../src/workboard.css", import.meta.url), "utf8");
   const iosUserDataStoreSource = await readFile(
     new URL("../../NYC CC APP/permitext/Data/UserDataStore.swift", import.meta.url),
     "utf8"
@@ -810,7 +808,6 @@ async function main() {
     assert(
       workspaceScript.text.includes("async function activateProjectStudio(project, options = {})") &&
         workspaceScript.text.includes("state.notebooks = keepNotebookOpen ? [identity] : []") &&
-        workspaceScript.text.includes("state.workboards = keepGenericWorkboardOpen ? [genericWorkboardIdentity] : []") &&
         workspaceScript.text.includes("state.reportDrafts = keepReportDraftOpen ? [identity] : []") &&
         workspaceScript.text.includes("confirmDiscardIfNeeded()") &&
         workspaceScript.text.includes("Discard unsaved Report changes?") &&
@@ -2951,46 +2948,7 @@ async function main() {
       "Reader header controls are no longer equally spaced and center-aligned."
     );
 
-    const workboardScript = await request("/web/workboard-assets/workboard.js");
-    assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
-    assert(
-      workspaceScript.text.includes('const workboardClientVersion = "20260801-workboard-control-align-v31";') &&
-        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68"') &&
-        workspaceScript.text.includes('link[href*="/web/workboard-assets/workboard.css"]') &&
-        !webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68'),
-      "Workboard styles should load once, on demand, instead of blocking every workspace load."
-    );
-    assert(
-      workboardScript.response.headers.get("content-type")?.includes("javascript"),
-      "Workboard script asset returned the wrong content type."
-    );
-    assert(
-      workboardScript.response.headers.get("cache-control")?.includes("immutable"),
-      "Versioned Workboard assets were not browser-cacheable."
-    );
-    assert(
-      workboardSource.includes("function usePreferredTheme()") &&
-        workboardSource.includes('"viewBackgroundColor",') &&
-        workboardSource.includes("changeViewBackgroundColor: true") &&
-        workboardSource.includes('mediaQuery.addEventListener("change", updateTheme)') &&
-        workboardSource.includes("theme={theme}"),
-      "Workboard no longer follows live system appearance changes."
-    );
-    assert(
-      webRoot.text.includes('id="toggle-workboard"') &&
-        webRoot.text.includes('data-deferred-feature="workboard" hidden') &&
-        workspaceScript.text.includes("workboard: false") &&
-        workspaceScript.text.includes('toggleWorkboardButton.style.display = releaseSurfaceVisibility.workboard ? "" : "none"') &&
-        workspaceScript.text.includes("if (!releaseSurfaceVisibility.workboard && !detachedProjectWindow) return false;") &&
-        workspaceScript.text.includes('id: "permitext-generic-workboard"') &&
-        workspaceScript.text.includes("const syncEnabled = !isGeneric && Boolean(activeAccount())") &&
-        workspaceScript.text.includes("saveSyncedBoard: isGeneric ? null : saveSyncedWorkboard") &&
-        workspaceScript.text.includes("function retireProjectWorkboardSyncState()") &&
-        !workspaceScript.text.includes('workboardButton.textContent = "Workboard"') &&
-        !iosBookmarksSource.includes("Workboard editing stays on the web") &&
-        !iosOrganizationProjectHubSource.includes("Workboard preview"),
-      "Deferred Workboard must stay hidden from web and iOS while its implementation and data compatibility remain preserved."
-    );
+
     assert(
       workspaceScript.text.includes("function placeProjectToolPaneLast(detail, paneID)") &&
         workspaceScript.text.includes("if (!wasOpen) placeProjectToolPaneLast(identity, coordinationID)") &&
@@ -3009,61 +2967,6 @@ async function main() {
         iosBookmarksSource.includes('PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"'),
       "Deferred Coordination must stay hidden and blocked on web and iOS while its implementation remains preserved."
     );
-    assert(
-      workboardSource.includes("const preventWheelPanning = (event) =>") &&
-        workboardSource.includes("if (event.ctrlKey || event.metaKey) return;") &&
-        workboardSource.includes("event.stopImmediatePropagation();") &&
-        workboardSource.includes('host.addEventListener("wheel", preventWheelPanning, { capture: true, passive: false })'),
-      "Workboard wheel panning guard no longer preserves trackpad and modified-wheel zoom gestures."
-    );
-    assert(
-        !workboardSource.includes("permitext-workboard-zoom-controls") &&
-        !workboardSource.includes('aria-label="Reset zoom"') &&
-        !workboardSource.includes("New local board") &&
-        workboardSource.includes('status === "Synced" || status === "Saved locally" ? "" : status') &&
-        workboardSource.includes('visibleStatus ? <span className="permitext-workboard-save-state"') &&
-        workboardStyleSource.includes("width: var(--panel-title-control-size, 18px);") &&
-        workboardStyleSource.includes("color: var(--text-secondary, #8f8f96);") &&
-        workboardStyleSource.includes("width: var(--panel-title-icon-size, 16px);") &&
-        workboardStyleSource.includes(".permitext-workboard .help-icon {\n  display: none !important;"),
-      "Workboard header controls no longer match the shared workspace icon metrics."
-    );
-    assert(
-      workboardSource.includes("exportToBlob") &&
-        workboardSource.includes("await savePreview(null") &&
-        workboardSource.includes("await savePreview(blob") &&
-        workspaceScript.text.includes("async function saveWorkboardPreview") &&
-        workspaceScript.text.includes('postJSON("/workboards/previews/clear"') &&
-        workspaceScript.text.includes('new URL("/workboards/previews/upload"'),
-      "Workboard no longer persists its flattened Project preview after a successful sync."
-    );
-    const workboardStyles = await request("/web/workboard-assets/workboard.css");
-    assert(workboardStyles.response.ok, "Nested Workboard stylesheet asset did not load.");
-    assert(
-      workboardStyles.response.headers.get("content-type")?.includes("text/css"),
-      "Workboard stylesheet asset returned the wrong content type."
-    );
-    assert(
-      workboardStyleSource.includes("--color-surface-primary-container:") &&
-        workboardStyleSource.includes("--color-brand-active: var(--project-color"),
-      "Workboard active tools no longer inherit the project color."
-    );
-    assert(
-      workboardStyleSource.includes("--project-pane-band-background") &&
-        workboardStyleSource.includes("color-mix(in srgb, var(--project-color, #c96410) 42%, var(--surface, #fff))") &&
-        workboardStyleSource.includes("top: var(--panel-padding, 24px);") &&
-        workboardStyleSource.includes("right: 16px;") &&
-        workboardStyleSource.match(/background: var\(--surface-raised, #fff\);/g)?.length >= 2,
-      "Workboard no longer limits the owning Project color to its aligned header band."
-    );
-    const workboardFont = await request(
-      "/web/workboard-assets/fonts/Xiaolai/Xiaolai-Regular-353f33792a8f60dc69323ddf635a269e.woff2"
-    );
-    assert(workboardFont.response.ok, "Nested Workboard font asset did not load.");
-    assert(
-      workboardFont.response.headers.get("content-type")?.includes("font/woff2"),
-      "Workboard font asset returned the wrong content type."
-    );
 
     const sharedSectionLink = await request("/open/section/8881");
     assert(sharedSectionLink.response.ok, "Shared section URL did not load the web workspace.");
@@ -3074,12 +2977,6 @@ async function main() {
     const zoningSectionLink = await request("/open/section/20018521");
     assert(zoningSectionLink.response.ok, "Zoning section URL did not load the web workspace.");
 
-    const detachedWorkboard = await request("/detached-workboard");
-    assert(detachedWorkboard.response.ok, "Detached Workboard URL did not load the web workspace.");
-    assert(
-      detachedWorkboard.response.headers.get("content-type")?.includes("text/html"),
-      "Detached Workboard URL did not return the web workspace HTML."
-    );
 
     const canonicalOverrideSection = await request("/code/sections/8881");
     assert(canonicalOverrideSection.response.ok, "Canonical section override did not load.");

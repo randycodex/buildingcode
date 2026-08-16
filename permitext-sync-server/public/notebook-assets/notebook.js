@@ -50150,12 +50150,12 @@ gX[2], gX[6], gX[2], gX[6], gX[2], gX[7], gX[2], gX[7], gX[2], gX[8], gX[5], gX[
 //#endregion
 //#region src/notebook-schema.js
 var vX = "permitext-notebook-card", yX = "blocknote-json", bX = Object.freeze([
+	"workboard",
 	"canonicalSection",
 	"selectedPassage",
 	"researchAnswer",
 	"notebookCard",
 	"attachment",
-	"workboard",
 	"reportDraft"
 ]), xX = Object.freeze([
 	"paragraph",

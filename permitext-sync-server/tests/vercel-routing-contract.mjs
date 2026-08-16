@@ -10,7 +10,7 @@ assert.equal(
   "A universal Function rewrite would send static assets, unknown paths, and bot traffic through Fluid Compute."
 );
 
-for (const source of ["/web", "/web/", "/detached-workboard", "/open/section/:path*"]) {
+for (const source of ["/web", "/web/", "/open/section/:path*"]) {
   assert.equal(rewrites.get(source), "/index.html", `${source} must resolve to the static app shell.`);
 }
 for (const source of ["/privacy", "/privacy/"]) {

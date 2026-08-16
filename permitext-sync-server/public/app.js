@@ -268,13 +268,7 @@ const toggleAnalysisButton = document.querySelector("#toggle-analysis") || (() =
   topbarActions?.append(button);
   return button;
 })();
-const toggleWorkboardButton = document.querySelector("#toggle-workboard");
-if (toggleWorkboardButton) {
-  toggleWorkboardButton.hidden = !releaseSurfaceVisibility.workboard;
-  toggleWorkboardButton.disabled = !releaseSurfaceVisibility.workboard;
-  toggleWorkboardButton.style.display = releaseSurfaceVisibility.workboard ? "" : "none";
-  toggleWorkboardButton.setAttribute("aria-hidden", String(!releaseSurfaceVisibility.workboard));
-}
+const toggleWorkboardButton = null;
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
@@ -295,7 +289,6 @@ const searchTemplate = document.querySelector("#search-template");
 const savedTemplate = document.querySelector("#saved-template");
 const analysisTemplate = document.querySelector("#analysis-template");
 const settingsTemplate = document.querySelector("#settings-template");
-if (detachedWorkboardRoute) document.body.classList.add("is-detached-workboard-window");
 
 const codeOptions = [
   { prefix: "BC", label: "Building Code", theme: "building", group: "2022 Construction Codes" },
@@ -19972,15 +19965,6 @@ async function notebookReferenceCandidates(project, foundation, cards) {
       label: `Notebook: ${card.title}`
     });
   });
-  activeLinks.filter((link) =>
-    releaseSurfaceVisibility.workboard && link.targetKind === "workboard"
-  ).forEach((link) => {
-    references.push({
-      referenceKind: "workboard",
-      referenceID: String(link.targetID),
-      label: "Project Workboard"
-    });
-  });
   return references
     .filter((reference, index, all) =>
       all.findIndex((candidate) =>
@@ -20027,7 +20011,10 @@ async function openNotebookReference(project, foundation, reference, selectCard,
     return;
   }
   if (reference.referenceKind === "workboard") {
-    await openProjectWorkboard(project);
+    await showWebNotice(
+      "Legacy Workboard reference",
+      "This reference is preserved for the historical Notebook record, but Workboard has been retired and can no longer be opened."
+    );
     return;
   }
   await showWebNotice(

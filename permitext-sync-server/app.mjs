@@ -23550,6 +23550,7 @@ const handlers = {
   "internal/evaluations/data": handleInternalEvaluationData,
   "internal/evaluations/review": handleInternalEvaluationReview,
   "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,
+  // Legacy authenticated compatibility only. No current client exposes these writers.
   "workboards/assets/upload": handleWorkboardAssetUpload,
   "workboards/assets/read": handleWorkboardAssetRead,
   "workboards/assets/delete": handleWorkboardAssetDelete,
@@ -23580,7 +23581,6 @@ async function handleRequestUnlocked(request, response) {
         path === "" ||
         path === "web" ||
         path === "web/" ||
-        path === "detached-workboard" ||
         path.startsWith("open/section/")
       )
     ) {
