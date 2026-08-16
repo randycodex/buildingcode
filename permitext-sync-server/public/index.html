@@ -9,31 +9,34 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/web/styles.css?v=20260815-topbar-workspace-actions-v261">
+    <link rel="stylesheet" href="/web/styles.css?v=20260816-topbar-words-v263">
   </head>
   <body>
     <main class="workspace-shell">
       <header class="topbar">
         <nav class="topbar-actions" aria-label="Workspace tools">
-          <button class="toolbar-button" id="add-reader" type="button" aria-label="Add reader" title="Add reader" data-mobile-label="Reader" data-icon-only>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
-              <path d="m9 9.5 2 2 4-4"></path>
-            </svg>
-          </button>
-          <button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search" data-icon-only>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m21 21-4.34-4.34"></path>
-              <circle cx="11" cy="11" r="8"></circle>
-            </svg>
-          </button>
-          <button class="toolbar-button" id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false" data-mobile-label="Projects" data-icon-only>
+          <button class="toolbar-button" id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false" data-mobile-label="Projects">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
               <circle cx="12" cy="13" r="1"></circle>
             </svg>
+            <span>Projects</span>
           </button>
-          <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Research" title="Research" aria-pressed="false" data-mobile-label="Research" data-icon-only>
+          <button class="toolbar-button" id="add-reader" type="button" aria-label="Add reader" title="Add reader" data-mobile-label="Reader">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path>
+              <path d="m9 9.5 2 2 4-4"></path>
+            </svg>
+            <span>Reader</span>
+          </button>
+          <button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false" data-mobile-label="Search">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21 21-4.34-4.34"></path>
+              <circle cx="11" cy="11" r="8"></circle>
+            </svg>
+            <span>Search</span>
+          </button>
+          <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Research" title="Research" aria-pressed="false" data-mobile-label="Research">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 18V5"></path>
               <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"></path>
@@ -44,6 +47,7 @@
               <path d="M6 18a4 4 0 0 1-2-7.464"></path>
               <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"></path>
             </svg>
+            <span>Research</span>
           </button>
           <button class="toolbar-button" id="toggle-workboard" type="button" aria-label="Workboard" title="Workboard" aria-pressed="false" data-deferred-feature="workboard" hidden>Workboard</button>
           <button class="mobile-more-button" id="mobile-more" type="button" aria-label="More" title="More" aria-haspopup="dialog" aria-expanded="false" data-mobile-label="More">
@@ -52,35 +56,19 @@
               <circle cx="12" cy="12" r="1.5"></circle>
               <circle cx="19" cy="12" r="1.5"></circle>
             </svg>
+            <span>More</span>
           </button>
         </nav>
         <div class="topbar-workspaces" aria-label="Workspaces">
           <div class="workspace-tabs" id="workspace-tabs" role="tablist" aria-label="Workspaces"></div>
-          <button class="workspace-add-button" id="add-workspace" type="button" aria-label="Create workspace" title="Create workspace">+</button>
-          <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Workspace actions" title="Workspace actions" aria-haspopup="menu">•••</button>
+          <button class="workspace-add-button" id="add-workspace" type="button" aria-label="Create workspace" title="Create workspace">New</button>
+          <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Workspace actions" title="Workspace actions" aria-haspopup="menu">Manage</button>
         </div>
         <div class="topbar-layout-actions" aria-label="Column layout">
-          <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset column widths" title="Reset column widths" data-icon-only>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-              <path d="M3 3v5h5"></path>
-            </svg>
-          </button>
-          <button class="toolbar-button" id="collapse-readers" type="button" aria-label="Close all columns" title="Close all columns" data-icon-only>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M8 3v3a2 2 0 0 1-2 2H3"></path>
-              <path d="M21 8h-3a2 2 0 0 1-2-2V3"></path>
-              <path d="M3 16h3a2 2 0 0 1 2 2v3"></path>
-              <path d="M16 21v-3a2 2 0 0 1 2-2h3"></path>
-            </svg>
-          </button>
+          <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset workspace" title="Reset column widths">Reset workspace</button>
+          <button class="toolbar-button" id="collapse-readers" type="button" aria-label="Close all columns" title="Close all columns">Close all</button>
         </div>
-        <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false">
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-        </button>
+        <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false">Settings</button>
         <div class="topbar-account-state">
           <span class="connection-status" id="connection-status" role="status" aria-live="polite">Online</span>
           <div class="topbar-brand" aria-label="permitext">
@@ -587,6 +575,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260815-topbar-workspace-actions-v261" type="module"></script>
+    <script src="/web/app.js?v=20260816-topbar-words-v263" type="module"></script>
   </body>
 </html>

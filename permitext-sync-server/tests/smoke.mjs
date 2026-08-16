@@ -360,9 +360,9 @@ async function main() {
     );
     const topbarGroupOrder = [
       'class="topbar-actions"',
+      'id="toggle-saved"',
       'id="add-reader"',
       'id="toggle-search"',
-      'id="toggle-saved"',
       'id="toggle-analysis"',
       'class="topbar-workspaces"',
       'class="topbar-layout-actions"',
@@ -376,8 +376,8 @@ async function main() {
       "Web topbar tools or right-side workspace controls are no longer in their intended order."
     );
     assert(
-      topbarSource.includes('id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false" data-icon-only>'),
-      "The Projects toolbar control no longer exposes its icon-only accessible label."
+      topbarSource.includes('id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false" data-mobile-label="Projects">'),
+      "The Projects toolbar control no longer exposes its visible and accessible label."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -526,7 +526,7 @@ async function main() {
       webRoot.text.includes('id="workspace-tabs"') &&
         webRoot.text.includes('id="add-workspace"') &&
         webRoot.text.includes('id="workspace-actions"') &&
-        webRoot.text.includes('id="collapse-readers" type="button" aria-label="Close all columns" title="Close all columns" data-icon-only>') &&
+        webRoot.text.includes('id="collapse-readers" type="button" aria-label="Close all columns" title="Close all columns">Close all</button>') &&
         !webRoot.text.includes(">One Reader</button>") &&
         workspaceScript.text.includes('const workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
         workspaceScript.text.includes('const toolbarOrderKey = "permitext:webToolbarOrder:v1"') &&
@@ -1439,7 +1439,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260815-topbar-workspace-actions-v261'),
+        webRoot.text.includes('/web/app.js?v=20260816-topbar-words-v263'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1600,7 +1600,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-topbar-workspace-actions-v261'),
+      webRoot.text.includes('/web/styles.css?v=20260816-topbar-words-v263'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1874,7 +1874,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260815-topbar-workspace-actions-v261'),
+      webRoot.text.includes('/web/styles.css?v=20260816-topbar-words-v263'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

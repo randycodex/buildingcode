@@ -502,14 +502,14 @@ textarea:focus-visible {
   gap: var(--space-3);
   padding: 0 clamp(22px, 3vw, 46px);
   border-bottom: 1px solid var(--border);
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .topbar button,
 .topbar input,
 .topbar .connection-status,
 .topbar .topbar-brand-plan {
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .workspace-issue {
@@ -847,42 +847,29 @@ textarea:focus-visible {
 
 .workspace-add-button,
 .workspace-actions-button {
-  display: grid;
-  width: 40px;
-  flex: 0 0 40px;
-  padding: 0;
-  place-items: center;
+  display: inline-flex;
+  width: auto;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 0 11px;
   cursor: pointer;
-  font-weight: 700;
-}
-
-.workspace-add-button {
-  font-size: 20px;
-  line-height: 1;
-}
-
-.workspace-actions-button {
   font-size: 12px;
-  letter-spacing: 1px;
+  font-weight: 600;
 }
 
 .topbar-settings-button {
-  display: grid;
-  width: 40px;
+  display: inline-flex;
+  width: auto;
   height: 40px;
-  flex: 0 0 40px;
-  place-items: center;
-  padding: 0;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 0 12px;
   border: 0;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 8%, transparent);
   color: var(--text-secondary);
   cursor: pointer;
-}
-
-.topbar-settings-button svg {
-  width: 18px;
-  height: 18px;
+  font-size: 14px;
 }
 
 .topbar-settings-button:hover,
@@ -1772,16 +1759,9 @@ body.is-detached-workboard-window .detached-workboard-error p {
   box-shadow: none;
 }
 
-.topbar .toolbar-button[data-icon-only] {
-  justify-content: center;
-  width: 40px;
-  min-height: 40px;
-  padding: 0;
-}
-
-.topbar .toolbar-button[data-icon-only] svg {
-  width: 18px;
-  height: 18px;
+.topbar .toolbar-button > svg,
+.topbar .mobile-more-button > svg {
+  display: none;
 }
 
 .topbar .toolbar-button[draggable="true"] {
@@ -12907,13 +12887,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
     text-transform: none;
   }
 
-  .topbar .toolbar-button::after,
-  .topbar .mobile-more-button::after {
-    content: attr(data-mobile-label);
-  }
-
-  .topbar .toolbar-button svg,
-  .topbar .mobile-more-button svg {
+  .topbar .toolbar-button > svg,
+  .topbar .mobile-more-button > svg {
+    display: block;
     width: 21px;
     height: 21px;
   }
