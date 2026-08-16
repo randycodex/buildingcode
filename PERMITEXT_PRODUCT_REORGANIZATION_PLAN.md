@@ -292,6 +292,19 @@ The reorganization changes how users reach and understand these systems, not the
 - Demote specialized systems.
 - Simplify the mobile hierarchy.
 
+### Step 20 completion audit — August 16, 2026
+
+The four controlled phases are complete for the desktop web workspace:
+
+- **Phase 1 — Complete.** Projects anchors the workspace; the top bar, product vocabulary, column names, and column responsibilities have been simplified and standardized. Saved work is reached through Projects rather than duplicated as another primary top-bar destination.
+- **Phase 2 — Complete.** Passage saving is immediate; Project context is inherited but editable; enacted sources open in Reader; Search stays separate; and Research can begin directly from Reader, Saved evidence, Project context, or its own composer.
+- **Phase 3 — Complete.** Notebook is the professional writing surface; evidence relationships are optional; Note-to-Report promotion uses Add to Report and Update in Report; and Report remains a persistent editable document with revision-aware source relationships.
+- **Phase 4 — Complete for desktop.** Governance machinery is removed from ordinary navigation, specialized systems are hidden or retired from the product surface, and the desktop column model uses progressive disclosure.
+
+The original mobile-web hierarchy in Step 18 is intentionally superseded, not incomplete. Mobile visitors to permitext.com will eventually receive a focused prompt to download the iOS app instead of a reduced web workspace. The native iOS app retains its icons and adds text labels. The download prompt and final iOS labeling are separate future implementation work.
+
+No record migration is required. The completion audit confirms that workspace layouts control presentation only and do not replace Saved evidence, Research history, Notebook cards, Reports, Project associations, governance records, or their versions.
+
 ## Implementation rule
 
 Work through this plan one numbered step at a time. Before changing a step:
