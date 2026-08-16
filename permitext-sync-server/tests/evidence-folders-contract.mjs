@@ -601,8 +601,7 @@ assert.match(stylesSource, /\.saved-project-fact-input:focus-visible \{[\s\S]*?b
 assert.match(stylesSource, /\.saved-project-structured-fact-value,[\s\S]*?\.saved-project-structured-fact-label-input \{[^}]*background: transparent;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*text-align: right;/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value \{[^}]*min-width: 144px;[^}]*max-width: 100%;[^}]*justify-self: end;[^}]*field-sizing: content;/);
-assert.match(stylesSource, /\.saved-project-structured-fact \+ \.saved-project-structured-fact \{[^}]*border-top: 1px solid var\(--border\);/);
-assert.match(stylesSource, /\.saved-project-structured-fact\.is-custom \+ \.saved-project-structured-fact\.is-custom \{[^}]*border-top: 1px solid var\(--border\);/);
+assert.match(stylesSource, /\.saved-project-structured-fact \+ \.saved-project-structured-fact::before,[\s\S]*?\.saved-project-evidence-body \.saved-code-group \.saved-row::after \{[^}]*right: 0;[^}]*left: 0;[^}]*height: 1px;[^}]*background: var\(--border\);/);
 assert.match(stylesSource, /\.saved-project-structured-fact-value:focus-visible,[^}]*box-shadow: none;/);
 assert.match(stylesSource, /\.saved-evidence-heading-actions button,[\s\S]*?button\[aria-pressed="true"\] \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.saved-project-list:has\(\.saved-project-tile\.is-selected\) \.saved-project-tile:not\(\.is-selected\) \{[\s\S]*?opacity: 0\.58;/);
@@ -651,6 +650,7 @@ assert.match(stylesSource, /\.project-studio-section-heading > \.saved-project-r
 assert.match(stylesSource, /\.saved-project-structured-group \{[\s\S]*?gap: 0;[\s\S]*?\.saved-project-structured-group\.project-section-motion\.is-open > \.saved-project-structured-group-body \{[\s\S]*?padding-top: 2px;/);
 assert.match(stylesSource, /\.saved-project-structured-facts-list \{[^}]*width: calc\(100% \+ \(2 \* var\(--space-3\)\)\);[^}]*margin-inline: calc\(-1 \* var\(--space-3\)\);/);
 assert.match(stylesSource, /\.saved-project-structured-fact \{[^}]*padding: var\(--space-2\) var\(--space-3\);/);
+assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-evidence-body \.saved-code-group \.saved-row \{[^}]*width: calc\(100% \+ \(2 \* var\(--space-3\)\)\);[^}]*margin-inline: calc\(-1 \* var\(--space-3\)\);[^}]*border-bottom: 0;/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote/);
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-auto-flow: column;[\s\S]*?grid-auto-columns: minmax\(0, 1fr\);[\s\S]*?width: 100%;/);
