@@ -494,6 +494,9 @@ async function main() {
       workspaceScript.text.indexOf("async function start()"),
       workspaceScript.text.indexOf("start().catch")
     );
+    const startupChapterCatalogIndex = workspaceStartupSource.search(
+      /api\("\/code\/chapters(?:\?view=startup)?"\)/
+    );
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(
       interFont.response.ok && sourceSerifFont.response.ok &&
@@ -613,7 +616,8 @@ async function main() {
         workspaceScript.text.includes("function hydrateSavedPanelWhenConnected") &&
         !workspaceScript.text.includes('appendMutedRow(content, "Loading saved content"') &&
         workspaceStartupSource.indexOf("bindImmediateUtilityControls();") >= 0 &&
-        workspaceStartupSource.indexOf("bindImmediateUtilityControls();") < workspaceStartupSource.indexOf('api("/code/chapters")'),
+        startupChapterCatalogIndex >= 0 &&
+        workspaceStartupSource.indexOf("bindImmediateUtilityControls();") < startupChapterCatalogIndex,
       "Search and Saved must bind before cold-start catalogs load, and Saved must hydrate after its shell is mounted."
     );
     assert(
@@ -1433,7 +1437,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-reader-demand-v336'),
+        webRoot.text.includes('/web/app.js?v=20260816-project-artifact-checkpoints-v341'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

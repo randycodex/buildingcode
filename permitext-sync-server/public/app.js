@@ -50,6 +50,15 @@ import {
   saveOfflineSyncSnapshot,
   stageNotebookImage
 } from "./offline-storage.js?v=20260816-reader-demand-v336";
+import {
+  accountArtifactRevisionKey,
+  normalizeAccountArtifactRevisionEnvelope,
+  normalizeProjectArtifactRevisionEnvelope,
+  projectArtifactRefreshPlan,
+  reduceAccountArtifactRevision,
+  reduceProjectArtifactRevisions,
+  uniqueProjectArtifactConsumerIDs
+} from "./project-artifact-checkpoints.js?v=20260816-project-artifact-checkpoints-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -430,6 +439,12 @@ const foregroundSyncTabID = crypto.randomUUID?.() || `${Date.now()}-${Math.rando
 const foregroundSyncLeaseKeyPrefix = "permitext:sync-leader:";
 const foregroundSyncSignalKey = "permitext:sync-signal";
 let foregroundSyncChannel = null;
+let projectArtifactCheckpointTimer = null;
+let projectArtifactCheckpointPromise = null;
+let projectArtifactCheckpointPending = false;
+const projectArtifactRevisions = new Map();
+const accountArtifactRevisions = new Map();
+let projectArtifactConsumerRefreshQueue = Promise.resolve();
 let continuityPushTimer = null;
 let draggedPaneID = "";
 let dragPreviewOrder = [];
@@ -1874,6 +1889,7 @@ async function openProjectNotebook(project) {
   saveWorkspaceState();
   await transitionWorkspace("utility");
   scrollPaneIntoView(notebookID);
+  startProjectArtifactCheckpointLoop({ immediate: true });
   return true;
 }
 
@@ -1907,6 +1923,7 @@ async function openProjectReportDraft(project) {
   saveWorkspaceState();
   await transitionWorkspace("utility");
   scrollPaneIntoView(reportDraftID);
+  startProjectArtifactCheckpointLoop({ immediate: true });
   return true;
 }
 
@@ -3635,17 +3652,97 @@ async function refreshProjectSourceConsumers(projects = [], options = {}) {
   const refreshes = [];
   projectIDs.forEach((projectID) => {
     const notebook = notebookMounts.get(projectID);
-    if (typeof notebook?.refreshReferenceSources === "function") {
+    if (options.refreshNotebookCards === true && typeof notebook?.refreshCards === "function") {
+      refreshes.push(notebook.refreshCards());
+    }
+    if (options.refreshNotebookReferences !== false && typeof notebook?.refreshReferenceSources === "function") {
       refreshes.push(notebook.refreshReferenceSources({
         refreshFoundation: options.refreshNotebookFoundation === true
       }));
     }
+    if (options.refreshNotebookReportStatus === true && typeof notebook?.refreshReportStatus === "function") {
+      refreshes.push(notebook.refreshReportStatus());
+    }
     const report = reportDraftMounts.get(projectID);
-    if (typeof report?.refreshSources === "function") {
+    if (options.refreshReportArtifacts === true && typeof report?.refreshArtifacts === "function") {
+      refreshes.push(report.refreshArtifacts());
+    } else if (options.refreshReportSources !== false && typeof report?.refreshSources === "function") {
       refreshes.push(report.refreshSources());
     }
   });
   await Promise.all(refreshes.map((refresh) => Promise.resolve(refresh).catch(() => false)));
+}
+
+async function refreshVisibleProjectArtifactSummaries(projectID) {
+  const deferUntilEditorBlur = (paneID, panel) => {
+    if (!panel || panel.dataset.projectArtifactRefreshPending === "true") return;
+    panel.dataset.projectArtifactRefreshPending = "true";
+    panel.addEventListener("focusout", () => {
+      window.setTimeout(() => {
+        if (!panel.isConnected) return;
+        delete panel.dataset.projectArtifactRefreshPending;
+        void refreshVisibleProjectArtifactSummaries(projectID);
+      }, 0);
+    }, { once: true });
+  };
+  const savedRefreshes = savedPaneIDs().flatMap((paneID) => {
+    const panel = track.querySelector(`.saved-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    const context = panel?.querySelector(
+      `.saved-folder-context.is-project[data-project-id="${CSS.escape(projectID)}"]`
+    );
+    if (!panel?.isConnected || !context) return [];
+    if (workspacePaneHasFocusedEditor(paneID)) {
+      deferUntilEditorBlur(paneID, panel);
+      return [];
+    }
+    return [refreshSavedPanelInPlace(paneID, {
+      reconcileProjectStudio: false,
+      preserveProjectChrome: true
+    }).catch(() => false)];
+  });
+  if (savedRefreshes.length) {
+    await Promise.all(savedRefreshes);
+    return true;
+  }
+  const project = visibleProjectRecords(currentContentSummary().projects || [])
+    .find((item) => projectDetailKey(projectIdentity(item)) === projectID);
+  if (!project) return false;
+  const paneID = paneIDForProjectDetail(projectIdentity(project));
+  const panel = track.querySelector(`.project-detail-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (!panel?.isConnected) return false;
+  if (workspacePaneHasFocusedEditor(paneID)) {
+    deferUntilEditorBlur(paneID, panel);
+    return false;
+  }
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  return true;
+}
+
+function refreshMountedResearchProjectContext(projectID) {
+  const project = researchProjects().find((item) => researchProjectID(item) === projectID);
+  if (!project) return false;
+  const label = researchProjectName(projectID);
+  track.querySelectorAll(".research-conversation-row[data-conversation-id]").forEach((row) => {
+    const conversation = researchConversationList.find((item) => item.id === row.dataset.conversationId);
+    if (conversation?.primaryProjectID !== projectID) return;
+    const pill = row.querySelector(".research-conversation-project-pill");
+    if (pill) {
+      pill.textContent = label;
+      pill.style.setProperty("--project-color", projectColor(project));
+    }
+  });
+  track.querySelectorAll(`.research-conversation-panel[data-project-id="${CSS.escape(projectID)}"]`)
+    .forEach((panel) => {
+      panel.style.setProperty("--project-color", projectColor(project));
+      const select = panel.querySelector(".research-conversation-header-project");
+      const option = select?.querySelector(`option[value="${CSS.escape(projectID)}"]`);
+      if (option) option.textContent = label;
+      if (select) {
+        select.title = `This conversation is in ${label}`;
+        select._syncCustomSelect?.();
+      }
+    });
+  return true;
 }
 
 function placeProjectDetailAfterProjects(detail, sourcePaneID = primarySavedPaneID()) {
@@ -8962,6 +9059,318 @@ function releaseForegroundSyncLeadership() {
   }
 }
 
+function visibleProjectArtifactIDs() {
+  const consumerIDs = [];
+  notebookMounts.forEach((mounted, projectID) => {
+    if (mounted.panel?.isConnected) consumerIDs.push(projectID);
+  });
+  reportDraftMounts.forEach((mounted, projectID) => {
+    if (mounted.panel?.isConnected) consumerIDs.push(projectID);
+  });
+  track.querySelectorAll(".workspace-panel[data-project-id], .saved-folder-context.is-project[data-project-id]")
+    .forEach((element) => {
+      if (element.isConnected) consumerIDs.push(element.dataset.projectId);
+    });
+  return uniqueProjectArtifactConsumerIDs(consumerIDs);
+}
+
+function researchArtifactConsumersVisible() {
+  return Boolean(track.querySelector(
+    ".research-list-panel.is-connected, .research-conversation-panel.is-connected"
+  )) || Boolean(track.querySelector(".research-list-panel, .research-conversation-panel"));
+}
+
+function currentProjectArtifactScope() {
+  const account = activeAccount();
+  return {
+    accountUserID: account?.userID || "",
+    sessionToken: account?.sessionToken || "",
+    workspaceID: activeWorkspaceID,
+    researchVisible: researchArtifactConsumersVisible(),
+    visibleProjectIDs: new Set(visibleProjectArtifactIDs())
+  };
+}
+
+async function refreshVisibleResearchArtifactConsumers() {
+  const account = activeAccount();
+  const workspaceID = activeWorkspaceID;
+  const paneIDs = [];
+  if (track.querySelector('.research-list-panel[data-pane-id="utility:analysis"]')) {
+    paneIDs.push("utility:analysis");
+  }
+  const conversationIDs = [];
+  if (
+    researchConversationPaneIsOpen() &&
+    track.querySelector(`.research-conversation-panel[data-pane-id="${CSS.escape(paneIDForResearchConversation())}"]`)
+  ) {
+    conversationIDs.push(state.researchConversationID);
+  }
+  supplementalResearchConversationIDs.forEach((conversationID) => {
+    const paneID = paneIDForResearchConversation(conversationID);
+    if (track.querySelector(`.research-conversation-panel[data-pane-id="${CSS.escape(paneID)}"]`)) {
+      conversationIDs.push(conversationID);
+    }
+  });
+  paneIDs.push(...conversationIDs.map((conversationID) => paneIDForResearchConversation(conversationID)));
+  if (!account || !paneIDs.length) return false;
+  const scrollPositions = new Map(paneIDs.map((paneID) => [
+    paneID,
+    track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`)?.scrollTop || 0
+  ]));
+  const refreshedConversations = await Promise.all(conversationIDs.map(async (conversationID) => {
+    try {
+      return [conversationID, await fetchAuthoritativeResearchConversation(conversationID)];
+    } catch {
+      return [conversationID, null];
+    }
+  }));
+  if (
+    activeAccount()?.userID !== account.userID ||
+    activeAccount()?.sessionToken !== account.sessionToken ||
+    activeWorkspaceID !== workspaceID ||
+    !researchArtifactConsumersVisible()
+  ) return false;
+  refreshedConversations.forEach(([conversationID, conversation]) => {
+    if (conversationID === state.researchConversationID) {
+      activeResearchConversation = conversation;
+    } else if (conversation) {
+      supplementalResearchConversations.set(conversationID, conversation);
+    } else {
+      supplementalResearchConversations.delete(conversationID);
+    }
+  });
+  const focusedDraftInput = document.activeElement?.matches?.(".research-question-input")
+    ? document.activeElement
+    : null;
+  const focusedDraftPaneID = focusedDraftInput?.closest(".workspace-panel")?.dataset.paneId || "";
+  const focusedDraftSelection = focusedDraftInput
+    ? [focusedDraftInput.selectionStart, focusedDraftInput.selectionEnd]
+    : null;
+  if (focusedDraftInput) researchQuestionDraft = focusedDraftInput.value;
+  await transitionWorkspace("utility", { refreshPaneIDs: paneIDs });
+  const preservedDraft = researchQuestionDraft;
+  track.querySelectorAll(".research-question-input").forEach((input) => {
+    if (input.value === preservedDraft) return;
+    input.value = preservedDraft;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  if (focusedDraftPaneID) {
+    const nextInput = track.querySelector(
+      `.workspace-panel[data-pane-id="${CSS.escape(focusedDraftPaneID)}"] .research-question-input`
+    );
+    nextInput?.focus({ preventScroll: true });
+    if (focusedDraftSelection) nextInput?.setSelectionRange?.(...focusedDraftSelection);
+  }
+  scrollPositions.forEach((scrollTop, paneID) => {
+    const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    if (pane) pane.scrollTop = Math.min(scrollTop, Math.max(0, pane.scrollHeight - pane.clientHeight));
+  });
+  return true;
+}
+
+async function applyAccountArtifactRevisionEnvelope(envelope) {
+  const scope = currentProjectArtifactScope();
+  const normalized = normalizeAccountArtifactRevisionEnvelope(envelope, scope);
+  const key = accountArtifactRevisionKey(normalized);
+  const result = reduceAccountArtifactRevision({
+    envelope: normalized,
+    revision: accountArtifactRevisions.get(key),
+    scope
+  });
+  if (!result.accepted) return result;
+  accountArtifactRevisions.set(key, result.accepted);
+  if (result.refreshResearch) {
+    await enqueueProjectArtifactConsumerRefresh(
+      () => refreshVisibleResearchArtifactConsumers().catch(() => false)
+    );
+  }
+  return result;
+}
+
+function projectArtifactRequestScopeIsCurrent(scope) {
+  const current = currentProjectArtifactScope();
+  return Boolean(
+    canRunForegroundSync() &&
+    scope.accountUserID &&
+    current.accountUserID === scope.accountUserID &&
+    current.sessionToken === scope.sessionToken &&
+    current.workspaceID === scope.workspaceID
+  );
+}
+
+function enqueueProjectArtifactConsumerRefresh(refresh) {
+  const task = projectArtifactConsumerRefreshQueue.then(refresh, refresh);
+  projectArtifactConsumerRefreshQueue = task.catch(() => false);
+  return task;
+}
+
+async function refreshProjectArtifactConsumers(projectID, domains) {
+  const plan = projectArtifactRefreshPlan(domains);
+  if (projectTransitionHubMatches(projectTransitionHubEntry, projectID)) {
+    projectTransitionHubEntry = null;
+  }
+  if (plan.notebookCards) {
+    await notebookMounts.get(projectID)?.refreshCards?.().catch(() => false);
+  }
+  await refreshProjectSourceConsumers([projectID], {
+    refreshNotebookCards: false,
+    refreshNotebookReferences: plan.notebookReferences,
+    refreshNotebookFoundation: plan.notebookFoundation,
+    refreshNotebookReportStatus: plan.notebookReportStatus,
+    refreshReportArtifacts: plan.reportArtifacts,
+    refreshReportSources: plan.reportSources
+  });
+  if (plan.notebookFoundation || plan.summaries) {
+    refreshMountedResearchProjectContext(projectID);
+  }
+  if (plan.summaries) {
+    await refreshVisibleProjectArtifactSummaries(projectID).catch(() => false);
+  }
+}
+
+async function applyProjectArtifactRevisionEnvelopes(envelopes = [], options = {}) {
+  const scope = currentProjectArtifactScope();
+  const result = reduceProjectArtifactRevisions({
+    envelopes,
+    revisions: projectArtifactRevisions,
+    scope
+  });
+  projectArtifactRevisions.clear();
+  result.nextRevisions.forEach((value, key) => projectArtifactRevisions.set(key, value));
+  if (options.broadcast === true && result.accepted.length) {
+    broadcastForegroundSyncSignal("project-artifact-revisions", {
+      workspaceID: scope.workspaceID,
+      envelopes: result.accepted
+    });
+  }
+  // The server checkpoint exposes the cumulative domain union for a Project,
+  // not a per-revision delta. Refreshes can therefore include an older domain,
+  // but remain bounded to connected consumers for the affected Project.
+  await enqueueProjectArtifactConsumerRefresh(() => Promise.all(
+    result.refreshes.map(({ projectID, domains }) =>
+      refreshProjectArtifactConsumers(projectID, domains).catch(() => false)
+    )
+  ));
+  return result;
+}
+
+function observeLocalProjectArtifactRevisions(payload) {
+  const projects = payload?.projects;
+  const scope = currentProjectArtifactScope();
+  const accountEnvelope = payload?.account
+    ? normalizeAccountArtifactRevisionEnvelope({
+        ...payload.account,
+        storageOwnerUserID: payload.account.storageOwnerUserID || payload.storageOwnerUserID
+      }, scope)
+    : null;
+  if (accountEnvelope?.storageOwnerUserID) {
+    const key = accountArtifactRevisionKey(accountEnvelope);
+    const previous = accountArtifactRevisions.get(key);
+    if (!previous || accountEnvelope.revision > Number(previous.revision || 0)) {
+      accountArtifactRevisions.set(key, accountEnvelope);
+    }
+  }
+  const envelopes = (Array.isArray(projects) ? projects : []).map((project) => normalizeProjectArtifactRevisionEnvelope({
+    ...project,
+    storageOwnerUserID: project.storageOwnerUserID || payload.storageOwnerUserID
+  }, scope));
+  envelopes.forEach((envelope) => {
+    if (!envelope.storageOwnerUserID || !envelope.projectID) return;
+    const key = [
+      envelope.accountUserID,
+      envelope.workspaceID,
+      envelope.storageOwnerUserID,
+      envelope.projectID
+    ].join("::");
+    const previous = projectArtifactRevisions.get(key);
+    if (!previous || envelope.revision > Number(previous.revision || 0)) {
+      projectArtifactRevisions.set(key, envelope);
+    }
+  });
+  if (!accountEnvelope && !envelopes.length) return;
+  broadcastForegroundSyncSignal("project-artifact-revisions", {
+    workspaceID: scope.workspaceID,
+    accountEnvelope,
+    envelopes
+  });
+}
+
+async function checkVisibleProjectArtifactRevisions() {
+  if (!canRunForegroundSync()) return null;
+  if (projectArtifactCheckpointPromise) {
+    projectArtifactCheckpointPending = true;
+    return projectArtifactCheckpointPromise;
+  }
+  const scope = currentProjectArtifactScope();
+  const projectIDs = Array.from(scope.visibleProjectIDs);
+  if (!scope.accountUserID || !scope.workspaceID || (!projectIDs.length && !scope.researchVisible)) return null;
+  projectArtifactCheckpointPromise = (async () => {
+    const payload = await postResearch("/projects/artifacts/checkpoint", {
+      projectIDs,
+      includeAccountResearch: scope.researchVisible
+    });
+    if (!projectArtifactRequestScopeIsCurrent(scope)) return null;
+    const currentVisible = new Set(visibleProjectArtifactIDs());
+    const envelopes = (payload.projects || [])
+      .filter((project) => currentVisible.has(String(project?.projectID || "")))
+      .map((project) => normalizeProjectArtifactRevisionEnvelope(project, scope));
+    const accountResult = payload.account && researchArtifactConsumersVisible()
+      ? await applyAccountArtifactRevisionEnvelope(payload.account)
+      : { accepted: null, refreshResearch: false };
+    const projectResult = await applyProjectArtifactRevisionEnvelopes(envelopes);
+    if (accountResult.accepted || projectResult.accepted.length) {
+      broadcastForegroundSyncSignal("project-artifact-revisions", {
+        workspaceID: scope.workspaceID,
+        accountEnvelope: accountResult.accepted,
+        envelopes: projectResult.accepted
+      });
+    }
+    return { account: accountResult, projects: projectResult };
+  })().finally(() => {
+    projectArtifactCheckpointPromise = null;
+    if (projectArtifactCheckpointPending) {
+      projectArtifactCheckpointPending = false;
+      startProjectArtifactCheckpointLoop({ immediate: true });
+    } else {
+      startProjectArtifactCheckpointLoop();
+    }
+  });
+  return projectArtifactCheckpointPromise;
+}
+
+function stopProjectArtifactCheckpointLoop() {
+  clearTimeout(projectArtifactCheckpointTimer);
+  projectArtifactCheckpointTimer = null;
+  projectArtifactCheckpointPending = false;
+}
+
+function startProjectArtifactCheckpointLoop(options = {}) {
+  if (
+    !canRunForegroundSync() ||
+    (!visibleProjectArtifactIDs().length && !researchArtifactConsumersVisible())
+  ) {
+    stopProjectArtifactCheckpointLoop();
+    return;
+  }
+  if (options.immediate) {
+    clearTimeout(projectArtifactCheckpointTimer);
+    projectArtifactCheckpointTimer = null;
+    if (projectArtifactCheckpointPromise) {
+      projectArtifactCheckpointPending = true;
+      return;
+    }
+    void checkVisibleProjectArtifactRevisions().catch(() => {});
+    return;
+  }
+  if (projectArtifactCheckpointTimer || projectArtifactCheckpointPromise) return;
+  projectArtifactCheckpointTimer = window.setTimeout(() => {
+    projectArtifactCheckpointTimer = null;
+    void checkVisibleProjectArtifactRevisions().catch(() => {
+      startProjectArtifactCheckpointLoop();
+    });
+  }, foregroundSyncDelay({ lastActivityAt: foregroundSyncLastActivityAt }));
+}
+
 function broadcastForegroundSyncSignal(type, details = {}) {
   const accountUserID = activeAccount()?.userID || "";
   if (!accountUserID) return;
@@ -8987,6 +9396,14 @@ async function handleForegroundSyncSignal(message) {
     message.accountUserID !== accountUserID ||
     message.sourceTabID === foregroundSyncTabID
   ) return;
+  if (message.type === "project-artifact-revisions") {
+    if (message.workspaceID !== activeWorkspaceID) return;
+    if (message.accountEnvelope) {
+      await applyAccountArtifactRevisionEnvelope(message.accountEnvelope);
+    }
+    await applyProjectArtifactRevisionEnvelopes(message.envelopes || []);
+    return;
+  }
   if (["leader-released", "sync-invalidated"].includes(message.type)) {
     startForegroundSyncLoop({
       immediate: true,
@@ -9035,6 +9452,7 @@ function stopForegroundSyncLoop() {
   clearTimeout(foregroundSyncLeaderTimer);
   foregroundSyncTimer = null;
   foregroundSyncLeaderTimer = null;
+  stopProjectArtifactCheckpointLoop();
   releaseForegroundSyncLeadership();
 }
 
@@ -9114,6 +9532,7 @@ function startForegroundSyncLoop(options = {}) {
   foregroundSyncLeaderTimer = null;
   if (!canRunForegroundSync()) return;
   ensureForegroundSyncChannel();
+  startProjectArtifactCheckpointLoop({ immediate: options.immediate === true });
   if (!claimForegroundSyncLeadership()) {
     foregroundSyncLeaderTimer = window.setTimeout(
       () => startForegroundSyncLoop(options),
@@ -9757,15 +10176,28 @@ async function updateProjectFolder(project, details = {}) {
   setOpenProjectDetails(openProjectDetails().map((detail) => projectDetailMatches(project, detail) ? projectIdentity(updated) : detail));
   saveWorkspaceState();
   refreshOpenProjectPaneTheme(updated);
+  let projectUpdatePersisted = !account;
 
   if (account) {
     try {
       await pushMutation(projectMutationForRecord(updated, account));
       state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
       saveWorkspaceState();
+      projectUpdatePersisted = true;
     } catch (error) {
       if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
       // Keep the local edit visible while the durable sync queue recovers.
+    }
+  }
+  const updatedProjectID = projectDetailKey(projectIdentity(updated));
+  if (visibleProjectArtifactIDs().includes(updatedProjectID)) {
+    refreshMountedResearchProjectContext(updatedProjectID);
+    if (projectUpdatePersisted && account) {
+      await refreshProjectSourceConsumers([updatedProjectID], {
+        refreshNotebookFoundation: true,
+        refreshNotebookReferences: true,
+        refreshReportSources: true
+      });
     }
   }
   return true;
@@ -14937,7 +15369,9 @@ function researchRequestBody(values = {}) {
 async function postResearch(path, values = {}) {
   const account = activeAccount();
   if (!account) throw new Error("Sign in from Settings to use private research conversations.");
-  return postJSON(path, researchRequestBody(values), { token: account.sessionToken });
+  const payload = await postJSON(path, researchRequestBody(values), { token: account.sessionToken });
+  if (payload?.artifactRevisions) observeLocalProjectArtifactRevisions(payload.artifactRevisions);
+  return payload;
 }
 
 async function postResearchWithProgress(values, { signal, onProgress } = {}) {
@@ -19951,6 +20385,7 @@ async function renderProjectNotebook(project) {
   let notebookIdlePrefetchTimer = null;
   let notebookIdlePrefetchHandle = null;
   let flushNotebookAutosave = async () => !dirty;
+  let refreshNotebookCards = async () => false;
   let refreshNotebookReferenceSources = async () => false;
   let refreshNotebookReportStatus = async () => false;
   const notebookImageUploaded = (event) => {
@@ -19975,6 +20410,9 @@ async function renderProjectNotebook(project) {
     },
     async refreshReferenceSources(options = {}) {
       return refreshNotebookReferenceSources(options);
+    },
+    async refreshCards() {
+      return refreshNotebookCards();
     },
     async refreshReportStatus() {
       return refreshNotebookReportStatus();
@@ -20601,6 +21039,46 @@ async function renderProjectNotebook(project) {
       updateNotebookCardManagement();
       requestAnimationFrame(sizeCardListForThreeRows);
     }
+
+    refreshNotebookCards = async () => {
+      if (disposed) return false;
+      const payload = await postResearch("/notebook/cards/list", { projectID });
+      if (disposed) return false;
+      let nextCards = payload.cards || [];
+      notebookReadOnly = payload.access?.readOnly === true;
+      const focusedCardID = activeCard?.id || "";
+      const focusedSummary = focusedCardID
+        ? nextCards.find((card) => card.id === focusedCardID)
+        : null;
+      if (dirty && activeCard) {
+        const localSummary = notebookSummaryForCard(activeCard, activeCard);
+        nextCards = focusedSummary
+          ? nextCards.map((card) => card.id === focusedCardID ? localSummary : card)
+          : [localSummary, ...nextCards];
+      }
+      cards = nextCards;
+      renderCardList();
+      await saveNotebookProjectSnapshot({
+        accountUserID: activeAccount()?.userID || "",
+        projectID,
+        foundation,
+        cardPayload: { cards, access: { readOnly: notebookReadOnly } }
+      }).catch(() => {});
+      if (dirty || !focusedCardID) return true;
+      if (!focusedSummary) {
+        activeCard = null;
+        draftDocument = emptyNotebookDocument();
+        await renderFocusedCard();
+        return true;
+      }
+      if (
+        Number(focusedSummary.version || 0) !== Number(activeCard?.version || 0) ||
+        String(focusedSummary.updatedAt || "") !== String(activeCard?.updatedAt || "")
+      ) {
+        await loadCard(focusedCardID);
+      }
+      return true;
+    };
 
     async function renderFocusedCard() {
       editorRenderSequence += 1;
@@ -21434,6 +21912,7 @@ async function renderProjectReportDraft(project) {
   let dirty = false;
   let disposed = false;
   let refreshReportSources = async () => false;
+  let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
   const reportSourceGroupExpanded = new Map();
   const reportHeaderHelp = Object.freeze({
@@ -21476,6 +21955,9 @@ async function renderProjectReportDraft(project) {
     },
     async refreshSources() {
       return refreshReportSources();
+    },
+    async refreshArtifacts() {
+      return refreshReportArtifacts();
     },
     dispose() {
       disposed = true;
@@ -22312,6 +22794,39 @@ async function renderProjectReportDraft(project) {
     if (!sourcePalette) return false;
     sourcePalette.replaceChildren();
     renderSourcePalette(sourcePalette);
+    return true;
+  };
+
+  refreshReportArtifacts = async () => {
+    if (disposed) return false;
+    const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
+      postResearch("/reports/drafts/list", { projectID }),
+      postResearch("/reports/sources/list", { projectID }),
+      postResearch("/reports/history/list", { projectID })
+    ]);
+    if (disposed) return false;
+    drafts = draftPayload.drafts || [];
+    sources = sourcePayload.sources || [];
+    sourceWarnings = sourcePayload.warnings || [];
+    history = historyPayload.reports || [];
+    if (dirty) {
+      const sourcePalette = panel.querySelector(".report-source-palette");
+      if (sourcePalette) {
+        sourcePalette.replaceChildren();
+        renderSourcePalette(sourcePalette);
+      }
+      const historyBody = panel.querySelector(".report-history");
+      if (historyBody) {
+        historyBody.replaceChildren();
+        renderHistory(historyBody);
+      }
+      return true;
+    }
+    const nextActiveDraft = drafts.find((draft) => draft.id === activeDraft.id) || drafts[0];
+    activeDraft = nextActiveDraft
+      ? structuredClone(nextActiveDraft)
+      : emptyProjectReportDraft(identity);
+    renderWorkspaceContent();
     return true;
   };
 
@@ -26622,6 +27137,7 @@ async function transitionProjectSelection(paneID) {
     await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
   } finally {
     if (projectTransitionHubEntry === entry) projectTransitionHubEntry = null;
+    startProjectArtifactCheckpointLoop({ immediate: true });
   }
 }
 
@@ -33742,6 +34258,7 @@ async function renderUtilityWorkspace(options = {}) {
   } else {
     saveWorkspaceState();
   }
+  startProjectArtifactCheckpointLoop();
   return true;
 }
 
@@ -33897,6 +34414,7 @@ async function focusUtility(key, selector = "") {
   }
   if (!paneID) return;
   scrollPaneIntoView(paneID);
+  if (key === "analysis") startProjectArtifactCheckpointLoop({ immediate: true });
   requestAnimationFrame(() => {
     const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
     const focusTarget = selector ? pane?.querySelector(selector) : pane?.querySelector("button, input, select, textarea");
