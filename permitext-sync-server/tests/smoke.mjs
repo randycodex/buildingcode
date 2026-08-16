@@ -1431,7 +1431,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-reader-hover-icons-v286'),
+        webRoot.text.includes('/web/app.js?v=20260816-reader-direct-note-link-v292'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1592,7 +1592,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-hover-icons-v286'),
+      webRoot.text.includes('/web/styles.css?v=20260816-reader-direct-note-link-v292'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1857,7 +1857,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-hover-icons-v286'),
+      webRoot.text.includes('/web/styles.css?v=20260816-reader-direct-note-link-v292'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2330,13 +2330,15 @@ async function main() {
         workspaceScript.text.includes("await persistSectionBookmark(payload, true, { refreshSavedPanes: false })") &&
         workspaceScript.text.includes("project = activeProjectForReaderSave()") &&
         workspaceScript.text.includes("await persistSectionInProject(project, payload)") &&
-        workspaceScript.text.includes('addNote.textContent = noteValueForTarget(target).trim() ? "Open note" : "Add note"'),
-      "Reader passage saving is no longer immediate, Project-aware, and followed by an optional Note action."
+        workspaceScript.text.includes('addNote.textContent = "Link to Note"') &&
+        workspaceScript.text.includes('showResearchSelectionMenu(selection, { pinned: true, noteOnly: true })'),
+      "Reader passage saving is no longer immediate, Project-aware, and followed by an optional Note-link action."
     );
     assert(
         workspaceScript.text.includes('if (window.getSelection && String(window.getSelection()).trim()) return;') &&
         workspaceScript.text.includes('wrapper.classList.toggle("is-actions-active")') &&
-        workspaceScript.text.includes('await saveReaderPassage(panel, section, reader, target, { openNote: true })') &&
+        workspaceScript.text.includes('await saveReaderPassage(panel, section, reader, target, { silent: true })') &&
+        workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
         workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", saved ? "Saved passage" : "Save passage")') &&
         workspaceScript.text.includes('savedMarker.className = "reader-section-saved-marker"') &&
         workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&

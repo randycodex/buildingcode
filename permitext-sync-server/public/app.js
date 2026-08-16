@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-reader-hover-icons-v286";
+} from "./offline-storage.js?v=20260816-reader-direct-note-link-v292";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -10870,6 +10870,40 @@ function readerSectionResearchSelection(sectionWrapper) {
   };
 }
 
+function readerPassageResearchSelection(wrapper, target, anchorElement = null) {
+  const sectionWrapper = wrapper?.closest(".chapter-section");
+  const source = wrapper?.querySelector(".section-block, .section-html, .code-table") || wrapper;
+  if (!sectionWrapper || !source) return null;
+  const range = document.createRange();
+  range.selectNodeContents(source);
+  const selectedText = researchSelectionTextFromRange("", range);
+  if (!selectedText) return null;
+  const passage = {
+    sectionID: String(target.sectionID || sectionWrapper.dataset.researchSectionId || ""),
+    sectionNumber: target.sectionNumber || sectionWrapper.dataset.researchSectionNumber || "",
+    title: target.title || sectionWrapper.dataset.researchSectionTitle || "",
+    codePrefix: target.codePrefix || sectionWrapper.dataset.researchCodePrefix || "BC",
+    savedItemID: sectionWrapper.dataset.researchSavedItemId || "",
+    selectedText,
+    codeEdition: sectionWrapper.dataset.researchCodeEdition || "",
+    codeVersion: target.codeVersion || sectionWrapper.dataset.researchCodeVersion || "",
+    sourceLibraryVersion: sectionWrapper.dataset.researchSourceLibraryVersion || target.codeVersion || "",
+    prefix: "",
+    suffix: "",
+    start: 0,
+    end: normalizedPassageAnchorText(selectedText).length
+  };
+  const panel = wrapper.closest(".workspace-panel");
+  return {
+    ...passage,
+    passages: [passage],
+    projectID: selectedOpenProjectID() || panel?.dataset.projectId || "",
+    originPaneID: panel?.dataset.paneId || "",
+    anchorElement,
+    rect: anchorElement?.getBoundingClientRect?.() || wrapper.getBoundingClientRect()
+  };
+}
+
 function currentResearchConversationLabel() {
   const conversationID = String(state.researchConversationID || "").trim();
   if (!conversationID) return "";
@@ -11359,10 +11393,10 @@ function showReaderSaveConfirmation(panel, section, reader, target, project = nu
     : "Saved";
   const addNote = document.createElement("button");
   addNote.type = "button";
-  addNote.textContent = noteValueForTarget(target).trim() ? "Open note" : "Add note";
+  addNote.textContent = "Link to Note";
   addNote.addEventListener("click", () => {
+    openReaderPassageNoteLinker(panel, target, addNote);
     confirmation.remove();
-    openReaderNotesSheet(panel, section, reader, { target });
   });
   confirmation.append(message, addNote);
   panel.append(confirmation);
@@ -11386,11 +11420,19 @@ async function saveReaderPassage(panel, section, reader, target, options = {}) {
   } else {
     project = activeProjectForReaderSave();
   }
-  if (options.openNote) {
-    openReaderNotesSheet(panel, section, reader, { target });
-  } else {
+  if (!options.silent) {
     showReaderSaveConfirmation(panel, section, reader, target, project);
   }
+  return true;
+}
+
+function openReaderPassageNoteLinker(panel, target, anchorElement) {
+  const blockID = normalizeAnnotationBlockID(target.blockID);
+  const wrapper = anchorElement?.closest(".annotated-code-block") ||
+    panel?.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(blockID)}"]`);
+  const selection = readerPassageResearchSelection(wrapper, target, anchorElement);
+  if (!selection) return false;
+  showResearchSelectionMenu(selection, { pinned: true, noteOnly: true });
   return true;
 }
 
@@ -11410,12 +11452,16 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   button.type = "button";
   button.className = "inline-comment-toggle";
   button.innerHTML = noteActionIconSVG();
-  button.setAttribute("aria-label", noteBody.trim() ? "Open note" : "Add note");
-  button.title = noteBody.trim() ? "Open note" : "Add note";
+  button.setAttribute("aria-label", "Link passage to Note");
+  button.title = "Link passage to Note";
   button.classList.toggle("has-comment", Boolean(noteBody.trim()));
   button.addEventListener("click", async () => {
     const panel = button.closest(".reader-panel");
-    await saveReaderPassage(panel, section, reader, target, { openNote: true });
+    const selection = readerPassageResearchSelection(button.closest(".annotated-code-block"), target, button);
+    if (!selection) return;
+    const savedPassage = await saveReaderPassage(panel, section, reader, target, { silent: true });
+    if (!savedPassage) return;
+    showResearchSelectionMenu(selection, { pinned: true, noteOnly: true });
   });
 
   const bookmarkButton = document.createElement("button");
@@ -13856,11 +13902,7 @@ function noteActionIconSVG() {
 function researchActionIconSVG(options = {}) {
   return `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="m6 18 7.2-7.2"></path>
-      <path d="m9 7 6-5 4 4-5 6z"></path>
-      <path d="M6 18h8"></path>
-      <path d="M3 22h18"></path>
-      <path d="m14 14 4 8"></path>
+      <path d="M12.983 21.186a1 1 0 0 1-1.966 0 10 10 0 0 0-8.203-8.203 1 1 0 0 1 0-1.966 10 10 0 0 0 8.203-8.203 1 1 0 0 1 1.966 0 10 10 0 0 0 8.203 8.203 1 1 0 0 1 0 1.966 10 10 0 0 0-8.203 8.203"></path>
       ${options.createNew ? '<path d="M19 9v5"></path><path d="M16.5 11.5h5"></path>' : ""}
     </svg>
   `;
@@ -18875,6 +18917,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
   closeResearchSelectionMenu();
   pendingResearchSelection = captured;
   researchSelectionMenuPinned = options.pinned === true;
+  const noteOnly = options.noteOnly === true;
   const menu = document.createElement("div");
   menu.className = "research-selection-menu";
   menu.setAttribute("role", "toolbar");
@@ -18978,7 +19021,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
     pendingResearchSelection.projectID = selectedProjectChoice?.value || "";
     menu.append(projectPicker);
   }
-  if (state.researchConversationID && activeAccount()) {
+  if (!noteOnly && state.researchConversationID && activeAccount()) {
     const addButton = document.createElement("button");
     addButton.type = "button";
     addButton.textContent = "Add as supporting evidence";
@@ -18989,7 +19032,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
     const linkButton = document.createElement("button");
     linkButton.type = "button";
     linkButton.className = "research-selection-link-note-action";
-    linkButton.textContent = "Link to Note";
+    linkButton.textContent = noteOnly ? "Link passage" : "Link to Note";
     linkButton.title = "Link the selected enacted passage to a Project Note";
     refreshNoteChooser = async (projectID, preferredCardID = "") => {
       projectID = String(projectID || "").trim();
@@ -19096,6 +19139,7 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
         return;
       }
       if (!selectedNotebookCardID) {
+        status.textContent = "Choose a Note for this passage.";
         return;
       }
       linkButton.disabled = true;
@@ -19123,14 +19167,16 @@ function showResearchSelectionMenu(selectionOverride = null, options = {}) {
     });
     actions.append(linkButton);
   }
-  const analyzeButton = document.createElement("button");
-  analyzeButton.type = "button";
-  analyzeButton.className = "research-selection-start-action";
-  analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research";
-  analyzeButton.disabled = false;
-  analyzeButton.title = "A Project is optional. You can assign this Research conversation later.";
-  analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
-  actions.append(analyzeButton);
+  if (!noteOnly) {
+    const analyzeButton = document.createElement("button");
+    analyzeButton.type = "button";
+    analyzeButton.className = "research-selection-start-action";
+    analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research";
+    analyzeButton.disabled = false;
+    analyzeButton.title = "A Project is optional. You can assign this Research conversation later.";
+    analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
+    actions.append(analyzeButton);
+  }
   menu.append(noteChooser, actions, status);
   document.body.append(menu);
   if (initialProjectID && activeAccount()) {
@@ -19186,7 +19232,8 @@ function bindResearchTextSelection() {
   document.addEventListener("pointerup", (event) => {
     if (
       event.target.closest?.(".research-selection-menu") ||
-      event.target.closest?.(".reader-notes-card-action")
+      event.target.closest?.(".reader-notes-card-action") ||
+      event.target.closest?.(".inline-comment")
     ) return;
     window.setTimeout(showResearchSelectionMenu, 0);
   });
