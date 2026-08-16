@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-edge-dividers-v328";
+} from "./offline-storage.js?v=20260816-notebook-reference-groups-v329";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18634,7 +18634,7 @@ function notebookEvidenceLinksFromSelection(selection, context = {}) {
       title: source.title || "Section"
     }).replace(/[.\s]+$/, "");
     const codePrefix = String(source.codePrefix || "BC").toUpperCase();
-    const citation = `${codePrefix} § ${source.sectionNumber || "Section"}`;
+    const citation = `${notebookReferenceCodeTitle(codePrefix)} · § ${source.sectionNumber || "Section"}`;
     return {
       id: crypto.randomUUID(),
       relationshipRole: selection.evidenceRelationshipRole || "context",
@@ -20452,27 +20452,7 @@ async function renderProjectNotebook(project) {
           reference.referenceKind !== "notebookCard" ||
           reference.referenceID !== activeCard.id
         );
-      let activeCodeGroup = "";
-      let activeReferenceKind = "";
-      candidates.forEach((reference, index) => {
-        if (reference.referenceKind === "canonicalSection" && reference.codePrefix !== activeCodeGroup) {
-          activeCodeGroup = reference.codePrefix;
-          const groupTitle = document.createElement("h4");
-          groupTitle.className = `notebook-reference-group-title code-theme-${codeTheme(reference.codePrefix)}`;
-          groupTitle.textContent = notebookReferenceCodeTitle(reference.codePrefix);
-          referenceList.append(groupTitle);
-        }
-        if (reference.referenceKind !== "canonicalSection" && reference.referenceKind !== activeReferenceKind) {
-          activeReferenceKind = reference.referenceKind;
-          const groupTitle = document.createElement("h4");
-          groupTitle.className = "notebook-reference-group-title";
-          groupTitle.textContent = reference.referenceKind === "researchAnswer"
-            ? "Research answers"
-            : reference.referenceKind === "notebookCard"
-              ? "Other Notes"
-              : "Project references";
-          referenceList.append(groupTitle);
-        }
+      const appendReferenceOption = (reference, index, parent) => {
         const option = document.createElement("button");
         option.className = "notebook-reference-option";
         option.type = "button";
@@ -20490,7 +20470,58 @@ async function renderProjectNotebook(project) {
         } else {
           option.textContent = reference.label;
         }
-        referenceList.append(option);
+        parent.append(option);
+      };
+      const canonicalGroups = new Map();
+      candidates.forEach((reference, index) => {
+        if (reference.referenceKind !== "canonicalSection") return;
+        const codePrefix = reference.codePrefix || "BC";
+        const chapterNumber = String(reference.chapterNumber || "Other").trim() || "Other";
+        if (!canonicalGroups.has(codePrefix)) canonicalGroups.set(codePrefix, new Map());
+        const chapters = canonicalGroups.get(codePrefix);
+        if (!chapters.has(chapterNumber)) chapters.set(chapterNumber, []);
+        chapters.get(chapterNumber).push({ reference, index });
+      });
+      canonicalGroups.forEach((chapters, codePrefix) => {
+        const codeGroup = document.createElement("details");
+        codeGroup.className = `notebook-reference-code-group code-theme-${codeTheme(codePrefix)}`;
+        codeGroup.open = true;
+        const codeSummary = document.createElement("summary");
+        codeSummary.className = "notebook-reference-group-title";
+        codeSummary.textContent = notebookReferenceCodeTitle(codePrefix);
+        const codeBody = document.createElement("div");
+        codeBody.className = "notebook-reference-code-body";
+        chapters.forEach((entries, chapterNumber) => {
+          const chapterGroup = document.createElement("details");
+          chapterGroup.className = "notebook-reference-chapter-group";
+          chapterGroup.open = true;
+          const chapterSummary = document.createElement("summary");
+          chapterSummary.className = "notebook-reference-chapter-title";
+          chapterSummary.textContent = chapterNumber === "Other" ? "Other provisions" : `Chapter ${chapterNumber}`;
+          const chapterBody = document.createElement("div");
+          chapterBody.className = "notebook-reference-chapter-body";
+          entries.forEach(({ reference, index }) => appendReferenceOption(reference, index, chapterBody));
+          chapterGroup.append(chapterSummary, chapterBody);
+          codeBody.append(chapterGroup);
+        });
+        codeGroup.append(codeSummary, codeBody);
+        referenceList.append(codeGroup);
+      });
+      let activeReferenceKind = "";
+      candidates.forEach((reference, index) => {
+        if (reference.referenceKind === "canonicalSection") return;
+        if (reference.referenceKind !== activeReferenceKind) {
+          activeReferenceKind = reference.referenceKind;
+          const groupTitle = document.createElement("h4");
+          groupTitle.className = "notebook-reference-group-title";
+          groupTitle.textContent = reference.referenceKind === "researchAnswer"
+            ? "Research answers"
+            : reference.referenceKind === "notebookCard"
+              ? "Other Notes"
+              : "Project references";
+          referenceList.append(groupTitle);
+        }
+        appendReferenceOption(reference, index, referenceList);
       });
       if (!candidates.length) {
         const empty = document.createElement("p");

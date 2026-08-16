@@ -50274,9 +50274,22 @@ var OX = new Set(xX), kX = Object.freeze([
 		"data-text-size": e
 	}),
 	parse: (e) => e.dataset.textSize || e.style.fontSize || void 0
-});
-function MX(e, t) {
-	let n = String(t || "Linked item").trim();
+}), MX = {
+	BC: "Building Code",
+	EBC: "Existing Building Code",
+	BC68: "1968 Building Code",
+	MC: "Mechanical Code",
+	PC: "Plumbing Code",
+	FGC: "Fuel Gas Code",
+	FC: "Fire Code",
+	AC: "Administrative Code",
+	ZR: "Zoning Resolution"
+};
+function NX(e) {
+	return String(e || "Linked item").trim().replace(/^([A-Z][A-Z0-9]{0,4})\s+(§\s*)/, (e, t, n) => `${MX[t] || t} · ${n}`);
+}
+function PX(e, t) {
+	let n = NX(t);
 	if (e === "researchAnswer") return {
 		meta: "Research",
 		title: "Research answer",
@@ -50298,8 +50311,8 @@ function MX(e, t) {
 		preview: ""
 	};
 }
-function NX(e, t) {
-	let n = MX(e, t);
+function FX(e, t) {
+	let n = PX(e, t);
 	return [
 		_.createElement("span", {
 			className: "notebook-reference-meta",
@@ -50315,7 +50328,7 @@ function NX(e, t) {
 		}, n.preview) : null
 	].filter(Boolean);
 }
-var PX = tV({
+var IX = tV({
 	type: "permitextReference",
 	propSchema: {
 		referenceKind: {
@@ -50335,19 +50348,19 @@ var PX = tV({
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label,
 		"aria-label": `Open ${e.props.label}`
-	}, ...NX(e.props.referenceKind, e.props.label)),
+	}, ...FX(e.props.referenceKind, e.props.label)),
 	toExternalHTML: ({ inlineContent: e }) => _.createElement("span", {
 		className: "notebook-reference-chip",
 		"data-permitext-reference": "true",
 		"data-reference-kind": e.props.referenceKind,
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label
-	}, ...NX(e.props.referenceKind, e.props.label))
-}), FX = Object.fromEntries(Object.entries(xx).filter(([e]) => OX.has(e))), IX = Dx.create({
-	blockSpecs: FX,
+	}, ...FX(e.props.referenceKind, e.props.label))
+}), LX = Object.fromEntries(Object.entries(xx).filter(([e]) => OX.has(e))), RX = Dx.create({
+	blockSpecs: LX,
 	inlineContentSpecs: {
 		...Tx,
-		permitextReference: PX
+		permitextReference: IX
 	},
 	styleSpecs: {
 		...wx,
@@ -50355,8 +50368,8 @@ var PX = tV({
 		textSize: jX
 	}
 });
-function LX() {
-	let e = q(IX), t = J(), n = RI({
+function zX() {
+	let e = q(RX), t = J(), n = RI({
 		editor: e,
 		selector: ({ editor: e }) => e.getActiveStyles().fontSize || ""
 	});
@@ -50375,8 +50388,8 @@ function LX() {
 		}))
 	}) : null;
 }
-function RX() {
-	let e = q(IX), t = J(), n = RI({
+function BX() {
+	let e = q(RX), t = J(), n = RI({
 		editor: e,
 		selector: ({ editor: e }) => e.getActiveStyles().textSize || ""
 	});
@@ -50395,11 +50408,11 @@ function RX() {
 		}))
 	}) : null;
 }
-function zX() {
+function VX() {
 	let e = _z();
-	return _.createElement(vz, null, e[0], _.createElement(RX, { key: "text-size-select" }), _.createElement(LX, { key: "line-spacing-select" }), ...e.slice(1));
+	return _.createElement(vz, null, e[0], _.createElement(BX, { key: "text-size-select" }), _.createElement(zX, { key: "line-spacing-select" }), ...e.slice(1));
 }
-function BX(e) {
+function HX(e) {
 	let t = String(e?.referenceKind || "").trim(), n = String(e?.referenceID || "").trim(), r = String(e?.label || "").trim();
 	if (!bX.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
 	return {
@@ -50408,7 +50421,7 @@ function BX(e) {
 		label: r
 	};
 }
-function VX(e) {
+function UX(e) {
 	return {
 		schema: vX,
 		schemaVersion: 2,
@@ -50416,19 +50429,19 @@ function VX(e) {
 		document: e
 	};
 }
-function HX() {
+function WX() {
 	let e = document.documentElement.dataset.theme;
 	return e === "dark" || e === "light" ? e : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function UX({ options: e, controllerRef: t }) {
-	let [n, r] = (0, _.useState)(HX), i = VI({
-		schema: IX,
+function GX({ options: e, controllerRef: t }) {
+	let [n, r] = (0, _.useState)(WX), i = VI({
+		schema: RX,
 		initialContent: (0, _.useMemo)(() => EX(e.document), []),
 		uploadFile: e.uploadFile,
 		resolveFileUrl: e.resolveFileUrl
 	}), a = (0, _.useRef)(e.document);
 	return (0, _.useEffect)(() => {
-		let e = () => r(HX()), t = new MutationObserver(e);
+		let e = () => r(WX()), t = new MutationObserver(e);
 		t.observe(document.documentElement, {
 			attributes: !0,
 			attributeFilter: ["class", "data-theme"]
@@ -50449,19 +50462,19 @@ function UX({ options: e, controllerRef: t }) {
 		theme: n,
 		formattingToolbar: !1,
 		portalElements: { slashMenu: null },
-		onChange: () => e.onChange?.(VX(i.document)),
+		onChange: () => e.onChange?.(UX(i.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
-	}, _.createElement(bz, { formattingToolbar: zX }));
+	}, _.createElement(bz, { formattingToolbar: VX }));
 }
-function WX(e, t = {}) {
+function KX(e, t = {}) {
 	if (!(e instanceof HTMLElement)) throw Error("A Notebook editor mount element is required.");
 	let n = { current: null }, r = (0, y.createRoot)(e);
-	return r.render(_.createElement(UX, {
+	return r.render(_.createElement(GX, {
 		options: t,
 		controllerRef: n
 	})), {
 		getDocument() {
-			return VX(n.current?.document || t.document?.document || []);
+			return UX(n.current?.document || t.document?.document || []);
 		},
 		setDocument(e) {
 			let t = n.current;
@@ -50471,7 +50484,7 @@ function WX(e, t = {}) {
 			let t = n.current;
 			t && (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
-				props: BX(e)
+				props: HX(e)
 			}, " "]));
 		},
 		replaceAssetURL(e, t) {
@@ -50506,4 +50519,4 @@ function WX(e, t = {}) {
 	};
 }
 //#endregion
-export { WX as mountPermitextNotebookEditor, IX as permitextNotebookSchema };
+export { KX as mountPermitextNotebookEditor, RX as permitextNotebookSchema };

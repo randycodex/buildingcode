@@ -939,7 +939,9 @@ async function main() {
         workspaceScript.text.includes("filterGap + notebookReferenceBottomGap") &&
         workspaceScript.text.includes('chapterNumber ? `Chapter ${chapterNumber}` : ""') &&
         workspaceScript.text.includes("function notebookReferenceCodeTitle") &&
-        workspaceScript.text.includes('groupTitle.className = `notebook-reference-group-title code-theme-${codeTheme(reference.codePrefix)}`') &&
+        workspaceScript.text.includes('codeGroup.className = `notebook-reference-code-group code-theme-${codeTheme(codePrefix)}`') &&
+        workspaceScript.text.includes('chapterGroup.className = "notebook-reference-chapter-group"') &&
+        workspaceScript.text.includes('chapterSummary.textContent = chapterNumber === "Other" ? "Other provisions" : `Chapter ${chapterNumber}`') &&
         workspaceScript.text.includes("const currentProjectSections = (summary.projectSections || [])") &&
         workspaceScript.text.includes("projectSectionBelongsToProject(item, identity)") &&
         workspaceScript.text.includes("displayTitle: citation.title") &&
@@ -1431,7 +1433,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-edge-dividers-v328'),
+        webRoot.text.includes('/web/app.js?v=20260816-notebook-reference-groups-v329'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1592,7 +1594,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-edge-dividers-v328'),
+      webRoot.text.includes('/web/styles.css?v=20260816-notebook-reference-groups-v329'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1857,7 +1859,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-edge-dividers-v328'),
+      webRoot.text.includes('/web/styles.css?v=20260816-notebook-reference-groups-v329'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

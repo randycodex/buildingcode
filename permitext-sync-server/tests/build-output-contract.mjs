@@ -10,6 +10,7 @@ assert.equal(
 
 const notebookEditor = await readFile(new URL("../src/notebook-editor.js", import.meta.url), "utf8");
 assert.match(notebookEditor, /function notebookReferenceParts\(referenceKind, label\)[\s\S]*?notebook-reference-meta[\s\S]*?notebook-reference-title[\s\S]*?notebook-reference-preview/, "Notebook reference components must render structured evidence previews.");
+assert.match(notebookEditor, /const notebookReferenceCodeNames = \{[\s\S]*?BC: "Building Code"[\s\S]*?function normalizedNotebookReferenceLabel\(label\)/, "Notebook reference previews must normalize legacy code prefixes to full code titles.");
 const notebookSchema = await readFile(new URL("../src/notebook-schema.js", import.meta.url), "utf8");
 const appServer = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
 const webClient = await readFile(new URL("../public/app.js", import.meta.url), "utf8");

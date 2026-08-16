@@ -81,8 +81,27 @@ const PermitextTextSize = createReactStyleSpec(
   }
 );
 
+const notebookReferenceCodeNames = {
+  BC: "Building Code",
+  EBC: "Existing Building Code",
+  BC68: "1968 Building Code",
+  MC: "Mechanical Code",
+  PC: "Plumbing Code",
+  FGC: "Fuel Gas Code",
+  FC: "Fire Code",
+  AC: "Administrative Code",
+  ZR: "Zoning Resolution"
+};
+
+function normalizedNotebookReferenceLabel(label) {
+  return String(label || "Linked item").trim().replace(
+    /^([A-Z][A-Z0-9]{0,4})\s+(§\s*)/,
+    (match, prefix, sectionMarker) => `${notebookReferenceCodeNames[prefix] || prefix} · ${sectionMarker}`
+  );
+}
+
 function notebookReferenceParts(referenceKind, label) {
-  const normalizedLabel = String(label || "Linked item").trim();
+  const normalizedLabel = normalizedNotebookReferenceLabel(label);
   if (referenceKind === "researchAnswer") {
     return {
       meta: "Research",

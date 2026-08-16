@@ -13757,6 +13757,58 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   text-transform: uppercase;
 }
 
+.notebook-reference-code-group,
+.notebook-reference-chapter-group {
+  display: block;
+}
+
+.notebook-reference-code-group > summary,
+.notebook-reference-chapter-group > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.notebook-reference-code-group > summary::-webkit-details-marker,
+.notebook-reference-chapter-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.notebook-reference-code-group > .notebook-reference-group-title,
+.notebook-reference-chapter-title {
+  position: relative;
+  padding-right: 18px;
+}
+
+.notebook-reference-code-group > .notebook-reference-group-title::after,
+.notebook-reference-chapter-title::after {
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  color: var(--text-tertiary);
+  content: "›";
+  transform: translateY(-50%);
+  transition: transform 160ms ease;
+}
+
+.notebook-reference-code-group[open] > .notebook-reference-group-title::after,
+.notebook-reference-chapter-group[open] > .notebook-reference-chapter-title::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.notebook-reference-chapter-title {
+  margin: var(--space-1) 0 0;
+  padding-block: 5px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.notebook-reference-chapter-body {
+  padding-left: var(--space-2);
+}
+
 .notebook-reference-group-title:first-child {
   margin-top: 0;
 }
