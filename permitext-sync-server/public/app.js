@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-unassigned-saved-v297";
+} from "./offline-storage.js?v=20260816-unassigned-inbox-v298";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -25775,10 +25775,10 @@ async function reconcileProjectStudioWithSavedFolders(folders) {
   }
 }
 
-function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems, projectSections, selectedFolder) {
+function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems, projectSections, projects, selectedFolder) {
   panel.querySelector(".saved-unassigned-notice")?.remove();
   if (selectedFolder) return new Set();
-  const unassignedIDs = unassignedSavedEvidenceKeys(savedItems, projectSections);
+  const unassignedIDs = unassignedSavedEvidenceKeys(savedItems, projectSections, projects);
   if (!unassignedIDs.size && !savedInstance.organizeUnassigned) return unassignedIDs;
 
   const notice = document.createElement("section");
@@ -25789,8 +25789,8 @@ function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems
     : `${unassignedIDs.size} saved ${unassignedIDs.size === 1 ? "section needs" : "sections need"} a destination`;
   const copy = document.createElement("p");
   copy.textContent = savedInstance.organizeUnassigned
-    ? "These passages are saved safely without a Project. Open one to read it, or use Save to add it to a Project or saved collection."
-    : "Older saved evidence is kept safely until you choose a Project or saved collection.";
+    ? "These passages are saved safely without a Project. Open one to read it, or use Save to add it to a Project."
+    : "Older saved evidence is kept safely until you choose a Project.";
   const action = document.createElement("button");
   action.type = "button";
   action.textContent = savedInstance.organizeUnassigned ? "Return to All Saved" : "Organize existing evidence";
@@ -25804,8 +25804,11 @@ function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems
   return unassignedIDs;
 }
 
-function unassignedSavedEvidenceKeys(savedItems, projectSections) {
-  const linkedSectionIDs = new Set((projectSections || []).map((item) => savedEvidenceKey(item)));
+function unassignedSavedEvidenceKeys(savedItems, projectSections, projects = []) {
+  const projectRecords = (projects || []).filter(folderIsProject);
+  const linkedSectionIDs = new Set((projectSections || [])
+    .filter((item) => projectRecords.some((project) => projectSectionBelongsToProject(item, project)))
+    .map((item) => savedEvidenceKey(item)));
   return new Set((savedItems || [])
     .map((item) => savedEvidenceKey(item))
     .filter((sectionID) => !sectionID.endsWith(":") && !linkedSectionIDs.has(sectionID)));
@@ -25923,7 +25926,8 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     if (unassignedCountLabel) {
       const unassignedCount = unassignedSavedEvidenceKeys(
         summary.savedItems || [],
-        summary.projectSections || []
+        summary.projectSections || [],
+        workspaceProjects
       ).size;
       unassignedCountLabel.textContent = String(unassignedCount);
       unassignedCountLabel.title = unassignedCount === 1
@@ -25962,6 +25966,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     paneID,
     savedItems,
     summary.projectSections || [],
+    workspaceProjects,
     selectedFolder
   );
   const annotatedItems = consolidatedSavedAnnotations(annotations || []);
@@ -26381,17 +26386,14 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
     const visibleRecords = showingArchived
       ? archivedProjectRecords(projects)
       : activeFolderRecords(projects);
-    const visibleProjects = [
-      ...visibleRecords.filter(folderIsProject),
-      ...visibleRecords.filter((record) => !folderIsProject(record))
-    ];
+    const visibleProjects = visibleRecords.filter(folderIsProject);
     clear(list);
     list.classList.toggle("is-showing-archive", showingArchived);
     if (!visibleProjects.length) {
       if (!showingArchived) {
         const empty = document.createElement("p");
         empty.className = "saved-projects-empty";
-        empty.textContent = "No Projects or saved collections yet. Use New to create one.";
+        empty.textContent = "No Projects yet. Use New to create one.";
         list.append(empty);
       }
     }
@@ -26402,21 +26404,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
       emptyProjects.textContent = showingArchived ? "No archived Projects." : "No Projects yet.";
       list.append(emptyProjects);
     }
-
-    let savedCollectionsList = null;
-    const ensureSavedCollectionsList = () => {
-      if (savedCollectionsList) return savedCollectionsList;
-      const collections = document.createElement("section");
-      collections.className = "saved-collections-section";
-      const heading = document.createElement("h3");
-      heading.className = "saved-collections-heading";
-      heading.textContent = showingArchived ? "Archived saved collections" : "Saved collections";
-      savedCollectionsList = document.createElement("div");
-      savedCollectionsList.className = "saved-collections-list";
-      collections.append(heading, savedCollectionsList);
-      list.append(collections);
-      return savedCollectionsList;
-    };
 
     let draggedProjectID = "";
     const clearDropIndicators = () => {
@@ -26622,10 +26609,10 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
           tile.dataset.justDragged = "false";
         });
       });
-      (folderIsProject(project) ? list : ensureSavedCollectionsList()).append(tile);
+      list.append(tile);
     });
     if (!showingArchived) {
-      const unassignedCount = unassignedSavedEvidenceKeys(savedItems, projectSections).size;
+      const unassignedCount = unassignedSavedEvidenceKeys(savedItems, projectSections, projects).size;
       const unassignedTile = document.createElement("article");
       unassignedTile.className = "saved-project-tile is-reference is-unassigned-saved";
       unassignedTile.tabIndex = 0;
@@ -26667,7 +26654,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
         event.preventDefault();
         void openUnassigned();
       });
-      ensureSavedCollectionsList().append(unassignedTile);
+      list.append(unassignedTile);
     }
     updateSelectionControls();
     updateCodeFilterMenu(list, instance, {

@@ -551,8 +551,8 @@ assert.match(appSource, /function createSavedEvidenceHeading\([\s\S]*?saved-evid
 assert.match(indexSource, /class="saved-evidence-search"[\s\S]*?class="saved-evidence-search-input"[\s\S]*?class="saved-evidence-search-close"/);
 assert.match(indexSource, /class="saved-projects-section[^>]*aria-label="Projects"/);
 assert.match(indexSource, /class="code-filter-menu-toggle saved-projects-menu-toggle"[^>]*aria-label="Expand Projects"/);
-assert.match(appSource, /heading\.textContent = showingArchived \? "Archived saved collections" : "Saved collections"/);
-assert.match(appSource, /visibleRecords\.filter\(folderIsProject\)[\s\S]*?visibleRecords\.filter\(\(record\) => !folderIsProject\(record\)\)/);
+assert.doesNotMatch(appSource, /heading\.textContent = showingArchived \? "Archived saved collections" : "Saved collections"/);
+assert.match(appSource, /const visibleProjects = visibleRecords\.filter\(folderIsProject\)/);
 assert.match(appSource, /folderType\(visibleProjects\[sourceIndex\]\) !== folderType\(visibleProjects\[targetIndex\]\)/);
 assert.match(stylesSource, /\.saved-collections-section \{[\s\S]*?border-top: 1px solid var\(--border\);/);
 assert.doesNotMatch(indexSource, /class="code-filter-menu saved-code-filter-menu"/);

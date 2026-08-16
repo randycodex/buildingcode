@@ -9997,6 +9997,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: var(--surface-muted);
 }
 
+.saved-project-tile.is-unassigned-saved {
+  grid-column: 1 / -1;
+}
+
 .saved-folder-context,
 .saved-unassigned-notice {
   display: grid;
