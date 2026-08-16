@@ -9869,7 +9869,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   height: 13px;
 }
 
-.saved-projects-selection-cancel {
+.saved-projects-actions .saved-projects-selection-cancel {
   width: auto;
   padding-inline: var(--space-1);
   font-size: calc(var(--chrome-font-size) * 0.66);
