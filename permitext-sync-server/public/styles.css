@@ -6781,8 +6781,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .research-list-panel .research-conversation-list {
-  width: calc(100% + (2 * var(--panel-padding)));
-  margin-inline: calc(-1 * var(--panel-padding));
+  width: 100%;
+  min-width: 0;
+  margin-inline: 0;
 }
 
 .research-history-group {
@@ -7233,6 +7234,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
 }
 
 .analysis-panel.has-research-composer > .analysis-content {
+  width: calc(100% + (2 * var(--panel-padding)));
+  min-width: 0;
+  margin-inline: calc(-1 * var(--panel-padding));
+  overflow-x: hidden;
   overflow-y: auto;
 }
 
