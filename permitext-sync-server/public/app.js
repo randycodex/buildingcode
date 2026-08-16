@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-saved-reader-v269";
+} from "./offline-storage.js?v=20260816-research-system-v270";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -18294,7 +18294,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const headingWrap = document.createElement("div");
   const eyebrow = document.createElement("p");
   eyebrow.className = "eyebrow panel-kind";
-  eyebrow.textContent = "Research conversation";
+  eyebrow.textContent = "Research";
   const panelTitle = document.createElement("h2");
   panelTitle.className = "panel-title";
   panelTitle.tabIndex = -1;
@@ -22555,12 +22555,8 @@ function appendProjectResearchHistory(content, identity, foundation) {
     card.append(question);
     if (!identity.sharedOnly) {
       card.addEventListener("click", () => {
-        if (state.utilities.analysis && researchConversationPaneIsOpen()) {
-          void openSupplementalResearchConversation(conversation.id);
-          return;
-        }
         researchConversationPaneOpened = true;
-        void openResearchConversation(conversation.id, { showResearchList: false });
+        void openResearchConversation(conversation.id);
       });
     }
     body.append(card);
@@ -25584,12 +25580,8 @@ async function appendSavedProjectResearchConversations(container, identity) {
     question.textContent = conversation.starterQuestion;
     card.append(itemNumber, question);
     card.addEventListener("click", () => {
-      if (state.utilities.analysis && researchConversationPaneIsOpen()) {
-        void openSupplementalResearchConversation(conversation.id);
-        return;
-      }
       researchConversationPaneOpened = true;
-      void openResearchConversation(conversation.id, { showResearchList: false });
+      void openResearchConversation(conversation.id);
     });
     body.append(card);
   });
