@@ -13674,9 +13674,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .notebook-card-title {
+  height: 40px;
   min-height: 40px;
   min-width: 0;
-  padding: 8px 10px;
+  padding: 0 10px;
   border: 0;
   border-radius: var(--radius-control);
   background: var(--surface-muted);
@@ -13689,6 +13690,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   box-sizing: border-box;
   font-size: 16px;
   font-weight: 700;
+  line-height: 40px;
 }
 
 .notebook-toolbar {
