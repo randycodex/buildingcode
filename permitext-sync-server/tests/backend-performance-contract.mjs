@@ -286,6 +286,34 @@ assert(
   "Reader progressive hydration still downloads the entire chapter without user demand."
 );
 assert(
+  webAppSource.includes("let projectTransitionHubEntry = null;") &&
+    webAppSource.includes('postResearch("/projects/hub/bootstrap", { projectID })') &&
+    webAppSource.includes("entry.accountUserID === account.userID") &&
+    webAppSource.includes("entry.sessionToken === account.sessionToken") &&
+    webAppSource.includes("entry.workspaceID === activeWorkspaceID"),
+  "Project switching does not share one account-, session-, workspace-, and Project-scoped bootstrap."
+);
+assert(
+  webAppSource.includes("hubPayload?.foundation && hubPayload?.notebook") &&
+    webAppSource.includes('hubPayload?.reports || postResearch("/reports/history/list", { projectID })') &&
+    webAppSource.includes("foundation = hubPayload?.foundation ||"),
+  "Notebook, Report history, and Saved do not share the Project transition bootstrap payload."
+);
+assert(
+  webAppSource.includes("const projectToolPanePromises = [];") &&
+    webAppSource.includes("Promise.all(projectToolPanePromises)"),
+  "Project switching still builds Notebook and Report serially."
+);
+assert(
+  webAppSource.includes("settleSavedPanelAfterProjectTransition(paneID, previousPanel)") &&
+    webAppSource.includes('panel.dataset.savedHydrated = "true"'),
+  "Project switching can queue a duplicate hydration for a newly rendered Saved panel."
+);
+assert(
+  /async function handleProjectHubBootstrap[\s\S]*?access: \{[\s\S]*?organization: access\.organization[\s\S]*?organizationForClient/.test(appSource),
+  "Project Hub bootstrap omits organization identity required by shared Project clients."
+);
+assert(
   syncBatchIncludesProjectMutation([{ project: { id: "project-1" } }]) &&
     !syncBatchIncludesProjectMutation([{ savedItem: { id: "saved-1" } }]) &&
     !syncBatchIncludesProjectMutation([]),

@@ -453,6 +453,7 @@ const coordinationComposerDraftByProject = new Map();
 let projectStudioFolderReconcilePromise = null;
 let projectStudioTransitionGeneration = 0;
 let workspaceRenderGeneration = 0;
+let projectTransitionHubEntry = null;
 const pendingNotebookCardByProject = new Map();
 const pendingReportDraftByProject = new Map();
 const reportDraftFocusResultByProject = new Map();
@@ -19934,13 +19935,25 @@ async function renderProjectNotebook(project) {
     let foundationPayload;
     let cardPayload;
     try {
-      [foundationPayload, cardPayload] = await Promise.all([
-        identity.sharedOrganizationID
-          ? postResearch("/organizations/projects/snapshot", { projectID })
-              .then((payload) => payload.project)
-          : postResearch("/projects/foundation/state", { projectID }),
-        postResearch("/notebook/cards/list", { projectID })
-      ]);
+      const hubPayload = await projectTransitionHubPayload(projectID);
+      if (hubPayload?.foundation && hubPayload?.notebook && hubPayload.access?.canReadNotebook === true) {
+        foundationPayload = hubPayload.foundation;
+        cardPayload = {
+          ...hubPayload.notebook,
+          access: {
+            ...(hubPayload.notebook.access || {}),
+            readOnly: hubPayload.access?.readOnly === true
+          }
+        };
+      } else {
+        [foundationPayload, cardPayload] = await Promise.all([
+          identity.sharedOrganizationID
+            ? postResearch("/organizations/projects/snapshot", { projectID })
+                .then((payload) => payload.project)
+            : postResearch("/projects/foundation/state", { projectID }),
+          postResearch("/notebook/cards/list", { projectID })
+        ]);
+      }
       await saveNotebookProjectSnapshot({
         accountUserID: activeAccount().userID,
         projectID,
@@ -22171,10 +22184,12 @@ async function renderProjectReportDraft(project) {
   }
 
   try {
+    const historyPayloadPromise = projectTransitionHubPayload(projectID)
+      .then((hubPayload) => hubPayload?.reports || postResearch("/reports/history/list", { projectID }));
     const [draftPayload, sourcePayload, historyPayload, optionsPayload] = await Promise.all([
       postResearch("/reports/drafts/list", { projectID }),
       postResearch("/reports/sources/list", { projectID }),
-      postResearch("/reports/history/list", { projectID }),
+      historyPayloadPromise,
       postResearch("/reports/options", { projectID })
     ]);
     if (disposed) return panel;
@@ -25642,10 +25657,11 @@ async function appendSavedProjectResearchConversations(container, identity) {
   const projectID = projectDetailKey(identity);
   let foundation;
   try {
-    foundation = identity.sharedOrganizationID
+    const hubPayload = await projectTransitionHubPayload(projectID);
+    foundation = hubPayload?.foundation || (identity.sharedOrganizationID
       ? await postResearch("/organizations/projects/snapshot", { projectID })
           .then((payload) => payload.project)
-      : await postResearch("/projects/foundation/state", { projectID });
+      : await postResearch("/projects/foundation/state", { projectID }));
   } catch {
     return;
   }
@@ -26380,7 +26396,10 @@ function hydrateSavedPanel(panel, savedInstance, paneID, options = {}) {
     .catch(() => {})
     .then(() => performSavedPanelHydration(panel, savedInstance, paneID, options));
   panel.__savedHydrationPromise = hydration;
-  return hydration.finally(() => {
+  return hydration.then((value) => {
+    panel.dataset.savedHydrated = "true";
+    return value;
+  }).finally(() => {
     if (panel.__savedHydrationPromise === hydration) {
       delete panel.__savedHydrationPromise;
     }
@@ -26403,10 +26422,74 @@ async function refreshSavedPanelInPlace(paneID, options = {}) {
   return true;
 }
 
+function projectTransitionHubMatches(entry, projectID) {
+  const account = activeAccount();
+  return Boolean(
+    entry &&
+    account &&
+    entry.projectID === String(projectID || "") &&
+    entry.accountUserID === account.userID &&
+    entry.sessionToken === account.sessionToken &&
+    entry.workspaceID === activeWorkspaceID
+  );
+}
+
+async function projectTransitionHubPayload(projectID) {
+  const entry = projectTransitionHubEntry;
+  if (!projectTransitionHubMatches(entry, projectID)) return null;
+  const payload = await entry.promise;
+  if (!projectTransitionHubMatches(entry, projectID)) return null;
+  return String(payload?.projectID || "") === String(projectID || "") ? payload : null;
+}
+
+function beginProjectTransitionHub(project) {
+  const account = activeAccount();
+  const projectID = project ? projectDetailKey(projectIdentity(project)) : "";
+  if (!account || !projectID || (!projectHasOpenNotebook(project) && !projectHasOpenReportDraft(project))) {
+    return null;
+  }
+  const entry = {
+    accountUserID: account.userID,
+    sessionToken: account.sessionToken,
+    workspaceID: activeWorkspaceID,
+    projectID,
+    promise: postResearch("/projects/hub/bootstrap", { projectID }).catch(() => null)
+  };
+  projectTransitionHubEntry = entry;
+  return entry;
+}
+
+async function settleSavedPanelAfterProjectTransition(paneID, previousPanel) {
+  const panel = track.querySelector(
+    `.saved-panel[data-pane-id="${CSS.escape(paneID)}"]`
+  );
+  if (!panel) return false;
+  if (panel === previousPanel) return refreshSavedPanelInPlace(paneID);
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  const hydration = panel.__savedHydrationPromise;
+  if (hydration) await hydration;
+  else if (panel.dataset.savedHydrated !== "true") {
+    const savedInstance = (state.utilityInstances || []).find((instance) =>
+      instance.key === "saved" && paneIDForUtilityInstance(instance) === paneID
+    );
+    if (!savedInstance) return false;
+    await hydrateSavedPanel(panel, savedInstance, paneID);
+  }
+  return panel.isConnected;
+}
+
 async function transitionProjectSelection(paneID) {
-  await transitionWorkspace("utility");
-  if (await refreshSavedPanelInPlace(paneID)) return;
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  const previousPanel = track.querySelector(
+    `.saved-panel[data-pane-id="${CSS.escape(paneID)}"]`
+  );
+  const entry = beginProjectTransitionHub(openProjectDetails()[0] || null);
+  try {
+    await transitionWorkspace("utility");
+    if (await settleSavedPanelAfterProjectTransition(paneID, previousPanel)) return;
+    await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  } finally {
+    if (projectTransitionHubEntry === entry) projectTransitionHubEntry = null;
+  }
 }
 
 function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 0) {
@@ -33287,14 +33370,16 @@ async function renderUtilityWorkspace(options = {}) {
     panes.push(await reuseOrRenderPane(workboardID, () => renderProjectWorkboard(genericWorkboardIdentity)));
   }
   for (const detail of openProjectDetails()) {
+    const projectToolPanePromises = [];
     if (projectHasOpenNotebook(detail)) {
       const notebookID = paneIDForProjectNotebook(detail);
-      panes.push(await reuseOrRenderPane(notebookID, () => renderProjectNotebook(detail)));
+      projectToolPanePromises.push(reuseOrRenderPane(notebookID, () => renderProjectNotebook(detail)));
     }
     if (projectHasOpenReportDraft(detail)) {
       const reportDraftID = paneIDForProjectReportDraft(detail);
-      panes.push(await reuseOrRenderPane(reportDraftID, () => renderProjectReportDraft(detail)));
+      projectToolPanePromises.push(reuseOrRenderPane(reportDraftID, () => renderProjectReportDraft(detail)));
     }
+    panes.push(...(await Promise.all(projectToolPanePromises)).filter(Boolean));
     if (releaseSurfaceVisibility.coordination && projectHasOpenCoordination(detail)) {
       const coordinationID = paneIDForProjectCoordination(detail);
       panes.push(await reuseOrRenderPane(coordinationID, () => renderProjectCoordination(detail)));

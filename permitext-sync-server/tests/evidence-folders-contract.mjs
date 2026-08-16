@@ -272,7 +272,14 @@ assert.ok(
     deactivateProjectStudioSource.indexOf("closeProjectDetailForProject"),
   "Project deactivation must confirm Report edits before changing workspace state."
 );
-assert.match(functionSource(appSource, "transitionProjectSelection"), /refreshSavedPanelInPlace/);
+assert.match(
+  functionSource(appSource, "transitionProjectSelection"),
+  /settleSavedPanelAfterProjectTransition/
+);
+assert.match(
+  functionSource(appSource, "settleSavedPanelAfterProjectTransition"),
+  /refreshSavedPanelInPlace/
+);
 assert.match(functionSource(appSource, "refreshSavedPanelInPlace"), /scrollTop[\s\S]*?hydrateSavedPanel[\s\S]*?scrollTop/);
 const syncedRefreshSource = functionSource(appSource, "refreshSyncedWorkspaceInPlace");
 assert.doesNotMatch(

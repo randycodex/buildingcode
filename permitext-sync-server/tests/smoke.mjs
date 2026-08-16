@@ -7830,9 +7830,10 @@ async function main() {
       projectHubBootstrap.json.projectID === "project-client-smoke" &&
         Array.isArray(projectHubBootstrap.json.foundation?.projects) &&
         projectHubBootstrap.json.foundation.projects.length === 1 &&
-        projectHubBootstrap.json.foundation.projects[0].id === "project-client-smoke" &&
-        Array.isArray(projectHubBootstrap.json.notebook?.cards) &&
-        Array.isArray(projectHubBootstrap.json.reports?.reports),
+      projectHubBootstrap.json.foundation.projects[0].id === "project-client-smoke" &&
+      Array.isArray(projectHubBootstrap.json.notebook?.cards) &&
+      Array.isArray(projectHubBootstrap.json.reports?.reports) &&
+      Object.hasOwn(projectHubBootstrap.json.access || {}, "organization"),
       "Project Hub bootstrap did not return a single-project foundation with notebook and report sections."
     );
     const linkSavedToProject = await request("/projects/foundation/link", {

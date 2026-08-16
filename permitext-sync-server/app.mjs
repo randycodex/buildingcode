@@ -12488,7 +12488,15 @@ async function handleProjectHubBootstrap(request, response) {
       permissions: access.permissions,
       readOnly: !access.permissions.includes(organizationPermissions.projectEdit),
       canReadNotebook,
-      canDownloadReports
+      canDownloadReports,
+      organization: access.organization
+        ? organizationForClient(access.organization, {
+          role: access.role,
+          permissions: access.permissions,
+          accessScope: access.membership?.projectID ? "project" : "organization",
+          visibleProjectIDs: [access.projectID]
+        })
+        : null
     },
     foundation,
     notebook: {
