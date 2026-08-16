@@ -360,6 +360,21 @@ assert.match(openResearchConversationSource, /researchSurfaceWasOpen/);
 assert.match(openResearchConversationSource, /options\.anchorPaneID && !researchSurfaceWasOpen/);
 assert.match(openResearchConversationSource, /placePaneAfter\(options\.anchorPaneID, "utility:analysis"\)/);
 assert.match(functionSource(appSource, "researchSelectionFromWindow"), /originPaneID: panel\.dataset\.paneId/);
+[
+  "closeUtilityInstance",
+  "closeResearchWorkspace",
+  "closeResearchConversation",
+  "closeProjectNotebook",
+  "closeProjectReportDraft",
+  "closeAllColumns"
+].forEach((functionName) => {
+  const closeSource = functionSource(appSource, functionName);
+  assert.doesNotMatch(
+    closeSource,
+    /deleteResearchConversationFromList|deleteNotebookCard|removeSectionFromProject|removeSectionFromAllProjects|deleteArchivedProjectData/,
+    `${functionName} must close presentation state without deleting user records.`
+  );
+});
 assert.match(functionSource(appSource, "activePaneIDs"), /pinCriticalWorkflowPanesToLeft\(paired\)/);
 assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);

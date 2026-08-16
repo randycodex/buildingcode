@@ -105,6 +105,27 @@ assert.equal(legacyLayout.coordinationThreads[0].threadID, "thread-1");
 assert.deepEqual(legacyLayout.coordinationFilters, { "project-1": "waiting" });
 assert.equal(workspaceLayoutHasVisiblePanes(legacyLayout), true);
 
+const domainRecords = {
+  projects: [{ id: "project-1", name: "Project 1" }],
+  savedEvidence: [{ id: "evidence-1", projectID: "project-1", sectionID: "8779" }],
+  researchHistory: [{ id: "research-1", projectID: "project-1", evidenceIDs: ["evidence-1"] }],
+  notebookCards: [{ id: "note-1", projectID: "project-1", evidenceIDs: ["evidence-1"] }],
+  reports: [{ id: "report-1", projectID: "project-1", notebookCardIDs: ["note-1"] }],
+  governanceRecords: [{ id: "review-1", reportID: "report-1", version: 3 }]
+};
+const stateWithDomainRecords = {
+  ...structuredClone(domainRecords),
+  ...emptyWorkspaceLayout()
+};
+applyWorkspaceLayout(stateWithDomainRecords, legacyLayout);
+Object.entries(domainRecords).forEach(([key, records]) => {
+  assert.deepEqual(
+    stateWithDomainRecords[key],
+    records,
+    `Applying a legacy workspace layout must not migrate or replace ${key}.`
+  );
+});
+
 const restoredResearchLayout = normalizeWorkspaceLayout({
   utilities: { analysis: true },
   researchConversationID: "research-1",
