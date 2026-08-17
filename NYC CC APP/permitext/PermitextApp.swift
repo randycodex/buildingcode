@@ -221,7 +221,7 @@ private struct PermitextTabNavigation: View {
 
             ResearchView()
                 .tabItem {
-                    Image("Astroid")
+                    Image(systemName: "sparkles")
                 }
                 .accessibilityLabel("Research")
                 .tag(AppTab.research)
