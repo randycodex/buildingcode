@@ -186,6 +186,12 @@ struct ChapterHTMLSectionTarget: Hashable {
     }
 }
 
+struct ChapterHTMLResearchTarget: Hashable {
+    let anchorID: String
+    let sectionNumber: String?
+    let selectedText: String
+}
+
 struct ChapterHTMLWebView: UIViewRepresentable {
     let chapterURL: URL
     let readAccessURL: URL
@@ -208,6 +214,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let onScrollProgressChange: ((CGFloat) -> Void)?
     let onScrollOffsetChange: ((CGFloat) -> Void)?
     let onOpenSectionForAnchor: ((ChapterHTMLSectionTarget) -> Void)?
+    let onResearchSelection: ((ChapterHTMLResearchTarget) -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -219,6 +226,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         configuration.userContentController.add(context.coordinator, name: Coordinator.visibleAnchorMessageName)
         configuration.userContentController.add(context.coordinator, name: Coordinator.scrollProgressMessageName)
         configuration.userContentController.add(context.coordinator, name: Coordinator.openSectionMessageName)
+        configuration.userContentController.add(context.coordinator, name: Coordinator.researchSelectionMessageName)
         configuration.userContentController.addUserScript(
             WKUserScript(
                 source: Coordinator.initialReaderBootstrapScript(for: colorScheme),
@@ -307,6 +315,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         static let visibleAnchorMessageName = "nycccVisibleAnchor"
         static let scrollProgressMessageName = "nycccScrollProgress"
         static let openSectionMessageName = "nycccOpenSection"
+        static let researchSelectionMessageName = "nycccResearchSelection"
 
         var parent: ChapterHTMLWebView?
         weak var webView: WKWebView?
@@ -391,6 +400,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             contentController.removeScriptMessageHandler(forName: Self.visibleAnchorMessageName)
             contentController.removeScriptMessageHandler(forName: Self.scrollProgressMessageName)
             contentController.removeScriptMessageHandler(forName: Self.openSectionMessageName)
+            contentController.removeScriptMessageHandler(forName: Self.researchSelectionMessageName)
             contentController.removeAllUserScripts()
             self.webView = nil
         }
@@ -601,6 +611,103 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 var text = (heading.textContent || '').replace(/^\\s*#-+\\s*/, '').trim();
                 var match = text.match(/^([A-Z]?\\d+(?:\\.\\d+)*)\\b/i);
                 return match ? match[1].toUpperCase() : null;
+              }
+
+              function researchTargetForNode(node) {
+                var element = node && node.nodeType === Node.ELEMENT_NODE ? node : (node && node.parentElement);
+                if (!element) { return null; }
+
+                var taggedBlock = element.closest('[data-nyccc-heading-anchor], [data-nyccc-section-number]');
+                if (taggedBlock) {
+                  return {
+                    anchorID: taggedBlock.dataset.nycccHeadingAnchor || '',
+                    sectionNumber: taggedBlock.dataset.nycccSectionNumber || ''
+                  };
+                }
+
+                var directHeading = element.closest('.Subsection, .Section');
+                if (directHeading) {
+                  return {
+                    anchorID: directHeading.id || '',
+                    sectionNumber: sectionNumberForHeading(directHeading) || ''
+                  };
+                }
+
+                var headings = document.querySelectorAll('.Section, .Subsection');
+                var precedingHeading = null;
+                headings.forEach(function(heading) {
+                  if (heading === node || (heading.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING)) {
+                    precedingHeading = heading;
+                  }
+                });
+                if (!precedingHeading) { return null; }
+                return {
+                  anchorID: precedingHeading.id || '',
+                  sectionNumber: sectionNumberForHeading(precedingHeading) || ''
+                };
+              }
+
+              function researchSelectionButton() {
+                var button = document.getElementById('nyccc-research-selection-button');
+                if (button) { return button; }
+                button = document.createElement('button');
+                button.id = 'nyccc-research-selection-button';
+                button.type = 'button';
+                button.hidden = true;
+                button.setAttribute('aria-label', 'Add selected enacted text to Research');
+                button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C10.7 7.3 7.3 10.7 2 12c5.3 1.3 8.7 4.7 10 10 1.3-5.3 4.7-8.7 10-10-5.3-1.3-8.7-4.7-10-10Z"></path></svg>';
+                button.addEventListener('pointerdown', function(event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                });
+                button.addEventListener('click', function(event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  var payload = window.__nycccResearchSelectionPayload;
+                  if (!payload) { return; }
+                  try {
+                    window.webkit.messageHandlers.\(Coordinator.researchSelectionMessageName).postMessage(payload);
+                  } catch (error) {}
+                  button.hidden = true;
+                });
+                document.body.appendChild(button);
+                return button;
+              }
+
+              function updateResearchSelectionAction() {
+                var button = researchSelectionButton();
+                var selection = window.getSelection ? window.getSelection() : null;
+                var text = selection ? String(selection).replace(/\\s+/g, ' ').trim() : '';
+                if (!selection || selection.rangeCount === 0 || text.length < 2) {
+                  window.__nycccResearchSelectionPayload = null;
+                  button.hidden = true;
+                  return;
+                }
+
+                var range = selection.getRangeAt(0);
+                var startTarget = researchTargetForNode(range.startContainer);
+                var endTarget = researchTargetForNode(range.endContainer);
+                if (!startTarget || !endTarget ||
+                    (startTarget.anchorID || startTarget.sectionNumber) !== (endTarget.anchorID || endTarget.sectionNumber)) {
+                  window.__nycccResearchSelectionPayload = null;
+                  button.hidden = true;
+                  return;
+                }
+
+                var rect = range.getBoundingClientRect();
+                if (!rect || (!rect.width && !rect.height)) {
+                  button.hidden = true;
+                  return;
+                }
+
+                window.__nycccResearchSelectionPayload = {
+                  anchorID: startTarget.anchorID || '',
+                  sectionNumber: startTarget.sectionNumber || '',
+                  selectedText: text.slice(0, 12000)
+                };
+                button.style.left = Math.max(8, Math.min(window.innerWidth - 48, rect.right - 40)) + 'px';
+                button.style.top = Math.max(8, Math.min(window.innerHeight - 48, rect.bottom + 8)) + 'px';
+                button.hidden = false;
               }
 
               function openSectionForHeading(heading) {
@@ -986,6 +1093,17 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 });
               };
               window.addEventListener('scroll', window.__nycccVisibleAnchorListener, { passive: true });
+              document.removeEventListener('selectionchange', window.__nycccResearchSelectionListener);
+              window.__nycccResearchSelectionListener = function() {
+                window.requestAnimationFrame(updateResearchSelectionAction);
+              };
+              document.addEventListener('selectionchange', window.__nycccResearchSelectionListener);
+              window.removeEventListener('scroll', window.__nycccResearchSelectionScrollListener);
+              window.__nycccResearchSelectionScrollListener = function() {
+                var button = document.getElementById('nyccc-research-selection-button');
+                if (button) { button.hidden = true; }
+              };
+              window.addEventListener('scroll', window.__nycccResearchSelectionScrollListener, { passive: true });
               setTimeout(function() {
                 reportVisibleAnchor();
                 reportScrollProgress();
@@ -1315,6 +1433,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 return
             }
 
+            if message.name == Self.researchSelectionMessageName {
+                guard let target = researchTarget(from: message.body) else { return }
+                DispatchQueue.main.async { [weak self] in
+                    self?.parent?.onResearchSelection?(target)
+                }
+                return
+            }
+
             guard message.name == Self.visibleAnchorMessageName,
                   let anchorID = message.body as? String,
                   !anchorID.isEmpty
@@ -1359,6 +1485,23 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 blockID: blockID?.isEmpty == false ? blockID : nil,
                 blockLabel: blockLabel?.isEmpty == false ? blockLabel : nil,
                 action: action?.isEmpty == false ? action : nil
+            )
+        }
+
+        private func researchTarget(from body: Any) -> ChapterHTMLResearchTarget? {
+            guard let payload = body as? [String: Any] else { return nil }
+            let anchorID = (payload["anchorID"] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let sectionNumber = (payload["sectionNumber"] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let selectedText = (payload["selectedText"] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            guard !selectedText.isEmpty,
+                  !anchorID.isEmpty || !(sectionNumber?.isEmpty ?? true) else { return nil }
+            return ChapterHTMLResearchTarget(
+                anchorID: anchorID,
+                sectionNumber: sectionNumber?.isEmpty == false ? sectionNumber : nil,
+                selectedText: selectedText
             )
         }
 
@@ -1629,6 +1772,35 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-section-open-target {
               cursor: pointer;
+            }
+            #nyccc-research-selection-button {
+              position: fixed !important;
+              z-index: 2147483647 !important;
+              display: inline-flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              width: 2.5rem !important;
+              height: 2.5rem !important;
+              padding: 0 !important;
+              border: 0 !important;
+              border-radius: 999px !important;
+              background: \(accentHex) !important;
+              color: white !important;
+              box-shadow: 0 0.2rem 0.8rem rgba(0,0,0,0.28) !important;
+              -webkit-appearance: none !important;
+              appearance: none !important;
+            }
+            #nyccc-research-selection-button[hidden] {
+              display: none !important;
+            }
+            #nyccc-research-selection-button svg {
+              width: 1.28rem !important;
+              height: 1.28rem !important;
+              fill: none !important;
+              stroke: currentColor !important;
+              stroke-width: 1.8 !important;
+              stroke-linecap: round !important;
+              stroke-linejoin: round !important;
             }
             .nyccc-inline-reference {
               display: inline !important;

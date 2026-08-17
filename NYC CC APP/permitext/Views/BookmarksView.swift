@@ -1151,6 +1151,26 @@ struct ProjectView: View {
         )
     }
 
+    private var nativeNotebookReferenceCandidates: [NativeNotebookReferenceCandidate] {
+        let evidence = projectBookmarks.map { bookmark in
+            NativeNotebookReferenceCandidate(
+                kind: "canonicalSection",
+                referenceID: bookmark.clientID ?? String(bookmark.id),
+                label: "\(bookmark.codeSectionName) · § \(bookmark.sectionNumber) · \(bookmark.displayTitle)",
+                detail: "Saved Evidence"
+            )
+        }
+        let research = (projectHubSnapshot?.researchAnswers ?? []).map { answer in
+            NativeNotebookReferenceCandidate(
+                kind: "researchAnswer",
+                referenceID: answer.id,
+                label: answer.question,
+                detail: "Terra Research"
+            )
+        }
+        return evidence + research
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
@@ -1402,6 +1422,24 @@ struct ProjectView: View {
             PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"
         }
         projectHubSection(title: "Notebook", systemImage: "note.text") {
+            if let projectID = library.backendProjectID(for: folderID) {
+                NavigationLink {
+                    ProjectNotebookView(
+                        projectID: projectID,
+                        projectName: folder?.name ?? "Project",
+                        accentColor: accentColor,
+                        referenceCandidates: nativeNotebookReferenceCandidates,
+                        onChanged: { Task { await loadProjectHub() } }
+                    )
+                    .environmentObject(library)
+                } label: {
+                    Label("Open Notebook", systemImage: "note.text")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 6)
+                }
+                .buttonStyle(.plain)
+            }
             if cards.isEmpty {
                 projectHubEmpty("No synced Notebook cards yet.")
             } else {

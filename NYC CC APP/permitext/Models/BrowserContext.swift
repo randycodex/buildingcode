@@ -6,7 +6,7 @@ enum AppTab: Hashable {
     case browseSecondary
     case search
     case bookmarks
-    case settings
+    case research
 }
 
 struct ContinuityStore {

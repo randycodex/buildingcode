@@ -311,7 +311,6 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
                 researchAnswers: bootstrap.foundation.researchAnswers,
                 activity: bootstrap.foundation.activity,
                 reports: bootstrap.reports.reports,
-                workboardPreview: bootstrap.foundation.workboardPreview,
                 foundationArtifacts: bootstrap.foundation.artifacts ?? []
             )
         } catch let error as PermitextBackendHTTPError {
@@ -353,8 +352,193 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             researchAnswers: foundationResponse.researchAnswers,
             activity: foundationResponse.activity,
             reports: reportResponse.reports,
-            workboardPreview: foundationResponse.workboardPreview,
             foundationArtifacts: foundationResponse.artifacts ?? []
+        )
+    }
+
+    func researchConversations(account: SignedInAccount) async throws -> [ResearchConversationSummary] {
+        try await transport.researchConversationList(
+            ResearchConversationListRequest(auth: authContext(for: account))
+        ).conversations
+    }
+
+    func researchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation {
+        try await transport.researchConversationGet(
+            ResearchConversationGetRequest(
+                auth: authContext(for: account),
+                conversationID: conversationID
+            )
+        ).conversation
+    }
+
+    func createResearchConversation(
+        account: SignedInAccount,
+        projectID: String?,
+        selections: [ResearchSelectionRequest]
+    ) async throws -> ResearchConversation {
+        try await transport.researchConversationCreate(
+            ResearchConversationCreateRequest(
+                auth: authContext(for: account),
+                projectID: projectID,
+                selections: selections.isEmpty ? nil : selections,
+                originSurface: "ios-reader"
+            )
+        ).conversation
+    }
+
+    func addResearchEvidence(
+        account: SignedInAccount,
+        conversationID: String,
+        selections: [ResearchSelectionRequest]
+    ) async throws -> ResearchConversation {
+        try await transport.researchConversationAddEvidence(
+            ResearchConversationEvidenceRequest(
+                auth: authContext(for: account),
+                conversationID: conversationID,
+                selections: selections,
+                originSurface: "ios-reader"
+            )
+        ).conversation
+    }
+
+    func sendResearchMessage(
+        account: SignedInAccount,
+        conversationID: String,
+        question: String,
+        requestID: String
+    ) async throws -> ResearchConversation {
+        try await transport.researchConversationMessage(
+            ResearchConversationMessageRequest(
+                auth: authContext(for: account),
+                conversationID: conversationID,
+                question: question,
+                requestID: requestID
+            )
+        ).conversation
+    }
+
+    func renameResearchConversation(
+        account: SignedInAccount,
+        conversationID: String,
+        title: String
+    ) async throws -> ResearchConversation {
+        try await transport.researchConversationRename(
+            ResearchConversationRenameRequest(
+                auth: authContext(for: account),
+                conversationID: conversationID,
+                title: title
+            )
+        ).conversation
+    }
+
+    func assignResearchConversation(
+        account: SignedInAccount,
+        conversationID: String,
+        projectID: String?,
+        confirmMove: Bool
+    ) async throws -> ResearchConversation {
+        try await transport.researchConversationAssignProject(
+            ResearchConversationAssignProjectRequest(
+                auth: authContext(for: account),
+                conversationID: conversationID,
+                projectID: projectID,
+                confirmMove: confirmMove
+            )
+        ).conversation
+    }
+
+    func deleteResearchConversation(account: SignedInAccount, conversationID: String) async throws {
+        _ = try await transport.researchConversationDelete(
+            ResearchConversationDeleteRequest(
+                auth: authContext(for: account),
+                conversationID: conversationID
+            )
+        )
+    }
+
+    func notebookCards(account: SignedInAccount, projectID: String) async throws -> NotebookCardListResponse {
+        try await transport.notebookCardList(
+            NotebookCardListRequest(auth: authContext(for: account), projectID: projectID)
+        )
+    }
+
+    func notebookCard(account: SignedInAccount, projectID: String, cardID: String) async throws -> NotebookCard {
+        try await transport.notebookCardGet(
+            NotebookCardGetRequest(
+                auth: authContext(for: account),
+                projectID: projectID,
+                cardID: cardID
+            )
+        ).card
+    }
+
+    func saveNotebookCard(
+        account: SignedInAccount,
+        projectID: String,
+        cardID: String?,
+        expectedVersion: Int,
+        title: String,
+        document: NotebookDocument,
+        evidenceLinks: [NotebookEvidenceLink]
+    ) async throws -> NotebookCard {
+        try await transport.notebookCardSave(
+            NotebookCardSaveRequest(
+                auth: authContext(for: account),
+                projectID: projectID,
+                cardID: cardID,
+                expectedVersion: expectedVersion,
+                cardType: "finding",
+                title: title,
+                document: document,
+                evidenceLinks: evidenceLinks
+            )
+        ).card
+    }
+
+    func deleteNotebookCard(
+        account: SignedInAccount,
+        projectID: String,
+        cardID: String,
+        expectedVersion: Int
+    ) async throws {
+        _ = try await transport.notebookCardDelete(
+            NotebookCardDeleteRequest(
+                auth: authContext(for: account),
+                projectID: projectID,
+                cardID: cardID,
+                expectedVersion: expectedVersion
+            )
+        )
+    }
+
+    func uploadNotebookAsset(
+        account: SignedInAccount,
+        projectID: String,
+        data: Data,
+        contentType: String,
+        width: Int?,
+        height: Int?
+    ) async throws -> NotebookImageAsset {
+        try await transport.notebookAssetUpload(
+            NotebookAssetUploadRequest(
+                auth: authContext(for: account),
+                projectID: projectID,
+                assetID: UUID().uuidString.lowercased(),
+                contentType: contentType,
+                width: width,
+                height: height
+            ),
+            data: data
+        ).asset
+    }
+
+    func notebookAsset(account: SignedInAccount, projectID: String, assetID: String) async throws -> Data {
+        try await transport.notebookAsset(
+            NotebookAssetReadRequest(
+                auth: authContext(for: account),
+                projectID: projectID,
+                assetID: assetID
+            )
         )
     }
 
@@ -399,20 +583,6 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
                 auth: authContext(for: account),
                 projectID: projectID,
                 generatedReportID: generatedReportID
-            )
-        )
-    }
-
-    func projectWorkboardPreview(
-        account: SignedInAccount,
-        projectID: String,
-        previewID: String
-    ) async throws -> Data {
-        try await transport.projectWorkboardPreview(
-            BackendProjectWorkboardPreviewRequest(
-                auth: authContext(for: account),
-                projectID: projectID,
-                previewID: previewID
             )
         )
     }

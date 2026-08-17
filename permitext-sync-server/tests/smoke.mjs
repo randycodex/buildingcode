@@ -1438,8 +1438,15 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260816-reader-orphan-cleanup-v343'),
+        webRoot.text.includes('/web/app.js?v=20260817-native-research-notebook-v346'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
+    );
+    assert(
+      webRoot.text.includes('class="mobile-web-message"') &&
+        webRoot.text.includes("Permitext mobile is still in process.") &&
+        workspaceStyles.text.includes("@media (max-width: 767px) and (pointer: coarse)") &&
+        workspaceStyles.text.includes("body > .workspace-shell"),
+      "Phone-sized touch browsers should receive the temporary mobile-in-process screen."
     );
     assert(
       workspaceScript.text.includes("function syncSavedArchiveButtonStates()") &&
@@ -1529,10 +1536,8 @@ async function main() {
         workspaceStyles.text.includes(".bn-suggestion-menu {\n  background: var(--menu-surface) !important;") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-block-content::after,\n.notebook-editor-surface .bn-side-menu svg {\n  color: var(--text-tertiary) !important;") &&
         workspaceStyles.text.includes('.notebook-editor-surface table :is(th, td) {\n  border-color: #000 !important;') &&
-        workspaceStyles.text.includes('[data-line-spacing="24px"] { --notebook-line-spacing: 24px; line-height: 24px !important; }') &&
-        workspaceStyles.text.includes('[data-text-size="24px"] { --notebook-text-size: 24px; font-size: 24px !important; }') &&
-        workspaceStyles.text.includes("line-height: max(var(--notebook-line-spacing, 0px), calc(var(--notebook-text-size) * 1.2)) !important;") &&
-        workspaceStyles.text.includes(".notebook-editor-surface [data-text-size] * {\n  font-size: inherit !important;") &&
+        !workspaceStyles.text.includes("notebook-line-spacing") &&
+        !workspaceStyles.text.includes("notebook-text-size") &&
         workspaceStyles.text.includes("border: 0;\n  border-radius: var(--radius-control);") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-container {\n  min-height: 100%;\n  border-radius: inherit;") &&
         workspaceStyles.text.includes(".notebook-editor-surface,\n  .notebook-editor-surface .bn-container,\n  .notebook-editor-surface .bn-editor {\n    background: var(--menu-surface);\n    color: var(--text-primary);") &&
@@ -1599,7 +1604,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-orphan-cleanup-v342'),
+      webRoot.text.includes('/web/styles.css?v=20260817-native-research-notebook-v346'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1866,7 +1871,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260816-reader-orphan-cleanup-v342'),
+      webRoot.text.includes('/web/styles.css?v=20260817-native-research-notebook-v346'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

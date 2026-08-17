@@ -550,6 +550,19 @@ struct ChapterHTMLReaderView: View {
                 } else {
                     openNotes(for: target)
                 }
+            },
+            onResearchSelection: { target in
+                let sectionTarget = ChapterHTMLSectionTarget(
+                    anchorID: target.anchorID,
+                    sectionNumber: target.sectionNumber
+                )
+                guard let section = sectionSummary(for: sectionTarget) else { return }
+                library.sendToResearch(
+                    ResearchSelectionRequest(
+                        sectionID: String(section.id),
+                        selectedText: target.selectedText
+                    )
+                )
             }
         )
         .safeAreaInset(edge: .bottom, spacing: 0) {

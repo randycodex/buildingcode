@@ -13317,27 +13317,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-tertiary) !important;
 }
 
-/* The workspace's compact typography uses an !important rule, so preserve
- * explicitly selected BlockNote sizes with an equally scoped editor override. */
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="12px"] { --notebook-line-spacing: 12px; line-height: 12px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="14px"] { --notebook-line-spacing: 14px; line-height: 14px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="16px"] { --notebook-line-spacing: 16px; line-height: 16px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="18px"] { --notebook-line-spacing: 18px; line-height: 18px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="24px"] { --notebook-line-spacing: 24px; line-height: 24px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="32px"] { --notebook-line-spacing: 32px; line-height: 32px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="12px"] { --notebook-text-size: 12px; font-size: 12px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="14px"] { --notebook-text-size: 14px; font-size: 14px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="16px"] { --notebook-text-size: 16px; font-size: 16px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="18px"] { --notebook-text-size: 18px; font-size: 18px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="24px"] { --notebook-text-size: 24px; font-size: 24px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="32px"] { --notebook-text-size: 32px; font-size: 32px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size] {
-  line-height: max(var(--notebook-line-spacing, 0px), calc(var(--notebook-text-size) * 1.2)) !important;
-}
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size] * {
-  font-size: inherit !important;
-}
-
 .notebook-editor-surface .bn-side-menu,
 .notebook-editor-surface .bn-formatting-toolbar,
 .notebook-editor-surface .bn-suggestion-menu,
@@ -15785,4 +15764,40 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   .code-question-legacy-filters input,
   .code-question-legacy-filters select { flex: 1 1 100%; }
   .code-question-legacy-migration dl { grid-template-columns: 1fr; }
+}
+.mobile-web-message {
+  display: none;
+}
+
+@media (max-width: 767px) and (pointer: coarse) {
+  body > .workspace-shell,
+  body > .web-warning-backdrop,
+  body > .web-prompt-backdrop {
+    display: none !important;
+  }
+
+  .mobile-web-message {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+    background: #000;
+    color: #f5f5f7;
+    text-align: center;
+  }
+
+  .mobile-web-message > div {
+    width: min(100%, 28rem);
+  }
+
+  .mobile-web-message h1 {
+    margin: 22px 0 10px;
+    font: 650 1.65rem/1.18 Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .mobile-web-message p {
+    margin: 0;
+    color: #a8a8af;
+    font: 450 1rem/1.5 Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
 }

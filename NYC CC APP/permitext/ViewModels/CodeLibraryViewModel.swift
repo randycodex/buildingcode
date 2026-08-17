@@ -159,6 +159,8 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var startupFirstUsableDurationMilliseconds: Int?
     @Published var selectedTab: AppTab = .browse
     @Published var browserTabSwitchRequest: BrowserContextID?
+    @Published var activeResearchConversationID: String?
+    @Published private(set) var pendingResearchSelections: [ResearchSelectionRequest] = []
     @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
 
     private let locator: BundleDatabaseLocator
@@ -1490,7 +1492,7 @@ final class CodeLibraryViewModel: ObservableObject {
         if let invitationToken = Self.organizationInvitationToken(from: url) {
             guard PermitextReleaseSurfaceVisibility.firmCollaboration else { return }
             pendingOrganizationInvitationToken = invitationToken
-            selectedTab = .settings
+            selectedTab = .research
             return
         }
         guard let sectionID = Self.deepLinkedSectionID(from: url) else { return }
@@ -2097,6 +2099,191 @@ final class CodeLibraryViewModel: ObservableObject {
         return folder(id: activeProjectID)
     }
 
+    func backendProjectID(for folderID: Int64) -> String? {
+        guard let folder = folder(id: folderID), let signedInAccount else { return nil }
+        return UserContentProjectIdentity.stable(
+            folder.clientID,
+            userID: signedInAccount.appUserID
+        ) ?? folder.clientID
+    }
+
+    var activeBackendProjectID: String? {
+        activeProjectID.flatMap(backendProjectID(for:))
+    }
+
+    func folder(forBackendProjectID projectID: String?) -> CodeFolder? {
+        guard let projectID, let signedInAccount else { return nil }
+        return folders.first { folder in
+            (UserContentProjectIdentity.stable(folder.clientID, userID: signedInAccount.appUserID) ?? folder.clientID) == projectID
+        }
+    }
+
+    func sendToResearch(_ selection: ResearchSelectionRequest) {
+        pendingResearchSelections = [selection]
+        selectedTab = .research
+    }
+
+    func takePendingResearchSelections() -> [ResearchSelectionRequest] {
+        defer { pendingResearchSelections = [] }
+        return pendingResearchSelections
+    }
+
+    func researchConversations() async throws -> [ResearchConversationSummary] {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.researchConversations(account: signedInAccount)
+    }
+
+    func researchConversation(id: String) async throws -> ResearchConversation {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.researchConversation(
+            account: signedInAccount,
+            conversationID: id
+        )
+    }
+
+    func createResearchConversation(
+        selections: [ResearchSelectionRequest],
+        projectID: String?
+    ) async throws -> ResearchConversation {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.createResearchConversation(
+            account: signedInAccount,
+            projectID: projectID,
+            selections: selections
+        )
+    }
+
+    func addResearchEvidence(
+        conversationID: String,
+        selections: [ResearchSelectionRequest]
+    ) async throws -> ResearchConversation {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.addResearchEvidence(
+            account: signedInAccount,
+            conversationID: conversationID,
+            selections: selections
+        )
+    }
+
+    func sendResearchMessage(
+        conversationID: String,
+        question: String,
+        requestID: String = UUID().uuidString
+    ) async throws -> ResearchConversation {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.sendResearchMessage(
+            account: signedInAccount,
+            conversationID: conversationID,
+            question: question,
+            requestID: requestID
+        )
+    }
+
+    func renameResearchConversation(id: String, title: String) async throws -> ResearchConversation {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.renameResearchConversation(
+            account: signedInAccount,
+            conversationID: id,
+            title: title
+        )
+    }
+
+    func assignResearchConversation(
+        id: String,
+        projectID: String?,
+        confirmMove: Bool
+    ) async throws -> ResearchConversation {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.assignResearchConversation(
+            account: signedInAccount,
+            conversationID: id,
+            projectID: projectID,
+            confirmMove: confirmMove
+        )
+    }
+
+    func deleteResearchConversation(id: String) async throws {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        try await accountBackendClient.deleteResearchConversation(
+            account: signedInAccount,
+            conversationID: id
+        )
+    }
+
+    func notebookCards(projectID: String) async throws -> NotebookCardListResponse {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.notebookCards(
+            account: signedInAccount,
+            projectID: projectID
+        )
+    }
+
+    func notebookCard(projectID: String, cardID: String) async throws -> NotebookCard {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.notebookCard(
+            account: signedInAccount,
+            projectID: projectID,
+            cardID: cardID
+        )
+    }
+
+    func saveNotebookCard(
+        projectID: String,
+        cardID: String?,
+        expectedVersion: Int,
+        title: String,
+        document: NotebookDocument,
+        evidenceLinks: [NotebookEvidenceLink]
+    ) async throws -> NotebookCard {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.saveNotebookCard(
+            account: signedInAccount,
+            projectID: projectID,
+            cardID: cardID,
+            expectedVersion: expectedVersion,
+            title: title,
+            document: document,
+            evidenceLinks: evidenceLinks
+        )
+    }
+
+    func deleteNotebookCard(projectID: String, cardID: String, expectedVersion: Int) async throws {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        try await accountBackendClient.deleteNotebookCard(
+            account: signedInAccount,
+            projectID: projectID,
+            cardID: cardID,
+            expectedVersion: expectedVersion
+        )
+    }
+
+    func uploadNotebookAsset(
+        projectID: String,
+        data: Data,
+        contentType: String,
+        width: Int?,
+        height: Int?
+    ) async throws -> NotebookImageAsset {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.uploadNotebookAsset(
+            account: signedInAccount,
+            projectID: projectID,
+            data: data,
+            contentType: contentType,
+            width: width,
+            height: height
+        )
+    }
+
+    func notebookAsset(projectID: String, assetID: String) async throws -> Data {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.notebookAsset(
+            account: signedInAccount,
+            projectID: projectID,
+            assetID: assetID
+        )
+    }
+
     func bookmarks(inFolder folderID: Int64) -> [BookmarkedSection] {
         projectBookmarksByFolderID[folderID] ?? []
     }
@@ -2266,28 +2453,6 @@ final class CodeLibraryViewModel: ObservableObject {
             data: rendered.1
         )
         return rendered.0
-    }
-
-    func projectWorkboardPreviewData(
-        projectID: String,
-        previewID: String,
-        expectedContentHash: String
-    ) async throws -> Data {
-        guard let signedInAccount else {
-            throw ProjectHubLoadError.signInRequired
-        }
-        let data = try await accountBackendClient.projectWorkboardPreview(
-            account: signedInAccount,
-            projectID: projectID,
-            previewID: previewID
-        )
-        let digest = SHA256.hash(data: data)
-            .map { String(format: "%02x", $0) }
-            .joined()
-        guard digest == expectedContentHash else {
-            throw URLError(.cannotDecodeContentData)
-        }
-        return data
     }
 
     private func denyIfNeeded(_ decision: EntitlementDecision) -> Bool {

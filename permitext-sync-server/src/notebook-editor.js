@@ -11,14 +11,12 @@ import "@blocknote/mantine/style.css";
 import "./notebook.css";
 import {
   createReactInlineContentSpec,
-  createReactStyleSpec,
+  BasicTextStyleButton,
+  BlockTypeSelect,
+  CreateLinkButton,
   FormattingToolbar,
   FormattingToolbarController,
-  getFormattingToolbarItems,
-  useBlockNoteEditor,
-  useComponentsContext,
-  useCreateBlockNote,
-  useEditorState
+  useCreateBlockNote
 } from "@blocknote/react";
 import {
   blockNoteBlocksFromNotebookDocument,
@@ -31,55 +29,6 @@ import {
 } from "./notebook-schema.js";
 
 const allowedBlockTypeSet = new Set(notebookBlockTypes);
-
-const notebookNumericSizes = Object.freeze([
-  { label: "12", value: "12px" },
-  { label: "14", value: "" },
-  { label: "16", value: "16px" },
-  { label: "18", value: "18px" },
-  { label: "24", value: "24px" },
-  { label: "32", value: "32px" }
-]);
-
-const PermitextFontSize = createReactStyleSpec(
-  {
-    type: "fontSize",
-    propSchema: "string"
-  },
-  {
-    render: ({ value, contentRef }) => React.createElement("span", {
-      ref: contentRef,
-      style: { lineHeight: value },
-      "data-line-spacing": value
-    }),
-    toExternalHTML: ({ value, contentRef }) => React.createElement("span", {
-      ref: contentRef,
-      style: { lineHeight: value },
-      "data-line-spacing": value
-    }),
-    parse: (element) => element.dataset.lineSpacing || element.style.lineHeight || undefined
-  }
-);
-
-const PermitextTextSize = createReactStyleSpec(
-  {
-    type: "textSize",
-    propSchema: "string"
-  },
-  {
-    render: ({ value, contentRef }) => React.createElement("span", {
-      ref: contentRef,
-      style: { fontSize: value },
-      "data-text-size": value
-    }),
-    toExternalHTML: ({ value, contentRef }) => React.createElement("span", {
-      ref: contentRef,
-      style: { fontSize: value },
-      "data-text-size": value
-    }),
-    parse: (element) => element.dataset.textSize || element.style.fontSize || undefined
-  }
-);
 
 const notebookReferenceCodeNames = {
   BC: "Building Code",
@@ -190,77 +139,19 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
     permitextReference: PermitextReference
   },
   styleSpecs: {
-    ...defaultStyleSpecs,
-    fontSize: PermitextFontSize,
-    textSize: PermitextTextSize
+    bold: defaultStyleSpecs.bold,
+    italic: defaultStyleSpecs.italic
   }
 });
 
-function FontSizeSelect() {
-  const editor = useBlockNoteEditor(permitextNotebookSchema);
-  const components = useComponentsContext();
-  const activeFontSize = useEditorState({
-    editor,
-    selector: ({ editor: currentEditor }) => currentEditor.getActiveStyles().fontSize || ""
-  });
-  if (!components) return null;
-  return React.createElement(components.FormattingToolbar.Select, {
-    className: "notebook-line-spacing-select",
-    items: notebookNumericSizes.map(({ label, value }) => ({
-      text: label,
-      icon: React.createElement("span", {
-        "aria-hidden": "true",
-        className: "notebook-line-spacing-icon"
-      }, "↕"),
-      isSelected: activeFontSize === value,
-      onClick: () => {
-        if (value) {
-          editor.addStyles({ fontSize: value });
-        } else if (activeFontSize) {
-          editor.removeStyles({ fontSize: activeFontSize });
-        }
-      }
-    }))
-  });
-}
-
-function TextSizeSelect() {
-  const editor = useBlockNoteEditor(permitextNotebookSchema);
-  const components = useComponentsContext();
-  const activeTextSize = useEditorState({
-    editor,
-    selector: ({ editor: currentEditor }) => currentEditor.getActiveStyles().textSize || ""
-  });
-  if (!components) return null;
-  return React.createElement(components.FormattingToolbar.Select, {
-    className: "notebook-text-size-select",
-    items: notebookNumericSizes.map(({ label, value }) => ({
-      text: label,
-      icon: React.createElement("span", {
-        "aria-hidden": "true",
-        className: "notebook-text-size-icon"
-      }, "A"),
-      isSelected: activeTextSize === value,
-      onClick: () => {
-        if (value) {
-          editor.addStyles({ textSize: value });
-        } else if (activeTextSize) {
-          editor.removeStyles({ textSize: activeTextSize });
-        }
-      }
-    }))
-  });
-}
-
 function PermitextFormattingToolbar() {
-  const defaultItems = getFormattingToolbarItems();
   return React.createElement(
     FormattingToolbar,
     null,
-    defaultItems[0],
-    React.createElement(TextSizeSelect, { key: "text-size-select" }),
-    React.createElement(FontSizeSelect, { key: "line-spacing-select" }),
-    ...defaultItems.slice(1)
+    React.createElement(BlockTypeSelect, { key: "block-type" }),
+    React.createElement(BasicTextStyleButton, { key: "bold", basicTextStyle: "bold" }),
+    React.createElement(BasicTextStyleButton, { key: "italic", basicTextStyle: "italic" }),
+    React.createElement(CreateLinkButton, { key: "link" })
   );
 }
 

@@ -1470,18 +1470,6 @@ struct ProjectActivitySummary: Codable, Hashable, Identifiable, Sendable {
     let createdAt: String
 }
 
-struct ProjectWorkboardPreviewSummary: Codable, Hashable, Identifiable, Sendable {
-    let id: String
-    let projectID: String
-    let title: String
-    let contentType: String
-    let contentHash: String
-    let size: Int
-    let elementCount: Int
-    let workboardUpdatedAt: String
-    let createdAt: String
-}
-
 struct ProjectFoundationProjectSummary: Codable, Hashable, Identifiable, Sendable {
     let id: String
     let sourceRecordID: String
@@ -1498,7 +1486,6 @@ struct BackendProjectFoundationResponse: Codable, Hashable, Sendable {
     let researchConversations: [ProjectResearchConversationSummary]
     let researchAnswers: [ProjectResearchAnswerSummary]
     let activity: [ProjectActivitySummary]
-    var workboardPreview: ProjectWorkboardPreviewSummary? = nil
     var projects: [ProjectFoundationProjectSummary]? = nil
     var links: [ProjectFoundationLinkSummary]? = nil
     var artifacts: [ProjectFoundationArtifact]? = nil
@@ -1717,12 +1704,6 @@ struct BackendProjectReportFileUploadResponse: Codable, Hashable, Sendable {
     let file: ProjectReportFile
 }
 
-struct BackendProjectWorkboardPreviewRequest: Codable, Hashable, Sendable {
-    let auth: BackendAuthContext
-    let projectID: String
-    let previewID: String
-}
-
 struct ProjectHubSnapshot: Codable, Hashable, Sendable {
     let projectID: String
     let notebookCards: [ProjectNotebookCardSummary]
@@ -1730,7 +1711,6 @@ struct ProjectHubSnapshot: Codable, Hashable, Sendable {
     let researchAnswers: [ProjectResearchAnswerSummary]
     let activity: [ProjectActivitySummary]
     let reports: [ProjectReportSummary]
-    let workboardPreview: ProjectWorkboardPreviewSummary?
     var foundationArtifacts: [ProjectFoundationArtifact] = []
     var loadedFromCache: Bool = false
     var cachedAt: String? = nil
@@ -1743,7 +1723,6 @@ struct ProjectHubSnapshot: Codable, Hashable, Sendable {
             researchAnswers: [],
             activity: [],
             reports: [],
-            workboardPreview: nil,
             foundationArtifacts: []
         )
     }
@@ -2372,6 +2351,20 @@ protocol PermitextBackendTransport {
     func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse
     func projectHubBootstrap(_ request: BackendProjectHubBootstrapRequest) async throws -> BackendProjectHubBootstrapResponse
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse
+    func researchConversationList(_ request: ResearchConversationListRequest) async throws -> ResearchConversationListResponse
+    func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse
+    func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse
+    func researchConversationAddEvidence(_ request: ResearchConversationEvidenceRequest) async throws -> ResearchConversationEvidenceResponse
+    func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse
+    func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse
+    func researchConversationAssignProject(_ request: ResearchConversationAssignProjectRequest) async throws -> ResearchConversationResponse
+    func researchConversationDelete(_ request: ResearchConversationDeleteRequest) async throws -> ResearchConversationDeleteResponse
+    func notebookCardList(_ request: NotebookCardListRequest) async throws -> NotebookCardListResponse
+    func notebookCardGet(_ request: NotebookCardGetRequest) async throws -> NotebookCardResponse
+    func notebookCardSave(_ request: NotebookCardSaveRequest) async throws -> NotebookCardResponse
+    func notebookCardDelete(_ request: NotebookCardDeleteRequest) async throws -> NotebookCardDeleteResponse
+    func notebookAssetUpload(_ request: NotebookAssetUploadRequest, data: Data) async throws -> NotebookAssetUploadResponse
+    func notebookAsset(_ request: NotebookAssetReadRequest) async throws -> Data
     func projectReportHistory(_ request: BackendProjectReportHistoryRequest) async throws -> BackendProjectReportHistoryResponse
     func projectReportManifest(_ request: BackendProjectReportManifestRequest) async throws -> BackendProjectReportManifestResponse
     func projectReportFileUpload(
@@ -2379,7 +2372,6 @@ protocol PermitextBackendTransport {
         data: Data
     ) async throws -> BackendProjectReportFileUploadResponse
     func projectReportFile(_ request: BackendProjectReportFileReadRequest) async throws -> Data
-    func projectWorkboardPreview(_ request: BackendProjectWorkboardPreviewRequest) async throws -> Data
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
     func checkpointUserContent(_ request: BackendUserContentCheckpointRequest) async throws -> ServerUserContentCheckpointResult
@@ -2594,6 +2586,103 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("notebook/cards/list", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    func researchConversationList(_ request: ResearchConversationListRequest) async throws -> ResearchConversationListResponse {
+        try await post("research/conversations/list", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse {
+        try await post("research/conversations/get", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse {
+        try await post("research/conversations/create", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchConversationAddEvidence(_ request: ResearchConversationEvidenceRequest) async throws -> ResearchConversationEvidenceResponse {
+        try await post("research/conversations/evidence", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse {
+        try await post("research/conversations/message", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse {
+        try await post("research/conversations/rename", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchConversationAssignProject(_ request: ResearchConversationAssignProjectRequest) async throws -> ResearchConversationResponse {
+        try await post("research/conversations/assign-project", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchConversationDelete(_ request: ResearchConversationDeleteRequest) async throws -> ResearchConversationDeleteResponse {
+        try await post("research/conversations/delete", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func notebookCardList(_ request: NotebookCardListRequest) async throws -> NotebookCardListResponse {
+        try await post("notebook/cards/list", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func notebookCardGet(_ request: NotebookCardGetRequest) async throws -> NotebookCardResponse {
+        try await post("notebook/cards/get", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func notebookCardSave(_ request: NotebookCardSaveRequest) async throws -> NotebookCardResponse {
+        try await post("notebook/cards/save", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func notebookCardDelete(_ request: NotebookCardDeleteRequest) async throws -> NotebookCardDeleteResponse {
+        try await post("notebook/cards/delete", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func notebookAssetUpload(
+        _ upload: NotebookAssetUploadRequest,
+        data: Data
+    ) async throws -> NotebookAssetUploadResponse {
+        var components = URLComponents(
+            url: baseURL.appendingPathComponent("notebook/assets/upload"),
+            resolvingAgainstBaseURL: false
+        )
+        components?.queryItems = [
+            URLQueryItem(name: "projectID", value: upload.projectID),
+            URLQueryItem(name: "assetID", value: upload.assetID)
+        ]
+        guard let url = components?.url else { throw PermitextBackendHTTPError.invalidResponse }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = requestTimeout
+        request.setValue(upload.contentType, forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(upload.auth.accountUserID, forHTTPHeaderField: "X-Permitext-User-ID")
+        if let width = upload.width { request.setValue(String(width), forHTTPHeaderField: "X-Permitext-Image-Width") }
+        if let height = upload.height { request.setValue(String(height), forHTTPHeaderField: "X-Permitext-Image-Height") }
+        if let token = upload.auth.bearerToken, !token.isEmpty {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = data
+        return try await send(request)
+    }
+
+    func notebookAsset(_ read: NotebookAssetReadRequest) async throws -> Data {
+        var request = URLRequest(url: baseURL.appendingPathComponent("notebook/assets/read"))
+        request.httpMethod = "POST"
+        request.timeoutInterval = requestTimeout
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("image/*", forHTTPHeaderField: "Accept")
+        if let token = read.auth.bearerToken, !token.isEmpty {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = try encoder.encode(read)
+        let (data, response) = try await session.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw PermitextBackendHTTPError.invalidResponse
+        }
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            let backendMessage = try? decoder.decode(BackendErrorResponse.self, from: data).error
+            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode, backendMessage)
+        }
+        return data
+    }
+
     func projectReportHistory(_ request: BackendProjectReportHistoryRequest) async throws -> BackendProjectReportHistoryResponse {
         try await post("reports/history/list", body: request, bearerToken: request.auth.bearerToken)
     }
@@ -2651,27 +2740,6 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         }
         guard data.starts(with: Data("%PDF-".utf8)) else {
             throw PermitextBackendHTTPError.invalidResponse
-        }
-        return data
-    }
-
-    func projectWorkboardPreview(_ preview: BackendProjectWorkboardPreviewRequest) async throws -> Data {
-        var request = URLRequest(url: baseURL.appendingPathComponent("workboards/previews/read"))
-        request.httpMethod = "POST"
-        request.timeoutInterval = requestTimeout
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("image/png", forHTTPHeaderField: "Accept")
-        if let token = preview.auth.bearerToken, !token.isEmpty {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        }
-        request.httpBody = try encoder.encode(preview)
-        let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw PermitextBackendHTTPError.invalidResponse
-        }
-        guard (200..<300).contains(httpResponse.statusCode) else {
-            let backendMessage = try? decoder.decode(BackendErrorResponse.self, from: data).error
-            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode, backendMessage)
         }
         return data
     }
@@ -2842,6 +2910,67 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         )
     }
 
+    func researchConversationList(_ request: ResearchConversationListRequest) async throws -> ResearchConversationListResponse {
+        ResearchConversationListResponse(conversations: [])
+    }
+
+    func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse {
+        throw URLError(.fileDoesNotExist)
+    }
+
+    func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func researchConversationAddEvidence(_ request: ResearchConversationEvidenceRequest) async throws -> ResearchConversationEvidenceResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func researchConversationAssignProject(_ request: ResearchConversationAssignProjectRequest) async throws -> ResearchConversationResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func researchConversationDelete(_ request: ResearchConversationDeleteRequest) async throws -> ResearchConversationDeleteResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func notebookCardList(_ request: NotebookCardListRequest) async throws -> NotebookCardListResponse {
+        NotebookCardListResponse(
+            schemaVersion: 1,
+            projectID: request.projectID,
+            cards: [],
+            access: NotebookAccess(role: "owner", readOnly: false)
+        )
+    }
+
+    func notebookCardGet(_ request: NotebookCardGetRequest) async throws -> NotebookCardResponse {
+        throw URLError(.fileDoesNotExist)
+    }
+
+    func notebookCardSave(_ request: NotebookCardSaveRequest) async throws -> NotebookCardResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func notebookCardDelete(_ request: NotebookCardDeleteRequest) async throws -> NotebookCardDeleteResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func notebookAssetUpload(_ request: NotebookAssetUploadRequest, data: Data) async throws -> NotebookAssetUploadResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func notebookAsset(_ request: NotebookAssetReadRequest) async throws -> Data {
+        throw URLError(.fileDoesNotExist)
+    }
+
     func projectReportHistory(_ request: BackendProjectReportHistoryRequest) async throws -> BackendProjectReportHistoryResponse {
         BackendProjectReportHistoryResponse(
             schemaVersion: 1,
@@ -2862,10 +2991,6 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     }
 
     func projectReportFile(_ request: BackendProjectReportFileReadRequest) async throws -> Data {
-        throw URLError(.fileDoesNotExist)
-    }
-
-    func projectWorkboardPreview(_ request: BackendProjectWorkboardPreviewRequest) async throws -> Data {
         throw URLError(.fileDoesNotExist)
     }
 
@@ -4128,6 +4253,62 @@ protocol AccountBackendClient {
         projectID: String
     ) async throws -> BackendOrganizationProjectSnapshotResponse
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot
+    func researchConversations(account: SignedInAccount) async throws -> [ResearchConversationSummary]
+    func researchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation
+    func createResearchConversation(
+        account: SignedInAccount,
+        projectID: String?,
+        selections: [ResearchSelectionRequest]
+    ) async throws -> ResearchConversation
+    func addResearchEvidence(
+        account: SignedInAccount,
+        conversationID: String,
+        selections: [ResearchSelectionRequest]
+    ) async throws -> ResearchConversation
+    func sendResearchMessage(
+        account: SignedInAccount,
+        conversationID: String,
+        question: String,
+        requestID: String
+    ) async throws -> ResearchConversation
+    func renameResearchConversation(
+        account: SignedInAccount,
+        conversationID: String,
+        title: String
+    ) async throws -> ResearchConversation
+    func assignResearchConversation(
+        account: SignedInAccount,
+        conversationID: String,
+        projectID: String?,
+        confirmMove: Bool
+    ) async throws -> ResearchConversation
+    func deleteResearchConversation(account: SignedInAccount, conversationID: String) async throws
+    func notebookCards(account: SignedInAccount, projectID: String) async throws -> NotebookCardListResponse
+    func notebookCard(account: SignedInAccount, projectID: String, cardID: String) async throws -> NotebookCard
+    func saveNotebookCard(
+        account: SignedInAccount,
+        projectID: String,
+        cardID: String?,
+        expectedVersion: Int,
+        title: String,
+        document: NotebookDocument,
+        evidenceLinks: [NotebookEvidenceLink]
+    ) async throws -> NotebookCard
+    func deleteNotebookCard(
+        account: SignedInAccount,
+        projectID: String,
+        cardID: String,
+        expectedVersion: Int
+    ) async throws
+    func uploadNotebookAsset(
+        account: SignedInAccount,
+        projectID: String,
+        data: Data,
+        contentType: String,
+        width: Int?,
+        height: Int?
+    ) async throws -> NotebookImageAsset
+    func notebookAsset(account: SignedInAccount, projectID: String, assetID: String) async throws -> Data
     func projectReportManifest(account: SignedInAccount, manifestID: String) async throws -> ProjectReportManifest
     func saveProjectReportPDF(
         account: SignedInAccount,
@@ -4139,11 +4320,6 @@ protocol AccountBackendClient {
         account: SignedInAccount,
         projectID: String,
         generatedReportID: String
-    ) async throws -> Data
-    func projectWorkboardPreview(
-        account: SignedInAccount,
-        projectID: String,
-        previewID: String
     ) async throws -> Data
 }
 

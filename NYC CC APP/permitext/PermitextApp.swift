@@ -5,7 +5,9 @@ import UIKit
 struct PermitextApp: App {
 #if DEBUG
     init() {
-        PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")
+        if UserDefaults.standard.string(forKey: PermitextBackendConfiguration.apiBaseURLDefaultsKey) == nil {
+            PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")
+        }
         Self.configureTabBarAppearance()
     }
 #else
@@ -221,13 +223,13 @@ private struct PermitextTabNavigation: View {
                 .accessibilityLabel("Saved")
                 .tag(AppTab.bookmarks)
 
-            SettingsView()
+            ResearchView()
                 .tabItem {
-                    Image(systemName: library.selectedTab == .settings ? "gearshape.fill" : "gearshape")
-                    Text("Settings")
+                    Image("Astroid")
+                    Text("Research")
                 }
-                .accessibilityLabel("Settings")
-                .tag(AppTab.settings)
+                .accessibilityLabel("Research")
+                .tag(AppTab.research)
         }
     }
 }
@@ -301,9 +303,9 @@ private struct AppLaunchLoadingView: View {
             .tabItem {
                 Image(systemName: "bookmark")
             }
-        SettingsView()
+        ResearchView()
             .tabItem {
-                Image(systemName: "gearshape")
+                Image("Astroid")
             }
     }
     .environmentObject(CodeLibraryViewModel.preview())

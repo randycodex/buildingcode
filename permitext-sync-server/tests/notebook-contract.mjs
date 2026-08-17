@@ -48,31 +48,15 @@ assert.match(html, /data-reference-kind="canonicalSection"/);
 assert.match(html, /AC § 28-103\.30\.2/);
 assert.match(html, /<strong>Verify <\/strong>/);
 
-const numericStyleDocument = {
-  ...emptyNotebookDocument(),
-  document: [{
-    type: "paragraph",
-    content: [{
-      type: "text",
-      text: "Readable field note",
-      styles: { fontSize: "24px", textSize: "18px" }
-    }]
-  }]
-};
-const numericStyleValidated = validateNotebookDocument(numericStyleDocument);
-assert.equal(numericStyleValidated.document.document[0].content[0].styles.fontSize, "24px");
-assert.equal(numericStyleValidated.document.document[0].content[0].styles.textSize, "18px");
-assert.match(renderNotebookDocumentHTML(numericStyleDocument), /line-height:24px/);
-assert.match(renderNotebookDocumentHTML(numericStyleDocument), /font-size:18px/);
 assert.throws(
   () => validateNotebookDocument({
     ...emptyNotebookDocument(),
     document: [{
       type: "paragraph",
-      content: [{ type: "text", text: "Bad size", styles: { textSize: "999px" } }]
+      content: [{ type: "text", text: "Unsupported styling", styles: { textSize: "18px" } }]
     }]
   }),
-  /unsupported numeric style value/
+  /unsupported style/
 );
 
 const escapedHTML = renderNotebookDocumentHTML({
@@ -147,9 +131,17 @@ const richDocument = {
       content: [{ type: "text", text: "Field conditions", styles: {} }]
     },
     {
-      type: "checkListItem",
-      props: { checked: true },
-      content: [{ type: "text", text: "Confirm rated wall", styles: {} }]
+      type: "bulletListItem",
+      content: [{ type: "text", text: "Confirm rated wall", styles: { italic: true } }]
+    },
+    {
+      type: "numberedListItem",
+      props: { start: 1 },
+      content: [{
+        type: "link",
+        href: "https://www.nyc.gov/site/buildings/index.page",
+        content: [{ type: "text", text: "Confirm with DOB", styles: {} }]
+      }]
     },
     {
       type: "image",
@@ -159,25 +151,12 @@ const richDocument = {
         caption: "Existing wall at corridor",
         previewWidth: 640
       }
-    },
-    {
-      type: "table",
-      content: {
-        type: "tableContent",
-        rows: [{
-          cells: [{
-            type: "tableCell",
-            content: [{ type: "text", text: "Item", styles: {} }],
-            props: { colspan: 1, rowspan: 1 }
-          }]
-        }]
-      }
     }
   ]
 };
 const richValidated = validateNotebookDocument(richDocument);
 assert.equal(richValidated.document.document[0].type, "heading");
-assert.equal(richValidated.document.document[2].type, "image");
+assert.equal(richValidated.document.document[3].type, "image");
 assert.deepEqual(
   richValidated.imageAssets,
   ["project-assets%2Fproject%2Fnotebook%2Fimage.png"],
@@ -185,7 +164,19 @@ assert.deepEqual(
 );
 assert.match(notebookPlainText(richValidated.document), /Existing wall at corridor/);
 assert.match(renderNotebookDocumentHTML(richValidated.document), /data-notebook-image-asset/);
-assert.match(renderNotebookDocumentHTML(richValidated.document), /<table>/);
+assert.match(renderNotebookDocumentHTML(richValidated.document), /<ul><li><em>Confirm rated wall<\/em><\/li><\/ul>/);
+assert.match(renderNotebookDocumentHTML(richValidated.document), /<a href="https:\/\/www\.nyc\.gov/);
+
+for (const unsupportedType of ["checkListItem", "toggleListItem", "quote", "codeBlock", "divider", "table"]) {
+  assert.throws(
+    () => validateNotebookDocument({
+      ...emptyNotebookDocument(),
+      document: [{ type: unsupportedType, content: [] }]
+    }),
+    /unsupported block/,
+    `${unsupportedType} remains available in the simple shared Notebook contract.`
+  );
+}
 
 assert.throws(
   () => validateNotebookDocument({

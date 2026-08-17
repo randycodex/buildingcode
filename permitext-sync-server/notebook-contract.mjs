@@ -29,30 +29,13 @@ const inlineBlockTypes = new Set([
   "paragraph",
   "heading",
   "bulletListItem",
-  "numberedListItem",
-  "checkListItem",
-  "toggleListItem",
-  "quote",
-  "codeBlock"
+  "numberedListItem"
 ]);
 const maximumNotebookTextLength = 50_000;
 const maximumNotebookJSONLength = 500_000;
 const maximumNotebookBlocks = 500;
 const maximumNotebookDepth = 8;
-const maximumTableCells = 400;
-const allowedAlignments = new Set(["left", "center", "right", "justify"]);
-const permittedStyleNames = new Set([
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "code",
-  "textColor",
-  "backgroundColor",
-  "fontSize",
-  "textSize"
-]);
-const permittedNotebookNumericStyles = new Set(["12px", "16px", "18px", "24px", "32px"]);
+const permittedStyleNames = new Set(["bold", "italic"]);
 const notebookEvidenceRoles = new Set(["context", "supports", "conflicts", "unresolved"]);
 const maximumNotebookEvidenceLinks = 100;
 const maximumNotebookEvidencePassages = 24;
@@ -177,14 +160,7 @@ function canonicalStyles(styles) {
     if (!permittedStyleNames.has(name)) {
       throw new Error("Notebook text uses an unsupported style.");
     }
-    if (["textColor", "backgroundColor"].includes(name)) {
-      canonical[name] = canonicalColor(value, `Notebook ${name}`);
-    } else if (["fontSize", "textSize"].includes(name)) {
-      if (!permittedNotebookNumericStyles.has(value)) {
-        throw new Error("Notebook text uses an unsupported numeric style value.");
-      }
-      canonical[name] = value;
-    } else if (value === true) {
+    if (value === true) {
       canonical[name] = true;
     } else if (value !== false) {
       throw new Error("Notebook text styles are invalid.");
@@ -253,24 +229,16 @@ function canonicalInlineContent(content, state) {
   });
 }
 
-function canonicalAlignment(value) {
-  const normalized = String(value || "left");
-  if (!allowedAlignments.has(normalized)) {
-    throw new Error("Notebook text alignment is unsupported.");
-  }
-  return normalized;
-}
-
 function canonicalBlockProps(type, props = {}) {
   if (!props || typeof props !== "object" || Array.isArray(props)) {
     throw new Error("Notebook block properties are invalid.");
   }
   const common = () => ({
-    backgroundColor: canonicalColor(props.backgroundColor || "default", "Notebook background color"),
-    textColor: canonicalColor(props.textColor || "default", "Notebook text color"),
-    textAlignment: canonicalAlignment(props.textAlignment)
+    backgroundColor: "default",
+    textColor: "default",
+    textAlignment: "left"
   });
-  if (type === "paragraph" || type === "bulletListItem" || type === "toggleListItem") return common();
+  if (type === "paragraph" || type === "bulletListItem") return common();
   if (type === "numberedListItem") {
     const canonical = common();
     if (props.start !== undefined) {
@@ -281,26 +249,12 @@ function canonicalBlockProps(type, props = {}) {
     }
     return canonical;
   }
-  if (type === "checkListItem") return { ...common(), checked: props.checked === true };
   if (type === "heading") {
     const level = Number(props.level || 1);
     if (!Number.isInteger(level) || level < 1 || level > 6) {
       throw new Error("Notebook heading level is unsupported.");
     }
-    return { ...common(), level, isToggleable: props.isToggleable === true };
-  }
-  if (type === "quote") {
-    return {
-      backgroundColor: canonicalColor(props.backgroundColor || "default", "Notebook background color"),
-      textColor: canonicalColor(props.textColor || "default", "Notebook text color")
-    };
-  }
-  if (type === "codeBlock") {
-    return { language: optionalText(props.language || "text", "Notebook code language", 64) };
-  }
-  if (type === "divider") return {};
-  if (type === "table") {
-    return { textColor: canonicalColor(props.textColor || "default", "Notebook table text color") };
+    return { ...common(), level, isToggleable: false };
   }
   if (type === "image") {
     const url = optionalText(props.url, "Notebook image URL", 2_500).trim();
@@ -308,8 +262,8 @@ function canonicalBlockProps(type, props = {}) {
       throw new Error("Notebook images require a Permitext asset or HTTPS URL.");
     }
     const canonical = {
-      textAlignment: canonicalAlignment(props.textAlignment),
-      backgroundColor: canonicalColor(props.backgroundColor || "default", "Notebook image background color"),
+      textAlignment: "left",
+      backgroundColor: "default",
       name: optionalText(props.name, "Notebook image name", 300),
       url,
       caption: optionalText(props.caption, "Notebook image caption", 1_000),
@@ -325,63 +279,6 @@ function canonicalBlockProps(type, props = {}) {
     return canonical;
   }
   throw new Error("Notebook block properties are unsupported.");
-}
-
-function canonicalTableCell(cell, state) {
-  if (cell?.type !== "tableCell") throw new Error("Notebook table cells are invalid.");
-  const props = cell.props || {};
-  const colspan = Number(props.colspan || 1);
-  const rowspan = Number(props.rowspan || 1);
-  if (![colspan, rowspan].every((value) => Number.isInteger(value) && value >= 1 && value <= 50)) {
-    throw new Error("Notebook table spans are invalid.");
-  }
-  return {
-    type: "tableCell",
-    content: canonicalInlineContent(cell.content, state),
-    props: {
-      colspan,
-      rowspan,
-      backgroundColor: canonicalColor(props.backgroundColor || "default", "Notebook cell background color"),
-      textColor: canonicalColor(props.textColor || "default", "Notebook cell text color"),
-      textAlignment: canonicalAlignment(props.textAlignment)
-    }
-  };
-}
-
-function canonicalTableContent(content, state) {
-  if (content?.type !== "tableContent" || !Array.isArray(content.rows) || !content.rows.length) {
-    throw new Error("Notebook tables require rows.");
-  }
-  let cellCount = 0;
-  const rows = content.rows.map((row) => {
-    if (!Array.isArray(row?.cells) || !row.cells.length) {
-      throw new Error("Notebook table rows require cells.");
-    }
-    cellCount += row.cells.length;
-    if (cellCount > maximumTableCells) throw new Error("Notebook table is too large.");
-    return { cells: row.cells.map((cell) => canonicalTableCell(cell, state)) };
-  });
-  const widthCount = rows[0].cells.length;
-  const columnWidths = Array.isArray(content.columnWidths)
-    ? content.columnWidths.slice(0, widthCount).map((width) => {
-        if (width === null || width === undefined) return null;
-        const normalized = Number(width);
-        if (!Number.isFinite(normalized) || normalized < 24 || normalized > 4_000) {
-          throw new Error("Notebook table column width is invalid.");
-        }
-        return Math.round(normalized);
-      })
-    : Array(widthCount).fill(null);
-  const canonical = { type: "tableContent", columnWidths, rows };
-  for (const name of ["headerRows", "headerCols"]) {
-    if (content[name] === undefined || content[name] === null) continue;
-    const value = Number(content[name]);
-    if (!Number.isInteger(value) || value < 0 || value > 50) {
-      throw new Error("Notebook table headers are invalid.");
-    }
-    canonical[name] = value;
-  }
-  return canonical;
 }
 
 function canonicalBlock(node, state, depth = 0) {
@@ -401,8 +298,7 @@ function canonicalBlock(node, state, depth = 0) {
   if (node.type === "image" && block.props.url?.startsWith("permitext-notebook-asset:")) {
     state.imageAssets.push(block.props.url.slice("permitext-notebook-asset:".length));
   }
-  if (node.type === "table") block.content = canonicalTableContent(node.content, state);
-  else if (inlineBlockTypes.has(node.type)) block.content = canonicalInlineContent(node.content, state);
+  if (inlineBlockTypes.has(node.type)) block.content = canonicalInlineContent(node.content, state);
   return block;
 }
 
@@ -482,14 +378,8 @@ function inlinePlainText(content) {
 
 function blockPlainText(block, depth = 0) {
   let text = "";
-  if (block.type === "table") {
-    text = block.content.rows
-      .map((row) => row.cells.map((cell) => inlinePlainText(cell.content)).join("\t"))
-      .join("\n");
-  } else if (block.type === "image") {
+  if (block.type === "image") {
     text = block.props.caption || block.props.name || "Image";
-  } else if (block.type === "divider") {
-    text = "";
   } else {
     text = inlinePlainText(block.content);
   }
@@ -522,13 +412,8 @@ function renderInlineHTML(content) {
       return `<a href="${escapeHTML(node.href)}">${renderInlineHTML(node.content)}</a>`;
     }
     let html = escapeHTML(node.text);
-    if (node.styles.code) html = `<code>${html}</code>`;
     if (node.styles.bold) html = `<strong>${html}</strong>`;
     if (node.styles.italic) html = `<em>${html}</em>`;
-    if (node.styles.underline) html = `<u>${html}</u>`;
-    if (node.styles.strike) html = `<s>${html}</s>`;
-    if (node.styles.fontSize) html = `<span style="line-height:${escapeHTML(node.styles.fontSize)}">${html}</span>`;
-    if (node.styles.textSize) html = `<span style="font-size:${escapeHTML(node.styles.textSize)}">${html}</span>`;
     return html;
   }).join("");
 }
@@ -537,17 +422,8 @@ function renderBlockHTML(block) {
   const children = block.children.map(renderBlockHTML).join("");
   const content = renderInlineHTML(block.content);
   if (block.type === "heading") return `<h${block.props.level}>${content}</h${block.props.level}>${children}`;
-  if (block.type === "quote") return `<blockquote>${content}</blockquote>${children}`;
-  if (block.type === "codeBlock") return `<pre><code>${escapeHTML(inlinePlainText(block.content))}</code></pre>${children}`;
-  if (block.type === "divider") return `<hr>${children}`;
   if (block.type === "bulletListItem") return `<ul><li>${content}${children}</li></ul>`;
   if (block.type === "numberedListItem") return `<ol${block.props.start ? ` start="${block.props.start}"` : ""}><li>${content}${children}</li></ol>`;
-  if (block.type === "checkListItem") return `<p data-checked="${block.props.checked}">${block.props.checked ? "☑" : "☐"} ${content}</p>${children}`;
-  if (block.type === "toggleListItem") return `<details><summary>${content}</summary>${children}</details>`;
-  if (block.type === "table") {
-    const rows = block.content.rows.map((row) => `<tr>${row.cells.map((cell) => `<td colspan="${cell.props.colspan}" rowspan="${cell.props.rowspan}">${renderInlineHTML(cell.content)}</td>`).join("")}</tr>`).join("");
-    return `<table><tbody>${rows}</tbody></table>${children}`;
-  }
   if (block.type === "image") {
     if (!block.props.url) return children;
     const caption = block.props.caption ? `<figcaption>${escapeHTML(block.props.caption)}</figcaption>` : "";
@@ -583,7 +459,7 @@ export function notebookManifestItem({ cardID, cardType, title, document }) {
         ? "published-code"
         : reference.referenceKind === "researchAnswer"
           ? "ai-assisted"
-          : ["attachment", "workboard"].includes(reference.referenceKind)
+          : reference.referenceKind === "attachment"
             ? "project-material"
             : "user-authored"
     }))

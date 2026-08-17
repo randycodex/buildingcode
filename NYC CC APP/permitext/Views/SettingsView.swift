@@ -910,7 +910,7 @@ struct SettingsView: View {
     }
 
     private var accountDeletionMessage: String {
-        let dataDeletion = "This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports, and any firm workspace you own. This cannot be undone."
+        let dataDeletion = "This permanently deletes your Permitext account, synced saved work, Research history, private images and reports, and any firm workspace you own. This cannot be undone."
         if library.hasAppleManagedBillingForAccountDeletion &&
             library.hasWebManagedBillingForAccountDeletion {
             return "Permitext will cancel your Stripe subscription first. Apple billing cannot be canceled by Permitext, so manage your Apple subscription before deleting or Apple may continue charging you. \(dataDeletion)"

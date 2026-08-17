@@ -2294,7 +2294,6 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             researchAnswers: [],
             activity: [],
             reports: [],
-            workboardPreview: nil,
             foundationArtifacts: try XCTUnwrap(foundation.artifacts)
         )
 
@@ -2323,5 +2322,66 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 scope: "personal"
             )
         )
+    }
+
+    func testQuestionFirstResearchCreationOmitsEmptySelections() throws {
+        let request = ResearchConversationCreateRequest(
+            auth: BackendAuthContext(accountUserID: "account-1", bearerToken: "token"),
+            projectID: "project-1",
+            selections: nil,
+            originSurface: "ios-reader"
+        )
+        let object = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: JSONEncoder().encode(request)) as? [String: Any]
+        )
+
+        XCTAssertNil(object["selections"])
+        XCTAssertEqual(object["projectID"] as? String, "project-1")
+        XCTAssertEqual(object["originSurface"] as? String, "ios-reader")
+    }
+
+    func testNativeNotebookSimpleDocumentRoundTripsWithoutLosingReferencesOrImages() throws {
+        let document = NotebookDocument(document: [
+            NotebookBlock.textBlock(type: "heading", text: "Finding", level: 2),
+            NotebookBlock(
+                id: "paragraph-1",
+                type: "paragraph",
+                props: .text,
+                content: [
+                    .text("Enacted text", bold: true),
+                    NotebookInlineContent(
+                        type: "link",
+                        href: "https://example.com/source",
+                        content: [.text("Source", italic: true)]
+                    )
+                ],
+                children: []
+            ),
+            NotebookBlock.textBlock(type: "bulletListItem", text: "Verify occupancy"),
+            NotebookBlock.reference(
+                kind: "canonicalSection",
+                id: "section-101-2",
+                label: "Building Code · § 101.2 · Scope"
+            ),
+            NotebookBlock.image(
+                url: "/notebook/assets/read?projectID=project-1&assetID=image-1",
+                name: "site-photo.jpg",
+                caption: "Existing condition",
+                width: 1200
+            )
+        ])
+
+        let decoded = try JSONDecoder().decode(
+            NotebookDocument.self,
+            from: JSONEncoder().encode(document)
+        )
+
+        XCTAssertEqual(decoded, document)
+        XCTAssertEqual(decoded.document.map(\.type), [
+            "heading", "paragraph", "bulletListItem", "paragraph", "image"
+        ])
+        XCTAssertEqual(decoded.document[1].content?[1].href, "https://example.com/source")
+        XCTAssertEqual(decoded.document[3].content?.first?.props?.referenceKind, "canonicalSection")
+        XCTAssertEqual(decoded.document[4].props.caption, "Existing condition")
     }
 }

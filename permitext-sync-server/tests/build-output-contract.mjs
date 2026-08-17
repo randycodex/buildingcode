@@ -23,29 +23,14 @@ assert(
   "The Notebook editor is not built from the open-source BlockNote packages."
 );
 assert(
-  notebookEditor.includes('type: "fontSize"') &&
-    notebookEditor.includes('type: "textSize"') &&
-    notebookEditor.includes('{ label: "14", value: "" }') &&
-    notebookEditor.includes('className: "notebook-line-spacing-icon"') &&
-    notebookEditor.includes('className: "notebook-text-size-icon"') &&
-    !notebookEditor.includes('label: "Default"') &&
-    notebookEditor.includes('className: "notebook-line-spacing-select"') &&
-    notebookEditor.includes('className: "notebook-text-size-select"') &&
-    notebookEditor.includes("FormattingToolbarController") &&
-    notebookEditor.includes("editor.addStyles({ fontSize: value })") &&
-    notebookEditor.includes("editor.addStyles({ textSize: value })") &&
-    notebookEditor.includes("editor.removeStyles({ textSize: activeTextSize })"),
-  "Every shared BlockNote editor must offer independent line-spacing and text-size formatting."
-);
-assert(
-  notebookEditor.indexOf('React.createElement(TextSizeSelect, { key: "text-size-select" })') <
-    notebookEditor.indexOf('React.createElement(FontSizeSelect, { key: "line-spacing-select" })'),
-  "Notebook text size must appear before line spacing in the formatting toolbar."
-);
-assert(
-  notebookEditor.indexOf('{ label: "12", value: "12px" }') <
-    notebookEditor.indexOf('{ label: "14", value: "" }'),
-  "Notebook text-size and line-spacing menus must list 12 before the default 14 option."
+  notebookEditor.includes("FormattingToolbarController") &&
+    notebookEditor.includes("BlockTypeSelect") &&
+    notebookEditor.includes('BasicTextStyleButton, { key: "bold", basicTextStyle: "bold" }') &&
+    notebookEditor.includes('BasicTextStyleButton, { key: "italic", basicTextStyle: "italic" }') &&
+    notebookEditor.includes("CreateLinkButton") &&
+    !notebookEditor.includes('type: "fontSize"') &&
+    !notebookEditor.includes('type: "textSize"'),
+  "The shared Notebook editor must keep the same basic formatting surface as native iOS."
 );
 assert.equal(notebookSchema.includes("tiptapDocumentToBlockNote"), true);
 assert.equal(notebookSchema.includes('notebookSchemaVersion = 2'), true);
@@ -65,7 +50,7 @@ assert(
 assert(
   webClient.includes('uploadNotebookAsset(projectID, file, cardID = "")') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL)") &&
-    webClient.includes('notebookClientVersion = "20260815-notebook-size-order-v12"'),
+    webClient.includes('notebookClientVersion = "20260817-simple-native-parity-v13"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 

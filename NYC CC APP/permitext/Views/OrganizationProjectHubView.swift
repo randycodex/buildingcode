@@ -67,6 +67,17 @@ struct OrganizationProjectHubView: View {
         )
     }
 
+    private var nativeNotebookReferenceCandidates: [NativeNotebookReferenceCandidate] {
+        (foundation?.researchAnswers ?? []).map { answer in
+            NativeNotebookReferenceCandidate(
+                kind: "researchAnswer",
+                referenceID: answer.id,
+                label: answer.question,
+                detail: "Terra Research"
+            )
+        }
+    }
+
     private var savedEvidenceCount: Int {
         (foundation?.links ?? []).filter {
             $0.targetKind == "canonicalSection" && $0.deletedAt == nil
@@ -328,6 +339,21 @@ struct OrganizationProjectHubView: View {
     @ViewBuilder
     private var notebookSection: some View {
         projectSection(title: "Notebook", systemImage: "note.text") {
+            NavigationLink {
+                ProjectNotebookView(
+                    projectID: project.id,
+                    projectName: project.name,
+                    accentColor: projectAccent,
+                    referenceCandidates: nativeNotebookReferenceCandidates,
+                    onChanged: { Task { await loadSnapshot() } }
+                )
+                .environmentObject(library)
+            } label: {
+                Label("Open Notebook", systemImage: "note.text")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.plain)
             if notebookCards.isEmpty {
                 emptyText("No synced Notebook cards yet.")
             } else {
