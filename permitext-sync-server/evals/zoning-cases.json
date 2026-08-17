@@ -364,21 +364,24 @@
       "id": "zr-zoning-lot-contiguity-definition",
       "category": "definition",
       "status": "draft",
-      "evidenceReadiness": "blocked",
-      "knownEvidenceLimitations": [
-        "The current imported ZR 12-10 record contains only the definitions preamble and does not contain the operative zoning-lot definition or its 10-linear-foot contiguity language."
-      ],
       "question": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
       "selectedEvidenceSectionIDs": [20018523],
+      "evidenceReviewTerms": [
+        "minimum of 10 linear feet",
+        "may or may not coincide"
+      ],
       "requiredConcepts": [
-        "The answer identifies the Section 12-10 zoning-lot definition as the controlling source for the ownership and contiguity pathways.",
-        "The answer states that the current selected Permitext record does not contain the operative definition needed to verify the proposed 10-linear-foot rule.",
-        "The answer declines to decide whether the two tax lots form one zoning lot until the complete official definition and all applicable branches are available.",
-        "The content gap is classified as missing evidence rather than a missing project fact."
+        "No. Common ownership alone does not make the two tax lots one zoning lot under the stated facts.",
+        "The Section 12-10 pathways in paragraphs (c) and (d) require two or more lots of record to be contiguous for at least 10 linear feet within a single block, so an eight-foot connection does not satisfy those pathways.",
+        "The answer separately checks the historical pathways in paragraphs (a) and (b) and does not imply that the 10-linear-foot requirement governs every branch of the definition.",
+        "The answer identifies the additional filing, ownership, party-in-interest, or Declaration requirements that apply under paragraphs (c) and (d), as relevant.",
+        "The answer explains that a zoning lot may or may not coincide with a tax lot shown on the official tax map."
       ],
       "forbiddenClaims": [
         "Common ownership is said to create a zoning-lot merger automatically.",
-        "The 10-linear-foot requirement is asserted from model knowledge as though it appeared in the selected imported evidence."
+        "The 10-linear-foot requirement is said to govern every branch of the zoning-lot definition.",
+        "An eight-foot point of contiguity is said to satisfy the current paragraphs (c) or (d).",
+        "A tax lot and a zoning lot are treated as necessarily identical."
       ],
       "reviewer": null,
       "reviewedAt": null
@@ -387,21 +390,24 @@
       "id": "zr-cellar-floor-area-definition",
       "category": "definition",
       "status": "draft",
-      "evidenceReadiness": "blocked",
-      "knownEvidenceLimitations": [
-        "The current imported ZR 12-10 record contains only the definitions preamble and does not contain the operative cellar and floor-area definitions needed to answer this question."
-      ],
       "question": "A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?",
       "selectedEvidenceSectionIDs": [20018523],
+      "evidenceReviewTerms": [
+        "Where a base plane is used to determine building height, a cellar is a space",
+        "cellar space, except where such space is used for dwelling purposes",
+        "Cellar space used for retailing"
+      ],
       "requiredConcepts": [
-        "The answer identifies the Section 12-10 cellar and floor-area definitions as the controlling evidence.",
-        "The answer states that the current selected Permitext record lacks the operative definitions needed to classify the level and determine the floor-area treatment.",
-        "The answer declines to conclude that the 5,000 square feet is excluded until the complete official definitions are available.",
-        "The content gap is classified as missing evidence rather than a missing elevation fact because the necessary elevation relationship was supplied."
+        "No, on the stated facts and subject to the definition's special measurement rules. Where a base plane determines building height, a space with more than one-half its floor-to-ceiling height below that base plane is a cellar.",
+        "The Section 12-10 floor-area definition generally excludes cellar space unless it is used for dwelling purposes, and the stated storage use is not a dwelling use.",
+        "The answer checks the special cellar rules for a sloping base plane, the applicable street wall line level or through lot, and a yard lowered after December 5, 1990 before treating the classification as conclusive.",
+        "The answer notes that cellar space used for retailing is included when calculating accessory off-street parking, bicycle parking, and loading requirements, without converting ordinary non-dwelling storage into zoning floor area."
       ],
       "forbiddenClaims": [
         "All below-grade space is described as exempt from zoning floor area.",
-        "The cellar classification or floor-area exclusion is asserted from model knowledge as though it appeared in the selected imported evidence."
+        "Any amount of space below grade is said to establish a cellar without applying the more-than-one-half-height test.",
+        "The retailing caveat is said to make every cellar count as floor area for all purposes.",
+        "The New York City Building Code is substituted for the Zoning Resolution definitions."
       ],
       "reviewer": null,
       "reviewedAt": null

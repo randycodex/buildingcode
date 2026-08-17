@@ -4,7 +4,7 @@ Content edition: NYC Zoning Resolution — text through 2026-07-16
 
 Status: DRAFT — NOT APPROVED
 
-Case readiness: 19 evidence-ready · 2 blocked by known content gaps
+Case readiness: 21 evidence-ready · 0 blocked by known content gaps
 
 This packet is for review by a professional qualified to evaluate New York City zoning sources. No case in this packet enables Zoning in AI Research. Approval must be explicit and recorded; the application never treats a generated answer or an automatic score as reviewer approval.
 
@@ -746,8 +746,6 @@ Question: A zoning lot assembled in 2026 straddles two zoning districts, with mo
 
 Category: definition
 
-Evidence readiness: BLOCKED
-
 Question: Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?
 
 ### Selected official evidence
@@ -757,23 +755,24 @@ Question: Two tax lots on the same block have the same owner but touch for only 
   - Official source: https://zr.planning.nyc.gov/article-i/chapter-2/12-10
   - Text version: NYC Zoning Resolution — text through 2026-07-16
   - Last amended: 2026-03-26
-  - Evidence preview: Words in the text or tables of this Resolution which are italicized shall be interpreted in accordance with the provisions set forth in this Section.
-
-### Known evidence limitations
-
-- The current imported ZR 12-10 record contains only the definitions preamble and does not contain the operative zoning-lot definition or its 10-linear-foot contiguity language.
+  - Evidence preview: Words in the text or tables of this Resolution which are italicized shall be interpreted in accordance with the provisions set forth in this Section. above-grade mass transit station Applicable to Article VI - Chapter 6 Last Amended 10/7/2021 FROM 66-11: For the purposes of this Chapter, an “above-grade mass transit station” shall refer to a mass transit station with a platform that is located entirely above five fe
+  - Matched review excerpt for “minimum of 10 linear feet”: …ntiguous lots of record, located within a single block, which, on December 15, 1961, or any applicable subsequent amendment thereto, was in single ownership; (c) a tract of land, either unsubdivided or consisting of two or more lots of record contiguous for a minimum of 10 linear feet, located within a single block, which at the time of filing for a building permit (or, if no building permit is required, at the time of the filing for a certificate of occupancy) is under single fee ownership and with respect to which each party having any i…
+  - Matched review excerpt for “may or may not coincide”: …s Section of the Office of the City Register or, if applicable, the County Clerk's Office of the county in which such tract of land is located, against each lot of record constituting a portion of the land covered by such Declaration. A zoning lot, therefore, may or may not coincide with a lot as shown on the official tax map of the City of New York, or on any recorded subdivision plat or deed. Parcels within City-owned tracts of land located in Broad Channel within the boundaries of Community Board 14 in the Borough of Queens that were …
 
 ### Required concepts
 
-- [ ] The answer identifies the Section 12-10 zoning-lot definition as the controlling source for the ownership and contiguity pathways.
-- [ ] The answer states that the current selected Permitext record does not contain the operative definition needed to verify the proposed 10-linear-foot rule.
-- [ ] The answer declines to decide whether the two tax lots form one zoning lot until the complete official definition and all applicable branches are available.
-- [ ] The content gap is classified as missing evidence rather than a missing project fact.
+- [ ] No. Common ownership alone does not make the two tax lots one zoning lot under the stated facts.
+- [ ] The Section 12-10 pathways in paragraphs (c) and (d) require two or more lots of record to be contiguous for at least 10 linear feet within a single block, so an eight-foot connection does not satisfy those pathways.
+- [ ] The answer separately checks the historical pathways in paragraphs (a) and (b) and does not imply that the 10-linear-foot requirement governs every branch of the definition.
+- [ ] The answer identifies the additional filing, ownership, party-in-interest, or Declaration requirements that apply under paragraphs (c) and (d), as relevant.
+- [ ] The answer explains that a zoning lot may or may not coincide with a tax lot shown on the official tax map.
 
 ### Forbidden claims
 
 - [ ] Common ownership is said to create a zoning-lot merger automatically.
-- [ ] The 10-linear-foot requirement is asserted from model knowledge as though it appeared in the selected imported evidence.
+- [ ] The 10-linear-foot requirement is said to govern every branch of the zoning-lot definition.
+- [ ] An eight-foot point of contiguity is said to satisfy the current paragraphs (c) or (d).
+- [ ] A tax lot and a zoning lot are treated as necessarily identical.
 
 ### Reviewer decision
 
@@ -789,8 +788,6 @@ Question: Two tax lots on the same block have the same owner but touch for only 
 
 Category: definition
 
-Evidence readiness: BLOCKED
-
 Question: A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?
 
 ### Selected official evidence
@@ -800,23 +797,24 @@ Question: A 5,000-square-foot below-grade storage level has more than one-half o
   - Official source: https://zr.planning.nyc.gov/article-i/chapter-2/12-10
   - Text version: NYC Zoning Resolution — text through 2026-07-16
   - Last amended: 2026-03-26
-  - Evidence preview: Words in the text or tables of this Resolution which are italicized shall be interpreted in accordance with the provisions set forth in this Section.
-
-### Known evidence limitations
-
-- The current imported ZR 12-10 record contains only the definitions preamble and does not contain the operative cellar and floor-area definitions needed to answer this question.
+  - Evidence preview: Words in the text or tables of this Resolution which are italicized shall be interpreted in accordance with the provisions set forth in this Section. above-grade mass transit station Applicable to Article VI - Chapter 6 Last Amended 10/7/2021 FROM 66-11: For the purposes of this Chapter, an “above-grade mass transit station” shall refer to a mass transit station with a platform that is located entirely above five fe
+  - Matched review excerpt for “Where a base plane is used to determine building height, a cellar is a space”: …ilding height, is a space wholly or partly below curb level, with more than one-half its height (measured from floor to ceiling) below curb level. On through lots, the curb level nearest to such space shall be used to determine whether such space is a cellar. Where a base plane is used to determine building height, a cellar is a space wholly or partly below the base plane, with more than one-half its height (measured from floor to ceiling) below the base plane. In addition, the following rules shall apply: (a) When a sloping base plane is established, a cellar is a space wholly or partly b…
+  - Matched review excerpt for “cellar space, except where such space is used for dwelling purposes”: …ace shall not constitute an enclosure. A sun control device that is accessible for purposes other than for maintenance shall be considered a balcony; and any other floor space not specifically excluded. However, the floor area of a building shall not include: cellar space, except where such space is used for dwelling purposes. Cellar space used for retailing shall be included for the purpose of calculating requirements for accessory off-street parking spaces, accessory bicycle parking spaces and accessory off-street loading berths; elevator or stair bulkheads, accessory water tank…
+  - Matched review excerpt for “Cellar space used for retailing”: …ccessible for purposes other than for maintenance shall be considered a balcony; and any other floor space not specifically excluded. However, the floor area of a building shall not include: cellar space, except where such space is used for dwelling purposes. Cellar space used for retailing shall be included for the purpose of calculating requirements for accessory off-street parking spaces, accessory bicycle parking spaces and accessory off-street loading berths; elevator or stair bulkheads, accessory water tanks, or cooling towers, except that…
 
 ### Required concepts
 
-- [ ] The answer identifies the Section 12-10 cellar and floor-area definitions as the controlling evidence.
-- [ ] The answer states that the current selected Permitext record lacks the operative definitions needed to classify the level and determine the floor-area treatment.
-- [ ] The answer declines to conclude that the 5,000 square feet is excluded until the complete official definitions are available.
-- [ ] The content gap is classified as missing evidence rather than a missing elevation fact because the necessary elevation relationship was supplied.
+- [ ] No, on the stated facts and subject to the definition's special measurement rules. Where a base plane determines building height, a space with more than one-half its floor-to-ceiling height below that base plane is a cellar.
+- [ ] The Section 12-10 floor-area definition generally excludes cellar space unless it is used for dwelling purposes, and the stated storage use is not a dwelling use.
+- [ ] The answer checks the special cellar rules for a sloping base plane, the applicable street wall line level or through lot, and a yard lowered after December 5, 1990 before treating the classification as conclusive.
+- [ ] The answer notes that cellar space used for retailing is included when calculating accessory off-street parking, bicycle parking, and loading requirements, without converting ordinary non-dwelling storage into zoning floor area.
 
 ### Forbidden claims
 
 - [ ] All below-grade space is described as exempt from zoning floor area.
-- [ ] The cellar classification or floor-area exclusion is asserted from model knowledge as though it appeared in the selected imported evidence.
+- [ ] Any amount of space below grade is said to establish a cellar without applying the more-than-one-half-height test.
+- [ ] The retailing caveat is said to make every cellar count as floor area for all purposes.
+- [ ] The New York City Building Code is substituted for the Zoning Resolution definitions.
 
 ### Reviewer decision
 

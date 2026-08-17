@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-25T03:41:27.849Z",
+  "generatedAt": "2026-08-17T20:14:42.392Z",
   "libraryID": "nyc-zoning-resolution",
   "sourceAuthority": "New York City Department of City Planning",
   "sourceHomepageURL": "https://zr.planning.nyc.gov/",
@@ -110,7 +110,7 @@
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-2",
-      "contentHash": "7105a40c12d4018a9bf0a0278ba51bfe3232ec2e37aef92bed58d233948875c0"
+      "contentHash": "e555df2237e667f20f5bed533b17758f33ca6c86778046dfd443ce53cd6ce9a4"
     },
     {
       "kind": "chapter",
@@ -1739,6 +1739,13 @@
       "contentHash": "03e34da6e620e91667bd62f6152253e04f946bf63ae2659db5dfd28ab9673d6a"
     },
     {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20102%E2%80%9301.0.png",
+      "fileName": "zr-0c2ae853c1658ee8-Zoning-Resolutions-102-01.0.png",
+      "contentType": "image/png",
+      "byteCount": 24842,
+      "contentHash": "0c2ae853c1658ee848b075e68327bc2e09e422a837af458ca46e2ae81dc19840"
+    },
+    {
       "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20102%E2%80%93615.0.png",
       "fileName": "zr-11ba0d01a7a61ea8-Zoning-Resolutions-102-615.0.png",
       "contentType": "image/png",
@@ -1765,6 +1772,55 @@
       "contentType": "image/png",
       "byteCount": 6361,
       "contentHash": "741038d01628de775fc447c81bcadb079d9e92d09b4b23c1d40c583029eb5897"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2012%E2%80%9310.0.png",
+      "fileName": "zr-cb491af4ae74f597-Zoning-Resolutions-12-10.0.png",
+      "contentType": "image/png",
+      "byteCount": 25556,
+      "contentHash": "cb491af4ae74f597e42c01a4cc995451007a0c79a666920f1fd8ed740f7acc19"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2012%E2%80%9310.1.png",
+      "fileName": "zr-3b138b55c76576f4-Zoning-Resolutions-12-10.1.png",
+      "contentType": "image/png",
+      "byteCount": 49182,
+      "contentHash": "3b138b55c76576f471728130a4bbb3b77d0ac9aa5cd3227a6c4fc01046be1c06"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2012%E2%80%9310.2.png",
+      "fileName": "zr-0fc79d5b9b6cb95d-Zoning-Resolutions-12-10.2.png",
+      "contentType": "image/png",
+      "byteCount": 28667,
+      "contentHash": "0fc79d5b9b6cb95db3887859b193b36facba831541656372d46379870bd44c74"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2012%E2%80%9310.3.png",
+      "fileName": "zr-a870f5549bb2b931-Zoning-Resolutions-12-10.3.png",
+      "contentType": "image/png",
+      "byteCount": 44075,
+      "contentHash": "a870f5549bb2b9314ea660f06cb2c50b3749784e5bfd9e81021d177744f06b55"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2012%E2%80%9310.5.png",
+      "fileName": "zr-deec32d8062d4841-Zoning-Resolutions-12-10.5.png",
+      "contentType": "image/png",
+      "byteCount": 50098,
+      "contentHash": "deec32d8062d4841ead2f84400eb3e8b69a445863e4c1a9af82dc59ad2060f8b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2012%E2%80%9310.6.png",
+      "fileName": "zr-87626e78fb108e8e-Zoning-Resolutions-12-10.6.png",
+      "contentType": "image/png",
+      "byteCount": 63183,
+      "contentHash": "87626e78fb108e8e61fd59436e75ebc98383b2406c7916304891ec0c69254ac6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2012%E2%80%9310.7.png",
+      "fileName": "zr-d6ca442841ebf3c1-Zoning-Resolutions-12-10.7.png",
+      "contentType": "image/png",
+      "byteCount": 36409,
+      "contentHash": "d6ca442841ebf3c1434eb91c2fd3e36f0c5a993f6000aa988990daa645e00994"
     },
     {
       "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2013%E2%80%93141.0.png",
@@ -3090,11 +3146,25 @@
       "contentHash": "3f8b6a607159bf403a9f39a1824baf33e203e32aef4ecb9b64dd66c473ee739c"
     },
     {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/Impeded%20access%20frontages_2024June11_final.jpg",
+      "fileName": "zr-c87d62b5aecfdaec-Impeded-access-frontages_2024June11_final.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 339007,
+      "contentHash": "c87d62b5aecfdaecad31a926e71e58f13e7e46c8bd338a393a27ef5eba38843f"
+    },
+    {
       "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/Impeded%20Access%20Frontages_800x652%20png.png",
       "fileName": "zr-05b35b68dd4384bf-Impeded-Access-Frontages_800x652-png.png",
       "contentType": "image/png",
       "byteCount": 36354,
       "contentHash": "05b35b68dd4384bf5581257c86ec044bde3f869b6843acdf99b21c370b538fc8"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/102-01_View%20plane%20image.jpg",
+      "fileName": "zr-9e3cc6dcca172ff5-102-01_View-plane-image.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 69227,
+      "contentHash": "9e3cc6dcca172ff5b051973d535516e162a7f1e4082293df821c71805fd05c15"
     },
     {
       "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/130%20St.%20Felix%20Street%20ready%20for%20ZR_F%20BK%20CD2%20Map%208.jpg",
@@ -3641,12 +3711,21 @@
     "chapters": 101,
     "appendixPages": 16,
     "sections": 4068,
-    "subsections": 6571,
-    "tables": 305,
-    "mapReferences": 208,
+    "subsections": 7296,
+    "tables": 313,
+    "mapReferences": 209,
     "amendmentEvents": 13141,
-    "assets": 423
+    "assets": 433
   },
   "researchEligibility": false,
-  "researchBlockedReason": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass."
+  "researchBlockedReason": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+  "sectionCompletenessRepairs": [
+    {
+      "sectionID": 20018523,
+      "sectionNumber": "12-10",
+      "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-2/12-10",
+      "capturedAt": "2026-08-17T20:14:42.392Z",
+      "reason": "Preserve defined-term records stored outside the nested body field."
+    }
+  ]
 }

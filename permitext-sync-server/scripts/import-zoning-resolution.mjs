@@ -397,6 +397,35 @@ async function main() {
     "chapters"
   );
 
+  for (const completenessContract of zoningResolutionContract.requiredCompleteSections) {
+    const section = importedChapters
+      .flatMap((chapter) => chapter.sections)
+      .find((candidate) => candidate.sourcePath === completenessContract.sourcePath);
+    if (!section) {
+      throw new Error(`Required complete zoning section ${completenessContract.sourcePath} was not found.`);
+    }
+    if (
+      section.sourceNodeID !== completenessContract.sourceNodeID ||
+      section.sectionNumber !== completenessContract.sectionNumber
+    ) {
+      throw new Error(`Required complete zoning section identity changed at ${completenessContract.sourcePath}.`);
+    }
+    if (section.plainText.length < completenessContract.minimumPlainTextLength) {
+      throw new Error(
+        `Required complete zoning section ${completenessContract.sectionNumber} is incomplete: ` +
+        `${section.plainText.length} characters found.`
+      );
+    }
+    for (const requiredText of completenessContract.requiredText) {
+      if (!section.plainText.toLowerCase().includes(requiredText.toLowerCase())) {
+        throw new Error(
+          `Required complete zoning section ${completenessContract.sectionNumber} is missing required text: ` +
+          `${requiredText}.`
+        );
+      }
+    }
+  }
+
   const appendixSections = await concurrentMap(
     homepage.appendices,
     Math.min(options.concurrency, 8),
@@ -604,6 +633,13 @@ async function main() {
     documents: sourceDocuments.sort((left, right) => left.sourceURL.localeCompare(right.sourceURL)),
     assets: assetRecords.sort((left, right) => left.sourceURL.localeCompare(right.sourceURL)),
     validationSummary,
+    sectionCompletenessRepairs: zoningResolutionContract.requiredCompleteSections.map((contract) => ({
+      sectionID: sections.find((section) => section.sourcePath === contract.sourcePath).id,
+      sectionNumber: contract.sectionNumber,
+      sourceURL: new URL(contract.sourcePath, zoningResolutionContract.sourceBaseURL).toString(),
+      capturedAt: generatedAt,
+      reason: "Preserve defined-term records stored outside the nested body field."
+    })),
     researchEligibility: false,
     researchBlockedReason: zoningResolutionContract.researchBlockedReason
   });

@@ -11,6 +11,17 @@ export const zoningResolutionContract = Object.freeze({
   sourceHomepageURL: "https://zr.planning.nyc.gov/",
   sourceDownloadsURL: "https://zr.planning.nyc.gov/zr-downloads",
   textChangesThrough: "2026-07-16",
+  requiredCompleteSections: Object.freeze([Object.freeze({
+    sourcePath: "/article-i/chapter-2/12-10",
+    sourceNodeID: 18_523,
+    sectionNumber: "12-10",
+    minimumPlainTextLength: 100_000,
+    requiredText: Object.freeze([
+      "cellar",
+      "floor area",
+      "zoning lot"
+    ])
+  })]),
   researchEligibility: false,
   researchBlockedReason:
     "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
@@ -264,9 +275,12 @@ function sectionRecord(sectionNode, context) {
   const numberNode = firstDescendant(sectionNode, (node) => hasClasses(node, "field--name-title"));
   const sectionNumber = attribute(sectionNode, "data-section") || normalizedText(numberNode);
   const title = normalizedText(titleNode);
-  const bodyNode =
-    firstDescendant(sectionNode, (node) => hasClasses(node, "field--name-body", "field__item")) ||
-    firstDescendant(sectionNode, (node) => hasClasses(node, "sec-body"));
+  const sectionBody = firstDescendant(sectionNode, (node) => hasClasses(node, "sec-body"));
+  const fieldBody = firstDescendant(sectionNode, (node) => hasClasses(node, "field--name-body", "field__item"));
+  const containsDefinedTerms = Boolean(firstDescendant(sectionBody, (node) =>
+    classes(node).has("node--type-defined-term")
+  ));
+  const bodyNode = containsDefinedTerms ? sectionBody : (fieldBody || sectionBody);
   if (!bodyNode) {
     throw new Error(`Zoning section node ${sourceNodeID} has no official body.`);
   }

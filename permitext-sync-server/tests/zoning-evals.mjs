@@ -65,14 +65,18 @@ for (const testCase of dataset.cases) {
     assert(section?.blocks?.length, `${testCase.id} references section ${sectionID} without evidence blocks.`);
     assert.equal(section.zoning?.researchEligibility, false);
     assert.match(section.zoning?.sourceURL || "", /^https:\/\/zr\.planning\.nyc\.gov\//);
+    const selectedText = section.blocks.map((block) => block.plainText).join("\n").toLowerCase();
+    for (const term of testCase.evidenceReviewTerms || []) {
+      assert(
+        selectedText.includes(term.toLowerCase()),
+        `${testCase.id} review term is absent from selected section ${sectionID}: ${term}`
+      );
+    }
   }
 }
 
 assert.equal(requiredCategories.size, 0, `Missing zoning evaluation categories: ${[...requiredCategories].join(", ")}`);
-assert.deepEqual(blockedEvidenceCaseIDs, new Set([
-  "zr-zoning-lot-contiguity-definition",
-  "zr-cellar-floor-area-definition"
-]));
+assert.deepEqual(blockedEvidenceCaseIDs, new Set());
 assert.equal(dataset.researchEligibility, false, "Zoning cases cannot enable public Research.");
 
 console.log("zoning evaluation review cases passed", {

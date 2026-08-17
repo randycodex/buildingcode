@@ -12,6 +12,15 @@ function line(value = "") {
   return String(value).replace(/\s+/g, " ").trim();
 }
 
+function evidenceExcerpt(section, term, radius = 260) {
+  const plainText = line((section.blocks || []).map((block) => block.plainText).join(" "));
+  const index = plainText.toLowerCase().indexOf(String(term || "").toLowerCase());
+  if (index === -1) return null;
+  const start = Math.max(0, index - radius);
+  const end = Math.min(plainText.length, index + String(term).length + radius);
+  return `${start > 0 ? "…" : ""}${plainText.slice(start, end)}${end < plainText.length ? "…" : ""}`;
+}
+
 const output = [
   "# NYC Zoning Resolution Evaluation Review Packet",
   "",
@@ -65,6 +74,13 @@ for (const [index, testCase] of dataset.cases.entries()) {
       `  - Last amended: ${section.zoning.lastAmended || "not stated"}`,
       `  - Evidence preview: ${line(section.previewText).slice(0, 500)}`
     );
+    for (const term of testCase.evidenceReviewTerms || []) {
+      const excerpt = evidenceExcerpt(section, term);
+      if (!excerpt) {
+        throw new Error(`${testCase.id} review term was not found in selected section ${sectionID}: ${term}`);
+      }
+      output.push(`  - Matched review excerpt for “${term}”: ${excerpt}`);
+    }
   }
   if (testCase.knownEvidenceLimitations?.length) {
     output.push(

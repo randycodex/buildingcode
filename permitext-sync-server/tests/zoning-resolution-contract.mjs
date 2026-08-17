@@ -4,6 +4,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  parseZoningChapterHTML,
   stableZoningChapterID,
   stableZoningSectionID,
   zoningResolutionContract
@@ -33,6 +34,29 @@ async function readJSON(path) {
 function sha256(data) {
   return createHash("sha256").update(data).digest("hex");
 }
+
+const definitionFixture = parseZoningChapterHTML(`
+  <article class="node node--type-section node--view-mode-default" data-node-id="18523"
+    data-section="12-10" about="/article-i/chapter-2/12-10">
+    <span class="field--name-title">12-10</span>
+    <h3>DEFINITIONS</h3>
+    <div class="sec-body">
+      <div class="field--name-body field__item"><p>Definitions preamble.</p></div>
+      <article class="node--type-defined-term">
+        <h2>cellar</h2><p>Operative cellar definition.</p>
+      </article>
+    </div>
+  </article>
+`, {
+  articleRoman: "I",
+  articleTitle: "General Provisions",
+  chapterNumber: "2",
+  chapterTitle: "Construction of Language and Definitions",
+  canonicalChapterNumber: "I-2",
+  sourcePath: "/article-i/chapter-2"
+});
+assert.match(definitionFixture.sections[0].plainText, /Definitions preamble/);
+assert.match(definitionFixture.sections[0].plainText, /Operative cellar definition/);
 
 const [bundle, sourceManifest, preparedManifest, searchIndex, sectionFileNames, chapterHTMLFileNames] =
   await Promise.all([
@@ -68,6 +92,10 @@ assert.equal(sectionFileNames.length, summary.sections);
 assert.equal(chapterHTMLFileNames.filter((name) => name.endsWith(".html")).length, summary.chapters + summary.appendixPages);
 assert.equal(sourceManifest.documents.length, summary.chapters + summary.appendixPages + 15);
 assert.equal(sourceManifest.assets.length, summary.assets);
+assert.deepEqual(
+  sourceManifest.sectionCompletenessRepairs.map((repair) => [repair.sectionID, repair.sectionNumber]),
+  [[20_018_523, "12-10"]]
+);
 
 const chapterIDs = bundle.chapters.map((chapter) => chapter.id);
 assert.equal(new Set(chapterIDs).size, chapterIDs.length);
@@ -85,6 +113,7 @@ let specialDistrictCount = 0;
 let appendixSectionCount = 0;
 let localAssetReferenceCount = 0;
 let sectionTwelveOne = null;
+let sectionTwelveTen = null;
 for (const fileName of sectionFileNames) {
   assert.match(fileName, /^\d+\.json$/);
   const section = await readJSON(join(sectionRoot, fileName));
@@ -110,6 +139,7 @@ for (const fileName of sectionFileNames) {
     0
   );
   if (section.sectionNumber === "12-01") sectionTwelveOne = section;
+  if (section.sectionNumber === "12-10") sectionTwelveTen = section;
 }
 
 assert.equal(new Set(sectionIDs).size, sectionIDs.length);
@@ -124,6 +154,13 @@ assert(sectionTwelveOne);
 assert.match(sectionTwelveOne.previewText, /particular shall control the general/i);
 assert(sectionTwelveOne.zoning.amendmentHistory.length > 0);
 assert(searchIndex.tokens.particular.includes(sectionTwelveOne.sectionID));
+assert(sectionTwelveTen);
+assert(sectionTwelveTen.blocks.map((block) => block.plainText).join("\n").length > 100_000);
+assert(sectionTwelveTen.zoning.subsections.length > 100);
+assert.match(sectionTwelveTen.blocks.map((block) => block.plainText).join("\n"), /zoning lot/i);
+assert.match(sectionTwelveTen.blocks.map((block) => block.plainText).join("\n"), /cellar/i);
+assert.match(sectionTwelveTen.blocks.map((block) => block.plainText).join("\n"), /floor area/i);
+assert(searchIndex.tokens.cellar.includes(sectionTwelveTen.sectionID));
 
 for (const asset of sourceManifest.assets) {
   assert.match(asset.fileName, /^zr-[a-f0-9]{16}-[a-zA-Z0-9._-]+$/);
