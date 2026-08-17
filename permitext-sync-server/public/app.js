@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260816-reader-demand-v336";
+} from "./offline-storage.js?v=20260816-reader-orphan-cleanup-v343";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -58,7 +58,7 @@ import {
   reduceAccountArtifactRevision,
   reduceProjectArtifactRevisions,
   uniqueProjectArtifactConsumerIDs
-} from "./project-artifact-checkpoints.js?v=20260816-project-artifact-checkpoints-v1";
+} from "./project-artifact-checkpoints.js?v=20260816-project-artifact-checkpoints-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -2422,7 +2422,6 @@ function changeReaderTextSize(panel, reader, delta) {
   saveWorkspaceState();
   requestAnimationFrame(() => {
     track.querySelectorAll(".reader-panel").forEach((openPanel) => {
-      syncCommentBoxHeights(openPanel.querySelector(".reader-content"), openPanel.querySelector(".comments-list"));
       updateReaderScrollIndicator(openPanel);
     });
   });
@@ -2502,10 +2501,7 @@ function newReaderState(overrides = {}) {
     sectionID: "",
     sectionNumber: "",
     title: "Reader",
-    commentsOpen: false,
-    commentsWidth: 34,
     internalSearchQuery: "",
-    activeNotesSectionID: "",
     shouldSmoothScrollToSection: false,
     ...overrides
   };
@@ -8688,15 +8684,8 @@ function refreshVisibleSyncedDerivedState() {
       codeVersion: wrapper.dataset.commentCodeVersion
     });
   });
-  track.querySelectorAll(".reader-notes-sheet, .section-detail-panel").forEach((element) => {
+  track.querySelectorAll(".section-detail-panel").forEach((element) => {
     addTarget(element.__annotationTarget);
-  });
-  track.querySelectorAll(".section-comment-box[data-section-id]").forEach((box) => {
-    addTarget({
-      sectionID: box.dataset.sectionId,
-      blockID: box.dataset.blockId,
-      codeVersion: defaultSyncCodeVersion
-    });
   });
 
   const focusedElement = document.activeElement;
@@ -8707,16 +8696,6 @@ function refreshVisibleSyncedDerivedState() {
       noteValueForTarget(target),
       { source: focusedElement, target }
     );
-  });
-
-  track.querySelectorAll(".section-comment-box[data-section-id]").forEach((box) => {
-    const input = box.querySelector(".comment-input");
-    if (!input || input === focusedElement) return;
-    input.value = noteValueForTarget({
-      sectionID: box.dataset.sectionId,
-      blockID: box.dataset.blockId,
-      codeVersion: defaultSyncCodeVersion
-    });
   });
 
   const visibleReaderSections = new Map();
@@ -8747,14 +8726,6 @@ function refreshVisibleSyncedDerivedState() {
     if (textarea && textarea !== focusedElement) textarea.value = noteValueForTarget(target);
     const tags = panel.querySelector(".section-detail-tags");
     if (tags && !tags.contains(focusedElement)) renderAnnotationTagEditor(tags, target);
-  });
-
-  track.querySelectorAll(".reader-notes-sheet.is-open:not([hidden])").forEach((sheet) => {
-    const target = sheet.__annotationTarget;
-    const tags = sheet.querySelector(".reader-notes-tags");
-    if (target?.sectionID && tags && !tags.contains(focusedElement)) {
-      renderAnnotationTagEditor(tags, target);
-    }
   });
 
   openProjectDetails().forEach((detail) => {
@@ -10953,16 +10924,6 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
 }
 
 function refreshOpenAnnotationProjectEditors() {
-  track.querySelectorAll(".reader-notes-sheet.is-open:not([hidden])").forEach((sheet) => {
-    const target = sheet.__annotationTarget;
-    const container = sheet.querySelector(".reader-notes-projects");
-    if (!target?.sectionID || !container) return;
-    renderAnnotationProjectEditor(container, target, target, {
-      onChange: () => {
-        if (state.utilities.saved) renderWorkspace();
-      }
-    });
-  });
   track.querySelectorAll(".section-detail-panel").forEach((panel) => {
     const target = panel.__annotationTarget;
     const sectionPayload = panel.__sectionPayload;
@@ -11665,12 +11626,10 @@ async function progressivelyRenderReaderChapter(
 
 async function renderSectionContent(panel, reader) {
   const content = panel.querySelector(".reader-content");
-  const commentsList = panel.querySelector(".comments-list");
   stopReaderProgressiveHydration(content);
   content?.classList.remove("is-searching-reader");
   if (!reader.chapterID) {
     blankReader(content);
-    clear(commentsList);
     return;
   }
 
@@ -11688,7 +11647,6 @@ async function renderSectionContent(panel, reader) {
   );
   if (!sections.length) {
     emptyReader(content, "No sections", "This chapter does not contain readable sections.");
-    clear(commentsList);
     return;
   }
   const targetIndex = Math.max(0, readerTargetSectionIndex(sections, reader));
@@ -11721,9 +11679,6 @@ async function renderSectionContent(panel, reader) {
   });
   cacheRecentlyViewedReaderPreview(reader, initialSections[targetIndex - initialStart]);
   collapseRepeatedReaderCatalogAliases(content);
-  // Notes now open from each block in the reader notes sheet. Do not build the
-  // retired, permanently hidden sidebar editor for every block in the chapter.
-  clear(commentsList);
 
   if (reader.sectionID) {
     requestAnimationFrame(() => {
@@ -12017,97 +11972,15 @@ function setSectionNoteValue(sectionID, value) {
 function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
   const sectionKey = sectionNoteKey(sectionID);
   if (!sectionKey) return;
-  const blockKey = normalizeAnnotationBlockID(blockID);
-  const hasNote = Boolean(value.trim());
-  const selector = `.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"][data-comment-block-id="${CSS.escape(blockKey)}"]`;
-  track.querySelectorAll(selector).forEach((wrapper) => {
-    const button = wrapper.querySelector(".inline-comment-toggle");
-    wrapper.classList.toggle("has-note", hasNote);
-    button?.classList.toggle("has-comment", hasNote);
-    if (button) button.setAttribute("aria-label", hasNote ? "Open note" : "Add note");
-  });
   const bookmarkCodeVersion = options.codeVersion || options.target?.codeVersion || defaultSyncCodeVersion;
   syncReaderNoteBookmarkButtons(sectionID, isSectionSaved({
     sectionID,
     codeVersion: bookmarkCodeVersion
   }), bookmarkCodeVersion);
-  track.querySelectorAll(`.reader-notes-sheet[data-section-id="${CSS.escape(sectionKey)}"][data-block-id="${CSS.escape(blockKey)}"]`).forEach((sheet) => {
-    const input = sheet.querySelector(".reader-notes-input");
-    if (input && input !== options.source) input.value = value;
-  });
-}
-
-function ensureReaderNotesSheet(panel, reader) {
-  let sheet = panel.querySelector(".reader-notes-sheet");
-  if (sheet) return sheet;
-
-  sheet = document.createElement("section");
-  sheet.className = "reader-notes-sheet";
-  sheet.hidden = true;
-
-  const resizer = document.createElement("div");
-  resizer.className = "reader-notes-resizer";
-  resizer.setAttribute("role", "separator");
-  resizer.setAttribute("aria-orientation", "horizontal");
-  resizer.setAttribute("aria-label", "Resize note card");
-
-  const header = document.createElement("header");
-  header.className = "reader-notes-header";
-
-  const researchButton = document.createElement("button");
-  researchButton.className = "reader-notes-card-action reader-notes-research-action";
-  researchButton.type = "button";
-  researchButton.textContent = "Add to Research";
-
-  const noteTitle = document.createElement("strong");
-  noteTitle.className = "reader-notes-title";
-  noteTitle.textContent = "Note";
-
-  const leadingActions = document.createElement("div");
-  leadingActions.className = "reader-notes-leading-actions";
-  leadingActions.setAttribute("role", "toolbar");
-  leadingActions.setAttribute("aria-label", "Section actions");
-  leadingActions.append(noteTitle, researchButton);
-
-  const doneButton = document.createElement("button");
-  doneButton.className = "reader-notes-done";
-  doneButton.type = "button";
-  doneButton.textContent = "Done";
-  doneButton.addEventListener("click", () => closeReaderNotesSheet(panel, reader));
-
-  const actions = document.createElement("div");
-  actions.className = "reader-notes-actions";
-  actions.append(doneButton);
-
-  header.append(leadingActions, actions);
-
-  const input = document.createElement("textarea");
-  input.className = "reader-notes-input";
-  input.placeholder = "Add a note";
-  input.addEventListener("input", () => {
-    const sectionID = sheet.dataset.sectionId || "";
-    const blockID = sheet.dataset.blockId || "";
-    const target = sheet.__annotationTarget || { sectionID, blockID, codeVersion: defaultSyncCodeVersion };
-    if (!setAnnotationNoteValue(target, input.value)) {
-      input.value = noteValueForTarget(target);
-      return;
-    }
-    syncReaderNoteControls(sectionID, blockID, input.value, { source: input, target });
-  });
-
-  bindReaderNotesResize(resizer, sheet, panel);
-  sheet.append(resizer, header, input);
-  panel.append(sheet);
-  return sheet;
 }
 
 function removeReaderNotesProjectPicker(sheet) {
   sheet?.querySelector(".reader-notes-project-picker")?.remove();
-}
-
-async function openReaderNotesProjectPicker(sheet, sectionPayload) {
-  showReaderNotesProjectPicker(sheet, sectionPayload);
-  return true;
 }
 
 function showReaderNotesProjectPicker(sheet, sectionPayload) {
@@ -12342,171 +12215,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   picker.append(newFolderActions, status, actions);
   syncConfirmState();
 
-  const header = sheet.querySelector(".reader-notes-header");
-  if (header) header.insertAdjacentElement("afterend", picker);
-  else sheet.prepend(picker);
-}
-
-function bindReaderNotesResize(resizer, sheet, panel) {
-  resizer.addEventListener("pointerdown", (event) => {
-    if (!sheet.classList.contains("is-open")) return;
-    const input = sheet.querySelector(".reader-notes-input");
-    if (!input) return;
-    event.preventDefault();
-    resizer.classList.add("is-dragging");
-    document.body.classList.add("is-resizing-notes");
-    sheet.classList.add("is-resizing");
-
-    const panelBounds = panel.getBoundingClientRect();
-    const sheetBounds = sheet.getBoundingClientRect();
-    const sheetStyles = getComputedStyle(sheet);
-    const inputBounds = input.getBoundingClientRect();
-    const cssMinHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-min-height")) || 320;
-    const minInputHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-input-min-height")) || 64;
-    const readerTrackTop = parseFloat(getComputedStyle(panel).getPropertyValue("--reader-scrollbar-track-top")) || 0;
-    const maxHeight = Math.max(cssMinHeight, sheetBounds.bottom - panelBounds.top - readerTrackTop);
-    const nonInputContentHeight = Math.max(0, sheet.scrollHeight - input.offsetHeight);
-    const minHeight = Math.min(maxHeight, Math.max(cssMinHeight, nonInputContentHeight + minInputHeight));
-
-    const resize = (moveEvent) => {
-      const height = sheetBounds.bottom - moveEvent.clientY;
-      const clampedHeight = Math.min(maxHeight, Math.max(minHeight, height));
-      const inputHeight = Math.max(minInputHeight, inputBounds.height + clampedHeight - sheetBounds.height);
-      sheet.style.setProperty("--reader-notes-height", `${clampedHeight}px`);
-      sheet.style.setProperty("--reader-notes-input-height", `${inputHeight}px`);
-    };
-
-    const stopResize = () => {
-      resizer.classList.remove("is-dragging");
-      document.body.classList.remove("is-resizing-notes");
-      sheet.classList.remove("is-resizing");
-      window.removeEventListener("pointermove", resize);
-      window.removeEventListener("pointerup", stopResize);
-      window.removeEventListener("pointercancel", stopResize);
-    };
-
-    resize(event);
-    window.addEventListener("pointermove", resize);
-    window.addEventListener("pointerup", stopResize);
-    window.addEventListener("pointercancel", stopResize);
-  });
-}
-
-function toggleReaderNotesSheet(panel, section, reader, options = {}) {
-  if (!panel || !section) return;
-  const sheet = panel.querySelector(".reader-notes-sheet.is-open");
-  const sectionID = sectionNoteKey(section.id);
-  const target = options.target || annotationTargetForSection(section, reader);
-  const blockID = normalizeAnnotationBlockID(target.blockID);
-  if (
-    sheet?.dataset.sectionId === sectionID &&
-    normalizeAnnotationBlockID(sheet?.dataset.blockId) === blockID
-  ) {
-    closeReaderNotesSheet(panel, reader);
-    return;
-  }
-  openReaderNotesSheet(panel, section, reader, { ...options, target });
-}
-
-function setReaderNotesActiveTarget(panel, sectionID = "", blockID = "") {
-  if (!panel) return;
-  panel.querySelectorAll(".chapter-section.is-notes-active, .annotated-code-block.is-notes-active").forEach((element) => {
-    element.classList.remove("is-notes-active");
-  });
-  const sectionKey = sectionNoteKey(sectionID);
-  if (!sectionKey) return;
-  const sectionElement = panel.querySelector(`.chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`);
-  sectionElement?.classList.add("is-notes-active");
-  const blockKey = normalizeAnnotationBlockID(blockID);
-  if (!blockKey) return;
-  sectionElement
-    ?.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(blockKey)}"]`)
-    ?.classList.add("is-notes-active");
-}
-
-function openReaderNotesSheet(panel, section, reader, options = {}) {
-  if (!panel || !section) return;
-  const sheet = ensureReaderNotesSheet(panel, reader);
-  const wasOpen = sheet.classList.contains("is-open") && !sheet.hidden;
-  const sectionID = sectionNoteKey(section.id);
-  const target = options.target || annotationTargetForSection(section, reader);
-  const blockID = normalizeAnnotationBlockID(target.blockID);
-  setReaderNotesActiveTarget(panel, sectionID, blockID);
-
-  const saved = isSectionSaved({ sectionID: section.id, codeVersion: target.codeVersion });
-  const researchButton = sheet.querySelector(".reader-notes-research-action");
-  const sectionWrapper = panel.querySelector(`.chapter-section[data-section-id="${CSS.escape(sectionID)}"]`);
-  const sectionPayload = {
-    codeVersion: target.codeVersion,
-    sectionID: section.id,
-    sectionNumber: section.sectionNumber,
-    title: section.title,
-    codePrefix: reader?.codePrefix || "BC",
-    chapterID: reader?.chapterID || "",
-    chapterNumber: section.chapterNumber || "",
-    blockID,
-    blockLabel: target.blockLabel || ""
-  };
-  if (researchButton) {
-    const currentResearchLabel = currentResearchConversationLabel();
-    researchButton.disabled = !sectionWrapper ||
-      String(reader?.codePrefix || "").toUpperCase() === zoningCodePrefix;
-    researchButton.textContent = currentResearchLabel ? `Add to: ${currentResearchLabel}` : "Start Research";
-    researchButton.title = researchButton.disabled
-      ? "Research requires enacted code text with stable section identifiers"
-      : currentResearchLabel
-        ? `Add as supporting evidence to “${currentResearchLabel}”`
-        : "Start Research with this passage";
-    researchButton.onclick = () => selectReaderSectionForResearch(sectionWrapper, {
-      addToCurrent: Boolean(currentResearchLabel)
-    });
-  }
-
-  const input = sheet.querySelector(".reader-notes-input");
-  const projectsHost = sheet.querySelector(".reader-notes-projects");
-  const tagsHost = sheet.querySelector(".reader-notes-tags");
-  sheet.dataset.sectionId = sectionID;
-  sheet.dataset.blockId = blockID;
-  sheet.__annotationTarget = target;
-  if (!wasOpen) {
-    sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
-    sheet.style.setProperty("--reader-notes-input-height", "120px");
-  }
-  removeReaderNotesProjectPicker(sheet);
-  input.value = noteValueForTarget(section.id, blockID);
-  input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
-  if (projectsHost) renderAnnotationProjectEditor(projectsHost, target, sectionPayload);
-  if (tagsHost) renderAnnotationTagEditor(tagsHost, target, {
-    onChange: () => {
-      if (state.utilities.saved) renderWorkspace();
-    }
-  });
-  sheet.hidden = false;
-  if (options.instant) {
-    sheet.classList.add("is-restoring", "is-open");
-    requestAnimationFrame(() => {
-      sheet.classList.remove("is-restoring");
-    });
-    return;
-  }
-  requestAnimationFrame(() => {
-    sheet.classList.add("is-open");
-    input.focus();
-  });
-}
-
-function closeReaderNotesSheet(panel, reader = null, options = {}) {
-  const sheet = panel?.querySelector(".reader-notes-sheet");
-  if (!sheet) return;
-  sheet.classList.remove("is-open");
-  setReaderNotesActiveTarget(panel);
-  if (options.instant) {
-    sheet.hidden = true;
-    return;
-  }
-  window.setTimeout(() => {
-    if (!sheet.classList.contains("is-open")) sheet.hidden = true;
-  }, 220);
+  sheet.prepend(picker);
 }
 
 function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSyncCodeVersion) {
@@ -12549,71 +12258,8 @@ function sectionElementForInlineComment(commentWrapper) {
   return commentWrapper.closest(".chapter-section");
 }
 
-function syncCommentBoxHeights(content, commentsList) {
-  if (!content || !commentsList) return;
-  const boxes = Array.from(commentsList.querySelectorAll(".section-comment-box"));
-  if (!boxes.length) return;
-  const sections = Array.from(content.querySelectorAll(".chapter-section"));
-  sections.forEach((section, index) => {
-    const box = boxes[index];
-    if (!box) return;
-    box.style.minHeight = `${Math.ceil(section.getBoundingClientRect().height)}px`;
-  });
-}
-
-function syncAllCommentBoxHeights() {
-  requestAnimationFrame(() => {
-    track.querySelectorAll(".reader-panel").forEach((panel) => {
-      syncCommentBoxHeights(panel.querySelector(".reader-content"), panel.querySelector(".comments-list"));
-    });
-  });
-}
-
-function normalizeCommentsWidth(width) {
-  const numeric = Number(width);
-  if (!Number.isFinite(numeric)) return 34;
-  return Math.min(58, Math.max(22, numeric));
-}
-
-function applyCommentsWidth(panel, reader) {
-  const readerBody = panel.querySelector(".reader-body");
-  if (!readerBody) return;
-  reader.commentsWidth = normalizeCommentsWidth(reader.commentsWidth);
-  readerBody.style.setProperty("--comments-width", `${reader.commentsWidth}%`);
-}
-
-function setReaderCommentsOpen(panel, reader, open) {
-  const readerBody = panel.querySelector(".reader-body");
-  const commentsPanel = panel.querySelector(".reader-comments");
-  const commentsButton = panel.querySelector(".reader-comments-toggle");
-  if (!readerBody || !commentsPanel || !commentsButton) return;
-
-  reader.commentsOpen = Boolean(open);
-  commentsButton.setAttribute("aria-pressed", String(reader.commentsOpen));
-  commentsButton.title = reader.commentsOpen ? "Hide comments" : "Show comments";
-
-  if (reader.commentsOpen) {
-    commentsPanel.hidden = false;
-    requestAnimationFrame(() => {
-      readerBody.classList.add("comments-open");
-      syncCommentBoxHeights(panel.querySelector(".reader-content"), panel.querySelector(".comments-list"));
-    });
-    return;
-  }
-
-  readerBody.classList.remove("comments-open");
-  const hideComments = (event) => {
-    if (event && event.target !== readerBody) return;
-    if (!reader.commentsOpen) commentsPanel.hidden = true;
-    readerBody.removeEventListener("transitionend", hideComments);
-  };
-  readerBody.addEventListener("transitionend", hideComments);
-  window.setTimeout(hideComments, 500);
-}
-
 async function refreshReaderContent(panel, reader) {
   const saveButton = panel.querySelector(".reader-save");
-  const commentsPanel = panel.querySelector(".reader-comments");
   applyCodeTheme(panel, reader);
   renderReaderTrust(panel, reader);
   populateCodeSelect(panel, reader);
@@ -12621,72 +12267,11 @@ async function refreshReaderContent(panel, reader) {
   await populateReaderSelectors(panel, reader);
   await renderSectionContent(panel, reader);
   setTitle(panel, reader);
-  applyCommentsWidth(panel, reader);
-  reader.commentsOpen = false;
-  panel.querySelector(".reader-body")?.classList.remove("comments-open");
-  panel.querySelector(".reader-comments-toggle")?.setAttribute("hidden", "");
   panel.querySelectorAll("select").forEach(enhanceSelect);
   if (saveButton) {
     saveButton.hidden = !reader.sectionID;
     saveButton.disabled = !reader.sectionID;
   }
-  if (commentsPanel) commentsPanel.hidden = true;
-}
-
-function bindCommentDividerDrag(panel, reader) {
-  const readerBody = panel.querySelector(".reader-body");
-  const resizer = panel.querySelector(".reader-comments-resizer");
-  if (!readerBody || !resizer || panel.dataset.commentResizeBound === "true") return;
-  panel.dataset.commentResizeBound = "true";
-
-  function resize(event) {
-    const bounds = readerBody.getBoundingClientRect();
-    if (!bounds.width) return;
-    const width = ((bounds.right - event.clientX) / bounds.width) * 100;
-    reader.commentsWidth = normalizeCommentsWidth(width);
-    readerBody.style.setProperty("--comments-width", `${reader.commentsWidth}%`);
-    syncCommentBoxHeights(panel.querySelector(".reader-content"), panel.querySelector(".comments-list"));
-  }
-
-  const endDrag = () => {
-    resizer.classList.remove("is-dragging");
-    document.body.classList.remove("is-resizing-comments");
-    saveWorkspaceState();
-    window.removeEventListener("pointermove", resize);
-    window.removeEventListener("pointerup", endDrag);
-    window.removeEventListener("pointercancel", endDrag);
-  };
-
-  resizer.addEventListener("pointerdown", (event) => {
-    if (!reader.commentsOpen) return;
-    event.preventDefault();
-    resizer.classList.add("is-dragging");
-    document.body.classList.add("is-resizing-comments");
-    resize(event);
-    window.addEventListener("pointermove", resize);
-    window.addEventListener("pointerup", endDrag);
-    window.addEventListener("pointercancel", endDrag);
-  });
-}
-
-function bindReaderCommentScroll(panel) {
-  const content = panel.querySelector(".reader-content");
-  const comments = panel.querySelector(".reader-comments");
-  if (!content || !comments || panel.dataset.commentScrollBound === "true") return;
-  panel.dataset.commentScrollBound = "true";
-  let syncing = false;
-
-  const syncScroll = (source, target) => {
-    if (syncing) return;
-    syncing = true;
-    target.scrollTop = source.scrollTop;
-    requestAnimationFrame(() => {
-      syncing = false;
-    });
-  };
-
-  content.addEventListener("scroll", () => syncScroll(content, comments), { passive: true });
-  comments.addEventListener("scroll", () => syncScroll(comments, content), { passive: true });
 }
 
 function updateReaderScrollIndicator(panel) {
@@ -12772,50 +12357,10 @@ function scheduleVisibleReaderScrollIndicatorUpdates() {
   });
 }
 
-function bindAllReaderCommentScroll() {
+function bindAllReaderScrollIndicators() {
   track.querySelectorAll(".reader-panel").forEach((panel) => {
-    bindReaderCommentScroll(panel);
     bindReaderScrollIndicator(panel);
     updateReaderScrollIndicator(panel);
-  });
-}
-
-function renderSectionComments(commentsList, targets) {
-  if (!commentsList) return;
-  clear(commentsList);
-  if (!targets.length) {
-    const empty = document.createElement("p");
-    empty.className = "comments-empty";
-    empty.textContent = "";
-    commentsList.append(empty);
-    return;
-  }
-
-  targets.forEach((target) => {
-    const item = document.createElement("article");
-    item.className = "section-comment-box";
-    item.dataset.sectionId = String(target.sectionID);
-    item.dataset.blockId = target.blockID || "";
-
-    const inputLabel = document.createElement("label");
-    inputLabel.className = "comment-composer";
-    const textarea = document.createElement("textarea");
-    textarea.className = "comment-input";
-    textarea.rows = 4;
-    textarea.value = noteValueForTarget(target.sectionID, target.blockID);
-    textarea.placeholder = "Add a note";
-    textarea.setAttribute("aria-label", `Note for ${sectionDisplayTitle(target.sectionNumber, target.title)}`);
-    textarea.addEventListener("input", () => {
-      if (!setAnnotationNoteValue(target, textarea.value)) {
-        textarea.value = noteValueForTarget(target.sectionID, target.blockID);
-        return;
-      }
-      syncReaderNoteControls(target.sectionID, target.blockID, textarea.value, { source: textarea, target });
-    });
-
-    inputLabel.append(textarea);
-    item.append(inputLabel);
-    commentsList.append(item);
   });
 }
 
@@ -13302,7 +12847,6 @@ async function renderReader(reader, options = {}) {
   const closeButton = panel.querySelector(".reader-close");
   const dragHandle = panel.querySelector(".pane-drag-handle");
   const referenceSourceButton = panel.querySelector(".reader-reference-source");
-  const commentsButton = panel.querySelector(".reader-comments-toggle");
   const decreaseTextButton = panel.querySelector(".reader-text-decrease");
   const increaseTextButton = panel.querySelector(".reader-text-increase");
   const decreaseSpacingButton = panel.querySelector(".reader-spacing-decrease");
@@ -13313,8 +12857,6 @@ async function renderReader(reader, options = {}) {
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
   const internalSearchClearButton = panel.querySelector(".reader-internal-search-clear");
-  const readerBody = panel.querySelector(".reader-body");
-  const commentsPanel = panel.querySelector(".reader-comments");
   const codeSelect = panel.querySelector(".code-select");
   const chapterSelect = panel.querySelector(".chapter-select");
   const sectionSelect = panel.querySelector(".section-select");
@@ -13335,11 +12877,6 @@ async function renderReader(reader, options = {}) {
   applyReaderSpacing(panel, reader);
   selector.hidden = false;
   setTitle(panel, reader);
-  reader.commentsOpen = false;
-  applyCommentsWidth(panel, reader);
-  readerBody.classList.remove("comments-open");
-  commentsPanel.hidden = true;
-  commentsButton.hidden = true;
   referenceSourceButton.hidden = !referenceSourceReader;
   if (referenceSourceReader) {
     referenceSourceButton.title = "Return to source Reader";
@@ -13376,7 +12913,6 @@ async function renderReader(reader, options = {}) {
     typographyToggle.setAttribute("aria-label", typographyToggle.title);
   });
   codeSelect.addEventListener("change", async () => {
-    closeReaderNotesSheet(panel, reader, { instant: true });
     reader.codePrefix = codeSelect.value || "BC";
     reader.codeVersion = syncCodeVersionForPrefix(reader.codePrefix);
     applyCodeTheme(panel, reader);
@@ -13441,7 +12977,6 @@ async function renderReader(reader, options = {}) {
   });
 
   chapterSelect.addEventListener("change", async () => {
-    closeReaderNotesSheet(panel, reader, { instant: true });
     reader.chapterID = chapterSelect.value;
     state.recentChaptersByCode = state.recentChaptersByCode || {};
     if (reader.chapterID) {
@@ -19714,7 +19249,6 @@ function bindResearchTextSelection() {
   document.addEventListener("pointerup", (event) => {
     if (
       event.target.closest?.(".research-selection-menu") ||
-      event.target.closest?.(".reader-notes-card-action") ||
       event.target.closest?.(".inline-comment")
     ) return;
     window.setTimeout(showResearchSelectionMenu, 0);
@@ -30839,8 +30373,6 @@ function restoreReaderScrollPositions(positions) {
         Math.max(0, content.scrollHeight - content.clientHeight)
       );
       content.scrollTop = scrollTop;
-      const comments = panel.querySelector(".reader-comments");
-      if (comments) comments.scrollTop = scrollTop;
       updateReaderScrollIndicator(panel);
     });
   };
@@ -34076,8 +33608,7 @@ async function renderWorkspace(options = {}) {
     panes.push(await renderProjectWorkboard(detachedProject));
     if (renderGeneration !== workspaceRenderGeneration) return false;
     appendPaneSequence(panes);
-    syncAllCommentBoxHeights();
-    bindAllReaderCommentScroll();
+    bindAllReaderScrollIndicators();
     if (options.persist !== false) saveWorkspaceState();
     return true;
   }
@@ -34125,8 +33656,7 @@ async function renderWorkspace(options = {}) {
   if (renderGeneration !== workspaceRenderGeneration) return false;
   appendPaneSequence(panes);
   restoreReaderScrollPositions(readerScrollPositions);
-  syncAllCommentBoxHeights();
-  bindAllReaderCommentScroll();
+  bindAllReaderScrollIndicators();
   enhanceReaderSelects();
   if (options.persist !== false) saveWorkspaceState();
   return true;
@@ -34250,8 +33780,7 @@ async function renderUtilityWorkspace(options = {}) {
       );
     }
   }
-  syncAllCommentBoxHeights();
-  bindAllReaderCommentScroll();
+  bindAllReaderScrollIndicators();
   enhanceReaderSelects();
   if (options.deferStateSave) {
     scheduleWorkspaceStateSaveAfterPaint();

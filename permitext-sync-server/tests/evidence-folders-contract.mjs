@@ -765,10 +765,6 @@ assert.match(
 assert.match(appSource, /function renameAnnotationTag\([\s\S]*?normalizeAnnotationTags/);
 assert.match(appSource, /function wireCodeFilterMenu\([\s\S]*?"ArrowDown"[\s\S]*?"Home"[\s\S]*?"End"[\s\S]*?"Escape"/);
 assert.match(stylesSource, /\.reader-notes-project-options \{[\s\S]*?max-height:[\s\S]*?overflow-y: auto;[\s\S]*?scrollbar-gutter: stable;/);
-assert.match(stylesSource, /--reader-notes-comment-surface: rgba\(246, 244, 241, 0\.1\);/);
-assert.match(stylesSource, /--reader-notes-comment-text: #ffffff;/);
-assert.match(stylesSource, /\.reader-notes-input \{[\s\S]*?background: var\(--reader-notes-comment-surface\);[\s\S]*?color: var\(--reader-notes-comment-text\);/);
-assert.match(stylesSource, /\.reader-notes-tags \.annotation-tag-input \{[\s\S]*?border: 0;[\s\S]*?box-shadow: none;/);
 assert.match(appSource, /function renderAnnotationProjectEditor[\s\S]*?const projectListLabel = selectedProjects\.length === 0[\s\S]*?chips\.inert = !open;[\s\S]*?projectListToggle\.textContent = projectListLabel/);
 assert.match(appSource, /selectedProjects\.length === 1[\s\S]*?primarySelectedProjectName[\s\S]*?: "MULTIPLE PROJECTS";/, "Multi-project Reader notes should use a stable MULTIPLE PROJECTS disclosure label.");
 assert.match(stylesSource, /\.annotation-project-list-toggle\[aria-expanded="true"\]::after \{[\s\S]*?transform: rotate\(90deg\);/);

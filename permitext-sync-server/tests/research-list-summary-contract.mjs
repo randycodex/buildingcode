@@ -434,7 +434,6 @@ assert.match(clientSource, /if \(!options\.openInReader\) toggle\.append\(disclo
 assert.match(stylesSource, /\.workspace-tab \{[\s\S]*?font-size: 12px;/, "Workspace tab labels are not 12px.");
 assert.match(stylesSource, /\.connection-status \{[\s\S]*?font-size: 12px;/, "Connection status labels are not 12px.");
 assert.match(stylesSource, /\.reader-nav-chapter-row \{[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/, "Reader chapter rows retain a persistent highlight instead of highlighting on hover.");
-assert.match(stylesSource, /\.reader-notes-research-action \{[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?background: color-mix\(in srgb, var\(--code-accent\) 16%, var\(--surface\)\);/, "Add to Research is not rendered as a filled Reader-notes pill.");
 assert.match(stylesSource, /\.research-selection-menu \{[\s\S]*?border: 0;/, "The enacted-text Research selection menu still renders a thin edge.");
 assert.match(clientSource, /projectPicker\.className = "research-selection-project-picker"[\s\S]*?projectList\.hidden = !willOpen;[\s\S]*?projectTrigger\.setAttribute\("aria-expanded", String\(willOpen\)\)/, "The selection-menu Project picker does not expand inline with its card.");
 assert.match(stylesSource, /\.research-selection-menu \.research-selection-project-option \+ \.research-selection-project-option \{[\s\S]*?border-top: 1px solid var\(--border\);/, "The inline Research Project choices are not separated by thin dividers.");
@@ -444,7 +443,6 @@ assert.doesNotMatch(clientSource, /research-selection-context-summary|updateSele
 assert.doesNotMatch(stylesSource, /\.research-selection-context-summary/, "Removed selected-passage summary styling is still present.");
 assert.match(clientSource, /analyzeButton\.disabled = false;[\s\S]*?A Project is optional\. You can assign this Research conversation later\./, "Unassigned Reader evidence does not expose an enabled Start Research action.");
 assert.match(clientSource, /projectID: selection\.projectID \|\| ""/, "Unassigned Reader evidence is not submitted as an unassigned Research conversation.");
-assert.match(clientSource, /researchButton\.onclick = \(\) => selectReaderSectionForResearch\(sectionWrapper, \{[\s\S]*?addToCurrent: Boolean\(currentResearchLabel\)/, "The Reader comment card does not use the context-sensitive direct Research flow.");
 assert.match(clientSource, /function readerSectionResearchSelection\(sectionWrapper\)[\s\S]*?selectedOpenProjectID\(\)[\s\S]*?passages: \[passage\],[\s\S]*?projectID/, "Reader passage Research does not preserve the passage and active Project context.");
 assert.match(clientSource, /currentResearchConversationLabel\(\)[\s\S]*?researchActionLabel[\s\S]*?researchActionIconSVG\(\)[\s\S]*?addToCurrent: Boolean\(currentResearchLabel\)/, "The single Reader Research action does not adapt to the current Research destination.");
 assert.doesNotMatch(clientSource, /newResearchButton|inline-new-research-toggle|Start new Research with this passage|createNew: true/, "The Reader still exposes a duplicate new-Research icon.");
