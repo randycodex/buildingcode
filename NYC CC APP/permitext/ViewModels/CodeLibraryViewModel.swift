@@ -1670,6 +1670,13 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func refreshBookmarks() {
+        // Any caller performing the full Saved/Project presentation refresh
+        // has already satisfied a pending debounced note refresh. Cancel it
+        // so a quick follow-up action (for example adding a tag after typing a
+        // note) does not rebuild account-wide Project evidence a second time.
+        savedPresentationRefreshTask?.cancel()
+        savedPresentationRefreshTask = nil
+
         guard let selectedVersion, let userContentRepository else {
             let didChange = !bookmarkedSectionIDs.isEmpty || !bookmarks.isEmpty
             bookmarkedSectionIDs = []
@@ -2620,6 +2627,7 @@ final class CodeLibraryViewModel: ObservableObject {
         savedPresentationRefreshTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 650_000_000)
             guard !Task.isCancelled, let self else { return }
+            self.savedPresentationRefreshTask = nil
             self.refreshBookmarks()
         }
     }

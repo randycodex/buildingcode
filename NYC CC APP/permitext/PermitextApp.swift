@@ -191,6 +191,7 @@ private struct PermitextTabNavigation: View {
                 .environment(\.isBrowserTabActive, library.selectedTab == .browse)
                 .tabItem {
                     Image(systemName: "text.line.first.and.arrowtriangle.forward")
+                    Text("Reader 1")
                 }
                 .accessibilityLabel("First reader")
                 .tag(AppTab.browse)
@@ -199,6 +200,7 @@ private struct PermitextTabNavigation: View {
                 .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
                 .tabItem {
                     Image(systemName: "text.line.last.and.arrowtriangle.forward")
+                    Text("Reader 2")
                 }
                 .accessibilityLabel("Second reader")
                 .tag(AppTab.browseSecondary)
@@ -206,6 +208,7 @@ private struct PermitextTabNavigation: View {
             SearchView()
                 .tabItem {
                     Image(systemName: "sparkle.magnifyingglass")
+                    Text("Search")
                 }
                 .accessibilityLabel("Search")
                 .tag(AppTab.search)
@@ -213,6 +216,7 @@ private struct PermitextTabNavigation: View {
             BookmarksView()
                 .tabItem {
                     Image(systemName: library.selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
+                    Text("Saved")
                 }
                 .accessibilityLabel("Saved")
                 .tag(AppTab.bookmarks)
@@ -220,6 +224,7 @@ private struct PermitextTabNavigation: View {
             SettingsView()
                 .tabItem {
                     Image(systemName: library.selectedTab == .settings ? "gearshape.fill" : "gearshape")
+                    Text("Settings")
                 }
                 .accessibilityLabel("Settings")
                 .tag(AppTab.settings)
