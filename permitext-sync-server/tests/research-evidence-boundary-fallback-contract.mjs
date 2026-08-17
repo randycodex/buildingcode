@@ -193,6 +193,11 @@ const handlerEnd = appSource.indexOf("async function handleResearchConversationD
 const handler = appSource.slice(handlerStart, handlerEnd);
 assert.match(handler, /if \(applyEvidenceBoundaryFallback\(\)\) break;/);
 assert.ok(
+  handler.indexOf("if (applyEvidenceBoundaryFallback()) break;") <
+    handler.indexOf("if (attempt === maximumResearchVerificationAttempts - 1)"),
+  "A safe no-governing-evidence outcome must stop before a futile model revision."
+);
+assert.ok(
   handler.indexOf("applyEvidenceBoundaryFallback") < handler.indexOf("await commitResearchConversationMessage("),
   "The evidence-boundary response must continue through the ordinary durable answer/conversation commit."
 );

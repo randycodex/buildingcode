@@ -14929,8 +14929,8 @@ async function handleResearchConversationMessage(request, response) {
             issues: combinedResearchAnswerRevisionIssues(requiredClaimCoverage, claimMateriality, answerQuality),
             model: "permitext-deterministic-answer-quality-gate"
           });
+          if (applyEvidenceBoundaryFallback()) break;
           if (attempt === maximumResearchVerificationAttempts - 1) {
-            if (applyEvidenceBoundaryFallback()) break;
             const error = new Error("The answer failed deterministic materiality or evidence-economy checks after two bounded revisions.");
             error.code = "RESEARCH_VERIFICATION_FAILED";
             error.verificationAttempts = verificationAttempts;
@@ -14958,8 +14958,8 @@ async function handleResearchConversationMessage(request, response) {
           model: verification.model
         });
         if (verification.result.pass) break;
+        if (applyEvidenceBoundaryFallback()) break;
         if (attempt === maximumResearchVerificationAttempts - 1) {
-          if (applyEvidenceBoundaryFallback()) break;
           const error = new Error("The answer did not pass verification after two bounded revisions.");
           error.code = "RESEARCH_VERIFICATION_FAILED";
           error.verificationAttempts = verificationAttempts;
