@@ -647,10 +647,10 @@ async function main() {
         !workspaceScript.text.includes("const addZoningReaderButton") &&
         !workspaceScript.text.includes('label: "Open ZR Reader"') &&
         workspaceScript.text.includes('item.classList.toggle("is-indented", indented)') &&
-        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.construction2022)') &&
-        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.codes2025)') &&
-        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.existingAndHistorical)') &&
-        iosBrowseSource.includes('codeSectionName: "Zoning Resolution"') &&
+        iosBrowseSource.includes('title: ReaderCodeMenuSectionTitle.construction2022') &&
+        iosBrowseSource.includes('title: ReaderCodeMenuSectionTitle.codes2025') &&
+        iosBrowseSource.includes('title: ReaderCodeMenuSectionTitle.existingAndHistorical') &&
+        iosBrowseSource.includes('ReaderCodePickerItem(version: zoningResolutionVersion, name: "Zoning Resolution")') &&
         iosBrowserContextSource.includes("storedVersionFileName") &&
         iosBrowserContextSource.includes("persistVersionFileName"),
       "Web Reader pickers should organize all enacted code collections, including Zoning Resolution."
@@ -1440,7 +1440,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-research-multicorpus-v350'),
+        webRoot.text.includes('/web/app.js?v=20260817-research-multicorpus-v351'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1606,7 +1606,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v350'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v351'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1872,7 +1872,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v350'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v351'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2749,10 +2749,10 @@ async function main() {
       "Divider resizing still invalidates cursor styles across every workspace descendant."
     );
     assert(
-      workspaceStyles.text.includes("scrollbar-width: none !important") &&
+      !workspaceStyles.text.includes("scrollbar-width: none !important") &&
         workspaceStyles.text.includes("scroll-snap-type: x mandatory") &&
         workspaceStyles.text.includes("flex: 0 0 100% !important"),
-      "Hidden scrollbars or one-pane mobile behavior regressed."
+      "Visible native scrollbars or one-pane mobile behavior regressed."
     );
     assert(
       workspaceStyles.text.includes(".web-warning-backdrop") &&
@@ -2906,30 +2906,23 @@ async function main() {
       "Column labels no longer maintain high contrast across light and dark appearance."
     );
     assert(
-      workspaceStyles.text.includes("*::-webkit-scrollbar") &&
-        workspaceStyles.text.includes("display: none !important") &&
-        workspaceStyles.text.includes("width: 0 !important") &&
-        workspaceStyles.text.includes("height: 0 !important"),
-      "Web workspace no longer hides scrollbars globally."
+      !workspaceStyles.text.includes("scrollbar-width: none !important") &&
+        !workspaceStyles.text.includes("*::-webkit-scrollbar") &&
+        workspaceStyles.text.match(/\.reader-content,[\s\S]*?\.project-create-sheet \{[\s\S]*?overflow-y: auto;[\s\S]*?scrollbar-gutter: stable;/),
+      "Web workspace scrollable panes no longer use visible native scrollbars."
     );
     assert(
-      workspaceStyles.text.includes(".reader-scroll-indicator") &&
-        workspaceStyles.text.includes("display: none;"),
-      "Reader workspace still renders its custom scroll indicator."
-    );
-    assert(
-      webRoot.text.includes('class="reader-reading-progress"') &&
-        webRoot.text.includes('class="reader-reading-progress-value"') &&
+      !webRoot.text.includes('class="reader-reading-progress"') &&
+        !webRoot.text.includes('class="reader-scroll-indicator"') &&
+        !workspaceStyles.text.includes(".reader-reading-progress") &&
+        !workspaceStyles.text.includes(".reader-scroll-indicator") &&
         webRoot.text.includes('class="reader-to-top"') &&
-        workspaceStyles.text.match(/\.reader-reading-progress \{[\s\S]*?right: calc\(var\(--panel-padding\) \+ var\(--reader-scrollbar-rail-width\)\);[\s\S]*?left: var\(--panel-padding\);[\s\S]*?height: 3px;[\s\S]*?background: color-mix\(in srgb, var\(--code-accent\) 22%, transparent\);/) &&
-        workspaceStyles.text.match(/\.reader-reading-progress-value \{[\s\S]*?transform: scaleX\(var\(--reader-reading-progress, 0\)\);[\s\S]*?transition: transform 50ms linear;/) &&
         workspaceStyles.text.match(/\.reader-to-top \{[\s\S]*?right: var\(--panel-padding\);[\s\S]*?bottom: calc\(var\(--panel-padding\) \+ var\(--space-3\)\);/) &&
-        workspaceScript.text.includes("content.scrollTop / scrollable") &&
-        workspaceScript.text.includes('progress?.setAttribute("aria-valuenow"') &&
+        !workspaceScript.text.includes('progress?.setAttribute("aria-valuenow"') &&
         workspaceScript.text.includes('toTopButton.classList.toggle("is-visible", showToTop)') &&
         workspaceScript.text.includes('content.scrollTo({ top: 0, behavior: "smooth" })') &&
         workspaceScript.text.includes('track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates)'),
-      "Reader chapter progress or the contextual Back to top control is missing."
+      "The removed Reader progress line returned or the contextual Back to top control is missing."
     );
     assert(
       workspaceStyles.text.match(/\.reader-panel \.panel-actions \{[\s\S]*?align-items: center;[\s\S]*?gap: var\(--space-2\);/) &&

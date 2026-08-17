@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-research-multicorpus-v350";
+} from "./offline-storage.js?v=20260817-research-multicorpus-v351";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -12178,18 +12178,9 @@ function updateReaderScrollIndicator(panel) {
     return;
   }
   const content = panel.querySelector(".reader-content");
-  const indicator = panel.querySelector(".reader-scroll-indicator");
-  const thumb = panel.querySelector(".reader-scroll-thumb");
-  const progress = panel.querySelector(".reader-reading-progress");
-  const progressValue = panel.querySelector(".reader-reading-progress-value");
   const toTopButton = panel.querySelector(".reader-to-top");
   if (!content) return;
   const scrollable = Math.max(0, content.scrollHeight - content.clientHeight);
-  const scrollProgress = scrollable > 1
-    ? Math.min(Math.max(content.scrollTop / scrollable, 0), 1)
-    : 0;
-  progressValue?.style.setProperty("--reader-reading-progress", String(scrollProgress));
-  progress?.setAttribute("aria-valuenow", String(Math.round(scrollProgress * 100)));
   const showToTop = scrollable > 1 &&
     content.scrollTop > Math.min(240, Math.max(120, content.clientHeight * 0.25));
   if (toTopButton) {
@@ -12197,19 +12188,6 @@ function updateReaderScrollIndicator(panel) {
     toTopButton.setAttribute("aria-hidden", String(!showToTop));
     toTopButton.tabIndex = showToTop ? 0 : -1;
   }
-  if (!indicator || !thumb) return;
-  const trackHeight = indicator.clientHeight;
-  if (scrollable <= 1 || trackHeight <= 0) {
-    thumb.hidden = true;
-    panel.classList.remove("is-scrolling");
-    return;
-  }
-  thumb.hidden = false;
-  const thumbHeight = Math.max(24, Math.round((content.clientHeight / content.scrollHeight) * trackHeight));
-  const maxTop = Math.max(0, trackHeight - thumbHeight);
-  const top = Math.round((content.scrollTop / scrollable) * maxTop);
-  thumb.style.height = `${thumbHeight}px`;
-  thumb.style.setProperty("--reader-scroll-thumb-top", `${top}px`);
 }
 
 function bindReaderScrollIndicator(panel) {

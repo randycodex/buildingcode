@@ -854,6 +854,20 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 } catch (error) {}
               }
 
+              function toggleBookmarkForHeading(heading) {
+                if (!heading) { return; }
+                var anchorID = heading.id || '';
+                var sectionNumber = sectionNumberForHeading(heading);
+                if (!anchorID && !sectionNumber) { return; }
+                try {
+                  window.webkit.messageHandlers.\(Coordinator.openSectionMessageName).postMessage({
+                    action: 'toggleBookmark',
+                    anchorID: anchorID,
+                    sectionNumber: sectionNumber
+                  });
+                } catch (error) {}
+              }
+
               function openNoteForBlock(heading, block) {
                 if (!heading || !block) { return; }
                 var anchorID = heading.id || '';
@@ -1066,6 +1080,41 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               }
               applyDepthClasses();
 
+              function setupSubsectionActions() {
+                document.querySelectorAll('.Subsection').forEach(function(heading) {
+                  if (heading.querySelector(':scope > .nyccc-subsection-actions')) { return; }
+                  var actions = document.createElement('span');
+                  actions.className = 'nyccc-subsection-actions';
+
+                  var noteButton = document.createElement('button');
+                  noteButton.type = 'button';
+                  noteButton.className = 'nyccc-subsection-note-button';
+                  noteButton.setAttribute('aria-label', 'Add or edit section note');
+                  noteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>';
+                  noteButton.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    openSectionForHeading(heading);
+                  });
+
+                  var bookmarkButton = document.createElement('button');
+                  bookmarkButton.type = 'button';
+                  bookmarkButton.className = 'nyccc-subsection-bookmark-button';
+                  bookmarkButton.setAttribute('aria-label', 'Save section');
+                  bookmarkButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4Z"></path></svg>';
+                  bookmarkButton.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    toggleBookmarkForHeading(heading);
+                  });
+
+                  actions.appendChild(noteButton);
+                  actions.appendChild(bookmarkButton);
+                  heading.appendChild(actions);
+                });
+              }
+              setupSubsectionActions();
+
               function anchorIDForHeading(heading) {
                 if (!heading) { return null; }
                 if (heading.id) { return heading.id; }
@@ -1136,7 +1185,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 heading.classList.add('nyccc-collapsible-heading');
                 setCollapsed(heading, false);
                 heading.addEventListener('click', function(event) {
-                  if (event.target.closest('a')) { return; }
+                  if (event.target.closest('a, button')) { return; }
                   if (heading.classList.contains('Subsection')) {
                     event.preventDefault();
                     event.stopPropagation();
@@ -1200,13 +1249,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     node.addEventListener('click', function(event) {
                       if (event.target.closest('a, button')) { return; }
                       if (window.getSelection && String(window.getSelection()).trim().length > 0) { return; }
-                      event.preventDefault();
-                      event.stopPropagation();
-                      if (node.id) {
-                        openNoteForBlock(heading, node);
-                      } else {
-                        openSectionForHeading(heading);
-                      }
+                      // Plain paragraph taps remain reading interactions. Notes
+                      // and bookmarks use the explicit heading actions above,
+                      // so an incidental tap no longer opens a modal sheet.
                     });
                   });
                 }
@@ -1294,6 +1339,18 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 heading.classList.toggle('nyccc-bookmarked-heading', isBookmarked);
                 heading.classList.toggle('nyccc-noted-heading', hasNote);
                 heading.setAttribute('data-nyccc-section-number', sectionNumber || '');
+
+                var bookmarkButton = heading.querySelector(':scope > .nyccc-subsection-actions > .nyccc-subsection-bookmark-button');
+                if (bookmarkButton) {
+                  bookmarkButton.classList.toggle('nyccc-is-bookmarked', isBookmarked);
+                  bookmarkButton.setAttribute('aria-label', isBookmarked ? 'Remove bookmark' : 'Save section');
+                }
+
+                var noteButton = heading.querySelector(':scope > .nyccc-subsection-actions > .nyccc-subsection-note-button');
+                if (noteButton) {
+                  noteButton.classList.toggle('nyccc-has-note', hasNote);
+                  noteButton.setAttribute('aria-label', hasNote ? 'Open section note' : 'Add section note');
+                }
 
               });
 
@@ -1908,7 +1965,56 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               user-select: none;
             }
             .nyccc-section-open-target {
-              cursor: pointer;
+              cursor: text;
+            }
+            .nyccc-subsection-actions {
+              position: absolute !important;
+              top: 0 !important;
+              right: 0 !important;
+              z-index: 3 !important;
+              display: inline-flex !important;
+              align-items: center !important;
+              gap: 0.12rem !important;
+            }
+            .Subsection h6,
+            .nyccc-section-card-expanded .Subsection h6 {
+              padding-right: 4rem !important;
+            }
+            .nyccc-subsection-actions button {
+              display: inline-flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              width: 1.85rem !important;
+              height: 1.85rem !important;
+              padding: 0 !important;
+              border: 0 !important;
+              border-radius: 999px !important;
+              background: transparent !important;
+              color: \(secondaryColor) !important;
+              opacity: 0.55 !important;
+              -webkit-appearance: none !important;
+              appearance: none !important;
+            }
+            .nyccc-subsection-actions button:focus-visible {
+              outline: 2px solid \(accentHex) !important;
+              outline-offset: 1px !important;
+            }
+            .nyccc-subsection-actions svg {
+              width: 1.05rem !important;
+              height: 1.05rem !important;
+              fill: none !important;
+              stroke: currentColor !important;
+              stroke-width: 2 !important;
+              stroke-linecap: round !important;
+              stroke-linejoin: round !important;
+            }
+            .nyccc-subsection-note-button.nyccc-has-note,
+            .nyccc-subsection-bookmark-button.nyccc-is-bookmarked {
+              color: \(accentHex) !important;
+              opacity: 1 !important;
+            }
+            .nyccc-subsection-bookmark-button.nyccc-is-bookmarked svg {
+              fill: currentColor !important;
             }
             #nyccc-research-selection-button {
               position: fixed !important;
@@ -2010,6 +2116,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-block-note-button[hidden],
             .nyccc-block-bookmark-indicator[hidden] {
+              display: none !important;
+            }
+            .nyccc-block-bookmark-indicator {
               display: none !important;
             }
             .nyccc-block-note-button svg {

@@ -160,9 +160,6 @@ struct ChapterReaderView: View {
             }
         }
         .tint(accentColor)
-        .safeAreaInset(edge: .top, spacing: 0) {
-            ChapterReadingProgressBar(progress: scrollProgress, accentColor: accentColor)
-        }
         .fullScreenCover(
             isPresented: Binding(
                 get: { expandedInlineImage != nil },
@@ -297,15 +294,13 @@ struct ChapterReaderView: View {
 
                     Spacer(minLength: 0)
 
-                    sectionStatusIndicators(isBookmarked: isBookmarked, hasNote: hasNote)
+                    sectionActionButtons(block: block, isBookmarked: isBookmarked, hasNote: hasNote)
                 }
 
                 ChapterBlockBodyView(
                     sectionID: block.id,
                     onOpenImage: { expandedInlineImage = $0 },
-                    onOpenNotes: { detail in
-                        openNotes(for: detail)
-                    },
+                    onOpenNotes: nil,
                     onSelectionChange: { hasSelection in
                         hasActiveTextSelection = hasSelection
                     }
@@ -359,23 +354,40 @@ struct ChapterReaderView: View {
     }
 
     @ViewBuilder
-    private func sectionStatusIndicators(isBookmarked: Bool, hasNote: Bool) -> some View {
-        if isBookmarked || hasNote {
-            HStack(spacing: 6) {
-                if hasNote {
-                    Image(systemName: "note.text")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 16, height: 16)
+    private func sectionActionButtons(
+        block: CodeLibraryViewModel.ChapterReaderBlockSummary,
+        isBookmarked: Bool,
+        hasNote: Bool
+    ) -> some View {
+        HStack(spacing: 4) {
+            Button {
+                Task { @MainActor in
+                    guard let detail = await library.loadSectionDetailAsync(sectionID: block.id) else { return }
+                    openNotes(for: detail)
                 }
-
-                if isBookmarked {
-                    Image(systemName: "bookmark.fill")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(accentColor)
-                        .frame(width: 16, height: 16)
-                }
+            } label: {
+                Image(systemName: "note.text")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(hasNote ? Color.secondary : Color(uiColor: .tertiaryLabel))
+                    .frame(width: 30, height: 30)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(hasNote ? "Open section note" : "Add section note")
+
+            Button {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                _ = library.toggleBookmark(sectionID: block.id)
+                syncVisibleSavedState()
+            } label: {
+                Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(isBookmarked ? accentColor : Color(uiColor: .tertiaryLabel))
+                    .frame(width: 30, height: 30)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isBookmarked ? "Remove bookmark" : "Save section")
         }
     }
 
@@ -1069,29 +1081,6 @@ private struct ChapterBlockBodyView: View {
 private struct ChapterBlockBodyTaskID: Hashable {
     let sectionID: Int64
     let theme: ReaderTheme
-}
-
-struct ChapterReadingProgressBar: View {
-    let progress: CGFloat
-    let accentColor: Color
-
-    var body: some View {
-        GeometryReader { proxy in
-            let clamped = min(max(progress, 0), 1)
-            let barWidth = proxy.size.width * clamped
-            ZStack(alignment: .leading) {
-                Rectangle()
-                    .fill(accentColor.opacity(0.22))
-                Rectangle()
-                    .fill(accentColor)
-                    .frame(width: max(barWidth, clamped > 0 ? 3 : 0))
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 3)
-        .animation(.linear(duration: 0.05), value: progress)
-        .allowsHitTesting(false)
-    }
 }
 
 private struct ChapterReaderBlockOffsetPreferenceKey: PreferenceKey {

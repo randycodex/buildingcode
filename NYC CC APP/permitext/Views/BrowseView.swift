@@ -11,6 +11,22 @@ enum ReaderCodeMenuSectionTitle {
     static let landUseAndZoning = "Land Use and Zoning"
 }
 
+private struct ReaderCodePickerItem: Identifiable {
+    let version: BundledCodeVersion?
+    let name: String
+
+    var id: String {
+        "\(version?.fileName ?? "unavailable")::\(name)"
+    }
+}
+
+private struct ReaderCodePickerGroup: Identifiable {
+    let title: String
+    let items: [ReaderCodePickerItem]
+
+    var id: String { title }
+}
+
 struct BrowseView: View {
     var browserContext: BrowserContextID = .primary
 
@@ -22,6 +38,7 @@ struct BrowseView: View {
     @State private var browseCodeSectionID: Int64?
     @State private var hasSeededBrowseSection = false
     @State private var pendingReaderCodeSectionName: String?
+    @State private var isReaderCodePickerPresented = false
     @State private var rememberedSectionIDs: [Int64: Int64] = [:]
     @State private var rememberedAnchorIDs: [Int64: String] = [:]
     @State private var rememberedScrollOffsets: [Int64: Double] = [:]
@@ -78,6 +95,18 @@ struct BrowseView: View {
         .onChange(of: library.isInitialContentLoaded) { _, isLoaded in
             guard isLoaded else { return }
             resolvePendingReaderCodeSelection()
+        }
+        .sheet(isPresented: $isReaderCodePickerPresented) {
+            ReaderCodePickerSheet(
+                groups: readerCodePickerGroups,
+                selectedVersionFileName: library.selectedVersionFileName,
+                selectedCodeSectionName: selectedCodeSectionName,
+                normalizeName: normalizedReaderCodeName,
+                onSelect: { item in
+                    selectReaderCode(version: item.version, codeSectionName: item.name)
+                    isReaderCodePickerPresented = false
+                }
+            )
         }
     }
 
@@ -227,75 +256,14 @@ struct BrowseView: View {
     private var libraryHeader: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 12) {
-                Menu {
-                    Section(ReaderCodeMenuSectionTitle.construction2022) {
-                        ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
-                            readerCodePickerButton(
-                                version: constructionCodeVersion,
-                                codeSectionName: codeSectionName
-                            )
-                        }
-                    }
-
-                    Section(ReaderCodeMenuSectionTitle.codes2025) {
-                        readerCodePickerButton(
-                            version: specialtyCodeVersion,
-                            codeSectionName: "2025 Energy Conservation Code"
-                        )
-                        readerCodePickerButton(
-                            version: specialtyCodeVersion,
-                            codeSectionName: "2025 Electrical Code — NYC Amendments"
-                        )
-                    }
-
-                    Section(ReaderCodeMenuSectionTitle.existingAndHistorical) {
-                        readerCodePickerButton(
-                            version: existingBuildingCodeVersion,
-                            codeSectionName: "Existing Building Code"
-                        )
-                        readerCodePickerButton(
-                            version: enactedAdministrativeCodeVersion,
-                            codeSectionName: "1968 Building Code"
-                        )
-                    }
-
-                    Section(ReaderCodeMenuSectionTitle.fireAndHousing) {
-                        readerCodePickerButton(
-                            version: enactedAdministrativeCodeVersion,
-                            codeSectionName: "Fire Code"
-                        )
-                        readerCodePickerButton(
-                            version: enactedAdministrativeCodeVersion,
-                            codeSectionName: "Housing Maintenance Code"
-                        )
-                    }
-
-                    Section(ReaderCodeMenuSectionTitle.administrative) {
-                        ForEach(enactedAdministrativeCodeSectionNames, id: \.self) { codeSectionName in
-                            readerCodePickerButton(
-                                version: enactedAdministrativeCodeVersion,
-                                codeSectionName: codeSectionName
-                            )
-                        }
-                    }
-
-                    Section(ReaderCodeMenuSectionTitle.localLaws) {
-                        readerCodePickerButton(
-                            version: enactedAdministrativeCodeVersion,
-                            codeSectionName: "Construction-Related Local Laws"
-                        )
-                    }
-
-                    Section(ReaderCodeMenuSectionTitle.landUseAndZoning) {
-                        readerCodePickerButton(
-                            version: zoningResolutionVersion,
-                            codeSectionName: "Zoning Resolution"
-                        )
-                    }
+                Button {
+                    isReaderCodePickerPresented = true
                 } label: {
                     headerTitle(showPicker: true)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Select code")
+                .accessibilityHint("Shows every available code collection")
             }
 
             VStack(alignment: .leading, spacing: 6) {
@@ -323,6 +291,56 @@ struct BrowseView: View {
             "Plumbing Code",
             "Mechanical Code",
             "Fuel Gas Code"
+        ]
+    }
+
+    private var readerCodePickerGroups: [ReaderCodePickerGroup] {
+        [
+            ReaderCodePickerGroup(
+                title: ReaderCodeMenuSectionTitle.construction2022,
+                items: constructionCodeSectionNames.map {
+                    ReaderCodePickerItem(version: constructionCodeVersion, name: $0)
+                }
+            ),
+            ReaderCodePickerGroup(
+                title: ReaderCodeMenuSectionTitle.codes2025,
+                items: [
+                    ReaderCodePickerItem(version: specialtyCodeVersion, name: "2025 Energy Conservation Code"),
+                    ReaderCodePickerItem(version: specialtyCodeVersion, name: "2025 Electrical Code — NYC Amendments")
+                ]
+            ),
+            ReaderCodePickerGroup(
+                title: ReaderCodeMenuSectionTitle.existingAndHistorical,
+                items: [
+                    ReaderCodePickerItem(version: existingBuildingCodeVersion, name: "Existing Building Code"),
+                    ReaderCodePickerItem(version: enactedAdministrativeCodeVersion, name: "1968 Building Code")
+                ]
+            ),
+            ReaderCodePickerGroup(
+                title: ReaderCodeMenuSectionTitle.fireAndHousing,
+                items: [
+                    ReaderCodePickerItem(version: enactedAdministrativeCodeVersion, name: "Fire Code"),
+                    ReaderCodePickerItem(version: enactedAdministrativeCodeVersion, name: "Housing Maintenance Code")
+                ]
+            ),
+            ReaderCodePickerGroup(
+                title: ReaderCodeMenuSectionTitle.administrative,
+                items: enactedAdministrativeCodeSectionNames.map {
+                    ReaderCodePickerItem(version: enactedAdministrativeCodeVersion, name: $0)
+                }
+            ),
+            ReaderCodePickerGroup(
+                title: ReaderCodeMenuSectionTitle.localLaws,
+                items: [
+                    ReaderCodePickerItem(version: enactedAdministrativeCodeVersion, name: "Construction-Related Local Laws")
+                ]
+            ),
+            ReaderCodePickerGroup(
+                title: ReaderCodeMenuSectionTitle.landUseAndZoning,
+                items: [
+                    ReaderCodePickerItem(version: zoningResolutionVersion, name: "Zoning Resolution")
+                ]
+            )
         ]
     }
 
@@ -363,33 +381,6 @@ struct BrowseView: View {
         library.availableVersions.first { version in
             version.codeVersion.localizedCaseInsensitiveContains("zoning")
         }
-    }
-
-    private func isReaderCodeSelected(
-        version: BundledCodeVersion?,
-        codeSectionName: String
-    ) -> Bool {
-        guard version?.fileName == library.selectedVersionFileName else { return false }
-        return normalizedReaderCodeName(selectedCodeSectionName) == normalizedReaderCodeName(codeSectionName)
-    }
-
-    @ViewBuilder
-    private func readerCodePickerButton(
-        version: BundledCodeVersion?,
-        codeSectionName: String
-    ) -> some View {
-        Button {
-            selectReaderCode(version: version, codeSectionName: codeSectionName)
-        } label: {
-            codeSectionPickerLabel(
-                codeSectionName,
-                isSelected: isReaderCodeSelected(
-                    version: version,
-                    codeSectionName: codeSectionName
-                )
-            )
-        }
-        .disabled(version == nil)
     }
 
     private func selectReaderCode(
@@ -456,15 +447,6 @@ struct BrowseView: View {
         }
         .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
         .opacity(1 - (collapseProgress * 0.22))
-    }
-
-    private func codeSectionPickerLabel(_ title: String, isSelected: Bool) -> some View {
-        HStack(spacing: 8) {
-            Text(title)
-            if isSelected {
-                Image(systemName: "checkmark")
-            }
-        }
     }
 
     private func chapterRow(for chapter: CodeChapter) -> some View {
@@ -747,6 +729,65 @@ struct BrowseView: View {
 extension View {
     func disablesInteractivePopGesture() -> some View {
         background(InteractivePopGestureDisabler())
+    }
+}
+
+private struct ReaderCodePickerSheet: View {
+    let groups: [ReaderCodePickerGroup]
+    let selectedVersionFileName: String
+    let selectedCodeSectionName: String
+    let normalizeName: (String) -> String
+    let onSelect: (ReaderCodePickerItem) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(groups) { group in
+                    Section(group.title) {
+                        ForEach(group.items) { item in
+                            Button {
+                                onSelect(item)
+                            } label: {
+                                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                                    Text(item.name)
+                                        .multilineTextAlignment(.leading)
+                                        .foregroundStyle(.primary)
+
+                                    Spacer(minLength: 12)
+
+                                    if isSelected(item) {
+                                        Image(systemName: "checkmark")
+                                            .font(.body.weight(.semibold))
+                                            .foregroundStyle(Color.appChrome)
+                                            .accessibilityHidden(true)
+                                    }
+                                }
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(item.version == nil)
+                            .accessibilityValue(isSelected(item) ? "Selected" : "")
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Select Code")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func isSelected(_ item: ReaderCodePickerItem) -> Bool {
+        item.version?.fileName == selectedVersionFileName
+            && normalizeName(item.name) == normalizeName(selectedCodeSectionName)
     }
 }
 

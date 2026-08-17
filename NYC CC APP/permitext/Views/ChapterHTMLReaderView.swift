@@ -445,11 +445,6 @@ struct ChapterHTMLReaderView: View {
             ReaderView(sectionID: section.id)
                 .environmentObject(library)
         }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            if chapterURL != nil, readAccessURL != nil, hasActivatedHTMLReader {
-                ChapterReadingProgressBar(progress: scrollProgress, accentColor: accentColor)
-            }
-        }
         .overlay(alignment: .top) {
             if chapterURL != nil, readAccessURL != nil, hasActivatedHTMLReader {
                 CodeTopContentFade(alwaysVisible: true)
@@ -543,6 +538,8 @@ struct ChapterHTMLReaderView: View {
             onOpenSectionForAnchor: { target in
                 if target.action == "openReference" {
                     openInlineReference(target)
+                } else if target.action == "toggleBookmark" {
+                    toggleBookmark(for: target)
                 } else {
                     openNotes(for: target)
                 }
@@ -782,6 +779,13 @@ struct ChapterHTMLReaderView: View {
                 blockLabel: target.blockLabel
             )
         }
+    }
+
+    private func toggleBookmark(for target: ChapterHTMLSectionTarget) {
+        guard let section = sectionSummary(for: target) else { return }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        _ = library.toggleBookmark(sectionID: section.id)
+        recomputeSavedDecorations()
     }
 
     private func openInlineReference(_ target: ChapterHTMLSectionTarget) {
