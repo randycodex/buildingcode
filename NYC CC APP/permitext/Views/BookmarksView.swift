@@ -124,11 +124,9 @@ struct BookmarksView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     savedScreenHeader
 
-                    if library.bookmarks.isEmpty {
-                        savedEmptyState
-                    } else if cachedFilteredBookmarks.isEmpty {
+                    if !library.bookmarks.isEmpty && cachedFilteredBookmarks.isEmpty {
                         filteredSavedEmptyState
-                    } else {
+                    } else if !library.bookmarks.isEmpty {
                         savedBookmarkList
                     }
                 }
@@ -270,27 +268,6 @@ private var savedBookmarkList: some View {
             }
         }
     }
-}
-
-private var savedEmptyState: some View {
-    VStack(alignment: .leading, spacing: 14) {
-        CodeEmptyStateCard(
-            title: "No Saved Sections Yet",
-            systemImage: "bookmark",
-            description: "Save code sections while reading to keep the requirements, notes, and project evidence you need close at hand.",
-            accent: accentColor
-        )
-
-        Button {
-            library.selectedTab = .browse
-        } label: {
-            Label("Browse Codes", systemImage: "books.vertical")
-                .font(.subheadline.weight(.semibold))
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(accentColor)
-    }
-    .padding(.top, CodeScreenMetrics.contentSpacingBelowTitle)
 }
 
 private var filteredSavedEmptyState: some View {

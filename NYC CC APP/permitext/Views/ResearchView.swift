@@ -168,52 +168,38 @@ struct ResearchView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if library.signedInAccount == nil {
-                    ContentUnavailableView(
-                        "Sign in to use Research",
-                        image: "Astroid",
-                        description: Text("Research conversations synchronize with Permitext on the web.")
-                    )
-                } else if !library.hasResearchAccess {
-                    ContentUnavailableView(
-                        "Research requires the Research Add-On",
-                        image: "Astroid",
-                        description: Text("Manage your plan from Settings.")
-                    )
-                } else if let conversation {
-                    conversationView(conversation)
-                } else if isLoading && summaries.isEmpty {
-                    ProgressView("Loading Research…")
-                } else {
-                    historyView
+            VStack(alignment: .leading, spacing: 0) {
+                researchScreenHeader
+
+                Group {
+                    if library.signedInAccount == nil {
+                        ContentUnavailableView(
+                            "Sign in to use Research",
+                            image: "Astroid",
+                            description: Text("Research conversations synchronize with Permitext on the web.")
+                        )
+                    } else if !library.hasResearchAccess {
+                        ContentUnavailableView(
+                            "Research requires the Research Add-On",
+                            image: "Astroid",
+                            description: Text("Manage your plan from Settings.")
+                        )
+                    } else if let conversation {
+                        conversationView(conversation)
+                    } else if isLoading && summaries.isEmpty {
+                        ProgressView("Loading Research…")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        historyView
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .navigationTitle("Research")
+            .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
+            .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if conversation != nil {
-                        Button("History", systemImage: "chevron.left") {
-                            library.activeResearchConversationID = nil
-                            self.conversation = nil
-                            failedQuestionAttempt = nil
-                            questionErrorMessage = nil
-                        }
-                    }
-                }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    if library.signedInAccount != nil, library.hasResearchAccess {
-                        Button("New Research", systemImage: "plus") {
-                            Task { await createConversation(selections: []) }
-                        }
-                        .disabled(isCreatingConversation)
-                    }
-                    Button("Settings", systemImage: "gearshape") {
-                        showingSettings = true
-                    }
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showingSettings) {
                 NavigationStack { SettingsView() }
                     .environmentObject(library)
@@ -263,6 +249,54 @@ struct ResearchView: View {
             .onAppear { isVisible = true }
             .onDisappear { isVisible = false }
         }
+    }
+
+    private var researchScreenHeader: some View {
+        CodeScreenTitleRow(title: "Research") {
+            HStack(spacing: 6) {
+                if conversation != nil {
+                    Button {
+                        library.activeResearchConversationID = nil
+                        self.conversation = nil
+                        failedQuestionAttempt = nil
+                        questionErrorMessage = nil
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
+                            .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Research history")
+                }
+
+                if library.signedInAccount != nil, library.hasResearchAccess {
+                    Button {
+                        Task { await createConversation(selections: []) }
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
+                            .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isCreatingConversation)
+                    .accessibilityLabel("New Research")
+                }
+
+                Button {
+                    showingSettings = true
+                } label: {
+                    Image(systemName: "gearshape")
+                        .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
+                        .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Settings")
+            }
+            .foregroundStyle(Color.appChrome)
+        }
+        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+        .padding(.top, 8)
+        .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
     }
 
     private var historyView: some View {

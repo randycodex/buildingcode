@@ -58,6 +58,16 @@ struct SearchView: View {
         min(max(-scrollOffset / 64, 0), 1)
     }
 
+    private var activeSearchFilterCodeSectionIDs: Set<Int64> {
+        guard !library.isZoningResolutionSelected else { return [] }
+        let availableIDs = Set(library.codeSections.map(\.id))
+        return searchFilterCodeSectionIDs.intersection(availableIDs)
+    }
+
+    private var searchTaskID: String {
+        "\(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(query)"
+    }
+
     init() {
         _searchFilterCodeSectionIDs = State(
             initialValue: FilterIDsStorage.load(key: Self.filterCodeSectionIDsDefaultsKey)
@@ -112,10 +122,11 @@ struct SearchView: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
-                    if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-                       !library.codeSections.isEmpty {
+                    if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         searchResultSummary
-                        searchCodeSectionFilter
+                        if !library.isZoningResolutionSelected, !library.codeSections.isEmpty {
+                            searchCodeSectionFilter
+                        }
                     }
                     searchField
                 }
@@ -154,6 +165,9 @@ struct SearchView: View {
             .onChange(of: library.searchResults) { _, _ in
                 rebuildSearchCaches()
             }
+            .onChange(of: library.codeSections) { _, _ in
+                rebuildSearchCaches()
+            }
             .onChange(of: library.recentlyViewedSections) { _, _ in
                 rebuildJumpBackInCache()
             }
@@ -168,7 +182,7 @@ struct SearchView: View {
                     openPendingDeepLinkedSectionIfNeeded()
                 }
             }
-            .task(id: query) {
+            .task(id: searchTaskID) {
                 let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmedQuery.isEmpty else {
                     // Only reset results if there's anything to clear —
@@ -182,7 +196,10 @@ struct SearchView: View {
 
                 try? await Task.sleep(for: .milliseconds(250))
                 guard !Task.isCancelled else { return }
-                library.search(query: query, restrictToSelectedCodeSection: false)
+                library.search(
+                    query: query,
+                    restrictToSelectedCodeSection: library.isZoningResolutionSelected
+                )
             }
             .navigationDestination(for: SearchReaderRoute.self) { route in
                 SearchChapterReaderDestination(route: route)
@@ -193,7 +210,7 @@ struct SearchView: View {
     }
 
     private var showsGroupedSearchResults: Bool {
-        searchFilterCodeSectionIDs.isEmpty || searchFilterCodeSectionIDs.count > 1
+        activeSearchFilterCodeSectionIDs.isEmpty || activeSearchFilterCodeSectionIDs.count > 1
     }
 
     /// Rebuilds the filtered + grouped search caches. Called only when the
@@ -201,12 +218,12 @@ struct SearchView: View {
     /// driven by scroll offset don't re-run Dictionary(grouping:) + sort.
     private func rebuildSearchCaches() {
         let filtered: [CodeSearchResult]
-        if searchFilterCodeSectionIDs.isEmpty {
+        if activeSearchFilterCodeSectionIDs.isEmpty {
             filtered = library.searchResults
         } else {
             filtered = library.searchResults.filter { result in
                 guard let codeSectionID = result.codeSectionID else { return false }
-                return searchFilterCodeSectionIDs.contains(codeSectionID)
+                return activeSearchFilterCodeSectionIDs.contains(codeSectionID)
             }
         }
         cachedFilteredResults = filtered
@@ -269,7 +286,7 @@ struct SearchView: View {
 
             Spacer(minLength: 8)
 
-            if !searchFilterCodeSectionIDs.isEmpty {
+            if !library.isZoningResolutionSelected, !activeSearchFilterCodeSectionIDs.isEmpty {
                 Button("All Codes") {
                     searchFilterCodeSectionIDs.removeAll()
                 }
@@ -293,13 +310,13 @@ struct SearchView: View {
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.center)
 
-            Text("Nothing matched in \(activeSearchScopeName). Try a shorter phrase, a section number, or search all codes.")
+            Text(noResultsGuidance)
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
-            if !searchFilterCodeSectionIDs.isEmpty {
+            if !library.isZoningResolutionSelected, !activeSearchFilterCodeSectionIDs.isEmpty {
                 Button("Search All Codes") {
                     searchFilterCodeSectionIDs.removeAll()
                 }
@@ -319,12 +336,22 @@ struct SearchView: View {
     }
 
     private var activeSearchScopeName: String {
-        guard !searchFilterCodeSectionIDs.isEmpty else { return "All Codes" }
+        if library.isZoningResolutionSelected {
+            return library.codeSections.first
+                .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
+                ?? "Zoning Resolution"
+        }
+        guard !activeSearchFilterCodeSectionIDs.isEmpty else { return "All Codes" }
         let names = library.codeSections
-            .filter { searchFilterCodeSectionIDs.contains($0.id) }
+            .filter { activeSearchFilterCodeSectionIDs.contains($0.id) }
             .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
         if names.count == 1 { return names[0] }
         return "\(names.count) code books"
+    }
+
+    private var noResultsGuidance: String {
+        let base = "Nothing matched in \(activeSearchScopeName). Try a shorter phrase or a section number"
+        return library.isZoningResolutionSelected ? "\(base)." : "\(base), or search all codes."
     }
 
     private func seedCurrentCodeFilterIfNeeded() {
@@ -729,7 +756,10 @@ struct SearchView: View {
 
     private func applySearch(_ searchQuery: String) {
         query = searchQuery
-        library.search(query: searchQuery, restrictToSelectedCodeSection: false)
+        library.search(
+            query: searchQuery,
+            restrictToSelectedCodeSection: library.isZoningResolutionSelected
+        )
     }
 
     private func searchPinHaptic() {

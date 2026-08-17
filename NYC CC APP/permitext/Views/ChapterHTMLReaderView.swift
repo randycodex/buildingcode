@@ -864,7 +864,7 @@ struct ChapterHTMLReaderView: View {
                     sectionNumber: anchor.sectionNumber,
                     title: anchor.title,
                     anchorID: anchor.anchorID,
-                    displayText: anchor.displayLabel
+                    displayText: nil
                 )
             )
         }

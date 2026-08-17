@@ -1729,6 +1729,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               transform: none;
               transition: none;
             }
+            .zr-section {
+              border-radius: 0 !important;
+              padding: 0 !important;
+              background: transparent !important;
+              box-shadow: none !important;
+            }
             .nyccc-section-card > div {
               width: auto !important;
               max-width: 100% !important;

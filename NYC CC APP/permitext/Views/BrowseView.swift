@@ -75,6 +75,10 @@ struct BrowseView: View {
         .onChange(of: library.codeSections) { _, _ in
             resolvePendingReaderCodeSelection()
         }
+        .onChange(of: library.isInitialContentLoaded) { _, isLoaded in
+            guard isLoaded else { return }
+            resolvePendingReaderCodeSelection()
+        }
     }
 
     private var browseContent: some View {

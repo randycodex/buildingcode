@@ -366,6 +366,11 @@ final class CodeLibraryViewModel: ObservableObject {
             ?? availableVersions.first { $0.fileName == selectedVersionFileName }
     }
 
+    var isZoningResolutionSelected: Bool {
+        guard let codeVersion = selectedVersion?.codeVersion else { return false }
+        return UserContentSyncCodeVersion.server(codeVersion) == UserContentSyncCodeVersion.canonicalNYCZoning
+    }
+
     var filteredVersions: [BundledCodeVersion] {
         guard !selectedJurisdictionKey.isEmpty else { return availableVersions }
         return availableVersions.filter { version in
