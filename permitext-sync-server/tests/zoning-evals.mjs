@@ -22,6 +22,7 @@ assert.equal(dataset.governance.automaticApprovalAllowed, false);
 assert.equal(dataset.governance.paidEvaluationAllowed, false);
 assert.equal(sourceManifest.researchEligibility, false);
 assert.equal(zoningSyncCodeVersion, "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1");
+assert.equal(dataset.cases.length, 21);
 
 const requiredCategories = new Set([
   "citation-fidelity",
@@ -32,6 +33,7 @@ const requiredCategories = new Set([
   "explicit-uncertainty"
 ]);
 const caseIDs = new Set();
+const blockedEvidenceCaseIDs = new Set();
 for (const testCase of dataset.cases) {
   assert(!caseIDs.has(testCase.id), `Duplicate zoning evaluation case: ${testCase.id}`);
   caseIDs.add(testCase.id);
@@ -50,6 +52,10 @@ for (const testCase of dataset.cases) {
   assert(testCase.requiredConcepts.length >= 3);
   assert(testCase.forbiddenClaims.length >= 2);
   assert(testCase.selectedEvidenceSectionIDs.length > 0);
+  if (testCase.evidenceReadiness === "blocked") {
+    blockedEvidenceCaseIDs.add(testCase.id);
+    assert(testCase.knownEvidenceLimitations?.length > 0);
+  }
   for (const sectionID of testCase.selectedEvidenceSectionIDs) {
     const [summary, section] = await Promise.all([
       zoningSectionSummary(sectionID),
@@ -63,6 +69,10 @@ for (const testCase of dataset.cases) {
 }
 
 assert.equal(requiredCategories.size, 0, `Missing zoning evaluation categories: ${[...requiredCategories].join(", ")}`);
+assert.deepEqual(blockedEvidenceCaseIDs, new Set([
+  "zr-zoning-lot-contiguity-definition",
+  "zr-cellar-floor-area-definition"
+]));
 assert.equal(dataset.researchEligibility, false, "Zoning cases cannot enable public Research.");
 
 console.log("zoning evaluation review cases passed", {

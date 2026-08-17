@@ -4,6 +4,8 @@ Content edition: NYC Zoning Resolution — text through 2026-07-16
 
 Status: DRAFT — NOT APPROVED
 
+Case readiness: 19 evidence-ready · 2 blocked by known content gaps
+
 This packet is for review by a professional qualified to evaluate New York City zoning sources. No case in this packet enables Zoning in AI Research. Approval must be explicit and recorded; the application never treats a generated answer or an automatic score as reviewer approval.
 
 ## Reviewer checklist
@@ -228,6 +230,630 @@ Question: Is a proposed self-storage use permitted as-of-right on a specific pro
 
 - [ ] The proposed use is approved or prohibited for the unidentified property.
 - [ ] The answer silently retrieves evidence outside the selected sections.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 7. zr-mapped-district-missing
+
+Category: mapped-applicability
+
+Question: A 10,000-square-foot site in the Bronx is proposed for a 40,000-square-foot residential building. What is the maximum permitted residential FAR when the mapped zoning district has not been established?
+
+### Selected official evidence
+
+- ZR 11-14 — Incorporation of Maps
+  - Permitext section ID: 20018425
+  - Official source: https://zr.planning.nyc.gov/article-i/chapter-1/11-14
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 1961-12-15
+  - Evidence preview: The location and boundaries of the districts established by this Resolution are shown upon the zoning maps, which are hereby incorporated into the provisions of this Resolution. The said zoning maps in their entirety, including all amendments thereto, shall be as much a part of this Resolution as if fully set forth and described herein.
+
+### Required concepts
+
+- [ ] The maximum residential FAR cannot be determined until the mapped zoning district is established.
+- [ ] Section 11-14 incorporates the zoning maps into the Zoning Resolution and makes the mapped district an applicability fact.
+- [ ] The answer identifies any applicable overlay, Special Purpose District, or other mapped condition as an additional fact that may affect the governing regulations.
+- [ ] The answer may use authoritative map evidence if supplied, but otherwise asks for the property location and mapped conditions.
+
+### Forbidden claims
+
+- [ ] A Residence District is inferred merely because the proposal is residential.
+- [ ] Allowable floor area is calculated before the governing mapped district and conditions are established.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 8. zr-r7a-standard-far
+
+Category: arithmetic
+
+Question: A 10,000-square-foot R7A zoning lot will contain standard residences and 42,000 square feet of residential floor area. Does the proposal comply with the basic maximum residential FAR?
+
+### Selected official evidence
+
+- ZR 23-22 — Floor Area Regulations for R6 Through R12 Districts
+  - Permitext section ID: 20018017
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-22
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R6 R7 R8 R9 R10 R11 R12 In the districts indicated, the maximum residential floor area ratio shall be as set forth in the following table. Separate maximum residential floor area ratios are set forth for zoning lots containing standard residences and zoning lots containing qualifying affordable housing or qualifying senior housing. MAXIMUM FLOOR AREA RATIO FOR R6-R12 DISTRICTS District Standard residences Qualifyi
+
+### Required concepts
+
+- [ ] Section 23-22 sets the R7A maximum residential FAR for standard residences at 4.00.
+- [ ] A 4.00 FAR applied to the stated 10,000-square-foot zoning lot permits 40,000 square feet of residential floor area.
+- [ ] The proposed 42,000 square feet exceeds that basic limit by 2,000 square feet.
+- [ ] The answer distinguishes zoning floor area from an unsupported claim about gross building area.
+
+### Forbidden claims
+
+- [ ] The 42,000-square-foot proposal complies with the basic 4.00 FAR limit.
+- [ ] The answer states that the building can contain exactly 40,000 gross square feet.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 9. zr-r7a-affordable-far-qualification
+
+Category: conditional-qualification
+
+Question: A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area, and the project is described as containing qualifying affordable housing. Is the proposed FAR within the R7A limit?
+
+### Selected official evidence
+
+- ZR 23-22 — Floor Area Regulations for R6 Through R12 Districts
+  - Permitext section ID: 20018017
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-22
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R6 R7 R8 R9 R10 R11 R12 In the districts indicated, the maximum residential floor area ratio shall be as set forth in the following table. Separate maximum residential floor area ratios are set forth for zoning lots containing standard residences and zoning lots containing qualifying affordable housing or qualifying senior housing. MAXIMUM FLOOR AREA RATIO FOR R6-R12 DISTRICTS District Standard residences Qualifyi
+- ZR 27-111 — General definitions
+  - Permitext section ID: 20022699
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-7/27-111
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: The following definitions shall apply throughout Section 27-10 (ADMINISTRATION OF AFFORDABLE HOUSING), inclusive: Affordable floor area Where all of the dwelling units, rooming units and supportive housing units in an MIH site or UAP site, other than any super’s unit, are affordable housing units, all of the residential floor area or community facility floor area for a supportive housing project, in such UAP site o
+- ZR 27-16 — Requirements for MIH Sites or UAP Sites
+  - Permitext section ID: 20022711
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-7/27-16
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: Affordable housing in an MIH site or UAP site shall meet each of the requirements set forth in this Section for the entire regulatory period, except that affordable housing restricted pursuant to an affordable housing regulatory agreement shall only be required to comply with paragraphs (a) and (j) of this Section. Location of MIH site or UAP site and MIH zoning lot or UAP zoning lot Where an MIH site or UAP site is
+
+### Required concepts
+
+- [ ] Section 23-22 sets an R7A maximum FAR of 5.01 for qualifying affordable housing or qualifying senior housing.
+- [ ] A 5.01 FAR applied to 10,000 square feet permits 50,100 square feet, so the stated 48,000 square feet is within that particular limit.
+- [ ] The conclusion is expressly conditional on the project satisfying the applicable affordable-housing definitions and requirements in Article II, Chapter 7.
+- [ ] The user's label alone is not treated as proof that the development qualifies for the higher FAR.
+
+### Forbidden claims
+
+- [ ] Any project containing affordable units automatically receives 5.01 FAR.
+- [ ] The answer gives an unconditional compliance conclusion without establishing the qualifying-affordable-housing path.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 10. zr-r7a-standard-height
+
+Category: table
+
+Question: Can a standard residential building in an R7A district be 90 feet tall under the basic height-and-setback table?
+
+### Selected official evidence
+
+- ZR 23-432 — Height and setback requirements
+  - Permitext section ID: 20018085
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-432
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R6 R7 R8 R9 R10 R11 R12 In the districts indicated, the minimum base height, maximum base height, and maximum building height shall be as set forth in the following table. Separate maximum base heights and maximum building heights are set forth for zoning lots containing standard residences and zoning lots containing qualifying affordable housing or qualifying senior housing. For portions of a building street wall
+- ZR 23-434 — Height and setback modifications for eligible sites
+  - Permitext section ID: 20018087
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-434
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R6 R7 R8 R9 R10 R11 R12 In the districts indicated, without a letter suffix, for zoning lots that meet the criteria of paragraph (a) of this Section, the height and setback modifications set forth in paragraph (b) may be applied. The eligible site provisions of this Section may be applied to either a single zoning lot that meets the criteria of paragraph (a) or two or more zoning lots under single fee ownership or a
+
+### Required concepts
+
+- [ ] Section 23-432 limits a standard-residence building in R7A to 85 feet under the basic table.
+- [ ] The same table allows 115 feet for qualifying affordable housing or qualifying senior housing in R7A.
+- [ ] A 90-foot standard residential building exceeds the basic maximum by five feet.
+- [ ] Section 23-434 is not used to enlarge the R7A limit because its eligible-site modifications apply only in listed districts without a letter suffix.
+
+### Forbidden claims
+
+- [ ] R7A universally permits a 115-foot building.
+- [ ] The eligible-site modifications of Section 23-434 are represented as applicable to R7A.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 11. zr-r7a-lot-coverage
+
+Category: lot-coverage
+
+Question: An R7A interior zoning lot contains 10,000 square feet. Can a standard residential development cover 8,500 square feet of the lot under the basic lot-coverage regulation?
+
+### Selected official evidence
+
+- ZR 23-362 — Maximum lot coverage in R6 through R12 Districts
+  - Permitext section ID: 20022764
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-362
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R6 R7 R8 R9 R10 R11 R12 For standard lots In the districts indicated, the maximum residential lot coverage for interior lots or through lots shall be 80 percent and the maximum residential lot coverage for corner lots shall be 100 percent. For eligible sites In the districts indicated, for zoning lots with buildings utilizing the eligible site provisions of Section 23-434 (Height and setback modifications for eligib
+- ZR 23-363 — Special rules for certain interior or through lots
+  - Permitext section ID: 20018020
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-363
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In the districts indicated, the maximum lot coverage set forth in Section 23-361 (Maximum lot coverage in R1 through R5 Districts) or 23-362 (Maximum lot coverage in R6 through R12 Districts), as applicable, may be increased in accordance with the provisions of this Section. Shallow zoning lots For zoning lots eligible for the rear yard modifications for shallow interior lots
+- ZR 23-342 — Rear yard requirements
+  - Permitext section ID: 20018051
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-342
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, rear yards shall be provided on interior lots in accordance with this Section., except as otherwise provided pursuant to the provisions of Section 23-34, inclusive. Standard lots In the districts indicated, a rear yard shall be provided as follows: For detached and zero lot line buildings, for buildings or portions thereof at or below a height of 75 feet, as
+
+### Required concepts
+
+- [ ] Section 23-362 sets the basic maximum residential lot coverage for a standard interior or through lot in R6 through R12 Districts at 80 percent.
+- [ ] Eighty percent of the stated 10,000-square-foot lot is 8,000 square feet, so 8,500 square feet exceeds the basic maximum.
+- [ ] Section 23-363 can modify the percentage for specified shallow lots, locations near corners, and short block dimensions.
+- [ ] The answer does not treat the 8,000-square-foot percentage calculation as an entitlement to that footprint because yard and other open-area rules may be more restrictive.
+
+### Forbidden claims
+
+- [ ] The owner has an unconditional right to build an 8,000-square-foot footprint.
+- [ ] The answer ignores the possible modifications in Section 23-363 or applicable yard requirements.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 12. zr-narrow-attached-rear-yard
+
+Category: yard
+
+Question: An attached residential building is proposed on a 35-foot-wide interior zoning lot with a 20-foot rear yard. Is that sufficient under the standard rear-yard rule?
+
+### Selected official evidence
+
+- ZR 23-342 — Rear yard requirements
+  - Permitext section ID: 20018051
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-342
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, rear yards shall be provided on interior lots in accordance with this Section., except as otherwise provided pursuant to the provisions of Section 23-34, inclusive. Standard lots In the districts indicated, a rear yard shall be provided as follows: For detached and zero lot line buildings, for buildings or portions thereof at or below a height of 75 feet, as
+
+### Required concepts
+
+- [ ] Section 23-342 requires a rear yard at least 30 feet deep for an attached or semi-detached building on a zoning lot less than 40 feet wide.
+- [ ] The proposed 20-foot rear yard is 10 feet short of the standard requirement.
+- [ ] The conclusion is limited to the stated standard-lot facts and does not erase the shallow-lot modification or other exceptions in Section 23-34.
+
+### Forbidden claims
+
+- [ ] A 20-foot rear yard satisfies the standard rule for the stated 35-foot-wide attached-building lot.
+- [ ] All residential rear yards are described as universally requiring 30 feet.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 13. zr-through-lot-historic-shallow-condition
+
+Category: historical-applicability
+
+Question: A through lot is 150 feet deep and the proposal provides a 20-foot rear yard equivalent. Is that enough when the lot's historical shallow-lot condition is unknown?
+
+### Selected official evidence
+
+- ZR 23-343 — Rear yard equivalent requirements
+  - Permitext section ID: 20018060
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-343
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, rear yard equivalents shall be provided on through lots in accordance with this Section, except as otherwise provided pursuant to the provisions of Section 23-34, inclusive. ExceptionsNo rear yard equivalent regulations shall apply: to any through lots that extend less than 110 feet in maximum depth from street to street; to large sites; to any zoning lot tha
+
+### Required concepts
+
+- [ ] Section 23-343 does not make the 20-foot minimum automatically available merely because the through lot is 150 feet deep.
+- [ ] The reduced rear-yard-equivalent path requires the shallow-lot condition to have existed on December 15, 1961 and subsequently neither increased nor decreased in depth.
+- [ ] Historic shallow-lot status is identified as a required missing project fact.
+- [ ] The answer also recognizes the section's categorical exceptions for specified through lots.
+
+### Forbidden claims
+
+- [ ] A 150-foot through lot automatically requires only a 20-foot rear yard equivalent.
+- [ ] The historical December 15, 1961 condition is assumed without evidence.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 14. zr-residential-building-spacing
+
+Category: building-spacing
+
+Question: Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?
+
+### Selected official evidence
+
+- ZR 23-371 — Standard minimum distance between buildings
+  - Permitext section ID: 20018102
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-3/23-371
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, as indicated, the minimum distance between the portion of a building containing residences and any other building on the same zoning lot shall be as provided in this Section. For the purpose of this Section, abutting buildings on a single zoning lot may be considered a single building. However, if two or more portions of a building are not connected or not ab
+
+### Required concepts
+
+- [ ] Section 23-371 requires buildings on the same zoning lot that do not connect at any level to be 40 feet apart for portions below 125 feet.
+- [ ] The stated 30-foot separation is 10 feet short of that standard requirement.
+- [ ] The answer recognizes the section's exception for buildings separated by a rear yard equivalent and does not convert the rule into a universal spacing rule.
+
+### Forbidden claims
+
+- [ ] The stated 30-foot separation satisfies the 40-foot standard.
+- [ ] All buildings on one zoning lot are said to require 40 feet of separation in every circumstance.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 15. zr-c3-professional-office
+
+Category: use-permission
+
+Question: A 1,500-square-foot architectural office is proposed in a C3 district. Is the professional office use permitted as-of-right under the underlying C3 use regulations?
+
+### Selected official evidence
+
+- ZR 32-17 — Use Group VII – Offices and Laboratories
+  - Permitext section ID: 20017827
+  - Official source: https://zr.planning.nyc.gov/article-iii/chapter-2/32-17
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-06-06
+  - Evidence preview: C1 C2 C3 C4 C5 C6 C7 C8 Use Group VII consists of uses that provide administrative and research workspaces for business, professional or governmental purposes. The provisions regulating uses classified in this Use Group, are set forth as follows: Section 32-171 (Use Group VII – general use allowances) which includes the compilation of uses in the Use Group table; Section 32-172 (Use Group VII – use permitted with l
+- ZR 32-171 — Use Group VII – general use allowances
+  - Permitext section ID: 20022494
+  - Official source: https://zr.planning.nyc.gov/article-iii/chapter-2/32-171
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-06-06
+  - Evidence preview: The following table includes uses classified as Use Group VII and sets forth their allowances by Commercial District. Notations found in the table are further described in Section 32-10 (USE ALLOWANCES). USE GROUP VII – OFFICES AND LABORATORIES ● = Permitted ♦ = Permitted with limitations ○ = Special permit required – = Not permitted S = Size restriction P = Additional conditions U = Open use allowances Uses C1 C2 C
+
+### Required concepts
+
+- [ ] Section 32-17 classifies business and professional offices in Use Group VII.
+- [ ] The office row in Section 32-171 is marked not permitted in the C3 column.
+- [ ] The answer states that the use is not permitted as-of-right under the underlying C3 use regulations while preserving separate special-purpose-district, authorization, or variance paths.
+
+### Forbidden claims
+
+- [ ] The architectural office is represented as permitted as-of-right in C3.
+- [ ] The answer claims that professional offices are unlawful in every C3-mapped location under every possible modifying provision.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 16. zr-c4-4-residential-use
+
+Category: use-permission
+
+Question: A C4-4 zoning lot is proposed with retail on the ground floor and apartments above. Is the residential use permitted under the underlying use regulations?
+
+### Selected official evidence
+
+- ZR 32-121 — Use Group II – general use allowances
+  - Permitext section ID: 20022450
+  - Official source: https://zr.planning.nyc.gov/article-iii/chapter-2/32-121
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-06-06
+  - Evidence preview: The following table includes uses classified as Use Group II and sets forth their allowances by Commercial District. Notations found in the table are further described in Section 32-10 (USE ALLOWANCES). USE GROUP II – RESIDENTIAL USES ● = Permitted ♦ = Permitted with limitations ○ = Special permit required – = Not permitted S = Size restriction P = Additional conditions U = Open use allowances Uses C1 C2 C3 C4 C5 C6
+- ZR 32-123 — Use Group II – uses subject to additional conditions
+  - Permitext section ID: 20022452
+  - Official source: https://zr.planning.nyc.gov/article-iii/chapter-2/32-123
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: For uses denoted with a “P” in Section 32-121 (Use Group II – general use allowances), the provisions of this Section shall apply. In C4 Districts, all residential uses shall be permitted except that in lower density growth management areas within the Borough of Staten Island, no residences shall be allowed on the following zoning lots in C4-1 Districts where such zoning district occupies at least four acres within a
+
+### Required concepts
+
+- [ ] Section 32-121 places residential uses in Use Group II and marks the C4 column as permitted subject to additional conditions.
+- [ ] Section 32-123 generally permits residential uses in C4 Districts and states the identified C4-1 Staten Island limitation.
+- [ ] The answer concludes that residential use is permitted under these underlying C4-4 provisions without claiming complete zoning compliance.
+- [ ] The answer separates use permission from mixed-building FAR, height, lot coverage, parking, and other bulk analysis.
+
+### Forbidden claims
+
+- [ ] Permission for apartments is treated as proof that the entire mixed building complies with zoning.
+- [ ] Residential R-district bulk controls are applied directly without researching the mixed-building provisions.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 17. zr-inner-transit-zone-new-unit-parking
+
+Category: effective-date
+
+Question: An 80-unit residential development in an R7A district is within the Inner Transit Zone, and all dwelling units will be created after December 5, 2024. How many accessory residential parking spaces are required?
+
+### Selected official evidence
+
+- ZR 25-20 — REQUIRED ACCESSORY OFF-STREET PARKING SPACES FOR RESIDENCES
+  - Permitext section ID: 20017540
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-5/25-20
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: In the districts indicated, accessory off-street parking spaces shall be required for residences in accordance with the provisions of this Section, inclusive. Separate requirements are set forth for zoning lots in the Inner Transit Zone pursuant to Section 25-21, inclusive, the Outer Transit Zone, pursuant to Section 25-22, inclusive, and beyond the Greater Transit Zone, pursuant to Section 25-23, inclusive.
+- ZR 25-211 — General provisions
+  - Permitext section ID: 20017541
+  - Official source: https://zr.planning.nyc.gov/article-ii/chapter-5/25-211
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In the districts indicated, within the Inner Transit Zone, no accessory off-street parking spaces shall be required for dwelling units or rooming units created after December 5, 2024. For dwelling units or rooming units in multiple dwelling residences created between July 20, 1950 and December 5, 2024, off-street parking spaces accessory to such dwelling units or rooming units
+
+### Required concepts
+
+- [ ] Section 25-211 requires no accessory off-street parking spaces for dwelling units or rooming units created after December 5, 2024 within the Inner Transit Zone.
+- [ ] The answer states that zero spaces are required under that provision for the stated new units.
+- [ ] The answer distinguishes units created after December 5, 2024 from existing units and parking governed by the separate maintenance provisions.
+- [ ] The answer uses the section's certificate-of-occupancy definition of when a unit is created rather than assuming a colloquial construction date.
+
+### Forbidden claims
+
+- [ ] Parking is represented as never required anywhere in the Inner Transit Zone.
+- [ ] Existing required parking is said to be removable automatically.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 18. zr-new-divided-zoning-lot
+
+Category: cross-provision
+
+Question: A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?
+
+### Selected official evidence
+
+- ZR 77-02 — Zoning Lots not Existing Prior to Effective Date or Amendment of Resolution
+  - Permitext section ID: 20018891
+  - Official source: https://zr.planning.nyc.gov/article-vii/chapter-7/77-02
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: Whenever a zoning lot is divided by a boundary between two or more districts and such zoning lot did not exist on December 15, 1961, or any applicable subsequent amendment thereto, each portion of such zoning lot shall be regulated by all the provisions applicable to the district in which such portion of the zoning lot is located. However, the provisions of Section 77-22 (Floor Area Ratio) shall apply to zoning lots
+- ZR 77-11 — Conditions for Application of Use Regulations to Entire Zoning Lot
+  - Permitext section ID: 20018894
+  - Official source: https://zr.planning.nyc.gov/article-vii/chapter-7/77-11
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 1989-06-29
+  - Evidence preview: Whenever a zoning lot existing on December 15, 1961, or on any applicable subsequent amendment thereto, is divided by a boundary between districts in which different uses are permitted, the use regulations applicable to the district in which more than 50 percent of the lot area of the zoning lot is located may apply to the entire zoning lot, provided that the greatest distance from the mapped district boundary to any
+- ZR 77-22 — Floor Area Ratio
+  - Permitext section ID: 20018899
+  - Official source: https://zr.planning.nyc.gov/article-vii/chapter-7/77-22
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-12-05
+  - Evidence preview: The maximum floor area ratio permitted on each portion of such zoning lot for the applicable type of building or buildings on such zoning lot shall be determined under the applicable regulations of this Resolution. Each such floor area ratio shall be multiplied by the percentage of the zoning lot to which such floor area ratio applies. The sum of the products thus obtained shall be the adjusted maximum floor area ra
+
+### Required concepts
+
+- [ ] Section 77-11's majority-district use treatment applies only to qualifying zoning lots existing on December 15, 1961 or on the date of an applicable subsequent amendment.
+- [ ] For the stated lot created in 2026, Section 77-02 generally regulates each portion under the district in which it is located.
+- [ ] Section 77-22 separately applies an adjusted maximum FAR calculation to divided zoning lots created at any time.
+- [ ] The answer distinguishes use-regulation treatment from the separate adjusted-FAR mechanism.
+
+### Forbidden claims
+
+- [ ] Whichever district contains 51 percent of a newly assembled zoning lot automatically controls the entire lot.
+- [ ] The Section 77-22 FAR mechanism is represented as transferring the majority district's use regulations to the entire lot.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 19. zr-zoning-lot-contiguity-definition
+
+Category: definition
+
+Evidence readiness: BLOCKED
+
+Question: Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?
+
+### Selected official evidence
+
+- ZR 12-10 — DEFINITIONS
+  - Permitext section ID: 20018523
+  - Official source: https://zr.planning.nyc.gov/article-i/chapter-2/12-10
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2026-03-26
+  - Evidence preview: Words in the text or tables of this Resolution which are italicized shall be interpreted in accordance with the provisions set forth in this Section.
+
+### Known evidence limitations
+
+- The current imported ZR 12-10 record contains only the definitions preamble and does not contain the operative zoning-lot definition or its 10-linear-foot contiguity language.
+
+### Required concepts
+
+- [ ] The answer identifies the Section 12-10 zoning-lot definition as the controlling source for the ownership and contiguity pathways.
+- [ ] The answer states that the current selected Permitext record does not contain the operative definition needed to verify the proposed 10-linear-foot rule.
+- [ ] The answer declines to decide whether the two tax lots form one zoning lot until the complete official definition and all applicable branches are available.
+- [ ] The content gap is classified as missing evidence rather than a missing project fact.
+
+### Forbidden claims
+
+- [ ] Common ownership is said to create a zoning-lot merger automatically.
+- [ ] The 10-linear-foot requirement is asserted from model knowledge as though it appeared in the selected imported evidence.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 20. zr-cellar-floor-area-definition
+
+Category: definition
+
+Evidence readiness: BLOCKED
+
+Question: A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?
+
+### Selected official evidence
+
+- ZR 12-10 — DEFINITIONS
+  - Permitext section ID: 20018523
+  - Official source: https://zr.planning.nyc.gov/article-i/chapter-2/12-10
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2026-03-26
+  - Evidence preview: Words in the text or tables of this Resolution which are italicized shall be interpreted in accordance with the provisions set forth in this Section.
+
+### Known evidence limitations
+
+- The current imported ZR 12-10 record contains only the definitions preamble and does not contain the operative cellar and floor-area definitions needed to answer this question.
+
+### Required concepts
+
+- [ ] The answer identifies the Section 12-10 cellar and floor-area definitions as the controlling evidence.
+- [ ] The answer states that the current selected Permitext record lacks the operative definitions needed to classify the level and determine the floor-area treatment.
+- [ ] The answer declines to conclude that the 5,000 square feet is excluded until the complete official definitions are available.
+- [ ] The content gap is classified as missing evidence rather than a missing elevation fact because the necessary elevation relationship was supplied.
+
+### Forbidden claims
+
+- [ ] All below-grade space is described as exempt from zoning floor area.
+- [ ] The cellar classification or floor-area exclusion is asserted from model knowledge as though it appeared in the selected imported evidence.
+
+### Reviewer decision
+
+- Reviewer:
+- Qualification / role:
+- Review date:
+- Disposition: Approve / Revise / Reject
+- Notes:
+
+---
+
+## 21. zr-nonconforming-use-discontinuance
+
+Category: nonconforming-use
+
+Question: A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?
+
+### Selected official evidence
+
+- ZR 52-61 — General Provisions
+  - Permitext section ID: 20018658
+  - Official source: https://zr.planning.nyc.gov/article-v/chapter-2/52-61
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-06-06
+  - Evidence preview: If, for a continuous period of two years, either the non-conforming use of land with minor improvements is discontinued, or the active operation of substantially all the non-conforming uses in any building or other structure is discontinued, such land or building or other structure shall thereafter be used only for a conforming use. Intent to resume active operations shall not affect the foregoing. The provisions of
+
+### Required concepts
+
+- [ ] Section 52-61 generally requires the building thereafter to be used only for a conforming use after active operation of substantially all non-conforming uses is discontinued continuously for two years.
+- [ ] The owner's intent to resume active operations does not preserve the use under the general rule.
+- [ ] Thirty continuous months exceeds the section's two-year period.
+- [ ] The answer checks the express governmental-project, vacant-store, transient-hotel, and other stated exceptions before reaching a project-specific conclusion.
+
+### Forbidden claims
+
+- [ ] The owner's continuing intent alone is said to preserve the discontinued non-conforming use.
+- [ ] Every non-conforming use is said to expire after two years regardless of the nature of the discontinuance or the section's express exceptions.
 
 ### Reviewer decision
 

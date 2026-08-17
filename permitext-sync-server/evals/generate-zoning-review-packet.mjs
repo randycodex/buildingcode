@@ -4,6 +4,9 @@ import { zoningSection, zoningSectionSummary } from "../zoning-content.mjs";
 const datasetURL = new URL("./zoning-cases.json", import.meta.url);
 const outputURL = new URL("./NYC_ZONING_EVALUATION_REVIEW_PACKET.md", import.meta.url);
 const dataset = JSON.parse(await readFile(datasetURL, "utf8"));
+const blockedCaseCount = dataset.cases.filter((testCase) =>
+  testCase.evidenceReadiness === "blocked"
+).length;
 
 function line(value = "") {
   return String(value).replace(/\s+/g, " ").trim();
@@ -15,6 +18,8 @@ const output = [
   `Content edition: ${dataset.codeVersion}`,
   "",
   "Status: DRAFT — NOT APPROVED",
+  "",
+  `Case readiness: ${dataset.cases.length - blockedCaseCount} evidence-ready · ${blockedCaseCount} blocked by known content gaps`,
   "",
   "This packet is for review by a professional qualified to evaluate New York City zoning sources. " +
     "No case in this packet enables Zoning in AI Research. Approval must be explicit and recorded; " +
@@ -38,6 +43,9 @@ for (const [index, testCase] of dataset.cases.entries()) {
     `## ${index + 1}. ${testCase.id}`,
     "",
     `Category: ${testCase.category}`,
+    ...(testCase.evidenceReadiness
+      ? ["", `Evidence readiness: ${testCase.evidenceReadiness.toUpperCase()}`]
+      : []),
     "",
     `Question: ${testCase.question}`,
     "",
@@ -56,6 +64,14 @@ for (const [index, testCase] of dataset.cases.entries()) {
       `  - Text version: ${section.zoning.version}`,
       `  - Last amended: ${section.zoning.lastAmended || "not stated"}`,
       `  - Evidence preview: ${line(section.previewText).slice(0, 500)}`
+    );
+  }
+  if (testCase.knownEvidenceLimitations?.length) {
+    output.push(
+      "",
+      "### Known evidence limitations",
+      "",
+      ...testCase.knownEvidenceLimitations.map((limitation) => `- ${limitation}`)
     );
   }
   output.push(
