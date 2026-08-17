@@ -7,6 +7,9 @@ const dataset = JSON.parse(await readFile(datasetURL, "utf8"));
 const blockedCaseCount = dataset.cases.filter((testCase) =>
   testCase.evidenceReadiness === "blocked"
 ).length;
+const approvedCaseCount = dataset.cases.filter((testCase) => testCase.status === "approved").length;
+const draftCaseCount = dataset.cases.filter((testCase) => testCase.status === "draft").length;
+const rejectedCaseCount = dataset.cases.filter((testCase) => testCase.status === "rejected").length;
 
 function line(value = "") {
   return String(value).replace(/\s+/g, " ").trim();
@@ -26,17 +29,19 @@ const output = [
   "",
   `Content edition: ${dataset.codeVersion}`,
   "",
-  "Status: DRAFT — NOT APPROVED",
+  "Status: PARTIALLY APPROVED FOR TERRA ANSWER-KEY TESTING",
   "",
   `Case readiness: ${dataset.cases.length - blockedCaseCount} evidence-ready · ${blockedCaseCount} blocked by known content gaps`,
   "",
-  "This packet is for review by a professional qualified to evaluate New York City zoning sources. " +
-    "No case in this packet enables Zoning in AI Research. Approval must be explicit and recorded; " +
-    "the application never treats a generated answer or an automatic score as reviewer approval.",
+  `Review status: ${approvedCaseCount} approved for Terra answer-key testing · ${draftCaseCount} draft/revised and awaiting review · ${rejectedCaseCount} rejected`,
+  "",
+  "Approval in this packet is limited to Terra answer-key testing. It is not professional zoning sign-off, " +
+    "does not enable Zoning in public AI Research, and does not authorize paid evaluation. Draft cases still " +
+    "require explicit human approval after their revisions are reviewed.",
   "",
   "## Reviewer checklist",
   "",
-  "For every case:",
+  "For each draft or revised case awaiting approval:",
   "",
   "1. Confirm that the selected evidence is the correct official authority for the question.",
   "2. Confirm that every required concept is supportable from the selected evidence.",
@@ -52,6 +57,8 @@ for (const [index, testCase] of dataset.cases.entries()) {
     `## ${index + 1}. ${testCase.id}`,
     "",
     `Category: ${testCase.category}`,
+    "",
+    `Case status: ${testCase.status.toUpperCase()}`,
     ...(testCase.evidenceReadiness
       ? ["", `Evidence readiness: ${testCase.evidenceReadiness.toUpperCase()}`]
       : []),
@@ -74,13 +81,46 @@ for (const [index, testCase] of dataset.cases.entries()) {
       `  - Last amended: ${section.zoning.lastAmended || "not stated"}`,
       `  - Evidence preview: ${line(section.previewText).slice(0, 500)}`
     );
-    for (const term of testCase.evidenceReviewTerms || []) {
+    const reviewTerms = [
+      ...(testCase.evidenceReviewTerms || []),
+      ...(testCase.evidenceReviewTermsBySection?.[String(sectionID)] || [])
+    ];
+    for (const term of reviewTerms) {
       const excerpt = evidenceExcerpt(section, term);
       if (!excerpt) {
         throw new Error(`${testCase.id} review term was not found in selected section ${sectionID}: ${term}`);
       }
       output.push(`  - Matched review excerpt for “${term}”: ${excerpt}`);
     }
+    const amendmentEvents = (testCase.evidenceReviewAmendmentEvents || [])
+      .filter((event) => String(event.sectionID) === String(sectionID));
+    for (const expectedEvent of amendmentEvents) {
+      const event = (section.zoning.amendmentHistory || []).find((candidate) =>
+        candidate.effectiveDate === expectedEvent.effectiveDate &&
+        candidate.reportNumber === expectedEvent.reportNumber
+      );
+      if (!event) {
+        throw new Error(
+          `${testCase.id} amendment event was not found in selected section ${sectionID}: ` +
+          `${expectedEvent.effectiveDate} ${expectedEvent.reportNumber}`
+        );
+      }
+      output.push(
+        `  - Amendment record: ${event.effectiveDate} · ${event.reportNumber} · ${event.action}`,
+        `    - Project: ${event.projectName || "not stated"}`,
+        `    - Official report: ${event.reportURL}`,
+        `    - Notes: ${event.notes || "not stated"}`
+      );
+    }
+  }
+  if (testCase.revisionNotes) {
+    output.push(
+      "",
+      "### Applied revision",
+      "",
+      `- ${testCase.revisionNotes}`,
+      `- Applied: ${testCase.revisionAppliedAt}`
+    );
   }
   if (testCase.knownEvidenceLimitations?.length) {
     output.push(
@@ -100,13 +140,25 @@ for (const [index, testCase] of dataset.cases.entries()) {
     "",
     ...testCase.forbiddenClaims.map((claim) => `- [ ] ${claim}`),
     "",
-    "### Reviewer decision",
-    "",
-    "- Reviewer:",
-    "- Qualification / role:",
-    "- Review date:",
-    "- Disposition: Approve / Revise / Reject",
-    "- Notes:",
+    ...(testCase.status === "approved"
+      ? [
+          "### Recorded decision",
+          "",
+          `- Reviewer: ${testCase.reviewer}`,
+          "- Role: Permitext owner",
+          `- Review date: ${testCase.reviewedAt}`,
+          `- Disposition: Approved for ${dataset.governance.approvedCaseUse}`,
+          "- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled."
+        ]
+      : [
+          "### Reviewer decision",
+          "",
+          "- Reviewer:",
+          "- Qualification / role:",
+          "- Review date:",
+          "- Disposition: Approve / Revise / Reject",
+          "- Notes:"
+        ]),
     "",
     "---",
     ""

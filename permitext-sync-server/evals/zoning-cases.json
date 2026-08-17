@@ -9,6 +9,9 @@
     "minimumQualifiedReviewers": 1,
     "automaticApprovalAllowed": false,
     "paidEvaluationAllowed": false,
+    "approvedCaseUse": "Terra answer-key testing only",
+    "professionalZoningSignoff": false,
+    "publicResearchReleaseAuthorized": false,
     "reviewScope": [
       "citation fidelity",
       "tables",
@@ -30,7 +33,7 @@
     {
       "id": "zr-rules-of-construction",
       "category": "citation-fidelity",
-      "status": "draft",
+      "status": "approved",
       "question": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
       "selectedEvidenceSectionIDs": [20018521],
       "requiredConcepts": [
@@ -42,13 +45,13 @@
         "An illustration overrides the enacted text.",
         "The answer relies on a section outside the selected evidence."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-use-group-table",
       "category": "table",
-      "status": "draft",
+      "status": "approved",
       "question": "Using only the selected table, summarize how Use Group I allowances differ across M1, M2, and M3 districts and explain the table symbols.",
       "selectedEvidenceSectionIDs": [20017276],
       "requiredConcepts": [
@@ -60,13 +63,13 @@
         "Every Use Group I use has the same allowance in every Manufacturing District.",
         "A symbol is interpreted without support in the selected evidence."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-appendix-map-boundaries",
       "category": "map",
-      "status": "draft",
+      "status": "approved",
       "question": "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
       "selectedEvidenceSectionIDs": [20021237],
       "requiredConcepts": [
@@ -78,15 +81,15 @@
         "A particular tax lot is inside a designated area without parcel and map evidence.",
         "The map image is treated as decorative rather than authoritative selected evidence."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-special-district-demolition",
       "category": "special-purpose-district",
       "status": "draft",
       "question": "What prerequisites does Section 101-75 state before a demolition permit may be issued in the identified Subdistrict, and what exception does it recognize?",
-      "selectedEvidenceSectionIDs": [20020889],
+      "selectedEvidenceSectionIDs": [20020818, 20020889],
       "requiredConcepts": [
         "The answer identifies the Special Downtown Brooklyn District context.",
         "The answer describes building-application approval and the stated construction-financing evidence.",
@@ -96,6 +99,8 @@
         "The rule is described as citywide.",
         "The answer invents a demolition prerequisite not present in the selected evidence."
       ],
+      "revisionNotes": "Added Section 101-04 to establish that Sections 101-70 through 101-75 apply to the Atlantic Avenue Subdistrict within the Special Downtown Brooklyn District.",
+      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
@@ -105,6 +110,23 @@
       "status": "draft",
       "question": "What does the imported amendment history show about Section 42-00, and what should a professional verify before relying on a historical version for a particular date?",
       "selectedEvidenceSectionIDs": [20017271],
+      "evidenceReviewAmendmentEvents": [
+        {
+          "sectionID": 20017271,
+          "effectiveDate": "2024-12-05",
+          "reportNumber": "N240290ZRY"
+        },
+        {
+          "sectionID": 20017271,
+          "effectiveDate": "2024-06-06",
+          "reportNumber": "N240011ZRY"
+        },
+        {
+          "sectionID": 20017271,
+          "effectiveDate": "2024-06-06",
+          "reportNumber": "N240010ZRY"
+        }
+      ],
       "requiredConcepts": [
         "The answer distinguishes current text from amendment-history metadata.",
         "The answer identifies multiple amendment events.",
@@ -114,6 +136,8 @@
         "The current text is represented as unchanged since 1961.",
         "An amendment note is treated as a complete historical reconstruction of prior enacted text."
       ],
+      "revisionNotes": "Surfaced three explicit amendment-history records, including effective dates and official report identifiers, from the already imported Section 42-00 metadata.",
+      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
@@ -122,23 +146,25 @@
       "category": "explicit-uncertainty",
       "status": "draft",
       "question": "Is a proposed self-storage use permitted as-of-right on a specific property when no address, zoning district, special district, or mapped subarea has been provided?",
-      "selectedEvidenceSectionIDs": [20017276, 20021237],
+      "selectedEvidenceSectionIDs": [20022472, 20022473, 20022474, 20019206, 20021237],
       "requiredConcepts": [
         "The answer declines to make a parcel-specific determination.",
         "The answer identifies the missing location, zoning-district, special-district, and mapped-subarea facts.",
-        "The answer separates general use-table evidence from map applicability."
+        "The answer separates the general Use Group IX table, limited-applicability and additional-condition provisions, the Subarea 2 special-permit path, and Appendix J map applicability."
       ],
       "forbiddenClaims": [
         "The proposed use is approved or prohibited for the unidentified property.",
         "The answer silently retrieves evidence outside the selected sections."
       ],
+      "revisionNotes": "Replaced the unrelated Use Group I evidence with the governing self-service-storage provisions in Sections 42-191 through 42-193, added the Subarea 2 special-permit provision in Section 74-192, and retained Appendix J.",
+      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
     {
       "id": "zr-mapped-district-missing",
       "category": "mapped-applicability",
-      "status": "draft",
+      "status": "approved",
       "question": "A 10,000-square-foot site in the Bronx is proposed for a 40,000-square-foot residential building. What is the maximum permitted residential FAR when the mapped zoning district has not been established?",
       "selectedEvidenceSectionIDs": [20018425],
       "requiredConcepts": [
@@ -151,15 +177,21 @@
         "A Residence District is inferred merely because the proposal is residential.",
         "Allowable floor area is calculated before the governing mapped district and conditions are established."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-r7a-standard-far",
       "category": "arithmetic",
       "status": "draft",
       "question": "A 10,000-square-foot R7A zoning lot will contain standard residences and 42,000 square feet of residential floor area. Does the proposal comply with the basic maximum residential FAR?",
-      "selectedEvidenceSectionIDs": [20018017],
+      "selectedEvidenceSectionIDs": [20018017, 20018523],
+      "evidenceReviewTermsBySection": {
+        "20018523": [
+          "floor area ratio",
+          "floor area"
+        ]
+      },
       "requiredConcepts": [
         "Section 23-22 sets the R7A maximum residential FAR for standard residences at 4.00.",
         "A 4.00 FAR applied to the stated 10,000-square-foot zoning lot permits 40,000 square feet of residential floor area.",
@@ -170,6 +202,8 @@
         "The 42,000-square-foot proposal complies with the basic 4.00 FAR limit.",
         "The answer states that the building can contain exactly 40,000 gross square feet."
       ],
+      "revisionNotes": "Added Section 12-10 definitions for floor area and floor area ratio so the arithmetic uses the Zoning Resolution's defined quantities.",
+      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
@@ -178,24 +212,31 @@
       "category": "conditional-qualification",
       "status": "draft",
       "question": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area, and the project is described as containing qualifying affordable housing. Is the proposed FAR within the R7A limit?",
-      "selectedEvidenceSectionIDs": [20018017, 20022699, 20022711],
+      "selectedEvidenceSectionIDs": [20018017, 20022699, 20022711, 20018523],
+      "evidenceReviewTermsBySection": {
+        "20018523": [
+          "qualifying affordable housing"
+        ]
+      },
       "requiredConcepts": [
         "Section 23-22 sets an R7A maximum FAR of 5.01 for qualifying affordable housing or qualifying senior housing.",
-        "A 5.01 FAR applied to 10,000 square feet permits 50,100 square feet, so the stated 48,000 square feet is within that particular limit.",
-        "The conclusion is expressly conditional on the project satisfying the applicable affordable-housing definitions and requirements in Article II, Chapter 7.",
+        "A 5.01 FAR applied to 10,000 square feet permits 50,100 square feet, so the stated 48,000 square feet is below that table ceiling.",
+        "Being below the table ceiling does not establish entitlement to the higher FAR; the applicable qualifying-affordable-housing path and required amount of affordable housing must be established under Article II, Chapter 7.",
         "The user's label alone is not treated as proof that the development qualifies for the higher FAR."
       ],
       "forbiddenClaims": [
         "Any project containing affordable units automatically receives 5.01 FAR.",
         "The answer gives an unconditional compliance conclusion without establishing the qualifying-affordable-housing path."
       ],
+      "revisionNotes": "Added the Section 12-10 qualifying-affordable-housing definition and narrowed the expected conclusion to distinguish the numerical table ceiling from entitlement to the higher FAR.",
+      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
     {
       "id": "zr-r7a-standard-height",
       "category": "table",
-      "status": "draft",
+      "status": "approved",
       "question": "Can a standard residential building in an R7A district be 90 feet tall under the basic height-and-setback table?",
       "selectedEvidenceSectionIDs": [20018085, 20018087],
       "requiredConcepts": [
@@ -208,13 +249,13 @@
         "R7A universally permits a 115-foot building.",
         "The eligible-site modifications of Section 23-434 are represented as applicable to R7A."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-r7a-lot-coverage",
       "category": "lot-coverage",
-      "status": "draft",
+      "status": "approved",
       "question": "An R7A interior zoning lot contains 10,000 square feet. Can a standard residential development cover 8,500 square feet of the lot under the basic lot-coverage regulation?",
       "selectedEvidenceSectionIDs": [20022764, 20018020, 20018051],
       "requiredConcepts": [
@@ -227,13 +268,13 @@
         "The owner has an unconditional right to build an 8,000-square-foot footprint.",
         "The answer ignores the possible modifications in Section 23-363 or applicable yard requirements."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-narrow-attached-rear-yard",
       "category": "yard",
-      "status": "draft",
+      "status": "approved",
       "question": "An attached residential building is proposed on a 35-foot-wide interior zoning lot with a 20-foot rear yard. Is that sufficient under the standard rear-yard rule?",
       "selectedEvidenceSectionIDs": [20018051],
       "requiredConcepts": [
@@ -245,13 +286,13 @@
         "A 20-foot rear yard satisfies the standard rule for the stated 35-foot-wide attached-building lot.",
         "All residential rear yards are described as universally requiring 30 feet."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-through-lot-historic-shallow-condition",
       "category": "historical-applicability",
-      "status": "draft",
+      "status": "approved",
       "question": "A through lot is 150 feet deep and the proposal provides a 20-foot rear yard equivalent. Is that enough when the lot's historical shallow-lot condition is unknown?",
       "selectedEvidenceSectionIDs": [20018060],
       "requiredConcepts": [
@@ -264,13 +305,13 @@
         "A 150-foot through lot automatically requires only a 20-foot rear yard equivalent.",
         "The historical December 15, 1961 condition is assumed without evidence."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-residential-building-spacing",
       "category": "building-spacing",
-      "status": "draft",
+      "status": "approved",
       "question": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
       "selectedEvidenceSectionIDs": [20018102],
       "requiredConcepts": [
@@ -282,13 +323,13 @@
         "The stated 30-foot separation satisfies the 40-foot standard.",
         "All buildings on one zoning lot are said to require 40 feet of separation in every circumstance."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-c3-professional-office",
       "category": "use-permission",
-      "status": "draft",
+      "status": "approved",
       "question": "A 1,500-square-foot architectural office is proposed in a C3 district. Is the professional office use permitted as-of-right under the underlying C3 use regulations?",
       "selectedEvidenceSectionIDs": [20017827, 20022494],
       "requiredConcepts": [
@@ -300,13 +341,13 @@
         "The architectural office is represented as permitted as-of-right in C3.",
         "The answer claims that professional offices are unlawful in every C3-mapped location under every possible modifying provision."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-c4-4-residential-use",
       "category": "use-permission",
-      "status": "draft",
+      "status": "approved",
       "question": "A C4-4 zoning lot is proposed with retail on the ground floor and apartments above. Is the residential use permitted under the underlying use regulations?",
       "selectedEvidenceSectionIDs": [20022450, 20022452],
       "requiredConcepts": [
@@ -319,32 +360,36 @@
         "Permission for apartments is treated as proof that the entire mixed building complies with zoning.",
         "Residential R-district bulk controls are applied directly without researching the mixed-building provisions."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-inner-transit-zone-new-unit-parking",
       "category": "effective-date",
       "status": "draft",
-      "question": "An 80-unit residential development in an R7A district is within the Inner Transit Zone, and all dwelling units will be created after December 5, 2024. How many accessory residential parking spaces are required?",
-      "selectedEvidenceSectionIDs": [20017540, 20017541],
+      "question": "An 80-unit residential development in an R7A district is within the Inner Transit Zone, all dwelling units will be created after December 5, 2024, and no timely application or vested right preserves the pre-December 5, 2024 regulations. How many accessory residential parking spaces are required?",
+      "selectedEvidenceSectionIDs": [20018444, 20017540, 20017541],
       "requiredConcepts": [
         "Section 25-211 requires no accessory off-street parking spaces for dwelling units or rooming units created after December 5, 2024 within the Inner Transit Zone.",
         "The answer states that zero spaces are required under that provision for the stated new units.",
+        "The answer checks Section 11-333 and relies on the stated absence of a timely application or vested right under the pre-December 5, 2024 regulations.",
         "The answer distinguishes units created after December 5, 2024 from existing units and parking governed by the separate maintenance provisions.",
         "The answer uses the section's certificate-of-occupancy definition of when a unit is created rather than assuming a colloquial construction date."
       ],
       "forbiddenClaims": [
         "Parking is represented as never required anywhere in the Inner Transit Zone.",
-        "Existing required parking is said to be removable automatically."
+        "Existing required parking is said to be removable automatically.",
+        "The December 5, 2024 transition and Section 11-333 vesting path are ignored."
       ],
+      "revisionNotes": "Added Section 11-333 and an explicit no-vesting project fact so the zero-space conclusion tests the current rule without silently ignoring the transition path.",
+      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
     {
       "id": "zr-new-divided-zoning-lot",
       "category": "cross-provision",
-      "status": "draft",
+      "status": "approved",
       "question": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
       "selectedEvidenceSectionIDs": [20018891, 20018894, 20018899],
       "requiredConcepts": [
@@ -357,13 +402,13 @@
         "Whichever district contains 51 percent of a newly assembled zoning lot automatically controls the entire lot.",
         "The Section 77-22 FAR mechanism is represented as transferring the majority district's use regulations to the entire lot."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-zoning-lot-contiguity-definition",
       "category": "definition",
-      "status": "draft",
+      "status": "approved",
       "question": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
       "selectedEvidenceSectionIDs": [20018523],
       "evidenceReviewTerms": [
@@ -383,13 +428,13 @@
         "An eight-foot point of contiguity is said to satisfy the current paragraphs (c) or (d).",
         "A tax lot and a zoning lot are treated as necessarily identical."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-cellar-floor-area-definition",
       "category": "definition",
-      "status": "draft",
+      "status": "approved",
       "question": "A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?",
       "selectedEvidenceSectionIDs": [20018523],
       "evidenceReviewTerms": [
@@ -409,13 +454,13 @@
         "The retailing caveat is said to make every cellar count as floor area for all purposes.",
         "The New York City Building Code is substituted for the Zoning Resolution definitions."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     },
     {
       "id": "zr-nonconforming-use-discontinuance",
       "category": "nonconforming-use",
-      "status": "draft",
+      "status": "approved",
       "question": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
       "selectedEvidenceSectionIDs": [20018658],
       "requiredConcepts": [
@@ -428,8 +473,8 @@
         "The owner's continuing intent alone is said to preserve the discontinued non-conforming use.",
         "Every non-conforming use is said to expire after two years regardless of the nature of the discontinuance or the section's express exceptions."
       ],
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     }
   ]
 }

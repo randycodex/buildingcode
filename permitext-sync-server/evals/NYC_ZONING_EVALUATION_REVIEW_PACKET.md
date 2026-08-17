@@ -2,15 +2,17 @@
 
 Content edition: NYC Zoning Resolution — text through 2026-07-16
 
-Status: DRAFT — NOT APPROVED
+Status: PARTIALLY APPROVED FOR TERRA ANSWER-KEY TESTING
 
 Case readiness: 21 evidence-ready · 0 blocked by known content gaps
 
-This packet is for review by a professional qualified to evaluate New York City zoning sources. No case in this packet enables Zoning in AI Research. Approval must be explicit and recorded; the application never treats a generated answer or an automatic score as reviewer approval.
+Review status: 15 approved for Terra answer-key testing · 6 draft/revised and awaiting review · 0 rejected
+
+Approval in this packet is limited to Terra answer-key testing. It is not professional zoning sign-off, does not enable Zoning in public AI Research, and does not authorize paid evaluation. Draft cases still require explicit human approval after their revisions are reviewed.
 
 ## Reviewer checklist
 
-For every case:
+For each draft or revised case awaiting approval:
 
 1. Confirm that the selected evidence is the correct official authority for the question.
 2. Confirm that every required concept is supportable from the selected evidence.
@@ -22,6 +24,8 @@ For every case:
 ## 1. zr-rules-of-construction
 
 Category: citation-fidelity
+
+Case status: APPROVED
 
 Question: How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?
 
@@ -45,19 +49,21 @@ Question: How does the Zoning Resolution instruct a reader to resolve a conflict
 - [ ] An illustration overrides the enacted text.
 - [ ] The answer relies on a section outside the selected evidence.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 2. zr-use-group-table
 
 Category: table
+
+Case status: APPROVED
 
 Question: Using only the selected table, summarize how Use Group I allowances differ across M1, M2, and M3 districts and explain the table symbols.
 
@@ -81,19 +87,21 @@ Question: Using only the selected table, summarize how Use Group I allowances di
 - [ ] Every Use Group I use has the same allowance in every Manufacturing District.
 - [ ] A symbol is interpreted without support in the selected evidence.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 3. zr-appendix-map-boundaries
 
 Category: map
+
+Case status: APPROVED
 
 Question: What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?
 
@@ -117,13 +125,13 @@ Question: What can the selected Appendix J material establish about designated a
 - [ ] A particular tax lot is inside a designated area without parcel and map evidence.
 - [ ] The map image is treated as decorative rather than authoritative selected evidence.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
@@ -131,16 +139,29 @@ Question: What can the selected Appendix J material establish about designated a
 
 Category: special-purpose-district
 
+Case status: DRAFT
+
 Question: What prerequisites does Section 101-75 state before a demolition permit may be issued in the identified Subdistrict, and what exception does it recognize?
 
 ### Selected official evidence
 
+- ZR 101-04 — Subdistricts
+  - Permitext section ID: 20020818
+  - Official source: https://zr.planning.nyc.gov/article-x/chapter-1/101-04
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2004-06-28
+  - Evidence preview: In order to carry out the provisions of this Chapter, two subdistricts are established within the Special Downtown Brooklyn District. In each of these subdistricts, certain special regulations apply that do not apply within the remainder of the Special Downtown Brooklyn District. The subdistricts are outlined on Map 1 (Special Downtown Brooklyn District and Subdistricts) in Appendix E of this Chapter. Special regulat
 - ZR 101-75 — Special Provisions for Demolition of Buildings
   - Permitext section ID: 20020889
   - Official source: https://zr.planning.nyc.gov/article-x/chapter-1/101-75
   - Text version: NYC Zoning Resolution — text through 2026-07-16
   - Last amended: 2011-02-02
   - Evidence preview: Except in the case of buildings that are unsafe and the demolition of which is required pursuant to the provisions of Chapter 26, Title C, Part I, Article 8, or its successor, of the New York City Administrative Code, no demolition permit shall be issued by the Department of Buildings for any development within the Subdistrict until: (a) the owner of the property has obtained a building application approval for the
+
+### Applied revision
+
+- Added Section 101-04 to establish that Sections 101-70 through 101-75 apply to the Atlantic Avenue Subdistrict within the Special Downtown Brooklyn District.
+- Applied: 2026-08-17T21:17:41.000Z
 
 ### Required concepts
 
@@ -167,6 +188,8 @@ Question: What prerequisites does Section 101-75 state before a demolition permi
 
 Category: amendment-history
 
+Case status: DRAFT
+
 Question: What does the imported amendment history show about Section 42-00, and what should a professional verify before relying on a historical version for a particular date?
 
 ### Selected official evidence
@@ -177,6 +200,23 @@ Question: What does the imported amendment history show about Section 42-00, and
   - Text version: NYC Zoning Resolution — text through 2026-07-16
   - Last amended: 2024-12-05
   - Evidence preview: In order to carry out the purposes and provisions of this Resolution, the uses within buildings or other structures as well as the open uses of zoning lots, or portions thereof, have been classified and combined into 10 separate Use Groups with similar characteristics. For the purposes of establishing permitted uses in this Resolution, references to permitted uses in the Use Groups, or any sub-categories therein, sha
+  - Amendment record: 2024-12-05 · N240290ZRY · Amended
+    - Project: City of Yes for Housing Opportunity
+    - Official report: http://a030-cpc.nyc.gov/html/cpc/report.aspx?num=N%20240290%20ZRY
+    - Notes: Removing Section that no longer is applicable and updating cross references.
+  - Amendment record: 2024-06-06 · N240011ZRY · Amended
+    - Project: City of Yes for Economic Opportunity - M Districts
+    - Official report: http://a030-cpc.nyc.gov/html/cpc/report.aspx?num=N%20240011%20ZRY
+    - Notes: Added M Districts with an A suffix applicability in paragraph (b)(2)(vi)
+  - Amendment record: 2024-06-06 · N240010ZRY · Amended
+    - Project: City of Yes for Economic Opportunity
+    - Official report: http://a030-cpc.nyc.gov/html/cpc/report.aspx?num=N%20240010%20ZRY
+    - Notes: Reorganized general provisions to reflect proposal; relocated various provisions to Sections 42-10 and 42-20, inclusive
+
+### Applied revision
+
+- Surfaced three explicit amendment-history records, including effective dates and official report identifiers, from the already imported Section 42-00 metadata.
+- Applied: 2026-08-17T21:17:41.000Z
 
 ### Required concepts
 
@@ -203,16 +243,36 @@ Question: What does the imported amendment history show about Section 42-00, and
 
 Category: explicit-uncertainty
 
+Case status: DRAFT
+
 Question: Is a proposed self-storage use permitted as-of-right on a specific property when no address, zoning district, special district, or mapped subarea has been provided?
 
 ### Selected official evidence
 
-- ZR 42-111 — Use Group I – general use allowances
-  - Permitext section ID: 20017276
-  - Official source: https://zr.planning.nyc.gov/article-iv/chapter-2/42-111
+- ZR 42-191 — Use Group IX – general use allowances
+  - Permitext section ID: 20022472
+  - Official source: https://zr.planning.nyc.gov/article-iv/chapter-2/42-191
   - Text version: NYC Zoning Resolution — text through 2026-07-16
   - Last amended: 2024-06-06
-  - Evidence preview: The following table includes uses classified as Use Group I and sets forth their allowances by Manufacturing District. Notations found in the table are further described in Section 42-10 (USE ALLOWANCES). Where permitted as-of-right in a Manufacturing District, all uses listed as “Open Uses” in the table shall be unenclosed, except for ancillary buildings or other structures. USE GROUP I – AGRICULTURE AND OPEN USES
+  - Evidence preview: The following table includes uses classified as Use Group IX and sets forth their allowances by Manufacturing District. Such uses are categorized as general storage, specialized storage, or vehicle storage, as provided in paragraphs A, B and C of this Section. Notations found in the table are further described in Section 42-10 (USE ALLOWANCES). A. General Storage USE GROUP IX(A) – GENERAL STORAGE ● = Permitted ♦ =
+- ZR 42-192 — Use Group IX – uses permitted with limited applicability
+  - Permitext section ID: 20022473
+  - Official source: https://zr.planning.nyc.gov/article-iv/chapter-2/42-192
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-06-06
+  - Evidence preview: For uses denoted with “♦” in Section 42-191 (Use Group IX – general use allowances), the provisions of this Section shall apply. For public parking garages and public parking lots, the following provisions shall apply: In the Manhattan Core, such uses are subject to the provisions of Article I, Chapter 3, and in the Long Island City area, as defined in Section 16-02 (Definitions), such uses# are subject to the provi
+- ZR 42-193 — Use Group IX – uses subject to additional conditions
+  - Permitext section ID: 20022474
+  - Official source: https://zr.planning.nyc.gov/article-iv/chapter-2/42-193
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-06-06
+  - Evidence preview: For uses denoted with a “P” in Section 42-191 (Use Group IX – general use allowances), the following provisions shall apply: Boat storage shall be restricted to boats less than 100 feet in length. Public parking garages and public parking lots shall be subject to the provisions set forth in Section 44-025 (Applicability of regulations to public parking garages and public parking lots). All uses denoted with a “P” in
+- ZR 74-192 — Self-service storage facility in designated areas within Manufacturing Districts
+  - Permitext section ID: 20019206
+  - Official source: https://zr.planning.nyc.gov/article-vii/chapter-4/74-192
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2024-06-06
+  - Evidence preview: On zoning lots in designated areas within Manufacturing Districts in Subarea 2, as shown on the maps in Appendix J (Designated Areas Within Manufacturing Districts) of this Resolution, the City Planning Commission may permit the development, enlargement not permitted pursuant to the provisions of Section 42-193 (Use Group IX – uses subject to additional conditions), or change of use of a building for self-service sto
 - ZR APPENDIX J — APPENDIX J — Designated Areas Within Manufacturing Districts
   - Permitext section ID: 20021237
   - Official source: https://zr.planning.nyc.gov/appendix-j-designated-areas-within-manufacturing-districts
@@ -220,11 +280,16 @@ Question: Is a proposed self-storage use permitted as-of-right on a specific pro
   - Last amended: 2024-06-06
   - Evidence preview: (6/6/24) The boundaries of certain designated areas within Manufacturing Districts are shown on the maps in this APPENDIX. Designated areas in which self-service storage facilities are subject to the as-of-right provisions of Section 42-19 (Use Group IX – Storage) are shown on the maps in Subarea 1, and those in which such uses are subject to special permit of the City Planning Commission pursuant to Section 74-192
 
+### Applied revision
+
+- Replaced the unrelated Use Group I evidence with the governing self-service-storage provisions in Sections 42-191 through 42-193, added the Subarea 2 special-permit provision in Section 74-192, and retained Appendix J.
+- Applied: 2026-08-17T21:17:41.000Z
+
 ### Required concepts
 
 - [ ] The answer declines to make a parcel-specific determination.
 - [ ] The answer identifies the missing location, zoning-district, special-district, and mapped-subarea facts.
-- [ ] The answer separates general use-table evidence from map applicability.
+- [ ] The answer separates the general Use Group IX table, limited-applicability and additional-condition provisions, the Subarea 2 special-permit path, and Appendix J map applicability.
 
 ### Forbidden claims
 
@@ -244,6 +309,8 @@ Question: Is a proposed self-storage use permitted as-of-right on a specific pro
 ## 7. zr-mapped-district-missing
 
 Category: mapped-applicability
+
+Case status: APPROVED
 
 Question: A 10,000-square-foot site in the Bronx is proposed for a 40,000-square-foot residential building. What is the maximum permitted residential FAR when the mapped zoning district has not been established?
 
@@ -268,19 +335,21 @@ Question: A 10,000-square-foot site in the Bronx is proposed for a 40,000-square
 - [ ] A Residence District is inferred merely because the proposal is residential.
 - [ ] Allowable floor area is calculated before the governing mapped district and conditions are established.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 8. zr-r7a-standard-far
 
 Category: arithmetic
+
+Case status: DRAFT
 
 Question: A 10,000-square-foot R7A zoning lot will contain standard residences and 42,000 square feet of residential floor area. Does the proposal comply with the basic maximum residential FAR?
 
@@ -292,6 +361,19 @@ Question: A 10,000-square-foot R7A zoning lot will contain standard residences a
   - Text version: NYC Zoning Resolution — text through 2026-07-16
   - Last amended: 2024-12-05
   - Evidence preview: R6 R7 R8 R9 R10 R11 R12 In the districts indicated, the maximum residential floor area ratio shall be as set forth in the following table. Separate maximum residential floor area ratios are set forth for zoning lots containing standard residences and zoning lots containing qualifying affordable housing or qualifying senior housing. MAXIMUM FLOOR AREA RATIO FOR R6-R12 DISTRICTS District Standard residences Qualifyi
+- ZR 12-10 — DEFINITIONS
+  - Permitext section ID: 20018523
+  - Official source: https://zr.planning.nyc.gov/article-i/chapter-2/12-10
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2026-03-26
+  - Evidence preview: Words in the text or tables of this Resolution which are italicized shall be interpreted in accordance with the provisions set forth in this Section. above-grade mass transit station Applicable to Article VI - Chapter 6 Last Amended 10/7/2021 FROM 66-11: For the purposes of this Chapter, an “above-grade mass transit station” shall refer to a mass transit station with a platform that is located entirely above five fe
+  - Matched review excerpt for “floor area ratio”: …ted ground floor dwelling units that is provided in accordance with the provisions of Section 23-23, inclusive; floor space in Quality Housing buildings that was exempted pursuant the Quality Housing Program, as such program existed prior to December 5, 2024. floor area ratio General Definition Last Amended 2/2/2011 "Floor area ratio" is the total floor area on a zoning lot, divided by the lot area of that zoning lot. If two or more buildings are located on the same zoning lot, the floor area ratio is the sum of their floor areas …
+  - Matched review excerpt for “floor area”: …ations for caretakers in connection with any use listed in other Use Groups, provided that: (i) no building contains more than one living or sleeping accommodation for caretakers; (ii) no such living or sleeping accommodation shall exceed 1,200 square feet of floor area; (iii) the owner shall sign a Restrictive Declaration that any such caretaker will provide maintenance and/or repair services, and containing a list of services to be performed by such caretaker. Such Restrictive Declaration shall be recorded in the Office of…
+
+### Applied revision
+
+- Added Section 12-10 definitions for floor area and floor area ratio so the arithmetic uses the Zoning Resolution's defined quantities.
+- Applied: 2026-08-17T21:17:41.000Z
 
 ### Required concepts
 
@@ -319,6 +401,8 @@ Question: A 10,000-square-foot R7A zoning lot will contain standard residences a
 
 Category: conditional-qualification
 
+Case status: DRAFT
+
 Question: A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area, and the project is described as containing qualifying affordable housing. Is the proposed FAR within the R7A limit?
 
 ### Selected official evidence
@@ -341,12 +425,24 @@ Question: A 10,000-square-foot R7A zoning lot is proposed with 48,000 square fee
   - Text version: NYC Zoning Resolution — text through 2026-07-16
   - Last amended: 2024-12-05
   - Evidence preview: Affordable housing in an MIH site or UAP site shall meet each of the requirements set forth in this Section for the entire regulatory period, except that affordable housing restricted pursuant to an affordable housing regulatory agreement shall only be required to comply with paragraphs (a) and (j) of this Section. Location of MIH site or UAP site and MIH zoning lot or UAP zoning lot Where an MIH site or UAP site is
+- ZR 12-10 — DEFINITIONS
+  - Permitext section ID: 20018523
+  - Official source: https://zr.planning.nyc.gov/article-i/chapter-2/12-10
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2026-03-26
+  - Evidence preview: Words in the text or tables of this Resolution which are italicized shall be interpreted in accordance with the provisions set forth in this Section. above-grade mass transit station Applicable to Article VI - Chapter 6 Last Amended 10/7/2021 FROM 66-11: For the purposes of this Chapter, an “above-grade mass transit station” shall refer to a mass transit station with a platform that is located entirely above five fe
+  - Matched review excerpt for “qualifying affordable housing”: …at functions as a street for the purposes of general public use, including vehicular and pedestrian traffic, and is open and unobstructed from its ground level to the sky, except by streetscape elements required or permitted by the provisions of this Chapter. qualifying affordable housing General Definition Last Amended 12/5/2024 “Qualifying affordable housing” shall include any of the following: (a) MIH developments in Mandatory Inclusionary Housing areas; (b) UAP developments; or (c) buildings subject to an affordable housing regulatory agre…
+
+### Applied revision
+
+- Added the Section 12-10 qualifying-affordable-housing definition and narrowed the expected conclusion to distinguish the numerical table ceiling from entitlement to the higher FAR.
+- Applied: 2026-08-17T21:17:41.000Z
 
 ### Required concepts
 
 - [ ] Section 23-22 sets an R7A maximum FAR of 5.01 for qualifying affordable housing or qualifying senior housing.
-- [ ] A 5.01 FAR applied to 10,000 square feet permits 50,100 square feet, so the stated 48,000 square feet is within that particular limit.
-- [ ] The conclusion is expressly conditional on the project satisfying the applicable affordable-housing definitions and requirements in Article II, Chapter 7.
+- [ ] A 5.01 FAR applied to 10,000 square feet permits 50,100 square feet, so the stated 48,000 square feet is below that table ceiling.
+- [ ] Being below the table ceiling does not establish entitlement to the higher FAR; the applicable qualifying-affordable-housing path and required amount of affordable housing must be established under Article II, Chapter 7.
 - [ ] The user's label alone is not treated as proof that the development qualifies for the higher FAR.
 
 ### Forbidden claims
@@ -367,6 +463,8 @@ Question: A 10,000-square-foot R7A zoning lot is proposed with 48,000 square fee
 ## 10. zr-r7a-standard-height
 
 Category: table
+
+Case status: APPROVED
 
 Question: Can a standard residential building in an R7A district be 90 feet tall under the basic height-and-setback table?
 
@@ -397,19 +495,21 @@ Question: Can a standard residential building in an R7A district be 90 feet tall
 - [ ] R7A universally permits a 115-foot building.
 - [ ] The eligible-site modifications of Section 23-434 are represented as applicable to R7A.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 11. zr-r7a-lot-coverage
 
 Category: lot-coverage
+
+Case status: APPROVED
 
 Question: An R7A interior zoning lot contains 10,000 square feet. Can a standard residential development cover 8,500 square feet of the lot under the basic lot-coverage regulation?
 
@@ -446,19 +546,21 @@ Question: An R7A interior zoning lot contains 10,000 square feet. Can a standard
 - [ ] The owner has an unconditional right to build an 8,000-square-foot footprint.
 - [ ] The answer ignores the possible modifications in Section 23-363 or applicable yard requirements.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 12. zr-narrow-attached-rear-yard
 
 Category: yard
+
+Case status: APPROVED
 
 Question: An attached residential building is proposed on a 35-foot-wide interior zoning lot with a 20-foot rear yard. Is that sufficient under the standard rear-yard rule?
 
@@ -482,19 +584,21 @@ Question: An attached residential building is proposed on a 35-foot-wide interio
 - [ ] A 20-foot rear yard satisfies the standard rule for the stated 35-foot-wide attached-building lot.
 - [ ] All residential rear yards are described as universally requiring 30 feet.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 13. zr-through-lot-historic-shallow-condition
 
 Category: historical-applicability
+
+Case status: APPROVED
 
 Question: A through lot is 150 feet deep and the proposal provides a 20-foot rear yard equivalent. Is that enough when the lot's historical shallow-lot condition is unknown?
 
@@ -519,19 +623,21 @@ Question: A through lot is 150 feet deep and the proposal provides a 20-foot rea
 - [ ] A 150-foot through lot automatically requires only a 20-foot rear yard equivalent.
 - [ ] The historical December 15, 1961 condition is assumed without evidence.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 14. zr-residential-building-spacing
 
 Category: building-spacing
+
+Case status: APPROVED
 
 Question: Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?
 
@@ -555,19 +661,21 @@ Question: Two separate apartment buildings containing more than three dwelling u
 - [ ] The stated 30-foot separation satisfies the 40-foot standard.
 - [ ] All buildings on one zoning lot are said to require 40 feet of separation in every circumstance.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 15. zr-c3-professional-office
 
 Category: use-permission
+
+Case status: APPROVED
 
 Question: A 1,500-square-foot architectural office is proposed in a C3 district. Is the professional office use permitted as-of-right under the underlying C3 use regulations?
 
@@ -597,19 +705,21 @@ Question: A 1,500-square-foot architectural office is proposed in a C3 district.
 - [ ] The architectural office is represented as permitted as-of-right in C3.
 - [ ] The answer claims that professional offices are unlawful in every C3-mapped location under every possible modifying provision.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 16. zr-c4-4-residential-use
 
 Category: use-permission
+
+Case status: APPROVED
 
 Question: A C4-4 zoning lot is proposed with retail on the ground floor and apartments above. Is the residential use permitted under the underlying use regulations?
 
@@ -640,13 +750,13 @@ Question: A C4-4 zoning lot is proposed with retail on the ground floor and apar
 - [ ] Permission for apartments is treated as proof that the entire mixed building complies with zoning.
 - [ ] Residential R-district bulk controls are applied directly without researching the mixed-building provisions.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
@@ -654,10 +764,18 @@ Question: A C4-4 zoning lot is proposed with retail on the ground floor and apar
 
 Category: effective-date
 
-Question: An 80-unit residential development in an R7A district is within the Inner Transit Zone, and all dwelling units will be created after December 5, 2024. How many accessory residential parking spaces are required?
+Case status: DRAFT
+
+Question: An 80-unit residential development in an R7A district is within the Inner Transit Zone, all dwelling units will be created after December 5, 2024, and no timely application or vested right preserves the pre-December 5, 2024 regulations. How many accessory residential parking spaces are required?
 
 ### Selected official evidence
 
+- ZR 11-333 — Special allowances for building permits issued prior to certain dates
+  - Permitext section ID: 20018444
+  - Official source: https://zr.planning.nyc.gov/article-i/chapter-1/11-333
+  - Text version: NYC Zoning Resolution — text through 2026-07-16
+  - Last amended: 2025-10-29
+  - Evidence preview: Residential developments with building permits issued on or before June 30, 1989 ​​​​If on or before June 30, 1989, the foundations of a residential major or minor development have been completed and permits issued pursuant to the requirements of Section 11-331 (Right to construct if foundations completed), and a certificate of occupancy has not been issued by June 30, 1991, construction may continue until June 30, 1
 - ZR 25-20 — REQUIRED ACCESSORY OFF-STREET PARKING SPACES FOR RESIDENCES
   - Permitext section ID: 20017540
   - Official source: https://zr.planning.nyc.gov/article-ii/chapter-5/25-20
@@ -671,10 +789,16 @@ Question: An 80-unit residential development in an R7A district is within the In
   - Last amended: 2024-12-05
   - Evidence preview: R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In the districts indicated, within the Inner Transit Zone, no accessory off-street parking spaces shall be required for dwelling units or rooming units created after December 5, 2024. For dwelling units or rooming units in multiple dwelling residences created between July 20, 1950 and December 5, 2024, off-street parking spaces accessory to such dwelling units or rooming units
 
+### Applied revision
+
+- Added Section 11-333 and an explicit no-vesting project fact so the zero-space conclusion tests the current rule without silently ignoring the transition path.
+- Applied: 2026-08-17T21:17:41.000Z
+
 ### Required concepts
 
 - [ ] Section 25-211 requires no accessory off-street parking spaces for dwelling units or rooming units created after December 5, 2024 within the Inner Transit Zone.
 - [ ] The answer states that zero spaces are required under that provision for the stated new units.
+- [ ] The answer checks Section 11-333 and relies on the stated absence of a timely application or vested right under the pre-December 5, 2024 regulations.
 - [ ] The answer distinguishes units created after December 5, 2024 from existing units and parking governed by the separate maintenance provisions.
 - [ ] The answer uses the section's certificate-of-occupancy definition of when a unit is created rather than assuming a colloquial construction date.
 
@@ -682,6 +806,7 @@ Question: An 80-unit residential development in an R7A district is within the In
 
 - [ ] Parking is represented as never required anywhere in the Inner Transit Zone.
 - [ ] Existing required parking is said to be removable automatically.
+- [ ] The December 5, 2024 transition and Section 11-333 vesting path are ignored.
 
 ### Reviewer decision
 
@@ -696,6 +821,8 @@ Question: An 80-unit residential development in an R7A district is within the In
 ## 18. zr-new-divided-zoning-lot
 
 Category: cross-provision
+
+Case status: APPROVED
 
 Question: A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?
 
@@ -732,19 +859,21 @@ Question: A zoning lot assembled in 2026 straddles two zoning districts, with mo
 - [ ] Whichever district contains 51 percent of a newly assembled zoning lot automatically controls the entire lot.
 - [ ] The Section 77-22 FAR mechanism is represented as transferring the majority district's use regulations to the entire lot.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 19. zr-zoning-lot-contiguity-definition
 
 Category: definition
+
+Case status: APPROVED
 
 Question: Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?
 
@@ -774,19 +903,21 @@ Question: Two tax lots on the same block have the same owner but touch for only 
 - [ ] An eight-foot point of contiguity is said to satisfy the current paragraphs (c) or (d).
 - [ ] A tax lot and a zoning lot are treated as necessarily identical.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 20. zr-cellar-floor-area-definition
 
 Category: definition
+
+Case status: APPROVED
 
 Question: A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?
 
@@ -816,19 +947,21 @@ Question: A 5,000-square-foot below-grade storage level has more than one-half o
 - [ ] The retailing caveat is said to make every cellar count as floor area for all purposes.
 - [ ] The New York City Building Code is substituted for the Zoning Resolution definitions.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
 ## 21. zr-nonconforming-use-discontinuance
 
 Category: nonconforming-use
+
+Case status: APPROVED
 
 Question: A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?
 
@@ -853,12 +986,12 @@ Question: A building contains a lawful non-conforming use, but active operation 
 - [ ] The owner's continuing intent alone is said to preserve the discontinued non-conforming use.
 - [ ] Every non-conforming use is said to expire after two years regardless of the nature of the discontinuance or the section's express exceptions.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-17T21:17:41.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---

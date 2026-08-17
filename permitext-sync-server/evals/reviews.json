@@ -22,6 +22,171 @@
       "notes": "",
       "reviewer": "Permitext owner",
       "reviewedAt": "2026-07-23T21:35:54.092Z"
+    },
+    {
+      "id": "d628b3d3-6ab1-4f89-bdfb-0e78bbdeec6d",
+      "kind": "zoning-case",
+      "caseID": "zr-rules-of-construction",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "3df24684-e118-4ce7-a838-8cd16057714c",
+      "kind": "zoning-case",
+      "caseID": "zr-use-group-table",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "98754415-56cd-4d47-9d61-838dd339ae56",
+      "kind": "zoning-case",
+      "caseID": "zr-appendix-map-boundaries",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "981a5fce-9d60-4c80-b6b8-34d5943afc21",
+      "kind": "zoning-case",
+      "caseID": "zr-mapped-district-missing",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "d7f1f4fd-ec69-43c7-9d8a-d1da8cb4d77f",
+      "kind": "zoning-case",
+      "caseID": "zr-r7a-standard-height",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "230c5e34-0a00-4ef6-a7c2-42703dfe1989",
+      "kind": "zoning-case",
+      "caseID": "zr-r7a-lot-coverage",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "a9ac6f6f-077c-4e18-b274-55d361703102",
+      "kind": "zoning-case",
+      "caseID": "zr-narrow-attached-rear-yard",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "d3822b9a-316f-4d3a-8889-8f6bf93499cb",
+      "kind": "zoning-case",
+      "caseID": "zr-through-lot-historic-shallow-condition",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "9b3fb972-a6a8-4e80-8af2-a69b57dc2bdd",
+      "kind": "zoning-case",
+      "caseID": "zr-residential-building-spacing",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "bb33ad0a-e7f4-4127-9fda-4f904eca2c71",
+      "kind": "zoning-case",
+      "caseID": "zr-c3-professional-office",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "d76aada4-5575-46d2-a38e-91687650999b",
+      "kind": "zoning-case",
+      "caseID": "zr-c4-4-residential-use",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "09e4ef4c-8a52-4296-956e-b5641472f751",
+      "kind": "zoning-case",
+      "caseID": "zr-new-divided-zoning-lot",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "9e91703a-a66b-437f-a23b-13bbf416c06f",
+      "kind": "zoning-case",
+      "caseID": "zr-zoning-lot-contiguity-definition",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "341fc17c-d6fb-4256-a310-efb07f5e5a9a",
+      "kind": "zoning-case",
+      "caseID": "zr-cellar-floor-area-definition",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "0abef194-61d0-49db-90d1-37e3b8d5adf3",
+      "kind": "zoning-case",
+      "caseID": "zr-nonconforming-use-discontinuance",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-17T21:17:41.000Z"
     }
   ]
 }
