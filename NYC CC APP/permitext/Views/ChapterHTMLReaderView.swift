@@ -104,6 +104,8 @@ struct ChapterHTMLReaderView: View {
     @State private var chapterSearchScrollRequestID = 0
     @State private var htmlChapterSearchEntries: [ChapterSearchSourceEntry] = []
     @State private var inlineReferenceDestination: CodeSectionSummary?
+    @State private var htmlLoadState: ChapterHTMLLoadState = .loading
+    @State private var htmlReloadTrigger = 0
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -520,7 +522,11 @@ struct ChapterHTMLReaderView: View {
             collapseAllTrigger: 0,
             scrollToTopTrigger: 0,
             scrollProgressSyncTrigger: scrollProgressSyncTrigger,
+            reloadTrigger: htmlReloadTrigger,
             restoreScrollOffset: rememberedScrollOffset.wrappedValue,
+            onLoadStateChange: { state in
+                htmlLoadState = state
+            },
             onVisibleAnchorChange: { anchorID in
                 guard let anchor = anchorMatchingReportedAnchorID(anchorID) else { return }
                 if selectedAnchor?.anchorID != anchor.anchorID {
@@ -565,11 +571,46 @@ struct ChapterHTMLReaderView: View {
                 )
             }
         )
+        .overlay {
+            chapterLoadOverlay
+        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar
                 .background(pageBackgroundColor)
         }
         .background(pageBackgroundColor.ignoresSafeArea())
+    }
+
+    @ViewBuilder
+    private var chapterLoadOverlay: some View {
+        switch htmlLoadState {
+        case .loading:
+            ProgressView("Loading chapter…")
+                .tint(accentColor)
+                .padding(18)
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        case .failed(let message):
+            VStack(spacing: 16) {
+                CodeEmptyStateCard(
+                    title: "Couldn’t Load Chapter",
+                    systemImage: "arrow.clockwise",
+                    description: message,
+                    accent: accentColor
+                )
+
+                Button("Retry") {
+                    htmlLoadState = .loading
+                    htmlReloadTrigger &+= 1
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(accentColor)
+            }
+            .padding(24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(pageBackgroundColor)
+        case .loaded:
+            EmptyView()
+        }
     }
 
     private var jumpBar: some View {

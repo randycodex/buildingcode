@@ -37,6 +37,23 @@ enum BundledWebViewNavigationPolicy {
     }
 }
 
+enum ChapterHTMLLoadState: Equatable {
+    case loading
+    case loaded
+    case failed(String)
+}
+
+enum ChapterHTMLLoadRecoveryPolicy {
+    static let maximumAutomaticAttempts = 2
+
+    static func shouldRetry(error: Error, attempt: Int) -> Bool {
+        let error = error as NSError
+        let isCancelled = error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled
+        return !isCancelled &&
+            attempt < maximumAutomaticAttempts
+    }
+}
+
 @MainActor
 enum ChapterHTMLWebProcessWarmup {
     private static var warmupWebView: WKWebView?
@@ -209,7 +226,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let collapseAllTrigger: Int
     let scrollToTopTrigger: Int
     let scrollProgressSyncTrigger: Int
+    let reloadTrigger: Int
     let restoreScrollOffset: Double?
+    let onLoadStateChange: ((ChapterHTMLLoadState) -> Void)?
     let onVisibleAnchorChange: ((String) -> Void)?
     let onScrollProgressChange: ((CGFloat) -> Void)?
     let onScrollOffsetChange: ((CGFloat) -> Void)?
@@ -260,11 +279,27 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
         if context.coordinator.loadedURL != chapterURL {
             context.coordinator.loadedURL = chapterURL
+            context.coordinator.appliedReloadTrigger = reloadTrigger
+            context.coordinator.resetLoadRecovery()
             context.coordinator.resetScrollProgressReporting()
             context.coordinator.pendingAnchorID = targetAnchorID
+            context.coordinator.reportLoadState(.loading)
             // Load off the main thread: reading a multi-MB HTML file and
             // running normalizeSharedAssetPaths synchronously in updateUIView
             // blocks the UI for the entire duration of the file read.
+            context.coordinator.loadHTMLAsync(
+                chapterURL: chapterURL,
+                readAccessURL: readAccessURL,
+                into: webView
+            )
+            return
+        }
+
+        if context.coordinator.appliedReloadTrigger != reloadTrigger {
+            context.coordinator.appliedReloadTrigger = reloadTrigger
+            context.coordinator.resetLoadRecovery()
+            context.coordinator.pendingAnchorID = targetAnchorID
+            context.coordinator.reportLoadState(.loading)
             context.coordinator.loadHTMLAsync(
                 chapterURL: chapterURL,
                 readAccessURL: readAccessURL,
@@ -320,6 +355,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var parent: ChapterHTMLWebView?
         weak var webView: WKWebView?
         var loadedURL: URL?
+        var appliedReloadTrigger = 0
         var pendingAnchorID: String?
         var lastScrolledAnchorID: String?
         var lastSearchScrollTarget: SearchScrollTarget?
@@ -335,7 +371,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedScrollToTopTrigger = 0
         var appliedScrollProgressSyncTrigger = 0
         private var htmlLoadTask: Task<Void, Never>?
+        private var recoveryTask: Task<Void, Never>?
         private var htmlLoadGeneration = 0
+        private var automaticRecoveryAttempt = 0
         private var htmlLoadBeganAt: TimeInterval?
         private var lastReportedScrollProgress: CGFloat = -1
         private var visibleAnchorReportPending = false
@@ -386,9 +424,64 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
         }
 
+        func resetLoadRecovery() {
+            recoveryTask?.cancel()
+            recoveryTask = nil
+            automaticRecoveryAttempt = 0
+        }
+
+        func reportLoadState(_ state: ChapterHTMLLoadState) {
+            DispatchQueue.main.async { [weak self] in
+                self?.parent?.onLoadStateChange?(state)
+            }
+        }
+
+        private func recoverFromLoadFailure(
+            in webView: WKWebView,
+            error: Error?,
+            message: String
+        ) {
+            guard recoveryTask == nil else { return }
+
+            if let error,
+               !ChapterHTMLLoadRecoveryPolicy.shouldRetry(
+                   error: error,
+                   attempt: automaticRecoveryAttempt
+               ) {
+                if (error as NSError).code == NSURLErrorCancelled { return }
+                reportLoadState(.failed(message))
+                return
+            }
+
+            guard automaticRecoveryAttempt < ChapterHTMLLoadRecoveryPolicy.maximumAutomaticAttempts,
+                  let parent else {
+                reportLoadState(.failed(message))
+                return
+            }
+
+            automaticRecoveryAttempt += 1
+            reportLoadState(.loading)
+            let chapterURL = parent.chapterURL
+            let readAccessURL = parent.readAccessURL
+            let delayMilliseconds = 150 * automaticRecoveryAttempt
+
+            recoveryTask = Task { @MainActor [weak self, weak webView] in
+                try? await Task.sleep(for: .milliseconds(delayMilliseconds))
+                guard !Task.isCancelled, let self, let webView else { return }
+                self.recoveryTask = nil
+                self.loadHTMLAsync(
+                    chapterURL: chapterURL,
+                    readAccessURL: readAccessURL,
+                    into: webView
+                )
+            }
+        }
+
         func teardown(webView: WKWebView) {
             htmlLoadTask?.cancel()
             htmlLoadTask = nil
+            recoveryTask?.cancel()
+            recoveryTask = nil
             htmlLoadGeneration &+= 1
             parent = nil
             loadedURL = nil
@@ -449,6 +542,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 print("permitext diagnostics: chapterReader finished milliseconds=\(elapsedMilliseconds)")
             }
             #endif
+            resetLoadRecovery()
+            reportLoadState(.loaded)
             applyReaderScripts(to: webView)
             applyBookmarkDecorations(to: webView)
             if let offset = parent?.restoreScrollOffset, offset > 0 {
@@ -459,6 +554,38 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             pendingAnchorID = nil
             lastReportedScrollProgress = -1
             reportScrollProgress(from: webView.scrollView)
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            didFail navigation: WKNavigation!,
+            withError error: Error
+        ) {
+            recoverFromLoadFailure(
+                in: webView,
+                error: error,
+                message: "The chapter stopped loading. Try again."
+            )
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            didFailProvisionalNavigation navigation: WKNavigation!,
+            withError error: Error
+        ) {
+            recoverFromLoadFailure(
+                in: webView,
+                error: error,
+                message: "The chapter could not be opened. Try again."
+            )
+        }
+
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            recoverFromLoadFailure(
+                in: webView,
+                error: nil,
+                message: "The chapter reader restarted. Try loading the chapter again."
+            )
         }
 
         func applyReaderScripts(to webView: WKWebView) {

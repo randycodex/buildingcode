@@ -533,6 +533,27 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testChapterHTMLLoadRecoveryPolicyRetriesFailuresButNotCancellation() {
+        XCTAssertTrue(
+            ChapterHTMLLoadRecoveryPolicy.shouldRetry(
+                error: NSError(domain: "permitext.reader.test", code: 1),
+                attempt: 0
+            )
+        )
+        XCTAssertFalse(
+            ChapterHTMLLoadRecoveryPolicy.shouldRetry(
+                error: NSError(domain: NSURLErrorDomain, code: NSURLErrorCancelled),
+                attempt: 0
+            )
+        )
+        XCTAssertFalse(
+            ChapterHTMLLoadRecoveryPolicy.shouldRetry(
+                error: NSError(domain: "permitext.reader.test", code: 1),
+                attempt: ChapterHTMLLoadRecoveryPolicy.maximumAutomaticAttempts
+            )
+        )
+    }
+
     func testSyncConflictErrorsRecognizeProductionCodesAndLegacyMessages() {
         let serverNewer = BackendUserContentRejection(
             code: "SERVER_NEWER",
