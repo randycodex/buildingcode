@@ -21122,13 +21122,20 @@ async function handleCodeQuestionResearchStart(request, response) {
         existingConversation,
         question
       );
+      const artifactRevisions = linked.replayed
+        ? null
+        : await bumpResearchArtifactRevisions(context.actorUserID, [{
+            projectID: context.projectID,
+            domains: ["activity", "foundation", "research"]
+          }]);
       sendJSON(response, 200, {
         conversation: await researchConversationForClient(existingConversation, {
           userID: context.actorUserID,
           projectLink: linked.link
         }),
         questionID,
-        replayed: true
+        replayed: linked.replayed,
+        ...(artifactRevisions ? { artifactRevisions } : {})
       });
       return;
     }
@@ -21165,13 +21172,18 @@ async function handleCodeQuestionResearchStart(request, response) {
       question,
       { now }
     );
+    const artifactRevisions = await bumpResearchArtifactRevisions(context.actorUserID, [{
+      projectID: context.projectID,
+      domains: ["activity", "foundation", "research"]
+    }]);
     sendJSON(response, 201, {
       conversation: await researchConversationForClient(conversation, {
         userID: context.actorUserID,
         projectLink: linked.link
       }),
       questionID,
-      replayed: false
+      replayed: false,
+      artifactRevisions
     });
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return;
@@ -21249,6 +21261,12 @@ async function handleCodeQuestionResearchLink(request, response) {
       if (current || lastQuestionID === questionID) {
         await saveResearchCodeDecisionUnlinkActivity(context, link, questionID);
       }
+      const artifactRevisions = current
+        ? await bumpResearchArtifactRevisions(context.actorUserID, [{
+            projectID: context.projectID,
+            domains: ["activity", "foundation", "research"]
+          }])
+        : null;
       sendJSON(response, 200, {
         conversation: await researchConversationForClient(conversation, {
           userID: context.actorUserID,
@@ -21256,7 +21274,8 @@ async function handleCodeQuestionResearchLink(request, response) {
         }),
         unlinked: Boolean(current),
         replayed: !current && lastQuestionID === questionID,
-        questionID
+        questionID,
+        ...(artifactRevisions ? { artifactRevisions } : {})
       });
       return;
     }
@@ -21282,6 +21301,12 @@ async function handleCodeQuestionResearchLink(request, response) {
       confirmReplaceDecisionConversation: context.body.confirmReplaceDecisionConversation === true,
       expectedTargetConversationID: context.body.expectedTargetConversationID
     });
+    const artifactRevisions = linked.replayed
+      ? null
+      : await bumpResearchArtifactRevisions(context.actorUserID, [{
+          projectID: context.projectID,
+          domains: ["activity", "foundation", "research"]
+        }]);
     sendJSON(response, linked.replayed ? 200 : 201, {
       conversation: await researchConversationForClient(conversation, {
         userID: context.actorUserID,
@@ -21289,7 +21314,8 @@ async function handleCodeQuestionResearchLink(request, response) {
       }),
       questionID,
       replayed: linked.replayed,
-      replacedConversationID: linked.replacedConversationID
+      replacedConversationID: linked.replacedConversationID,
+      ...(artifactRevisions ? { artifactRevisions } : {})
     });
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return;

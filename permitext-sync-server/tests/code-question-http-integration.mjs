@@ -137,6 +137,20 @@ async function postAsIsolated(account, path, body) {
   });
 }
 
+function assertResearchArtifactRevision(payload, { actorUserID, projectID, projectStorageOwnerUserID }) {
+  assert.deepEqual(payload.artifactRevisions.account.changedDomains, ["research"]);
+  assert.equal(payload.artifactRevisions.account.storageOwnerUserID, actorUserID);
+  assert.deepEqual(payload.artifactRevisions.projects.map((revision) => ({
+    projectID: revision.projectID,
+    storageOwnerUserID: revision.storageOwnerUserID,
+    changedDomains: revision.changedDomains
+  })), [{
+    projectID,
+    storageOwnerUserID: projectStorageOwnerUserID,
+    changedDomains: ["activity", "foundation", "research"]
+  }]);
+}
+
 async function inviteAndAccept(owner, member, organizationID, projectID, role) {
   const invited = await postAs(owner, "/organizations/members/invite", {
     organizationID,
@@ -435,6 +449,11 @@ async function main() {
     assert.ok(startedResearch.conversation.codeDecisionLinkVersion >= 1);
     assert.deepEqual(startedResearch.conversation.sources, []);
     assert.deepEqual(startedResearch.conversation.messages, []);
+    assertResearchArtifactRevision(startedResearch, {
+      actorUserID: editor.userID,
+      projectID,
+      projectStorageOwnerUserID: owner.userID
+    });
 
     const candidateDiscovery = await expectStatus(
       await postAs(editor, "/research/evidence/discover", {
@@ -552,6 +571,7 @@ async function main() {
       "Replaying linked Research start"
     );
     assert.equal(replayedResearch.replayed, true);
+    assert.equal(replayedResearch.artifactRevisions, undefined);
     assert.equal(replayedResearch.conversation.id, startedResearch.conversation.id);
     assert.equal(
       replayedResearch.conversation.codeDecisionLinkVersion,
@@ -801,6 +821,11 @@ async function main() {
     );
     assert.equal(ownerUnlink.conversation.linkedCodeDecisionID, null);
     assert.equal(ownerUnlink.conversation.primaryProjectID, projectID);
+    assertResearchArtifactRevision(ownerUnlink, {
+      actorUserID: owner.userID,
+      projectID,
+      projectStorageOwnerUserID: owner.userID
+    });
     const ownerUnlinkReplay = await expectStatus(
       await postAs(owner, "/projects/code-questions/research/link", {
         projectID,
@@ -813,6 +838,7 @@ async function main() {
       "Replaying the completed private Research unlink"
     );
     assert.equal(ownerUnlinkReplay.replayed, true);
+    assert.equal(ownerUnlinkReplay.artifactRevisions, undefined);
     const ownerDecisionAfterUnlinkReplay = await expectStatus(
       await postAs(owner, "/projects/code-questions/state", { projectID, questionID: question.id }),
       200,
@@ -833,6 +859,11 @@ async function main() {
       "Recovering an unlinked deterministic Research start"
     );
     assert.equal(ownerResearchRelink.conversation.linkedCodeDecisionID, question.id);
+    assertResearchArtifactRevision(ownerResearchRelink, {
+      actorUserID: owner.userID,
+      projectID,
+      projectStorageOwnerUserID: owner.userID
+    });
 
     await expectStatus(await postAs(owner, "/research/conversations/evidence", {
       conversationID: ownerResearchRelink.conversation.id,
@@ -943,6 +974,11 @@ async function main() {
       "Linking ordinary Research with its Project-link version"
     );
     assert.equal(ordinaryLinkResult.conversation.linkedCodeDecisionID, question.id);
+    assertResearchArtifactRevision(ordinaryLinkResult, {
+      actorUserID: owner.userID,
+      projectID,
+      projectStorageOwnerUserID: owner.userID
+    });
 
     const crossProjectUnlink = await postAs(owner, "/projects/code-questions/research/link", {
       projectID: ownerSecondaryProjectID,
