@@ -2354,6 +2354,7 @@ protocol PermitextBackendTransport {
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse
     func researchConversationList(_ request: ResearchConversationListRequest) async throws -> ResearchConversationListResponse
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse
+    func researchSelectionReview(_ request: ResearchSelectionReviewRequest) async throws -> ResearchSelectionReviewResponse
     func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse
     func researchConversationAddEvidence(_ request: ResearchConversationEvidenceRequest) async throws -> ResearchConversationEvidenceResponse
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse
@@ -2603,6 +2604,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse {
         try await post("research/conversations/get", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchSelectionReview(_ request: ResearchSelectionReviewRequest) async throws -> ResearchSelectionReviewResponse {
+        try await post("research/selections/review", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse {
@@ -2948,6 +2953,18 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse {
         throw URLError(.fileDoesNotExist)
+    }
+
+    func researchSelectionReview(_ request: ResearchSelectionReviewRequest) async throws -> ResearchSelectionReviewResponse {
+        ResearchSelectionReviewResponse(
+            selection: ResearchSelectionRequest(
+                sectionID: request.sectionID,
+                selectedText: request.selectedText
+            ),
+            requiresVisualReview: false,
+            maximumVisualSelections: 4,
+            visualSources: []
+        )
     }
 
     func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse {
@@ -4287,6 +4304,10 @@ protocol AccountBackendClient {
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot
     func researchConversations(account: SignedInAccount) async throws -> [ResearchConversationSummary]
     func researchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation
+    func reviewResearchSelection(
+        account: SignedInAccount,
+        selection: ResearchSelectionRequest
+    ) async throws -> ResearchSelectionReviewResponse
     func createResearchConversation(
         account: SignedInAccount,
         projectID: String?,

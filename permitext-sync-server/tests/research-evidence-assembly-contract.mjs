@@ -307,6 +307,20 @@ const twoReaderPins = [{ codePrefix: "PC", sectionNumber: "101.1" }, {
   codePrefix: "PC",
   sectionNumber: "101.2"
 }];
+for (const originSurface of ["reader", "ios-reader"]) {
+  assert.deepEqual(
+    researchEvidenceStrategyForTurn({
+      question: "Explain this passage.",
+      pinnedEvidence: [twoReaderPins[0]],
+      originSurface
+    }),
+    {
+      mode: researchEvidenceStrategies.pinnedFirst,
+      reason: "reader_question_bounded_to_selected_evidence"
+    },
+    `${originSurface} did not keep a direct selected-passage explanation anchored to its enacted text.`
+  );
+}
 assert.deepEqual(
   researchEvidenceStrategyForTurn({
     question: "Using both selected passages, what does PC 101.1 establish and what is within PC 101.2's scope?",

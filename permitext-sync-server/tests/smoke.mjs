@@ -3734,8 +3734,31 @@ async function main() {
     });
     assert(
       unreviewedVisualConversation.response.status === 400 &&
+        unreviewedVisualConversation.json.code === "RESEARCH_VISUAL_REVIEW_REQUIRED" &&
         /review and explicitly select/i.test(unreviewedVisualConversation.json.error || ""),
       "Research accepted a map-dependent passage without explicit visual-source review."
+    );
+    const nativeVisualReview = await request("/research/selections/review", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: fireDistrictMapCandidate.sectionID,
+        selectedText: fireDistrictMapCandidate.selectedText
+      }
+    });
+    assert(
+      nativeVisualReview.response.ok &&
+        nativeVisualReview.json.requiresVisualReview === true &&
+        nativeVisualReview.json.maximumVisualSelections === 4 &&
+        nativeVisualReview.json.selection.sectionID === fireDistrictMapCandidate.sectionID &&
+        nativeVisualReview.json.visualSources.length === 41 &&
+        nativeVisualReview.json.visualSources.every((source) =>
+          /^visual-source-/.test(source.id || "") &&
+          /^\/code\/assets\/[a-zA-Z0-9._-]+$/.test(source.assetURL || "") &&
+          /^[a-f0-9]{64}$/.test(source.contentHash || "")
+        ),
+      "Native Research selection review did not expose the complete verified visual inventory."
     );
     const forgedVisualConversation = await request("/research/conversations/create", {
       method: "POST",

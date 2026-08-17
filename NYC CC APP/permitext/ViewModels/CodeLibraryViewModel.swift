@@ -2136,6 +2136,16 @@ final class CodeLibraryViewModel: ObservableObject {
         )
     }
 
+    func reviewResearchSelection(
+        _ selection: ResearchSelectionRequest
+    ) async throws -> ResearchSelectionReviewResponse {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.reviewResearchSelection(
+            account: signedInAccount,
+            selection: selection
+        )
+    }
+
     func createResearchConversation(
         selections: [ResearchSelectionRequest],
         projectID: String?

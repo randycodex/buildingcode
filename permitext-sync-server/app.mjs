@@ -7930,7 +7930,7 @@ function requestedVisualSourceIDs(value, reviewConfirmed) {
   return ids;
 }
 
-async function researchSourcesForSelection(sectionID, selectedText, options = {}) {
+async function researchSelectionReview(sectionID, selectedText) {
   const normalizedSelection = readableResearchSelectionText(
     selectedText,
     maximumResearchSelectionCharacters
@@ -7949,6 +7949,19 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     error.code = "INVALID_RESEARCH_SELECTION";
     throw error;
   }
+  if (
+    Number(primary.visualSourceReferenceCount || 0) > 0 &&
+    primary.visualSources.length !== primary.visualSourceReferenceCount
+  ) {
+    const error = new Error("The complete official visual-source inventory is not available for review.");
+    error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+    throw error;
+  }
+  return { primary, canonicalSelection };
+}
+
+async function researchSourcesForSelection(sectionID, selectedText, options = {}) {
+  const { primary, canonicalSelection } = await researchSelectionReview(sectionID, selectedText);
   const richSourcesByID = new Map(
     (primary.richSources || []).map((source) => [source.id, source])
   );
@@ -7969,14 +7982,6 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     options.visualSourceIDs,
     options.visualReviewConfirmed
   );
-  if (
-    Number(primary.visualSourceReferenceCount || 0) > 0 &&
-    primary.visualSources.length !== primary.visualSourceReferenceCount
-  ) {
-    const error = new Error("The complete official visual-source inventory is not available for review.");
-    error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
-    throw error;
-  }
   if (primary.visualSources.length && !visualSourceIDs.length) {
     const error = new Error(
       "Permitext detected official visual evidence elsewhere in this enacted section. " +
@@ -13492,6 +13497,56 @@ async function handleResearchConversationGet(request, response) {
   });
 }
 
+async function handleResearchSelectionReview(request, response) {
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
+  if (!context) return;
+  try {
+    const { primary, canonicalSelection } = await researchSelectionReview(
+      context.body.sectionID,
+      context.body.selectedText
+    );
+    sendJSON(response, 200, {
+      selection: {
+        sectionID: primary.sectionID,
+        selectedText: canonicalSelection,
+        codePrefix: primary.codePrefix,
+        sectionNumber: primary.sectionNumber,
+        title: primary.title
+      },
+      requiresVisualReview: primary.visualSources.length > 0,
+      maximumVisualSelections: evidenceDiscoveryMaximumVisualSelections,
+      visualSources: primary.visualSources.map((source) => ({
+        id: source.id,
+        kind: source.kind,
+        assetName: source.assetName,
+        assetURL: source.assetURL,
+        mediaType: source.mediaType,
+        contentHash: source.contentHash,
+        byteLength: source.byteLength,
+        displayWidth: source.displayWidth,
+        displayHeight: source.displayHeight
+      }))
+    });
+  } catch (error) {
+    if ([
+      "INVALID_RESEARCH_SELECTION",
+      "INVALID_RESEARCH_SECTION",
+      "INVALID_RESEARCH_VISUAL_SOURCE"
+    ].includes(error.code)) {
+      sendJSON(response, 400, { error: error.message, code: error.code });
+      return;
+    }
+    if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
+      sendJSON(response, 422, {
+        error: "This code section is incomplete and cannot be reviewed for Research.",
+        code: "INCOMPLETE_RESEARCH_SECTION"
+      });
+      return;
+    }
+    throw error;
+  }
+}
+
 async function handleResearchConversationRename(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
@@ -14174,7 +14229,7 @@ async function handleResearchConversationCreate(request, response) {
       "INVALID_RESEARCH_VISUAL_SOURCE",
       "RESEARCH_VISUAL_REVIEW_REQUIRED"
     ].includes(error.code)) {
-      sendError(response, 400, error.message);
+      sendJSON(response, 400, { error: error.message, code: error.code });
       return;
     }
     if (error.code === "RESEARCH_CONVERSATION_VISUAL_LIMIT") {
@@ -14249,7 +14304,7 @@ async function handleResearchConversationEvidence(request, response) {
       "INVALID_RESEARCH_VISUAL_SOURCE",
       "RESEARCH_VISUAL_REVIEW_REQUIRED"
     ].includes(error.code)) {
-      sendError(response, 400, error.message);
+      sendJSON(response, 400, { error: error.message, code: error.code });
       return;
     }
     if (error.code === "RESEARCH_CONVERSATION_VISUAL_LIMIT") {
@@ -24313,6 +24368,7 @@ const handlers = {
   "research/interpret": handleResearchInterpretation,
   "research/conversations/list": handleResearchConversationList,
   "research/conversations/get": handleResearchConversationGet,
+  "research/selections/review": handleResearchSelectionReview,
   "research/conversations/rename": handleResearchConversationRename,
   "research/conversations/create": handleResearchConversationCreate,
   "research/conversations/evidence": handleResearchConversationEvidence,
@@ -24561,6 +24617,7 @@ function requestMutatesFileStore(request) {
     path === "research/conversations/message" ||
     path === "research/conversations/refresh" ||
     path === "research/conversations/evidence" ||
+    path === "research/selections/review" ||
     path === "research/evidence/discover" ||
     path === "billing/stripe/webhook" ||
     path === "billing/web/checkout" ||

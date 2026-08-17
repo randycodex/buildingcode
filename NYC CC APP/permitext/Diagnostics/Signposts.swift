@@ -371,6 +371,19 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         ).conversation
     }
 
+    func reviewResearchSelection(
+        account: SignedInAccount,
+        selection: ResearchSelectionRequest
+    ) async throws -> ResearchSelectionReviewResponse {
+        try await transport.researchSelectionReview(
+            ResearchSelectionReviewRequest(
+                auth: authContext(for: account),
+                sectionID: selection.sectionID,
+                selectedText: selection.selectedText
+            )
+        )
+    }
+
     func createResearchConversation(
         account: SignedInAccount,
         projectID: String?,

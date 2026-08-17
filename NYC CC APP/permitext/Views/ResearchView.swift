@@ -5,6 +5,12 @@ private struct ResearchQuestionAttempt: Identifiable, Equatable {
     let question: String
 }
 
+private struct PendingResearchVisualReview: Identifiable, Equatable {
+    let id = UUID()
+    let originalSelection: ResearchSelectionRequest
+    let review: ResearchSelectionReviewResponse
+}
+
 struct ResearchRequestReconciliation {
     static func matchesCompletedAttempt(
         messages: [ResearchMessage],
@@ -150,6 +156,8 @@ struct ResearchView: View {
     @State private var pendingQuestionAttempt: ResearchQuestionAttempt?
     @State private var failedQuestionAttempt: ResearchQuestionAttempt?
     @State private var errorMessage: String?
+    @State private var questionErrorMessage: String?
+    @State private var pendingVisualReview: PendingResearchVisualReview?
     @State private var showingSettings = false
     @State private var showingRename = false
     @State private var draftTitle = ""
@@ -189,6 +197,8 @@ struct ResearchView: View {
                         Button("History", systemImage: "chevron.left") {
                             library.activeResearchConversationID = nil
                             self.conversation = nil
+                            failedQuestionAttempt = nil
+                            questionErrorMessage = nil
                         }
                     }
                 }
@@ -207,6 +217,15 @@ struct ResearchView: View {
             .sheet(isPresented: $showingSettings) {
                 NavigationStack { SettingsView() }
                     .environmentObject(library)
+            }
+            .sheet(item: $pendingVisualReview) { pending in
+                ResearchVisualReviewSheet(
+                    review: pending.review,
+                    onCancel: { cancelVisualReview(pending) },
+                    onConfirm: { sourceIDs in
+                        Task { await confirmVisualReview(pending, sourceIDs: sourceIDs) }
+                    }
+                )
             }
             .alert("Rename Research", isPresented: $showingRename) {
                 TextField("Research title", text: $draftTitle)
@@ -347,6 +366,10 @@ struct ResearchView: View {
                         } else if let failedQuestionAttempt {
                             failedQuestionView(failedQuestionAttempt)
                                 .id("failed:\(failedQuestionAttempt.id)")
+                            if let questionErrorMessage {
+                                statusMessage(questionErrorMessage)
+                                    .id("failed-message:\(failedQuestionAttempt.id)")
+                            }
                         }
                         if conversation.messages.isEmpty,
                            pendingQuestionAttempt == nil,
@@ -539,6 +562,8 @@ struct ResearchView: View {
         guard let id = library.activeResearchConversationID,
               conversation?.id != id,
               let account = library.signedInAccount else { return }
+        failedQuestionAttempt = nil
+        questionErrorMessage = nil
         isLoading = true
         if let cached = try? cache.load(
             ResearchConversation.self,
@@ -560,7 +585,7 @@ struct ResearchView: View {
     }
 
     private func consumePendingSelectionIfNeeded() async {
-        guard !isConsumingPendingSelection else { return }
+        guard !isConsumingPendingSelection, pendingVisualReview == nil else { return }
         isConsumingPendingSelection = true
         defer { isConsumingPendingSelection = false }
 
@@ -569,27 +594,71 @@ struct ResearchView: View {
                 try? await Task.sleep(for: .milliseconds(150))
                 continue
             }
-            let selections = library.pendingResearchSelections
-            if let id = library.activeResearchConversationID {
-                do {
-                    let updated = try await library.addResearchEvidence(
-                        conversationID: id,
-                        selections: selections
+            let originalSelection = library.pendingResearchSelections[0]
+            do {
+                let review = try await library.reviewResearchSelection(originalSelection)
+                var reviewedSelection = review.selection
+                reviewedSelection.savedItemID = originalSelection.savedItemID
+                if review.requiresVisualReview {
+                    pendingVisualReview = PendingResearchVisualReview(
+                        originalSelection: originalSelection,
+                        review: review
                     )
-                    conversation = updated
-                    cacheConversation(updated)
-                    await loadHistory(forceNetwork: true)
-                    library.acknowledgePendingResearchSelections(selections)
-                } catch {
-                    errorMessage = error.localizedDescription
                     return
                 }
-            } else if await createConversation(selections: selections) {
-                library.acknowledgePendingResearchSelections(selections)
-            } else {
+                guard await persistResearchSelections([reviewedSelection]) else { return }
+                library.acknowledgePendingResearchSelections([originalSelection])
+            } catch {
+                errorMessage = error.localizedDescription
                 return
             }
         }
+    }
+
+    private func persistResearchSelections(_ selections: [ResearchSelectionRequest]) async -> Bool {
+        if let id = library.activeResearchConversationID {
+            do {
+                let updated = try await library.addResearchEvidence(
+                    conversationID: id,
+                    selections: selections
+                )
+                conversation = updated
+                cacheConversation(updated)
+                await loadHistory(forceNetwork: true)
+                errorMessage = nil
+                return true
+            } catch {
+                errorMessage = error.localizedDescription
+                return false
+            }
+        }
+        return await createConversation(selections: selections)
+    }
+
+    private func cancelVisualReview(_ pending: PendingResearchVisualReview) {
+        guard pendingVisualReview?.id == pending.id else { return }
+        pendingVisualReview = nil
+        library.acknowledgePendingResearchSelections([pending.originalSelection])
+        errorMessage = "The passage was not added because its official visual evidence was not selected."
+        Task { await consumePendingSelectionIfNeeded() }
+    }
+
+    private func confirmVisualReview(
+        _ pending: PendingResearchVisualReview,
+        sourceIDs: [String]
+    ) async {
+        guard pendingVisualReview?.id == pending.id, !sourceIDs.isEmpty else { return }
+        var selection = pending.review.selection
+        selection.savedItemID = pending.originalSelection.savedItemID
+        selection.visualSourceIDs = sourceIDs
+        selection.visualReviewConfirmed = true
+        guard await persistResearchSelections([selection]) else {
+            pendingVisualReview = nil
+            return
+        }
+        library.acknowledgePendingResearchSelections([pending.originalSelection])
+        pendingVisualReview = nil
+        await consumePendingSelectionIfNeeded()
     }
 
     @discardableResult
@@ -604,6 +673,8 @@ struct ResearchView: View {
             )
             conversation = created
             library.activeResearchConversationID = created.id
+            failedQuestionAttempt = nil
+            questionErrorMessage = nil
             cacheConversation(created)
             await loadHistory(forceNetwork: true)
             errorMessage = nil
@@ -634,6 +705,7 @@ struct ResearchView: View {
         pendingQuestionAttempt = attempt
         failedQuestionAttempt = nil
         errorMessage = nil
+        questionErrorMessage = nil
         defer {
             pendingQuestionAttempt = nil
             isSending = false
@@ -648,6 +720,7 @@ struct ResearchView: View {
             cacheConversation(updated)
             await loadHistory(forceNetwork: true)
             errorMessage = nil
+            questionErrorMessage = nil
         } catch {
             // A network timeout can arrive after Terra has completed on the
             // server. Reconcile before offering a retry; the same request ID
@@ -661,9 +734,10 @@ struct ResearchView: View {
                 cacheConversation(authoritative)
                 await loadHistory(forceNetwork: true)
                 errorMessage = nil
+                questionErrorMessage = nil
             } else {
                 failedQuestionAttempt = attempt
-                errorMessage = ResearchRequestFailurePresentation.resolve(error).message
+                questionErrorMessage = ResearchRequestFailurePresentation.resolve(error).message
             }
         }
     }
@@ -750,6 +824,137 @@ struct ResearchView: View {
             projectID: conversation.id,
             scope: "research-conversation"
         )
+    }
+}
+
+private struct ResearchVisualReviewSheet: View {
+    let review: ResearchSelectionReviewResponse
+    let onCancel: () -> Void
+    let onConfirm: ([String]) -> Void
+    @State private var selectedSourceIDs: Set<String> = []
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("Review official visual evidence")
+                            .font(.title2.weight(.bold))
+                        Text("This enacted section contains official visual material. Select only the images Terra should analyze with your passage.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text("Select up to \(review.maximumVisualSelections) official images.")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+
+                    ForEach(review.visualSources) { source in
+                        visualSourceButton(source)
+                    }
+
+                    Text("Permitext will preserve the exact selected image bytes and their integrity identity with the Research record.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(18)
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    onConfirm(review.visualSources.compactMap { source in
+                        selectedSourceIDs.contains(source.id) ? source.id : nil
+                    })
+                } label: {
+                    Text(confirmButtonTitle)
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .foregroundStyle(.white)
+                        .background(Color.appChrome, in: RoundedRectangle(cornerRadius: 16))
+                }
+                .disabled(selectedSourceIDs.isEmpty)
+                .opacity(selectedSourceIDs.isEmpty ? 0.45 : 1)
+                .padding(16)
+                .background(.regularMaterial)
+            }
+            .navigationTitle("Visual Evidence")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel", action: onCancel)
+                }
+            }
+            .interactiveDismissDisabled()
+        }
+    }
+
+    private var confirmButtonTitle: String {
+        let count = selectedSourceIDs.count
+        guard count > 0 else { return "Select an image" }
+        return "Attach \(count) image\(count == 1 ? "" : "s") and add to Research"
+    }
+
+    private func visualSourceButton(_ source: ResearchVisualSource) -> some View {
+        let selected = selectedSourceIDs.contains(source.id)
+        let selectionLimitReached = selectedSourceIDs.count >= review.maximumVisualSelections
+        return Button {
+            if selected {
+                selectedSourceIDs.remove(source.id)
+            } else if !selectionLimitReached {
+                selectedSourceIDs.insert(source.id)
+            }
+        } label: {
+            VStack(alignment: .leading, spacing: 10) {
+                AsyncImage(url: source.resolvedAssetURL) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFit()
+                    case .failure:
+                        ContentUnavailableView(
+                            "Preview unavailable",
+                            systemImage: "photo",
+                            description: Text("The official image can still be selected by its verified identity.")
+                        )
+                    case .empty:
+                        ProgressView()
+                            .frame(maxWidth: .infinity, minHeight: 140)
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+                .frame(maxWidth: .infinity, minHeight: 120, maxHeight: 300)
+                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                        .font(.title3)
+                        .foregroundStyle(selected ? Color.appChrome : Color.secondary)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(source.assetName)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        Text("\(formattedByteLength(source.byteLength)) · integrity \(source.contentHash.prefix(12))")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .padding(12)
+            .background(
+                selected ? Color.appChrome.opacity(0.14) : Color.secondary.opacity(0.08),
+                in: RoundedRectangle(cornerRadius: 16)
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(!selected && selectionLimitReached)
+        .accessibilityLabel("\(selected ? "Deselect" : "Select") official image \(source.assetName)")
+    }
+
+    private func formattedByteLength(_ bytes: Int) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: Int64(bytes))
     }
 }
 

@@ -31,7 +31,7 @@ export const researchEvidenceStrategies = Object.freeze({
   pinnedFirst: "pinned_first"
 });
 
-const selectedEvidenceCuePattern = /\b(?:selected|pinned)\s+(?:code\s+)?(?:passage|passages|evidence|text)|\b(?:both|these|the)\s+(?:selected\s+)?(?:passage|passages|provision|provisions)\b/i;
+const selectedEvidenceCuePattern = /\b(?:selected|pinned)\s+(?:code\s+)?(?:passage|passages|evidence|text)|\b(?:both|this|these|the)\s+(?:selected\s+)?(?:passage|passages|provision|provisions|text)\b/i;
 const broaderEvidenceCuePattern = /\b(?:applicab(?:le|ility)|comply|compliance|exception|exceptions|definition|definitions|defined|table|tables|calculate|calculation|other provisions?|additional provisions?|related provisions?|cross[- ]references?|project[- ]specific|verify|verification)\b/i;
 
 function explicitCodeReferences(value) {
@@ -45,7 +45,9 @@ export function researchEvidenceStrategyForTurn({
   pinnedEvidence = [],
   originSurface = ""
 } = {}) {
-  if (String(originSurface || "").trim() !== "reader" || !pinnedEvidence.length) {
+  const normalizedOriginSurface = String(originSurface || "").trim().toLowerCase();
+  const readerOrigin = normalizedOriginSurface === "reader" || normalizedOriginSurface.endsWith("-reader");
+  if (!readerOrigin || !pinnedEvidence.length) {
     return { mode: researchEvidenceStrategies.broad, reason: "default_authorized_retrieval" };
   }
   const normalizedQuestion = compactText(question);

@@ -15,6 +15,45 @@ struct ResearchSelectionRequest: Codable, Hashable, Sendable {
     let sectionID: String
     let selectedText: String
     var savedItemID: String? = nil
+    var richSourceIDs: [String]? = nil
+    var visualSourceIDs: [String]? = nil
+    var visualReviewConfirmed: Bool? = nil
+}
+
+struct ResearchSelectionReviewRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let sectionID: String
+    let selectedText: String
+}
+
+struct ResearchVisualSource: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let kind: String
+    let assetName: String
+    let assetURL: String
+    let mediaType: String
+    let contentHash: String
+    let byteLength: Int
+    var displayWidth: Double? = nil
+    var displayHeight: Double? = nil
+
+    var resolvedAssetURL: URL? {
+        if let absolute = URL(string: assetURL), absolute.scheme != nil {
+            return absolute
+        }
+        let configuration = PermitextBackendConfiguration.load()
+        guard let baseURLString = configuration.apiBaseURLString,
+              let baseURL = URL(string: baseURLString)
+        else { return nil }
+        return URL(string: assetURL, relativeTo: baseURL)?.absoluteURL
+    }
+}
+
+struct ResearchSelectionReviewResponse: Codable, Hashable, Sendable {
+    let selection: ResearchSelectionRequest
+    let requiresVisualReview: Bool
+    let maximumVisualSelections: Int
+    let visualSources: [ResearchVisualSource]
 }
 
 struct ResearchConversationCreateRequest: Codable, Hashable, Sendable {

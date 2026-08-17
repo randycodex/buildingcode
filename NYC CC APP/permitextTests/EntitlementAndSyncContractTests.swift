@@ -2340,6 +2340,58 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(object["originSurface"] as? String, "ios-reader")
     }
 
+    func testReviewedResearchSelectionEncodesExplicitVisualApproval() throws {
+        let selection = ResearchSelectionRequest(
+            sectionID: "section-1107",
+            selectedText: "The selected enacted accessibility passage.",
+            visualSourceIDs: ["visual-source-figure"],
+            visualReviewConfirmed: true
+        )
+        let object = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: JSONEncoder().encode(selection)) as? [String: Any]
+        )
+
+        XCTAssertEqual(object["sectionID"] as? String, "section-1107")
+        XCTAssertEqual(object["visualSourceIDs"] as? [String], ["visual-source-figure"])
+        XCTAssertEqual(object["visualReviewConfirmed"] as? Bool, true)
+    }
+
+    func testResearchSelectionReviewDecodesVerifiedVisualInventory() throws {
+        let data = Data(
+            """
+            {
+              "selection": {
+                "sectionID": "section-1107",
+                "selectedText": "The selected enacted accessibility passage.",
+                "codePrefix": "BC",
+                "sectionNumber": "1107.2.2.7.3.1"
+              },
+              "requiresVisualReview": true,
+              "maximumVisualSelections": 4,
+              "visualSources": [{
+                "id": "visual-source-figure",
+                "kind": "image",
+                "assetName": "figure-1107.png",
+                "assetURL": "/code/assets/figure-1107.png",
+                "mediaType": "image/png",
+                "contentHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "byteLength": 2048,
+                "displayWidth": 800,
+                "displayHeight": 600
+              }]
+            }
+            """.utf8
+        )
+
+        let decoded = try JSONDecoder().decode(ResearchSelectionReviewResponse.self, from: data)
+
+        XCTAssertTrue(decoded.requiresVisualReview)
+        XCTAssertEqual(decoded.maximumVisualSelections, 4)
+        XCTAssertEqual(decoded.selection.sectionID, "section-1107")
+        XCTAssertEqual(decoded.visualSources.first?.assetName, "figure-1107.png")
+        XCTAssertEqual(decoded.visualSources.first?.byteLength, 2048)
+    }
+
     func testResearchFailurePresentsInsufficientEvidenceOutcome() {
         let error = PermitextBackendHTTPError.serverStatus(
             422,
