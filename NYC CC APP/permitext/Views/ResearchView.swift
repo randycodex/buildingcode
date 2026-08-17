@@ -1,5 +1,10 @@
 import SwiftUI
 
+private struct ResearchQuestionAttempt: Identifiable, Equatable {
+    let id: String
+    let question: String
+}
+
 struct ResearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.scenePhase) private var scenePhase
@@ -7,7 +12,11 @@ struct ResearchView: View {
     @State private var conversation: ResearchConversation?
     @State private var question = ""
     @State private var isLoading = false
+    @State private var isCreatingConversation = false
+    @State private var isConsumingPendingSelection = false
     @State private var isSending = false
+    @State private var pendingQuestionAttempt: ResearchQuestionAttempt?
+    @State private var failedQuestionAttempt: ResearchQuestionAttempt?
     @State private var errorMessage: String?
     @State private var showingSettings = false
     @State private var showingRename = false
@@ -56,6 +65,7 @@ struct ResearchView: View {
                         Button("New Research", systemImage: "plus") {
                             Task { await createConversation(selections: []) }
                         }
+                        .disabled(isCreatingConversation)
                     }
                     Button("Settings", systemImage: "gearshape") {
                         showingSettings = true
@@ -199,7 +209,16 @@ struct ResearchView: View {
                             messageView(message)
                                 .id(message.id)
                         }
-                        if conversation.messages.isEmpty {
+                        if let pendingQuestionAttempt {
+                            pendingQuestionView(pendingQuestionAttempt)
+                                .id("pending:\(pendingQuestionAttempt.id)")
+                        } else if let failedQuestionAttempt {
+                            failedQuestionView(failedQuestionAttempt)
+                                .id("failed:\(failedQuestionAttempt.id)")
+                        }
+                        if conversation.messages.isEmpty,
+                           pendingQuestionAttempt == nil,
+                           failedQuestionAttempt == nil {
                             Text("Ask Terra a question about the selected enacted text or the current Project.")
                                 .font(.body)
                                 .foregroundStyle(.secondary)
@@ -290,6 +309,39 @@ struct ResearchView: View {
         }
     }
 
+    private func pendingQuestionView(_ attempt: ResearchQuestionAttempt) -> some View {
+        VStack(alignment: .trailing, spacing: 8) {
+            Text(attempt.question)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .foregroundStyle(.primary)
+                .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: 16))
+            HStack(spacing: 7) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("Terra is researching…")
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+
+    private func failedQuestionView(_ attempt: ResearchQuestionAttempt) -> some View {
+        VStack(alignment: .trailing, spacing: 8) {
+            Text(attempt.question)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .foregroundStyle(.primary)
+                .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: 16))
+            Button("Try again", systemImage: "arrow.clockwise") {
+                Task { await sendQuestion(attempt) }
+            }
+            .font(.caption.weight(.semibold))
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+
     private func statusMessage(_ text: String) -> some View {
         Text(text)
             .font(.caption)
@@ -376,29 +428,43 @@ struct ResearchView: View {
     }
 
     private func consumePendingSelectionIfNeeded() async {
-        let selections = library.takePendingResearchSelections()
-        guard !selections.isEmpty else { return }
-        if let id = library.activeResearchConversationID {
-            do {
-                let updated = try await library.addResearchEvidence(
-                    conversationID: id,
-                    selections: selections
-                )
-                conversation = updated
-                cacheConversation(updated)
-                await loadHistory(forceNetwork: true)
-            } catch {
-                errorMessage = error.localizedDescription
+        guard !isConsumingPendingSelection else { return }
+        isConsumingPendingSelection = true
+        defer { isConsumingPendingSelection = false }
+
+        while !library.pendingResearchSelections.isEmpty {
+            if isCreatingConversation {
+                try? await Task.sleep(for: .milliseconds(150))
+                continue
             }
-        } else {
-            await createConversation(selections: selections)
+            let selections = library.pendingResearchSelections
+            if let id = library.activeResearchConversationID {
+                do {
+                    let updated = try await library.addResearchEvidence(
+                        conversationID: id,
+                        selections: selections
+                    )
+                    conversation = updated
+                    cacheConversation(updated)
+                    await loadHistory(forceNetwork: true)
+                    library.acknowledgePendingResearchSelections(selections)
+                } catch {
+                    errorMessage = error.localizedDescription
+                    return
+                }
+            } else if await createConversation(selections: selections) {
+                library.acknowledgePendingResearchSelections(selections)
+            } else {
+                return
+            }
         }
     }
 
-    private func createConversation(selections: [ResearchSelectionRequest]) async {
-        guard !isLoading else { return }
-        isLoading = true
-        defer { isLoading = false }
+    @discardableResult
+    private func createConversation(selections: [ResearchSelectionRequest]) async -> Bool {
+        guard !isCreatingConversation else { return false }
+        isCreatingConversation = true
+        defer { isCreatingConversation = false }
         do {
             let created = try await library.createResearchConversation(
                 selections: selections,
@@ -409,31 +475,89 @@ struct ResearchView: View {
             cacheConversation(created)
             await loadHistory(forceNetwork: true)
             errorMessage = nil
+            if selections.isEmpty, !library.pendingResearchSelections.isEmpty {
+                Task {
+                    try? await Task.sleep(for: .milliseconds(250))
+                    await consumePendingSelectionIfNeeded()
+                }
+            }
+            return true
         } catch {
             errorMessage = error.localizedDescription
+            return false
         }
     }
 
     private func sendQuestion() async {
-        guard let id = conversation?.id else { return }
         let normalized = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard normalized.count >= 3 else { return }
-        isSending = true
         question = ""
-        defer { isSending = false }
+        await sendQuestion(ResearchQuestionAttempt(id: UUID().uuidString, question: normalized))
+    }
+
+    private func sendQuestion(_ attempt: ResearchQuestionAttempt) async {
+        guard let id = conversation?.id, !isSending else { return }
+        let messageIDsBeforeRequest = Set(conversation?.messages.map(\.id) ?? [])
+        isSending = true
+        pendingQuestionAttempt = attempt
+        failedQuestionAttempt = nil
+        errorMessage = nil
+        defer {
+            pendingQuestionAttempt = nil
+            isSending = false
+        }
         do {
             let updated = try await library.sendResearchMessage(
                 conversationID: id,
-                question: normalized
+                question: attempt.question,
+                requestID: attempt.id
             )
             conversation = updated
             cacheConversation(updated)
             await loadHistory(forceNetwork: true)
             errorMessage = nil
         } catch {
-            question = normalized
-            errorMessage = error.localizedDescription
+            // A network timeout can arrive after Terra has completed on the
+            // server. Reconcile before offering a retry; the same request ID
+            // makes a retry idempotent if the first response was merely lost.
+            if let authoritative = await completedConversationAfterLostResponse(
+                conversationID: id,
+                question: attempt.question,
+                priorMessageIDs: messageIDsBeforeRequest
+            ) {
+                conversation = authoritative
+                cacheConversation(authoritative)
+                await loadHistory(forceNetwork: true)
+                errorMessage = nil
+            } else {
+                failedQuestionAttempt = attempt
+                errorMessage = "Terra could not finish that request. Your question is still here."
+            }
         }
+    }
+
+    private func completedConversationAfterLostResponse(
+        conversationID: String,
+        question: String,
+        priorMessageIDs: Set<String>
+    ) async -> ResearchConversation? {
+        for delay in [0, 2, 4, 6] {
+            if delay > 0 {
+                try? await Task.sleep(for: .seconds(delay))
+            }
+            guard let authoritative = try? await library.researchConversation(id: conversationID) else {
+                continue
+            }
+            let newMessages = authoritative.messages.filter { !priorMessageIDs.contains($0.id) }
+            let containsQuestion = newMessages.contains {
+                $0.role == "user" && $0.question == question
+            }
+            let containsAnswer = newMessages.contains { $0.role == "assistant" && $0.answer != nil }
+            if containsQuestion && containsAnswer {
+                return authoritative
+            }
+        }
+        return nil
     }
 
     private func renameConversation() async {

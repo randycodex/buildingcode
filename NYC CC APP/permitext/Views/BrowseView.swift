@@ -133,8 +133,7 @@ struct BrowseView: View {
                                             ChapterTile(
                                                 chapter: chapter,
                                                 palette: tilePalette(for: chapter),
-                                                kind: .chapter,
-                                                hasReadingProgress: library.hasReadingProgress(in: chapter)
+                                                kind: .chapter
                                             )
                                         }
                                         .buttonStyle(.plain)
@@ -163,8 +162,7 @@ struct BrowseView: View {
                                             ChapterTile(
                                                 chapter: chapter,
                                                 palette: tilePalette(for: chapter),
-                                                kind: .appendix,
-                                                hasReadingProgress: library.hasReadingProgress(in: chapter)
+                                                kind: .appendix
                                             )
                                         }
                                         .buttonStyle(.plain)
@@ -1162,7 +1160,6 @@ private struct ChapterTile: View {
     let chapter: CodeChapter
     let palette: ChapterTilePalette
     let kind: ChapterTileKind
-    let hasReadingProgress: Bool
 
     var body: some View {
         ZStack {
@@ -1171,12 +1168,6 @@ private struct ChapterTile: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top) {
-                    if hasReadingProgress {
-                        Image(systemName: "circle.inset.filled")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(tileNumberColor)
-                            .accessibilityHidden(true)
-                    }
                     Spacer()
                     Text("\(chapter.chapterNumber)")
                         .font(.system(size: 28, weight: .bold))
@@ -1199,7 +1190,7 @@ private struct ChapterTile: View {
         .frame(minHeight: 110)
         .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Chapter \(chapter.displayLabel): \(chapter.title)\(hasReadingProgress ? ", reading started" : "")"))
+        .accessibilityLabel(Text("Chapter \(chapter.displayLabel): \(chapter.title)"))
     }
 
     private var tileFill: Color {

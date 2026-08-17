@@ -29,6 +29,7 @@ struct ProjectNotebookView: View {
     let projectName: String
     let accentColor: Color
     let referenceCandidates: [NativeNotebookReferenceCandidate]
+    let initialCardID: String?
     var onChanged: (() -> Void)? = nil
 
     @State private var cards: [ProjectNotebookCardSummary] = []
@@ -37,7 +38,24 @@ struct ProjectNotebookView: View {
     @State private var errorMessage: String?
     @State private var editorRoute: NativeNotebookEditorRoute?
     @State private var isVisible = false
+    @State private var hasPresentedInitialCard = false
     private let cache = ProjectHubOfflineCache()
+
+    init(
+        projectID: String,
+        projectName: String,
+        accentColor: Color,
+        referenceCandidates: [NativeNotebookReferenceCandidate],
+        initialCardID: String? = nil,
+        onChanged: (() -> Void)? = nil
+    ) {
+        self.projectID = projectID
+        self.projectName = projectName
+        self.accentColor = accentColor
+        self.referenceCandidates = referenceCandidates
+        self.initialCardID = initialCardID
+        self.onChanged = onChanged
+    }
 
     var body: some View {
         Group {
@@ -101,7 +119,13 @@ struct ProjectNotebookView: View {
             }
         }
         .tint(accentColor)
-        .task { await loadCards() }
+        .task {
+            if !hasPresentedInitialCard, let initialCardID {
+                hasPresentedInitialCard = true
+                editorRoute = NativeNotebookEditorRoute(cardID: initialCardID)
+            }
+            await loadCards()
+        }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active, isVisible, editorRoute == nil else { return }
             Task { await loadCards(forceNetwork: true) }
@@ -171,6 +195,13 @@ private struct NativeNotebookDraft: Codable, Hashable, Sendable {
     var title: String
     var document: NotebookDocument
     var evidenceLinks: [NotebookEvidenceLink]
+    var editedAt: Date? = nil
+}
+
+private struct NativeNotebookEditableContent: Hashable, Sendable {
+    var title: String
+    var document: NotebookDocument
+    var evidenceLinks: [NotebookEvidenceLink]
 }
 
 private struct NotebookLinkEditor: Identifiable {
@@ -213,7 +244,8 @@ private struct NotebookCardEditorView: View {
     @State private var linkLabel = ""
     @State private var linkURL = ""
     @State private var showingDeleteConfirmation = false
-    @State private var showingConflict = false
+    @State private var lastSyncedContent: NativeNotebookEditableContent?
+    @State private var lastLocalEditAt: Date?
     private let cache = ProjectHubOfflineCache()
 
     var body: some View {
@@ -317,17 +349,6 @@ private struct NotebookCardEditorView: View {
             Button("Add") { applyLink() }
         } message: {
             Text("Links must use HTTPS, HTTP, or mailto.")
-        }
-        .alert("This Note changed elsewhere", isPresented: $showingConflict) {
-            Button("Reload Server Version") { Task { await loadCard(forceNetwork: true) } }
-            Button("Save My Draft as New Note") {
-                currentCardID = nil
-                version = 0
-                Task { await saveNow() }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Permitext kept your local draft. Choose which version to continue with.")
         }
         .confirmationDialog("Delete this Note?", isPresented: $showingDeleteConfirmation) {
             Button("Delete Note", role: .destructive) { Task { await deleteCard() } }
@@ -468,6 +489,8 @@ private struct NotebookCardEditorView: View {
         isLoading = true
         defer { isLoading = false }
 
+        var restoredDraft: NativeNotebookDraft?
+
         if !forceNetwork, !hasLoaded {
             if let cachedDraft = try? cache.load(
                 NativeNotebookDraft.self,
@@ -475,6 +498,7 @@ private struct NotebookCardEditorView: View {
                 projectID: projectID,
                 scope: "native-notebook-draft:\(routeID)"
             )?.value {
+                restoredDraft = cachedDraft
                 apply(cachedDraft)
             } else if let cardID,
                       let cachedCard = try? cache.load(
@@ -496,7 +520,19 @@ private struct NotebookCardEditorView: View {
         }
         do {
             let card = try await library.notebookCard(projectID: projectID, cardID: cardID)
-            apply(card)
+            if let restoredDraft,
+               editableContent(for: restoredDraft) != editableContent(for: card),
+               let localEditAt = restoredDraft.editedAt,
+               localEditAt > notebookDateValue(card.updatedAt) {
+                currentCardID = card.id
+                version = card.version
+                lastSyncedContent = editableContent(for: card)
+                lastLocalEditAt = localEditAt
+                statusMessage = "Saving latest changes…"
+                needsSave = true
+            } else {
+                apply(card)
+            }
             errorMessage = nil
             try? cache.store(
                 card,
@@ -504,6 +540,9 @@ private struct NotebookCardEditorView: View {
                 projectID: projectID,
                 scope: "native-notebook-card:\(card.id)"
             )
+            if needsSave {
+                await saveNow()
+            }
         } catch {
             if !hasLoaded { errorMessage = error.localizedDescription }
         }
@@ -515,6 +554,8 @@ private struct NotebookCardEditorView: View {
         title = card.title
         document = card.document
         evidenceLinks = card.evidenceLinks
+        lastSyncedContent = editableContent(for: card)
+        lastLocalEditAt = nil
         hasLoaded = true
         statusMessage = "Synced"
     }
@@ -525,12 +566,16 @@ private struct NotebookCardEditorView: View {
         title = draft.title
         document = draft.document
         evidenceLinks = draft.evidenceLinks
+        lastSyncedContent = nil
+        lastLocalEditAt = draft.editedAt
         hasLoaded = true
         statusMessage = "Draft on this iPhone"
     }
 
     private func scheduleAutosave() {
         guard hasLoaded, !readOnly else { return }
+        guard editableContent != lastSyncedContent else { return }
+        lastLocalEditAt = Date()
         cacheDraft()
         statusMessage = "Saving…"
         saveTask?.cancel()
@@ -555,30 +600,19 @@ private struct NotebookCardEditorView: View {
             if needsSave { Task { await saveNow() } }
         }
         cacheDraft()
+        let contentAtStart = editableContent
         do {
             let saved = try await library.saveNotebookCard(
                 projectID: projectID,
                 cardID: currentCardID,
                 expectedVersion: version,
-                title: title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled Note" : title,
-                document: document,
-                evidenceLinks: evidenceLinks
+                title: normalizedTitle(contentAtStart.title),
+                document: contentAtStart.document,
+                evidenceLinks: contentAtStart.evidenceLinks
             )
-            apply(saved)
-            errorMessage = nil
-            statusMessage = "Synced"
-            if let accountID = library.signedInAccount?.appUserID {
-                try? cache.store(
-                    saved,
-                    accountID: accountID,
-                    projectID: projectID,
-                    scope: "native-notebook-card:\(saved.id)"
-                )
-            }
-            onSaved()
+            completeSave(saved, contentAtStart: contentAtStart)
         } catch let error as PermitextBackendHTTPError where error.statusCode == 409 {
-            statusMessage = "Draft kept on this iPhone"
-            showingConflict = true
+            await reconcileVersionConflict()
         } catch {
             statusMessage = "Draft kept on this iPhone"
             errorMessage = error.localizedDescription
@@ -608,11 +642,140 @@ private struct NotebookCardEditorView: View {
                 version: version,
                 title: title,
                 document: document,
-                evidenceLinks: evidenceLinks
+                evidenceLinks: evidenceLinks,
+                editedAt: lastLocalEditAt
             ),
             accountID: accountID,
             projectID: projectID,
             scope: "native-notebook-draft:\(routeID)"
+        )
+    }
+
+    @MainActor
+    private func reconcileVersionConflict() async {
+        guard let currentCardID else {
+            statusMessage = "Draft kept on this iPhone"
+            errorMessage = "Permitext could not reconcile this Note yet. Try Save again."
+            return
+        }
+
+        cacheDraft()
+        do {
+            let serverCard = try await library.notebookCard(
+                projectID: projectID,
+                cardID: currentCardID
+            )
+            let localContent = editableContent
+            let serverContent = editableContent(for: serverCard)
+
+            if localContent == serverContent {
+                apply(serverCard)
+                storeServerCard(serverCard)
+                errorMessage = nil
+                onSaved()
+                return
+            }
+
+            let serverEditAt = notebookDateValue(serverCard.updatedAt)
+            if lastLocalEditAt == nil || serverEditAt >= (lastLocalEditAt ?? .distantPast) {
+                // The local draft was cached before replacing it, so a failed or
+                // interrupted reconciliation never destroys the user's work.
+                apply(serverCard)
+                storeServerCard(serverCard)
+                errorMessage = nil
+                statusMessage = "Synced latest change"
+                onSaved()
+                return
+            }
+
+            // This iPhone has the newest edit. Rebase it on the authoritative
+            // version and retry exactly once; a second conflict remains a draft.
+            version = serverCard.version
+            lastSyncedContent = serverContent
+            let rebasedContent = editableContent
+            do {
+                let saved = try await library.saveNotebookCard(
+                    projectID: projectID,
+                    cardID: currentCardID,
+                    expectedVersion: serverCard.version,
+                    title: normalizedTitle(rebasedContent.title),
+                    document: rebasedContent.document,
+                    evidenceLinks: rebasedContent.evidenceLinks
+                )
+                completeSave(saved, contentAtStart: rebasedContent)
+            } catch {
+                cacheDraft()
+                statusMessage = "Draft kept on this iPhone"
+                errorMessage = "Permitext found another newer edit. Your draft is safe; try Save again after syncing."
+            }
+        } catch {
+            cacheDraft()
+            statusMessage = "Draft kept on this iPhone"
+            errorMessage = "Could not check the latest Note. Your draft is safe on this iPhone."
+        }
+    }
+
+    @MainActor
+    private func completeSave(
+        _ saved: NotebookCard,
+        contentAtStart: NativeNotebookEditableContent
+    ) {
+        let changedDuringSave = editableContent != contentAtStart
+        if changedDuringSave {
+            currentCardID = saved.id
+            version = saved.version
+            lastSyncedContent = editableContent(for: saved)
+            statusMessage = "Saving latest changes…"
+            needsSave = true
+        } else {
+            apply(saved)
+        }
+        errorMessage = nil
+        storeServerCard(saved)
+        onSaved()
+    }
+
+    private var editableContent: NativeNotebookEditableContent {
+        NativeNotebookEditableContent(
+            title: title,
+            document: document,
+            evidenceLinks: evidenceLinks
+        )
+    }
+
+    private func editableContent(for card: NotebookCard) -> NativeNotebookEditableContent {
+        NativeNotebookEditableContent(
+            title: card.title,
+            document: card.document,
+            evidenceLinks: card.evidenceLinks
+        )
+    }
+
+    private func editableContent(for draft: NativeNotebookDraft) -> NativeNotebookEditableContent {
+        NativeNotebookEditableContent(
+            title: draft.title,
+            document: draft.document,
+            evidenceLinks: draft.evidenceLinks
+        )
+    }
+
+    private func normalizedTitle(_ value: String) -> String {
+        value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled Note" : value
+    }
+
+    private func notebookDateValue(_ value: String) -> Date {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return fractional.date(from: value) ?? ISO8601DateFormatter().date(from: value) ?? .distantPast
+    }
+
+    private func storeServerCard(_ card: NotebookCard) {
+        guard let accountID = library.signedInAccount?.appUserID else { return }
+        try? cache.store(
+            card,
+            accountID: accountID,
+            projectID: projectID,
+            scope: "native-notebook-card:\(card.id)"
         )
     }
 

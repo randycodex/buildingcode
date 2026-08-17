@@ -1,6 +1,33 @@
 import SwiftUI
 import UIKit
 
+private struct SearchReaderRoute: Hashable {
+    let sectionID: Int64
+    let codeSectionID: Int64?
+    let chapterNumber: String?
+    let sectionNumber: String?
+    let title: String?
+    let kind: CodeSectionKind?
+
+    init(sectionID: Int64) {
+        self.sectionID = sectionID
+        self.codeSectionID = nil
+        self.chapterNumber = nil
+        self.sectionNumber = nil
+        self.title = nil
+        self.kind = nil
+    }
+
+    init(result: CodeSearchResult) {
+        sectionID = result.id
+        codeSectionID = result.codeSectionID
+        chapterNumber = result.chapterNumber
+        sectionNumber = result.sectionNumber
+        title = result.title
+        kind = result.kind
+    }
+}
+
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var query = ""
@@ -119,9 +146,6 @@ struct SearchView: View {
                     openPendingDeepLinkedSectionIfNeeded()
                     return
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                    isSearchFieldFocused = true
-                }
             }
             .onChange(of: searchFilterCodeSectionIDs) { _, newValue in
                 FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
@@ -160,8 +184,8 @@ struct SearchView: View {
                 guard !Task.isCancelled else { return }
                 library.search(query: query, restrictToSelectedCodeSection: false)
             }
-            .navigationDestination(for: Int64.self) { sectionID in
-                ReaderView(sectionID: sectionID)
+            .navigationDestination(for: SearchReaderRoute.self) { route in
+                SearchChapterReaderDestination(route: route)
             }
         }
         .coordinateSpace(name: "searchScroll")
@@ -329,7 +353,7 @@ struct SearchView: View {
               let sectionID = library.consumePendingDeepLinkedSectionID() else { return }
         isSearchFieldFocused = false
         searchNavigationPath = NavigationPath()
-        searchNavigationPath.append(sectionID)
+        searchNavigationPath.append(SearchReaderRoute(sectionID: sectionID))
     }
 
     private var bottomSearchDock: some View {
@@ -519,7 +543,7 @@ struct SearchView: View {
     private func jumpBackInTileSlot(_ entry: RecentlyViewedEntry?, tileWidth: CGFloat) -> some View {
         if let entry {
             ZStack(alignment: .topTrailing) {
-                NavigationLink(value: entry.sectionID) {
+                NavigationLink(value: SearchReaderRoute(sectionID: entry.sectionID)) {
                     recentlyViewedTile(entry)
                         .frame(width: tileWidth)
                 }
@@ -714,7 +738,7 @@ struct SearchView: View {
 
     private func searchResultLink(_ result: CodeSearchResult) -> some View {
         VStack(spacing: 0) {
-            NavigationLink(value: result.id) {
+            NavigationLink(value: SearchReaderRoute(result: result)) {
                 resultRow(result)
             }
             .buttonStyle(.plain)
@@ -849,6 +873,73 @@ struct SearchView: View {
     private func dismissKeyboard() {
         isSearchFieldFocused = false
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+
+private struct SearchChapterReaderDestination: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    let route: SearchReaderRoute
+
+    @State private var chapter: CodeChapter?
+    @State private var initialSection: CodeSectionSummary?
+    @State private var didFinishLoading = false
+
+    var body: some View {
+        Group {
+            if let chapter, let initialSection {
+                ChapterHTMLReaderView(chapter: chapter, initialSection: initialSection)
+            } else if didFinishLoading {
+                ContentUnavailableView(
+                    "Reader unavailable",
+                    systemImage: "text.page.slash",
+                    description: Text("Permitext could not locate this enacted section in its chapter.")
+                )
+            } else {
+                ProgressView("Opening Reader…")
+            }
+        }
+        .task(id: route) { await resolveDestination() }
+    }
+
+    @MainActor
+    private func resolveDestination() async {
+        didFinishLoading = false
+
+        if let chapterNumber = route.chapterNumber,
+           let sectionNumber = route.sectionNumber,
+           let title = route.title,
+           let kind = route.kind,
+           let matchedChapter = library.chapters(for: route.codeSectionID).first(where: {
+               $0.chapterNumber.caseInsensitiveCompare(chapterNumber) == .orderedSame
+           }) {
+            chapter = matchedChapter
+            initialSection = CodeSectionSummary(
+                id: route.sectionID,
+                chapterNumber: chapterNumber,
+                sectionNumber: sectionNumber,
+                title: title,
+                kind: kind
+            )
+            didFinishLoading = true
+            return
+        }
+
+        guard let detail = await library.loadSectionDetailsAsync(sectionIDs: [route.sectionID]).first,
+              let matchedChapter = library.chapters(for: detail.codeSectionID).first(where: {
+                  $0.chapterNumber.caseInsensitiveCompare(detail.chapterNumber) == .orderedSame
+              }) else {
+            didFinishLoading = true
+            return
+        }
+        chapter = matchedChapter
+        initialSection = CodeSectionSummary(
+            id: detail.id,
+            chapterNumber: detail.chapterNumber,
+            sectionNumber: detail.sectionNumber,
+            title: detail.title,
+            kind: detail.kind
+        )
+        didFinishLoading = true
     }
 }
 

@@ -2603,7 +2603,15 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     }
 
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse {
-        try await post("research/conversations/message", body: request, bearerToken: request.auth.bearerToken)
+        // Terra may need substantially longer than an ordinary metadata read.
+        // Keep the normal transport timeout tight, but do not abandon a valid
+        // Research generation while the server is still working.
+        try await post(
+            "research/conversations/message",
+            body: request,
+            bearerToken: request.auth.bearerToken,
+            timeoutInterval: max(requestTimeout, 300)
+        )
     }
 
     func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse {
@@ -2767,11 +2775,12 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     private func post<RequestBody: Encodable, ResponseBody: Decodable>(
         _ path: String,
         body: RequestBody,
-        bearerToken: String? = nil
+        bearerToken: String? = nil,
+        timeoutInterval: TimeInterval? = nil
     ) async throws -> ResponseBody {
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "POST"
-        request.timeoutInterval = requestTimeout
+        request.timeoutInterval = timeoutInterval ?? requestTimeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         if let bearerToken, !bearerToken.isEmpty {

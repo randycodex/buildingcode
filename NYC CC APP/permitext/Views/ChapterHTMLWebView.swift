@@ -705,8 +705,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   sectionNumber: startTarget.sectionNumber || '',
                   selectedText: text.slice(0, 12000)
                 };
-                button.style.left = Math.max(8, Math.min(window.innerWidth - 48, rect.right - 40)) + 'px';
-                button.style.top = Math.max(8, Math.min(window.innerHeight - 48, rect.bottom + 8)) + 'px';
+                // iOS places its edit menu next to the selected text and that
+                // system surface always sits above page content. Keep the
+                // Astroid in a stable lower-right action position instead of
+                // competing for the same space as Copy/Translate/Search.
+                button.style.left = 'auto';
+                button.style.top = 'auto';
                 button.hidden = false;
               }
 
@@ -1775,6 +1779,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             #nyccc-research-selection-button {
               position: fixed !important;
+              right: 1rem !important;
+              bottom: 1rem !important;
               z-index: 2147483647 !important;
               display: inline-flex !important;
               align-items: center !important;

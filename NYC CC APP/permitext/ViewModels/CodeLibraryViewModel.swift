@@ -1374,13 +1374,6 @@ final class CodeLibraryViewModel: ObservableObject {
         chapter(forSectionID: entry.sectionID)
     }
 
-    func hasReadingProgress(in chapter: CodeChapter) -> Bool {
-        recentlyViewedSections.contains { entry in
-            entry.codeSectionID == chapter.codeSectionID &&
-                entry.chapterTitle.localizedCaseInsensitiveCompare(chapter.title) == .orderedSame
-        }
-    }
-
     func chapter(forSectionID sectionID: Int64) -> CodeChapter? {
         guard let detail = loadSectionDetail(sectionID: sectionID) else { return nil }
         return chapters(for: detail.codeSectionID).first { chapter in
@@ -2119,13 +2112,15 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func sendToResearch(_ selection: ResearchSelectionRequest) {
-        pendingResearchSelections = [selection]
+        if !pendingResearchSelections.contains(selection) {
+            pendingResearchSelections.append(selection)
+        }
         selectedTab = .research
     }
 
-    func takePendingResearchSelections() -> [ResearchSelectionRequest] {
-        defer { pendingResearchSelections = [] }
-        return pendingResearchSelections
+    func acknowledgePendingResearchSelections(_ selections: [ResearchSelectionRequest]) {
+        guard pendingResearchSelections.starts(with: selections) else { return }
+        pendingResearchSelections.removeFirst(selections.count)
     }
 
     func researchConversations() async throws -> [ResearchConversationSummary] {

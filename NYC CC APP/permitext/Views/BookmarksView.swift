@@ -1421,63 +1421,92 @@ struct ProjectView: View {
         let cards = (projectHubSnapshot?.notebookCards ?? []).filter {
             PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item"
         }
-        projectHubSection(title: "Notebook", systemImage: "note.text") {
+        VStack(alignment: .leading, spacing: 8) {
             if let projectID = library.backendProjectID(for: folderID) {
                 NavigationLink {
-                    ProjectNotebookView(
-                        projectID: projectID,
-                        projectName: folder?.name ?? "Project",
-                        accentColor: accentColor,
-                        referenceCandidates: nativeNotebookReferenceCandidates,
-                        onChanged: { Task { await loadProjectHub() } }
-                    )
-                    .environmentObject(library)
+                    projectNotebookDestination(projectID: projectID)
                 } label: {
-                    Label("Open Notebook", systemImage: "note.text")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical, 6)
+                    HStack {
+                        Label("Notebook", systemImage: "note.text")
+                            .font(.subheadline.weight(.bold))
+                        Spacer(minLength: 8)
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .foregroundStyle(.primary)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+            } else {
+                Label("Notebook", systemImage: "note.text")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.primary)
             }
             if cards.isEmpty {
                 projectHubEmpty("No synced Notebook cards yet.")
             } else {
                 ForEach(cards.prefix(5)) { card in
-                    VStack(alignment: .leading, spacing: 5) {
-                        HStack(alignment: .firstTextBaseline) {
-                            Text(projectNotebookCardType(card.cardType))
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(accentColor)
-                            Spacer(minLength: 8)
-                            Text(projectHubDate(card.updatedAt))
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                    if let projectID = library.backendProjectID(for: folderID) {
+                        NavigationLink {
+                            projectNotebookDestination(projectID: projectID, cardID: card.id)
+                        } label: {
+                            projectNotebookCardRow(card)
                         }
-                        Text(card.title)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary)
-                        if !card.plainText.isEmpty {
-                            Text(card.plainText)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(3)
-                        }
-                        if card.referenceCount > 0 {
-                            Text("\(card.referenceCount) linked \(card.referenceCount == 1 ? "item" : "items")")
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        projectNotebookCardRow(card)
                     }
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(accentColor.opacity(0.08))
-                    )
                 }
             }
         }
+        .padding(.top, 4)
+    }
+
+    private func projectNotebookDestination(projectID: String, cardID: String? = nil) -> some View {
+        ProjectNotebookView(
+            projectID: projectID,
+            projectName: folder?.name ?? "Project",
+            accentColor: accentColor,
+            referenceCandidates: nativeNotebookReferenceCandidates,
+            initialCardID: cardID,
+            onChanged: { Task { await loadProjectHub() } }
+        )
+        .environmentObject(library)
+    }
+
+    private func projectNotebookCardRow(_ card: ProjectNotebookCardSummary) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(projectNotebookCardType(card.cardType))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(accentColor)
+                Spacer(minLength: 8)
+                Text(projectHubDate(card.updatedAt))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Text(card.title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+            if !card.plainText.isEmpty {
+                Text(card.plainText)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+            }
+            if card.referenceCount > 0 {
+                Text("\(card.referenceCount) linked \(card.referenceCount == 1 ? "item" : "items")")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(accentColor.opacity(0.08))
+        )
     }
 
     @ViewBuilder

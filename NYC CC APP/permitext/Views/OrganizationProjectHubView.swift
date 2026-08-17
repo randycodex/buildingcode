@@ -338,43 +338,65 @@ struct OrganizationProjectHubView: View {
 
     @ViewBuilder
     private var notebookSection: some View {
-        projectSection(title: "Notebook", systemImage: "note.text") {
-            NavigationLink {
-                ProjectNotebookView(
-                    projectID: project.id,
-                    projectName: project.name,
-                    accentColor: projectAccent,
-                    referenceCandidates: nativeNotebookReferenceCandidates,
-                    onChanged: { Task { await loadSnapshot() } }
-                )
-                .environmentObject(library)
-            } label: {
-                Label("Open Notebook", systemImage: "note.text")
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(.plain)
-            if notebookCards.isEmpty {
-                emptyText("No synced Notebook cards yet.")
-            } else {
-                ForEach(notebookCards.prefix(8)) { card in
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(card.title)
-                            .font(.subheadline.weight(.semibold))
-                        Text(card.cardType.replacingOccurrences(of: "-", with: " ").capitalized)
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(projectAccent)
-                        if !card.plainText.isEmpty {
-                            Text(card.plainText)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(4)
-                        }
+        CodeSurface(accent: projectAccent, showsBorder: false) {
+            VStack(alignment: .leading, spacing: 12) {
+                NavigationLink {
+                    organizationNotebookDestination()
+                } label: {
+                    HStack {
+                        Label("Notebook", systemImage: "note.text")
+                            .font(.headline)
+                        Spacer(minLength: 8)
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
                     }
-                    .projectHubRow(accent: projectAccent)
+                    .foregroundStyle(.primary)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                if notebookCards.isEmpty {
+                    emptyText("No synced Notebook cards yet.")
+                } else {
+                    ForEach(notebookCards.prefix(8)) { card in
+                        NavigationLink {
+                            organizationNotebookDestination(cardID: card.id)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(card.title)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                Text(card.cardType.replacingOccurrences(of: "-", with: " ").capitalized)
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(projectAccent)
+                                if !card.plainText.isEmpty {
+                                    Text(card.plainText)
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(4)
+                                }
+                            }
+                            .projectHubRow(accent: projectAccent)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    private func organizationNotebookDestination(cardID: String? = nil) -> some View {
+        ProjectNotebookView(
+            projectID: project.id,
+            projectName: project.name,
+            accentColor: projectAccent,
+            referenceCandidates: nativeNotebookReferenceCandidates,
+            initialCardID: cardID,
+            onChanged: { Task { await loadSnapshot() } }
+        )
+        .environmentObject(library)
     }
 
     @ViewBuilder
