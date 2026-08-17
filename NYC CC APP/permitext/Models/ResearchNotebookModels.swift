@@ -73,6 +73,7 @@ struct ResearchConversationEvidenceResponse: Codable, Hashable, Sendable {
 struct ResearchConversationMessageResponse: Codable, Hashable, Sendable {
     let conversation: ResearchConversation
     var replayed: Bool? = nil
+    var requestID: String? = nil
 }
 
 struct ResearchConversationDeleteResponse: Codable, Hashable, Sendable {
@@ -138,6 +139,7 @@ struct ResearchMessage: Codable, Hashable, Identifiable, Sendable {
     let role: String
     var question: String? = nil
     var answer: ResearchAnswer? = nil
+    var requestID: String? = nil
     let createdAt: String
 }
 

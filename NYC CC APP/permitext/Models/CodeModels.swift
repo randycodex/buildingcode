@@ -2284,6 +2284,7 @@ struct BackendProjectReportFileReadRequest: Codable, Hashable, Sendable {
 
 private struct BackendErrorResponse: Codable, Hashable, Sendable {
     let error: String?
+    let code: String?
 }
 
 struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
@@ -2480,11 +2481,21 @@ enum PermitextBackendFactory {
 
 enum PermitextBackendHTTPError: LocalizedError {
     case invalidResponse
-    case serverStatus(Int, String?)
+    case serverStatus(Int, String?, code: String? = nil)
 
     var statusCode: Int? {
-        guard case .serverStatus(let statusCode, _) = self else { return nil }
+        guard case .serverStatus(let statusCode, _, _) = self else { return nil }
         return statusCode
+    }
+
+    var serverCode: String? {
+        guard case .serverStatus(_, _, let code) = self else { return nil }
+        return code
+    }
+
+    var serverMessage: String? {
+        guard case .serverStatus(_, let message, _) = self else { return nil }
+        return message
     }
 
     var isAuthenticationFailure: Bool {
@@ -2495,7 +2506,7 @@ enum PermitextBackendHTTPError: LocalizedError {
         switch self {
         case .invalidResponse:
             return "The backend returned an invalid response."
-        case .serverStatus(let statusCode, let message):
+        case .serverStatus(let statusCode, let message, _):
             if let message, !message.isEmpty {
                 return message
             }
@@ -2685,8 +2696,12 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
             throw PermitextBackendHTTPError.invalidResponse
         }
         guard (200..<300).contains(httpResponse.statusCode) else {
-            let backendMessage = try? decoder.decode(BackendErrorResponse.self, from: data).error
-            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode, backendMessage)
+            let backendError = try? decoder.decode(BackendErrorResponse.self, from: data)
+            throw PermitextBackendHTTPError.serverStatus(
+                httpResponse.statusCode,
+                backendError?.error,
+                code: backendError?.code
+            )
         }
         return data
     }
@@ -2743,8 +2758,12 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
             throw PermitextBackendHTTPError.invalidResponse
         }
         guard (200..<300).contains(httpResponse.statusCode) else {
-            let backendMessage = try? decoder.decode(BackendErrorResponse.self, from: data).error
-            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode, backendMessage)
+            let backendError = try? decoder.decode(BackendErrorResponse.self, from: data)
+            throw PermitextBackendHTTPError.serverStatus(
+                httpResponse.statusCode,
+                backendError?.error,
+                code: backendError?.code
+            )
         }
         guard data.starts(with: Data("%PDF-".utf8)) else {
             throw PermitextBackendHTTPError.invalidResponse
@@ -2797,8 +2816,12 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
             throw PermitextBackendHTTPError.invalidResponse
         }
         guard (200..<300).contains(httpResponse.statusCode) else {
-            let backendMessage = try? decoder.decode(BackendErrorResponse.self, from: data).error
-            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode, backendMessage)
+            let backendError = try? decoder.decode(BackendErrorResponse.self, from: data)
+            throw PermitextBackendHTTPError.serverStatus(
+                httpResponse.statusCode,
+                backendError?.error,
+                code: backendError?.code
+            )
         }
         return try decoder.decode(ResponseBody.self, from: data)
     }

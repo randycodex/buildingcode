@@ -2340,6 +2340,158 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(object["originSurface"] as? String, "ios-reader")
     }
 
+    func testResearchFailurePresentsInsufficientEvidenceOutcome() {
+        let error = PermitextBackendHTTPError.serverStatus(
+            422,
+            "Permitext could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation.",
+            code: "RESEARCH_EVIDENCE_NOT_FOUND"
+        )
+
+        XCTAssertEqual(error.statusCode, 422)
+        XCTAssertEqual(error.serverCode, "RESEARCH_EVIDENCE_NOT_FOUND")
+        XCTAssertEqual(
+            ResearchRequestFailurePresentation.resolve(error).message,
+            "Permitext could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation. Your question is still here."
+        )
+    }
+
+    func testResearchFailureDistinguishesVerificationFromProviderFailure() {
+        let verificationError = PermitextBackendHTTPError.serverStatus(
+            502,
+            "The research model could not return a verified, cited answer.",
+            code: "RESEARCH_VERIFICATION_FAILED"
+        )
+        let providerError = PermitextBackendHTTPError.serverStatus(
+            502,
+            "The Research evidence-analysis request failed.",
+            code: "RESEARCH_PROVIDER_ERROR"
+        )
+
+        XCTAssertEqual(
+            ResearchRequestFailurePresentation.resolve(verificationError).message,
+            "Terra produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here."
+        )
+        XCTAssertEqual(
+            ResearchRequestFailurePresentation.resolve(providerError).message,
+            "Terra's research service is temporarily unavailable. Your question is still here."
+        )
+    }
+
+    func testResearchFailurePreservesQuestionAfterNetworkTimeout() {
+        XCTAssertEqual(
+            ResearchRequestFailurePresentation.resolve(URLError(.timedOut)).message,
+            "Terra is taking longer than expected. Permitext checked for a completed answer but did not find one yet. Your question is still here."
+        )
+    }
+
+    func testResearchRequestReconciliationRequiresMatchingRequestPair() {
+        let messages = [
+            ResearchMessage(
+                id: "user-new",
+                role: "user",
+                question: "What are the requirements for a bike room?",
+                requestID: "request-new",
+                createdAt: "2026-08-17T12:00:00.000Z"
+            ),
+            ResearchMessage(
+                id: "assistant-other",
+                role: "assistant",
+                answer: ResearchAnswer(conclusion: "An unrelated answer"),
+                requestID: "request-other",
+                createdAt: "2026-08-17T12:00:01.000Z"
+            ),
+            ResearchMessage(
+                id: "assistant-new",
+                role: "assistant",
+                answer: ResearchAnswer(conclusion: "The verified answer"),
+                requestID: "request-new",
+                createdAt: "2026-08-17T12:00:02.000Z"
+            )
+        ]
+
+        XCTAssertTrue(
+            ResearchRequestReconciliation.matchesCompletedAttempt(
+                messages: messages,
+                requestID: "request-new",
+                question: "What are the requirements for a bike room?",
+                priorMessageIDs: []
+            )
+        )
+        XCTAssertFalse(
+            ResearchRequestReconciliation.matchesCompletedAttempt(
+                messages: Array(messages.dropLast()),
+                requestID: "request-new",
+                question: "What are the requirements for a bike room?",
+                priorMessageIDs: []
+            )
+        )
+    }
+
+    func testResearchRequestReconciliationSupportsLegacyMessagesWithoutRequestID() {
+        let messages = [
+            ResearchMessage(
+                id: "old",
+                role: "assistant",
+                answer: ResearchAnswer(conclusion: "Earlier answer"),
+                createdAt: "2026-08-17T11:59:00.000Z"
+            ),
+            ResearchMessage(
+                id: "user-new",
+                role: "user",
+                question: "What are the requirements for a bike room?",
+                createdAt: "2026-08-17T12:00:00.000Z"
+            ),
+            ResearchMessage(
+                id: "assistant-new",
+                role: "assistant",
+                answer: ResearchAnswer(conclusion: "The verified answer"),
+                createdAt: "2026-08-17T12:00:01.000Z"
+            )
+        ]
+
+        XCTAssertTrue(
+            ResearchRequestReconciliation.matchesCompletedAttempt(
+                messages: messages,
+                requestID: "request-new",
+                question: "What are the requirements for a bike room?",
+                priorMessageIDs: ["old"]
+            )
+        )
+    }
+
+    func testResearchMessageResponseDecodesPublicRequestID() throws {
+        let data = Data(
+            """
+            {
+              "conversation": {
+                "id": "research-1",
+                "title": "Bike room requirements",
+                "createdAt": "2026-08-17T12:00:00.000Z",
+                "updatedAt": "2026-08-17T12:00:01.000Z",
+                "projectContextReviewRequired": false,
+                "sourceStatus": "current",
+                "sources": [],
+                "messages": [{
+                  "id": "user-1",
+                  "role": "user",
+                  "question": "What are the requirements for a bike room?",
+                  "requestID": "request-1",
+                  "createdAt": "2026-08-17T12:00:00.000Z"
+                }]
+              },
+              "replayed": true,
+              "requestID": "request-1"
+            }
+            """.utf8
+        )
+
+        let decoded = try JSONDecoder().decode(ResearchConversationMessageResponse.self, from: data)
+
+        XCTAssertEqual(decoded.requestID, "request-1")
+        XCTAssertEqual(decoded.conversation.messages.first?.requestID, "request-1")
+        XCTAssertEqual(decoded.replayed, true)
+    }
+
     func testNativeNotebookSimpleDocumentRoundTripsWithoutLosingReferencesOrImages() throws {
         let document = NotebookDocument(document: [
             NotebookBlock.textBlock(type: "heading", text: "Finding", level: 2),

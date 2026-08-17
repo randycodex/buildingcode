@@ -6864,6 +6864,59 @@ export function accumulatedResearchVerificationIssues(attempts = []) {
     });
 }
 
+const researchEvidenceBoundaryIssueTypes = new Set([
+  "irrelevant_citation",
+  "incorrect_citation"
+]);
+
+function unsupportedOutsideLawIssue(issue) {
+  if (String(issue?.type || "").trim() !== "unsupported_requirement") return false;
+  const detail = String(issue?.detail || "").replace(/\s+/g, " ").trim().toLowerCase();
+  return /\b(?:outside|beyond) (?:the )?(?:authorized|available|provided|reviewed|supplied) (?:corpus|evidence|enacted text|law)\b/.test(detail) ||
+    /\b(?:authority|code|law|provision|regulation|requirement)s? (?:is |are |was |were )?not (?:included|provided|reviewed|supplied)\b/.test(detail) ||
+    /\bnot (?:included|provided|reviewed|supplied) (?:in|by) (?:the )?(?:authorized )?(?:corpus|evidence|enacted text)\b/.test(detail) ||
+    /\b(?:other|additional|external|unsupplied) (?:applicable )?(?:authority|code|law|provision|regulation|requirement)s?\b/.test(detail) ||
+    /\b(?:corpus|evidence) boundary\b/.test(detail);
+}
+
+export function researchEvidenceBoundaryFallbackEligibility({
+  verificationAttempts = [],
+  evidence = [],
+  requiredClaims = []
+} = {}) {
+  const issues = accumulatedResearchVerificationIssues(verificationAttempts);
+  if (!issues.length || (Array.isArray(requiredClaims) && requiredClaims.length > 0)) return false;
+  if ((Array.isArray(evidence) ? evidence : []).some((source) =>
+    String(source?.evidencePriority?.evidenceRole || "").trim() === "governing"
+  )) return false;
+  return issues.every((issue) =>
+    researchEvidenceBoundaryIssueTypes.has(String(issue?.type || "").trim()) ||
+    unsupportedOutsideLawIssue(issue)
+  );
+}
+
+export function researchEvidenceBoundaryInterpretation() {
+  return {
+    conclusion: "The enacted evidence Permitext reviewed does not establish a requirement responsive to this question.",
+    supportedPoints: [],
+    explanation: "Permitext cannot support a substantive code conclusion from this evidence set. The reviewed passages are not cited because they do not govern the question.",
+    assumptions: [],
+    missingFacts: [],
+    followUpQuestions: [
+      "Can you provide an applicable code section or narrow the question to a specific code topic?"
+    ],
+    evidenceLimitations: [
+      "The reviewed evidence contains no governing enacted provision that answers this question."
+    ],
+    additionalEvidenceNeeded: [
+      "Add the enacted provision or official authority governing the requested requirement before relying on a substantive answer."
+    ],
+    supportingSourceUses: [],
+    supportingSources: [],
+    citations: []
+  };
+}
+
 export function validateResearchInterpretation(value, evidence, supportingSources = []) {
   const allowedSections = new Map();
   const allowedSources = new Map();
@@ -8165,6 +8218,16 @@ function researchAnswerForClient(answer) {
   return clientAnswer;
 }
 
+export function researchMessageForClient(message) {
+  if (!message || typeof message !== "object") return message;
+  const { researchRequestID, ...clientMessage } = message;
+  return {
+    ...clientMessage,
+    ...(researchRequestID ? { requestID: researchRequestID } : {}),
+    ...(clientMessage.answer ? { answer: researchAnswerForClient(clientMessage.answer) } : {})
+  };
+}
+
 export function researchAnswerRecordForClient(answer) {
   if (!answer || typeof answer !== "object") return answer;
   const {
@@ -8183,13 +8246,7 @@ export function researchAnswerRecordForClient(answer) {
 async function researchConversationForClient(conversation, options = {}) {
   let clientConversation = {
     ...conversation,
-    messages: (conversation.messages || []).map((message) => {
-      const { researchRequestID: _researchRequestID, ...clientMessage } = message || {};
-      return clientMessage.answer ? {
-        ...clientMessage,
-        answer: researchAnswerForClient(clientMessage.answer)
-      } : clientMessage;
-    })
+    messages: (conversation.messages || []).map(researchMessageForClient)
   };
   if (options.checkSources) {
     const current = await currentResearchEvidence(conversation);
@@ -14570,6 +14627,7 @@ async function handleResearchConversationMessage(request, response) {
         mockMode,
         entitlement: context.authContext.entitlement
       }),
+      requestID: researchRequestID,
       replayed: true
     });
     return;
@@ -14772,6 +14830,7 @@ async function handleResearchConversationMessage(request, response) {
           signal: progressResponse.signal
         });
     let verificationAttempts = [];
+    let evidenceBoundaryFallback = false;
     let verifierUsage = combinedResearchUsage();
     let answerGenerationUsage = result.usage;
     let requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
@@ -14788,6 +14847,33 @@ async function handleResearchConversationMessage(request, response) {
       evidence: assembledEvidence,
       answer: result.interpretation
     });
+    const applyEvidenceBoundaryFallback = () => {
+      if (!researchEvidenceBoundaryFallbackEligibility({
+        verificationAttempts,
+        evidence: assembledEvidence,
+        requiredClaims
+      })) return false;
+      result = {
+        ...result,
+        interpretation: researchEvidenceBoundaryInterpretation()
+      };
+      requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
+        requiredClaims,
+        evidence: assembledEvidence,
+        answer: result.interpretation
+      });
+      claimMateriality = evaluateResearchClaimMateriality({
+        claims: materialityClaims,
+        evidence: assembledEvidence,
+        answer: result.interpretation
+      });
+      answerQuality = evaluateResearchAnswerQuality({
+        evidence: assembledEvidence,
+        answer: result.interpretation
+      });
+      evidenceBoundaryFallback = true;
+      return true;
+    };
     if (mockMode) {
       verificationAttempts = [{
         pass: requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass,
@@ -14844,6 +14930,7 @@ async function handleResearchConversationMessage(request, response) {
             model: "permitext-deterministic-answer-quality-gate"
           });
           if (attempt === maximumResearchVerificationAttempts - 1) {
+            if (applyEvidenceBoundaryFallback()) break;
             const error = new Error("The answer failed deterministic materiality or evidence-economy checks after two bounded revisions.");
             error.code = "RESEARCH_VERIFICATION_FAILED";
             error.verificationAttempts = verificationAttempts;
@@ -14872,6 +14959,7 @@ async function handleResearchConversationMessage(request, response) {
         });
         if (verification.result.pass) break;
         if (attempt === maximumResearchVerificationAttempts - 1) {
+          if (applyEvidenceBoundaryFallback()) break;
           const error = new Error("The answer did not pass verification after two bounded revisions.");
           error.code = "RESEARCH_VERIFICATION_FAILED";
           error.verificationAttempts = verificationAttempts;
@@ -14909,8 +14997,8 @@ async function handleResearchConversationMessage(request, response) {
       ...(researchRequestID ? { researchRequestID } : {}),
       researchProgress: progressResponse.summary(now),
       answer: {
-        mode: mockMode ? "mock" : "openai",
-        model: result.model,
+        mode: evidenceBoundaryFallback ? "evidence_boundary" : mockMode ? "mock" : "openai",
+        model: evidenceBoundaryFallback ? "permitext-deterministic-evidence-boundary" : result.model,
         requestedModel: result.requestedModel || result.model,
         promptVersion: result.configuration.promptVersion,
         evidenceVersion: result.configuration.evidenceVersion,
@@ -14971,8 +15059,9 @@ async function handleResearchConversationMessage(request, response) {
           webLimitation: webSupport.limitation || null
         },
         verification: {
-          status: "passed",
-          pass: true,
+          status: evidenceBoundaryFallback ? "evidence_boundary" : "passed",
+          pass: !evidenceBoundaryFallback,
+          ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,
           regenerated: verificationAttempts.length > 1,
           history: verificationAttempts
@@ -15118,6 +15207,7 @@ async function handleResearchConversationMessage(request, response) {
           pricingVersion: estimatedCost.pricingVersion
         }
       ], { mockMode, entitlement: context.authContext.entitlement }),
+      ...(researchRequestID ? { requestID: researchRequestID } : {}),
       artifactRevisions
     });
   } catch (error) {
@@ -15130,22 +15220,24 @@ async function handleResearchConversationMessage(request, response) {
     }
     if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
       progressResponse.failActive("failed");
-      progressResponse.error(422, "A cited code section is incomplete and cannot be analyzed yet.");
+      progressResponse.error(422, "A cited code section is incomplete and cannot be analyzed yet.", {
+        code: "INCOMPLETE_RESEARCH_SECTION"
+      });
       return;
     }
     if (error.code === "RESEARCH_NOT_CONFIGURED") {
       progressResponse.failActive("failed");
-      progressResponse.error(503, error.message);
+      progressResponse.error(503, error.message, { code: "RESEARCH_NOT_CONFIGURED" });
       return;
     }
     if (error.code === "RESEARCH_EVAL_SPEND_CAP") {
       progressResponse.failActive("failed");
-      progressResponse.error(503, error.message);
+      progressResponse.error(503, error.message, { code: "RESEARCH_EVAL_SPEND_CAP" });
       return;
     }
     if (error.code === "RESEARCH_REFUSAL") {
       progressResponse.failActive("failed");
-      progressResponse.error(422, error.message);
+      progressResponse.error(422, error.message, { code: "RESEARCH_REFUSAL" });
       return;
     }
     if (["RESEARCH_CANCELLED", "AbortError"].includes(error.code || error.name)) {
@@ -15180,7 +15272,9 @@ async function handleResearchConversationMessage(request, response) {
         providerCause: error.providerCause || null
       }));
       progressResponse.failActive("failed");
-      progressResponse.error(502, "The research model could not return a verified, cited answer.");
+      progressResponse.error(502, "The research model could not return a verified, cited answer.", {
+        code: error.code || error.name
+      });
       return;
     }
     throw error;

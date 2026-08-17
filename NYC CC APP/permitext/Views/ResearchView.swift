@@ -5,6 +5,138 @@ private struct ResearchQuestionAttempt: Identifiable, Equatable {
     let question: String
 }
 
+struct ResearchRequestReconciliation {
+    static func matchesCompletedAttempt(
+        messages: [ResearchMessage],
+        requestID: String,
+        question: String,
+        priorMessageIDs: Set<String>
+    ) -> Bool {
+        let newMessages = messages.filter { !priorMessageIDs.contains($0.id) }
+        let messagesForRequest = newMessages.filter { $0.requestID == requestID }
+
+        if newMessages.contains(where: { $0.requestID != nil }) {
+            let containsQuestion = messagesForRequest.contains {
+                $0.role == "user" && $0.question == question
+            }
+            let containsAnswer = messagesForRequest.contains {
+                $0.role == "assistant" && $0.answer != nil
+            }
+            return containsQuestion && containsAnswer
+        }
+
+        // Compatibility for conversations created before the server exposed
+        // the request identifier on serialized messages.
+        let containsQuestion = newMessages.contains {
+            $0.role == "user" && $0.question == question
+        }
+        let containsAnswer = newMessages.contains {
+            $0.role == "assistant" && $0.answer != nil
+        }
+        return containsQuestion && containsAnswer
+    }
+}
+
+struct ResearchRequestFailurePresentation: Equatable {
+    let message: String
+
+    static func resolve(_ error: Error) -> ResearchRequestFailurePresentation {
+        if let backendError = error as? PermitextBackendHTTPError {
+            return resolve(backendError)
+        }
+
+        if let urlError = error as? URLError {
+            switch urlError.code {
+            case .timedOut:
+                return retainedQuestion(
+                    "Terra is taking longer than expected. Permitext checked for a completed answer but did not find one yet."
+                )
+            case .notConnectedToInternet, .networkConnectionLost:
+                return retainedQuestion("Research could not connect to the internet.")
+            case .cancelled:
+                return retainedQuestion("Research was cancelled.")
+            default:
+                return retainedQuestion("Research could not reach Terra.")
+            }
+        }
+
+        return retainedQuestion("Research could not reach Terra.")
+    }
+
+    private static func resolve(
+        _ error: PermitextBackendHTTPError
+    ) -> ResearchRequestFailurePresentation {
+        let code = error.serverCode?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let serverMessage = error.serverMessage?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let verificationCodes: Set<String> = [
+            "INVALID_RESEARCH_RESPONSE",
+            "INVALID_RESEARCH_CITATION",
+            "INVALID_RESEARCH_WEB_CITATION",
+            "INVALID_RESEARCH_EVIDENCE_ANALYSIS",
+            "INVALID_RESEARCH_VERIFICATION",
+            "RESEARCH_VERIFIER_ERROR",
+            "RESEARCH_VERIFICATION_FAILED"
+        ]
+        let providerCodes: Set<String> = [
+            "RESEARCH_NOT_CONFIGURED",
+            "RESEARCH_PROVIDER_ERROR",
+            "RESEARCH_EVAL_SPEND_CAP",
+            "TIMEOUTERROR"
+        ]
+
+        switch code {
+        case "RESEARCH_EVIDENCE_NOT_FOUND":
+            return retainedQuestion(
+                serverMessage ?? "Permitext could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation."
+            )
+        case "RESEARCH_EVIDENCE_REQUIRED", "RESEARCH_SOURCE_CHANGED", "RESEARCH_REFUSAL":
+            return retainedQuestion(serverMessage ?? "Research needs updated enacted evidence before it can answer.")
+        case "RESEARCH_CAPACITY_REVIEW":
+            return retainedQuestion(serverMessage ?? "Research is temporarily unavailable while account capacity is reviewed.")
+        case "RESEARCH_CANCELLED":
+            return retainedQuestion("Research was cancelled.")
+        case let value? where verificationCodes.contains(value):
+            return retainedQuestion(
+                "Terra produced a response, but Permitext could not verify it against the enacted evidence."
+            )
+        case let value? where providerCodes.contains(value):
+            return retainedQuestion("Terra's research service is temporarily unavailable.")
+        default:
+            break
+        }
+
+        if error.isAuthenticationFailure {
+            return retainedQuestion("Your Permitext session no longer has access to Research. Sign in again and retry.")
+        }
+
+        if error.statusCode == 502,
+           serverMessage?.localizedCaseInsensitiveContains("verified") == true {
+            return retainedQuestion(
+                "Terra produced a response, but Permitext could not verify it against the enacted evidence."
+            )
+        }
+
+        if let statusCode = error.statusCode, statusCode >= 500 {
+            return retainedQuestion("Terra's research service is temporarily unavailable.")
+        }
+
+        if let serverMessage, !serverMessage.isEmpty {
+            return retainedQuestion(serverMessage)
+        }
+
+        return retainedQuestion("Research could not reach Terra.")
+    }
+
+    private static func retainedQuestion(_ explanation: String) -> ResearchRequestFailurePresentation {
+        let normalized = explanation.trimmingCharacters(in: .whitespacesAndNewlines)
+        let punctuation = normalized.last.map { ".!?".contains($0) } == true ? "" : "."
+        return ResearchRequestFailurePresentation(
+            message: "\(normalized)\(punctuation) Your question is still here."
+        )
+    }
+}
+
 struct ResearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.scenePhase) private var scenePhase
@@ -522,7 +654,7 @@ struct ResearchView: View {
             // makes a retry idempotent if the first response was merely lost.
             if let authoritative = await completedConversationAfterLostResponse(
                 conversationID: id,
-                question: attempt.question,
+                attempt: attempt,
                 priorMessageIDs: messageIDsBeforeRequest
             ) {
                 conversation = authoritative
@@ -531,14 +663,14 @@ struct ResearchView: View {
                 errorMessage = nil
             } else {
                 failedQuestionAttempt = attempt
-                errorMessage = "Terra could not finish that request. Your question is still here."
+                errorMessage = ResearchRequestFailurePresentation.resolve(error).message
             }
         }
     }
 
     private func completedConversationAfterLostResponse(
         conversationID: String,
-        question: String,
+        attempt: ResearchQuestionAttempt,
         priorMessageIDs: Set<String>
     ) async -> ResearchConversation? {
         for delay in [0, 2, 4, 6] {
@@ -548,12 +680,12 @@ struct ResearchView: View {
             guard let authoritative = try? await library.researchConversation(id: conversationID) else {
                 continue
             }
-            let newMessages = authoritative.messages.filter { !priorMessageIDs.contains($0.id) }
-            let containsQuestion = newMessages.contains {
-                $0.role == "user" && $0.question == question
-            }
-            let containsAnswer = newMessages.contains { $0.role == "assistant" && $0.answer != nil }
-            if containsQuestion && containsAnswer {
+            if ResearchRequestReconciliation.matchesCompletedAttempt(
+                messages: authoritative.messages,
+                requestID: attempt.id,
+                question: attempt.question,
+                priorMessageIDs: priorMessageIDs
+            ) {
                 return authoritative
             }
         }

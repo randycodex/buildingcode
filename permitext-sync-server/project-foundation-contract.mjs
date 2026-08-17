@@ -586,10 +586,24 @@ export function immutableResearchAnswer({
   userFeedback = null
 }) {
   if (!Array.isArray(evidence) || evidence.length < 1) throw new Error("Research answers require evidence.");
-  if (!Array.isArray(citations) || citations.length < 1) throw new Error("Research answers require citations.");
+  const evidenceBoundaryAnswer =
+    answer?.mode === "evidence_boundary" &&
+    answer?.verification?.status === "evidence_boundary" &&
+    answer?.verification?.pass === false &&
+    answer?.verification?.reason === "NO_GOVERNING_EVIDENCE" &&
+    typeof answer?.conclusion === "string" && /does not establish/i.test(answer.conclusion) &&
+    typeof answer?.explanation === "string" && /cannot support a substantive code conclusion/i.test(answer.explanation) &&
+    Array.isArray(answer?.supportedPoints) && answer.supportedPoints.length === 0 &&
+    Array.isArray(answer?.citations) && answer.citations.length === 0 &&
+    Array.isArray(answer?.supportingSources) && answer.supportingSources.length === 0 &&
+    Array.isArray(answer?.supportingSourceUses) && answer.supportingSourceUses.length === 0;
+  const researchCitations = Array.isArray(citations) ? citations : [];
+  if (researchCitations.length < 1 && !evidenceBoundaryAnswer) {
+    throw new Error("Research answers require citations.");
+  }
   const evidenceIDs = new Set(evidence.map((item) => item.id));
   const sourceIDs = new Set(evidence.map((item) => item.sourceID));
-  const mapping = citations.map((citation) => {
+  const mapping = researchCitations.map((citation) => {
     const citationSourceIDs = (citation.sourceIDs || []).filter((sourceID) => sourceIDs.has(sourceID));
     if (!citationSourceIDs.length) throw new Error("Research citation is not backed by the approved evidence set.");
     return {
