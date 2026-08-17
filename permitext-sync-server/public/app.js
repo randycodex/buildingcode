@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-research-multicorpus-v351";
+} from "./offline-storage.js?v=20260817-reader-progressive-scroll-v353";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -11435,7 +11435,10 @@ async function progressivelyRenderReaderChapter(
   let beforeCursor = initialStart;
   let afterCursor = initialEnd;
   let hydrationInFlight = false;
+  let hydrationCompleted = false;
   let scrollFrame = 0;
+  let connectionTimer = 0;
+  let connectionWaitCount = 0;
   let ignoreScrollUntil = 0;
   const status = document.createElement("p");
   status.className = "reader-progressive-status";
@@ -11446,9 +11449,19 @@ async function progressivelyRenderReaderChapter(
   const cleanup = () => {
     content.removeEventListener("scroll", onScroll);
     if (scrollFrame) cancelAnimationFrame(scrollFrame);
+    if (connectionTimer) window.clearTimeout(connectionTimer);
     scrollFrame = 0;
+    connectionTimer = 0;
   };
   content._readerProgressiveCleanup = cleanup;
+
+  const scheduleConnectionCheck = () => {
+    if (connectionTimer) return;
+    connectionTimer = window.setTimeout(() => {
+      connectionTimer = 0;
+      maybeHydrate();
+    }, 16);
+  };
 
   const updateStatus = (loading = false) => {
     const loadedCount = afterCursor - beforeCursor;
@@ -11462,6 +11475,7 @@ async function progressivelyRenderReaderChapter(
     const loadingAfter = direction === "after";
     if ((loadingAfter && afterCursor >= sections.length) || (!loadingAfter && beforeCursor <= 0)) return;
     hydrationInFlight = true;
+    hydrationCompleted = false;
     updateStatus(true);
     const start = loadingAfter
       ? afterCursor
@@ -11495,6 +11509,7 @@ async function progressivelyRenderReaderChapter(
         beforeCursor = start;
       }
       collapseRepeatedReaderCatalogAliases(content);
+      hydrationCompleted = true;
       if (beforeCursor === 0 && afterCursor === sections.length) {
         status.remove();
         content.dataset.chapterFullyLoaded = "true";
@@ -11511,12 +11526,24 @@ async function progressivelyRenderReaderChapter(
       }
     } finally {
       hydrationInFlight = false;
+      if (hydrationCompleted && status.isConnected) maybeHydrate();
     }
   };
 
   const maybeHydrate = () => {
     scrollFrame = 0;
-    if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) {
+    if (!panel.isConnected) {
+      if (connectionWaitCount < 120) {
+        connectionWaitCount += 1;
+        scheduleConnectionCheck();
+      } else {
+        status.remove();
+        cleanup();
+      }
+      return;
+    }
+    connectionWaitCount = 0;
+    if (panel.dataset.readerRenderToken !== renderToken) {
       status.remove();
       cleanup();
       return;
@@ -11541,7 +11568,7 @@ async function progressivelyRenderReaderChapter(
 
   content.addEventListener("scroll", onScroll, { passive: true });
   updateStatus();
-  scrollFrame = requestAnimationFrame(maybeHydrate);
+  maybeHydrate();
 }
 
 async function renderSectionContent(panel, reader) {

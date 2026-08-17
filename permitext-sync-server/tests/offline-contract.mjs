@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260817-research-multicorpus-v351"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260817-reader-progressive-scroll-v353"));
 assert(shellPrecacheURLs.includes("/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3"));
 assert(shellPrecacheURLs.includes("/web/styles.css?v=20260817-research-multicorpus-v351"));
 assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260813-research-reader-spacing-v120"));

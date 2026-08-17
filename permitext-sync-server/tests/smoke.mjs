@@ -1279,6 +1279,11 @@ async function main() {
         workspaceScript.text.includes('status.textContent = "Nearby sections could not be loaded. Scroll again to retry."') &&
         workspaceScript.text.includes('console.warn("Reader chapter hydration paused.", error)') &&
         workspaceScript.text.includes('content.addEventListener("scroll", onScroll, { passive: true })') &&
+        workspaceScript.text.includes("if (!panel.isConnected) {") &&
+        workspaceScript.text.includes("scheduleConnectionCheck();") &&
+        workspaceScript.text.includes("if (panel.dataset.readerRenderToken !== renderToken) {") &&
+        workspaceScript.text.includes("if (hydrationCompleted && status.isConnected) maybeHydrate();") &&
+        workspaceScript.text.includes('updateStatus();\n  maybeHydrate();\n}') &&
         !workspaceScript.text.includes("The current section is available, but the rest of this chapter could not be loaded.") &&
         workspaceScript.text.includes("status.remove();\n      cleanup();\n      return;") &&
         workspaceScript.text.includes('content.dataset.chapterFullyLoaded = "true"'),
@@ -1440,7 +1445,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-research-multicorpus-v351'),
+        webRoot.text.includes('/web/app.js?v=20260817-reader-progressive-scroll-v353'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

@@ -9,8 +9,8 @@ const notebookImagesStoreName = "notebook-images";
 const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v703";
-const shellAssetVersion = "20260817-research-multicorpus-v351";
+const shellCacheName = "permitext-pro-shell-v705";
+const shellAssetVersion = "20260817-reader-progressive-scroll-v353";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -24,11 +24,11 @@ const shellURLs = [
   "/web/fonts/inter-latin-wght-italic.woff2",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260817-research-multicorpus-v351",
+  "/web/app.js?v=20260817-reader-progressive-scroll-v353",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260813-research-reader-spacing-v120",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260817-research-multicorpus-v351",
+  "/web/offline-storage.js?v=20260817-reader-progressive-scroll-v353",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260811-research-columns-v3",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",
