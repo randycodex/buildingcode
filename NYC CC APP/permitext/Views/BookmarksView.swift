@@ -2,12 +2,6 @@ import SwiftUI
 import UIKit
 
 struct BookmarksView: View {
-    enum Mode {
-        case saved
-        case projects
-    }
-
-    let mode: Mode
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var savedFilterCodeSectionIDs: Set<Int64>
     @State private var savedFilterFolderIDs: Set<Int64>
@@ -26,8 +20,7 @@ struct BookmarksView: View {
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let projectTilePageSize = CodeScreenMetrics.tileGridPageSize
 
-    init(mode: Mode = .saved) {
-        self.mode = mode
+    init() {
         _savedFilterCodeSectionIDs = State(
             initialValue: FilterIDsStorage.load(key: Self.filterCodeSectionIDsDefaultsKey)
         )
@@ -114,7 +107,7 @@ struct BookmarksView: View {
     }
 
     private var showsProjectsSection: Bool {
-        mode == .saved && library.hasProjectAccess
+        library.hasProjectAccess
     }
 
     var body: some View {
@@ -127,17 +120,12 @@ struct BookmarksView: View {
                 .frame(height: 0)
 
                 VStack(alignment: .leading, spacing: 0) {
-                    if mode == .projects {
-                        projectsScreenHeader
-                        projectTilesGrid
-                    } else {
-                        savedScreenHeader
+                    savedScreenHeader
 
-                        if !library.bookmarks.isEmpty && cachedFilteredBookmarks.isEmpty {
-                            filteredSavedEmptyState
-                        } else if !library.bookmarks.isEmpty {
-                            savedBookmarkList
-                        }
+                    if !library.bookmarks.isEmpty && cachedFilteredBookmarks.isEmpty {
+                        filteredSavedEmptyState
+                    } else if !library.bookmarks.isEmpty {
+                        savedBookmarkList
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -146,7 +134,7 @@ struct BookmarksView: View {
                 .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
-                CodeTopContentFade(title: mode == .projects ? "Projects" : "Saved", progress: collapseProgress)
+                CodeTopContentFade(title: "Saved", progress: collapseProgress)
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
@@ -247,27 +235,6 @@ private var savedScreenHeader: some View {
             }
         }
     }
-}
-
-private var projectsScreenHeader: some View {
-    CodeScreenTitleRow(title: "Projects", collapseProgress: collapseProgress) {
-        Button {
-            if library.hasProjectAccess {
-                folderEditorTarget = .new
-            } else {
-                library.requireProjectAccess()
-            }
-        } label: {
-            Image(systemName: "plus")
-                .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
-                .foregroundStyle(Color.appChrome)
-                .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("New project")
-    }
-    .padding(.bottom, CodeScreenMetrics.contentSpacingBelowTitle)
 }
 
 private var savedBookmarkList: some View {
@@ -451,34 +418,29 @@ private var filteredSavedEmptyState: some View {
                 .accessibilityLabel("New project")
                 }
 
-            projectTilesGrid
-        }
-    }
-
-    @ViewBuilder
-    private var projectTilesGrid: some View {
-        if !projectPages.isEmpty {
-            GeometryReader { proxy in
-                let pageWidth = proxy.size.width
-                TabView(selection: $projectPageIndex) {
-                    ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
-                        projectPageGrid(page, pageWidth: pageWidth)
-                            .frame(
-                                width: pageWidth,
-                                height: projectGridViewportHeight,
-                                alignment: .topLeading
-                            )
-                            .tag(index)
+            if !projectPages.isEmpty {
+                GeometryReader { proxy in
+                    let pageWidth = proxy.size.width
+                    TabView(selection: $projectPageIndex) {
+                        ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
+                            projectPageGrid(page, pageWidth: pageWidth)
+                                .frame(
+                                    width: pageWidth,
+                                    height: projectGridViewportHeight,
+                                    alignment: .topLeading
+                                )
+                                .tag(index)
+                        }
                     }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
+                    .clipped()
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
-                .clipped()
-            }
-            .frame(height: projectGridViewportHeight)
+                .frame(height: projectGridViewportHeight)
 
-            if projectPages.count > 1 {
-                projectPageDots
+                if projectPages.count > 1 {
+                    projectPageDots
+                }
             }
         }
     }

@@ -2,7 +2,6 @@ import Foundation
 import SwiftUI
 
 enum AppTab: Hashable {
-    case projects
     case browse
     case browseSecondary
     case search

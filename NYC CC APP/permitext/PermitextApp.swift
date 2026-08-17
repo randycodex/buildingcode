@@ -188,89 +188,44 @@ private struct PermitextTabNavigation: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
 
     var body: some View {
-        selectedContent
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                compactNavigationBar
-            }
-    }
-
-    private var selectedContent: some View {
-        ZStack {
-            tabLayer(BookmarksView(mode: .projects), tab: .projects)
-            tabLayer(
-                BrowseView(browserContext: .primary)
-                    .environment(\.isBrowserTabActive, library.selectedTab == .browse),
-                tab: .browse
-            )
-            tabLayer(
-                BrowseView(browserContext: .secondary)
-                    .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary),
-                tab: .browseSecondary
-            )
-            tabLayer(SearchView(), tab: .search)
-            tabLayer(BookmarksView(), tab: .bookmarks)
-            tabLayer(ResearchView(), tab: .research)
-        }
-    }
-
-    private func tabLayer<Content: View>(_ content: Content, tab: AppTab) -> some View {
-        content
-            .opacity(library.selectedTab == tab ? 1 : 0)
-            .zIndex(library.selectedTab == tab ? 1 : 0)
-            .allowsHitTesting(library.selectedTab == tab)
-            .accessibilityHidden(library.selectedTab != tab)
-    }
-
-    private var compactNavigationBar: some View {
-        HStack(spacing: 0) {
-            navigationButton(tab: .projects, systemImage: "folder", selectedSystemImage: "folder.fill", label: "Projects")
-            navigationButton(tab: .browse, systemImage: "text.line.first.and.arrowtriangle.forward", label: "First reader")
-            navigationButton(tab: .browseSecondary, systemImage: "text.line.last.and.arrowtriangle.forward", label: "Second reader")
-            navigationButton(tab: .search, systemImage: "sparkle.magnifyingglass", label: "Search")
-            navigationButton(tab: .bookmarks, systemImage: "bookmark", selectedSystemImage: "bookmark.fill", label: "Saved")
-            navigationButton(tab: .research, assetImage: "Astroid", label: "Research")
-        }
-        .frame(height: 52)
-        .background(.ultraThinMaterial)
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(Color(uiColor: .separator).opacity(0.45))
-                .frame(height: 0.5)
-        }
-    }
-
-    private func navigationButton(
-        tab: AppTab,
-        systemImage: String? = nil,
-        selectedSystemImage: String? = nil,
-        assetImage: String? = nil,
-        label: String
-    ) -> some View {
-        Button {
-            if library.selectedTab == tab {
-                if tab == .search {
-                    library.notifySearchTabRetap()
+        TabView(selection: $library.selectedTab) {
+            BookmarksView()
+                .tabItem {
+                    Image(systemName: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
                 }
-            } else {
-                library.selectedTab = tab
-            }
-        } label: {
-            Group {
-                if let assetImage {
-                    Image(assetImage)
-                        .renderingMode(.template)
-                } else if let systemImage {
-                    Image(systemName: library.selectedTab == tab ? (selectedSystemImage ?? systemImage) : systemImage)
+                .accessibilityLabel("Saved")
+                .tag(AppTab.bookmarks)
+
+            BrowseView(browserContext: .primary)
+                .environment(\.isBrowserTabActive, library.selectedTab == .browse)
+                .tabItem {
+                    Image(systemName: "text.line.first.and.arrowtriangle.forward")
                 }
-            }
-            .font(.system(size: 19, weight: .semibold))
-            .foregroundStyle(library.selectedTab == tab ? Color.appChrome : Color.secondary)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .contentShape(Rectangle())
+                .accessibilityLabel("First reader")
+                .tag(AppTab.browse)
+
+            BrowseView(browserContext: .secondary)
+                .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
+                .tabItem {
+                    Image(systemName: "text.line.last.and.arrowtriangle.forward")
+                }
+                .accessibilityLabel("Second reader")
+                .tag(AppTab.browseSecondary)
+
+            SearchView()
+                .tabItem {
+                    Image(systemName: "sparkle.magnifyingglass")
+                }
+                .accessibilityLabel("Search")
+                .tag(AppTab.search)
+
+            ResearchView()
+                .tabItem {
+                    Image("Astroid")
+                }
+                .accessibilityLabel("Research")
+                .tag(AppTab.research)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(label)
-        .accessibilityAddTraits(library.selectedTab == tab ? .isSelected : [])
     }
 }
 
