@@ -600,7 +600,7 @@ async function main() {
     );
     const researchConversationRendererSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("async function renderResearchConversation"),
-      workspaceScript.text.indexOf("function closeResearchSelectionMenu")
+      workspaceScript.text.indexOf("function normalizedPassageAnchorText")
     );
     const projectResearchContextSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("function appendProjectResearchContextEditor"),
@@ -1411,7 +1411,7 @@ async function main() {
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
-        workspaceScript.text.includes("function researchSelectionTextFromRange") &&
+        workspaceScript.text.includes("function renderInlineCommentBox") &&
         workspaceScript.text.includes("function renderResearchProjectContext") &&
         workspaceScript.text.includes("function renderHistoricalResearchRecord") &&
         !researchConversationRendererSource.includes("renderHistoricalResearchControl") &&
@@ -1421,7 +1421,7 @@ async function main() {
         workspaceScript.text.includes('postResearch("/research/conversations/reuse-evidence"') &&
         workspaceScript.text.includes("Project information and additional facts are context only.") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
-        workspaceScript.text.includes('data-research-selection-exclude="true"') &&
+        workspaceScript.text.includes('wrapper.dataset.researchSelectionExclude = "true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
         !workspaceScript.text.includes("Open enacted section") &&
         workspaceScript.text.includes('facts.addEventListener("input"') &&
@@ -2210,18 +2210,23 @@ async function main() {
       "Project Research no longer owns a scoped Search entry point."
     );
     assert(
-      workspaceScript.text.includes("function bindResearchTextSelection") &&
-        workspaceScript.text.includes('analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research"') &&
-        workspaceScript.text.includes('addButton.textContent = "Add as supporting evidence"') &&
-        !workspaceScript.text.includes('hint.className = "research-selection-hint"') &&
-        workspaceScript.text.includes('unassignedLabel: "Unassigned — no Project context"') &&
+      workspaceScript.text.includes("function renderInlineCommentBox") &&
+        workspaceScript.text.includes("wrapper.append(bookmarkButton, researchButton)") &&
+        workspaceScript.text.includes("bookmarkButton.innerHTML = bookmarkIconSVG(saved)") &&
+        workspaceScript.text.includes("researchButton.innerHTML = researchActionIconSVG()") &&
+        workspaceScript.text.includes("currentResearchConversationLabel()") &&
+        workspaceScript.text.includes("addToCurrent: Boolean(currentResearchLabel)") &&
+        workspaceScript.text.includes("async function addResearchSelectionToCurrent") &&
+        !workspaceScript.text.includes("function bindResearchTextSelection") &&
+        !workspaceScript.text.includes("function showResearchSelectionMenu") &&
+        !workspaceScript.text.includes("research-selection-menu") &&
+        !workspaceScript.text.includes("Link to Note") &&
         workspaceScript.text.includes("selections: passages.map") &&
         workspaceScript.text.includes('groupHeading.dataset.researchSelectionExclude = "true"') &&
         workspaceScript.text.includes('sectionHeading.dataset.researchSelectionExclude = "true"') &&
         workspaceScript.text.includes('postResearch("/research/conversations/rename"') &&
         workspaceScript.text.includes('renameButton.title = "Rename conversation"') &&
         workspaceScript.text.includes("String(right.createdAt || \"\").localeCompare(String(left.createdAt || \"\"))") &&
-        workspaceScript.text.includes("researchSelectionMenuInteracting = true") &&
         !workspaceScript.text.includes('heading.textContent = "Conversations"') &&
         !workspaceScript.text.includes("Highlight enacted text in any Reader, search detail, or project section to begin.") &&
         workspaceScript.text.includes('postResearch("/research/conversations/create"') &&
@@ -2230,7 +2235,7 @@ async function main() {
         researchConversationRendererSource.includes("dialoguePane.append(composer)") &&
         !workspaceScript.text.includes("opening this conversation has not called an AI model") &&
         !workspaceScript.text.includes("research-conversation-prompt"),
-      "Web Research no longer exposes selection-first, persistent conversations without an eager model call."
+      "Web Research no longer exposes direct Save and Research passage actions with persistent conversations and no eager model call."
     );
     assert(
       workspaceScript.text.includes(

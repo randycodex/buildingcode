@@ -488,13 +488,8 @@ let researchOpenGeneration = 0;
 let researchUsage = null;
 let researchQuestionDraft = "";
 let activeEvidenceDiscovery = null;
-let pendingResearchSelection = null;
 const dismissedLinkedResearchDecisionKeys = new Set();
 const codeDecisionResearchNoticesByQuestion = new Map();
-let researchSelectionMenuInteracting = false;
-let researchSelectionMenuPinned = false;
-let activeResearchSelectionMenuPositioner = null;
-let researchSelectionMenuPositionFrame = 0;
 let activeWebWarningClose = null;
 const webWarningPositionCleanups = new WeakMap();
 let activeWorkspaceIssueAction = null;
@@ -592,9 +587,12 @@ function loadWorkspaceState() {
       archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
       searchResultReader: null,
       sectionDetail: null,
-      sectionDetails: saved.sectionDetails && typeof saved.sectionDetails === "object" ? saved.sectionDetails : {},
-      sectionDetailAnchors: saved.sectionDetailAnchors && typeof saved.sectionDetailAnchors === "object" ? saved.sectionDetailAnchors : {},
-      searchLinkedReaders: saved.searchLinkedReaders && typeof saved.searchLinkedReaders === "object" ? saved.searchLinkedReaders : {},
+      // Source Detail was retired from the ordinary workflow. Preserve enacted
+      // Readers from older layouts, but do not restore their obsolete detail
+      // panes or Search-owned coupling.
+      sectionDetails: {},
+      sectionDetailAnchors: {},
+      searchLinkedReaders: {},
       projectDetail: activeProjectDetail,
       projectDetails,
       projectHostPaneID: typeof saved.projectHostPaneID === "string" ? saved.projectHostPaneID : "",
@@ -1078,9 +1076,6 @@ function clearWorkspaceTransientRuntime() {
   activeResearchConversation = null;
   researchQuestionDraft = "";
   activeEvidenceDiscovery = null;
-  pendingResearchSelection = null;
-  researchSelectionMenuInteracting = false;
-  researchSelectionMenuPinned = false;
   closeActiveCustomSelect();
 }
 
@@ -2856,7 +2851,6 @@ function clearProjectSpecificResearch(project) {
     !activeEvidenceDiscovery?.projectID ||
     activeEvidenceDiscovery.projectID === projectID
   ) activeEvidenceDiscovery = null;
-  pendingResearchSelection = null;
   const conversationID = String(state.researchConversationID || "").trim();
   const conversationPaneID = paneIDForResearchConversation(conversationID);
   state.researchConversationID = "";
@@ -5876,9 +5870,6 @@ function clearResearchAccountRuntime() {
   researchUsage = null;
   researchQuestionDraft = "";
   activeEvidenceDiscovery = null;
-  pendingResearchSelection = null;
-  researchSelectionMenuInteracting = false;
-  researchSelectionMenuPinned = false;
   dismissedLinkedResearchDecisionKeys.clear();
   codeDecisionResearchNoticesByQuestion.clear();
   state.utilities.analysis = false;
@@ -5987,9 +5978,6 @@ async function selectCodeDecisionFromIndex(question) {
     // Candidate retrieval is exploratory working state for one question. Do not
     // carry its results or pending selection into the next Code Decision.
     activeEvidenceDiscovery = null;
-    pendingResearchSelection = null;
-    researchSelectionMenuInteracting = false;
-    researchSelectionMenuPinned = false;
   }
   const hydration = hydrateCodeQuestionState(projectID, questionID, { force: true, render: false });
   const nextWorkspace = openCodeDecisionSurface(priorWorkspace, {
@@ -11360,12 +11348,13 @@ function readerSectionResearchSelection(sectionWrapper) {
     start: 0,
     end: normalizedPassageAnchorText(selectedText).length
   };
-  const projectID = selectedOpenProjectID() ||
-    sectionWrapper.closest(".workspace-panel")?.dataset.projectId || "";
+  const panel = sectionWrapper.closest(".workspace-panel");
+  const projectID = selectedOpenProjectID() || panel?.dataset.projectId || "";
   return {
     ...passage,
     passages: [passage],
-    projectID
+    projectID,
+    originPaneID: panel?.dataset.paneId || ""
   };
 }
 
@@ -15455,17 +15444,6 @@ function selectedOpenProjectID() {
   ) || "";
 }
 
-function activeNotebookSelectionContext(projectID = "") {
-  const expectedProjectID = String(projectID || "").trim();
-  for (const [candidateProjectID, mounted] of notebookMounts.entries()) {
-    if (expectedProjectID && candidateProjectID !== expectedProjectID) continue;
-    if (!mounted.panel?.isConnected) continue;
-    const cardID = String(mounted.activeCardID?.() || "").trim();
-    if (cardID) return { projectID: candidateProjectID, cardID };
-  }
-  return null;
-}
-
 function researchProjectChoices({
   value = "",
   includeUnassigned = true,
@@ -18624,16 +18602,6 @@ async function renderResearchConversation(conversationID, options = {}) {
   return panel;
 }
 
-function closeResearchSelectionMenu() {
-  document.querySelector(".research-selection-menu")?.remove();
-  pendingResearchSelection = null;
-  researchSelectionMenuInteracting = false;
-  researchSelectionMenuPinned = false;
-  activeResearchSelectionMenuPositioner = null;
-  window.cancelAnimationFrame(researchSelectionMenuPositionFrame);
-  researchSelectionMenuPositionFrame = 0;
-}
-
 function researchSelectionTextFromRange(selection, range) {
   const fragment = range.cloneContents();
   const container = document.createElement("div");
@@ -18654,233 +18622,6 @@ function researchSelectionTextFromRange(selection, range) {
 
 function normalizedPassageAnchorText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
-}
-
-function researchPassageLocator(source, range, selection) {
-  const fullRange = document.createRange();
-  fullRange.selectNodeContents(source);
-  const beforeRange = fullRange.cloneRange();
-  const afterRange = fullRange.cloneRange();
-  try {
-    beforeRange.setEnd(range.startContainer, range.startOffset);
-    afterRange.setStart(range.endContainer, range.endOffset);
-  } catch {
-    return { prefix: "", suffix: "", start: null, end: null };
-  }
-  const before = normalizedPassageAnchorText(researchSelectionTextFromRange(selection, beforeRange));
-  const exact = normalizedPassageAnchorText(researchSelectionTextFromRange(selection, range));
-  const after = normalizedPassageAnchorText(researchSelectionTextFromRange(selection, afterRange));
-  return {
-    prefix: before.slice(-240),
-    suffix: after.slice(0, 240),
-    start: before.length,
-    end: before.length + exact.length
-  };
-}
-
-function researchSelectionFromWindow() {
-  const selection = window.getSelection?.();
-  if (!selection || selection.rangeCount !== 1 || selection.isCollapsed) return null;
-  const range = selection.getRangeAt(0);
-  const start = range.startContainer.nodeType === Node.ELEMENT_NODE ? range.startContainer : range.startContainer.parentElement;
-  const end = range.endContainer.nodeType === Node.ELEMENT_NODE ? range.endContainer : range.endContainer.parentElement;
-  const startSource = start?.closest?.(".research-selectable-text");
-  const endSource = end?.closest?.(".research-selectable-text");
-  const panel = startSource?.closest?.(".workspace-panel");
-  if (!startSource || !endSource || !panel || panel !== endSource.closest(".workspace-panel")) return null;
-  if (panel.closest(".research-conversation-panel")) return null;
-  const sources = Array.from(panel.querySelectorAll(".research-selectable-text"))
-    .filter((source) => {
-      try {
-        return range.intersectsNode(source);
-      } catch {
-        return false;
-      }
-    })
-    .filter((source) => !source.parentElement?.closest(".research-selectable-text"));
-  if (!sources.length || sources.length > 24) return null;
-  const passages = sources.map((source) => {
-    const sourceRange = document.createRange();
-    sourceRange.selectNodeContents(source);
-    if (source.contains(range.startContainer)) {
-      sourceRange.setStart(range.startContainer, range.startOffset);
-    }
-    if (source.contains(range.endContainer)) {
-      sourceRange.setEnd(range.endContainer, range.endOffset);
-    }
-    const selectedText = researchSelectionTextFromRange(selection, sourceRange);
-    const locator = researchPassageLocator(source, sourceRange, selection);
-    return {
-      sectionID: source.dataset.researchSectionId,
-      sectionNumber: source.dataset.researchSectionNumber,
-      title: source.dataset.researchSectionTitle,
-      codePrefix: source.dataset.researchCodePrefix,
-      savedItemID: source.dataset.researchSavedItemId || "",
-      selectedText,
-      codeEdition: source.dataset.researchCodeEdition || "",
-      codeVersion: source.dataset.researchCodeVersion || "",
-      sourceLibraryVersion: source.dataset.researchSourceLibraryVersion || "",
-      ...locator
-    };
-  }).filter((passage) => passage.sectionID && passage.selectedText.length >= 2);
-  if (!passages.length) return null;
-  const rect = range.getBoundingClientRect();
-  if (!rect.width && !rect.height) return null;
-  return {
-    ...passages[0],
-    passages,
-    projectID: panel.dataset.projectId || "",
-    originPaneID: panel.dataset.paneId || "",
-    rect,
-    anchorRange: range.cloneRange()
-  };
-}
-
-function notebookEvidenceLinksFromSelection(selection, context = {}) {
-  const grouped = new Map();
-  (selection?.passages || []).forEach((passage) => {
-    const sectionID = String(passage.sectionID || "").trim();
-    if (!sectionID) return;
-    const key = [String(passage.codePrefix || "BC").toUpperCase(), sectionID].join(":");
-    if (!grouped.has(key)) grouped.set(key, []);
-    grouped.get(key).push(passage);
-  });
-  return [...grouped.values()].map((passages) => {
-    const source = passages[0];
-    const sectionTitle = sectionTitleWithoutNumber({
-      sectionNumber: source.sectionNumber,
-      title: source.title || "Section"
-    }).replace(/[.\s]+$/, "");
-    const codePrefix = String(source.codePrefix || "BC").toUpperCase();
-    const citation = `${notebookReferenceCodeTitle(codePrefix)} · § ${source.sectionNumber || "Section"}`;
-    return {
-      id: crypto.randomUUID(),
-      relationshipRole: selection.evidenceRelationshipRole || "context",
-      label: [citation, sectionTitle].filter(Boolean).join(" · "),
-      projectID: String(context.projectID || selection.projectID || ""),
-      notebookCardID: String(context.cardID || ""),
-      source: {
-        jurisdiction: "New York City",
-        codePrefix,
-        codeEdition: source.codeEdition || researchCodeEdition(source),
-        codeVersion: source.codeVersion || "",
-        sourceID: source.sectionID,
-        sectionID: source.sectionID,
-        sectionNumber: source.sectionNumber || "Section",
-        sectionTitle: source.title || sectionTitle || "Section",
-        sourceLibraryVersion: source.sourceLibraryVersion || source.codeVersion || ""
-      },
-      passages: passages.map((passage) => ({
-        exact: passage.selectedText,
-        normalizedExact: normalizedPassageAnchorText(passage.selectedText),
-        prefix: passage.prefix || "",
-        suffix: passage.suffix || "",
-        start: Number.isInteger(passage.start) ? passage.start : null,
-        end: Number.isInteger(passage.end) ? passage.end : null
-      })),
-      createdAt: new Date().toISOString(),
-      noteTarget: { scope: "card", blockID: "", exact: "" }
-    };
-  });
-}
-
-function appendNotebookEvidenceReferences(documentValue, evidenceLinks) {
-  const document = structuredClone(documentValue || emptyNotebookDocument());
-  const blocks = Array.isArray(document.document) ? document.document : [];
-  evidenceLinks.forEach((link) => {
-    blocks.push({
-      type: "paragraph",
-      content: [{
-        type: "permitextReference",
-        props: {
-          referenceKind: "selectedPassage",
-          referenceID: link.id,
-          label: link.label
-        }
-      }]
-    });
-  });
-  document.document = blocks.length ? blocks : emptyNotebookDocument().document;
-  return document;
-}
-
-async function linkResearchSelectionToNotebookCard(projectID, cardID, selection) {
-  const evidenceLinks = notebookEvidenceLinksFromSelection(selection, { projectID, cardID });
-  if (!evidenceLinks.length) throw new Error("Select enacted text before linking evidence.");
-  const mounted = notebookMounts.get(projectID);
-  if (mounted?.linkEvidence) {
-    await mounted.linkEvidence(cardID, evidenceLinks);
-    return;
-  }
-  const payload = await postResearch("/notebook/cards/get", { projectID, cardID });
-  const card = payload.card;
-  const saved = await postResearch("/notebook/cards/save", {
-    projectID,
-    cardID: card.id,
-    expectedVersion: card.version,
-    cardType: card.cardType,
-    title: card.title,
-    document: appendNotebookEvidenceReferences(card.document, evidenceLinks),
-    evidenceLinks: [...(card.evidenceLinks || []), ...evidenceLinks]
-  });
-  await saveNotebookCardSnapshot(activeAccount().userID, projectID, saved.card).catch(() => {});
-}
-
-async function saveResearchSelection(mode, button, status) {
-  const selection = pendingResearchSelection;
-  if (!selection) return;
-  if (!activeAccount()) {
-    closeResearchSelectionMenu();
-    await focusUtility("settings");
-    return;
-  }
-  if (!hasCapability("research")) {
-    closeResearchSelectionMenu();
-    await presentPlanLimitNotice(
-      "Research Add-On required",
-      isProAccount()
-        ? "Add Research to start cited conversations grounded in enacted text."
-        : "Upgrade to Pro first, then add Research for cited enacted-code conversations."
-    );
-    return;
-  }
-  button.disabled = true;
-  const passages = selection.passages || [selection];
-  status.textContent = mode === "current"
-    ? `Adding ${passages.length === 1 ? "supporting passage" : `${passages.length} supporting passages`}…`
-    : "Starting research…";
-  try {
-    const payload = mode === "current"
-      ? await postResearch("/research/conversations/evidence", {
-          conversationID: state.researchConversationID,
-          selections: passages.map(({ sectionID, selectedText, savedItemID }) => ({
-            sectionID,
-            selectedText,
-            savedItemID
-          }))
-        })
-      : await postResearch("/research/conversations/create", {
-          selections: passages.map(({ sectionID, selectedText, savedItemID }) => ({
-            sectionID,
-            selectedText,
-            savedItemID
-          })),
-          projectID: selection.projectID || "",
-          savedItemID: selection.savedItemID || "",
-          originSurface: "reader"
-        });
-    activeResearchConversation = payload.conversation;
-    closeResearchSelectionMenu();
-    window.getSelection?.().removeAllRanges();
-    await refreshResearchConversationList();
-    await openResearchConversation(payload.conversation.id, {
-      refreshList: true,
-      anchorPaneID: selection.originPaneID || ""
-    });
-  } catch (error) {
-    button.disabled = false;
-    status.textContent = error.message;
-  }
 }
 
 async function startNewResearchFromSelection(selection) {
@@ -18909,7 +18650,6 @@ async function startNewResearchFromSelection(selection) {
     originSurface: selection.originSurface || "reader"
   });
   activeResearchConversation = payload.conversation;
-  closeResearchSelectionMenu();
   window.getSelection?.().removeAllRanges();
   await refreshResearchConversationList();
   await openResearchConversation(payload.conversation.id, {
@@ -18936,344 +18676,6 @@ async function addResearchSelectionToCurrent(selection) {
   await refreshResearchConversationList();
   await openResearchConversation(conversationID, { refreshList: true });
   return payload.conversation;
-}
-
-function showResearchSelectionMenu(selectionOverride = null, options = {}) {
-  const captured = selectionOverride || researchSelectionFromWindow();
-  if (!captured) {
-    closeResearchSelectionMenu();
-    return;
-  }
-  closeResearchSelectionMenu();
-  pendingResearchSelection = captured;
-  researchSelectionMenuPinned = options.pinned === true;
-  const menu = document.createElement("div");
-  menu.className = "research-selection-menu";
-  menu.setAttribute("role", "toolbar");
-  menu.setAttribute("aria-label", "Selected passage actions");
-  menu.addEventListener("pointerdown", (event) => {
-    if (event.target.closest?.("select, option")) {
-      researchSelectionMenuInteracting = true;
-      return;
-    }
-    event.preventDefault();
-  });
-  const actions = document.createElement("div");
-  actions.className = "research-selection-actions";
-  const status = document.createElement("span");
-  status.className = "research-selection-status";
-  const noteChooser = document.createElement("div");
-  noteChooser.className = "research-selection-note-list research-details-motion-body";
-  noteChooser.hidden = true;
-  let selectedNotebookCardID = "";
-  let selectedNotebookCardTitle = "";
-  let refreshNoteChooser = async () => {};
-  let positionMenu = () => {};
-  const projects = researchProjects();
-  const openProjectID = selectedOpenProjectID();
-  const openNotebookContext = activeNotebookSelectionContext(openProjectID);
-  const initialProjectID = String(
-    openProjectID || openNotebookContext?.projectID || ""
-  ).trim();
-  const initialNotebookCardID = openNotebookContext?.projectID === initialProjectID
-    ? openNotebookContext.cardID
-    : "";
-  if (activeAccount() && projects.length) {
-    const projectChoices = researchProjectChoices({
-      value: initialProjectID,
-      includeUnassigned: true,
-      unassignedLabel: "Unassigned — no Project context"
-    });
-    const selectedProjectChoice = projectChoices.find((choice) => choice.value === initialProjectID) || projectChoices[0];
-    const projectPicker = document.createElement("div");
-    projectPicker.className = "research-selection-project-picker";
-    const projectTrigger = document.createElement("button");
-    projectTrigger.type = "button";
-    projectTrigger.className = "research-selection-project-trigger";
-    projectTrigger.setAttribute("aria-label", "Project for new Research");
-    projectTrigger.setAttribute("aria-haspopup", "listbox");
-    projectTrigger.setAttribute("aria-expanded", "false");
-    projectTrigger.textContent = selectedProjectChoice?.label || "Unassigned — no Project context";
-    const projectList = document.createElement("div");
-    projectList.className = "research-selection-project-list";
-    projectList.setAttribute("role", "listbox");
-    projectList.setAttribute("aria-label", "Project for new Research");
-    projectList.hidden = true;
-    const chooseProject = (choice, option) => {
-      if (pendingResearchSelection) pendingResearchSelection.projectID = choice.value;
-      projectTrigger.textContent = choice.label;
-      projectList.querySelectorAll("[role='option']").forEach((item) => {
-        item.setAttribute("aria-selected", String(item === option));
-      });
-      projectList.hidden = true;
-      selectedNotebookCardID = "";
-      selectedNotebookCardTitle = "";
-      projectTrigger.setAttribute("aria-expanded", "false");
-      researchSelectionMenuInteracting = false;
-      void refreshNoteChooser(choice.value);
-      requestAnimationFrame(positionMenu);
-    };
-    projectChoices.forEach((choice) => {
-      const option = document.createElement("button");
-      option.type = "button";
-      option.className = "research-selection-project-option";
-      option.setAttribute("role", "option");
-      option.setAttribute("aria-selected", String(choice.value === selectedProjectChoice?.value));
-      option.textContent = choice.label;
-      option.addEventListener("click", () => chooseProject(choice, option));
-      projectList.append(option);
-    });
-    projectTrigger.addEventListener("click", () => {
-      const willOpen = projectList.hidden;
-      projectList.hidden = !willOpen;
-      projectTrigger.setAttribute("aria-expanded", String(willOpen));
-      researchSelectionMenuInteracting = willOpen;
-    });
-    projectTrigger.addEventListener("keydown", (event) => {
-      if (event.key !== "Escape" || projectList.hidden) return;
-      event.preventDefault();
-      projectList.hidden = true;
-      projectTrigger.setAttribute("aria-expanded", "false");
-      researchSelectionMenuInteracting = false;
-    });
-    projectPicker.append(projectTrigger, projectList);
-    pendingResearchSelection.projectID = selectedProjectChoice?.value || "";
-    menu.append(projectPicker);
-  }
-  if (state.researchConversationID && activeAccount()) {
-    const addButton = document.createElement("button");
-    addButton.type = "button";
-    addButton.textContent = "Add as supporting evidence";
-    addButton.addEventListener("click", () => saveResearchSelection("current", addButton, status));
-    actions.append(addButton);
-  }
-  if (activeAccount()) {
-    const linkButton = document.createElement("button");
-    linkButton.type = "button";
-    linkButton.className = "research-selection-link-note-action";
-    linkButton.textContent = "Link to Note";
-    linkButton.title = "Link the selected enacted passage to a Project Note";
-    refreshNoteChooser = async (projectID, preferredCardID = "") => {
-      projectID = String(projectID || "").trim();
-      if (!projectID) {
-        noteChooser.hidden = true;
-        noteChooser.replaceChildren();
-        noteChooser.removeAttribute("aria-busy");
-        selectedNotebookCardID = "";
-        selectedNotebookCardTitle = "";
-        requestAnimationFrame(positionMenu);
-        return;
-      }
-      noteChooser.setAttribute("aria-busy", "true");
-      try {
-        const payload = await postResearch("/notebook/cards/list", { projectID });
-        if (String(pendingResearchSelection?.projectID || "") !== projectID) return;
-        const cards = (payload.cards || []).filter((card) => !card.archivedAt);
-        noteChooser.replaceChildren();
-        const relationshipControl = document.createElement("div");
-        relationshipControl.className = "research-selection-relationship-control";
-        const relationshipTrigger = document.createElement("button");
-        relationshipTrigger.type = "button";
-        relationshipTrigger.className = "research-selection-relationship-trigger";
-        relationshipTrigger.setAttribute("aria-expanded", "false");
-        relationshipTrigger.textContent = "Relationship: Context";
-        const rolePicker = document.createElement("div");
-        rolePicker.className = "research-selection-evidence-role";
-        rolePicker.hidden = true;
-        relationshipTrigger.addEventListener("click", () => {
-          const willOpen = rolePicker.hidden;
-          rolePicker.hidden = !willOpen;
-          relationshipTrigger.setAttribute("aria-expanded", String(willOpen));
-          researchSelectionMenuInteracting = willOpen;
-          requestAnimationFrame(positionMenu);
-        });
-        [
-          ["context", "Context"],
-          ["supports", "Supports"],
-          ["conflicts", "Conflicts"],
-          ["unresolved", "Unresolved"]
-        ].forEach(([value, label]) => {
-          const role = document.createElement("button");
-          role.type = "button";
-          role.textContent = label;
-          role.setAttribute("aria-pressed", String(
-            (pendingResearchSelection.evidenceRelationshipRole || "context") === value
-          ));
-          role.addEventListener("click", () => {
-            pendingResearchSelection.evidenceRelationshipRole = value;
-            relationshipTrigger.textContent = `Relationship: ${label}`;
-            rolePicker.querySelectorAll("button").forEach((candidate) => {
-              candidate.setAttribute("aria-pressed", String(candidate === role));
-            });
-            rolePicker.hidden = true;
-            relationshipTrigger.setAttribute("aria-expanded", "false");
-            researchSelectionMenuInteracting = false;
-            requestAnimationFrame(positionMenu);
-          });
-          rolePicker.append(role);
-        });
-        relationshipControl.append(relationshipTrigger, rolePicker);
-        noteChooser.append(relationshipControl);
-        if (!cards.length) {
-          const empty = document.createElement("p");
-          empty.textContent = "Create a Note in this Project before linking evidence.";
-          noteChooser.append(empty);
-        } else {
-          cards.forEach((card) => {
-            const option = document.createElement("button");
-            option.type = "button";
-            option.className = "research-selection-note-option";
-            option.textContent = card.title;
-            const isSelected = card.id === preferredCardID;
-            option.setAttribute("aria-pressed", String(isSelected));
-            if (isSelected) {
-              selectedNotebookCardID = card.id;
-              selectedNotebookCardTitle = card.title;
-            }
-            option.addEventListener("click", () => {
-              selectedNotebookCardID = card.id;
-              selectedNotebookCardTitle = card.title;
-              noteChooser.querySelectorAll(".research-selection-note-option").forEach((candidate) => {
-                candidate.setAttribute("aria-pressed", String(candidate === option));
-              });
-              status.textContent = "";
-            });
-            noteChooser.append(option);
-          });
-        }
-        noteChooser.hidden = false;
-        noteChooser.removeAttribute("aria-busy");
-        status.textContent = "";
-        researchSelectionMenuInteracting = true;
-        requestAnimationFrame(positionMenu);
-      } catch (error) {
-        noteChooser.removeAttribute("aria-busy");
-        status.textContent = error.message;
-      }
-    };
-    linkButton.addEventListener("click", async () => {
-      const projectID = String(pendingResearchSelection?.projectID || "").trim();
-      if (!projectID) {
-        status.textContent = "Choose a Project before linking this passage to a Note.";
-        return;
-      }
-      if (!selectedNotebookCardID) {
-        status.textContent = "Choose a Note for this passage.";
-        return;
-      }
-      linkButton.disabled = true;
-      status.textContent = `Linking evidence to ${selectedNotebookCardTitle}…`;
-      try {
-        await linkResearchSelectionToNotebookCard(
-          projectID,
-          selectedNotebookCardID,
-          pendingResearchSelection
-        );
-        const linkedCardID = selectedNotebookCardID;
-        closeResearchSelectionMenu();
-        window.getSelection?.().removeAllRanges();
-        const project = researchProjects().find((candidate) =>
-          projectDetailKey(projectIdentity(candidate)) === projectID
-        );
-        if (project) {
-          pendingNotebookCardByProject.set(projectID, linkedCardID);
-          await openProjectNotebook(projectIdentity(project));
-        }
-      } catch (error) {
-        linkButton.disabled = false;
-        status.textContent = error.message;
-      }
-    });
-    actions.append(linkButton);
-  }
-  const analyzeButton = document.createElement("button");
-  analyzeButton.type = "button";
-  analyzeButton.className = "research-selection-start-action";
-  analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research";
-  analyzeButton.disabled = false;
-  analyzeButton.title = "A Project is optional. You can assign this Research conversation later.";
-  analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
-  actions.append(analyzeButton);
-  menu.append(noteChooser, actions, status);
-  document.body.append(menu);
-  if (initialProjectID && activeAccount()) {
-    void refreshNoteChooser(initialProjectID, initialNotebookCardID);
-  }
-  let positioningInitialized = false;
-  let anchorOffsetLeft = 0;
-  let anchorOffsetTop = 0;
-  const liveAnchorRect = () => {
-    if (captured.anchorElement?.isConnected) {
-      return captured.anchorElement.getBoundingClientRect();
-    }
-    try {
-      const rect = captured.anchorRange?.getBoundingClientRect?.();
-      if (rect && (rect.width || rect.height)) return rect;
-    } catch {
-      // The selected node left the document; retain the last usable rectangle.
-    }
-    return captured.rect;
-  };
-  positionMenu = () => {
-    if (!menu.isConnected) return;
-    const anchorRect = liveAnchorRect();
-    const menuRect = menu.getBoundingClientRect();
-    if (!positioningInitialized) {
-      const initialLeft = anchorRect.left + anchorRect.width / 2 - menuRect.width / 2;
-      const preferredTop = anchorRect.top - menuRect.height - 10;
-      const initialTop = preferredTop >= 12 ? preferredTop : anchorRect.bottom + 10;
-      anchorOffsetLeft = initialLeft - anchorRect.left;
-      anchorOffsetTop = initialTop - anchorRect.top;
-      positioningInitialized = true;
-    }
-    const left = Math.min(
-      window.innerWidth - menuRect.width - 12,
-      Math.max(12, anchorRect.left + anchorOffsetLeft)
-    );
-    const top = Math.max(12, anchorRect.top + anchorOffsetTop);
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
-  };
-  activeResearchSelectionMenuPositioner = positionMenu;
-  positionMenu();
-}
-
-function bindResearchTextSelection() {
-  document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape" || !document.querySelector(".research-selection-menu")) return;
-    event.preventDefault();
-    event.stopPropagation();
-    closeResearchSelectionMenu();
-    window.getSelection?.().removeAllRanges();
-  }, true);
-  document.addEventListener("pointerup", (event) => {
-    if (
-      event.target.closest?.(".research-selection-menu") ||
-      event.target.closest?.(".inline-comment")
-    ) return;
-    window.setTimeout(showResearchSelectionMenu, 0);
-  });
-  document.addEventListener("keyup", (event) => {
-    if (event.key.startsWith("Arrow") || event.key === "Shift") window.setTimeout(showResearchSelectionMenu, 0);
-  });
-  document.addEventListener("selectionchange", () => {
-    if (
-      window.getSelection?.().isCollapsed &&
-      !researchSelectionMenuInteracting &&
-      !researchSelectionMenuPinned
-    ) {
-      closeResearchSelectionMenu();
-    }
-  });
-  const scheduleSelectionMenuPosition = () => {
-    if (!activeResearchSelectionMenuPositioner || researchSelectionMenuPositionFrame) return;
-    researchSelectionMenuPositionFrame = window.requestAnimationFrame(() => {
-      researchSelectionMenuPositionFrame = 0;
-      activeResearchSelectionMenuPositioner?.();
-    });
-  };
-  window.addEventListener("scroll", scheduleSelectionMenuPosition, true);
-  window.addEventListener("resize", scheduleSelectionMenuPosition);
 }
 
 function createProjectBulkSelectionController(panel, projects, mode) {
@@ -20399,19 +19801,6 @@ async function renderProjectNotebook(project) {
       }
     }
 
-    mountState.linkEvidence = async (cardID, evidenceLinks) => {
-      if (dirty && activeCard && !(await flushNotebookAutosave())) {
-        throw new Error("Save the current Note before linking evidence to another Note.");
-      }
-      if (activeCard?.id !== cardID) await loadCard(cardID);
-      if (!activeCard || activeCard.id !== cardID) throw new Error("The selected Note is unavailable.");
-      activeCard.evidenceLinks = [...(activeCard.evidenceLinks || []), ...evidenceLinks];
-      draftDocument = appendNotebookEvidenceReferences(draftDocument, evidenceLinks);
-      markNotebookDirty();
-      await renderFocusedCard();
-      if (!(await flushNotebookAutosave())) throw new Error("The evidence link could not be saved.");
-    };
-
     async function deleteNotebookCard(card, trigger, options = {}) {
       let target = card;
       if (activeCard?.id === card.id) {
@@ -20485,6 +19874,7 @@ async function renderProjectNotebook(project) {
           foundation,
           cardPayload: { cards, access: { readOnly: notebookReadOnly } }
         }).catch(() => {});
+        await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
         return true;
       } catch (error) {
         await showWebNotice(archived ? "Note not archived" : "Note not restored", error.message);
@@ -27882,15 +27272,6 @@ function appendEmptySaved(container, title, message) {
   container.append(wrapper);
 }
 
-async function openSectionDetailForExistingSearch(item, options = {}) {
-  let searchInstance = (state.utilityInstances || []).find((instance) => instance.key === "search");
-  if (!searchInstance) {
-    searchInstance = newUtilityInstance("search");
-    state.utilityInstances = [...(state.utilityInstances || []), searchInstance];
-  }
-  await openSectionDetail(searchInstance.id, item, options);
-}
-
 async function openDeepLinkedSectionInReader(item) {
   const detail = searchResultDetail(item);
   let reader = (state.readers || []).find((candidate) => candidate.codePrefix === detail.codePrefix);
@@ -34175,7 +33556,6 @@ async function start() {
   window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates);
   bindWorkspaceKeyboardNavigation();
-  bindResearchTextSelection();
   window.addEventListener("storage", (event) => {
     if (event.key === foregroundSyncSignalKey && event.newValue) {
       try {

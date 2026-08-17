@@ -377,7 +377,7 @@ assert.match(workspaceScript, /research-feedback-details/);
 assert.match(workspaceScript, /void saveFeedback\("helpful"/);
 assert.match(workspaceStyles, /\.research-feedback-icon \{/);
 assert.match(workspaceStyles, /\.research-feedback-details\[hidden\]/);
-assert.match(workspaceStyles, /\.research-message\.is-user \{[\s\S]*?background: #000;[\s\S]*?color: #fff;/);
+assert.match(workspaceStyles, /\.research-message\.is-user \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);[\s\S]*?color: #fff;/);
 assert.match(workspaceStyles, /\.research-answer-review-row \{[\s\S]*?align-items: flex-start;/);
 assert.match(workspaceScript, /evidenceReviewedSummary\.textContent = "Evidence reviewed"/);
 assert.match(workspaceScript, /reviewRow\.append\(evidenceReviewed, compact\)/);
@@ -448,7 +448,8 @@ const postgresDispositionSource = serverSource.slice(postgresDispositionStart, p
 assert.match(postgresDispositionSource, /UPDATE permitext_research_conversations AS stored[\s\S]*?stored\.conversation->'candidateDispositions'/);
 assert.doesNotMatch(postgresDispositionSource, /WITH retained AS/);
 assert.match(workspaceScript, /async function selectCodeDecisionFromIndex\(question\)/);
-assert.match(workspaceScript, /selectCodeDecisionFromIndex[\s\S]*?activeEvidenceDiscovery = null;[\s\S]*?pendingResearchSelection = null;/);
+assert.match(workspaceScript, /selectCodeDecisionFromIndex[\s\S]*?activeEvidenceDiscovery = null;/);
+assert.doesNotMatch(workspaceScript, /pendingResearchSelection/);
 assert.match(workspaceScript, /hydrateCodeQuestionState\(projectID, questionID, \{ force: true, render: false \}\)/);
 assert.match(workspaceScript, /preserveOpenRoles: true/);
 assert.match(workspaceScript, /replacementPaneIDs[\s\S]*?state\.paneOrder = nextOrder[\s\S]*?state\.paneWeights\[nextPaneID\] = priorWeight/);
