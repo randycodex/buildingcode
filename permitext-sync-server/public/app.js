@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-research-live-sync-v347";
+} from "./offline-storage.js?v=20260817-adaptive-research-answer-v348";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -125,7 +125,7 @@ import {
 import {
   codeQuestionListFromServer,
   codeQuestionViewModelsFromServer
-} from "./code-question-server.js?v=20260809-code-decision-v2";
+} from "./code-question-server.js?v=20260817-adaptive-research-answer-v1";
 import {
   assertInputPresentationSeparation,
   createQuestionInput,
@@ -172,7 +172,7 @@ import {
   transferAnalysisCitations,
   updateConclusionDraft,
   useAnalysisAsStartingPoint
-} from "./code-question-analysis.js?v=20260803-code-question-analyze-v3";
+} from "./code-question-analysis.js?v=20260817-adaptive-research-answer-v1";
 import {
   adaptLegacyReviewThread,
   appendReviewComment,
@@ -14458,6 +14458,41 @@ function researchDisplayText(value) {
     .trim();
 }
 
+function researchAnswerNarrativeText(result) {
+  const adaptiveAnswer = researchDisplayText(result?.answerText);
+  if (adaptiveAnswer) return adaptiveAnswer;
+  return [result?.conclusion, result?.explanation]
+    .map(researchDisplayText)
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function appendResearchAnswerNarrative(container, result) {
+  const text = researchAnswerNarrativeText(result);
+  if (!text) return;
+  const narrative = document.createElement("div");
+  narrative.className = "research-answer-narrative";
+  text.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean).forEach((block) => {
+    const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+    if (lines.length && lines.every((line) => /^[-*]\s+/.test(line))) {
+      const list = document.createElement("ul");
+      list.className = "research-answer-list";
+      lines.forEach((line) => {
+        const item = document.createElement("li");
+        item.textContent = line.replace(/^[-*]\s+/, "");
+        list.append(item);
+      });
+      narrative.append(list);
+      return;
+    }
+    const paragraph = document.createElement("p");
+    paragraph.className = "research-answer-paragraph";
+    paragraph.textContent = block;
+    narrative.append(paragraph);
+  });
+  container.append(narrative);
+}
+
 function researchDisplayList(values) {
   return (values || []).map(researchDisplayText).filter(Boolean);
 }
@@ -14733,13 +14768,7 @@ function renderResearchInterpretation(container, result, options = {}) {
 
   const card = document.createElement("article");
   card.className = "analysis-card research-result-card";
-  const answer = document.createElement("p");
-  answer.className = "research-answer-primary";
-  answer.textContent = researchDisplayText(result.conclusion);
-  const explanation = document.createElement("p");
-  explanation.className = "research-answer-explanation";
-  explanation.textContent = researchDisplayText(result.explanation);
-  card.append(answer, explanation);
+  appendResearchAnswerNarrative(card, result);
 
   const codeBasis = result.codeBasis || null;
   const codeBasisText = String(
@@ -20568,6 +20597,26 @@ function appendReportPDFList(documentRoot, parent, title, items) {
   parent.append(heading, list);
 }
 
+function appendReportPDFResearchAnswer(documentRoot, parent, item) {
+  const text = researchAnswerNarrativeText(item);
+  text.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean).forEach((block) => {
+    const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+    if (lines.length && lines.every((line) => /^[-*]\s+/.test(line))) {
+      const list = documentRoot.createElement("ul");
+      lines.forEach((line) => {
+        const row = documentRoot.createElement("li");
+        row.textContent = line.replace(/^[-*]\s+/, "");
+        list.append(row);
+      });
+      parent.append(list);
+      return;
+    }
+    const paragraph = documentRoot.createElement("p");
+    paragraph.textContent = block;
+    parent.append(paragraph);
+  });
+}
+
 function printReportManifestAsPDF(manifest) {
   if (!hasCapability("professional-exports")) {
     void presentPlanLimitNotice(
@@ -20694,11 +20743,8 @@ function printReportManifestAsPDF(manifest) {
       } else if (item.kind === "researchAnswer") {
         const heading = documentRoot.createElement("h3");
         heading.textContent = item.question;
-        const conclusion = documentRoot.createElement("p");
-        const conclusionLabel = documentRoot.createElement("strong");
-        conclusionLabel.textContent = "Supported conclusion: ";
-        conclusion.append(conclusionLabel, documentRoot.createTextNode(researchDisplayText(item.conclusion)));
-        article.append(heading, conclusion);
+        article.append(heading);
+        appendReportPDFResearchAnswer(documentRoot, article, item);
         appendReportPDFList(
           documentRoot,
           article,
@@ -20709,18 +20755,6 @@ function printReportManifestAsPDF(manifest) {
               .join(": ")
           )
         );
-        if (item.explanation) {
-          const explanation = documentRoot.createElement("p");
-          const explanationLabel = documentRoot.createElement("strong");
-          explanationLabel.textContent = item.supportedPoints?.length
-            ? "Practical application: "
-            : "Explanation: ";
-          explanation.append(
-            explanationLabel,
-            documentRoot.createTextNode(researchDisplayText(item.explanation))
-          );
-          article.append(explanation);
-        }
         appendReportPDFList(documentRoot, article, "Assumptions", researchDisplayList(item.assumptions));
         appendReportPDFList(
           documentRoot,
@@ -31998,10 +32032,8 @@ function renderCodeQuestionBoundedAnalysisBody(_project, questionID) {
       <p class="code-question-pane-status">${stale ? "Stale analysis — retained for history" : "Current bounded analysis"}</p>
       <p class="code-question-define-muted">${escapeHTML(run.modelID)} · ${escapeHTML(run.createdAt)} · dependency ${escapeHTML(run.dependencyHash)}</p>
     </header>
-    <h3>Analysis conclusion</h3>
-    <p>${escapeHTML(run.answer.conclusion)}</p>
-    <h4>Explanation</h4>
-    <p>${escapeHTML(run.answer.explanation)}</p>`;
+    <h3>Analysis</h3>`;
+  appendResearchAnswerNarrative(result, run.answer);
   const structured = [
     ["Assumptions", run.answer.assumptions],
     ["Missing facts", run.answer.missingFacts],

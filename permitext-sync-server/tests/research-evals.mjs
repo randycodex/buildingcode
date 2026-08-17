@@ -328,9 +328,8 @@ function judgeSchemaForRubric(concepts, forbidden, uncertainty) {
 
 function answerForJudge(answer) {
   return {
-    conclusion: answer.conclusion,
+    answerText: answer.answerText || [answer.conclusion, answer.explanation].filter(Boolean).join("\n\n"),
     supportedPoints: answer.supportedPoints || [],
-    explanation: answer.explanation,
     assumptions: answer.assumptions || [],
     missingFacts: answer.missingFacts || [],
     evidenceLimitations: answer.evidenceLimitations || [],
@@ -441,12 +440,11 @@ async function judgeAnswer(testCase, answer) {
 
 function answerProseStrings(answer) {
   return [
-    answer?.conclusion,
+    answer?.answerText || [answer?.conclusion, answer?.explanation].filter(Boolean).join("\n\n"),
     ...(answer?.supportedPoints || []).flatMap((point) => [
       point?.heading,
       point?.explanation
     ]),
-    answer?.explanation,
     ...(answer?.assumptions || []),
     ...(answer?.missingFacts || []),
     ...(answer?.evidenceLimitations || []),
@@ -915,15 +913,13 @@ function reviewMarkdown(dataset, results, createdAt, configuration) {
       "",
       "### Permitext answer",
       "",
-      `**Conclusion:** ${answer.conclusion}`,
+      answer.answerText || [answer.conclusion, answer.explanation].filter(Boolean).join("\n\n"),
       "",
       "**What the selected evidence establishes**",
       "",
       markdownList((answer.supportedPoints || []).map((point) =>
         `${point.heading}: ${point.explanation}`
       )),
-      "",
-      answer.explanation,
       "",
       "**Assumptions**",
       "",
@@ -1440,12 +1436,11 @@ function answerComparisonText(result) {
   const answer = result?.answer;
   return answer
     ? [
-        answer.conclusion,
+        answer.answerText || [answer.conclusion, answer.explanation].filter(Boolean).join("\n\n"),
         ...(answer.supportedPoints || []).flatMap((point) => [
           point.heading,
           point.explanation
         ]),
-        answer.explanation,
         ...(answer.missingFacts || []),
         ...(answer.evidenceLimitations || []),
         ...(answer.additionalEvidenceNeeded || [])

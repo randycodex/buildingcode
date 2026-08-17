@@ -336,8 +336,7 @@ const researchInterpretationSource = workspaceScript.slice(
   workspaceScript.indexOf("function renderResearchInterpretation"),
   workspaceScript.indexOf("async function renderUtilityInstance")
 );
-assert.match(researchInterpretationSource, /research-answer-primary/);
-assert.match(researchInterpretationSource, /research-answer-explanation/);
+assert.match(researchInterpretationSource, /appendResearchAnswerNarrative\(card, result\)/);
 assert.match(researchInterpretationSource, /Sources, assumptions, and limits/);
 assert.match(researchInterpretationSource, /appendResearchSupportedPoints\(detailsBody/);
 assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Assumptions used"/);
@@ -368,10 +367,10 @@ assert.doesNotMatch(workspaceScript, /function renderCodeDecisionContextBar/);
 assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ensureCodeQuestionShellForProject\(project\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260817-research-live-sync-v347/);
-assert.match(serviceWorker, /permitext-pro-shell-v701/);
+assert.match(workspaceHTML, /styles\.css\?v=20260817-adaptive-research-answer-v348/);
+assert.match(serviceWorker, /permitext-pro-shell-v702/);
 assert.match(workspaceScript, /paneID\?\.startsWith\("research:conversation:"\)/);
-assert.match(serviceWorker, /styles\.css\?v=20260817-research-live-sync-v347/);
+assert.match(serviceWorker, /styles\.css\?v=20260817-adaptive-research-answer-v348/);
 assert.match(workspaceScript, /research-feedback-compact/);
 assert.match(workspaceScript, /research-feedback-details/);
 assert.match(workspaceScript, /void saveFeedback\("helpful"/);
@@ -384,7 +383,7 @@ assert.match(workspaceScript, /reviewRow\.append\(evidenceReviewed, compact\)/);
 assert.match(workspaceScript, /\(evidenceReviewedBody \|\| bubble\)\.append\(answerSources\)/);
 assert.match(workspaceStyles, /\.research-answer-review-row \.research-evidence-reviewed \{[\s\S]*?flex: 1;/);
 assert.match(workspaceStyles, /workspace-panel:not\(\.reader-panel\) \.research-evidence-reviewed > summary \{[\s\S]*?font-size: 14px !important;/);
-assert.match(workspaceStyles, /\.research-answer-primary \{[\s\S]*?font-weight: 400;/);
+assert.match(workspaceStyles, /\.research-answer-paragraph:first-child \{[\s\S]*?font-weight: 400;/);
 assert.match(workspaceStyles, /\.research-evidence-reviewed > summary::after \{[\s\S]*?content: "›";/);
 assert.doesNotMatch(workspaceScript, /Was this answer useful\?/);
 assert.doesNotMatch(workspaceScript, /explanation\.textContent = researchDisplayText\(point\.explanation\)/);

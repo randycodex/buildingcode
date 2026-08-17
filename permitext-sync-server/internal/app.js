@@ -404,11 +404,10 @@ function appendRunReviewStatus(parent, run) {
 function answerText(result) {
   const answer = result?.answer;
   return answer ? [
-    answer.conclusion,
+    answer.answerText || [answer.conclusion, answer.explanation].filter(Boolean).join("\n\n"),
     ...(answer.supportedPoints || []).map((point, index) =>
       `${index + 1}. ${point.heading}: ${point.explanation}`
     ),
-    answer.explanation,
     ...(answer.assumptions || []).map((item) => `Assumption: ${item}`),
     ...(answer.missingFacts || []).map((item) => `Missing fact: ${item}`),
     ...(answer.evidenceLimitations || []).map((item) => `Evidence limitation: ${item}`),

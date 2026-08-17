@@ -5304,15 +5304,23 @@ mark {
   color: var(--text-primary);
 }
 
-.research-answer-primary,
-.research-answer-explanation {
+.research-answer-narrative {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.research-answer-paragraph,
+.research-answer-list {
   margin: 0;
   line-height: var(--reader-line-height);
+}
+
+.research-answer-paragraph {
   white-space: pre-line;
 }
 
-body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-primary,
-body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-explanation {
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-paragraph,
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-list {
   color: #ffffff !important;
 }
 
@@ -5323,13 +5331,18 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   line-height: 1.35;
 }
 
-.research-answer-primary {
+.research-answer-paragraph:first-child {
   font-size: 1.02rem;
   font-weight: 400;
 }
 
-.research-answer-explanation {
+.research-answer-paragraph,
+.research-answer-list {
   font-weight: 400;
+}
+
+.research-answer-list {
+  padding-left: 1.25rem;
 }
 
 .research-answer-citation-chips {

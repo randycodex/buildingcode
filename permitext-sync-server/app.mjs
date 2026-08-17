@@ -421,7 +421,7 @@ const researchInterpretationSchema = {
   type: "object",
   additionalProperties: false,
   properties: {
-    conclusion: { type: "string" },
+    answerText: { type: "string" },
     supportedPoints: {
       type: "array",
       minItems: 1,
@@ -438,7 +438,6 @@ const researchInterpretationSchema = {
         required: ["heading", "explanation", "sectionID", "sourceIDs"]
       }
     },
-    explanation: { type: "string" },
     assumptions: { type: "array", items: { type: "string" } },
     missingFacts: { type: "array", items: { type: "string" } },
     followUpQuestions: { type: "array", maxItems: 8, items: { type: "string" } },
@@ -472,9 +471,8 @@ const researchInterpretationSchema = {
     }
   },
   required: [
-    "conclusion",
+    "answerText",
     "supportedPoints",
-    "explanation",
     "assumptions",
     "missingFacts",
     "followUpQuestions",
@@ -6206,9 +6204,11 @@ function researchPrompt(question, evidence, options = {}) {
       .map((point, index) => `${index + 1}. ${point.heading}: ${point.explanation}`)
       .join("\n");
     return [
-      `ASSISTANT: ${message.answer?.conclusion || ""}`,
-      supportedPoints,
-      message.answer?.explanation || ""
+      `ASSISTANT: ${message.answer?.answerText || [
+        message.answer?.conclusion,
+        message.answer?.explanation
+      ].filter(Boolean).join("\n\n")}`,
+      supportedPoints
     ].filter(Boolean).join("\n");
   }).join("\n\n");
   const projectFacts = (options.projectContextFacts || [])
@@ -6647,12 +6647,16 @@ function mockResearchInterpretation(question, evidence, options = {}) {
   const conversational = options.responseStyle === "conversational";
   const acceptsConditionalYes = /^(?:can|could|does|is|are|may|must|should|will|would)\b/i
     .test(String(question || "").trim());
+  const directAnswer = conversational
+    ? acceptsConditionalYes
+      ? "Potentially, yes—but only if the conditions in the assembled enacted provisions are satisfied by the project."
+      : "The assembled enacted provisions provide a conditional answer, but the remaining project facts must be confirmed before relying on it."
+    : `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`;
+  const application = conversational
+    ? `The enacted text gives a governing starting point, but it is not a blanket approval. Read ${subject} together, then confirm the project facts that control the cited conditions before relying on the result.`
+    : "The assembled enacted code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.";
   return {
-    conclusion: conversational
-      ? acceptsConditionalYes
-        ? "Potentially, yes—but only if the conditions in the assembled enacted provisions are satisfied by the project."
-        : "The assembled enacted provisions provide a conditional answer, but the remaining project facts must be confirmed before relying on it."
-      : `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`,
+    answerText: [directAnswer, application].join("\n\n"),
     supportedPoints: answerEvidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
@@ -6661,9 +6665,6 @@ function mockResearchInterpretation(question, evidence, options = {}) {
       sectionID: section.sectionID,
       sourceIDs: [section.sourceID || `section-${section.sectionID}`]
     })),
-    explanation: conversational
-      ? `The enacted text gives a governing starting point, but it is not a blanket approval. Read ${subject} together, then confirm the project facts that control the cited conditions before relying on the result.`
-      : "The assembled enacted code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.",
     assumptions: ["Only the enacted 2022 New York City Construction Code provisions assembled for this answer were treated as governing authority."],
     missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
     followUpQuestions: ["What project fact would determine whether the cited conditions apply?"],
@@ -6896,10 +6897,13 @@ export function researchEvidenceBoundaryFallbackEligibility({
 }
 
 export function researchEvidenceBoundaryInterpretation() {
+  const conclusion = "The enacted evidence Permitext reviewed does not establish a requirement responsive to this question.";
+  const explanation = "Permitext cannot support a substantive code conclusion from this evidence set. The reviewed passages are not cited because they do not govern the question.";
   return {
-    conclusion: "The enacted evidence Permitext reviewed does not establish a requirement responsive to this question.",
+    answerText: `${conclusion}\n\n${explanation}`,
+    conclusion,
     supportedPoints: [],
-    explanation: "Permitext cannot support a substantive code conclusion from this evidence set. The reviewed passages are not cited because they do not govern the question.",
+    explanation,
     assumptions: [],
     missingFacts: [],
     followUpQuestions: [
@@ -6924,12 +6928,14 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     if (!allowedSections.has(section.sectionID)) allowedSections.set(section.sectionID, section);
     allowedSources.set(section.sourceID || `section-${section.sectionID}`, section);
   }
+  const hasAdaptiveAnswer = typeof value?.answerText === "string" && Boolean(value.answerText.trim());
+  const hasLegacyAnswer = typeof value?.conclusion === "string" && Boolean(value.conclusion.trim()) &&
+    typeof value?.explanation === "string" && Boolean(value.explanation.trim());
   if (!value || typeof value !== "object" ||
-      typeof value.conclusion !== "string" || !value.conclusion.trim() ||
+      (!hasAdaptiveAnswer && !hasLegacyAnswer) ||
       !Array.isArray(value.supportedPoints) ||
       value.supportedPoints.length === 0 ||
       value.supportedPoints.length > maximumResearchSupportedPoints ||
-      typeof value.explanation !== "string" || !value.explanation.trim() ||
       !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
       !Array.isArray(value.missingFacts) || !value.missingFacts.every((item) => typeof item === "string") ||
       !Array.isArray(value.followUpQuestions) || !value.followUpQuestions.every((item) => typeof item === "string") ||
@@ -7067,14 +7073,23 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     }
   }
   const cleanNarrative = (text) => String(text || "")
+    .replace(/\r\n?/g, "\n")
     .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
     .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
     .replace(/[【】：「」『』。“”]+(?=\s*[A-Za-z0-9])/g, " ")
     .replace(/\s+([,.;:!?])/g, "$1")
     .replace(/[;,]\s*$/, "")
     .trim();
-  const conclusion = cleanNarrative(value.conclusion);
-  const explanation = cleanNarrative(value.explanation);
+  const answerText = cleanNarrative(hasAdaptiveAnswer
+    ? value.answerText
+    : [value.conclusion, value.explanation].filter(Boolean).join("\n\n"));
+  const answerParagraphs = answerText.split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean);
+  const conclusion = hasAdaptiveAnswer
+    ? cleanNarrative(answerParagraphs[0])
+    : cleanNarrative(value.conclusion);
+  const explanation = hasAdaptiveAnswer
+    ? cleanNarrative(answerParagraphs.slice(1).join("\n\n"))
+    : cleanNarrative(value.explanation);
   const cleanedSupportedPoints = supportedPoints.map((point) => ({
     ...point,
     heading: cleanNarrative(point.heading),
@@ -7104,8 +7119,8 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     relevance: cleanNarrative(citation.relevance)
   }));
   if (
+    !answerText ||
     !conclusion ||
-    !explanation ||
     !evidenceLimitations.length ||
     cleanedSupportedPoints.some((point) => !point.heading || !point.explanation) ||
     cleanedCitations.some((citation) => !citation.relevance)
@@ -7115,7 +7130,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     throw error;
   }
   if (
-    [conclusion, explanation, ...cleanedSupportedPoints.flatMap((point) => [point.heading, point.explanation])]
+    [answerText, ...cleanedSupportedPoints.flatMap((point) => [point.heading, point.explanation])]
       .some((text) => /\b(?:SECTION_ID|PASSAGE_IDS?)\b/i.test(text))
   ) {
     const error = new Error("The model exposed an internal evidence identifier in user-facing prose.");
@@ -7123,6 +7138,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     throw error;
   }
   return {
+    answerText,
     conclusion,
     supportedPoints: cleanedSupportedPoints,
     explanation,
@@ -7152,7 +7168,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   const configuration = conversational
     ? {
         ...baseConfiguration,
-        promptVersion: `${baseConfiguration.promptVersion}:conversational-v2`,
+        promptVersion: `${baseConfiguration.promptVersion}:conversational-v3`,
         evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
       }
     : baseConfiguration;
@@ -7186,15 +7202,19 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence.",
         "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
         "Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic.",
-        "Write the conclusion as a concise professional answer of one to three sentences.",
+        "Write answerText as the complete user-facing answer. Do not target a fixed number of paragraphs or sentences.",
+        "Use the shortest answer that fully and reliably resolves the question from the available evidence. Structure must follow the reasoning: a simple answer may be one paragraph; rule-and-application reasoning may use more; multiple provisions, exceptions, applicability paths, competing interpretations, or evidence gaps may use additional paragraphs or a short hyphen-led breakdown.",
+        "Lead with the strongest supported conclusion. State a conditional conclusion immediately when a material condition remains. When the evidence is insufficient, identify exactly what cannot be determined.",
+        "Include only what is needed to explain the conclusion, controlling rule, application to stated facts, material conditions or exceptions, and material uncertainty or missing evidence. Never omit a material qualification, applicability issue, conflicting provision, or evidence limitation merely to keep the answer short. Never expand a complete short answer for visual consistency or completeness theater.",
+        "In answerText, separate natural paragraphs with a blank line. Use a short hyphen-led breakdown only when it makes multiple material paths or issues clearer. Do not add headings or a list when ordinary prose is clearer.",
         conversational
-          ? "For this ordinary Research conversation, write conclusion and explanation so they read consecutively as one natural response. Lead with the clearest supported answer, such as Yes, No, or Potentially, then explain why in direct plain language. Avoid report boilerplate, process narration, repeated question text, and phrases such as a project-specific answer requires reading. Keep the tone professional but conversational."
-          : "Use the formal governed-analysis tone for conclusion and explanation.",
-        "Do not print SECTION_ID or PASSAGE_ID markers in the conclusion, supported-point prose, or practical explanation; those identifiers belong only in the structured mapping fields.",
+          ? "For this ordinary Research conversation, write in direct plain language. Avoid report boilerplate, process narration, repeated question text, and phrases such as a project-specific answer requires reading. Keep the tone professional but conversational."
+          : "Use a formal governed-analysis tone in answerText.",
+        "Do not print SECTION_ID or PASSAGE_ID markers in answerText or supported-point prose; those identifiers belong only in the structured mapping fields.",
         "Break the material rules established by the assembled enacted evidence into ordered supportedPoints. Give each point a short plain-language heading, a complete explanation, and the exact supplied sectionID and sourceIDs that support it.",
         "Do not add an example, consequence, code category, or practical requirement unless the assembled evidence or user-provided Project facts establish it. Clearly identify any illustration as hypothetical, and never use a hypothetical to introduce an unsupported legal premise.",
         "Keep the answer within the scope of the current question. Do not introduce or cite a collateral code analysis merely to observe that a supplied fact might matter elsewhere; mention another code topic only when it materially qualifies the requested conclusion or the user asks for it.",
-        "Use explanation for the practical application of the supported points to the question and user-provided Project facts. Do not merely repeat the numbered points.",
+        "Use answerText to apply the supported rules to the question and user-provided Project facts. Do not merely repeat the structured supportedPoints.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
         "For a numeric limit or table comparison, compare the stated project value with every directly applicable supplied limit. If the value complies with a stricter baseline limit, state that direct conclusion and do not make it conditional on qualifying for a more generous allowance.",
         "A missing fact belongs in missingFacts or followUpQuestions only when it can change the requested conclusion. A fact that merely confirms an already-supported, more conservative result may be identified as a professional validation item, but it must not weaken or condition that result.",
@@ -7355,6 +7375,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
+      "Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs.",
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
       "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
@@ -12080,7 +12101,7 @@ async function reportSourcesForProject(userID, projectID) {
         id: answer.id,
         kind: "researchAnswer",
         label: answer.question,
-        summary: answer.answer?.conclusion?.slice(0, 500) || "",
+        summary: (answer.answer?.answerText || answer.answer?.conclusion || "").slice(0, 500),
         sourceClassification: "ai-assisted",
         updatedAt: answer.createdAt,
         manifestItem: {
@@ -12088,6 +12109,10 @@ async function reportSourcesForProject(userID, projectID) {
           answerID: answer.id,
           conversationID: answer.conversationID,
           question: answer.question,
+          answerText: answer.answer?.answerText || [
+            answer.answer?.conclusion,
+            answer.answer?.explanation
+          ].filter(Boolean).join("\n\n"),
           conclusion: answer.answer?.conclusion || "No supported conclusion was recorded.",
           supportedPoints: answer.answer?.supportedPoints || [],
           explanation: answer.answer?.explanation || "",
@@ -14812,7 +14837,7 @@ async function handleResearchConversationMessage(request, response) {
           model: "permitext-mock",
           configuration: {
             ...researchModelConfiguration(),
-            promptVersion: `${researchModelConfiguration().promptVersion}:conversational-v2`,
+            promptVersion: `${researchModelConfiguration().promptVersion}:conversational-v3`,
             evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
           },
           usage: combinedResearchUsage()

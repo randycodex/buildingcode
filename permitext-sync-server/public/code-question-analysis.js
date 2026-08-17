@@ -162,14 +162,22 @@ export function validateBoundedInterpretation(interpretation, binding) {
   const limitations = (interpretation.limitations || interpretation.evidenceLimitations || [])
     .map(String).map((item) => item.trim()).filter(Boolean);
   if (!limitations.length) throw new Error("Bounded analysis must disclose its evidence limitations.");
+  const answerText = requiredText(
+    interpretation.answerText || [interpretation.conclusion, interpretation.explanation].filter(Boolean).join("\n\n"),
+    "analysis answer"
+  );
+  const answerParagraphs = answerText.split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean);
   return {
-    conclusion: requiredText(interpretation.conclusion, "analysis conclusion"),
+    answerText,
+    conclusion: String(interpretation.conclusion || answerParagraphs[0] || "").trim(),
     supportedPoints: (interpretation.supportedPoints || []).map((point) => ({
       heading: requiredText(point.heading, "supported-point heading", 500),
       explanation: requiredText(point.explanation, "supported-point explanation"),
       snapshotIDs: (point.snapshotIDs || point.sourceIDs || []).map(String).filter((id) => allowedSnapshotIDs.has(id))
     })),
-    explanation: requiredText(interpretation.explanation, "analysis explanation"),
+    explanation: String(
+      interpretation.explanation || (interpretation.answerText ? answerParagraphs.slice(1).join("\n\n") : "")
+    ).trim(),
     assumptions: (interpretation.assumptions || []).map(String).filter(Boolean),
     missingFacts: (interpretation.missingFacts || []).map(String).filter(Boolean),
     limitations,

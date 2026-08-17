@@ -31,6 +31,7 @@ function normalizedAnalysisAnswer(answerRecord = {}) {
     relevance: String(citation.relevance || citation.explanation || "Supports the bounded analysis.")
   })).filter((citation) => citation.snapshotIDs.length);
   return {
+    answerText: String(answer.answerText || [answer.conclusion, answer.explanation].filter(Boolean).join("\n\n")),
     conclusion: String(answer.conclusion || ""),
     supportedPoints: Array.isArray(answer.supportedPoints) ? copy(answer.supportedPoints) : [],
     explanation: String(answer.explanation || ""),

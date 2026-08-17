@@ -665,7 +665,7 @@ async function main() {
     const firstResearchAnswerMessage = researchMessage.conversation.messages.find((item) => item.role === "assistant");
     assert.ok(capturedMessage?.id);
     assert.ok(firstResearchAnswerMessage?.id);
-    assert.ok(firstResearchAnswerMessage.answer.promptVersion.endsWith(":conversational-v2"));
+    assert.ok(firstResearchAnswerMessage.answer.promptVersion.endsWith(":conversational-v3"));
     assert.match(firstResearchAnswerMessage.answer.conclusion, /^(?:Potentially, yes|The assembled enacted provisions provide a conditional answer)/);
     const firstResearchAnswer = await expectStatus(
       await postAs(editor, "/research/answers/get", { answerID: firstResearchAnswerMessage.id }),

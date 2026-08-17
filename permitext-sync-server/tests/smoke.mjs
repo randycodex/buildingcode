@@ -1432,14 +1432,15 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        workspaceScript.text.includes('answer.className = "research-answer-primary"') &&
-        workspaceScript.text.includes('explanation.className = "research-answer-explanation"') &&
+        workspaceScript.text.includes('narrative.className = "research-answer-narrative"') &&
+        workspaceScript.text.includes('paragraph.className = "research-answer-paragraph"') &&
+        workspaceScript.text.includes('list.className = "research-answer-list"') &&
         workspaceScript.text.includes('summary.textContent = "Sources, assumptions, and limits"') &&
         workspaceScript.text.includes('details.open = Boolean(options.detailsOpen)') &&
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-research-live-sync-v347'),
+        webRoot.text.includes('/web/app.js?v=20260817-adaptive-research-answer-v348'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1605,7 +1606,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-live-sync-v347'),
+      webRoot.text.includes('/web/styles.css?v=20260817-adaptive-research-answer-v348'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1872,7 +1873,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-live-sync-v347'),
+      webRoot.text.includes('/web/styles.css?v=20260817-adaptive-research-answer-v348'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -4139,7 +4140,7 @@ async function main() {
     assert(
       conversationMessage.json.conversation.messages.length === 2 &&
         conversationMessage.json.conversation.messages[1].answer.supportedPoints.length >= 1 &&
-        conversationMessage.json.conversation.messages[1].answer.promptVersion.endsWith(":conversational-v2") &&
+        conversationMessage.json.conversation.messages[1].answer.promptVersion.endsWith(":conversational-v3") &&
         conversationMessage.json.conversation.messages[1].answer.conclusion.startsWith("The assembled enacted provisions provide a conditional answer") &&
         conversationMessage.json.conversation.messages[1].answer.supportedPoints[0].sourceIDs[0] ===
           conversationMessage.json.conversation.messages[1].answer.citations[0].sourceIDs[0] &&

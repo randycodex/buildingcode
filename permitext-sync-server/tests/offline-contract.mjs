@@ -195,21 +195,21 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260817-research-live-sync-v347"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260817-adaptive-research-answer-v348"));
 assert(shellPrecacheURLs.includes("/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3"));
-assert(shellPrecacheURLs.includes("/web/styles.css?v=20260817-research-live-sync-v347"));
+assert(shellPrecacheURLs.includes("/web/styles.css?v=20260817-adaptive-research-answer-v348"));
 assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260813-research-reader-spacing-v120"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260811-research-columns-v3"));
 assert(!shellPrecacheURLs.some((url) => url.includes("/web/workboard-assets/workboard.css")));
 assert(shellPrecacheURLs.includes("/web/code-question-workspace.js?v=20260809-decision-index-width-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-client-state.js?v=20260809-session-stability-v3"));
-assert(shellPrecacheURLs.includes("/web/code-question-server.js?v=20260809-code-decision-v2"));
+assert(shellPrecacheURLs.includes("/web/code-question-server.js?v=20260817-adaptive-research-answer-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-legacy.js?v=20260806-code-question-legacy-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-issue.js?v=20260803-code-question-issue-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-define.js?v=20260803-code-question-analyze-v3"));
 assert(shellPrecacheURLs.includes("/web/code-question-evidence.js?v=20260807-code-question-phase5a-v1"));
-assert(shellPrecacheURLs.includes("/web/code-question-analysis.js?v=20260803-code-question-analyze-v3"));
+assert(shellPrecacheURLs.includes("/web/code-question-analysis.js?v=20260817-adaptive-research-answer-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-review.js?v=20260803-code-question-review-v1"));
 assert(shellPrecacheURLs.includes("/web/fonts/inter-latin-wght-normal.woff2"));
 assert(shellPrecacheURLs.includes("/web/fonts/inter-latin-wght-italic.woff2"));

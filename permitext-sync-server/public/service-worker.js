@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v701";
+const shellCacheName = "permitext-pro-shell-v702";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -6,26 +6,26 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260817-research-live-sync-v347",
+  "/web/styles.css?v=20260817-adaptive-research-answer-v348",
   "/web/fonts/inter-latin-wght-normal.woff2",
   "/web/fonts/inter-latin-wght-italic.woff2",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260817-research-live-sync-v347",
+  "/web/app.js?v=20260817-adaptive-research-answer-v348",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260813-research-reader-spacing-v120",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260817-research-live-sync-v347",
+  "/web/offline-storage.js?v=20260817-adaptive-research-answer-v348",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260811-research-columns-v3",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",
   "/web/code-question-client-state.js?v=20260809-session-stability-v3",
-  "/web/code-question-server.js?v=20260809-code-decision-v2",
+  "/web/code-question-server.js?v=20260817-adaptive-research-answer-v1",
   "/web/code-question-legacy.js?v=20260806-code-question-legacy-v1",
   "/web/code-question-issue.js?v=20260803-code-question-issue-v1",
   "/web/code-question-define.js?v=20260803-code-question-analyze-v3",
   "/web/code-question-evidence.js?v=20260807-code-question-phase5a-v1",
-  "/web/code-question-analysis.js?v=20260803-code-question-analyze-v3",
+  "/web/code-question-analysis.js?v=20260817-adaptive-research-answer-v1",
   "/web/code-question-review.js?v=20260803-code-question-review-v1",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",
