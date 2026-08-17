@@ -162,6 +162,12 @@ import {
 } from "./research-source-policy.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import {
+  createResearchCorpusRegistry,
+  researchCorpusByPrefix,
+  researchCorpusRegistryVersion,
+  routeResearchCorpora
+} from "./research-corpus-registry.mjs";
+import {
   evaluateResearchRequiredClaimCoverage,
   requiredResearchClaimsFromEvidence,
   researchRequiredClaimCoverageVersion,
@@ -5126,8 +5132,10 @@ async function constructionVisualSourceMetadata(reference) {
   if (!/^[a-zA-Z0-9._-]+\.(?:avif|gif|jpe?g|png|webp)$/i.test(assetName)) return null;
   let metadataPromise = constructionVisualAssetMetadataCache.get(assetName);
   if (!metadataPromise) {
-    metadataPromise = readFile(join(assetContentPath, assetName))
-      .then((body) => {
+    metadataPromise = resolveCodeAsset(assetName)
+      .then(async (resolved) => {
+        if (!resolved.path) return null;
+        const body = await readFile(resolved.path);
         const contentHash = createHash("sha256").update(body).digest("hex");
         return {
           id: `visual-source-${createHash("sha256")
@@ -5139,7 +5147,8 @@ async function constructionVisualSourceMetadata(reference) {
           assetURL: `/code/assets/${encodeURIComponent(assetName)}`,
           mediaType: contentTypeForPath(assetName),
           contentHash,
-          byteLength: body.length
+          byteLength: body.length,
+          assetRootID: resolved.rootId
         };
       })
       .catch((error) => {
@@ -5166,7 +5175,13 @@ async function constructionVisualSourceWithContent(source) {
   }
   let body;
   try {
-    body = await readFile(join(assetContentPath, assetName));
+    const resolved = await resolveCodeAsset(assetName);
+    if (!resolved.path) {
+      const missing = new Error("The selected visual evidence is no longer available in the enacted source.");
+      missing.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+      throw missing;
+    }
+    body = await readFile(resolved.path);
   } catch (error) {
     if (error.code === "ENOENT") {
       const missing = new Error("The selected visual evidence is no longer available in the enacted source.");
@@ -5901,6 +5916,131 @@ async function shippedSearchIndex() {
   return cachedShippedSearchIndex;
 }
 
+let cachedResearchCorpusRegistry = null;
+const cachedResearchCorpusResources = new Map();
+
+async function currentResearchCorpusRegistry() {
+  if (cachedResearchCorpusRegistry) return cachedResearchCorpusRegistry;
+  const zoningMetadata = await zoningContentMetadata();
+  cachedResearchCorpusRegistry = createResearchCorpusRegistry({
+    zoningResearchEligibility: zoningMetadata.researchEligibility === true,
+    zoningBlockedReason: zoningMetadata.researchBlockedReason
+  });
+  return cachedResearchCorpusRegistry;
+}
+
+async function researchCorpusPlanForTurn({
+  question,
+  messages = [],
+  projectCodeVersion = null,
+  pinnedEvidence = []
+}) {
+  const registry = await currentResearchCorpusRegistry();
+  const routed = routeResearchCorpora({
+    question,
+    previousMessages: messages,
+    projectCodeVersion,
+    registry
+  });
+  const selectedIDs = new Set(routed.selected.map((corpus) => corpus.id));
+  const pinnedCorpora = Array.from(new Set(
+    (Array.isArray(pinnedEvidence) ? pinnedEvidence : [])
+      .map((source) => researchCorpusByPrefix(registry, source?.codePrefix)?.id)
+      .filter(Boolean)
+  )).filter((id) => !selectedIDs.has(id)).map((id) => ({
+    ...registry.find((corpus) => corpus.id === id),
+    routeReason: "explicitly pinned evidence"
+  }));
+  const pinnedIDs = new Set(pinnedCorpora.map((corpus) => corpus.id));
+  return {
+    ...routed,
+    pinnedCorpora,
+    excluded: routed.excluded.filter((corpus) => !pinnedIDs.has(corpus.id))
+  };
+}
+
+function researchCatalogEntry(section, corpus) {
+  const storedNumber = String(section.sectionNumber || "").trim();
+  const sectionNumber = corpus.id === "nyc-2022-fire-code"
+    ? storedNumber.replace(/^FC\s+/i, "")
+    : storedNumber;
+  return {
+    ...section,
+    sectionNumber,
+    storedSectionNumber: section.storedSectionNumber || storedNumber,
+    jurisdiction: corpus.jurisdiction,
+    codeEdition: corpus.codeEdition,
+    codeVersion: corpus.codeVersion,
+    corpusID: corpus.id,
+    corpusLabel: corpus.label,
+    applicabilityStatus: corpus.applicabilityStatus
+  };
+}
+
+function mergedResearchSearchIndex(indexes) {
+  if (indexes.length === 1) return indexes[0];
+  const merged = new Map();
+  for (const index of indexes) {
+    for (const [token, ids] of index) {
+      const existing = merged.get(token) || [];
+      merged.set(token, normalizedSortedPostingList([...existing, ...ids]));
+    }
+  }
+  return merged;
+}
+
+async function researchCorpusResources(corpusPlan) {
+  const selected = Array.isArray(corpusPlan?.selected) ? corpusPlan.selected : [];
+  const cacheKey = selected.map((corpus) => corpus.id).sort().join(":") || "none";
+  if (cachedResearchCorpusResources.has(cacheKey)) {
+    return cachedResearchCorpusResources.get(cacheKey);
+  }
+  const resourcePromise = (async () => {
+    const catalogs = [];
+    const indexes = [];
+    for (const corpus of selected) {
+      if (corpus.id === "nyc-2022-construction-codes") {
+        catalogs.push((await sectionCatalog()).map((section) => researchCatalogEntry(section, corpus)));
+        indexes.push(await shippedSearchIndex());
+      } else if (corpus.id === "nyc-2022-fire-code") {
+        catalogs.push((await enactedSectionCatalog())
+          .filter((section) => section.codePrefix === "FC")
+          .map((section) => researchCatalogEntry(section, corpus)));
+        indexes.push(await enactedSearchIndex());
+      } else if (corpus.id === "nyc-zoning-resolution") {
+        catalogs.push((await zoningSectionCatalog()).map((section) => researchCatalogEntry(section, corpus)));
+        indexes.push(await zoningSearchIndex());
+      }
+    }
+    return {
+      catalog: catalogs.flat(),
+      invertedIndex: mergedResearchSearchIndex(indexes),
+      availableCodePrefixes: selected.flatMap((corpus) => corpus.codePrefixes || [])
+    };
+  })().catch((error) => {
+    cachedResearchCorpusResources.delete(cacheKey);
+    throw error;
+  });
+  cachedResearchCorpusResources.set(cacheKey, resourcePromise);
+  return resourcePromise;
+}
+
+async function researchBodyForCatalogSection(section) {
+  if (section?.corpusID === "nyc-existing-building-code-2027" || isExistingBuildingSectionID(section?.id)) {
+    return await existingBuildingSection(section.id) || { blocks: [] };
+  }
+  if (section?.corpusID === "nyc-2022-fire-code" || isEnactedCodeSectionID(section?.id)) {
+    return await enactedSection(section.id) || { blocks: [] };
+  }
+  if (section?.corpusID === "nyc-zoning-resolution" || isZoningSectionID(section?.id)) {
+    return await zoningSection(section.id) || { blocks: [] };
+  }
+  return sectionBody(section?.webSectionID || section?.id, {
+    allowMissing: true,
+    canonicalSectionID: section?.id
+  });
+}
+
 function tokenizeSearchText(text) {
   const tokens = [];
   let current = "";
@@ -6085,26 +6225,42 @@ function matchingCanonicalResearchSelection(value, canonicalText) {
 async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
   const evidence = [];
   const charactersPerSection = Math.min(12_000, Math.floor(60_000 / sectionIDs.length));
-  const chapterSummaries = await chapterIndex();
+  const registry = await currentResearchCorpusRegistry();
+  const constructionChapterSummaries = await chapterIndex();
   for (const requestedID of sectionIDs) {
     let summary;
+    let corpus;
     let canonicalID;
     let body;
     let enactedBodyText;
     let canonicalText;
     let text;
     try {
-      summary = await sectionSummaryByID(requestedID);
+      if (isEnactedCodeSectionID(requestedID)) {
+        summary = await enactedSectionSummary(requestedID);
+      } else if (isExistingBuildingSectionID(requestedID)) {
+        summary = await existingBuildingSectionSummary(requestedID);
+      } else if (isZoningSectionID(requestedID)) {
+        corpus = researchCorpusByPrefix(registry, "ZR");
+        summary = corpus?.automaticResearchEligible ? await zoningSectionSummary(requestedID) : null;
+      } else {
+        summary = await sectionSummaryByID(requestedID);
+      }
       if (!summary) {
         const error = new Error(`Unknown code section: ${requestedID}.`);
         error.code = "INVALID_RESEARCH_SECTION";
         throw error;
       }
+      corpus ||= researchCorpusByPrefix(registry, summary.codePrefix);
+      const explicitOptInAllowed = options.allowOptInCorpora === true && corpus?.optInRequired === true;
+      if (!corpus || !corpus.automaticResearchEligible && !explicitOptInAllowed) {
+        const error = new Error(`The ${summary.codePrefix || "requested"} corpus is not approved for ordinary Research.`);
+        error.code = "INVALID_RESEARCH_SECTION";
+        throw error;
+      }
+      summary = researchCatalogEntry(summary, corpus);
       canonicalID = String(summary.id || summary.sectionID || requestedID);
-      body = await sectionBody(summary.webSectionID || requestedID, {
-        allowMissing: false,
-        canonicalSectionID: canonicalID
-      });
+      body = await researchBodyForCatalogSection(summary);
       const rawText = (body.blocks || []).map((block) => block.plainText || "").join("\n\n");
       enactedBodyText = String(rawText || "").replace(/\s+/g, " ").trim();
       canonicalText = [summary.sectionNumber, summary.title, enactedBodyText]
@@ -6137,10 +6293,12 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
         constructionVisualSourceMetadata(reference)
       )
     )).filter(Boolean);
-    const chapterSummary = chapterSummaries.find((chapter) =>
-      chapter.codePrefix === String(summary.codePrefix || body.codePrefix || "") &&
-      String(chapter.chapterNumber) === String(summary.chapterNumber || body.chapterNumber || "")
-    );
+    const chapterSummary = summary.corpusID === "nyc-2022-construction-codes"
+      ? constructionChapterSummaries.find((chapter) =>
+          chapter.codePrefix === String(summary.codePrefix || body.codePrefix || "") &&
+          String(chapter.chapterNumber) === String(summary.chapterNumber || body.chapterNumber || "")
+        )
+      : null;
     evidence.push({
       sectionID: canonicalID,
       sectionNumber: String(summary.sectionNumber || body.sectionNumber || ""),
@@ -6150,6 +6308,12 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
       chapterTitle: String(chapterSummary?.fullTitle || chapterSummary?.displayTitle || ""),
       sectionGroupLabel: String(summary.headerLine || body.headerLine || ""),
       sectionGroupTitle: String(summary.headingLine || body.headingLine || ""),
+      jurisdiction: corpus.jurisdiction,
+      codeEdition: corpus.codeEdition,
+      codeVersion: corpus.codeVersion,
+      corpusID: corpus.id,
+      corpusLabel: corpus.label,
+      applicabilityStatus: corpus.applicabilityStatus,
       text,
       canonicalText,
       sectionTextHash: createHash("sha256").update(canonicalText).digest("hex"),
@@ -6169,6 +6333,8 @@ function researchPrompt(question, evidence, options = {}) {
       `CODE: ${section.codePrefix}`,
       `SECTION: ${section.sectionNumber}`,
       `TITLE: ${section.title}`,
+      `CORPUS: ${section.corpusLabel || section.corpusID || "Authorized enacted source"}`,
+      `APPLICABILITY_STATUS: ${section.applicabilityStatus || "current"}`,
       `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
       `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
       `EVIDENCE_ORIGIN: ${section.origin || "user_pinned"}`,
@@ -6260,11 +6426,13 @@ function researchPrompt(question, evidence, options = {}) {
     ? [
         "RESEARCH CODE BASIS",
         `JURISDICTION: ${options.codeBasis.jurisdiction}`,
-        `CODE_EDITION: ${options.codeBasis.codeEdition}`,
-        `CODE_VERSION: ${options.codeBasis.codeVersion}`,
         `RETRIEVAL_SCOPE: ${options.codeBasis.retrievalScope}`,
+        `SEARCHED_CORPORA: ${JSON.stringify(options.codeBasis.searchedCorpora || [])}`,
+        `EXPLICITLY_PINNED_CORPORA: ${JSON.stringify(options.codeBasis.pinnedCorpora || [])}`,
+        `UNAVAILABLE_CORPORA: ${JSON.stringify(options.codeBasis.unavailableCorpora || [])}`,
+        `EXCLUDED_CORPORA: ${JSON.stringify(options.codeBasis.excludedCorpora || [])}`,
         options.codeBasis.limitation ? `LIMITATION: ${options.codeBasis.limitation}` : "",
-        "Treat this as the edition boundary for the answer. Do not imply that another code edition was retrieved."
+        "Treat each evidence record's corpus and edition as its source boundary. Do not imply that an unavailable, excluded, or unsearched corpus was retrieved."
       ].filter(Boolean).join("\n")
     : "";
   return [
@@ -6501,6 +6669,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     instructions: [
       "Organize the supplied enacted evidence into a compact internal legal-research map before a separate model writes the user-facing answer.",
       "Retrieval relevance does not establish legal applicability. Identify controlling provisions only when the supplied text supports that role.",
+      "Classify historical and future-effective evidence as an applicability limitation unless supplied enacted evidence establishes why it governs the project at issue.",
       "Treat evidence labeled contextual only as the subject of a relevance comparison. Do not place it among controlling provisions or general rules, and do not treat evidence labeled irrelevant as answer support.",
       "Treat evidence labeled with a collateral topic route as internally reviewed material matched only by a supplied project fact. Do not classify it as controlling or a general rule for the current question unless the question expressly asks that separate legal topic.",
       "Separate general rules, exceptions, conditions, limitations, definitions, cross-references, tables, known project facts, unresolved project facts, and evidence limitations.",
@@ -7040,6 +7209,9 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       chapterNumber: source.chapterNumber,
       codeVersion: source.codeVersion || defaultSyncCodeVersion,
       codeEdition: source.codeEdition || defaultResearchCodeEdition,
+      corpusID: source.corpusID || null,
+      corpusLabel: source.corpusLabel || null,
+      applicabilityStatus: source.applicabilityStatus || null,
       sourceIDs,
       supportingPassages: sourceIDs.map((sourceID) => ({
         sourceID,
@@ -7201,6 +7373,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Apply current-turn hypothetical facts only to the current hypothetical. They do not replace established facts. User-stated unknowns remain unknown. Never promote an earlier assistant conclusion into a user-established fact.",
         "Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence.",
         "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
+        "Evidence labeled historical or future-effective is available only because the user explicitly pinned it. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence.",
         "Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic.",
         "Write answerText as the complete user-facing answer. Do not target a fixed number of paragraphs or sentences.",
         "Use the shortest answer that fully and reliably resolves the question from the available evidence. Structure must follow the reasoning: a simple answer may be one paragraph; rule-and-application reasoning may use more; multiple provisions, exceptions, applicability paths, competing interpretations, or evidence gaps may use additional paragraphs or a short hyphen-led breakdown.",
@@ -7379,6 +7552,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
       "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
+      "Fail with missed_material_conclusion if cited historical or future-effective evidence is not expressly identified as historical or not yet effective, or if the answer silently presents it as ordinary current law.",
       "Fail an answer that introduces a collateral code example or citation that does not materially qualify the requested conclusion and was not requested by the user.",
       "Fail with irrelevant_citation when the answer cites evidence labeled with a collateral topic route merely because a supplied project fact matched that separate code topic. Such evidence may be reviewed internally without appearing in the answer.",
       "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
@@ -7658,8 +7832,12 @@ function researchSourceFromEvidence(evidence, options = {}) {
       ? options.visualReviewConfirmedAt || new Date().toISOString()
       : null,
     sectionTextHash: evidence.sectionTextHash,
-    codeVersion: defaultSyncCodeVersion,
-    codeEdition: defaultResearchCodeEdition,
+    jurisdiction: evidence.jurisdiction || "New York City",
+    codeVersion: evidence.codeVersion || defaultSyncCodeVersion,
+    codeEdition: evidence.codeEdition || defaultResearchCodeEdition,
+    corpusID: evidence.corpusID || null,
+    corpusLabel: evidence.corpusLabel || null,
+    applicabilityStatus: evidence.applicabilityStatus || null,
     addedAt: new Date().toISOString()
   };
 }
@@ -7667,7 +7845,13 @@ function researchSourceFromEvidence(evidence, options = {}) {
 async function relatedResearchEvidence(primaryEvidence, limit = 3) {
   const phrases = inlineCodeReferencePhrases(primaryEvidence.text);
   if (!phrases.length) return [];
-  const catalog = await sectionCatalog();
+  const registry = await currentResearchCorpusRegistry();
+  const relatedPlan = {
+    selected: registry.filter((corpus) => corpus.automaticResearchEligible),
+    unavailable: [],
+    excluded: []
+  };
+  const { catalog } = await researchCorpusResources(relatedPlan);
   const relatedIDs = [];
   for (const phrase of phrases) {
     const codePrefix = phrase.codePrefix || primaryEvidence.codePrefix;
@@ -7756,7 +7940,9 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     error.code = "INVALID_RESEARCH_SELECTION";
     throw error;
   }
-  const [primary] = await researchEvidenceForSectionIDs([sectionID]);
+  const [primary] = await researchEvidenceForSectionIDs([sectionID], {
+    allowOptInCorpora: true
+  });
   const canonicalSelection = matchingCanonicalResearchSelection(normalizedSelection, primary.canonicalText);
   if (!canonicalSelection) {
     const error = new Error("The selected passage no longer matches the enacted section text.");
@@ -8049,10 +8235,14 @@ async function currentResearchEvidence(conversation) {
       .map((source) => source.sectionID)
       .filter(Boolean)
   ));
-  const evidence = await researchEvidenceForSectionIDs(selectedSectionIDs);
+  const evidence = await researchEvidenceForSectionIDs(selectedSectionIDs, {
+    allowOptInCorpora: true
+  });
   for (const sectionID of relatedSectionIDs) {
     try {
-      evidence.push(...await researchEvidenceForSectionIDs([sectionID]));
+      evidence.push(...await researchEvidenceForSectionIDs([sectionID], {
+        allowOptInCorpora: true
+      }));
     } catch (error) {
       if (!["INCOMPLETE_RESEARCH_SECTION", "INVALID_RESEARCH_SECTION", "ENOENT"].includes(error.code)) throw error;
     }
@@ -8173,14 +8363,20 @@ async function resolveResearchAssemblySection(request, catalog) {
       String(item.codePrefix || "").toUpperCase() === requestedPrefix &&
       String(item.sectionNumber || "").replace(/\.$/, "").toUpperCase() === requestedNumber
     );
-  if (!summary) return null;
-  const [evidence] = await researchEvidenceForSectionIDs([summary.id], { skipUnavailable: false });
+  const directPinnedSectionID = !summary && request?.origin === "user_pinned"
+    ? requestedID
+    : "";
+  if (!summary && !directPinnedSectionID) return null;
+  const [evidence] = await researchEvidenceForSectionIDs(
+    [summary?.id || directPinnedSectionID],
+    {
+      skipUnavailable: false,
+      allowOptInCorpora: Boolean(directPinnedSectionID)
+    }
+  );
   if (!evidence) return null;
   return {
     ...evidence,
-    jurisdiction: "New York City",
-    codeEdition: defaultResearchCodeEdition,
-    codeVersion: defaultSyncCodeVersion,
     crossReferences: researchAssemblyCrossReferences(evidence, catalog)
   };
 }
@@ -8192,18 +8388,17 @@ async function assembledResearchEvidenceForTurn({
   originSurface,
   projectFacts,
   topicContext,
+  corpusPlan,
   onStage
 }) {
-  const [catalog, invertedIndex] = await Promise.all([
-    sectionCatalog(),
-    shippedSearchIndex()
-  ]);
+  const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({ question, messages });
+  const { catalog, invertedIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
   const strategy = researchEvidenceStrategyForTurn({
     question,
     pinnedEvidence,
     originSurface
   });
-  return assembleResearchEvidence({
+  const assembled = await assembleResearchEvidence({
     question,
     previousMessages: messages,
     projectFacts,
@@ -8217,14 +8412,51 @@ async function assembledResearchEvidenceForTurn({
       retrievalContext,
       catalog,
       invertedIndex,
-      readSectionBody: (section) => sectionBody(section.webSectionID || section.id, {
-        allowMissing: true,
-        canonicalSectionID: section.id
-      }),
+      readSectionBody: researchBodyForCatalogSection,
+      resolveVisualSource: constructionVisualSourceMetadata,
+      availableCodePrefixes,
       limit
     }),
     resolveSection: (request) => resolveResearchAssemblySection(request, catalog)
   });
+  return {
+    ...assembled,
+    corpusPlan: structuredClone(appliedCorpusPlan),
+    discovery: {
+      ...assembled.discovery,
+      registryVersion: researchCorpusRegistryVersion,
+      searchedCorpora: appliedCorpusPlan.selected.map((corpus) => ({
+        id: corpus.id,
+        label: corpus.label,
+        codeEdition: corpus.codeEdition,
+        codeVersion: corpus.codeVersion,
+        codePrefixes: [...corpus.codePrefixes],
+        routeReason: corpus.routeReason
+      })),
+      pinnedCorpora: (appliedCorpusPlan.pinnedCorpora || []).map((corpus) => ({
+        id: corpus.id,
+        label: corpus.label,
+        codeEdition: corpus.codeEdition,
+        codeVersion: corpus.codeVersion,
+        codePrefixes: [...corpus.codePrefixes],
+        applicabilityStatus: corpus.applicabilityStatus,
+        routeReason: corpus.routeReason
+      })),
+      unavailableCorpora: appliedCorpusPlan.unavailable.map((corpus) => ({
+        id: corpus.id,
+        label: corpus.label,
+        blockedReason: corpus.blockedReason,
+        routeReason: corpus.routeReason
+      })),
+      excludedCorpora: appliedCorpusPlan.excluded.map((corpus) => ({
+        id: corpus.id,
+        label: corpus.label,
+        applicabilityStatus: corpus.applicabilityStatus,
+        blockedReason: corpus.blockedReason,
+        routeReason: corpus.routeReason
+      }))
+    }
+  };
 }
 
 function researchAnswerForClient(answer) {
@@ -8463,12 +8695,22 @@ export function researchProjectInformation(projectID, project) {
   };
 }
 
-function researchCodeBasis(projectID, projectInformation = null, resolvedAt = new Date().toISOString()) {
+function researchCodeBasis(
+  projectID,
+  projectInformation = null,
+  resolvedAt = new Date().toISOString(),
+  corpusPlan = null
+) {
+  const registry = cachedResearchCorpusRegistry || createResearchCorpusRegistry();
+  const appliedCorpusPlan = corpusPlan || routeResearchCorpora({
+    question: "Ordinary Construction Code question",
+    registry
+  });
   return resolveResearchCodeBasis({
     projectID,
     projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
-    availableCodeVersion: defaultSyncCodeVersion,
-    availableCodeEdition: defaultResearchCodeEdition,
+    corpusPlan: appliedCorpusPlan,
+    availableCorpora: registry,
     resolvedAt
   });
 }
@@ -14688,10 +14930,17 @@ async function handleResearchConversationMessage(request, response) {
       context.userID,
       conversation.primaryProjectID
     );
+    const corpusPlan = await researchCorpusPlanForTurn({
+      question,
+      messages: conversation.messages || [],
+      projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
+      pinnedEvidence
+    });
     const answerCodeBasis = researchCodeBasis(
       conversation.primaryProjectID,
       projectInformation,
-      new Date().toISOString()
+      new Date().toISOString(),
+      corpusPlan
     );
     const manualProjectFacts = conversation.projectContext?.facts || [];
     const combinedProjectFacts = combinedResearchProjectFacts(
@@ -14706,6 +14955,7 @@ async function handleResearchConversationMessage(request, response) {
       originSurface: conversation.origin?.surface || "",
       projectFacts: combinedProjectFacts,
       topicContext: conversation.topicContext || null,
+      corpusPlan,
       onStage: progressResponse.progress
     });
     const conversationFactState = resolveResearchConversationFacts({
@@ -14721,14 +14971,16 @@ async function handleResearchConversationMessage(request, response) {
     ].filter(Boolean)));
     const turnRetrievalLimitations = [
       ...(evidencePackage.limitations || []),
-      ...(answerCodeBasis.limitation ? [{ code: "RESEARCH_CODE_VERSION_FALLBACK", text: answerCodeBasis.limitation }] : [])
+      ...(answerCodeBasis.limitation ? [{ code: "RESEARCH_CORPUS_LIMITATION", text: answerCodeBasis.limitation }] : [])
     ];
     const assembledEvidence = evidencePackage.sources || [];
     if (!assembledEvidence.length) {
       progressResponse.progress("checking_citation_support", "active");
       progressResponse.json(422, {
-        error: "Permitext could not locate enacted text in the current authorized corpus for this question. Try a more specific code topic or citation.",
+        error: answerCodeBasis.limitation ||
+          "Permitext could not locate enacted text in the routed authorized corpus for this question. Try a more specific code topic or citation.",
         code: "RESEARCH_EVIDENCE_NOT_FOUND",
+        codeBasis: answerCodeBasis,
         retrieval: {
           assemblyVersion: evidencePackage.assemblyVersion,
           limitations: evidencePackage.limitations,
@@ -15049,7 +15301,12 @@ async function handleResearchConversationMessage(request, response) {
           crossReferenceCount: materialAssembledEvidence.filter((section) => section.origin === "permitext_cross_reference").length,
           supportingWebSourceCount: result.interpretation.supportingSources?.length || 0,
           unresolvedProjectFactCount: result.interpretation.missingFacts?.length || 0,
-          requiredClaimCount: requiredClaimCoverage.requiredClaimCount
+          requiredClaimCount: requiredClaimCoverage.requiredClaimCount,
+          searchedCorpusCount: answerCodeBasis.searchedCorpora.length,
+          pinnedCorpusCount: answerCodeBasis.pinnedCorpora.length,
+          citedCorpusCount: new Set(
+            result.interpretation.citations.map((citation) => citation.corpusID).filter(Boolean)
+          ).size
         },
         structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
         factUsage: researchFactUsageDisclosure({

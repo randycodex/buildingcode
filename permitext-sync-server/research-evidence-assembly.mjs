@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260813-adaptive-reader-evidence-v10";
+export const researchEvidenceAssemblyVersion = "20260817-routed-multi-corpus-evidence-v11";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -36,7 +36,7 @@ const broaderEvidenceCuePattern = /\b(?:applicab(?:le|ility)|comply|compliance|e
 
 function explicitCodeReferences(value) {
   return Array.from(String(value || "").matchAll(
-    /\b(AC|BC|EBC|FC|FGC|MC|PC)\s+(?:§\s*)?([A-Z]?\d+(?:\.[0-9A-Z-]+)*)/gi
+    /\b(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Z-]+)*)/gi
   )).map((match) => `${String(match[1]).toUpperCase()}:${String(match[2]).toUpperCase()}`);
 }
 
@@ -265,7 +265,10 @@ function sectionDescriptor(value = {}) {
     title: compactText(value.title || "Section"),
     codeEdition: compactText(value.codeEdition),
     codeVersion: compactText(value.codeVersion),
-    jurisdiction: compactText(value.jurisdiction)
+    jurisdiction: compactText(value.jurisdiction),
+    corpusID: compactText(value.corpusID),
+    corpusLabel: compactText(value.corpusLabel),
+    applicabilityStatus: compactText(value.applicabilityStatus)
   };
 }
 
@@ -296,7 +299,7 @@ async function canonicalSection(resolveSection, value, origin) {
 
 function comparableTableReference(value, fallbackCodePrefix = "") {
   const normalized = compactText(value).toUpperCase();
-  const match = normalized.match(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC)\s+)?TABLE\s+([A-Z]?\d+(?:\.[0-9A-Z-]+)*)/i);
+  const match = normalized.match(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?TABLE\s+([A-Z]?\d+(?:\.[0-9A-Z-]+)*)/i);
   if (!match) return "";
   const codePrefix = String(match[1] || fallbackCodePrefix || "").toUpperCase();
   return codePrefix ? `${codePrefix}:TABLE:${match[2].toUpperCase()}` : `TABLE:${match[2].toUpperCase()}`;
@@ -304,7 +307,7 @@ function comparableTableReference(value, fallbackCodePrefix = "") {
 
 function tableReferences(value, fallbackCodePrefix = "") {
   const references = new Set();
-  for (const match of compactText(value).matchAll(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC)\s+)?Table\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi)) {
+  for (const match of compactText(value).matchAll(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?Table\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi)) {
     const identity = comparableTableReference(match[0], match[1] || fallbackCodePrefix);
     if (identity) references.add(identity);
   }
@@ -916,7 +919,7 @@ export async function assembleResearchEvidence({
   if (!sources.length) {
     limitations.push({
       kind: "no-enacted-evidence-found",
-      text: "Permitext did not locate enacted text in the current authorized corpus for this question."
+      text: "Permitext did not locate enacted text in the authorized corpora routed for this question."
     });
   }
 

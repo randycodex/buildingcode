@@ -1440,7 +1440,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-adaptive-research-answer-v348'),
+        webRoot.text.includes('/web/app.js?v=20260817-research-multicorpus-v349'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1606,7 +1606,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-adaptive-research-answer-v348'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v349'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1873,7 +1873,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-adaptive-research-answer-v348'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v349'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -4045,6 +4045,80 @@ async function main() {
       inlineStyledConversation.response.status === 201 &&
         inlineStyledConversation.json.conversation.sources[0].selectedText === inlineStyledResearchText,
       "Research conversation rejected rendered enacted text when prepared plain text added spaces around inline styling."
+    );
+
+    const futureEBCSelection =
+      "101.2 Scope. The provisions of this code shall apply to the repair, alteration, change of occupancy, addition to and relocation of existing buildings.";
+    const futureEBCConversation = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: "26000000",
+        selectedText: futureEBCSelection
+      }
+    });
+    assert(
+      futureEBCConversation.response.status === 201 &&
+        futureEBCConversation.json.conversation.sources[0].corpusID ===
+          "nyc-existing-building-code-2027" &&
+        futureEBCConversation.json.conversation.sources[0].applicabilityStatus === "future-effective",
+      "Explicitly selected future-effective evidence was not preserved as an opt-in source with its applicability status."
+    );
+
+    const fireCodeConversation = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const fireCodeMessage = await request("/research/conversations/message", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID: fireCodeConversation.json.conversation.id,
+        question: "Under FDNY Fire Code FC 503, what governs fire apparatus access?"
+      }
+    });
+    const fireCodeAnswer = fireCodeMessage.json.conversation?.messages?.find(
+      (message) => message.role === "assistant"
+    )?.answer;
+    assert(
+      fireCodeConversation.response.status === 201 &&
+        fireCodeMessage.response.ok &&
+        fireCodeAnswer?.codeBasis?.retrievalScope === "routed-multi-corpus" &&
+        fireCodeAnswer.codeBasis.searchedCorpora.map((corpus) => corpus.id).join(",") ===
+          "nyc-2022-fire-code" &&
+        fireCodeAnswer.citations.some((citation) =>
+          citation.codePrefix === "FC" &&
+          citation.sectionNumber === "503" &&
+          citation.corpusID === "nyc-2022-fire-code"
+        ),
+      "Ordinary Research did not route an explicit Fire Code question to current FC evidence."
+    );
+
+    const zoningResearchConversation = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const zoningResearchMessage = await request("/research/conversations/message", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID: zoningResearchConversation.json.conversation.id,
+        question: "What does ZR 12-01 control?"
+      }
+    });
+    assert(
+      zoningResearchMessage.response.status === 422 &&
+        zoningResearchMessage.json.code === "RESEARCH_EVIDENCE_NOT_FOUND" &&
+        zoningResearchMessage.json.codeBasis?.unavailableCorpora?.some((corpus) =>
+          corpus.id === "nyc-zoning-resolution"
+        ) &&
+        /not searched/i.test(zoningResearchMessage.json.error || ""),
+      "Research silently substituted Construction Code evidence for a Zoning question whose approval gate is incomplete."
     );
 
     const createdConversation = await request("/research/conversations/create", {

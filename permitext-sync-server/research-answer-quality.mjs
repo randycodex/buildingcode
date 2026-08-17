@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260811-answer-evidence-economy-v1";
+  "20260817-answer-evidence-economy-applicability-v2";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -20,7 +20,8 @@ function normalizedEvidence(evidence) {
       reference: [compactText(source?.codePrefix), compactText(source?.sectionNumber)].filter(Boolean).join(" "),
       evidenceRole: compactText(source?.evidencePriority?.evidenceRole) || "supporting",
       evidenceFunction: compactText(source?.evidencePriority?.primaryFunction) || "candidate",
-      topicRouteRelationship: compactText(source?.evidencePriority?.topicRouteRelationship) || "unrestricted"
+      topicRouteRelationship: compactText(source?.evidencePriority?.topicRouteRelationship) || "unrestricted",
+      applicabilityStatus: compactText(source?.applicabilityStatus).toLowerCase()
     });
   }
   return result;
@@ -38,6 +39,28 @@ function answerBindings(answer) {
 
 function uniqueSectionCount(sourceIDs, availableEvidence) {
   return new Set(sourceIDs.map((sourceID) => availableEvidence.get(sourceID)?.sectionID).filter(Boolean)).size;
+}
+
+function answerApplicabilityText(answer) {
+  return compactText([
+    answer?.answerText,
+    answer?.conclusion,
+    answer?.explanation,
+    ...(Array.isArray(answer?.supportedPoints)
+      ? answer.supportedPoints.flatMap((point) => [point?.heading, point?.explanation])
+      : []),
+    ...(Array.isArray(answer?.evidenceLimitations) ? answer.evidenceLimitations : [])
+  ].filter(Boolean).join(" "));
+}
+
+function disclosesApplicability(source, answerText) {
+  if (source.applicabilityStatus === "future-effective") {
+    return /\b(?:future[- ]effective|not\s+(?:yet\s+)?effective|effective\s+(?:on\s+)?(?:july\s+17,?\s+2027|\d{4}-\d{2}-\d{2}))\b/i.test(answerText);
+  }
+  if (source.applicabilityStatus === "historical") {
+    return /\b(?:historical|prior[- ]code|1968\s+(?:NYC\s+)?Building\s+Code)\b/i.test(answerText);
+  }
+  return true;
 }
 
 export function evaluateResearchAnswerQuality({ evidence = [], answer = {} } = {}) {
@@ -58,6 +81,10 @@ export function evaluateResearchAnswerQuality({ evidence = [], answer = {} } = {
   );
   const collateralCitationSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
     availableEvidence.get(sourceID)?.topicRouteRelationship === "collateral"
+  );
+  const applicabilityText = answerApplicabilityText(answer);
+  const missingApplicabilityDisclosureSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
+    !disclosesApplicability(availableEvidence.get(sourceID), applicabilityText)
   );
   const citationSourceIDsByRole = {
     governing: knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.evidenceRole === "governing"),
@@ -83,12 +110,14 @@ export function evaluateResearchAnswerQuality({ evidence = [], answer = {} } = {
       orphanCitationSourceIDs.length === 0 &&
       uncitedSupportedPointSourceIDs.length === 0 &&
       irrelevantCitationSourceIDs.length === 0 &&
-      collateralCitationSourceIDs.length === 0,
+      collateralCitationSourceIDs.length === 0 &&
+      missingApplicabilityDisclosureSourceIDs.length === 0,
     unknownAnswerSourceIDs,
     orphanCitationSourceIDs,
     uncitedSupportedPointSourceIDs,
     irrelevantCitationSourceIDs,
     collateralCitationSourceIDs,
+    missingApplicabilityDisclosureSourceIDs,
     citedSourceIDs: knownCitedSourceIDs,
     reviewedOnlySourceIDs,
     evidenceEconomy,
@@ -132,6 +161,12 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "incorrect_citation",
       detail: `Remove evidence identities outside the assembled package: ${result.unknownAnswerSourceIDs.join(", ")}.`
+    });
+  }
+  if (result.missingApplicabilityDisclosureSourceIDs?.length) {
+    issues.push({
+      type: "missed_material_conclusion",
+      detail: `State the historical or future-effective applicability status for explicitly selected evidence before relying on it: ${references(result.missingApplicabilityDisclosureSourceIDs, result.sources)}.`
     });
   }
   return issues;

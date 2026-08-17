@@ -577,6 +577,7 @@ const outsideLibrarySignals = [
   {
     pattern: /\bzoning\b|\bZR\s*\d/i,
     label: "NYC Zoning Resolution Research",
+    codePrefix: "ZR",
     sourceName: "NYC Zoning Resolution",
     sourceURL: "https://zr.planning.nyc.gov/"
   },
@@ -601,6 +602,7 @@ const outsideLibrarySignals = [
   {
     pattern: /\bFDNY\b|Fire Department/i,
     label: "Fire Department requirements",
+    codePrefix: "FC",
     sourceName: "FDNY Fire Code and Rules",
     sourceURL: "https://www.nyc.gov/site/fdny/about/resources/code-and-rules/nyc-fire-code.page"
   },
@@ -677,11 +679,11 @@ function codeReferences(question) {
     seen.add(key);
     references.push(reference);
   };
-  const pattern = /\b(AC|BC|EBC|FC|MC|PC)\s*(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)+)\b/gi;
+  const pattern = /\b(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
   for (const match of String(question || "").matchAll(pattern)) {
     add(match[1], match[2]);
   }
-  const headingPattern = /\bSECTION\s+(AC|BC|EBC|FC|MC|PC)\s+[A-Z]?\d+(?:-\d+)?\s*:[^\n]{0,120}?\b([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)+)\b/gi;
+  const headingPattern = /\bSECTION\s+(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+[A-Z]?\d+(?:-\d+)?\s*:[^\n]{0,120}?\b([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
   for (const match of String(question || "").matchAll(headingPattern)) {
     add(match[1], match[2]);
   }
@@ -1018,6 +1020,7 @@ export async function discoverRelevantEvidence({
   invertedIndex,
   readSectionBody,
   resolveVisualSource,
+  availableCodePrefixes = [],
   limit = 8
 }) {
   const normalizedQuestion = validateEvidenceDiscoveryQuestion(question);
@@ -1217,6 +1220,12 @@ export async function discoverRelevantEvidence({
       chapterNumber: String(item.section.chapterNumber || ""),
       sectionNumber: String(item.section.sectionNumber || ""),
       title: String(item.section.title || "Section"),
+      jurisdiction: String(item.section.jurisdiction || ""),
+      codeEdition: String(item.section.codeEdition || ""),
+      codeVersion: String(item.section.codeVersion || ""),
+      corpusID: String(item.section.corpusID || ""),
+      corpusLabel: String(item.section.corpusLabel || ""),
+      applicabilityStatus: String(item.section.applicabilityStatus || ""),
       selectedText: item.passage.text,
       displayBlock: item.displayBlock,
       blockID: item.passage.blockID || null,
@@ -1292,14 +1301,21 @@ export async function discoverRelevantEvidence({
       text: "The question refers to a section without identifying it. Add the code citation or open the section and select its enacted text."
     });
   }
+  const availablePrefixSet = new Set(
+    (Array.isArray(availableCodePrefixes) ? availableCodePrefixes : [])
+      .map((prefix) => String(prefix || "").trim().toUpperCase())
+      .filter(Boolean)
+  );
   const outsideCurrentLibrary = Array.from(new Map(outsideLibrarySignals
-    .filter(({ pattern }) => pattern.test(normalizedQuestion))
+    .filter(({ pattern, codePrefix }) =>
+      pattern.test(normalizedQuestion) && (!codePrefix || !availablePrefixSet.has(codePrefix))
+    )
     .map(({ label, sourceName, sourceURL }) => [label, {
       kind: "outside-current-library",
       label,
       sourceName,
       sourceURL,
-      text: `${label} may require authoritative material outside Permitext's current Construction Code Research scope.`
+      text: `${label} may require authoritative material outside the corpora routed for this Research turn.`
     }])).values());
   if (outsideCurrentLibrary.length) {
     coverageLimitations.push({

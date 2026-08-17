@@ -77,4 +77,34 @@ const orphan = evaluateResearchAnswerQuality({
 assert.equal(orphan.pass, false);
 assert.deepEqual(orphan.orphanCitationSourceIDs, ["reviewed-cross-reference"]);
 
+const futureEvidence = [{
+  ...source("future-ebc", "101", "governing", "aligned"),
+  codePrefix: "EBC",
+  applicabilityStatus: "future-effective"
+}];
+const undisclosedFuture = evaluateResearchAnswerQuality({
+  evidence: futureEvidence,
+  answer: {
+    answerText: "EBC 101 governs this work.",
+    supportedPoints: [{ sourceIDs: ["future-ebc"] }],
+    citations: [{ sourceIDs: ["future-ebc"] }]
+  }
+});
+assert.equal(undisclosedFuture.pass, false);
+assert.deepEqual(undisclosedFuture.missingApplicabilityDisclosureSourceIDs, ["future-ebc"]);
+assert.equal(
+  researchAnswerQualityRevisionIssues(undisclosedFuture).at(-1).type,
+  "missed_material_conclusion"
+);
+
+const disclosedFuture = evaluateResearchAnswerQuality({
+  evidence: futureEvidence,
+  answer: {
+    answerText: "EBC 101 is enacted but not yet effective; its effective date is July 17, 2027.",
+    supportedPoints: [{ sourceIDs: ["future-ebc"] }],
+    citations: [{ sourceIDs: ["future-ebc"] }]
+  }
+});
+assert.equal(disclosedFuture.pass, true);
+
 console.log("Permitext Research answer-quality and evidence-economy contract passed.");

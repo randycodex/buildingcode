@@ -537,6 +537,19 @@ export function immutableEvidenceSnapshot({
     evidenceSetVersion: boundedVersion(evidenceSetVersion, "evidence set version"),
     sourceLibraryVersion: libraryVersion
   };
+  if (String(source?.corpusID || "").trim()) {
+    snapshot.corpusID = requiredText(source.corpusID, "Research corpus ID", 256);
+    snapshot.corpusLabel = requiredText(
+      source.corpusLabel || source.codeEdition,
+      "Research corpus label",
+      256
+    );
+    snapshot.applicabilityStatus = requiredText(
+      source.applicabilityStatus || "current",
+      "Research corpus applicability status",
+      128
+    );
+  }
   const provenance = {
     origin: String(source?.origin || "user_pinned").trim(),
     authorityClass: String(source?.authorityClass || "enacted").trim(),

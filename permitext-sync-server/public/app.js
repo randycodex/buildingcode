@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-adaptive-research-answer-v348";
+} from "./offline-storage.js?v=20260817-research-multicorpus-v349";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -14809,6 +14809,7 @@ function renderResearchInterpretation(container, result, options = {}) {
         citation.codePrefix,
         citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
       ].filter(Boolean).join(" ");
+      citationButton.title = [citation.corpusLabel, citation.codeEdition].filter(Boolean).join(" · ");
       citationButton.addEventListener("click", () => {
         const sourceDetails = container.querySelector(".research-answer-source-text");
         if (!sourceDetails) return;
@@ -14896,6 +14897,9 @@ function renderResearchInterpretation(container, result, options = {}) {
         citation.codePrefix,
         citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
       ].filter(Boolean).join(" ");
+      if (citation.corpusLabel || citation.codeEdition) {
+        row.title = [citation.corpusLabel, citation.codeEdition].filter(Boolean).join(" · ");
+      }
       citations.append(row);
     });
     detailsBody.append(citationsHeading, citations);

@@ -4,40 +4,108 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { immutableEvidenceSnapshot, immutableResearchAnswer } from "../project-foundation-contract.mjs";
 import { resolveResearchCodeBasis } from "../research-code-basis.mjs";
+import {
+  createResearchCorpusRegistry,
+  routeResearchCorpora
+} from "../research-corpus-registry.mjs";
 
 const availableCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const availableCodeEdition = "2022 New York City Construction Codes";
 const resolvedAt = "2026-08-10T12:00:00.000Z";
+const registry = createResearchCorpusRegistry();
+const constructionPlan = routeResearchCorpora({
+  question: "What does BC 101.1 require?",
+  registry
+});
 
-const unassigned = resolveResearchCodeBasis({ availableCodeVersion, availableCodeEdition, resolvedAt });
+const unassigned = resolveResearchCodeBasis({
+  availableCorpora: registry,
+  corpusPlan: constructionPlan,
+  resolvedAt
+});
 assert.equal(unassigned.codeYear, 2022);
-assert.equal(unassigned.retrievalScope, "single-corpus");
-assert.equal(unassigned.basisSource, "permitext-default");
-assert.match(unassigned.disclosure, /2022 NYC Construction Codes/);
+assert.equal(unassigned.retrievalScope, "routed-multi-corpus");
+assert.equal(unassigned.basisSource, "permitext-router");
+assert.deepEqual(unassigned.searchedCorpora.map((corpus) => corpus.id), ["nyc-2022-construction-codes"]);
+assert.match(unassigned.disclosure, /Sources searched: 2022 NYC Construction Codes/);
+
+const mixedPlan = routeResearchCorpora({
+  question: "Compare BC 903 with FC 901.",
+  registry
+});
+const mixedBasis = resolveResearchCodeBasis({
+  availableCorpora: registry,
+  corpusPlan: mixedPlan,
+  resolvedAt
+});
+assert.equal(mixedBasis.codeYear, null);
+assert.equal(mixedBasis.codeVersion, "multiple-authorized-corpora");
+assert.equal(mixedBasis.searchedCorpora.length, 2);
+assert.match(mixedBasis.disclosure, /2022 NYC Construction Codes · 2022 NYC Fire Code/);
 
 const projectDefault = resolveResearchCodeBasis({
   projectID: "project-1",
   projectCodeVersion: "nyc-2022",
-  availableCodeVersion,
-  availableCodeEdition,
+  availableCorpora: registry,
+  corpusPlan: constructionPlan,
   resolvedAt
 });
 assert.equal(projectDefault.basisSource, "project-default");
 assert.equal(projectDefault.projectCodeVersionSupported, true);
 assert.match(projectDefault.disclosure, /Project default/);
 
-const unsupportedProjectDefault = resolveResearchCodeBasis({
+const zoningPlan = routeResearchCorpora({
+  question: "What does ZR 12-01 control?",
+  registry
+});
+const unavailableZoning = resolveResearchCodeBasis({
   projectID: "project-2",
   projectCodeVersion: "NYC Zoning Resolution",
-  availableCodeVersion,
-  availableCodeEdition,
+  availableCorpora: registry,
+  corpusPlan: zoningPlan,
   resolvedAt
 });
-assert.equal(unsupportedProjectDefault.codeVersion, availableCodeVersion);
+assert.equal(unavailableZoning.projectCodeVersionRecognized, true);
+assert.equal(unavailableZoning.projectCodeVersionSupported, false);
+assert.equal(unavailableZoning.retrievalScope, "routed-multi-corpus");
+assert.deepEqual(unavailableZoning.searchedCorpora, []);
+assert.deepEqual(unavailableZoning.unavailableCorpora.map((corpus) => corpus.id), ["nyc-zoning-resolution"]);
+assert.match(unavailableZoning.disclosure, /Zoning Resolution unavailable for Research/);
+assert.match(unavailableZoning.limitation, /was not searched.*approval/i);
+
+const unsupportedProjectDefault = resolveResearchCodeBasis({
+  projectID: "project-3",
+  projectCodeVersion: "2014 NYC Construction Codes",
+  availableCorpora: registry,
+  corpusPlan: constructionPlan,
+  resolvedAt
+});
 assert.equal(unsupportedProjectDefault.projectCodeVersionSupported, false);
-assert.equal(unsupportedProjectDefault.retrievalScope, "single-corpus");
-assert.match(unsupportedProjectDefault.disclosure, /not available in Research/);
+assert.match(unsupportedProjectDefault.disclosure, /Project version unavailable/);
 assert.match(unsupportedProjectDefault.limitation, /did not retrieve.*configured version/i);
+
+const existingBuildingCorpus = registry.find((corpus) => corpus.id === "nyc-existing-building-code-2027");
+const explicitFutureBasis = resolveResearchCodeBasis({
+  projectID: "project-4",
+  projectCodeVersion: "EBC",
+  availableCorpora: registry,
+  corpusPlan: {
+    registryVersion: "test",
+    routingMode: "question-and-conversation-topic",
+    selected: [],
+    pinnedCorpora: [{ ...existingBuildingCorpus, routeReason: "explicitly pinned evidence" }],
+    unavailable: [],
+    excluded: []
+  },
+  resolvedAt
+});
+assert.deepEqual(explicitFutureBasis.searchedCorpora, []);
+assert.deepEqual(explicitFutureBasis.pinnedCorpora.map((corpus) => corpus.id), [
+  "nyc-existing-building-code-2027"
+]);
+assert.equal(explicitFutureBasis.projectCodeVersionRetrieved, true);
+assert.match(explicitFutureBasis.disclosure, /Explicit evidence reviewed: NYC Existing Building Code/);
+assert.doesNotMatch(explicitFutureBasis.disclosure, /unavailable for Research/);
 
 const evidence = immutableEvidenceSnapshot({
   id: "evidence-1",
@@ -82,7 +150,7 @@ const appSource = await readFile(join(root, "../app.mjs"), "utf8");
 const uiSource = await readFile(join(root, "../public/app.js"), "utf8");
 const styles = await readFile(join(root, "../public/styles.css"), "utf8");
 assert.match(appSource, /codeBasis: answerCodeBasis/);
-assert.match(appSource, /Do not imply that another code edition was retrieved/);
+assert.match(appSource, /Do not imply that an unavailable, excluded, or unsearched corpus was retrieved/);
 assert.match(uiSource, /research-answer-code-basis/);
 assert.match(styles, /workspace-panel:not\(\.reader-panel\) \.research-answer-code-basis\s*\{[\s\S]*?font-size: 10px !important;/);
 
