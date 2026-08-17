@@ -8,6 +8,32 @@ export const PROJECT_ARTIFACT_DOMAINS = Object.freeze([
 
 const PROJECT_ARTIFACT_DOMAIN_SET = new Set(PROJECT_ARTIFACT_DOMAINS);
 
+export const projectArtifactCheckpointSchedule = Object.freeze({
+  activeWindowMs: 5 * 60_000,
+  recentlyActiveWindowMs: 15 * 60_000,
+  activeIntervalMs: 5_000,
+  recentlyActiveIntervalMs: 15_000,
+  idleIntervalMs: 60_000,
+  jitterMs: 500
+});
+
+export function projectArtifactCheckpointDelay({
+  now = Date.now(),
+  lastActivityAt = 0,
+  random = Math.random(),
+  schedule = projectArtifactCheckpointSchedule
+} = {}) {
+  const idleFor = Math.max(0, Number(now) - Number(lastActivityAt || 0));
+  const interval = idleFor < schedule.activeWindowMs
+    ? schedule.activeIntervalMs
+    : idleFor < schedule.recentlyActiveWindowMs
+      ? schedule.recentlyActiveIntervalMs
+      : schedule.idleIntervalMs;
+  const boundedRandom = Math.min(1, Math.max(0, Number(random) || 0));
+  const jitter = Math.round((boundedRandom * 2 - 1) * schedule.jitterMs);
+  return Math.max(500, interval + jitter);
+}
+
 export function normalizeProjectArtifactRevisionEnvelope(value = {}, scope = {}) {
   const domains = Array.from(new Set(
     (Array.isArray(value.changedDomains) ? value.changedDomains : value.domains || [])

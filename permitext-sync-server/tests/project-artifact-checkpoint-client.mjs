@@ -4,12 +4,30 @@ import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
   normalizeProjectArtifactRevisionEnvelope,
+  projectArtifactCheckpointDelay,
+  projectArtifactCheckpointSchedule,
   projectArtifactRefreshPlan,
   projectArtifactRevisionKey,
   reduceAccountArtifactRevision,
   reduceProjectArtifactRevisions,
   uniqueProjectArtifactConsumerIDs
 } from "../public/project-artifact-checkpoints.js";
+
+assert.equal(
+  projectArtifactCheckpointDelay({ now: 60_000, lastActivityAt: 0, random: 0.5 }),
+  projectArtifactCheckpointSchedule.activeIntervalMs,
+  "visible artifact consumers must check cross-device changes within five seconds while active"
+);
+assert.equal(
+  projectArtifactCheckpointDelay({ now: 10 * 60_000, lastActivityAt: 0, random: 0.5 }),
+  projectArtifactCheckpointSchedule.recentlyActiveIntervalMs,
+  "artifact checkpoints may back off after the active interaction window"
+);
+assert.equal(
+  projectArtifactCheckpointDelay({ now: 30 * 60_000, lastActivityAt: 0, random: 0.5 }),
+  projectArtifactCheckpointSchedule.idleIntervalMs,
+  "idle artifact consumers must keep a bounded refresh cadence"
+);
 
 const scope = {
   accountUserID: "account-a",
@@ -122,6 +140,9 @@ assert.match(appSource, /postResearch\("\/projects\/artifacts\/checkpoint", \{[\
 assert.match(appSource, /\(!projectIDs\.length && !scope\.researchVisible\)/);
 assert.match(appSource, /focusedDraftInput[\s\S]*?researchQuestionDraft = focusedDraftInput\.value;[\s\S]*?transitionWorkspace\("utility", \{ refreshPaneIDs: paneIDs \}\);[\s\S]*?const preservedDraft = researchQuestionDraft;/, "Research refresh must preserve its live composer draft and pane IDs");
 assert.match(appSource, /const accountResult = payload\.account[\s\S]*?applyAccountArtifactRevisionEnvelope\(payload\.account\)[\s\S]*?const projectResult = await applyProjectArtifactRevisionEnvelopes/, "one checkpoint must apply account Research once before Project-domain refreshes");
+assert.match(appSource, /projectArtifactCheckpointDelay\(\{ lastActivityAt: foregroundSyncLastActivityAt \}\)/, "artifact checkpoints must not inherit the slower full foreground-sync cadence");
+assert.match(appSource, /async function refreshResearchProjectAssignmentConsumers[\s\S]*?refreshProjectSourceConsumers\(visibleProjectIDs,[\s\S]*?refreshVisibleProjectArtifactSummaries\(projectID\)/, "same-tab Research assignment must refresh both mounted Project sources and its visible summary");
+assert.equal((appSource.match(/refreshResearchProjectAssignmentConsumers\(\[previousProjectID, targetProjectID\]\)/g) || []).length, 2, "both Research assignment controls must refresh visible Project consumers");
 assert.match(appSource, /\.saved-folder-context\.is-project\[data-project-id=[\s\S]*?workspacePaneHasFocusedEditor\(paneID\)[\s\S]*?refreshSavedPanelInPlace\(paneID/, "visible Project summaries must refresh in place and wait for an active editor to blur");
 assert.match(appSource, /if \(dirty \|\| !focusedCardID\) return true;/, "dirty Notebook editors must not be remounted");
 assert.match(appSource, /if \(dirty\) \{[\s\S]*?renderSourcePalette\(sourcePalette\);[\s\S]*?renderHistory\(historyBody\);[\s\S]*?return true;/, "dirty Reports must only refresh safe mounted consumers");

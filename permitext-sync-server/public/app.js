@@ -49,16 +49,17 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-native-research-notebook-v346";
+} from "./offline-storage.js?v=20260817-research-live-sync-v347";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
   normalizeProjectArtifactRevisionEnvelope,
+  projectArtifactCheckpointDelay,
   projectArtifactRefreshPlan,
   reduceAccountArtifactRevision,
   reduceProjectArtifactRevisions,
   uniqueProjectArtifactConsumerIDs
-} from "./project-artifact-checkpoints.js?v=20260816-project-artifact-checkpoints-v2";
+} from "./project-artifact-checkpoints.js?v=20260817-research-live-sync-v3";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -3705,6 +3706,18 @@ async function refreshVisibleProjectArtifactSummaries(projectID) {
     return false;
   }
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  return true;
+}
+
+async function refreshResearchProjectAssignmentConsumers(projectIDs = []) {
+  const visibleProjectIDs = uniqueProjectArtifactConsumerIDs(projectIDs);
+  if (!visibleProjectIDs.length) return false;
+  await refreshProjectSourceConsumers(visibleProjectIDs, {
+    refreshNotebookFoundation: true
+  });
+  for (const projectID of visibleProjectIDs) {
+    await refreshVisibleProjectArtifactSummaries(projectID).catch(() => false);
+  }
   return true;
 }
 
@@ -9327,7 +9340,7 @@ function startProjectArtifactCheckpointLoop(options = {}) {
     void checkVisibleProjectArtifactRevisions().catch(() => {
       startProjectArtifactCheckpointLoop();
     });
-  }, foregroundSyncDelay({ lastActivityAt: foregroundSyncLastActivityAt }));
+  }, projectArtifactCheckpointDelay({ lastActivityAt: foregroundSyncLastActivityAt }));
 }
 
 function broadcastForegroundSyncSignal(type, details = {}) {
@@ -17160,9 +17173,7 @@ async function renderResearch(paneID = "utility:analysis") {
             if (previousProjectID) {
               await hydrateCodeQuestionList(previousProjectID, { force: true, render: false });
             }
-            await refreshProjectSourceConsumers([previousProjectID, targetProjectID], {
-              refreshNotebookFoundation: true
-            });
+            await refreshResearchProjectAssignmentConsumers([previousProjectID, targetProjectID]);
             const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
             await transitionWorkspace("utility", {
               refreshPaneIDs: [
@@ -18325,9 +18336,7 @@ async function renderResearchConversation(conversationID, options = {}) {
         researchConversationList = researchConversationList.map((item) =>
           item.id === conversation.id ? { ...item, ...conversation } : item
         );
-        await refreshProjectSourceConsumers([previousProjectID, targetProjectID], {
-          refreshNotebookFoundation: true
-        });
+        await refreshResearchProjectAssignmentConsumers([previousProjectID, targetProjectID]);
         const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
         await transitionWorkspace("utility", {
           refreshPaneIDs: ["utility:analysis", paneID, ...projectPaneIDs]

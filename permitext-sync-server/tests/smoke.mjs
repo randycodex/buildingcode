@@ -987,7 +987,8 @@ async function main() {
         iosLibraryViewModelSource.includes("repository.evidenceReferences(inFolder: folder.id)") &&
         iosUserDataStoreSource.includes("func evidenceReferences(inFolder folderID: Int64)") &&
         iosBookmarksSource.includes('CodeEyebrow(text: "Project Hub"') &&
-        iosBookmarksSource.includes('projectHubSection(title: "Notebook"') &&
+        iosBookmarksSource.includes('Label("Notebook", systemImage: "note.text")') &&
+        iosBookmarksSource.includes("projectNotebookDestination(projectID: projectID, cardID: card.id)") &&
         iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
         iosBookmarksSource.includes('projectHubSection(title: "Exports"') &&
         iosExportBuilderSource.includes("struct ProjectReportExportBuilder: Sendable") &&
@@ -1438,7 +1439,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-native-research-notebook-v346'),
+        webRoot.text.includes('/web/app.js?v=20260817-research-live-sync-v347'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1604,7 +1605,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-native-research-notebook-v346'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-live-sync-v347'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1871,7 +1872,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-native-research-notebook-v346'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-live-sync-v347'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
