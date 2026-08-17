@@ -84,14 +84,6 @@ struct OrganizationProjectHubView: View {
         }.count
     }
 
-    private var assignedFirmTags: [PermitextFirmTag] {
-        guard let controls = organization.firmControls else { return [] }
-        let assignedIDs = Set(controls.projectTagAssignments[project.id] ?? [])
-        return controls.tags
-            .filter { $0.status == "active" && assignedIDs.contains($0.id) }
-            .sorted { $0.order < $1.order }
-    }
-
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
@@ -275,27 +267,6 @@ struct OrganizationProjectHubView: View {
                     )
                         .font(.footnote)
                         .foregroundStyle(.secondary)
-                    if !assignedFirmTags.isEmpty {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 7) {
-                                ForEach(assignedFirmTags) { tag in
-                                    Text(tag.name)
-                                        .font(.caption2.weight(.bold))
-                                        .padding(.horizontal, 9)
-                                        .padding(.vertical, 5)
-                                        .background(
-                                            Capsule(style: .continuous)
-                                                .fill(
-                                                    Color(
-                                                        uiColor: PlatformColor(hex: tag.colorHex)
-                                                            ?? .systemGray
-                                                    ).opacity(0.2)
-                                                )
-                                        )
-                                }
-                            }
-                        }
-                    }
                     Text(
                         "Retention: \(controls.retentionPolicy.retentionDays) days (policy only; no automatic deletion)"
                     )

@@ -481,9 +481,8 @@ assert.match(
 const savedHydrationSource = functionSource(appSource, "performSavedPanelHydration");
 const savedEvidenceMatchesQuery = new Function(
   "codeDisplayLabel",
-  "savedItemTags",
   `${functionSource(appSource, "savedEvidenceMatchesQuery")}; return savedEvidenceMatchesQuery;`
-)((prefix) => prefix, (item) => item.tags || []);
+)((prefix) => prefix);
 const resolveSavedSearchPage = new Function(
   `${functionSource(appSource, "resolveSavedSearchPage")}; return resolveSavedSearchPage;`
 )();
@@ -762,7 +761,9 @@ assert.match(
   /const settingsScrollTop = refreshPaneIDs\.has\("utility:settings"\)[\s\S]*?settingsPane\.scrollTop = Math\.min\(/,
   "Refreshing Settings must preserve its vertical scroll position."
 );
-assert.match(appSource, /function renameAnnotationTag\([\s\S]*?normalizeAnnotationTags/);
+assert.doesNotMatch(appSource, /function renameAnnotationTag\(/);
+assert.doesNotMatch(appSource, /function renderAnnotationTagEditor\(/);
+assert.doesNotMatch(appSource, /saved-tag-filter/);
 assert.match(appSource, /function wireCodeFilterMenu\([\s\S]*?"ArrowDown"[\s\S]*?"Home"[\s\S]*?"End"[\s\S]*?"Escape"/);
 assert.match(stylesSource, /\.reader-notes-project-options \{[\s\S]*?max-height:[\s\S]*?overflow-y: auto;[\s\S]*?scrollbar-gutter: stable;/);
 assert.match(appSource, /function renderAnnotationProjectEditor[\s\S]*?const projectListLabel = selectedProjects\.length === 0[\s\S]*?chips\.inert = !open;[\s\S]*?projectListToggle\.textContent = projectListLabel/);

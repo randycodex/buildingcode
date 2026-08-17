@@ -21,16 +21,12 @@ struct ReaderView: View {
     @State private var expandedInlineImage: UIImage?
     @State private var noteSaveState: NoteSaveState = .idle
     @State private var noteSaveResetTask: Task<Void, Never>?
-    @State private var sectionTags: [String] = []
-    @State private var pendingCustomTag: String = ""
-    @State private var isTagComposerOpen: Bool = false
     @State private var isFolderPickerOpen: Bool = false
     @State private var pendingFolderIDs: Set<Int64> = []
     @State private var pendingFinalFolderRemoval: CodeFolder?
     @State private var showsBookmarkRemovalConfirmation = false
     @State private var folderEditorTarget: ReaderFolderEditorTarget?
     @FocusState private var isNotesFieldFocused: Bool
-    @FocusState private var isTagComposerFocused: Bool
 
     /// Same shape as BookmarksView.FolderEditorTarget but scoped to this view
     /// so the two states don't share an `Identifiable` collision.
@@ -106,8 +102,6 @@ struct ReaderView: View {
                         CodeHairline().padding(.top, 2)
                         projectsEditor
 
-                        CodeHairline().padding(.top, 2)
-                        tagsEditor
                     }
 
                     notesEditor
@@ -439,160 +433,6 @@ struct ReaderView: View {
         }
     }
 
-    private var tagsEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Tags")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Spacer(minLength: 0)
-                if library.hasTagAccess {
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.18)) {
-                            isTagComposerOpen.toggle()
-                        }
-                        if isTagComposerOpen {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                isTagComposerFocused = true
-                            }
-                        }
-                    } label: {
-                        Label(isTagComposerOpen ? "Done" : "Add", systemImage: isTagComposerOpen ? "checkmark" : "plus")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(accentColor)
-                    }
-                    .buttonStyle(.plain)
-                } else {
-                    Label("Pro", systemImage: "lock.fill")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            if sectionTags.isEmpty {
-                Text(
-                    library.hasTagAccess
-                        ? "No tags yet — tap Add to create one."
-                        : "Adding and editing tags is available with Pro."
-                )
-                    .font(.footnote)
-                    .foregroundStyle(.tertiary)
-            } else {
-                tagChipFlow(tags: sectionTags) { tag in
-                    HStack(spacing: 4) {
-                        Text(tag)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(accentColor)
-                        if library.hasTagAccess {
-                            Button {
-                                removeTag(tag)
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .font(.caption2.weight(.bold))
-                                    .foregroundStyle(accentColor.opacity(0.7))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(
-                        Capsule(style: .continuous).fill(accentColor.opacity(0.12))
-                    )
-                }
-            }
-
-            if isTagComposerOpen {
-                tagComposer
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-            } else if !library.hasTagAccess {
-                Button {
-                    library.requireTagAccess()
-                } label: {
-                    Label("Upgrade to Add Tags", systemImage: "sparkles")
-                        .font(.footnote.weight(.semibold))
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(accentColor)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var tagComposer: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Free-form input for custom tags. Commit with Return.
-            HStack(spacing: 8) {
-                Image(systemName: "tag")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                TextField("Add a custom tag", text: $pendingCustomTag)
-                    .focused($isTagComposerFocused)
-                    .textInputAutocapitalization(.words)
-                    .autocorrectionDisabled()
-                    .submitLabel(.done)
-                    .onSubmit { commitCustomTag() }
-                if !pendingCustomTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Button("Add") { commitCustomTag() }
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(accentColor)
-                        .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
-                    .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
-            )
-        }
-    }
-
-    /// Lightweight flowing chip layout: wraps to multiple lines without
-    /// needing iOS 16+ Layout APIs. Uses a single HStack with
-    /// fixedSize chips and wrapping enabled via a basic accumulator.
-    @ViewBuilder
-    private func tagChipFlow<ChipContent: View>(
-        tags: [String],
-        @ViewBuilder chip: @escaping (String) -> ChipContent
-    ) -> some View {
-        FlowLayout(spacing: 6) {
-            ForEach(tags, id: \.self) { tag in
-                chip(tag)
-            }
-        }
-    }
-
-    private func commitCustomTag() {
-        let trimmed = pendingCustomTag.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        addTag(trimmed)
-        pendingCustomTag = ""
-    }
-
-    private func addTag(_ tag: String) {
-        let cleaned = tag.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleaned.isEmpty else { return }
-        guard !sectionTags.contains(where: { $0.caseInsensitiveCompare(cleaned) == .orderedSame }) else { return }
-        let updatedTags = sectionTags + [cleaned]
-        if library.setTags(updatedTags, sectionID: sectionID) {
-            sectionTags = updatedTags
-        } else {
-            sectionTags = library.tags(sectionID: sectionID)
-        }
-    }
-
-    private func removeTag(_ tag: String) {
-        let updatedTags = sectionTags.filter { $0.caseInsensitiveCompare(tag) != .orderedSame }
-        if library.setTags(updatedTags, sectionID: sectionID) {
-            sectionTags = updatedTags
-        } else {
-            sectionTags = library.tags(sectionID: sectionID)
-        }
-    }
-
     private func loadContent() async {
         loadState = .loading
         detail = nil
@@ -611,15 +451,11 @@ struct ReaderView: View {
         isBookmarked = library.isBookmarked(sectionID: sectionID)
         persistedNoteBody = library.noteBody(sectionID: sectionID)
         noteBody = persistedNoteBody
-        sectionTags = library.tags(sectionID: sectionID)
         noteSaveState = .idle
     }
 
     private func syncUserContentState() {
         isBookmarked = library.isBookmarked(sectionID: sectionID)
-        if !isTagComposerFocused {
-            sectionTags = library.tags(sectionID: sectionID)
-        }
         if !isFolderPickerOpen {
             pendingFolderIDs = Set(library.folderMembership[sectionID] ?? [])
         }
@@ -641,8 +477,6 @@ struct ReaderView: View {
         guard isBookmarked else { return }
         isBookmarked = library.toggleBookmark(sectionID: sectionID)
         if !isBookmarked {
-            sectionTags = []
-            isTagComposerOpen = false
             pendingFolderIDs = []
         }
     }
@@ -938,48 +772,6 @@ private struct FigureImageView: View {
                 return
             }
             image = UIImage(contentsOfFile: url.path)
-        }
-    }
-}
-
-/// Minimal flow layout that wraps subviews onto multiple lines. Used by the
-/// tag editor so any number of chips wraps cleanly without horizontal
-/// scrolling. iOS 16+ Layout API — fine for this project.
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 6
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let maxWidth = proposal.width ?? .infinity
-        var x: CGFloat = 0
-        var y: CGFloat = 0
-        var lineHeight: CGFloat = 0
-        for view in subviews {
-            let size = view.sizeThatFits(.unspecified)
-            if x + size.width > maxWidth && x > 0 {
-                x = 0
-                y += lineHeight + spacing
-                lineHeight = 0
-            }
-            x += size.width + spacing
-            lineHeight = max(lineHeight, size.height)
-        }
-        return CGSize(width: maxWidth.isFinite ? maxWidth : x, height: y + lineHeight)
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        var x = bounds.minX
-        var y = bounds.minY
-        var lineHeight: CGFloat = 0
-        for view in subviews {
-            let size = view.sizeThatFits(.unspecified)
-            if x + size.width > bounds.maxX && x > bounds.minX {
-                x = bounds.minX
-                y += lineHeight + spacing
-                lineHeight = 0
-            }
-            view.place(at: CGPoint(x: x, y: y), anchor: .topLeading, proposal: ProposedViewSize(size))
-            x += size.width + spacing
-            lineHeight = max(lineHeight, size.height)
         }
     }
 }

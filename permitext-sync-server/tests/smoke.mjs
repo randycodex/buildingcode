@@ -415,9 +415,10 @@ async function main() {
         !settingsTemplateSource.includes("All browser changes are synced."),
       "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
-    ["Clear All Projects", "Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
+    ["Clear All Projects", "Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
+    assert(!settingsTemplateSource.includes("Clear All Tags"), "Web Settings still exposes tag management.");
     assert(
       settingsTemplateSource.includes('class="settings-scroll"') &&
       settingsTemplateSource.includes('class="settings-project-list"') &&
@@ -765,8 +766,7 @@ async function main() {
         savedTemplateSource.includes('class="saved-evidence-search-input"') &&
         savedTemplateSource.includes('class="saved-evidence-search-close"') &&
         !savedTemplateSource.includes('class="saved-code-filter"') &&
-        savedTemplateSource.includes('class="code-filter-menu saved-tag-filter-menu"') &&
-        savedTemplateSource.includes('class="saved-tag-filter"') &&
+        !savedTemplateSource.includes('saved-tag-filter') &&
         savedTemplateSource.indexOf('class="saved-projects-section code-filter-menu saved-projects-menu"') < savedTemplateSource.indexOf('class="saved-inline-filters"') &&
         savedTemplateSource.indexOf('class="saved-inline-filters"') < savedTemplateSource.indexOf('class="saved-content"') &&
         !topbarSource.includes('id="toggle-projects"') &&
@@ -997,7 +997,7 @@ async function main() {
         iosExportBuilderSource.includes("reportCoverLabel") &&
         iosExportBuilderSource.includes("reportBrandName") &&
         iosOrganizationProjectHubSource.includes('projectSection(title: "Firm context"') &&
-        iosOrganizationProjectHubSource.includes("assignedFirmTags") &&
+        !iosOrganizationProjectHubSource.includes("assignedFirmTags") &&
         iosExportBuilderSource.includes("manifest.contentHash") &&
         iosBookmarksSource.includes("Create & Save iOS PDF") &&
         !iosBookmarksSource.includes("Flattened Project Workboard preview") &&
@@ -1097,7 +1097,7 @@ async function main() {
         workspaceScript.text.includes("function presentPlanLimitNotice(title, message)") &&
         workspaceScript.text.includes("Free saved-section limit reached") &&
         workspaceScript.text.includes("Free note limit reached") &&
-        workspaceScript.text.includes("Tags require Pro") &&
+        !workspaceScript.text.includes("Tags require Pro") &&
         workspaceScript.text.includes("Projects require Pro") &&
         workspaceScript.text.includes("PDF export requires Pro") &&
         workspaceScript.text.includes("Workboards require Pro") &&
@@ -1440,7 +1440,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-research-multicorpus-v349'),
+        webRoot.text.includes('/web/app.js?v=20260817-research-multicorpus-v350'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1474,7 +1474,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-menu-toggle {\n  flex: 1 1 auto;\n  border-radius: var(--radius-control);") &&
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
-        workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
+        !workspaceStyles.text.includes('.saved-tag-filter-menu-toggle') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden],") &&
         workspaceStyles.text.includes(".saved-projects-archive-button[hidden]") &&
         !workspaceScript.text.includes('selectionCount.className = "saved-projects-bulk-count"') &&
@@ -1606,7 +1606,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v349'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v350'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1839,18 +1839,17 @@ async function main() {
         workspaceStyles.text.match(/\.saved-evidence-search-input \{[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;[\s\S]*?border-radius: var\(--radius-pill\);/) &&
         workspaceStyles.text.includes(".saved-evidence-search[hidden]") &&
         workspaceStyles.text.includes('.saved-project-evidence-body > .saved-inline-filters:not(:has(> :not([hidden])))') &&
-        workspaceStyles.text.includes(".saved-tag-filter-menu.is-open .saved-tag-filter-actions") &&
-        webRoot.text.includes('class="saved-tag-filter-clear"') &&
-        workspaceScript.text.includes('const tagClearButton = panel.querySelector(".saved-tag-filter-clear")') &&
-        workspaceScript.text.includes("availableTags.forEach((tag) => {") &&
-        !workspaceScript.text.includes('["", ...availableTags].forEach((tag) => {'),
-      "Saved Evidence should provide a revealable project search while retaining optional tag filtering."
+        !workspaceStyles.text.includes(".saved-tag-filter") &&
+        !webRoot.text.includes('class="saved-tag-filter-clear"') &&
+        !workspaceScript.text.includes('const tagClearButton = panel.querySelector(".saved-tag-filter-clear")'),
+      "Saved Evidence should provide a revealable project search without tag filtering."
     );
     assert(
       !webRoot.text.includes("account-plan-detail") &&
         !workspaceScript.text.includes("account-plan-detail") &&
         webRoot.text.includes("Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
-        webRoot.text.includes("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, tags, and web offline access."),
+        webRoot.text.includes("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, and web offline access.") &&
+        !webRoot.text.includes("professional exports, tags"),
       "Plan details should live in the Free and Pro descriptions instead of a redundant summary."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant manual sync card");
@@ -1873,7 +1872,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v349'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v350'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2557,26 +2556,21 @@ async function main() {
       workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?overflow: visible;[\s\S]*?background-image: none;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;[\s\S]*?font-size: 12px !important;[\s\S]*?text-align: left;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 600;/) &&
-        workspaceStyles.text.match(/\.code-filter-menu \.saved-project-list,[\s\S]*?\.code-filter-menu \.saved-tag-filter,[\s\S]*?\.code-filter-menu \.research-conversation-project-options \{[\s\S]*?max-height: 0;/) &&
-        workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-project-list,[\s\S]*?\.code-filter-menu\.is-open \.saved-tag-filter,[\s\S]*?\.code-filter-menu\.is-open \.research-conversation-project-options \{[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
-        workspaceStyles.text.match(/\.code-filter-menu\.is-restoring \.search-code-filter,[\s\S]*?\.code-filter-menu\.is-restoring \.saved-tag-filter,[\s\S]*?\.code-filter-menu\.is-restoring \.research-conversation-project-options \{[\s\S]*?transition: none;/) &&
+        workspaceStyles.text.match(/\.code-filter-menu \.saved-project-list,[\s\S]*?\.code-filter-menu \.research-conversation-project-options \{[\s\S]*?max-height: 0;/) &&
+        workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-project-list,[\s\S]*?\.code-filter-menu\.is-open \.research-conversation-project-options \{[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
+        workspaceStyles.text.match(/\.code-filter-menu\.is-restoring \.search-code-filter,[\s\S]*?\.code-filter-menu\.is-restoring \.research-conversation-project-options \{[\s\S]*?transition: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-section \{[\s\S]*?margin-top: var\(--space-2\);[\s\S]*?border-radius: var\(--saved-projects-card-radius\);[\s\S]*?background: var\(--menu-subtle-surface\);/) &&
         workspaceStyles.text.match(/\.saved-projects-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-menu\.is-open \.saved-projects-actions \{[\s\S]*?display: flex;/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?background-image: none;/) &&
-        workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-tag-filter \{[\s\S]*?max-height: min\(var\(--code-filter-menu-height, 240px\), 152px\);[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 0;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;[\s\S]*?font-size: 12px !important;[\s\S]*?text-align: left;/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter-chip::before \{[\s\S]*?content: none;/) &&
-        !workspaceStyles.text.includes('.saved-tag-filter-chip:nth-child(even)') &&
+        !workspaceStyles.text.includes('.saved-tag-filter') &&
         !workspaceStyles.text.includes(".saved-filter-resize-handle") &&
         !workspaceScript.text.includes("wireSavedFilterResizeHandle") &&
         workspaceScript.text.includes('stateKey: "projectsMenuOpen"') &&
-        workspaceScript.text.includes('stateKey: "tagsMenuOpen"') &&
+        !workspaceScript.text.includes('stateKey: "tagsMenuOpen"') &&
         workspaceScript.text.includes('menu.classList.add("is-restoring")') &&
         workspaceScript.text.includes("void filterRail.offsetHeight") &&
         workspaceScript.text.includes("instant: true") &&
         !workspaceScript.text.includes("savedFilterScrollPositions") &&
-        !workspaceScript.text.includes("bindHorizontalWheelScroll(tagRail)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(codeRail)"),
       "Saved menu grids should auto-fit only as many aligned columns as their items and available width support."
     );
@@ -2726,7 +2720,8 @@ async function main() {
         workspaceScript.text.includes("function showProjectCreateSheet(panel, project = null, options = {})") &&
         workspaceScript.text.includes("await options.onCreated?.(createdProject);") &&
         workspaceStyles.text.match(/\.section-detail-panel \{[\s\S]*?position: relative;/) &&
-        workspaceScript.text.includes("notes.append(notesHeader, textareaWrap, projectsHost, tagsHost)") &&
+        workspaceScript.text.includes("notes.append(notesHeader, textareaWrap, projectsHost)") &&
+        !workspaceScript.text.includes("tagsHost") &&
         workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
         !workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&
         workspaceScript.text.includes('const projectListLabel = selectedProjects.length === 0') &&
@@ -2734,7 +2729,7 @@ async function main() {
         workspaceScript.text.includes("projectListToggle.textContent = projectListLabel") &&
         workspaceStyles.text.includes(".annotation-project-list-motion.is-open") &&
         workspaceStyles.text.match(/\.annotation-project-chip \+ \.annotation-project-chip \{[\s\S]*?border-top:/),
-      "Section Detail organization no longer exposes its Project and tag controls."
+      "Section Detail organization should expose Project controls without tag controls."
     );
     assert(
       workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),
@@ -2818,9 +2813,7 @@ async function main() {
       workspaceStyles.text.includes(".saved-panel .saved-code-group .saved-row") &&
         workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter-chip \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter-chip::before \{\s*content: none;/) &&
+        !workspaceStyles.text.includes('.saved-tag-filter') &&
         workspaceStyles.text.includes(".saved-chapter-header") &&
         workspaceStyles.text.includes(".saved-project-tile.is-opening") &&
         workspaceStyles.text.includes(".project-detail-loading-status") &&
@@ -2838,9 +2831,10 @@ async function main() {
       "Static Reader section titles still use pointer styling."
     );
     assert(
-      workspaceStyles.text.includes(".section-detail-tags .annotation-tag-input") &&
-        workspaceStyles.text.includes(".section-detail-projects,"),
-      "Section-detail organization should expose Projects before its pill-style tag input."
+      !workspaceStyles.text.includes(".section-detail-tags") &&
+        workspaceStyles.text.includes(".section-detail-projects {") &&
+        !workspaceScript.text.includes("renderAnnotationTagEditor"),
+      "Section-detail organization should expose Projects without a tag editor."
     );
     assert(
       workspaceStyles.text.includes("--reader-notes-active-text: #00636d") &&

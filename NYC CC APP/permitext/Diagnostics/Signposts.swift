@@ -70,7 +70,7 @@ struct UserContentSyncConflict: Identifiable, Hashable, Sendable {
         case .savedItem:
             return "Saved section"
         case .annotation:
-            return "Note or tags"
+            return "Annotation"
         case .project:
             return "Project"
         case .projectSection:

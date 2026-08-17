@@ -102,7 +102,7 @@ struct BookmarkExportBuilder {
 
     /// Builds the single big NSAttributedString that CTFramesetter pages
     /// through. Each section is prefixed with an inline header (code
-    /// section, section number + title) and followed by tags/notes blocks
+    /// section, section number + title) and followed by the note block
     /// and a divider, all using paragraph attributes that keep visual
     /// rhythm consistent.
     private func composeDocument(bodies: [Int64: String]) -> NSAttributedString {
@@ -141,14 +141,6 @@ struct BookmarkExportBuilder {
                 result.append(NSAttributedString(
                     string: body + "\n",
                     attributes: bodyAttributes()
-                ))
-            }
-
-            // Tags
-            if !bookmark.tags.isEmpty {
-                result.append(NSAttributedString(
-                    string: "\nTags: " + bookmark.tags.joined(separator: " · ") + "\n",
-                    attributes: tagsAttributes()
                 ))
             }
 
@@ -319,13 +311,6 @@ struct BookmarkExportBuilder {
             .font: UIFont.systemFont(ofSize: 11, weight: .regular),
             .foregroundColor: UIColor(white: 0.15, alpha: 1),
             .paragraphStyle: paragraph
-        ]
-    }
-
-    private func tagsAttributes() -> [NSAttributedString.Key: Any] {
-        [
-            .font: UIFont.systemFont(ofSize: 9, weight: .medium),
-            .foregroundColor: UIColor(white: 0.35, alpha: 1)
         ]
     }
 

@@ -27,7 +27,7 @@ func permitextUpgradeCallToActionTitle(
 }
 
 func permitextProfessionalWorkspaceRequirementMessage() -> String {
-    "Upgrade to Pro to unlock unlimited saved work and notes, Projects, professional exports, tags, and offline access."
+    "Upgrade to Pro to unlock unlimited saved work and notes, Projects, professional exports, and offline access."
 }
 
 enum ProjectHubLoadError: LocalizedError {
@@ -1672,8 +1672,8 @@ final class CodeLibraryViewModel: ObservableObject {
     func refreshBookmarks() {
         // Any caller performing the full Saved/Project presentation refresh
         // has already satisfied a pending debounced note refresh. Cancel it
-        // so a quick follow-up action (for example adding a tag after typing a
-        // note) does not rebuild account-wide Project evidence a second time.
+        // so a quick follow-up edit does not rebuild account-wide Project
+        // evidence a second time.
         savedPresentationRefreshTask?.cancel()
         savedPresentationRefreshTask = nil
 
@@ -2515,10 +2515,6 @@ final class CodeLibraryViewModel: ObservableObject {
         hasCapability(.projects)
     }
 
-    var hasTagAccess: Bool {
-        currentPlan == .pro
-    }
-
     var hasResearchAccess: Bool {
         hasCapability(.research)
     }
@@ -2557,21 +2553,6 @@ final class CodeLibraryViewModel: ObservableObject {
         entitlementPrompt = requirement
         statusMessage = requirement.message
         return false
-    }
-
-    @discardableResult
-    func requireTagAccess() -> Bool {
-        guard hasTagAccess else {
-            let requirement = EntitlementRequirement(
-                feature: .advancedOrganization,
-                requiredPlan: .pro,
-                message: "Upgrade to Pro to add and edit tags."
-            )
-            entitlementPrompt = requirement
-            statusMessage = requirement.message
-            return false
-        }
-        return true
     }
 
     func showUpgradePlaceholder() {
@@ -3682,77 +3663,6 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Tags
-
-    /// Starter tag set that shows up as suggestions on every bookmark. The
-    /// list is intentionally short and architecture-focused; users can still
-    /// add anything they want on top.
-    nonisolated static let starterBookmarkTags: [String] = [
-        "Egress",
-        "Fire Rating",
-        "Accessibility",
-        "Occupancy",
-        "Construction Type",
-        "Shafts",
-        "Mechanical",
-        "Plumbing",
-        "Energy",
-        "Structural",
-        "Existing Building",
-        "Special Inspections",
-        "Alteration",
-        "Mixed-Use",
-        "Residential"
-    ]
-
-    /// Returns the tags currently saved for one section.
-    func tags(sectionID: Int64) -> [String] {
-        guard let selectedVersion, let userContentRepository else { return [] }
-        return (try? userContentRepository.tags(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? []
-    }
-
-    func tags(sectionID: Int64, blockID: String) -> [String] {
-        guard let selectedVersion, let userContentRepository else { return [] }
-        return (try? userContentRepository.tags(sectionID: sectionID, blockID: blockID, codeVersion: selectedVersion.codeVersion)) ?? []
-    }
-
-    /// Replaces a section's tag set. Empty array clears all tags for it.
-    @discardableResult
-    func setTags(_ tags: [String], sectionID: Int64) -> Bool {
-        setTags(tags, sectionID: sectionID, blockID: "")
-    }
-
-    @discardableResult
-    func setTags(_ tags: [String], sectionID: Int64, blockID: String) -> Bool {
-        guard let selectedVersion, let userContentRepository else { return false }
-        do {
-            if !tags.isEmpty {
-                guard !denyIfNeeded(entitlementService.canUse(.advancedOrganization)) else {
-                    return false
-                }
-            }
-            try userContentRepository.setTags(
-                tags,
-                sectionID: sectionID,
-                blockID: blockID.trimmingCharacters(in: .whitespacesAndNewlines),
-                codeVersion: selectedVersion.codeVersion
-            )
-            refreshBookmarks()
-            scheduleUserContentAutoSync()
-            return true
-        } catch {
-            statusMessage = error.localizedDescription
-            return false
-        }
-    }
-
-    /// Every tag in use for the current code version with how many bookmarks
-    /// carry it. Sorted by usage (most-used first), then alphabetically.
-    func tagUsageCounts() -> [(tag: String, count: Int)] {
-        guard let selectedVersion, let userContentRepository else { return [] }
-        return (try? userContentRepository.tagUsageCounts(codeVersion: selectedVersion.codeVersion)) ?? []
-    }
-
     func clearAllBookmarks() {
         guard let userContentRepository else { return }
         do {
@@ -3768,17 +3678,6 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let selectedVersion, let userContentRepository else { return }
         do {
             try userContentRepository.clearNotes(codeVersion: selectedVersion.codeVersion)
-            refreshBookmarks()
-            scheduleUserContentAutoSync()
-        } catch {
-            statusMessage = error.localizedDescription
-        }
-    }
-
-    func clearAllTags() {
-        guard let selectedVersion, let userContentRepository else { return }
-        do {
-            try userContentRepository.clearAllTags(codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
             scheduleUserContentAutoSync()
         } catch {

@@ -397,8 +397,6 @@ struct ChapterHTMLReaderView: View {
                 accentColor: accentColor,
                 projects: library.folders,
                 projectMemberIDs: Set(library.folderMembership[target.detail.id] ?? []),
-                initialTags: library.tags(sectionID: target.detail.id, blockID: target.blockID),
-                isTagEditingAvailable: library.hasTagAccess,
                 isBookmarked: library.isBookmarked(sectionID: target.detail.id),
                 onToggleBookmark: {
                     let isBookmarked = library.toggleBookmark(sectionID: target.detail.id)
@@ -411,14 +409,6 @@ struct ChapterHTMLReaderView: View {
                     } else {
                         library.removeSection(target.detail.id, fromFolder: project.id)
                     }
-                },
-                onSetTags: { tags in
-                    _ = library.setTags(tags, sectionID: target.detail.id, blockID: target.blockID)
-                    recomputeSavedDecorations()
-                    return library.tags(sectionID: target.detail.id, blockID: target.blockID)
-                },
-                onRequireTagAccess: {
-                    library.requireTagAccess()
                 },
                 onSave: { body in
                     let result = library.saveNote(sectionID: target.detail.id, blockID: target.blockID, body: body)

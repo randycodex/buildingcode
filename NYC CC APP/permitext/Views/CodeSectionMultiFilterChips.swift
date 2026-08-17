@@ -22,7 +22,7 @@ struct CodeSectionMultiFilterChips: View {
             HStack(spacing: CodeFilterChipMetrics.spacing) {
                 // The "All Sections" chip uses a neutral grey rather than the
                 // library's accent so it reads as a non-state (no code section
-                // picked), matching how the All Tags chip behaves on Saved.
+                // picked), matching the inclusive multi-filter behavior on Saved.
                 filterChip(
                     title: "All Sections",
                     accent: Color.secondary,

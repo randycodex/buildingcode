@@ -4555,7 +4555,7 @@ struct LocalEntitlementService: EntitlementService {
         case .premiumExports:
             return limits.premiumExportsEnabled ? .allowed : denied(feature, "Upgrade to Pro to export saved sections.")
         case .advancedOrganization:
-            return limits.advancedOrganizationEnabled ? .allowed : denied(feature, "Upgrade to Pro to use tags and advanced organization.")
+            return limits.advancedOrganizationEnabled ? .allowed : denied(feature, "Upgrade to Pro to use advanced organization.")
         case .continuity:
             return limits.continuityEnabled ? .allowed : denied(feature, "Upgrade to Pro for reading continuity.")
         case .crossDeviceSync:
@@ -4957,7 +4957,6 @@ enum BookmarkSortMode: String, CaseIterable, Identifiable {
     case recentlySaved
     case codeBook
     case title
-    case tag
 
     var id: String { rawValue }
 
@@ -4967,7 +4966,6 @@ enum BookmarkSortMode: String, CaseIterable, Identifiable {
         case .recentlySaved: return "Recent"
         case .codeBook: return "Code Book"
         case .title: return "Title"
-        case .tag: return "Tag"
         }
     }
 
@@ -4977,7 +4975,6 @@ enum BookmarkSortMode: String, CaseIterable, Identifiable {
         case .recentlySaved: return "clock"
         case .codeBook: return "books.vertical"
         case .title: return "textformat"
-        case .tag: return "tag"
         }
     }
 }
@@ -5007,15 +5004,6 @@ enum BookmarkSorter {
             case .title:
                 let titleCompare = lhs.displayTitle.localizedStandardCompare(rhs.displayTitle)
                 if titleCompare != .orderedSame { return titleCompare == .orderedAscending }
-                return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
-            case .tag:
-                let lhsTag = lhs.tags.first ?? ""
-                let rhsTag = rhs.tags.first ?? ""
-                if lhsTag != rhsTag {
-                    if lhsTag.isEmpty { return false }
-                    if rhsTag.isEmpty { return true }
-                    return lhsTag.localizedStandardCompare(rhsTag) == .orderedAscending
-                }
                 return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
             }
         }

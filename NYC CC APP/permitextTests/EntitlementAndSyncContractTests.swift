@@ -599,7 +599,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     func testSyncConflictPresentationIdentifiesEverySupportedRecordKind() {
         let expected: [(ServerUserContentEntityKind, String, String)] = [
             (.savedItem, "Saved section", "bookmark"),
-            (.annotation, "Note or tags", "note.text"),
+            (.annotation, "Annotation", "note.text"),
             (.project, "Project", "folder"),
             (.projectSection, "Project evidence", "folder.badge.plus"),
             (.workboard, "Workboard", "rectangle.3.group"),
@@ -1219,7 +1219,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         XCTAssertEqual(
             message,
-            "Upgrade to Pro to unlock unlimited saved work and notes, Projects, professional exports, tags, and offline access."
+            "Upgrade to Pro to unlock unlimited saved work and notes, Projects, professional exports, and offline access."
         )
         XCTAssertFalse(message.localizedCaseInsensitiveContains("continuity"))
         XCTAssertFalse(message.localizedCaseInsensitiveContains("cross-device sync"))

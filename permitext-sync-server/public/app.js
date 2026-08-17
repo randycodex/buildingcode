@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-research-multicorpus-v349";
+} from "./offline-storage.js?v=20260817-research-multicorpus-v350";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -364,7 +364,7 @@ const recentSearchLimit = 50;
 const recentSearchPopoverLimit = 15;
 const researchChatPlaceholder = "AI-assisted research — not an official interpretation";
 const repeatableUtilityKeys = new Set(["search", "saved"]);
-const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title", "tag"]);
+const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title"]);
 const collapsedSettingsCardIDs = new Set();
 const sharedWorkspaceStateKeys = [
   "localProjects",
@@ -893,7 +893,6 @@ function newUtilityInstance(key, overrides = {}) {
     instance.historySplitRatio = normalizeSearchHistorySplitRatio(overrides.historySplitRatio);
   } else if (key === "saved") {
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
-    instance.tagFilter = typeof overrides.tagFilter === "string" ? overrides.tagFilter.trim() : "";
     instance.sortMode = normalizeSavedSortMode(overrides.sortMode);
     instance.projectsMenuOpen = overrides.projectsMenuOpen === undefined
       ? true
@@ -905,7 +904,6 @@ function newUtilityInstance(key, overrides = {}) {
         .filter(Boolean)
     ));
     instance.codeFilterMenuOpen = Boolean(overrides.codeFilterMenuOpen);
-    instance.tagsMenuOpen = Boolean(overrides.tagsMenuOpen);
     instance.selectedFolderID = String(overrides.selectedFolderID || "");
     instance.organizeUnassigned = Boolean(overrides.organizeUnassigned);
     instance.folderQuery = String(overrides.folderQuery || "");
@@ -928,13 +926,11 @@ function normalizeUtilityInstances(saved = {}) {
       query: typeof pane?.query === "string" ? pane.query : "",
       codeFilters: pane?.codeFilters,
       historySplitRatio: pane?.historySplitRatio,
-      tagFilter: pane?.tagFilter,
       sortMode: pane?.sortMode,
       projectsMenuOpen: pane?.projectsMenuOpen,
       projectsArchiveMode: pane?.projectsArchiveMode,
       collapsedEvidenceFolderIDs: pane?.collapsedEvidenceFolderIDs,
       codeFilterMenuOpen: pane?.codeFilterMenuOpen,
-      tagsMenuOpen: pane?.tagsMenuOpen,
       selectedFolderID: pane?.selectedFolderID,
       organizeUnassigned: pane?.organizeUnassigned,
       folderQuery: pane?.folderQuery,
@@ -2325,12 +2321,10 @@ function normalizeSavedInstance(instance) {
   if (!instance || typeof instance !== "object") {
     return {
       codeFilters: [],
-      tagFilter: "",
       sortMode: "codeOrder",
       projectsMenuOpen: false,
       collapsedEvidenceFolderIDs: [],
       codeFilterMenuOpen: false,
-      tagsMenuOpen: false,
       selectedFolderID: "",
       organizeUnassigned: false,
       folderQuery: "",
@@ -2340,7 +2334,6 @@ function normalizeSavedInstance(instance) {
     };
   }
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
-  instance.tagFilter = typeof instance.tagFilter === "string" ? instance.tagFilter.trim() : "";
   instance.sortMode = normalizeSavedSortMode(instance.sortMode);
   instance.projectsMenuOpen = Boolean(instance.projectsMenuOpen);
   instance.collapsedEvidenceFolderIDs = Array.from(new Set(
@@ -2349,7 +2342,6 @@ function normalizeSavedInstance(instance) {
       .filter(Boolean)
   ));
   instance.codeFilterMenuOpen = Boolean(instance.codeFilterMenuOpen);
-  instance.tagsMenuOpen = Boolean(instance.tagsMenuOpen);
   instance.selectedFolderID = String(instance.selectedFolderID || "");
   instance.organizeUnassigned = Boolean(instance.organizeUnassigned);
   instance.folderQuery = String(instance.folderQuery || "");
@@ -4074,7 +4066,7 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
       const notebookReferenceBottomGap = Number.parseFloat(filterStyles.getPropertyValue("--space-3")) || filterGap;
       const openingPadding = menu.closest(".saved-inline-filters")
         ? filterGap + (
-            filterRail.classList.contains("saved-code-filter") || filterRail.classList.contains("saved-tag-filter")
+            filterRail.classList.contains("saved-code-filter")
               ? savedCodeBottomGap
               : filterGap
           )
@@ -8725,8 +8717,6 @@ function refreshVisibleSyncedDerivedState() {
     }));
     const textarea = notes?.querySelector("textarea");
     if (textarea && textarea !== focusedElement) textarea.value = noteValueForTarget(target);
-    const tags = panel.querySelector(".section-detail-tags");
-    if (tags && !tags.contains(focusedElement)) renderAnnotationTagEditor(tags, target);
   });
 
   openProjectDetails().forEach((detail) => {
@@ -10464,7 +10454,7 @@ async function unlinkEvidenceFromFolder(folder, item, container = null, options 
   if (!remainingLinks.length) {
     const confirmed = await openWebWarning({
       title: "Remove final destination?",
-      message: "This is the last destination containing this evidence. Removing it will also delete the saved record. Notes, tags, source metadata, and evidence history are not silently reassigned.",
+      message: "This is the last destination containing this evidence. Removing it will also delete the saved record. Notes, source metadata, and evidence history are not silently reassigned.",
       confirmLabel: "Remove and delete",
       container
     });
@@ -10702,78 +10692,6 @@ function setAnnotationNoteValue(target, value) {
   return true;
 }
 
-function setAnnotationTags(target, tags) {
-  if (!target?.sectionID) return false;
-  const currentTags = tagsForTarget(target);
-  const nextTags = normalizeAnnotationTags(tags);
-  const addsTag = nextTags.some((tag) =>
-    !currentTags.some((current) => current.toLowerCase() === tag.toLowerCase())
-  );
-  if (!isProAccount() && addsTag) {
-    void presentPlanLimitNotice("Tags require Pro", "Upgrade to Pro to add tags and use advanced organization.");
-    return false;
-  }
-  const noteBody = noteValueForTarget(target);
-  const record = annotationRecordForTarget(target, {
-    noteBody,
-    tags: nextTags,
-    syncFields: ["tags"]
-  });
-  upsertLocalAnnotation(record);
-  refreshOpenSavedPanes().catch(() => {});
-  scheduleAnnotationPush(record);
-  return true;
-}
-
-function renderAnnotationTagEditor(container, target, options = {}) {
-  if (!container || !target?.sectionID) return;
-  clear(container);
-  const tags = tagsForTarget(target);
-  const label = document.createElement("p");
-  label.className = "annotation-tags-label";
-  label.textContent = "Tags";
-
-  const chips = document.createElement("div");
-  chips.className = "annotation-tag-chips";
-  if (tags.length) {
-    tags.forEach((tag) => {
-      const chip = document.createElement("button");
-      chip.type = "button";
-      chip.className = "annotation-tag-chip";
-      chip.textContent = tag;
-      chip.title = `Remove ${tag}`;
-      chip.addEventListener("click", () => {
-        if (!setAnnotationTags(target, tags.filter((item) => item.toLowerCase() !== tag.toLowerCase()))) return;
-        renderAnnotationTagEditor(container, target, options);
-        options.onChange?.();
-      });
-      chips.append(chip);
-    });
-  }
-
-  const input = document.createElement("input");
-  input.className = "annotation-tag-input";
-  input.type = "text";
-  input.placeholder = isProAccount() ? "Add tag" : "Pro required";
-  input.setAttribute("aria-label", "Add tag");
-  input.disabled = !isProAccount();
-  if (!isProAccount()) input.title = "Tags require Pro";
-  input.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    const value = input.value.trim();
-    if (!value) return;
-    if (!setAnnotationTags(target, [...tags, value])) return;
-    input.value = "";
-    renderAnnotationTagEditor(container, target, options);
-    options.onChange?.();
-  });
-
-  container.append(label);
-  if (tags.length) container.append(chips);
-  container.append(input);
-}
-
 function projectLinkForAnnotationTarget(project, target) {
   const sectionID = String(target.sectionID || "");
   const targetBlockID = normalizeAnnotationBlockID(target.blockID);
@@ -10820,7 +10738,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
 
   const projectListToggle = document.createElement("button");
   projectListToggle.type = "button";
-  projectListToggle.className = "annotation-project-list-toggle annotation-tags-label";
+  projectListToggle.className = "annotation-project-list-toggle annotation-editor-label";
   projectListToggle.textContent = projectListLabel;
   projectListToggle.setAttribute("aria-controls", chips.id);
   projectListToggle.addEventListener("click", () => {
@@ -12007,33 +11925,9 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save evidence";
   const instruction = document.createElement("p");
   instruction.className = "reader-notes-project-instruction";
-  instruction.textContent = "Select one or more Projects or saved collections, add optional tags, then confirm. Permitext keeps one saved record linked to every destination you choose.";
+  instruction.textContent = "Select one or more Projects or saved collections, then confirm. Permitext keeps one saved record linked to every destination you choose.";
   pickerHeader.append(label);
   picker.append(pickerHeader, instruction);
-
-  const optionalTags = document.createElement("input");
-  optionalTags.type = "text";
-  optionalTags.className = "reader-notes-save-tags";
-  optionalTags.placeholder = "Optional tags, separated by commas";
-  optionalTags.setAttribute("aria-label", "Optional tags");
-  optionalTags.disabled = !isProAccount();
-  picker.append(optionalTags);
-  const suggestedTags = recentAnnotationTags();
-  if (suggestedTags.length && isProAccount()) {
-    const suggestions = document.createElement("div");
-    suggestions.className = "reader-notes-save-tag-suggestions";
-    suggestedTags.forEach((tag) => {
-      const suggestion = document.createElement("button");
-      suggestion.type = "button";
-      suggestion.textContent = tag;
-      suggestion.addEventListener("click", () => {
-        const current = normalizeAnnotationTags(optionalTags.value.split(","));
-        optionalTags.value = normalizeAnnotationTags([...current, tag]).join(", ");
-      });
-      suggestions.append(suggestion);
-    });
-    picker.append(suggestions);
-  }
 
   const status = document.createElement("p");
   status.className = "reader-notes-project-status";
@@ -12195,8 +12089,6 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
         destinationList.querySelectorAll("button").forEach((button) => { button.disabled = false; });
         return;
       }
-      const tags = normalizeAnnotationTags(optionalTags.value.split(","));
-      if (tags.length) setAnnotationTags(sectionPayload, [...tagsForTarget(sectionPayload), ...tags]);
       syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
       const names = selectedFolders.map((folder) => folder.name || folder.title || folderTypeLabel(folder));
       status.textContent = `${result.queued ? "Saved locally; sync pending" : "Saved"} to ${new Intl.ListFormat(undefined, { style: "long", type: "conjunction" }).format(names)}.`;
@@ -14272,14 +14164,7 @@ async function renderSectionDetail(searchID, detail) {
       saveState.textContent = "Saved locally";
     }
   });
-  const tagsHost = document.createElement("section");
-  tagsHost.className = "section-detail-tags";
-  renderAnnotationTagEditor(tagsHost, sectionTarget, {
-    onChange: () => {
-      saveState.textContent = "Saved locally";
-    }
-  });
-  notes.append(notesHeader, textareaWrap, projectsHost, tagsHost);
+  notes.append(notesHeader, textareaWrap, projectsHost);
   panel.__annotationTarget = sectionTarget;
   panel.__sectionPayload = sectionPayload;
   notes.addEventListener("permitext-folder-save", (event) => {
@@ -14313,7 +14198,7 @@ async function renderSectionDetail(searchID, detail) {
       }
       const confirmed = await openWebWarning({
         title: "Delete saved evidence?",
-        message: "This removes the section from every destination and deletes the canonical saved record. Notes and tags remain available if you save the section again later.",
+        message: "This removes the section from every destination and deletes the canonical saved record. Notes remain available if you save the section again later.",
         confirmLabel: "Delete saved evidence",
         container: panel
       });
@@ -20875,8 +20760,7 @@ async function renderProjectReportDraft(project) {
   let reportOptions = {
     templates: [],
     defaultReportTemplateID: "permitext-standard",
-    branding: { displayName: "Permitext", accentColorHex: "#a65318" },
-    tags: []
+    branding: { displayName: "Permitext", accentColorHex: "#a65318" }
   };
   let selectedReportTemplateID = "permitext-standard";
   let activeDraft = emptyProjectReportDraft(identity);
@@ -21548,12 +21432,6 @@ async function renderProjectReportDraft(project) {
     });
     titleControl.append(titleButton, titleEditor, revisionLabel, select);
     draftPicker.append(titleControl);
-    if (reportOptions.tags?.length) {
-      const tags = document.createElement("p");
-      tags.className = "report-draft-empty";
-      tags.textContent = `Firm tags: ${reportOptions.tags.map((tag) => tag.name).join(", ")}`;
-      draftPicker.append(tags);
-    }
 
     const metadata = document.createElement("div");
     metadata.className = "report-draft-metadata";
@@ -24459,11 +24337,6 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
   });
 }
 
-function savedItemTags(item) {
-  const annotation = annotationForTarget(item);
-  return normalizeAnnotationTags([...(Array.isArray(item.tags) ? item.tags : []), ...(annotation.tags || [])]);
-}
-
 function savedItemTitle(item) {
   const sectionNumber = String(item.sectionNumber || item.sectionID || "").trim();
   return sectionTitleWithoutNumber({ sectionNumber, title: item.title || "Section" }) || "Section";
@@ -24503,14 +24376,6 @@ function sortSavedItems(items, mode) {
     } else if (mode === "title") {
       const titleOrder = savedItemTitle(left).localeCompare(savedItemTitle(right), undefined, { numeric: true, sensitivity: "base" });
       if (titleOrder) return titleOrder;
-    } else if (mode === "tag") {
-      const leftTag = savedItemTags(left)[0] || "";
-      const rightTag = savedItemTags(right)[0] || "";
-      if (leftTag !== rightTag) {
-        if (!leftTag) return 1;
-        if (!rightTag) return -1;
-        return leftTag.localeCompare(rightTag, undefined, { numeric: true, sensitivity: "base" });
-      }
     }
     return compareSavedCodeOrder(left, right);
   });
@@ -24547,7 +24412,7 @@ function openSavedActionMenu(panel, anchor, items) {
 
 function printSavedItemsAsPDF(items, scopeLabel) {
   if (!hasCapability("professional-exports")) {
-    void presentPlanLimitNotice("PDF export requires Pro", "Upgrade to Pro to export saved code, notes, and tags as a PDF.");
+    void presentPlanLimitNotice("PDF export requires Pro", "Upgrade to Pro to export saved code and notes as a PDF.");
     return;
   }
   const frame = document.createElement("iframe");
@@ -24558,7 +24423,7 @@ function printSavedItemsAsPDF(items, scopeLabel) {
     const documentRoot = frame.contentDocument;
     if (!documentRoot) return;
     const style = documentRoot.createElement("style");
-    style.textContent = "body{margin:40px;color:#111;font:14px/1.45 -apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}h1{font-size:26px;margin:0 0 4px}h2{margin:28px 0 8px;padding-bottom:6px;border-bottom:1px solid #ccc;font-size:15px;text-transform:uppercase}article{padding:12px 0;border-bottom:1px solid #ddd;break-inside:avoid}strong,span{display:block}.meta{color:#8a4a10;font-weight:700}.preview{margin-top:4px;color:#555}.note{margin-top:6px;color:#8a4a10}.tags{margin-top:6px;font-size:12px;color:#666}@page{margin:0.6in}";
+    style.textContent = "body{margin:40px;color:#111;font:14px/1.45 -apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}h1{font-size:26px;margin:0 0 4px}h2{margin:28px 0 8px;padding-bottom:6px;border-bottom:1px solid #ccc;font-size:15px;text-transform:uppercase}article{padding:12px 0;border-bottom:1px solid #ddd;break-inside:avoid}strong,span{display:block}.meta{color:#8a4a10;font-weight:700}.preview{margin-top:4px;color:#555}.note{margin-top:6px;color:#8a4a10}@page{margin:0.6in}";
     documentRoot.head.append(style);
     const heading = documentRoot.createElement("h1");
     heading.textContent = "permitext Saved";
@@ -24594,13 +24459,6 @@ function printSavedItemsAsPDF(items, scopeLabel) {
         note.textContent = noteText;
         row.append(note);
       }
-      const tags = savedItemTags(item);
-      if (tags.length) {
-        const tagLine = documentRoot.createElement("span");
-        tagLine.className = "tags";
-        tagLine.textContent = tags.map((tag) => `#${tag}`).join("  ");
-        row.append(tagLine);
-      }
       documentRoot.body.append(row);
     });
     frame.contentWindow?.focus();
@@ -24610,111 +24468,13 @@ function printSavedItemsAsPDF(items, scopeLabel) {
   document.body.append(frame);
 }
 
-function recentAnnotationTags(limit = 8) {
-  const records = [...(currentContentSummary().annotations || [])]
-    .filter((record) => !record.deletedAt && Array.isArray(record.tags))
-    .sort((left, right) => Date.parse(right.updatedAt || 0) - Date.parse(left.updatedAt || 0));
-  return normalizeAnnotationTags(records.flatMap((record) => record.tags || [])).slice(0, limit);
-}
-
-function renameAnnotationTag(oldTag, newTag) {
-  const oldKey = normalizeAnnotationTags([oldTag])[0]?.toLocaleLowerCase();
-  const replacement = normalizeAnnotationTags([newTag])[0];
-  if (!oldKey || !replacement) return 0;
-  const latestByTarget = new Map();
-  (currentContentSummary().annotations || []).forEach((record) => {
-    if (!record || record.deletedAt || !Array.isArray(record.tags)) return;
-    const key = [
-      syncCodeVersion(record.codeVersion),
-      record.sectionID,
-      normalizeAnnotationBlockID(record.blockID)
-    ].join(":");
-    const existing = latestByTarget.get(key);
-    if (!existing || Date.parse(record.updatedAt || 0) >= Date.parse(existing.updatedAt || 0)) {
-      latestByTarget.set(key, record);
-    }
-  });
-  let changed = 0;
-  latestByTarget.forEach((record) => {
-    const tags = normalizeAnnotationTags(record.tags || []);
-    if (!tags.some((tag) => tag.toLocaleLowerCase() === oldKey)) return;
-    const nextTags = tags.map((tag) => tag.toLocaleLowerCase() === oldKey ? replacement : tag);
-    if (setAnnotationTags({
-      ...record,
-      sectionID: record.sectionID,
-      codeVersion: record.codeVersion,
-      blockID: record.blockID || ""
-    }, nextTags)) changed += 1;
-  });
-  return changed;
-}
-
-function showSavedTagManager(panel, tags, onChange) {
-  panel.querySelector(".project-sheet-overlay")?.remove();
-  const overlay = document.createElement("section");
-  overlay.className = "project-sheet-overlay";
-  overlay.setAttribute("aria-label", "Manage tags");
-  const sheet = document.createElement("section");
-  sheet.className = "project-create-sheet saved-tag-manager";
-  const header = document.createElement("header");
-  header.className = "project-sheet-header project-sheet-header-compact";
-  const title = document.createElement("strong");
-  title.textContent = "Rename or merge tags";
-  const done = document.createElement("button");
-  done.type = "button";
-  done.textContent = "Done";
-  done.addEventListener("click", () => overlay.remove());
-  header.append(title, done);
-  const copy = document.createElement("p");
-  copy.textContent = "Rename a tag across every Project and saved collection. Renaming it to an existing tag merges them without duplicates.";
-  sheet.append(header, copy);
-  tags.forEach((tag) => {
-    const form = document.createElement("form");
-    form.className = "saved-tag-manager-row";
-    const input = document.createElement("input");
-    input.value = tag;
-    input.setAttribute("aria-label", `Rename ${tag}`);
-    const rename = document.createElement("button");
-    rename.type = "submit";
-    rename.textContent = "Rename";
-    rename.disabled = true;
-    input.addEventListener("input", () => {
-      rename.disabled = !normalizeAnnotationTags([input.value])[0] || input.value === tag;
-    });
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const count = renameAnnotationTag(tag, input.value);
-      if (!count) return;
-      overlay.remove();
-      onChange();
-    });
-    form.append(input, rename);
-    sheet.append(form);
-  });
-  overlay.append(sheet);
-  panel.append(overlay);
-}
-
 function renderSavedFilters(panel, instance, allItems, onChange) {
   const wrapper = panel.querySelector(".saved-inline-filters");
   const searchForm = panel.querySelector(".saved-evidence-search");
   const searchInput = panel.querySelector(".saved-evidence-search-input");
   const searchCloseButton = panel.querySelector(".saved-evidence-search-close");
   const searchToggle = panel.querySelector(".saved-evidence-search-toggle");
-  const tagRail = panel.querySelector(".saved-tag-filter");
-  const tagMenu = panel.querySelector(".saved-tag-filter-menu");
-  const tagClearButton = panel.querySelector(".saved-tag-filter-clear");
-  let tagManageButton = panel.querySelector(".saved-tag-manage");
-  const tagCounts = new Map();
-  allItems.forEach((item) => {
-    new Set(savedItemTags(item)).forEach((tag) => tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1));
-  });
-  const availableTags = [...tagCounts.entries()]
-    .sort(([leftTag, leftCount], [rightTag, rightCount]) =>
-      rightCount - leftCount || leftTag.localeCompare(rightTag, undefined, { sensitivity: "base" }))
-    .map(([tag]) => tag);
   instance.codeFilters = [];
-  clear(tagRail);
   const syncEvidenceSearch = ({ focus = false } = {}) => {
     const open = Boolean(instance.evidenceSearchOpen);
     searchForm.hidden = !open;
@@ -24753,65 +24513,6 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     };
   }
   syncEvidenceSearch();
-  if (!tagManageButton) {
-    tagManageButton = document.createElement("button");
-    tagManageButton.type = "button";
-    tagManageButton.className = "saved-tag-manage";
-    tagManageButton.textContent = "Manage";
-    tagManageButton.setAttribute("aria-label", "Rename or merge tags");
-    tagClearButton.before(tagManageButton);
-  }
-  tagManageButton.hidden = availableTags.length === 0;
-  tagManageButton.onclick = () => showSavedTagManager(panel, availableTags, () => {
-    void transitionWorkspace("utility", { refreshPaneIDs: [paneIDForUtilityInstance(instance)] });
-  });
-  if (availableTags.length) {
-    availableTags.forEach((tag) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "saved-tag-filter-chip";
-      button.textContent = tag || "All Tags";
-      button.setAttribute("aria-pressed", String(instance.tagFilter === tag));
-      button.addEventListener("click", () => {
-        instance.tagFilter = instance.tagFilter === tag && tag ? "" : tag;
-        tagRail.querySelectorAll(".saved-tag-filter-chip").forEach((chip) => {
-          chip.setAttribute("aria-pressed", String(chip.textContent === (instance.tagFilter || "All Tags")));
-        });
-        tagClearButton.disabled = !instance.tagFilter;
-        updateCodeFilterMenu(tagRail, instance, {
-          stateKey: "tagsMenuOpen",
-          menuName: "tag filters",
-          label: (savedInstance) => savedInstance?.tagFilter || "All Tags"
-        });
-        onChange();
-        saveWorkspaceState();
-      });
-      tagRail.append(button);
-    });
-    tagClearButton.disabled = !instance.tagFilter;
-    tagClearButton.addEventListener("click", () => {
-      instance.tagFilter = "";
-      tagRail.querySelectorAll(".saved-tag-filter-chip").forEach((chip) => {
-        chip.setAttribute("aria-pressed", "false");
-      });
-      tagClearButton.disabled = true;
-      updateCodeFilterMenu(tagRail, instance, {
-        stateKey: "tagsMenuOpen",
-        menuName: "tag filters",
-        label: (savedInstance) => savedInstance?.tagFilter || "All Tags"
-      });
-      onChange();
-      saveWorkspaceState();
-    });
-  }
-  tagMenu.hidden = availableTags.length === 0;
-  if (availableTags.length) {
-    wireCodeFilterMenu(tagRail, instance, {
-      stateKey: "tagsMenuOpen",
-      menuName: "tag filters",
-      label: (savedInstance) => savedInstance?.tagFilter || "All Tags"
-    });
-  }
   wrapper.hidden = allItems.length === 0;
 }
 
@@ -25461,7 +25162,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     convert.addEventListener("click", async () => {
       const confirmed = await openWebWarning({
         title: "Convert to Project?",
-        message: "This keeps every saved section, note, tag, and collection association, then adds Notebook, Report, and Project history.",
+        message: "This keeps every saved section, note, and collection association, then adds Notebook, Report, and Project history.",
         confirmLabel: "Convert",
         container: panel
       });
@@ -25641,8 +25342,7 @@ function savedEvidenceMatchesQuery(item, query) {
     item.previewText,
     item.text,
     item.excerpt,
-    item.noteBody,
-    ...savedItemTags(item)
+    item.noteBody
   ].some((value) => String(value || "").toLocaleLowerCase().includes(normalizedQuery));
 }
 
@@ -25758,7 +25458,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     clear(content);
-    appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced bookmarks, tags, and notes.");
+    appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced bookmarks and notes.");
     return;
   }
   if (data.status === "error" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
@@ -25871,7 +25571,6 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
     }
     const viewSignature = [
       query.toLocaleLowerCase(),
-      savedInstance.tagFilter,
       String(savedInstance.organizeUnassigned),
       String(savedInstance.showAllSaved),
       selectedFolder ? projectRecordID(selectedFolder) : "all"
@@ -25881,7 +25580,6 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       previousViewSignature = viewSignature;
     }
     const matchesView = (item, options = {}) => {
-      const tagMatches = !savedInstance.tagFilter || savedItemTags(item).some((tag) => tag.localeCompare(savedInstance.tagFilter, undefined, { sensitivity: "accent" }) === 0);
       const itemSectionID = savedEvidenceKey(item);
       const folderMatches = !selectedFolder || savedInstance.showAllSaved || (summary.projectSections || []).some((link) =>
         savedEvidenceKey(link) === itemSectionID &&
@@ -25889,7 +25587,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       );
       const queryMatches = options.ignoreQuery || savedEvidenceMatchesQuery(item, query);
       const organizationMatches = !savedInstance.organizeUnassigned || unassignedSectionIDs.has(itemSectionID);
-      return tagMatches && folderMatches && queryMatches && organizationMatches;
+      return folderMatches && queryMatches && organizationMatches;
     };
     let resolvedItems;
     let hasMore;
@@ -25969,10 +25667,10 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       }
     } else if (combinedItems.length > 0) {
       appendEmptySaved(content, "No saved items match", selectedFolder
-        ? "Try another search, code book, or tag filter, or add evidence to this destination."
-        : "Try another code book or tag filter.");
+        ? "Try another search or code book, or add evidence to this destination."
+        : "Try another code book.");
     } else {
-      appendMutedRow(content, "No saved sections", "Bookmarks, paragraph notes, and tags will appear here.");
+      appendMutedRow(content, "No saved sections", "Bookmarks and paragraph notes will appear here.");
     }
     if (hasMore) {
       const footer = document.createElement("section");
@@ -26754,7 +26452,7 @@ function consolidatedSavedAnnotations(annotations = []) {
   });
   return Array.from(latestByTarget.values()).flatMap((annotation) => {
     const merged = annotationForTarget(annotation.sectionID, annotation.blockID);
-    if (!String(merged.noteBody || "").trim() && merged.tags.length === 0) return [];
+    if (!String(merged.noteBody || "").trim()) return [];
     return [{ ...annotation, ...merged, savedColumnKind: "annotation" }];
   });
 }
@@ -26770,7 +26468,7 @@ function mergeSavedColumnItems(savedItems = [], annotatedItems = []) {
     const annotation = sectionAnnotations.get(String(item.sectionID || ""));
     return {
       ...item,
-      ...(annotation ? { noteBody: annotation.noteBody, tags: annotation.tags } : {}),
+      ...(annotation ? { noteBody: annotation.noteBody } : {}),
       savedColumnKind: "bookmark"
     };
   });
@@ -26878,10 +26576,6 @@ function mergeEquivalentSavedColumnRows(items = []) {
     if (!bookmark || !bookmarkPreview || bookmarkPreview !== normalizedPreview(item)) return;
     bookmark.annotationBlockID = blockID;
     bookmark.noteBody = String(item.noteBody || bookmark.noteBody || "").trim();
-    bookmark.tags = normalizeAnnotationTags([
-      ...savedItemTags(bookmark),
-      ...savedItemTags(item)
-    ]);
     mergedAnnotations.add(item);
   });
 
@@ -27165,18 +26859,6 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           note.className = "saved-note-preview";
           note.textContent = notePreview;
           openButton.append(note);
-        }
-        const itemTags = savedItemTags(item);
-        if (itemTags.length) {
-          const tags = document.createElement("span");
-          tags.className = "saved-row-tags";
-          itemTags.forEach((tag) => {
-            const chip = document.createElement("span");
-            chip.className = "saved-row-tag";
-            chip.textContent = tag;
-            tags.append(chip);
-          });
-          openButton.append(tags);
         }
         if (options.showProjectContext !== false) {
           const projectNames = typeof options.projectNamesForItem === "function"
@@ -27547,7 +27229,7 @@ async function clearSettingsBookmarks() {
   return records.length;
 }
 
-async function clearSettingsAnnotations(field) {
+async function clearSettingsNotes() {
   const records = currentContentSummary().annotations || [];
   const uniqueTargets = new Map();
   records.forEach((record) => {
@@ -27557,11 +27239,10 @@ async function clearSettingsAnnotations(field) {
   uniqueTargets.forEach((record) => {
     const localRecord = (state.localAnnotations || []).find((item) => String(item.id || "") === String(record.id || ""));
     if (!localRecord) return;
-    if (field === "noteBody") localRecord.noteBody = "";
-    else localRecord.tags = [];
+    localRecord.noteBody = "";
   });
-  if (field === "noteBody") state.sectionNotes = {};
-  enqueueSettingsBulkClear(field === "noteBody" ? "notes" : "tags");
+  state.sectionNotes = {};
+  enqueueSettingsBulkClear("notes");
   saveWorkspaceState();
   if (activeAccount()) await flushSyncOutbox({ refresh: true }).catch(() => {});
   return uniqueTargets.size;
@@ -27613,8 +27294,7 @@ async function performSettingsClearAction(action) {
     return 0;
   }
   if (action === "bookmarks") return clearSettingsBookmarks();
-  if (action === "notes") return clearSettingsAnnotations("noteBody");
-  if (action === "tags") return clearSettingsAnnotations("tags");
+  if (action === "notes") return clearSettingsNotes();
   return 0;
 }
 
@@ -27785,7 +27465,7 @@ function renderFirmStandardsEditor(organization, setFirmStatus) {
   const details = document.createElement("details");
   details.className = "settings-firm-standards";
   const summary = document.createElement("summary");
-  summary.textContent = "Firm standards, tags & Report templates";
+  summary.textContent = "Firm standards & Report templates";
   const editor = document.createElement("div");
   details.append(summary, editor);
   let controls = structuredClone(organization.firmControls || {});
@@ -27846,101 +27526,6 @@ function renderFirmStandardsEditor(organization, setFirmStatus) {
       firmControlLabel("Required disclaimers", requiredDisclaimers)
     );
     editor.append(branding);
-
-    const tagsSection = document.createElement("section");
-    tagsSection.className = "settings-firm-standard-section";
-    const tagsHeading = document.createElement("div");
-    tagsHeading.className = "settings-firm-standard-heading";
-    const tagsTitle = document.createElement("strong");
-    tagsTitle.textContent = "Project tags";
-    const addTag = document.createElement("button");
-    addTag.className = "settings-secondary-button";
-    addTag.type = "button";
-    addTag.textContent = "Add tag";
-    addTag.addEventListener("click", () => {
-      const now = new Date().toISOString();
-      controls.tags ||= [];
-      controls.tags.push({
-        id: crypto.randomUUID(),
-        name: "New tag",
-        colorHex: "#6b7280",
-        status: "active",
-        createdAt: now,
-        updatedAt: now,
-        order: controls.tags.length
-      });
-      render();
-    });
-    tagsHeading.append(tagsTitle, addTag);
-    tagsSection.append(tagsHeading);
-    (controls.tags || []).forEach((tag) => {
-      const row = document.createElement("div");
-      row.className = "settings-firm-standard-row";
-      const name = document.createElement("input");
-      name.value = tag.name || "";
-      name.maxLength = 80;
-      name.setAttribute("aria-label", "Firm tag name");
-      name.addEventListener("input", () => {
-        tag.name = name.value;
-      });
-      const color = document.createElement("input");
-      color.type = "color";
-      color.value = tag.colorHex || "#6b7280";
-      color.setAttribute("aria-label", `${tag.name || "Firm tag"} color`);
-      color.addEventListener("input", () => {
-        tag.colorHex = color.value;
-      });
-      const status = document.createElement("select");
-      status.setAttribute("aria-label", `${tag.name || "Firm tag"} status`);
-      [["active", "Active"], ["archived", "Archived"]].forEach(([value, label]) => {
-        const option = document.createElement("option");
-        option.value = value;
-        option.textContent = label;
-        status.append(option);
-      });
-      status.value = tag.status || "active";
-      status.addEventListener("change", () => {
-        tag.status = status.value;
-      });
-      row.append(name, color, status);
-      tagsSection.append(row);
-    });
-    const activeTags = (controls.tags || []).filter((tag) => tag.status === "active");
-    if (activeTags.length && organization.projects?.length) {
-      const assignmentsTitle = document.createElement("span");
-      assignmentsTitle.className = "settings-firm-subheading";
-      assignmentsTitle.textContent = "Assignments";
-      tagsSection.append(assignmentsTitle);
-      (organization.projects || []).forEach((project) => {
-        const assignment = document.createElement("fieldset");
-        assignment.className = "settings-firm-tag-assignment";
-        const legend = document.createElement("legend");
-        legend.textContent = project.name || "Untitled Project";
-        assignment.append(legend);
-        activeTags.forEach((tag) => {
-          const label = document.createElement("label");
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.checked = (controls.projectTagAssignments?.[project.id] || [])
-            .includes(tag.id);
-          checkbox.addEventListener("change", () => {
-            controls.projectTagAssignments ||= {};
-            const assigned = new Set(controls.projectTagAssignments[project.id] || []);
-            if (checkbox.checked) assigned.add(tag.id);
-            else assigned.delete(tag.id);
-            if (assigned.size) controls.projectTagAssignments[project.id] = Array.from(assigned);
-            else delete controls.projectTagAssignments[project.id];
-          });
-          const swatch = document.createElement("span");
-          swatch.className = "settings-firm-tag-swatch";
-          swatch.style.setProperty("--firm-tag-color", tag.colorHex);
-          label.append(checkbox, swatch, document.createTextNode(tag.name));
-          assignment.append(label);
-        });
-        tagsSection.append(assignment);
-      });
-    }
-    editor.append(tagsSection);
 
     const templatesSection = document.createElement("section");
     templatesSection.className = "settings-firm-standard-section";
@@ -29207,8 +28792,7 @@ function renderSettings() {
   const clearActionCopy = {
     searches: ["Clear recent searches", "This will remove recent search history and Recently Viewed sections from this browser. Pinned searches will remain. Are you sure?"],
     bookmarks: ["Clear all bookmarks", "This will remove every bookmark saved for the current code version. Are you sure?"],
-    notes: ["Clear all notes", "This will remove every note saved for the current code version. Are you sure?"],
-    tags: ["Clear all tags", "This will remove every tag from saved sections. Bookmarks and notes will not be affected. Are you sure?"]
+    notes: ["Clear all notes", "This will remove every note saved for the current code version. Are you sure?"]
   };
   panel.querySelectorAll("[data-clear-action]").forEach((button) => {
     button.addEventListener("click", async () => {

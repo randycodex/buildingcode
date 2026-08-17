@@ -5,13 +5,11 @@ struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var savedFilterCodeSectionIDs: Set<Int64>
     @State private var savedFilterFolderIDs: Set<Int64>
-    @State private var selectedTagFilter: String? = nil
     @State private var folderEditorTarget: FolderEditorTarget?
     @State private var savedSortMode: BookmarkSortMode = .codeOrder
     @State private var projectPageIndex: Int = 0
     @State private var scrollOffset: CGFloat = 0
     @State private var cachedFilteredBookmarks: [BookmarkedSection] = []
-    @State private var cachedAvailableTags: [String] = []
     @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
     @State private var cachedBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
     @State private var pendingExport: BookmarkExportRequest?
@@ -101,7 +99,7 @@ struct BookmarksView: View {
     }
 
     private var showsSavedInlineFilters: Bool {
-        !availableFilterSections.isEmpty || !cachedAvailableTags.isEmpty
+        !availableFilterSections.isEmpty
     }
 
     private var hasSavedHeaderContentBelowTitle: Bool {
@@ -151,9 +149,6 @@ struct BookmarksView: View {
             }
             .onChange(of: savedFilterFolderIDs) { _, newValue in
                 FilterIDsStorage.persist(newValue, key: Self.filterFolderIDsDefaultsKey)
-                rebuildBookmarkCaches()
-            }
-            .onChange(of: selectedTagFilter) { _, _ in
                 rebuildBookmarkCaches()
             }
             .onChange(of: savedSortMode) { _, _ in
@@ -275,14 +270,13 @@ private var filteredSavedEmptyState: some View {
         CodeEmptyStateCard(
             title: "No Saved Sections Match",
             systemImage: "line.3.horizontal.decrease.circle",
-            description: "Clear the active code or tag filters to see all of your saved sections.",
+            description: "Clear the active code filters to see all of your saved sections.",
             accent: accentColor
         )
 
         Button("Clear Filters") {
             savedFilterCodeSectionIDs.removeAll()
             savedFilterFolderIDs.removeAll()
-            selectedTagFilter = nil
         }
         .font(.subheadline.weight(.semibold))
         .buttonStyle(.plain)
@@ -389,9 +383,6 @@ private var filteredSavedEmptyState: some View {
                 .filter { savedFilterCodeSectionIDs.contains($0.id) }
                 .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
             if !names.isEmpty { parts.append(names.joined(separator: ", ")) }
-        }
-        if let tag = selectedTagFilter {
-            parts.append("Tag: \(tag)")
         }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
@@ -605,31 +596,7 @@ private var filteredSavedEmptyState: some View {
                 return savedFilterCodeSectionIDs.contains(id)
             }
         }
-        if let tag = selectedTagFilter {
-            results = results.filter { bookmark in
-                bookmark.tags.contains { $0.caseInsensitiveCompare(tag) == .orderedSame }
-            }
-        }
         return results
-    }
-
-    /// Distinct tags actually in use across the user's bookmarks, sorted by
-    /// usage (most-used first). The starter set is only surfaced inside the
-    /// editor — the filter row only shows tags the user has applied at least
-    /// once so it never feels empty.
-    private func makeAvailableTags() -> [String] {
-        var counts: [String: Int] = [:]
-        for bookmark in library.bookmarks {
-            for tag in bookmark.tags {
-                counts[tag, default: 0] += 1
-            }
-        }
-        return counts
-            .sorted {
-                if $0.value != $1.value { return $0.value > $1.value }
-                return $0.key.localizedStandardCompare($1.key) == .orderedAscending
-            }
-            .map(\.key)
     }
 
     @ViewBuilder
@@ -638,55 +605,7 @@ private var filteredSavedEmptyState: some View {
             if !availableFilterSections.isEmpty {
                 savedFilterControl
             }
-            if !cachedAvailableTags.isEmpty {
-                tagFilterControl
-            }
         }
-    }
-
-    private var tagFilterControl: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: CodeFilterChipMetrics.spacing) {
-                tagFilterChip(title: "All Tags", isSelected: selectedTagFilter == nil) {
-                    selectedTagFilter = nil
-                }
-                ForEach(cachedAvailableTags, id: \.self) { tag in
-                    tagFilterChip(
-                        title: tag,
-                        isSelected: selectedTagFilter == tag
-                    ) {
-                        selectedTagFilter = selectedTagFilter == tag ? nil : tag
-                    }
-                }
-            }
-            .padding(.vertical, 2)
-        }
-    }
-
-    private func tagFilterChip(
-        title: String,
-        isSelected: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        let minWidth = title == "All Tags" ? CodeFilterChipMetrics.primaryChipWidth : nil
-        return Button(action: action) {
-            HStack(spacing: 4) {
-                Image(systemName: "tag.fill")
-                    .font(.caption2.weight(.semibold))
-                Text(title)
-                    .font(CodeFilterChipMetrics.font)
-            }
-            .foregroundStyle(isSelected ? Color.appChromeOnFill : .secondary)
-            .frame(width: minWidth, alignment: .leading)
-            .padding(.horizontal, CodeFilterChipMetrics.compactHorizontalPadding)
-            .padding(.vertical, CodeFilterChipMetrics.verticalPadding)
-            .frame(minHeight: CodeFilterChipMetrics.minHeight)
-            .background(
-                Capsule(style: .continuous)
-                    .fill(isSelected ? Color.secondary : Color.secondary.opacity(0.12))
-            )
-        }
-        .buttonStyle(.plain)
     }
 
     private var savedFilterControl: some View {
@@ -700,7 +619,6 @@ private var filteredSavedEmptyState: some View {
     private func rebuildBookmarkCaches() {
         let filtered = makeFilteredBookmarks()
         cachedFilteredBookmarks = filtered
-        cachedAvailableTags = makeAvailableTags()
         cachedBookmarkCodeGroups = makeBookmarkCodeGroups(from: filtered)
         cachedBookmarksByFolderID = makeBookmarksByFolderID()
     }
@@ -864,32 +782,11 @@ private var filteredSavedEmptyState: some View {
                         .padding(.top, 4)
                 }
 
-                if !bookmark.tags.isEmpty {
-                    bookmarkTagsRow(bookmark.tags, accent: bookmarkAccent)
-                        .padding(.top, 6)
-                }
             }
 
             Spacer(minLength: 0)
         }
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
-    }
-
-    private func bookmarkTagsRow(_ tags: [String], accent: Color) -> some View {
-        // Wrap with the shared FlowLayout so many tags don't get clipped.
-        FlowLayout(spacing: 6) {
-            ForEach(tags, id: \.self) { tag in
-                Text(tag)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(accent)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(
-                        Capsule(style: .continuous)
-                            .fill(accent.opacity(0.12))
-                    )
-            }
-        }
     }
 
 }
@@ -1068,7 +965,6 @@ struct ProjectView: View {
     @State private var isProjectReportBuilding = false
     @State private var projectReportBuildError: String?
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
-    @State private var selectedEvidenceTag: String?
     @State private var evidenceSearchQuery = ""
     @State private var isEvidenceSearchPresented = false
 
@@ -1087,19 +983,9 @@ struct ProjectView: View {
         )
     }
 
-    private var availableEvidenceTags: [String] {
-        Array(Set(projectBookmarks.flatMap(\.tags))).sorted {
-            $0.localizedStandardCompare($1) == .orderedAscending
-        }
-    }
-
     private var visibleProjectBookmarks: [BookmarkedSection] {
         let query = evidenceSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         return projectBookmarks.filter { bookmark in
-            let matchesTag = selectedEvidenceTag.map { selectedTag in
-                bookmark.tags.contains { $0.caseInsensitiveCompare(selectedTag) == .orderedSame }
-            } ?? true
-            guard matchesTag else { return false }
             guard !query.isEmpty else { return true }
             return [
                 bookmark.sectionNumber,
@@ -1107,8 +993,7 @@ struct ProjectView: View {
                 bookmark.previewText,
                 bookmark.noteBody,
                 bookmark.chapterTitle,
-                bookmark.codeSectionName,
-                bookmark.tags.joined(separator: " ")
+                bookmark.codeSectionName
             ].contains { $0.lowercased().contains(query) }
         }
     }
@@ -1162,13 +1047,11 @@ struct ProjectView: View {
                     savedEvidenceHeader
                         .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
 
-                    evidenceTagMenu
-
                     if visibleProjectBookmarks.isEmpty {
                         ContentUnavailableView(
                             "No matching evidence",
                             systemImage: "bookmark.slash",
-                            description: Text("Choose another tag or change the search.")
+                            description: Text("Change the search to see saved evidence.")
                         )
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 28)
@@ -1261,12 +1144,6 @@ struct ProjectView: View {
             selectedBookmarkRowIDs = selectedBookmarkRowIDs.intersection(Set(projectBookmarks.map(\.rowID)))
             if selectedBookmarkRowIDs.isEmpty {
                 isSelecting = false
-            }
-            if let selectedEvidenceTag,
-               availableEvidenceTags.contains(where: {
-                   $0.caseInsensitiveCompare(selectedEvidenceTag) == .orderedSame
-               }) == false {
-                self.selectedEvidenceTag = nil
             }
         }
         .onChange(of: visibleProjectBookmarks) { _, visibleBookmarks in
@@ -1849,32 +1726,6 @@ struct ProjectView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var evidenceTagMenu: some View {
-        Menu {
-            Button("All Tags") { selectedEvidenceTag = nil }
-            ForEach(availableEvidenceTags, id: \.self) { tag in
-                Button(tag) { selectedEvidenceTag = tag }
-            }
-        } label: {
-            HStack(spacing: 10) {
-                Text(selectedEvidenceTag ?? "All Tags")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.primary)
-                Spacer(minLength: 12)
-                Image(systemName: "chevron.down")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 11)
-            .background(Color(uiColor: .secondarySystemGroupedBackground), in: Capsule(style: .continuous))
-        }
-        .buttonStyle(.plain)
-        .disabled(availableEvidenceTags.isEmpty)
-        .accessibilityLabel("Filter saved evidence by tag")
-        .accessibilityValue(selectedEvidenceTag ?? "All Tags")
-    }
-
     @ViewBuilder
     private func projectEvidenceGroup(_ group: ProjectEvidenceCodeGroup) -> some View {
         let groupAccent = Color(uiColor: CodeSectionThemeProfile(codeSectionName: group.codeSectionName).accentColor)
@@ -2058,19 +1909,6 @@ struct ProjectView: View {
                             .padding(.top, 4)
                     }
 
-                    if !bookmark.tags.isEmpty {
-                        FlowLayout(spacing: 6) {
-                            ForEach(bookmark.tags, id: \.self) { tag in
-                                Text(tag)
-                                    .font(.caption2.weight(.semibold))
-                                    .foregroundStyle(bookmarkAccent)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 3)
-                                    .background(Capsule(style: .continuous).fill(bookmarkAccent.opacity(0.12)))
-                            }
-                        }
-                        .padding(.top, 6)
-                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
