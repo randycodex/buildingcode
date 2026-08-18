@@ -59,7 +59,18 @@ Environment:
 - Xcode 26.6 / iOS Simulator SDK 26.5
 - Dark appearance
 
-The existing artifact is the pre-migration HTML baseline. The new selector was not present in that artifact; it was used to record the unchanged default reader while the current Xcode GUI process was unresponsive to new command-line builds.
+The existing artifact is the pre-migration HTML baseline used for the measurements below. The current branch was then built separately in both Debug and Release configurations and installed over that artifact for selector verification.
+
+### Current-branch build and selector verification
+
+- The Debug simulator scheme build succeeded against the committed branch sources.
+- On first opening an authored chapter, the debug menu marked `HTML (Default)` as selected and rendered the existing HTML reader.
+- Selecting `Native (Comparison)` displayed the existing native reader and marked that option as selected.
+- Selecting `HTML (Default)` again returned to the authored HTML reader.
+- The Release simulator scheme build succeeded without the `DEBUG` compilation condition. Its authored chapter toolbar contained the normal search control and no reader selector.
+- Independent full-source Swift type-checks also passed with and without `-D DEBUG`.
+
+The live `.xcodeproj` path was held by macOS file coordination from the already-running Xcode session, causing command-line builds to wait before project evaluation. To avoid terminating that session or altering the repository, verification used an untouched temporary copy of the project metadata with symlinks to the same committed source and resource directories. The build logs showed the branch `ChapterHTMLReaderView.swift` compiling in both configurations. No project settings or source paths were rewritten for the build.
 
 ### Measured timings
 
@@ -93,6 +104,9 @@ Screenshots:
 - `baseline/screenshots/html-building-code-chapter-1.png`
 - `baseline/screenshots/html-building-code-chapter-search.png`
 - `baseline/screenshots/html-building-code-chapter-16-figure-table.png`
+- `baseline/screenshots/debug-reader-selector-html-default.png`
+- `baseline/screenshots/debug-reader-native-comparison.png`
+- `baseline/screenshots/release-reader-no-debug-selector.png`
 
 Interaction recordings:
 
