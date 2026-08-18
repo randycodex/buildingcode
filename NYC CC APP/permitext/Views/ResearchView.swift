@@ -570,12 +570,12 @@ struct ResearchView: View {
     }
 
     private func researchTitle(for summary: ResearchConversationSummary) -> String {
+        let title = summary.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !title.isEmpty { return title }
         let starterQuestion = summary.starterQuestion?
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        if let starterQuestion, !starterQuestion.isEmpty {
-            return starterQuestion
-        }
-        return summary.title
+        if let starterQuestion, !starterQuestion.isEmpty { return starterQuestion }
+        return "New Research"
     }
 
     private func requestDeletion(id: String, title: String) {

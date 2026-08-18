@@ -1012,6 +1012,7 @@ function selectedPassages(testCase) {
 
 async function createEvaluationConversation(baseURL, account, testCase) {
   const passages = selectedPassages(testCase);
+  const passageTitleSource = String(passages[0]?.selectedText || "").replace(/\s+/g, " ").trim();
   const created = await jsonRequest(baseURL, "/research/conversations/create", {
     method: "POST",
     token: account.backendSessionToken,
@@ -1028,8 +1029,9 @@ async function createEvaluationConversation(baseURL, account, testCase) {
     `${testCase.id} did not preserve every passage supplied through the multi-selection request contract.`
   );
   assert(
-    /^[A-Z][a-z]{2} \d{1,2}, \d{4} · \d{1,2}:\d{2} [AP]M$/.test(created.conversation.title),
-    `${testCase.id} did not receive a creation-date default conversation title.`
+    created.conversation.title.length <= 120 &&
+      passageTitleSource.startsWith(created.conversation.title.replace(/…$/, "")),
+    `${testCase.id} did not receive a title based on its first selected passage.`
   );
   return created.conversation.id;
 }
@@ -1312,19 +1314,21 @@ async function runMockConversationCases(baseURL, checkedCases) {
       emptyChat.conversation?.sources?.length === 0,
     "Research did not create an immediate empty chat without manually selected evidence."
   );
+  const automaticQuestion = "What does NYC BC 1019.3 establish about open exit access stairs?";
   const automaticTurn = await askEvaluationQuestion(
     baseURL,
     account,
     emptyChat.conversation.id,
-    "What does NYC BC 1019.3 establish about open exit access stairs?"
+    automaticQuestion
   );
   assert(
-    automaticTurn.answer.sourceSummary?.userPinnedCount === 0 &&
+    automaticTurn.conversation.title === automaticQuestion &&
+      automaticTurn.answer.sourceSummary?.userPinnedCount === 0 &&
       automaticTurn.answer.sourceSummary?.permitextDiscoveredCount > 0 &&
       automaticTurn.answer.evidenceSourceIDs?.length > 0 &&
       automaticTurn.answer.citations?.length > 0 &&
       automaticTurn.answer.verification?.pass === true,
-    "Research did not answer an unpinned chat question from automatically discovered enacted evidence."
+    "Research did not title and answer an unpinned chat from automatically discovered enacted evidence."
   );
   const factChat = await jsonRequest(baseURL, "/research/conversations/create", {
     method: "POST",

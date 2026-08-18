@@ -1450,7 +1450,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-instant-project-selection-v360'),
+        webRoot.text.includes('/web/app.js?v=20260817-research-conversation-titles-v361'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1619,7 +1619,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-instant-project-selection-v360'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-conversation-titles-v361'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1885,7 +1885,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-instant-project-selection-v360'),
+      webRoot.text.includes('/web/styles.css?v=20260817-research-conversation-titles-v361'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -4160,9 +4160,11 @@ async function main() {
     });
     assert(createdConversation.response.status === 201, "Research conversation creation failed.");
     assert(createdConversation.json.conversation.messages.length === 0, "Creating research unexpectedly generated an AI message.");
+    const selectedPassageTitle = selectedResearchText.replace(/\s+/g, " ").trim();
     assert(
-      /^[A-Z][a-z]{2} \d{1,2}, \d{4} · \d{1,2}:\d{2} [AP]M$/.test(createdConversation.json.conversation.title),
-      "New Research conversations should use their New York creation date and time as the default title."
+      createdConversation.json.conversation.title.length <= 120 &&
+        selectedPassageTitle.startsWith(createdConversation.json.conversation.title.replace(/…$/, "")),
+      "New Research conversations should use their first selected passage as the title."
     );
     assert(
         createdConversation.json.conversation.sources[0].selectedText === selectedResearchText &&
@@ -4239,6 +4241,7 @@ async function main() {
     assert(conversationMessage.json.usage.mockMode === true, "Mock research did not disclose its zero-call mode.");
     assert(
       conversationMessage.json.conversation.messages.length === 2 &&
+        conversationMessage.json.conversation.title === "When must the owner notify the department?" &&
         conversationMessage.json.conversation.messages[1].answer.supportedPoints.length >= 1 &&
         conversationMessage.json.conversation.messages[1].answer.promptVersion.endsWith(":conversational-v3") &&
         conversationMessage.json.conversation.messages[1].answer.conclusion.startsWith("The assembled enacted provisions provide a conditional answer") &&
@@ -6046,8 +6049,8 @@ async function main() {
         reusedResearchEvidence.json.conversation.primaryProjectID === researchProjectIDs[1] &&
         reusedResearchEvidence.json.conversation.messages.length === 0 &&
         reusedResearchEvidence.json.conversation.origin.answerID === answerID &&
-        /^[A-Z][a-z]{2} \d{1,2}, \d{4} · \d{1,2}:\d{2} [AP]M$/.test(
-          reusedResearchEvidence.json.conversation.title
+        selectedPassageTitle.startsWith(
+          reusedResearchEvidence.json.conversation.title.replace(/…$/, "")
         ) &&
         reusedResearchEvidence.json.conversation.sources[0].id !==
           createdConversation.json.conversation.sources[0].id &&

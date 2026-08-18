@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
   projectResearchConversationForList,
+  researchConversationDisplayTitle,
   researchProjectInformation,
   validateResearchEvidenceAnalysis,
   researchFactUsageDisclosure
@@ -97,6 +98,7 @@ assert.equal(projected.sources.length, 1);
 assert.equal(projected.sources[0].sectionID, "8881");
 assert.equal(projected.messages, undefined);
 assert.equal(projected.starterQuestion, "What applies?");
+assert.equal(projected.title, "List projection conversation", "A manual Research title should remain authoritative.");
 assert.equal(
   JSON.stringify(projected).includes(hugeVisual),
   false,
@@ -197,6 +199,33 @@ assert.equal(
   "Legacy conversations should derive the original question without returning message history."
 );
 
+assert.equal(
+  researchConversationDisplayTitle({
+    title: "Aug 1, 2026 · 8:00 PM",
+    titleSource: "default",
+    createdAt: "2026-08-02T00:00:00.000Z",
+    starterQuestion: "What was asked first?",
+    sources: []
+  }),
+  "What was asked first?",
+  "The first Research question should become the automatic conversation title."
+);
+assert.equal(
+  researchConversationDisplayTitle({
+    title: "Aug 1, 2026 · 8:00 PM",
+    titleSource: "default",
+    createdAt: "2026-08-02T00:00:00.000Z",
+    sources: [{
+      kind: "selection",
+      sectionID: "8881",
+      selectedText: "101.4.4 Plumbing. The provisions of the New York City Plumbing Code shall apply."
+    }],
+    messages: []
+  }),
+  "101.4.4 Plumbing. The provisions of the New York City Plumbing Code shall apply.",
+  "A passage-only Research conversation should use its first selected passage as the title."
+);
+
 assert.match(
   appSource,
   /listStoredResearchConversations\(context\.userID,\s*\{\s*summaryOnly:\s*true\s*\}/,
@@ -218,7 +247,8 @@ assert.match(
   "Postgres summary listing does not recover the original question for legacy conversations."
 );
 assert.match(appSource, /conversation\.starterQuestion \|\|= question;/, "The first ordinary Research question is not persisted as the stable starter question.");
-assert.match(clientSource, /title\.textContent = conversation\.starterQuestion \|\| "Question not yet asked";/, "Previous chats do not show the original question.");
+assert.match(appSource, /refreshGeneratedResearchConversationTitle\(conversation\);[\s\S]*?conversation\.messages\.push/, "The first ordinary Research question does not update the generated title.");
+assert.match(clientSource, /title\.textContent = researchConversationTitle\(conversation\);/, "Previous chats do not show the shared Research title.");
 assert.match(clientSource, /meta\.textContent = researchConversationDate\(conversation\.createdAt\);/, "Previous chats do not show the conversation creation date.");
 assert.match(clientSource, /projectPill\.textContent = conversation\.primaryProjectID[\s\S]*?researchProjectName\(conversation\.primaryProjectID\)[\s\S]*?"Unassigned";/, "Previous chats do not identify their assigned Project or use the shared Unassigned vocabulary.");
 assert.match(stylesSource, /\.research-conversation-open \{[\s\S]*?gap: var\(--space-3\);/, "Previous chat questions need visible separation from their metadata.");
@@ -227,7 +257,7 @@ assert.match(stylesSource, /\.research-conversation-project-pill \{[\s\S]*?width
 assert.match(clientSource, /const researchListScrollTop = track\.querySelector\([\s\S]*?utility:analysis[\s\S]*?analysis-content[\s\S]*?\)\?\.scrollTop \?\? 0;[\s\S]*?refreshedResearchList\.scrollTop = Math\.min/, "Opening a previous chat should preserve the inner Research list scroll position.");
 assert.match(stylesSource, /\.research-conversation-open strong \{[\s\S]*?font-weight: 400;[\s\S]*?line-height: 1\.35;/, "Previous chat questions do not use regular weight with readable line spacing.");
 assert.match(indexSource, /<p class="eyebrow panel-kind">Research<\/p>[\s\S]*?<h2 class="panel-title">History<\/h2>/, "The Research index is not clearly named History within the Research system.");
-assert.match(clientSource, /eyebrow\.textContent = "Research";[\s\S]*?panelTitle\.textContent = conversation\.starterQuestion/, "The active conversation does not present itself as the working Research surface.");
+assert.match(clientSource, /eyebrow\.textContent = "Research";[\s\S]*?panelTitle\.textContent = researchConversationTitle\(conversation/, "The active conversation does not present the shared Research title.");
 assert.match(clientSource, /function researchConversationHistoryGroups\(conversations = \[\], now = new Date\(\)\)/, "Research history has no deterministic time-grouping helper.");
 assert.match(clientSource, /ageInDays < 7[\s\S]*?"7 days"[\s\S]*?ageInDays < 14[\s\S]*?"Previous 7 days"[\s\S]*?ageInDays < 30[\s\S]*?"Previous 30 days"/, "Research history does not use the expected recent weekly buckets.");
 assert.match(stylesSource, /\.research-history-group-label \{[\s\S]*?font-size: 14px !important;[\s\S]*?font-weight: 400;/, "Research history group headings should use 14px regular text.");
@@ -269,7 +299,7 @@ assert.match(clientSource, /function renderResearchStructuredSource\(structuredS
 assert.match(clientSource, /const structuredSource = renderResearchStructuredSource\(source\.structuredSource\);[\s\S]*?body\.append\(structuredSource\)/, "Research source cards should use the immutable structured source snapshot when it is available.");
 assert.match(stylesSource, /\.research-source-structured-table table \{[\s\S]*?min-width: 32rem;[\s\S]*?table-layout: auto;/, "Structured Research tables should remain readable and horizontally scroll within narrow conversation columns.");
 assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body \{[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/, "Research history cannot inherit the established collapse motion.");
-assert.match(clientSource, /conversation\.starterQuestion \|\| summaryQuestion \|\| conversation\.title/, "The standalone conversation column does not retain the original question as its title.");
+assert.match(clientSource, /panelTitle\.textContent = researchConversationTitle\(conversation, researchConversationTitle\(summaryConversation\)\)/, "The standalone conversation column does not use the shared Research title.");
 assert.match(clientSource, /if \(!releaseSurfaceVisibility\.researchHistoryManagement\)/, "Deferred per-chat management controls are not hidden behind the release boundary.");
 assert.doesNotMatch(clientSource, /Ask naturally\. Permitext will research/, "The redundant Research start helper sentence is still visible.");
 assert.doesNotMatch(clientSource, /Project context \(optional\)/i, "The redundant Project context caption is still visible above the Research selector.");
@@ -322,7 +352,7 @@ assert.match(appSource, /filter\(\(conversation\) => !conversation\.historyHidde
 assert.doesNotMatch(clientSource, /className = "ghost-button research-back-button"/, "The redundant Research Back control should remain removed.");
 assert.doesNotMatch(clientSource, /className = "ghost-button research-new-chat-button"/, "The redundant Research New chat control should remain removed.");
 assert.match(clientSource, /function bindResearchSendShortcut[\s\S]*?event\.key !== "Enter" \|\| event\.shiftKey \|\| event\.isComposing[\s\S]*?form\.requestSubmit\(\)/, "Enter should start a Research conversation while Shift+Enter remains available for a line break.");
-assert.match(clientSource, /const conversations = \[\.\.\.\(foundation\?\.researchConversations \|\| \[\]\)\][\s\S]*?filter\(\(conversation\) => String\(conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = conversation\.starterQuestion;/, "Project Research history must show only conversations with an original question.");
+assert.match(clientSource, /function appendProjectResearchHistory[\s\S]*?filter\(\(conversation\) => String\(conversation\.title \|\| conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = researchConversationTitle\(conversation\);/, "Project Research history does not include passage-titled conversations.");
 assert.doesNotMatch(clientSource, /renderResearchAnswerSave|Save to Project|research-answer-save/, "Per-answer Project saving must remain removed from Research conversations.");
 assert.match(clientSource, /unassignedLabel: "Unassigned"[\s\S]*?assignResearchConversationProject\(conversation, targetProjectID/, "The conversation header does not use the shared Unassigned state or auto-assign the full conversation to a Project.");
 assert.match(clientSource, /: "Not assigned to a Project";/, "Unassigned Research controls must retain an explanatory tooltip.");
@@ -330,7 +360,7 @@ assert.match(appSource, /const requiresContextReview = Boolean\(currentProjectID
 assert.match(clientSource, /`Move this conversation to \$\{targetProjectName\}\?`[\s\S]*?The entire conversation will move from \$\{currentProjectName\} to \$\{targetProjectName\}[\s\S]*?Its existing answers and citations will not change[\s\S]*?Future questions will use the current Project facts from \$\{targetProjectName\}/, "The Project-move warning should explain what moves, what stays unchanged, and which visible Project facts future questions use.");
 assert.match(clientSource, /confirmLabel: targetProjectID \? "Move conversation" : "Remove from Project"/, "The Project-move warning should use explicit action labels.");
 assert.match(appSource, /conversation\.projectContextReviewRequired = false;/, "A confirmed move should use the destination Project's visible facts without a second hidden review gate.");
-assert.match(clientSource, /function appendSavedProjectResearchConversations[\s\S]*?filter\(\(conversation\) => String\(conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = conversation\.starterQuestion[\s\S]*?openResearchConversation\(conversation\.id\)/, "The Project folder does not open assigned conversations directly by original question.");
+assert.match(clientSource, /function appendSavedProjectResearchConversations[\s\S]*?filter\(\(conversation\) => String\(conversation\.title \|\| conversation\.starterQuestion \|\| ""\)\.trim\(\)\)[\s\S]*?question\.textContent = researchConversationTitle\(conversation\)[\s\S]*?openResearchConversation\(conversation\.id\)/, "The Project folder does not open assigned conversations by their shared title.");
 assert.doesNotMatch(clientSource, /if \(state\.utilities\.analysis && researchConversationPaneIsOpen\(\)\) \{[\s\S]*?openSupplementalResearchConversation\(conversation\.id\)/, "Ordinary Project Research navigation should reuse the single active Research pair.");
 assert.match(clientSource, /function openResearchConversationPaneIDs\(\)[\s\S]*?supplementalResearchConversationIDs\.map[\s\S]*?for \(const conversationID of supplementalResearchConversationIDs\)[\s\S]*?renderResearchConversation\(conversationID, \{ supplemental: true \}\)/, "Supplemental Project conversations are not represented as independent active panes.");
 assert.match(clientSource, /Cited \$\{citedProvisionCount\} enacted/, "Research answers do not distinguish cited provisions from reviewed evidence.");

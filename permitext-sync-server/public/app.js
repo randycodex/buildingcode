@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-instant-project-selection-v360";
+} from "./offline-storage.js?v=20260817-research-conversation-titles-v361";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -11298,13 +11298,17 @@ function readerSectionResearchSelection(sectionWrapper) {
   };
 }
 
+function researchConversationTitle(conversation, fallback = "New Research") {
+  return String(conversation?.title || conversation?.starterQuestion || fallback).trim() || fallback;
+}
+
 function currentResearchConversationLabel() {
   const conversationID = String(state.researchConversationID || "").trim();
   if (!conversationID) return "";
   const conversation = activeResearchConversation?.id === conversationID
     ? activeResearchConversation
     : researchConversationList.find((candidate) => candidate.id === conversationID);
-  const label = String(conversation?.title || conversation?.starterQuestion || "Current Research").trim();
+  const label = researchConversationTitle(conversation, "Current Research");
   return label.length > 32 ? `${label.slice(0, 29).trim()}…` : label;
 }
 
@@ -16975,7 +16979,7 @@ async function renderResearch(paneID = "utility:analysis") {
       openButton.className = "research-conversation-open";
       openButton.type = "button";
       const title = document.createElement("strong");
-      title.textContent = conversation.starterQuestion || "Question not yet asked";
+      title.textContent = researchConversationTitle(conversation);
       const metaRow = document.createElement("span");
       metaRow.className = "research-conversation-meta";
       const meta = document.createElement("span");
@@ -18246,8 +18250,8 @@ async function renderResearchConversation(conversationID, options = {}) {
     }
   }
   applyProjectDerivedPaneTheme(panel, conversation.primaryProjectID);
-  const summaryQuestion = researchConversationList.find((item) => item.id === conversation.id)?.starterQuestion;
-  panelTitle.textContent = conversation.starterQuestion || summaryQuestion || conversation.title;
+  const summaryConversation = researchConversationList.find((item) => item.id === conversation.id);
+  panelTitle.textContent = researchConversationTitle(conversation, researchConversationTitle(summaryConversation));
   if (!embedded) {
     const projectSelect = createResearchProjectSelect({
       value: conversation.primaryProjectID || "",
@@ -22151,7 +22155,7 @@ function appendProjectResearchContextEditor(content, identity, initialConversati
 
 function appendProjectResearchHistory(content, identity, foundation) {
   const conversations = [...(foundation?.researchConversations || [])]
-    .filter((conversation) => String(conversation.starterQuestion || "").trim())
+    .filter((conversation) => String(conversation.title || conversation.starterQuestion || "").trim())
     .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
   const section = document.createElement("section");
   section.className = "project-studio-section project-studio-research";
@@ -22186,7 +22190,7 @@ function appendProjectResearchHistory(content, identity, foundation) {
     card.dataset.researchConversationId = conversation.id;
     if (!identity.sharedOnly) card.type = "button";
     const question = document.createElement("strong");
-    question.textContent = conversation.starterQuestion;
+    question.textContent = researchConversationTitle(conversation);
     card.append(question);
     if (!identity.sharedOnly) {
       card.addEventListener("click", () => {
@@ -25010,7 +25014,7 @@ async function appendSavedProjectResearchConversations(container, identity) {
     return;
   }
   const conversations = [...(foundation?.researchConversations || [])]
-    .filter((conversation) => String(conversation.starterQuestion || "").trim())
+    .filter((conversation) => String(conversation.title || conversation.starterQuestion || "").trim())
     .sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")));
   if (!conversations.length) return;
 
@@ -25043,7 +25047,7 @@ async function appendSavedProjectResearchConversations(container, identity) {
     itemNumber.className = "project-research-history-index";
     itemNumber.textContent = String(index + 1);
     const question = document.createElement("strong");
-    question.textContent = conversation.starterQuestion;
+    question.textContent = researchConversationTitle(conversation);
     card.append(itemNumber, question);
     card.addEventListener("click", () => {
       researchConversationPaneOpened = true;

@@ -3039,7 +3039,11 @@ async function createPostgresStoreAdapter() {
                 'sources', COALESCE((
                   SELECT jsonb_agg(jsonb_build_object(
                     'kind', 'selection',
-                    'sectionID', src->>'sectionID'
+                    'sectionID', src->>'sectionID',
+                    'sectionNumber', src->>'sectionNumber',
+                    'title', src->>'title',
+                    'codePrefix', src->>'codePrefix',
+                    'selectedText', LEFT(src->>'selectedText', 240)
                   ))
                   FROM jsonb_array_elements(COALESCE(conversation->'sources', '[]'::jsonb)) AS src
                   WHERE src->>'kind' = 'selection'
@@ -3068,7 +3072,11 @@ async function createPostgresStoreAdapter() {
                 'sources', COALESCE((
                   SELECT jsonb_agg(jsonb_build_object(
                     'kind', 'selection',
-                    'sectionID', src->>'sectionID'
+                    'sectionID', src->>'sectionID',
+                    'sectionNumber', src->>'sectionNumber',
+                    'title', src->>'title',
+                    'codePrefix', src->>'codePrefix',
+                    'selectedText', LEFT(src->>'selectedText', 240)
                   ))
                   FROM jsonb_array_elements(COALESCE(conversation->'sources', '[]'::jsonb)) AS src
                   WHERE src->>'kind' = 'selection'
@@ -7710,14 +7718,18 @@ export function projectResearchConversationForList(conversation) {
     .filter((source) => source?.kind === "selection")
     .map((source) => ({
       kind: "selection",
-      sectionID: String(source.sectionID || "").trim() || undefined
+      sectionID: String(source.sectionID || "").trim() || undefined,
+      sectionNumber: String(source.sectionNumber || "").trim() || undefined,
+      title: String(source.title || "").trim() || undefined,
+      codePrefix: String(source.codePrefix || "").trim() || undefined,
+      selectedText: normalizedResearchText(source.selectedText, 240) || undefined
     }));
   const messageCount = Number.isFinite(Number(conversation.messageCount))
     ? Number(conversation.messageCount)
     : (Array.isArray(conversation.messages) ? conversation.messages.length : 0);
   return {
     id: conversation.id,
-    title: conversation.title,
+    title: researchConversationDisplayTitle(conversation),
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
     historyHiddenAt: conversation.historyHiddenAt || null,
@@ -7748,7 +7760,7 @@ function researchConversationSummary(conversation, projectLink = null) {
     : (Array.isArray(conversation?.messages) ? conversation.messages.length : 0);
   return {
     id: conversation.id,
-    title: conversation.title,
+    title: researchConversationDisplayTitle(conversation),
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
     historyHiddenAt: conversation.historyHiddenAt || null,
@@ -7785,6 +7797,72 @@ function defaultResearchConversationTitle(timestamp) {
       .map((part) => [part.type, part.value])
   );
   return `${parts.month} ${parts.day}, ${parts.year} · ${parts.hour}:${parts.minute} ${parts.dayPeriod}`;
+}
+
+function conciseResearchConversationTitle(value, maximumLength = 120) {
+  const normalized = normalizedResearchText(value, Math.max(maximumLength * 2, maximumLength));
+  if (normalized.length <= maximumLength) return normalized;
+  const clipped = normalized.slice(0, maximumLength - 1);
+  const lastWordBoundary = clipped.lastIndexOf(" ");
+  const readable = lastWordBoundary >= Math.floor(maximumLength * 0.6)
+    ? clipped.slice(0, lastWordBoundary)
+    : clipped;
+  return `${readable.trimEnd()}…`;
+}
+
+function researchConversationPassageTitle(conversation) {
+  const firstPassage = (Array.isArray(conversation?.sources) ? conversation.sources : [])
+    .find((source) => source?.kind === "selection");
+  if (!firstPassage) return "";
+  const selectedText = conciseResearchConversationTitle(firstPassage.selectedText);
+  if (selectedText) return selectedText;
+  const reference = [firstPassage.codePrefix, firstPassage.sectionNumber]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(" ");
+  const sectionTitle = String(firstPassage.title || "").trim();
+  return conciseResearchConversationTitle(
+    [reference, sectionTitle].filter(Boolean).join(" — ") || "Selected code passage"
+  );
+}
+
+function researchConversationHasManualTitle(conversation) {
+  if (conversation?.titleSource === "manual") return true;
+  if (["default", "passage", "question"].includes(conversation?.titleSource)) return false;
+  const storedTitle = String(conversation?.title || "").trim();
+  if (!storedTitle) return false;
+  const creationTitle = conversation?.createdAt
+    ? defaultResearchConversationTitle(conversation.createdAt)
+    : "";
+  return storedTitle !== creationTitle;
+}
+
+export function researchConversationDisplayTitle(conversation) {
+  const storedTitle = conciseResearchConversationTitle(conversation?.title);
+  if (researchConversationHasManualTitle(conversation)) return storedTitle;
+  return conciseResearchConversationTitle(originalResearchQuestion(conversation)) ||
+    researchConversationPassageTitle(conversation) ||
+    storedTitle ||
+    "New Research";
+}
+
+function refreshGeneratedResearchConversationTitle(conversation) {
+  if (!conversation || researchConversationHasManualTitle(conversation)) return conversation;
+  const questionTitle = conciseResearchConversationTitle(originalResearchQuestion(conversation));
+  if (questionTitle) {
+    conversation.title = questionTitle;
+    conversation.titleSource = "question";
+    return conversation;
+  }
+  const passageTitle = researchConversationPassageTitle(conversation);
+  if (passageTitle) {
+    conversation.title = passageTitle;
+    conversation.titleSource = "passage";
+    return conversation;
+  }
+  conversation.title ||= defaultResearchConversationTitle(conversation.createdAt || new Date().toISOString());
+  conversation.titleSource = "default";
+  return conversation;
 }
 
 function researchSourceFromEvidence(evidence, options = {}) {
@@ -8504,6 +8582,7 @@ export function researchAnswerRecordForClient(answer) {
 async function researchConversationForClient(conversation, options = {}) {
   let clientConversation = {
     ...conversation,
+    title: researchConversationDisplayTitle(conversation),
     messages: (conversation.messages || []).map(researchMessageForClient)
   };
   if (options.checkSources) {
@@ -13570,6 +13649,7 @@ async function handleResearchConversationRename(request, response) {
     return;
   }
   conversation.title = title;
+  conversation.titleSource = "manual";
   const updatedAt = new Date().toISOString();
   conversation.updatedAt = updatedAt > String(conversation.updatedAt || "")
     ? updatedAt
@@ -14103,6 +14183,7 @@ async function handleResearchConversationReuseEvidence(request, response) {
   const conversation = {
     id: randomUUID(),
     title: defaultResearchConversationTitle(now),
+    titleSource: "default",
     createdAt: now,
     updatedAt: now,
     codeVersion: defaultSyncCodeVersion,
@@ -14127,6 +14208,7 @@ async function handleResearchConversationReuseEvidence(request, response) {
     sources,
     messages: []
   };
+  refreshGeneratedResearchConversationTitle(conversation);
   await saveStoredResearchConversation(context.userID, conversation);
   await setResearchConversationProjectLink(context.userID, conversation.id, projectID, now);
   await recordResearchProjectLinkActivity(
@@ -14176,6 +14258,7 @@ async function handleResearchConversationCreate(request, response) {
     const conversation = {
       id: randomUUID(),
       title: defaultResearchConversationTitle(now),
+      titleSource: "default",
       createdAt: now,
       updatedAt: now,
       codeVersion: defaultSyncCodeVersion,
@@ -14196,6 +14279,7 @@ async function handleResearchConversationCreate(request, response) {
       sources,
       messages: []
     };
+    refreshGeneratedResearchConversationTitle(conversation);
     await saveStoredResearchConversation(context.userID, conversation);
     if (projectID) {
       await setResearchConversationProjectLink(
@@ -14281,6 +14365,7 @@ async function handleResearchConversationEvidence(request, response) {
     }
     assertResearchConversationVisualLimits(resolved.sources);
     conversation.sources = resolved.sources;
+    refreshGeneratedResearchConversationTitle(conversation);
     conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
     conversation.updatedAt = new Date().toISOString();
     conversation.sourceStatus = "current";
@@ -15466,6 +15551,7 @@ async function handleResearchConversationMessage(request, response) {
       updatedAt: now
     };
     conversation.starterQuestion ||= question;
+    refreshGeneratedResearchConversationTitle(conversation);
     conversation.messages.push(userMessage, assistantMessage);
     conversation.updatedAt = now;
     delete conversation.historyHiddenAt;
@@ -21577,7 +21663,8 @@ async function handleCodeQuestionResearchStart(request, response) {
     const now = new Date().toISOString();
     const conversation = {
       id: requestedConversationID,
-      title: question.payload.title,
+      title: conciseResearchConversationTitle(question.payload.questionText),
+      titleSource: "question",
       starterQuestion: question.payload.questionText,
       createdAt: now,
       updatedAt: now,
