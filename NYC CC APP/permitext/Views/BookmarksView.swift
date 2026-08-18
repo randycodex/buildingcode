@@ -827,8 +827,8 @@ private var filteredSavedEmptyState: some View {
 
     @ViewBuilder
     private func bookmarkDestination(for bookmark: BookmarkedSection) -> some View {
-        // Bookmarks open the single-section reader (notes screen) directly so
-        // tapping a bookmarked subsection goes straight to its notes view
+        // Bookmarks open the single-section detail directly so tapping a
+        // bookmarked subsection goes straight to the saved passage
         // rather than landing inside the full chapter reader.
         ReaderView(sectionID: bookmark.id, codeVersion: bookmark.codeVersion)
     }

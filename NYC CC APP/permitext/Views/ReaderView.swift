@@ -14,19 +14,12 @@ struct ReaderView: View {
     @State private var detail: ReaderSectionDetail?
     @State private var loadState: SectionLoadState = .loading
     @State private var references: [ResolvedCodeReference] = []
-    @State private var noteBody = ""
-    @State private var persistedNoteBody = ""
-    @State private var isRestoringRejectedNoteChange = false
     @State private var isBookmarked = false
     @State private var expandedInlineImage: UIImage?
-    @State private var noteSaveState: NoteSaveState = .idle
-    @State private var noteSaveResetTask: Task<Void, Never>?
     @State private var isFolderPickerOpen: Bool = false
     @State private var pendingFolderIDs: Set<Int64> = []
     @State private var pendingFinalFolderRemoval: CodeFolder?
-    @State private var showsBookmarkRemovalConfirmation = false
     @State private var folderEditorTarget: ReaderFolderEditorTarget?
-    @FocusState private var isNotesFieldFocused: Bool
 
     /// Same shape as BookmarksView.FolderEditorTarget but scoped to this view
     /// so the two states don't share an `Identifiable` collision.
@@ -101,10 +94,7 @@ struct ReaderView: View {
                     if isBookmarked {
                         CodeHairline().padding(.top, 2)
                         projectsEditor
-
                     }
-
-                    notesEditor
                 }
                 .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
                 .padding(.top, CodeScreenMetrics.topTitlePadding)
@@ -112,10 +102,6 @@ struct ReaderView: View {
             } else {
                 sectionLoadState
             }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            dismissKeyboard()
         }
         .overlay(alignment: .top) {
             CodeTopContentFade(alwaysVisible: true)
@@ -127,7 +113,7 @@ struct ReaderView: View {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
                     if isBookmarked {
-                        showsBookmarkRemovalConfirmation = true
+                        removeBookmarkAndFolderLinks()
                     } else {
                         openFolderPicker()
                     }
@@ -161,9 +147,6 @@ struct ReaderView: View {
         }
         .onChange(of: library.bookmarkRevision) { _, _ in
             syncUserContentState()
-        }
-        .onDisappear {
-            noteSaveResetTask?.cancel()
         }
         .sheet(isPresented: $isFolderPickerOpen) {
             FolderPickerSheet(
@@ -223,18 +206,6 @@ struct ReaderView: View {
                     }
                 }
             )
-        }
-        .confirmationDialog(
-            "Remove saved section?",
-            isPresented: $showsBookmarkRemovalConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Remove from Saved", role: .destructive) {
-                removeBookmarkAndFolderLinks()
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("This removes the section from every folder and deletes its saved record. Notes remain available in the Reader.")
         }
         .confirmationDialog(
             "Remove the last folder?",
@@ -352,66 +323,6 @@ struct ReaderView: View {
         return detail.kind == .textBlock ? detail.displayTitle : detail.sectionNumber
     }
 
-    private var notesEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Notes")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-
-                Spacer(minLength: 0)
-
-                if noteSaveState != .idle {
-                    Label(noteSaveState.title, systemImage: noteSaveState.systemImage)
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(.secondary)
-                        .labelStyle(.titleAndIcon)
-                        .accessibilityLabel(noteSaveState.accessibilityLabel)
-                }
-            }
-
-            ZStack(alignment: .topLeading) {
-                TextEditor(text: $noteBody)
-                    .font(library.readerTheme.swiftUIFont())
-                    .scrollContentBackground(.hidden)
-                    .focused($isNotesFieldFocused)
-                    .frame(minHeight: 104)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
-                            .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
-                    )
-                    .onChange(of: noteBody) { _, _ in
-                        guard !isRestoringRejectedNoteChange else {
-                            isRestoringRejectedNoteChange = false
-                            return
-                        }
-                        saveNote(noteBody)
-                    }
-
-                if noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Text("Add a note")
-                        .font(library.readerTheme.swiftUIFont())
-                        .foregroundStyle(.tertiary)
-                        .padding(.horizontal, CodeScreenMetrics.cardPadding)
-                        .padding(.vertical, 16)
-                        .allowsHitTesting(false)
-                }
-            }
-
-            if case .failed(let message) = noteSaveState {
-                Text(message)
-                    .font(.footnote)
-                    .foregroundStyle(.orange)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityLabel("Note not saved. \(message)")
-            }
-        }
-    }
-
     private var projectsEditor: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Folders")
@@ -449,22 +360,12 @@ struct ReaderView: View {
             loadState = .failed(message)
         }
         isBookmarked = library.isBookmarked(sectionID: sectionID)
-        persistedNoteBody = library.noteBody(sectionID: sectionID)
-        noteBody = persistedNoteBody
-        noteSaveState = .idle
     }
 
     private func syncUserContentState() {
         isBookmarked = library.isBookmarked(sectionID: sectionID)
         if !isFolderPickerOpen {
             pendingFolderIDs = Set(library.folderMembership[sectionID] ?? [])
-        }
-        if !isNotesFieldFocused {
-            let nextPersistedNoteBody = library.noteBody(sectionID: sectionID)
-            persistedNoteBody = nextPersistedNoteBody
-            if noteBody != nextPersistedNoteBody {
-                noteBody = nextPersistedNoteBody
-            }
         }
     }
 
@@ -478,72 +379,6 @@ struct ReaderView: View {
         isBookmarked = library.toggleBookmark(sectionID: sectionID)
         if !isBookmarked {
             pendingFolderIDs = []
-        }
-    }
-
-    private func saveNote(_ proposedBody: String) {
-        switch library.saveNote(sectionID: sectionID, body: proposedBody) {
-        case .saved:
-            persistedNoteBody = proposedBody
-            noteSaveState = .saved
-        case .failed(let persistedBody, let message):
-            persistedNoteBody = persistedBody
-            if noteBody != persistedBody {
-                isRestoringRejectedNoteChange = true
-                noteBody = persistedBody
-            }
-            noteSaveState = .failed(message)
-        }
-
-        noteSaveResetTask?.cancel()
-        noteSaveResetTask = Task { @MainActor in
-            try? await Task.sleep(for: noteSaveState == .saved ? .seconds(2) : .seconds(5))
-            guard !Task.isCancelled else { return }
-            noteSaveState = .idle
-        }
-    }
-
-    private func dismissKeyboard() {
-        isNotesFieldFocused = false
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
-
-    private enum NoteSaveState: Equatable {
-        case idle
-        case saved
-        case failed(String)
-
-        var title: String {
-            switch self {
-            case .idle:
-                return ""
-            case .saved:
-                return "Saved"
-            case .failed:
-                return "Not Saved"
-            }
-        }
-
-        var systemImage: String {
-            switch self {
-            case .idle:
-                return ""
-            case .saved:
-                return "checkmark.circle"
-            case .failed:
-                return "exclamationmark.triangle"
-            }
-        }
-
-        var accessibilityLabel: String {
-            switch self {
-            case .idle:
-                return ""
-            case .saved:
-                return "Note saved"
-            case .failed:
-                return "Note not saved"
-            }
         }
     }
 

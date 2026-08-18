@@ -1664,6 +1664,122 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(UserContentMergeResolver.decision(for: candidate).action, .uploadLocal)
     }
 
+    func testSyncedDeleteHidesOlderSavedAliasesUntilANewerSaveArrives() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-synced-delete-intent-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let codeVersion = UserContentSyncCodeVersion.localNYC2022
+        let canonicalVersion = UserContentSyncCodeVersion.canonicalNYC2022
+        let sectionID: Int64 = 77
+        let folderID = try store.createFolder(
+            name: "Life Safety",
+            address: "",
+            description: "",
+            colorHex: CodeFolder.defaultColorHex,
+            codeVersion: codeVersion
+        )
+        try store.saveSection(sectionID, toFolderIDs: [folderID], codeVersion: codeVersion)
+        for item in try store.pendingSyncQueueItems(limit: 20) {
+            try store.markSyncQueueItemSynced(id: item.id)
+        }
+
+        let folder = try XCTUnwrap(store.folders(codeVersion: codeVersion).first)
+        try store.toggleBookmark(sectionID: sectionID, codeVersion: codeVersion)
+        let queuedDeletes = try store.pendingSyncQueueItems(limit: 20)
+        let bookmarkDelete = try XCTUnwrap(queuedDeletes.first {
+            $0.entityType == .bookmark && $0.operationType == .delete
+        })
+        for item in queuedDeletes {
+            try store.markSyncQueueItemSynced(id: item.id)
+        }
+
+        let olderServerDate = bookmarkDelete.mutationUpdatedAt.addingTimeInterval(-10)
+        try store.applyServerUserContentMutation(.savedItem(ServerSavedItemRecord(
+            id: "legacy-web-saved-77",
+            userID: "apple:delete-test",
+            codeVersion: canonicalVersion,
+            sectionID: sectionID,
+            updatedAt: olderServerDate,
+            deletedAt: nil
+        )))
+        try store.applyServerUserContentMutation(.projectSection(ServerProjectSectionRecord(
+            id: "legacy-web-project-section-77",
+            userID: "apple:delete-test",
+            codeVersion: canonicalVersion,
+            folderClientID: folder.clientID,
+            folderType: .project,
+            localFolderID: folderID,
+            sectionID: sectionID,
+            scope: nil,
+            updatedAt: olderServerDate,
+            deletedAt: nil
+        )))
+
+        XCTAssertFalse(try store.isBookmarked(sectionID: sectionID, codeVersion: codeVersion))
+        XCTAssertEqual(try store.bookmarkedSectionIDs(codeVersion: codeVersion), [])
+        XCTAssertEqual(try store.bookmarkCount(codeVersion: codeVersion), 0)
+        XCTAssertEqual(try store.totalBookmarkCount(), 0)
+        XCTAssertEqual(try store.folderMembership(codeVersion: codeVersion)[sectionID], nil)
+        XCTAssertEqual(try store.sections(inFolder: folderID, codeVersion: codeVersion), [])
+
+        try store.saveSection(sectionID, toFolderIDs: [folderID], codeVersion: codeVersion)
+        XCTAssertTrue(try store.isBookmarked(sectionID: sectionID, codeVersion: codeVersion))
+        XCTAssertEqual(try store.folderMembership(codeVersion: codeVersion)[sectionID], [folderID])
+        let resaveItems = try store.pendingSyncQueueItems(limit: 20)
+        XCTAssertTrue(resaveItems.contains {
+            $0.entityType == .bookmark && $0.operationType == .upsert
+        })
+        XCTAssertTrue(resaveItems.contains {
+            $0.entityType == .folderSection && $0.operationType == .upsert
+        })
+        for item in resaveItems {
+            try store.markSyncQueueItemSynced(id: item.id)
+        }
+
+        try store.toggleBookmark(sectionID: sectionID, codeVersion: codeVersion)
+        let secondDelete = try XCTUnwrap(
+            store.pendingSyncQueueItems(limit: 20).first {
+                $0.entityType == .bookmark && $0.operationType == .delete
+            }
+        )
+        for item in try store.pendingSyncQueueItems(limit: 20) {
+            try store.markSyncQueueItemSynced(id: item.id)
+        }
+
+        let newerServerDate = secondDelete.mutationUpdatedAt.addingTimeInterval(10)
+        try store.applyServerUserContentMutation(.savedItem(ServerSavedItemRecord(
+            id: "newer-web-saved-77",
+            userID: "apple:delete-test",
+            codeVersion: canonicalVersion,
+            sectionID: sectionID,
+            updatedAt: newerServerDate,
+            deletedAt: nil
+        )))
+        try store.applyServerUserContentMutation(.projectSection(ServerProjectSectionRecord(
+            id: "newer-web-project-section-77",
+            userID: "apple:delete-test",
+            codeVersion: canonicalVersion,
+            folderClientID: folder.clientID,
+            folderType: .project,
+            localFolderID: folderID,
+            sectionID: sectionID,
+            scope: nil,
+            updatedAt: newerServerDate,
+            deletedAt: nil
+        )))
+
+        XCTAssertTrue(try store.isBookmarked(sectionID: sectionID, codeVersion: codeVersion))
+        XCTAssertEqual(try store.bookmarkedSectionIDs(codeVersion: codeVersion), [sectionID])
+        XCTAssertEqual(try store.folderMembership(codeVersion: codeVersion)[sectionID], [folderID])
+        XCTAssertEqual(try store.sections(inFolder: folderID, codeVersion: codeVersion), [sectionID])
+    }
+
     func testNewerServerEditConflictsWithQueuedLocalDelete() {
         let deletionTime = Date()
         let candidate = UserContentMergeCandidate(

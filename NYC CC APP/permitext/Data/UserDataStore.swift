@@ -63,6 +63,23 @@ protocol UserContentRepository {
 }
 
 final class UserDataStore: UserContentRepository {
+    private struct BookmarkIdentity: Hashable {
+        let codeVersion: String
+        let sectionID: Int64
+    }
+
+    private struct FolderSectionIdentity: Hashable {
+        let codeVersion: String
+        let folderID: Int64
+        let sectionID: Int64
+    }
+
+    private struct LocalSyncIntent {
+        let queueID: Int64
+        let operationType: SyncOperationType
+        let updatedAt: Date
+    }
+
     private let connection: SQLiteConnection
     private let isoFormatter = ISO8601DateFormatter()
     private let jsonEncoder = JSONEncoder()
@@ -106,9 +123,10 @@ final class UserDataStore: UserContentRepository {
     }
 
     func bookmarkedSectionIDs(codeVersion: String) throws -> [Int64] {
+        let intents = try latestBookmarkIntents()
         let statement = try connection.prepare(
             """
-            SELECT section_id
+            SELECT section_id, updated_at
             FROM bookmarks
             WHERE code_version = ?
             ORDER BY created_at DESC;
@@ -119,26 +137,53 @@ final class UserDataStore: UserContentRepository {
 
         var ids: [Int64] = []
         while try connection.step(statement) == SQLITE_ROW {
-            ids.append(connection.int64(at: 0, in: statement))
+            let sectionID = connection.int64(at: 0, in: statement)
+            let updatedAt = dateFromDatabase(connection.string(at: 1, in: statement))
+            if bookmarkIsVisible(
+                sectionID: sectionID,
+                codeVersion: codeVersion,
+                rowUpdatedAt: updatedAt,
+                intents: intents
+            ) {
+                ids.append(sectionID)
+            }
         }
         return ids
     }
 
     func bookmarkCount(codeVersion: String) throws -> Int {
-        try countRows(
-            sql: "SELECT COUNT(*) FROM bookmarks WHERE code_version = ?;",
-            codeVersion: codeVersion
-        )
+        try bookmarkedSectionIDs(codeVersion: codeVersion).count
     }
 
     func totalBookmarkCount() throws -> Int {
-        try countRows(sql: "SELECT COUNT(*) FROM bookmarks;")
+        let intents = try latestBookmarkIntents()
+        let statement = try connection.prepare(
+            "SELECT code_version, section_id, updated_at FROM bookmarks;"
+        )
+        defer { connection.finalize(statement) }
+
+        var count = 0
+        while try connection.step(statement) == SQLITE_ROW {
+            let codeVersion = connection.string(at: 0, in: statement)
+            let sectionID = connection.int64(at: 1, in: statement)
+            let updatedAt = dateFromDatabase(connection.string(at: 2, in: statement))
+            if bookmarkIsVisible(
+                sectionID: sectionID,
+                codeVersion: codeVersion,
+                rowUpdatedAt: updatedAt,
+                intents: intents
+            ) {
+                count += 1
+            }
+        }
+        return count
     }
 
     func bookmarkCreatedAtBySectionID(codeVersion: String) throws -> [Int64: Date] {
+        let intents = try latestBookmarkIntents()
         let statement = try connection.prepare(
             """
-            SELECT section_id, created_at
+            SELECT section_id, created_at, updated_at
             FROM bookmarks
             WHERE code_version = ?;
             """
@@ -149,7 +194,13 @@ final class UserDataStore: UserContentRepository {
         var result: [Int64: Date] = [:]
         while try connection.step(statement) == SQLITE_ROW {
             let sectionID = connection.int64(at: 0, in: statement)
-            if let date = isoFormatter.date(from: connection.string(at: 1, in: statement)) {
+            let updatedAt = dateFromDatabase(connection.string(at: 2, in: statement))
+            if bookmarkIsVisible(
+                sectionID: sectionID,
+                codeVersion: codeVersion,
+                rowUpdatedAt: updatedAt,
+                intents: intents
+            ), let date = isoFormatter.date(from: connection.string(at: 1, in: statement)) {
                 result[sectionID] = date
             }
         }
@@ -157,9 +208,10 @@ final class UserDataStore: UserContentRepository {
     }
 
     func isBookmarked(sectionID: Int64, codeVersion: String) throws -> Bool {
+        let intents = try latestBookmarkIntents()
         let statement = try connection.prepare(
             """
-            SELECT 1
+            SELECT updated_at
             FROM bookmarks
             WHERE section_id = ? AND code_version = ?
             LIMIT 1;
@@ -168,7 +220,13 @@ final class UserDataStore: UserContentRepository {
         defer { connection.finalize(statement) }
         sqlite3_bind_int64(statement, 1, sectionID)
         try connection.bind(text: codeVersion, index: 2, to: statement)
-        return try connection.step(statement) == SQLITE_ROW
+        guard try connection.step(statement) == SQLITE_ROW else { return false }
+        return bookmarkIsVisible(
+            sectionID: sectionID,
+            codeVersion: codeVersion,
+            rowUpdatedAt: dateFromDatabase(connection.string(at: 0, in: statement)),
+            intents: intents
+        )
     }
 
     func toggleBookmark(sectionID: Int64, codeVersion: String) throws {
@@ -225,9 +283,17 @@ final class UserDataStore: UserContentRepository {
             """
             INSERT INTO bookmarks (
                 code_version, section_id, created_at, updated_at, client_id,
-                owner_id, visibility, sync_state
+                owner_id, visibility, sync_state, deleted_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)
+            ON CONFLICT(code_version, section_id) DO UPDATE SET
+                created_at = excluded.created_at,
+                updated_at = excluded.updated_at,
+                client_id = excluded.client_id,
+                owner_id = excluded.owner_id,
+                visibility = excluded.visibility,
+                sync_state = excluded.sync_state,
+                deleted_at = NULL;
             """
         )
         defer { connection.finalize(statement) }
@@ -278,9 +344,17 @@ final class UserDataStore: UserContentRepository {
                     """
                     INSERT INTO bookmarks (
                         code_version, section_id, created_at, updated_at, client_id,
-                        owner_id, visibility, sync_state
+                        owner_id, visibility, sync_state, deleted_at
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)
+                    ON CONFLICT(code_version, section_id) DO UPDATE SET
+                        created_at = excluded.created_at,
+                        updated_at = excluded.updated_at,
+                        client_id = excluded.client_id,
+                        owner_id = excluded.owner_id,
+                        visibility = excluded.visibility,
+                        sync_state = excluded.sync_state,
+                        deleted_at = NULL;
                     """
                 )
                 defer { connection.finalize(bookmark) }
@@ -333,9 +407,17 @@ final class UserDataStore: UserContentRepository {
                         """
                         INSERT INTO folder_sections (
                             client_id, owner_id, visibility, sync_state, folder_id,
-                            code_version, section_id, added_at, updated_at
+                            code_version, section_id, added_at, updated_at, deleted_at
                         )
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+                        ON CONFLICT(folder_id, code_version, section_id) DO UPDATE SET
+                            client_id = excluded.client_id,
+                            owner_id = excluded.owner_id,
+                            visibility = excluded.visibility,
+                            sync_state = excluded.sync_state,
+                            added_at = excluded.added_at,
+                            updated_at = excluded.updated_at,
+                            deleted_at = NULL;
                         """
                     )
                     defer { connection.finalize(membership) }
@@ -1904,9 +1986,10 @@ final class UserDataStore: UserContentRepository {
     /// version. The view model uses this to render the Projects row in the
     /// Reader without a per-section round trip.
     func folderMembership(codeVersion: String) throws -> [Int64: [Int64]] {
+        let intents = try latestFolderSectionIntents()
         let statement = try connection.prepare(
             """
-            SELECT section_id, folder_id
+            SELECT section_id, folder_id, updated_at
             FROM folder_sections
             WHERE code_version = ?;
             """
@@ -1918,7 +2001,16 @@ final class UserDataStore: UserContentRepository {
         while try connection.step(statement) == SQLITE_ROW {
             let sectionID = connection.int64(at: 0, in: statement)
             let folderID = connection.int64(at: 1, in: statement)
-            result[sectionID, default: []].append(folderID)
+            let updatedAt = dateFromDatabase(connection.string(at: 2, in: statement))
+            if folderSectionIsVisible(
+                folderID: folderID,
+                sectionID: sectionID,
+                codeVersion: codeVersion,
+                rowUpdatedAt: updatedAt,
+                intents: intents
+            ) {
+                result[sectionID, default: []].append(folderID)
+            }
         }
         return result
     }
@@ -1926,9 +2018,10 @@ final class UserDataStore: UserContentRepository {
     /// Returns sectionIDs that belong to a given folder, ordered by when
     /// they were added (oldest first so the user's project reads forward).
     func sections(inFolder folderID: Int64, codeVersion: String) throws -> [Int64] {
+        let intents = try latestFolderSectionIntents()
         let statement = try connection.prepare(
             """
-            SELECT section_id
+            SELECT section_id, updated_at
             FROM folder_sections
             WHERE folder_id = ? AND code_version = ?
             ORDER BY added_at ASC;
@@ -1940,7 +2033,17 @@ final class UserDataStore: UserContentRepository {
 
         var sectionIDs: [Int64] = []
         while try connection.step(statement) == SQLITE_ROW {
-            sectionIDs.append(connection.int64(at: 0, in: statement))
+            let sectionID = connection.int64(at: 0, in: statement)
+            let updatedAt = dateFromDatabase(connection.string(at: 1, in: statement))
+            if folderSectionIsVisible(
+                folderID: folderID,
+                sectionID: sectionID,
+                codeVersion: codeVersion,
+                rowUpdatedAt: updatedAt,
+                intents: intents
+            ) {
+                sectionIDs.append(sectionID)
+            }
         }
         return sectionIDs
     }
@@ -2225,11 +2328,19 @@ final class UserDataStore: UserContentRepository {
         let folderType = try folderType(id: folderID, codeVersion: codeVersion)
         let statement = try connection.prepare(
             """
-            INSERT OR IGNORE INTO folder_sections (
+            INSERT INTO folder_sections (
                 client_id, owner_id, visibility, sync_state, folder_id,
-                code_version, section_id, added_at, updated_at
+                code_version, section_id, added_at, updated_at, deleted_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+            ON CONFLICT(folder_id, code_version, section_id) DO UPDATE SET
+                client_id = excluded.client_id,
+                owner_id = excluded.owner_id,
+                visibility = excluded.visibility,
+                sync_state = excluded.sync_state,
+                added_at = excluded.added_at,
+                updated_at = excluded.updated_at,
+                deleted_at = NULL;
             """
         )
         defer { connection.finalize(statement) }
@@ -2331,9 +2442,10 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func folderSectionSyncTargets(sectionID: Int64, codeVersion: String) throws -> [FolderSectionSyncTarget] {
+        let intents = try latestFolderSectionIntents()
         let statement = try connection.prepare(
             """
-            SELECT fs.folder_id, f.client_id, f.folder_type
+            SELECT fs.folder_id, f.client_id, f.folder_type, fs.updated_at
             FROM folder_sections AS fs
             INNER JOIN folders AS f
                 ON f.id = fs.folder_id
@@ -2346,13 +2458,22 @@ final class UserDataStore: UserContentRepository {
 
         var targets: [FolderSectionSyncTarget] = []
         while try connection.step(statement) == SQLITE_ROW {
-            targets.append(
-                FolderSectionSyncTarget(
-                    folderID: connection.int64(at: 0, in: statement),
-                    folderClientID: connection.string(at: 1, in: statement),
-                    folderType: CodeFolderType(serverValue: connection.stringOrNil(at: 2, in: statement))
+            let folderID = connection.int64(at: 0, in: statement)
+            if folderSectionIsVisible(
+                folderID: folderID,
+                sectionID: sectionID,
+                codeVersion: codeVersion,
+                rowUpdatedAt: dateFromDatabase(connection.string(at: 3, in: statement)),
+                intents: intents
+            ) {
+                targets.append(
+                    FolderSectionSyncTarget(
+                        folderID: folderID,
+                        folderClientID: connection.string(at: 1, in: statement),
+                        folderType: CodeFolderType(serverValue: connection.stringOrNil(at: 2, in: statement))
+                    )
                 )
-            )
+            }
         }
         return targets
     }
@@ -3300,6 +3421,120 @@ final class UserDataStore: UserContentRepository {
         sqlite3_bind_int64(statement, 2, firstID)
         sqlite3_bind_int64(statement, 3, secondID)
         _ = try connection.step(statement)
+    }
+
+    /// Synced queue entries are retained as the durable record of what this
+    /// device most recently asked the server to do. Older deployments created
+    /// more than one server ID for the same saved section, so a full pull can
+    /// still contain an old active alias after the canonical delete succeeds.
+    /// Keep the newer local intent authoritative until a genuinely newer row
+    /// arrives or the user saves the section again.
+    private func latestBookmarkIntents() throws -> [BookmarkIdentity: LocalSyncIntent] {
+        var intents: [BookmarkIdentity: LocalSyncIntent] = [:]
+        for item in try localIntentQueueItems(entityType: .bookmark) {
+            guard let sectionID = item.payload.sectionID else { continue }
+            let identity = BookmarkIdentity(
+                codeVersion: UserContentSyncCodeVersion.server(item.payload.codeVersion),
+                sectionID: sectionID
+            )
+            let intent = LocalSyncIntent(
+                queueID: item.id,
+                operationType: item.operationType,
+                updatedAt: item.mutationUpdatedAt
+            )
+            if shouldReplace(intents[identity], with: intent) {
+                intents[identity] = intent
+            }
+        }
+        return intents
+    }
+
+    private func latestFolderSectionIntents() throws -> [FolderSectionIdentity: LocalSyncIntent] {
+        var intents: [FolderSectionIdentity: LocalSyncIntent] = [:]
+        for item in try localIntentQueueItems(entityType: .folderSection) {
+            guard let folderID = item.payload.folderID, let sectionID = item.payload.sectionID else { continue }
+            let identity = FolderSectionIdentity(
+                codeVersion: UserContentSyncCodeVersion.server(item.payload.codeVersion),
+                folderID: folderID,
+                sectionID: sectionID
+            )
+            let intent = LocalSyncIntent(
+                queueID: item.id,
+                operationType: item.operationType,
+                updatedAt: item.mutationUpdatedAt
+            )
+            if shouldReplace(intents[identity], with: intent) {
+                intents[identity] = intent
+            }
+        }
+        return intents
+    }
+
+    private func localIntentQueueItems(entityType: SyncEntityType) throws -> [SyncQueueItem] {
+        let statement = try connection.prepare(
+            """
+            SELECT id, client_id, entity_type, operation_type, payload_json, state,
+                   attempt_count, created_at, updated_at, last_error, mutation_updated_at
+            FROM sync_queue
+            WHERE entity_type = ?
+            ORDER BY mutation_updated_at ASC, id ASC;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: entityType.rawValue, index: 1, to: statement)
+
+        var items: [SyncQueueItem] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            if let item = syncQueueItem(from: statement) {
+                items.append(item)
+            }
+        }
+        return items
+    }
+
+    private func bookmarkIsVisible(
+        sectionID: Int64,
+        codeVersion: String,
+        rowUpdatedAt: Date,
+        intents: [BookmarkIdentity: LocalSyncIntent]
+    ) -> Bool {
+        let identity = BookmarkIdentity(
+            codeVersion: UserContentSyncCodeVersion.server(codeVersion),
+            sectionID: sectionID
+        )
+        return rowIsVisible(updatedAt: rowUpdatedAt, latestIntent: intents[identity])
+    }
+
+    private func folderSectionIsVisible(
+        folderID: Int64,
+        sectionID: Int64,
+        codeVersion: String,
+        rowUpdatedAt: Date,
+        intents: [FolderSectionIdentity: LocalSyncIntent]
+    ) -> Bool {
+        let identity = FolderSectionIdentity(
+            codeVersion: UserContentSyncCodeVersion.server(codeVersion),
+            folderID: folderID,
+            sectionID: sectionID
+        )
+        return rowIsVisible(updatedAt: rowUpdatedAt, latestIntent: intents[identity])
+    }
+
+    private func rowIsVisible(updatedAt: Date, latestIntent: LocalSyncIntent?) -> Bool {
+        guard let latestIntent, latestIntent.updatedAt >= updatedAt else { return true }
+        return latestIntent.operationType != .delete
+    }
+
+    private func shouldReplace(_ existing: LocalSyncIntent?, with candidate: LocalSyncIntent) -> Bool {
+        guard let existing else { return true }
+        if candidate.updatedAt != existing.updatedAt {
+            return candidate.updatedAt > existing.updatedAt
+        }
+        return candidate.queueID > existing.queueID
+    }
+
+    private func dateFromDatabase(_ value: String) -> Date {
+        isoFormatter.date(from: value) ?? .distantPast
     }
 
     private func countRows(sql: String, codeVersion: String) throws -> Int {
