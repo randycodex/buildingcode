@@ -214,7 +214,7 @@ private struct PermitextTabNavigation: View {
 
             SearchView()
                 .tabItem {
-                    Image(systemName: "sparkle.magnifyingglass")
+                    Image(systemName: "magnifyingglass")
                 }
                 .accessibilityLabel("Search")
                 .tag(AppTab.search)
@@ -292,7 +292,7 @@ private struct AppLaunchLoadingView: View {
             }
         SearchView()
             .tabItem {
-                Image(systemName: "sparkle.magnifyingglass")
+                Image(systemName: "magnifyingglass")
             }
         BookmarksView()
             .tabItem {
