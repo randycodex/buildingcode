@@ -227,7 +227,10 @@ struct BookmarksView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                library.refreshBookmarks()
+                // Reader bookmark actions publish the updated bookmark list
+                // synchronously. Rebuild from that state instead of reading
+                // and grouping the entire Saved library again when switching
+                // tabs.
                 rebuildBookmarkCaches()
             }
             .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
@@ -242,9 +245,6 @@ struct BookmarksView: View {
                 rebuildBookmarkCaches()
             }
             .onChange(of: library.bookmarks) { _, _ in
-                rebuildBookmarkCaches()
-            }
-            .onChange(of: library.bookmarkRevision) { _, _ in
                 rebuildBookmarkCaches()
             }
             .onChange(of: library.folderMembership) { _, _ in
