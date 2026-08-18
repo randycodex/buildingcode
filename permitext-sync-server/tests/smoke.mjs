@@ -1445,7 +1445,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-reader-progressive-scroll-v353'),
+        webRoot.text.includes('/web/app.js?v=20260817-reader-save-toggle-v354'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -2364,6 +2364,9 @@ async function main() {
         !workspaceScript.text.includes('className = "inline-comment-toggle"') &&
         !workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
         workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", saved ? "Saved passage" : "Save passage")') &&
+        workspaceScript.text.includes('const removingSavedPassage = bookmarkButton.classList.contains("is-saved")') &&
+        workspaceScript.text.includes("await persistSectionBookmark(payload, false);") &&
+        !workspaceScript.text.includes('if (bookmarkButton.disabled || bookmarkButton.classList.contains("is-saved")) return;') &&
         workspaceScript.text.includes('savedMarker.className = "reader-section-saved-marker"') &&
         workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
         workspaceScript.text.includes('function savedSectionRecord(section, codeVersion = "")') &&

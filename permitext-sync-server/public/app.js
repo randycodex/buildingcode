@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-reader-progressive-scroll-v353";
+} from "./offline-storage.js?v=20260817-reader-save-toggle-v354";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -11855,16 +11855,26 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   bookmarkButton.classList.toggle("is-saved", saved);
 
   bookmarkButton.addEventListener("click", async () => {
-    if (bookmarkButton.disabled || bookmarkButton.classList.contains("is-saved")) return;
+    if (bookmarkButton.disabled) return;
+    const removingSavedPassage = bookmarkButton.classList.contains("is-saved");
     bookmarkButton.disabled = true;
-    const panel = bookmarkButton.closest(".reader-panel");
-    const savedPassage = await saveReaderPassage(panel, section, reader, target);
-    bookmarkButton.disabled = false;
-    if (!savedPassage) return;
-    bookmarkButton.classList.add("is-saved");
-    bookmarkButton.innerHTML = bookmarkIconSVG(true);
-    bookmarkButton.setAttribute("aria-label", "Saved passage");
-    bookmarkButton.title = "Saved passage";
+    try {
+      if (removingSavedPassage) {
+        const payload = readerPassagePayload(section, reader, target);
+        await persistSectionBookmark(payload, false);
+        syncReaderNoteBookmarkButtons(section.id, false, target.codeVersion);
+        return;
+      }
+      const panel = bookmarkButton.closest(".reader-panel");
+      const savedPassage = await saveReaderPassage(panel, section, reader, target);
+      if (!savedPassage) return;
+      bookmarkButton.classList.add("is-saved");
+      bookmarkButton.innerHTML = bookmarkIconSVG(true);
+      bookmarkButton.setAttribute("aria-label", "Saved passage");
+      bookmarkButton.title = "Saved passage";
+    } finally {
+      bookmarkButton.disabled = false;
+    }
   });
 
   const researchButton = document.createElement("button");
