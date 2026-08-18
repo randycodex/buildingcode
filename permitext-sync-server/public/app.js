@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-hide-empty-projects-v355";
+} from "./offline-storage.js?v=20260817-instant-search-history-v357";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -8081,7 +8081,7 @@ function mergeRecentlyViewedDetails(entries, options = {}) {
   );
   if (!detailsByIdentity.size) return false;
   let changed = false;
-  state.recentlyViewedSections = (state.recentlyViewedSections || []).map((entry) => {
+  const mergedEntries = (state.recentlyViewedSections || []).map((entry) => {
     const details = detailsByIdentity.get(recentViewIdentity(entry));
     if (!details || String(entry.previewText || "").trim() === String(details.previewText || "").trim()) return entry;
     changed = true;
@@ -8091,6 +8091,14 @@ function mergeRecentlyViewedDetails(entries, options = {}) {
       viewedAt: entry.viewedAt || details.viewedAt
     };
   });
+  const mergedIdentities = new Set(mergedEntries.map(recentViewIdentity).filter(Boolean));
+  detailsByIdentity.forEach((details, identity) => {
+    if (mergedIdentities.has(identity)) return;
+    mergedEntries.push(details);
+    mergedIdentities.add(identity);
+    changed = true;
+  });
+  state.recentlyViewedSections = mergedEntries.slice(0, recentViewLimit);
   if (changed && options.persist !== false) saveWorkspaceState();
   return changed;
 }
@@ -8110,12 +8118,13 @@ function cacheRecentlyViewedReaderPreview(reader, section) {
     snippet: previewSource
   }).replace(/\s+/g, " ").trim().slice(0, 360);
   if (!previewText) return;
-  mergeRecentlyViewedDetails([{
+  const changed = mergeRecentlyViewedDetails([{
     ...entry,
     sectionNumber,
     title: sectionTitle,
     previewText
   }]);
+  if (changed) scheduleRecentSearchContinuitySync(reader);
 }
 
 function continuityRecentSearches(values = {}) {
@@ -8172,7 +8181,7 @@ function recordRecentlyViewedReader(reader) {
   saveWorkspaceState();
 }
 
-function continuityValuesForReader(reader) {
+function continuityValuesForReader(reader, options = {}) {
   const account = activeAccount();
   const pendingRecord = [...(state.syncOutbox || [])].reverse()
     .filter((entry) => !account || entry.accountUserID === account.userID)
@@ -8186,7 +8195,7 @@ function continuityValuesForReader(reader) {
   syncedRecentEntries.forEach((entry) => {
     if (!recentEntries.some((candidate) => recentViewIdentity(candidate) === recentViewIdentity(entry))) recentEntries.push(entry);
   });
-  if (Number.isSafeInteger(sectionID) && sectionID > 0) {
+  if (options.promoteReader !== false && Number.isSafeInteger(sectionID) && sectionID > 0) {
     const entry = recentViewEntryForReader(reader, chapter);
     const identity = recentViewIdentity(entry);
     recentEntries.splice(
@@ -8237,19 +8246,19 @@ function scheduleContinuitySync(reader) {
   }, 500);
 }
 
-function scheduleRecentSearchContinuitySync() {
+function scheduleRecentSearchContinuitySync(sourceReader = null) {
   const account = activeAccount();
   if (!account) return;
   clearTimeout(continuityPushTimer);
   continuityPushTimer = window.setTimeout(() => {
     const updatedAt = new Date().toISOString();
-    const reader = state.readers[0] || {};
+    const reader = sourceReader || state.readers[0] || {};
     state.continuityAppliedAt = updatedAt;
     enqueueSyncMutation({
       continuity: {
         userID: account.userID,
         codeVersion: defaultSyncCodeVersion,
-        values: continuityValuesForReader(reader),
+        values: continuityValuesForReader(reader, { promoteReader: false }),
         updatedAt
       }
     }, account);
@@ -13062,7 +13071,8 @@ async function hydrateSearchRecentlyViewedEntries(entries, options = {}) {
       return entry;
     }
   }));
-  mergeRecentlyViewedDetails(hydratedEntries);
+  const changed = mergeRecentlyViewedDetails(hydratedEntries);
+  if (changed) scheduleRecentSearchContinuitySync();
   return hydratedEntries;
 }
 

@@ -1351,7 +1351,10 @@ async function main() {
         workspaceScript.text.includes("await renderSearchHistory(panel, searchInstance, { hydrate: false });") &&
         workspaceScript.text.includes("function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0)") &&
         workspaceScript.text.includes("function mergeRecentlyViewedDetails(entries, options = {})") &&
+        workspaceScript.text.includes("mergedEntries.push(details)") &&
         workspaceScript.text.includes("function cacheRecentlyViewedReaderPreview(reader, section)") &&
+        workspaceScript.text.includes("if (changed) scheduleRecentSearchContinuitySync();") &&
+        workspaceScript.text.includes("continuityValuesForReader(reader, { promoteReader: false })") &&
         workspaceScript.text.includes("function updateVisibleSearchHistoryEntry(panel, entry)") &&
         workspaceScript.text.includes("options.onEntry?.(hydratedEntry)") &&
         workspaceScript.text.includes("tile.dataset.recentViewIdentity = recentViewIdentity(entry)") &&
@@ -1447,7 +1450,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-hide-empty-projects-v355'),
+        webRoot.text.includes('/web/app.js?v=20260817-instant-search-history-v357'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

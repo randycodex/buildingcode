@@ -71,6 +71,45 @@ assert.equal(
   "A Recently Viewed preview containing enacted body text must not be fetched again."
 );
 
+const recentState = {
+  recentlyViewedSections: [{ identity: "local", previewText: "", viewedAt: 10 }]
+};
+let recentStateSaveCount = 0;
+const mergeRecentlyViewedDetails = new Function(
+  "state",
+  "recentViewIdentity",
+  "recentViewLimit",
+  "saveWorkspaceState",
+  `${functionSource(appSource, "mergeRecentlyViewedDetails")};\nreturn mergeRecentlyViewedDetails;`
+)(recentState, (entry) => entry.identity || "", 50, () => { recentStateSaveCount += 1; });
+assert.equal(
+  mergeRecentlyViewedDetails([
+    { identity: "local", previewText: "Cached enacted text", viewedAt: 20 },
+    { identity: "synced-only", previewText: "Synced enacted text", viewedAt: 30 }
+  ]),
+  true,
+  "Hydrated Recently Viewed details should change the local cache."
+);
+assert.deepEqual(
+  recentState.recentlyViewedSections,
+  [
+    { identity: "local", previewText: "Cached enacted text", viewedAt: 10 },
+    { identity: "synced-only", previewText: "Synced enacted text", viewedAt: 30 }
+  ],
+  "Hydration should enrich existing views and retain synced-only views for the next Search open."
+);
+assert.equal(recentStateSaveCount, 1, "Hydrated Recently Viewed details should be persisted once.");
+assert.match(
+  functionSource(appSource, "cacheRecentlyViewedReaderPreview"),
+  /if \(changed\) scheduleRecentSearchContinuitySync\(reader\);/,
+  "Reader previews should reschedule continuity after their enacted text becomes available."
+);
+assert.match(
+  functionSource(appSource, "scheduleRecentSearchContinuitySync"),
+  /continuityValuesForReader\(reader, \{ promoteReader: false \}\)/,
+  "Background preview and search sync should not promote an unrelated Reader."
+);
+
 const folderType = new Function(`${functionSource(appSource, "folderType")}; return folderType;`)();
 assert.equal(folderType({}), "project", "Legacy folders must default to Project.");
 assert.equal(folderType({ folderType: "reference" }), "reference");
