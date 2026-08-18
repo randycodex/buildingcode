@@ -51,6 +51,22 @@ private enum ChapterSearchEntryCache {
     }
 }
 
+#if DEBUG
+private enum DebugChapterReaderPresentation: String, CaseIterable, Identifiable {
+    case html
+    case native
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .html: "HTML (Default)"
+        case .native: "Native (Comparison)"
+        }
+    }
+}
+#endif
+
 struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
@@ -84,6 +100,9 @@ struct ChapterHTMLReaderView: View {
     @State private var inlineReferenceDestination: CodeSectionSummary?
     @State private var htmlLoadState: ChapterHTMLLoadState = .loading
     @State private var htmlReloadTrigger = 0
+#if DEBUG
+    @State private var debugReaderPresentation: DebugChapterReaderPresentation = .html
+#endif
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -121,6 +140,14 @@ struct ChapterHTMLReaderView: View {
 
     private var chapterURL: URL? {
         htmlStore.chapterURL(chapterNumber: chapter.chapterNumber)
+    }
+
+    private var usesNativeDebugReader: Bool {
+#if DEBUG
+        debugReaderPresentation == .native
+#else
+        false
+#endif
     }
 
     private var readAccessURL: URL? {
@@ -261,7 +288,13 @@ struct ChapterHTMLReaderView: View {
     var body: some View {
         Group {
             if let chapterURL, let readAccessURL {
-                if hasActivatedHTMLReader {
+                if usesNativeDebugReader {
+                    ChapterReaderView(
+                        chapter: chapter,
+                        initialSectionID: initialSection.id,
+                        rememberedSectionID: rememberedNativeSectionID
+                    )
+                } else if hasActivatedHTMLReader {
                     htmlReader(chapterURL: chapterURL, readAccessURL: readAccessURL)
                 } else {
                     chapterLoadingShell
@@ -306,7 +339,12 @@ struct ChapterHTMLReaderView: View {
             }
 
             ToolbarItemGroup(placement: .topBarTrailing) {
-                chapterSearchToolbarButton
+#if DEBUG
+                debugReaderSelector
+#endif
+                if !usesNativeDebugReader {
+                    chapterSearchToolbarButton
+                }
             }
         }
         .tint(accentColor)
@@ -338,8 +376,8 @@ struct ChapterHTMLReaderView: View {
             lastRecordedVisibleAnchorID = nil
             chapterSearchQuery = ""
         }
-        .task(id: chapter.id) {
-            guard hasActivatedHTMLReader else { return }
+        .task(id: "\(chapter.id)|\(usesNativeDebugReader)") {
+            guard hasActivatedHTMLReader, !usesNativeDebugReader else { return }
             if anchors.isEmpty {
                 await loadAnchors()
             }
@@ -378,7 +416,7 @@ struct ChapterHTMLReaderView: View {
                 .environmentObject(library)
         }
         .overlay(alignment: .top) {
-            if chapterURL != nil, readAccessURL != nil, hasActivatedHTMLReader {
+            if chapterURL != nil, readAccessURL != nil, hasActivatedHTMLReader, !usesNativeDebugReader {
                 CodeTopContentFade(alwaysVisible: true)
             }
         }
@@ -386,6 +424,27 @@ struct ChapterHTMLReaderView: View {
             chapterSearchQuery = ""
         }
     }
+
+#if DEBUG
+    private var debugReaderSelector: some View {
+        Menu {
+            Picker("Reader presentation", selection: $debugReaderPresentation) {
+                ForEach(DebugChapterReaderPresentation.allCases) { presentation in
+                    Text(presentation.title)
+                        .tag(presentation)
+                }
+            }
+        } label: {
+            Image(systemName: "ladybug.fill")
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                .background(Color(uiColor: .systemBackground))
+                .clipShape(Capsule(style: .continuous))
+        }
+        .accessibilityLabel("Debug reader mode")
+        .accessibilityValue(debugReaderPresentation.title)
+    }
+#endif
 
     private var chapterLoadingShell: some View {
         pageBackgroundColor
