@@ -4,12 +4,19 @@ import UIKit
 struct ReaderView: View {
     let sectionID: Int64
     let codeVersion: String?
+    let returnsToProjectsAfterRemoval: Bool
 
-    init(sectionID: Int64, codeVersion: String? = nil) {
+    init(
+        sectionID: Int64,
+        codeVersion: String? = nil,
+        returnsToProjectsAfterRemoval: Bool = false
+    ) {
         self.sectionID = sectionID
         self.codeVersion = codeVersion
+        self.returnsToProjectsAfterRemoval = returnsToProjectsAfterRemoval
     }
 
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var detail: ReaderSectionDetail?
     @State private var loadState: SectionLoadState = .loading
@@ -379,6 +386,9 @@ struct ReaderView: View {
         isBookmarked = library.toggleBookmark(sectionID: sectionID)
         if !isBookmarked {
             pendingFolderIDs = []
+            if returnsToProjectsAfterRemoval {
+                dismiss()
+            }
         }
     }
 

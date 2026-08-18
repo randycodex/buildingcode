@@ -830,7 +830,11 @@ private var filteredSavedEmptyState: some View {
         // Bookmarks open the single-section detail directly so tapping a
         // bookmarked subsection goes straight to the saved passage
         // rather than landing inside the full chapter reader.
-        ReaderView(sectionID: bookmark.id, codeVersion: bookmark.codeVersion)
+        ReaderView(
+            sectionID: bookmark.id,
+            codeVersion: bookmark.codeVersion,
+            returnsToProjectsAfterRemoval: true
+        )
     }
 
     private func resolvedChapter(for bookmark: BookmarkedSection) -> CodeChapter? {
@@ -1979,7 +1983,11 @@ struct ProjectView: View {
             }
 
             NavigationLink {
-                ReaderView(sectionID: bookmark.id, codeVersion: bookmark.codeVersion)
+                ReaderView(
+                    sectionID: bookmark.id,
+                    codeVersion: bookmark.codeVersion,
+                    returnsToProjectsAfterRemoval: true
+                )
             } label: {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
