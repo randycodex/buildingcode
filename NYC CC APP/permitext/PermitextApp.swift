@@ -193,7 +193,7 @@ private struct PermitextTabNavigation: View {
                 .tabItem {
                     Image(systemName: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
                 }
-                .accessibilityLabel("Saved")
+                .accessibilityLabel("Projects")
                 .tag(AppTab.bookmarks)
 
             BrowseView(browserContext: .primary)
@@ -221,7 +221,7 @@ private struct PermitextTabNavigation: View {
 
             ResearchView()
                 .tabItem {
-                    Image(systemName: "sparkles")
+                    Image(systemName: "sparkle")
                 }
                 .accessibilityLabel("Research")
                 .tag(AppTab.research)

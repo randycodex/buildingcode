@@ -647,10 +647,10 @@ async function main() {
         !workspaceScript.text.includes("const addZoningReaderButton") &&
         !workspaceScript.text.includes('label: "Open ZR Reader"') &&
         workspaceScript.text.includes('item.classList.toggle("is-indented", indented)') &&
-        iosBrowseSource.includes('title: ReaderCodeMenuSectionTitle.construction2022') &&
-        iosBrowseSource.includes('title: ReaderCodeMenuSectionTitle.codes2025') &&
-        iosBrowseSource.includes('title: ReaderCodeMenuSectionTitle.existingAndHistorical') &&
-        iosBrowseSource.includes('ReaderCodePickerItem(version: zoningResolutionVersion, name: "Zoning Resolution")') &&
+        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.construction2022)') &&
+        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.codes2025)') &&
+        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.existingAndHistorical)') &&
+        iosBrowseSource.includes('codeSectionName: "Zoning Resolution"') &&
         iosBrowserContextSource.includes("storedVersionFileName") &&
         iosBrowserContextSource.includes("persistVersionFileName"),
       "Web Reader pickers should organize all enacted code collections, including Zoning Resolution."

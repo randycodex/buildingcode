@@ -209,6 +209,28 @@ struct ChapterHTMLResearchTarget: Hashable {
     let selectedText: String
 }
 
+private final class ChapterResearchWebView: WKWebView {
+    var onResearchSelectionMenuAction: (() -> Void)?
+
+    override func buildMenu(with builder: UIMenuBuilder) {
+        super.buildMenu(with: builder)
+        guard builder.system == .context else { return }
+
+        let researchAction = UIAction(
+            title: "Research",
+            image: UIImage(systemName: "sparkle")
+        ) { [weak self] _ in
+            self?.onResearchSelectionMenuAction?()
+        }
+        let researchMenu = UIMenu(
+            title: "",
+            options: .displayInline,
+            children: [researchAction]
+        )
+        builder.insertChild(researchMenu, atEndOfMenu: .standardEdit)
+    }
+}
+
 struct ChapterHTMLWebView: UIViewRepresentable {
     let chapterURL: URL
     let readAccessURL: URL
@@ -220,8 +242,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let colorScheme: ColorScheme
     let bookmarkedAnchorIDs: Set<String>
     let bookmarkedSectionNumbers: Set<String>
-    let notedSectionNumbers: Set<String>
-    let notedBlockIDs: Set<String>
     let expandAllTrigger: Int
     let collapseAllTrigger: Int
     let scrollToTopTrigger: Int
@@ -254,7 +274,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             )
         )
 
-        let webView = WKWebView(frame: .zero, configuration: configuration)
+        let webView = ChapterResearchWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.scrollView.delegate = context.coordinator
         let pageBackgroundColor = Coordinator.pageBackgroundUIColor(for: colorScheme)
@@ -267,6 +287,10 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         webView.allowsBackForwardNavigationGestures = false
         context.coordinator.parent = self
         context.coordinator.webView = webView
+        webView.onResearchSelectionMenuAction = { [weak coordinator = context.coordinator, weak webView] in
+            guard let webView else { return }
+            coordinator?.performResearchSelectionFromMenu(in: webView)
+        }
         return webView
     }
 
@@ -315,9 +339,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         }
 
         if context.coordinator.appliedBookmarkedAnchorIDs != bookmarkedAnchorIDs ||
-            context.coordinator.appliedBookmarkedSectionNumbers != bookmarkedSectionNumbers ||
-            context.coordinator.appliedNotedSectionNumbers != notedSectionNumbers ||
-            context.coordinator.appliedNotedBlockIDs != notedBlockIDs {
+            context.coordinator.appliedBookmarkedSectionNumbers != bookmarkedSectionNumbers {
             context.coordinator.applyBookmarkDecorations(to: webView)
         }
         if context.coordinator.appliedExpandAllTrigger != expandAllTrigger {
@@ -364,8 +386,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedColorScheme: ColorScheme?
         var appliedBookmarkedAnchorIDs: Set<String> = []
         var appliedBookmarkedSectionNumbers: Set<String> = []
-        var appliedNotedSectionNumbers: Set<String> = []
-        var appliedNotedBlockIDs: Set<String> = []
         var appliedExpandAllTrigger = 0
         var appliedCollapseAllTrigger = 0
         var appliedScrollToTopTrigger = 0
@@ -774,40 +794,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 };
               }
 
-              function researchSelectionButton() {
-                var button = document.getElementById('nyccc-research-selection-button');
-                if (button) { return button; }
-                button = document.createElement('button');
-                button.id = 'nyccc-research-selection-button';
-                button.type = 'button';
-                button.hidden = true;
-                button.setAttribute('aria-label', 'Add selected enacted text to Research');
-                button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C10.7 7.3 7.3 10.7 2 12c5.3 1.3 8.7 4.7 10 10 1.3-5.3 4.7-8.7 10-10-5.3-1.3-8.7-4.7-10-10Z"></path></svg>';
-                button.addEventListener('pointerdown', function(event) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                });
-                button.addEventListener('click', function(event) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  var payload = window.__nycccResearchSelectionPayload;
-                  if (!payload) { return; }
-                  try {
-                    window.webkit.messageHandlers.\(Coordinator.researchSelectionMessageName).postMessage(payload);
-                  } catch (error) {}
-                  button.hidden = true;
-                });
-                document.body.appendChild(button);
-                return button;
-              }
-
               function updateResearchSelectionAction() {
-                var button = researchSelectionButton();
                 var selection = window.getSelection ? window.getSelection() : null;
                 var text = selection ? String(selection).replace(/\\s+/g, ' ').trim() : '';
                 if (!selection || selection.rangeCount === 0 || text.length < 2) {
                   window.__nycccResearchSelectionPayload = null;
-                  button.hidden = true;
                   return;
                 }
 
@@ -817,13 +808,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 if (!startTarget || !endTarget ||
                     (startTarget.anchorID || startTarget.sectionNumber) !== (endTarget.anchorID || endTarget.sectionNumber)) {
                   window.__nycccResearchSelectionPayload = null;
-                  button.hidden = true;
                   return;
                 }
 
                 var rect = range.getBoundingClientRect();
                 if (!rect || (!rect.width && !rect.height)) {
-                  button.hidden = true;
+                  window.__nycccResearchSelectionPayload = null;
                   return;
                 }
 
@@ -832,13 +822,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   sectionNumber: startTarget.sectionNumber || '',
                   selectedText: text.slice(0, 12000)
                 };
-                // iOS places its edit menu next to the selected text and that
-                // system surface always sits above page content. Keep the
-                // Astroid in a stable lower-right action position instead of
-                // competing for the same space as Copy/Translate/Search.
-                button.style.left = 'auto';
-                button.style.top = 'auto';
-                button.hidden = false;
               }
 
               function openSectionForHeading(heading) {
@@ -868,21 +851,95 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 } catch (error) {}
               }
 
-              function openNoteForBlock(heading, block) {
-                if (!heading || !block) { return; }
-                var anchorID = heading.id || '';
-                var sectionNumber = sectionNumberForHeading(heading);
-                var blockID = block.id || '';
-                if (!blockID) { return; }
-                var label = (block.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 96);
-                try {
-                  window.webkit.messageHandlers.\(Coordinator.openSectionMessageName).postMessage({
-                    anchorID: anchorID,
-                    sectionNumber: sectionNumber,
-                    blockID: blockID,
-                    blockLabel: label
-                  });
-                } catch (error) {}
+              function installParagraphBookmarkSwipe(heading, node) {
+                if (!heading || !node || node.dataset.nycccBookmarkSwipeReady === 'true') { return; }
+                node.dataset.nycccBookmarkSwipeReady = 'true';
+                node.classList.add('nyccc-swipe-bookmark-target');
+
+                var indicator = document.createElement('span');
+                indicator.className = 'nyccc-swipe-bookmark-indicator';
+                indicator.setAttribute('aria-hidden', 'true');
+                indicator.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4Z"></path></svg>';
+                node.appendChild(indicator);
+
+                var accessibilityButton = document.createElement('button');
+                accessibilityButton.type = 'button';
+                accessibilityButton.className = 'nyccc-bookmark-accessibility-action';
+                accessibilityButton.setAttribute('aria-label', 'Toggle bookmark for this paragraph');
+                accessibilityButton.addEventListener('click', function(event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  toggleBookmarkForHeading(heading);
+                });
+                node.appendChild(accessibilityButton);
+
+                var startX = null;
+                var startY = null;
+                var lastX = null;
+                var lastY = null;
+                var isHorizontalSwipe = false;
+                var directionLocked = false;
+
+                function resetSwipe(success) {
+                  node.classList.remove('nyccc-swipe-active', 'nyccc-swipe-reveal');
+                  if (success) {
+                    node.classList.add('nyccc-swipe-complete');
+                    window.setTimeout(function() {
+                      node.classList.remove('nyccc-swipe-complete');
+                    }, 420);
+                  }
+                  node.style.removeProperty('--nyccc-swipe-offset');
+                  startX = null;
+                  startY = null;
+                  lastX = null;
+                  lastY = null;
+                  isHorizontalSwipe = false;
+                  directionLocked = false;
+                }
+
+                node.addEventListener('touchstart', function(event) {
+                  if (event.touches.length !== 1) { return; }
+                  if (window.getSelection && String(window.getSelection()).trim().length > 0) { return; }
+                  var touch = event.touches[0];
+                  startX = touch.clientX;
+                  startY = touch.clientY;
+                  lastX = startX;
+                  lastY = startY;
+                }, { passive: true });
+
+                node.addEventListener('touchmove', function(event) {
+                  if (startX === null || event.touches.length !== 1) { return; }
+                  var touch = event.touches[0];
+                  lastX = touch.clientX;
+                  lastY = touch.clientY;
+                  var dx = lastX - startX;
+                  var dy = lastY - startY;
+                  if (!directionLocked && Math.abs(dx) + Math.abs(dy) > 10) {
+                    isHorizontalSwipe = dx < 0 && Math.abs(dx) > Math.abs(dy) * 1.25;
+                    directionLocked = true;
+                  }
+                  if (!isHorizontalSwipe) { return; }
+                  event.preventDefault();
+                  var offset = Math.max(-88, Math.min(0, dx));
+                  node.classList.add('nyccc-swipe-active');
+                  node.classList.toggle('nyccc-swipe-reveal', offset <= -28);
+                  node.style.setProperty('--nyccc-swipe-offset', offset + 'px');
+                }, { passive: false });
+
+                node.addEventListener('touchend', function() {
+                  if (startX === null) { return; }
+                  var dx = (lastX === null ? startX : lastX) - startX;
+                  var dy = (lastY === null ? startY : lastY) - startY;
+                  var completed = isHorizontalSwipe && dx <= -68 && Math.abs(dx) > Math.abs(dy) * 1.25;
+                  if (completed) {
+                    toggleBookmarkForHeading(heading);
+                  }
+                  resetSwipe(completed);
+                }, { passive: true });
+
+                node.addEventListener('touchcancel', function() {
+                  resetSwipe(false);
+                }, { passive: true });
               }
 
               function openInlineReference(sectionNumber, codePrefix) {
@@ -1080,41 +1137,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               }
               applyDepthClasses();
 
-              function setupSubsectionActions() {
-                document.querySelectorAll('.Subsection').forEach(function(heading) {
-                  if (heading.querySelector(':scope > .nyccc-subsection-actions')) { return; }
-                  var actions = document.createElement('span');
-                  actions.className = 'nyccc-subsection-actions';
-
-                  var noteButton = document.createElement('button');
-                  noteButton.type = 'button';
-                  noteButton.className = 'nyccc-subsection-note-button';
-                  noteButton.setAttribute('aria-label', 'Add or edit section note');
-                  noteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>';
-                  noteButton.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    openSectionForHeading(heading);
-                  });
-
-                  var bookmarkButton = document.createElement('button');
-                  bookmarkButton.type = 'button';
-                  bookmarkButton.className = 'nyccc-subsection-bookmark-button';
-                  bookmarkButton.setAttribute('aria-label', 'Save section');
-                  bookmarkButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4Z"></path></svg>';
-                  bookmarkButton.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    toggleBookmarkForHeading(heading);
-                  });
-
-                  actions.appendChild(noteButton);
-                  actions.appendChild(bookmarkButton);
-                  heading.appendChild(actions);
-                });
-              }
-              setupSubsectionActions();
-
               function anchorIDForHeading(heading) {
                 if (!heading) { return null; }
                 if (heading.id) { return heading.id; }
@@ -1206,46 +1228,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     if (node.dataset.nycccSectionTapReady === 'true') { return; }
                     node.dataset.nycccSectionTapReady = 'true';
                     node.classList.add('nyccc-section-open-target');
-                    var blockID = node.id || '';
-                    if (blockID && node.classList && node.classList.contains('Normal-Level')) {
-                      node.classList.add('nyccc-note-block');
-                      node.dataset.nycccHeadingAnchor = heading.id || '';
-                      node.dataset.nycccSectionNumber = sectionNumberForHeading(heading) || '';
-                      if (!node.querySelector(':scope > .nyccc-block-content')) {
-                        var contentWrapper = document.createElement('span');
-                        contentWrapper.className = 'nyccc-block-content';
-                        while (node.firstChild) {
-                          contentWrapper.appendChild(node.firstChild);
-                        }
-                        node.appendChild(contentWrapper);
-                      }
-                      if (!node.querySelector(':scope > .nyccc-block-actions')) {
-                        var actionRail = document.createElement('span');
-                        actionRail.className = 'nyccc-block-actions';
-                        actionRail.setAttribute('aria-hidden', 'false');
-                        var noteButton = document.createElement('button');
-                        noteButton.type = 'button';
-                        noteButton.className = 'nyccc-block-note-button';
-                        noteButton.hidden = true;
-                        noteButton.disabled = true;
-                        noteButton.tabIndex = -1;
-                        noteButton.setAttribute('aria-hidden', 'true');
-                        noteButton.setAttribute('aria-label', 'Paragraph note');
-                        noteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>';
-                        noteButton.addEventListener('click', function(event) {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          openNoteForBlock(heading, node);
-                        });
-                        var bookmarkMarker = document.createElement('span');
-                        bookmarkMarker.className = 'nyccc-block-bookmark-indicator';
-                        bookmarkMarker.hidden = true;
-                        bookmarkMarker.setAttribute('aria-hidden', 'true');
-                        actionRail.appendChild(noteButton);
-                        actionRail.appendChild(bookmarkMarker);
-                        node.appendChild(actionRail);
-                      }
-                    }
+                    installParagraphBookmarkSwipe(heading, node);
                     node.addEventListener('click', function(event) {
                       if (event.target.closest('a, button')) { return; }
                       if (window.getSelection && String(window.getSelection()).trim().length > 0) { return; }
@@ -1274,12 +1257,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 window.requestAnimationFrame(updateResearchSelectionAction);
               };
               document.addEventListener('selectionchange', window.__nycccResearchSelectionListener);
-              window.removeEventListener('scroll', window.__nycccResearchSelectionScrollListener);
-              window.__nycccResearchSelectionScrollListener = function() {
-                var button = document.getElementById('nyccc-research-selection-button');
-                if (button) { button.hidden = true; }
-              };
-              window.addEventListener('scroll', window.__nycccResearchSelectionScrollListener, { passive: true });
               setTimeout(function() {
                 reportVisibleAnchor();
                 reportScrollProgress();
@@ -1299,18 +1276,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             guard let parent else { return }
             appliedBookmarkedAnchorIDs = parent.bookmarkedAnchorIDs
             appliedBookmarkedSectionNumbers = parent.bookmarkedSectionNumbers
-            appliedNotedSectionNumbers = parent.notedSectionNumbers
-            appliedNotedBlockIDs = parent.notedBlockIDs
             let anchorIDs = Array(parent.bookmarkedAnchorIDs).sorted()
             let sectionNumbers = Array(parent.bookmarkedSectionNumbers).sorted()
-            let notedSectionNumbers = Array(parent.notedSectionNumbers).sorted()
-            let notedBlockIDs = Array(parent.notedBlockIDs).sorted()
             let javascript = """
             (function() {
               var bookmarkedAnchors = new Set(\(Self.javascriptStringArray(anchorIDs)));
               var bookmarkedSections = new Set(\(Self.javascriptStringArray(sectionNumbers)));
-              var notedSections = new Set(\(Self.javascriptStringArray(notedSectionNumbers)));
-              var notedBlocks = new Set(\(Self.javascriptStringArray(notedBlockIDs)));
 
               function normalizeSectionNumber(value) {
                 return String(value || '')
@@ -1332,63 +1303,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 var sectionNumber = sectionNumberForBookmarkHeading(heading);
                 var isBookmarked = heading.classList.contains('Subsection') &&
                   (bookmarkedAnchors.has(anchorID) || bookmarkedSections.has(sectionNumber));
-                var hasNote = heading.classList.contains('Subsection') && notedSections.has(sectionNumber);
                 heading.querySelectorAll('.nyccc-bookmark-marker, .nyccc-status-badges').forEach(function(marker) {
                   marker.remove();
                 });
                 heading.classList.toggle('nyccc-bookmarked-heading', isBookmarked);
-                heading.classList.toggle('nyccc-noted-heading', hasNote);
                 heading.setAttribute('data-nyccc-section-number', sectionNumber || '');
-
-                var bookmarkButton = heading.querySelector(':scope > .nyccc-subsection-actions > .nyccc-subsection-bookmark-button');
-                if (bookmarkButton) {
-                  bookmarkButton.classList.toggle('nyccc-is-bookmarked', isBookmarked);
-                  bookmarkButton.setAttribute('aria-label', isBookmarked ? 'Remove bookmark' : 'Save section');
-                }
-
-                var noteButton = heading.querySelector(':scope > .nyccc-subsection-actions > .nyccc-subsection-note-button');
-                if (noteButton) {
-                  noteButton.classList.toggle('nyccc-has-note', hasNote);
-                  noteButton.setAttribute('aria-label', hasNote ? 'Open section note' : 'Add section note');
-                }
-
-              });
-
-              var bookmarkShownForSection = new Set();
-              var bookmarkFallbacks = new Map();
-              document.querySelectorAll('.nyccc-note-block').forEach(function(block) {
-                var hasBlockNote = notedBlocks.has(block.id || '');
-                block.classList.toggle('nyccc-noted-block', hasBlockNote);
-                var button = block.querySelector(':scope > .nyccc-block-actions > .nyccc-block-note-button');
-                if (button) {
-                  button.classList.toggle('nyccc-has-note', hasBlockNote);
-                  button.hidden = !hasBlockNote;
-                  button.disabled = !hasBlockNote;
-                  button.tabIndex = hasBlockNote ? 0 : -1;
-                  button.setAttribute('aria-hidden', hasBlockNote ? 'false' : 'true');
-                  button.setAttribute('aria-label', hasBlockNote ? 'Open paragraph note' : 'Paragraph note');
-                }
-                var marker = block.querySelector(':scope > .nyccc-block-actions > .nyccc-block-bookmark-indicator');
-                if (marker) {
-                  var blockAnchorID = block.dataset.nycccHeadingAnchor || '';
-                  var blockSectionNumber = normalizeSectionNumber(block.dataset.nycccSectionNumber || '');
-                  var bookmarkKey = blockAnchorID || blockSectionNumber;
-                  var hasSectionBookmark = bookmarkedAnchors.has(blockAnchorID) || bookmarkedSections.has(blockSectionNumber);
-                  var showBookmark = hasSectionBookmark && hasBlockNote && bookmarkKey && !bookmarkShownForSection.has(bookmarkKey);
-                  marker.hidden = !showBookmark;
-                  marker.setAttribute('aria-hidden', showBookmark ? 'false' : 'true');
-                  if (showBookmark) {
-                    bookmarkShownForSection.add(bookmarkKey);
-                  } else if (hasSectionBookmark && bookmarkKey && !bookmarkFallbacks.has(bookmarkKey)) {
-                    bookmarkFallbacks.set(bookmarkKey, marker);
-                  }
-                }
-              });
-              bookmarkFallbacks.forEach(function(marker, bookmarkKey) {
-                if (bookmarkShownForSection.has(bookmarkKey)) { return; }
-                marker.hidden = false;
-                marker.setAttribute('aria-hidden', 'false');
-                bookmarkShownForSection.add(bookmarkKey);
               });
             })();
             """
@@ -1693,6 +1612,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             )
         }
 
+        func performResearchSelectionFromMenu(in webView: WKWebView) {
+            webView.evaluateJavaScript("window.__nycccResearchSelectionPayload") { [weak self] body, _ in
+                guard let self, let target = self.researchTarget(from: body as Any) else { return }
+                DispatchQueue.main.async { [weak self] in
+                    self?.parent?.onResearchSelection?(target)
+                }
+            }
+        }
+
         private static func readerCSS(theme: ReaderTheme, colorScheme: ColorScheme, accentHex: String) -> String {
             let isDark = colorScheme == .dark
             let textColor = isDark ? "#f5f5f7" : "#111111"
@@ -1967,86 +1895,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .nyccc-section-open-target {
               cursor: text;
             }
-            .nyccc-subsection-actions {
-              position: absolute !important;
-              top: 0 !important;
-              right: 0 !important;
-              z-index: 3 !important;
-              display: inline-flex !important;
-              align-items: center !important;
-              gap: 0.12rem !important;
-            }
-            .Subsection h6,
-            .nyccc-section-card-expanded .Subsection h6 {
-              padding-right: 4rem !important;
-            }
-            .nyccc-subsection-actions button {
-              display: inline-flex !important;
-              align-items: center !important;
-              justify-content: center !important;
-              width: 1.85rem !important;
-              height: 1.85rem !important;
-              padding: 0 !important;
-              border: 0 !important;
-              border-radius: 999px !important;
-              background: transparent !important;
-              color: \(secondaryColor) !important;
-              opacity: 0.55 !important;
-              -webkit-appearance: none !important;
-              appearance: none !important;
-            }
-            .nyccc-subsection-actions button:focus-visible {
-              outline: 2px solid \(accentHex) !important;
-              outline-offset: 1px !important;
-            }
-            .nyccc-subsection-actions svg {
-              width: 1.05rem !important;
-              height: 1.05rem !important;
-              fill: none !important;
-              stroke: currentColor !important;
-              stroke-width: 2 !important;
-              stroke-linecap: round !important;
-              stroke-linejoin: round !important;
-            }
-            .nyccc-subsection-note-button.nyccc-has-note,
-            .nyccc-subsection-bookmark-button.nyccc-is-bookmarked {
-              color: \(accentHex) !important;
-              opacity: 1 !important;
-            }
-            .nyccc-subsection-bookmark-button.nyccc-is-bookmarked svg {
-              fill: currentColor !important;
-            }
-            #nyccc-research-selection-button {
-              position: fixed !important;
-              right: 1rem !important;
-              bottom: 1rem !important;
-              z-index: 2147483647 !important;
-              display: inline-flex !important;
-              align-items: center !important;
-              justify-content: center !important;
-              width: 2.5rem !important;
-              height: 2.5rem !important;
-              padding: 0 !important;
-              border: 0 !important;
-              border-radius: 999px !important;
-              background: \(accentHex) !important;
-              color: white !important;
-              box-shadow: 0 0.2rem 0.8rem rgba(0,0,0,0.28) !important;
-              -webkit-appearance: none !important;
-              appearance: none !important;
-            }
-            #nyccc-research-selection-button[hidden] {
-              display: none !important;
-            }
-            #nyccc-research-selection-button svg {
-              width: 1.28rem !important;
-              height: 1.28rem !important;
-              fill: none !important;
-              stroke: currentColor !important;
-              stroke-width: 1.8 !important;
-              stroke-linecap: round !important;
-              stroke-linejoin: round !important;
-            }
             .nyccc-inline-reference {
               display: inline !important;
               margin: 0 !important;
@@ -2067,90 +1915,56 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               outline: 2px solid \(accentHex) !important;
               outline-offset: 2px !important;
             }
-            .nyccc-note-block {
+            .nyccc-swipe-bookmark-target {
               position: relative !important;
-              display: grid !important;
-              grid-template-columns: minmax(0, 1fr) 1.55rem !important;
-              column-gap: 1rem !important;
-              align-items: start !important;
-              padding-right: 0 !important;
+              transform: translateX(var(--nyccc-swipe-offset, 0px));
+              transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+              will-change: transform;
             }
-            .nyccc-block-content {
-              display: block !important;
-              min-width: 0 !important;
-              grid-column: 1 !important;
-              grid-row: 1 !important;
+            .nyccc-swipe-bookmark-target.nyccc-swipe-active {
+              transition: none;
             }
-            .nyccc-block-actions {
-              position: static !important;
-              grid-column: 2 !important;
-              grid-row: 1 !important;
+            .nyccc-swipe-bookmark-indicator {
+              position: absolute !important;
+              top: 50% !important;
+              right: -3rem !important;
               display: inline-flex !important;
-              flex-direction: column !important;
               align-items: center !important;
               justify-content: center !important;
-              gap: 0.28rem !important;
-              width: 1.55rem !important;
-              margin-top: 0.15rem !important;
+              width: 2.25rem !important;
+              height: 2.25rem !important;
+              border-radius: 999px !important;
+              color: \(accentHex) !important;
+              background: color-mix(in srgb, \(accentHex) 18%, transparent) !important;
+              opacity: 0 !important;
+              transform: translateY(-50%) scale(0.82) !important;
+              transition: opacity 120ms ease, transform 120ms ease !important;
               pointer-events: none !important;
             }
-            .nyccc-block-note-button,
-            .nyccc-block-bookmark-indicator {
-              display: inline-flex !important;
-              align-items: center !important;
-              justify-content: center !important;
-              width: 1.28rem !important;
-              height: 1.28rem !important;
-              flex-shrink: 0 !important;
+            .nyccc-swipe-bookmark-target.nyccc-swipe-reveal .nyccc-swipe-bookmark-indicator,
+            .nyccc-swipe-bookmark-target.nyccc-swipe-complete .nyccc-swipe-bookmark-indicator {
+              opacity: 1 !important;
+              transform: translateY(-50%) scale(1) !important;
             }
-            .nyccc-block-note-button {
-              padding: 0 !important;
-              border: 0 !important;
-              border-radius: 999px !important;
-              background: transparent !important;
-              color: \(secondaryColor) !important;
-              opacity: 0.38 !important;
-              pointer-events: auto !important;
-              -webkit-appearance: none !important;
-              appearance: none !important;
-            }
-            .nyccc-block-note-button[hidden],
-            .nyccc-block-bookmark-indicator[hidden] {
-              display: none !important;
-            }
-            .nyccc-block-bookmark-indicator {
-              display: none !important;
-            }
-            .nyccc-block-note-button svg {
-              width: 0.95rem !important;
-              height: 0.95rem !important;
-              display: block !important;
-              fill: none !important;
+            .nyccc-swipe-bookmark-indicator svg {
+              width: 1.05rem !important;
+              height: 1.05rem !important;
+              fill: currentColor !important;
               stroke: currentColor !important;
-              stroke-width: 2.2 !important;
+              stroke-width: 1.8 !important;
               stroke-linecap: round !important;
               stroke-linejoin: round !important;
             }
-            .nyccc-note-block:hover .nyccc-block-note-button.nyccc-has-note,
-            .nyccc-block-note-button.nyccc-has-note:focus,
-            .nyccc-block-note-button.nyccc-has-note {
-              opacity: 1 !important;
-              color: \(accentHex) !important;
-            }
-            .nyccc-block-note-button.nyccc-has-note svg {
-              fill: currentColor !important;
-              stroke: currentColor !important;
-            }
-            .nyccc-noted-block {
-              background: transparent !important;
-            }
-            .nyccc-block-bookmark-indicator {
-              border-radius: 0.1rem 0.1rem 0.04rem 0.04rem !important;
-              color: \(accentHex) !important;
-              background: currentColor !important;
-              clip-path: polygon(22% 8%, 78% 8%, 78% 92%, 50% 70%, 22% 92%) !important;
-              width: 0.8rem !important;
-              height: 1.05rem !important;
+            .nyccc-bookmark-accessibility-action {
+              position: absolute !important;
+              width: 1px !important;
+              height: 1px !important;
+              padding: 0 !important;
+              margin: -1px !important;
+              overflow: hidden !important;
+              clip: rect(0, 0, 0, 0) !important;
+              white-space: nowrap !important;
+              border: 0 !important;
             }
             .Section.nyccc-collapsible-heading h6::before {
               content: "" !important;

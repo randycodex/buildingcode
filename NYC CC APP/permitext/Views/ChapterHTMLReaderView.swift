@@ -51,24 +51,6 @@ private enum ChapterSearchEntryCache {
     }
 }
 
-private struct ChapterNoteTarget: Identifiable, Equatable {
-    let detail: ReaderSectionDetail
-    let blockID: String
-    let blockLabel: String?
-
-    var id: String {
-        "\(detail.id):\(blockID)"
-    }
-
-    var title: String {
-        let trimmedLabel = blockLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        if !blockID.isEmpty, !trimmedLabel.isEmpty {
-            return String(trimmedLabel.prefix(90))
-        }
-        return detail.displayLabel
-    }
-}
-
 struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
@@ -84,14 +66,10 @@ struct ChapterHTMLReaderView: View {
     @State private var selectedAnchor: PublishedHTMLAnchor?
     @State private var anchors: [PublishedHTMLAnchor] = []
     @State private var openedSection: CodeSectionSummary?
-    @State private var noteTarget: ChapterNoteTarget?
-    @State private var noteBody = ""
     @State private var hasActivatedHTMLReader = true
     @State private var isJumpPickerPresented = false
     @State private var cachedBookmarkedAnchorIDs: Set<String> = []
     @State private var cachedBookmarkedSectionNumbers: Set<String> = []
-    @State private var cachedNotedSectionNumbers: Set<String> = []
-    @State private var cachedNotedBlockIDs: Set<String> = []
     @State private var cachedBookmarkRevision: Int = -1
     @State private var cachedHTMLStoreRootPath: String?
     @State private var cachedHTMLStore: PublishedHTMLContentStore?
@@ -216,21 +194,11 @@ struct ChapterHTMLReaderView: View {
         cachedBookmarkedSectionNumbers
     }
 
-    private var notedSectionNumbers: Set<String> {
-        cachedNotedSectionNumbers
-    }
-
-    private var notedBlockIDs: Set<String> {
-        cachedNotedBlockIDs
-    }
-
     private func recomputeSavedDecorations() {
         var anchorIDs: Set<String> = []
         var sectionNumbers = Set(library.bookmarks.map { bookmark in
             normalizedSectionNumber(bookmark.sectionNumber)
         })
-        var notedSectionNumbers: Set<String> = []
-        var notedBlockIDs: Set<String> = []
 
         for anchor in anchors {
             guard let summary = library.sectionSummary(
@@ -241,18 +209,10 @@ struct ChapterHTMLReaderView: View {
                 anchorIDs.insert(anchor.anchorID)
                 sectionNumbers.insert(normalizedSectionNumber(summary.sectionNumber))
             }
-            let blockIDs = Set(library.noteBlockIDs(sectionID: summary.id))
-            if !library.noteBody(sectionID: summary.id).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-                !blockIDs.isEmpty {
-                notedSectionNumbers.insert(normalizedSectionNumber(summary.sectionNumber))
-            }
-            notedBlockIDs.formUnion(blockIDs)
         }
 
         cachedBookmarkedAnchorIDs = anchorIDs
         cachedBookmarkedSectionNumbers = sectionNumbers
-        cachedNotedSectionNumbers = notedSectionNumbers
-        cachedNotedBlockIDs = notedBlockIDs
         cachedBookmarkRevision = library.bookmarkRevision
     }
 
@@ -389,34 +349,6 @@ struct ChapterHTMLReaderView: View {
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet
         }
-        .sheet(item: $noteTarget) { target in
-            ChapterNoteSheet(
-                detail: target.detail,
-                titleOverride: target.title,
-                noteBody: $noteBody,
-                accentColor: accentColor,
-                projects: library.folders,
-                projectMemberIDs: Set(library.folderMembership[target.detail.id] ?? []),
-                isBookmarked: library.isBookmarked(sectionID: target.detail.id),
-                onToggleBookmark: {
-                    let isBookmarked = library.toggleBookmark(sectionID: target.detail.id)
-                    recomputeSavedDecorations()
-                    return isBookmarked
-                },
-                onToggleProject: { project, shouldAdd in
-                    if shouldAdd {
-                        library.addSection(target.detail.id, toFolder: project.id)
-                    } else {
-                        library.removeSection(target.detail.id, fromFolder: project.id)
-                    }
-                },
-                onSave: { body in
-                    let result = library.saveNote(sectionID: target.detail.id, blockID: target.blockID, body: body)
-                    recomputeSavedDecorations()
-                    return result
-                }
-            )
-        }
         .fullScreenCover(isPresented: $isChapterSearchPresented) {
             ChapterSearchSheet(
                 title: chapter.displayLabel,
@@ -501,8 +433,6 @@ struct ChapterHTMLReaderView: View {
             colorScheme: colorScheme,
             bookmarkedAnchorIDs: bookmarkedAnchorIDs,
             bookmarkedSectionNumbers: bookmarkedSectionNumbers,
-            notedSectionNumbers: notedSectionNumbers,
-            notedBlockIDs: notedBlockIDs,
             expandAllTrigger: 0,
             collapseAllTrigger: 0,
             scrollToTopTrigger: 0,
@@ -540,8 +470,6 @@ struct ChapterHTMLReaderView: View {
                     openInlineReference(target)
                 } else if target.action == "toggleBookmark" {
                     toggleBookmark(for: target)
-                } else {
-                    openNotes(for: target)
                 }
             },
             onResearchSelection: { target in
@@ -761,24 +689,6 @@ struct ChapterHTMLReaderView: View {
         }
 
         return nil
-    }
-
-    private func openNotes(for target: ChapterHTMLSectionTarget) {
-        guard let section = sectionSummary(for: target) else { return }
-        Task { @MainActor in
-            guard let detail = await library.loadSectionDetailAsync(sectionID: section.id) else { return }
-            let blockID = target.blockID?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            if blockID.isEmpty {
-                noteBody = library.noteBody(sectionID: detail.id)
-            } else {
-                noteBody = library.noteBody(sectionID: detail.id, blockID: blockID)
-            }
-            noteTarget = ChapterNoteTarget(
-                detail: detail,
-                blockID: blockID,
-                blockLabel: target.blockLabel
-            )
-        }
     }
 
     private func toggleBookmark(for target: ChapterHTMLSectionTarget) {

@@ -134,7 +134,7 @@ struct BookmarksView: View {
                 .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
-                CodeTopContentFade(title: "Saved", progress: collapseProgress)
+                CodeTopContentFade(title: "Projects", progress: collapseProgress)
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
@@ -216,7 +216,7 @@ struct BookmarksView: View {
 
 private var savedScreenHeader: some View {
     VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-        CodeScreenTitleRow(title: "Saved", collapseProgress: collapseProgress) {
+        CodeScreenTitleRow(title: "Projects", collapseProgress: collapseProgress) {
             HStack(spacing: 6) {
                 sortButton
                 exportButton

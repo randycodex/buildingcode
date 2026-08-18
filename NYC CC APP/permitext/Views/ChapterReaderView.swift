@@ -13,11 +13,8 @@ struct ChapterReaderView: View {
     @State private var pendingScrollSectionID: Int64?
     @State private var expandedInlineImage: UIImage?
     @State private var visibleBookmarkedSectionIDs: Set<Int64> = []
-    @State private var visibleNotedSectionIDs: Set<Int64> = []
     @State private var visibleBookmarkedSectionNumbers: Set<String> = []
     @State private var duplicateHeadingSectionIDs: Set<Int64> = []
-    @State private var noteTarget: ReaderSectionDetail?
-    @State private var noteBody = ""
     @State private var hasActiveTextSelection = false
     @State private var isJumpPickerPresented = false
     @State private var pendingFocusedSectionID: Int64?
@@ -174,33 +171,6 @@ struct ChapterReaderView: View {
                 ZoomableImageViewer(image: expandedInlineImage)
             }
         }
-        .sheet(item: $noteTarget) { detail in
-            ChapterNoteSheet(
-                detail: detail,
-                noteBody: $noteBody,
-                accentColor: accentColor,
-                projects: library.folders,
-                projectMemberIDs: Set(library.folderMembership[detail.id] ?? []),
-                isBookmarked: library.isBookmarked(sectionID: detail.id),
-                onToggleBookmark: {
-                    let isBookmarked = library.toggleBookmark(sectionID: detail.id)
-                    syncVisibleSavedState()
-                    return isBookmarked
-                },
-                onToggleProject: { project, shouldAdd in
-                    if shouldAdd {
-                        library.addSection(detail.id, toFolder: project.id)
-                    } else {
-                        library.removeSection(detail.id, fromFolder: project.id)
-                    }
-                },
-                onSave: { body in
-                    let result = library.saveNote(sectionID: detail.id, body: body)
-                    syncVisibleSavedState()
-                    return result
-                }
-            )
-        }
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet(proxy: proxy)
         }
@@ -217,7 +187,6 @@ struct ChapterReaderView: View {
         }
         .task(id: chapter.id) {
             library.noteChapterOpened(chapter: chapter)
-            noteTarget = nil
             chapterSearchQuery = ""
             await loadBlocks(with: proxy)
         }
@@ -262,7 +231,6 @@ struct ChapterReaderView: View {
             .uppercased()
         let isBookmarked = visibleBookmarkedSectionIDs.contains(block.id)
             || visibleBookmarkedSectionNumbers.contains(normalizedSectionNumber)
-        let hasNote = visibleNotedSectionIDs.contains(block.id)
         let showsHierarchyBar = block.kind != .textBlock
         let barWidth: CGFloat = showsHierarchyBar ? hierarchyBarWidth(forDepth: depth) : 0
         let barOpacity: Double = showsHierarchyBar ? hierarchyBarOpacity(forDepth: depth) : 0
@@ -292,15 +260,11 @@ struct ChapterReaderView: View {
                             .multilineTextAlignment(.leading)
                     }
 
-                    Spacer(minLength: 0)
-
-                    sectionActionButtons(block: block, isBookmarked: isBookmarked, hasNote: hasNote)
                 }
 
                 ChapterBlockBodyView(
                     sectionID: block.id,
                     onOpenImage: { expandedInlineImage = $0 },
-                    onOpenNotes: nil,
                     onSelectionChange: { hasSelection in
                         hasActiveTextSelection = hasSelection
                     }
@@ -323,6 +287,16 @@ struct ChapterReaderView: View {
             CodeHairline().padding(.top, 2)
         }
         .id(block.id)
+        .modifier(
+            ParagraphBookmarkSwipeModifier(
+                isBookmarked: isBookmarked,
+                accentColor: accentColor,
+                onToggle: {
+                    _ = library.toggleBookmark(sectionID: block.id)
+                    syncVisibleSavedState()
+                }
+            )
+        )
         .background(
             GeometryReader { geo in
                 Color.clear.preference(
@@ -350,44 +324,6 @@ struct ChapterReaderView: View {
         case 2: return 0.6
         case 3: return 0.48
         default: return 0.38
-        }
-    }
-
-    @ViewBuilder
-    private func sectionActionButtons(
-        block: CodeLibraryViewModel.ChapterReaderBlockSummary,
-        isBookmarked: Bool,
-        hasNote: Bool
-    ) -> some View {
-        HStack(spacing: 4) {
-            Button {
-                Task { @MainActor in
-                    guard let detail = await library.loadSectionDetailAsync(sectionID: block.id) else { return }
-                    openNotes(for: detail)
-                }
-            } label: {
-                Image(systemName: "note.text")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(hasNote ? Color.secondary : Color(uiColor: .tertiaryLabel))
-                    .frame(width: 30, height: 30)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(hasNote ? "Open section note" : "Add section note")
-
-            Button {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                _ = library.toggleBookmark(sectionID: block.id)
-                syncVisibleSavedState()
-            } label: {
-                Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(isBookmarked ? accentColor : Color(uiColor: .tertiaryLabel))
-                    .frame(width: 30, height: 30)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(isBookmarked ? "Remove bookmark" : "Save section")
         }
     }
 
@@ -666,11 +602,6 @@ struct ChapterReaderView: View {
         visibleBookmarkedSectionIDs = Set(
             blocks.map(\.id).filter { library.isBookmarked(sectionID: $0) }
         )
-        visibleNotedSectionIDs = Set(
-            blocks.map(\.id).filter {
-                !library.noteBody(sectionID: $0).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            }
-        )
         visibleBookmarkedSectionNumbers = Set(
             blocks.compactMap { block in
                 guard library.isBookmarked(sectionID: block.id) else { return nil }
@@ -738,15 +669,6 @@ struct ChapterReaderView: View {
         case 2: return 0.68
         default: return 0.58
         }
-    }
-
-    private func openNotes(for detail: ReaderSectionDetail) {
-        if hasActiveTextSelection {
-            dismissTextSelection()
-            return
-        }
-        noteBody = library.noteBody(sectionID: detail.id)
-        noteTarget = detail
     }
 
     private func dismissTextSelection() {
@@ -1015,10 +937,71 @@ private struct ChapterNoteProjectPickerSheet: View {
     }
 }
 
+private struct ParagraphBookmarkSwipeModifier: ViewModifier {
+    let isBookmarked: Bool
+    let accentColor: Color
+    let onToggle: () -> Void
+
+    @GestureState private var dragTranslation: CGSize = .zero
+    @State private var didCompleteSwipe = false
+
+    private var horizontalOffset: CGFloat {
+        let dx = dragTranslation.width
+        let dy = dragTranslation.height
+        guard dx < 0, abs(dx) > abs(dy) * 1.25 else { return 0 }
+        return max(dx, -88)
+    }
+
+    func body(content: Content) -> some View {
+        ZStack(alignment: .trailing) {
+            Image(systemName: isBookmarked ? "bookmark.slash.fill" : "bookmark.fill")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(accentColor)
+                .frame(width: 44, height: 44)
+                .background(accentColor.opacity(0.16), in: Circle())
+                .padding(.trailing, 8)
+                .opacity(horizontalOffset <= -28 || didCompleteSwipe ? 1 : 0)
+                .scaleEffect(horizontalOffset <= -68 || didCompleteSwipe ? 1 : 0.84)
+                .allowsHitTesting(false)
+
+            content
+                .offset(x: horizontalOffset)
+        }
+        .contentShape(Rectangle())
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 18, coordinateSpace: .local)
+                .updating($dragTranslation) { value, state, _ in
+                    let dx = value.translation.width
+                    let dy = value.translation.height
+                    guard dx < 0, abs(dx) > abs(dy) * 1.25 else { return }
+                    state = value.translation
+                }
+                .onEnded { value in
+                    let dx = value.translation.width
+                    let dy = value.translation.height
+                    guard dx <= -68, abs(dx) > abs(dy) * 1.25 else { return }
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    onToggle()
+                    withAnimation(.easeOut(duration: 0.16)) {
+                        didCompleteSwipe = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.42) {
+                        withAnimation(.easeOut(duration: 0.16)) {
+                            didCompleteSwipe = false
+                        }
+                    }
+                }
+        )
+        .accessibilityAction(named: Text(isBookmarked ? "Remove paragraph bookmark" : "Bookmark paragraph")) {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            onToggle()
+        }
+    }
+}
+
 private struct ChapterBlockBodyView: View {
     let sectionID: Int64
     let onOpenImage: (UIImage) -> Void
-    let onOpenNotes: ((ReaderSectionDetail) -> Void)?
     let onSelectionChange: ((Bool) -> Void)?
 
     @EnvironmentObject private var library: CodeLibraryViewModel
@@ -1032,9 +1015,6 @@ private struct ChapterBlockBodyView: View {
                     detail: detail,
                     fallbackText: bodyText ?? NSAttributedString(string: ""),
                     onOpenImage: onOpenImage,
-                    onContentTap: {
-                        onOpenNotes?(detail)
-                    },
                     onSelectionChange: onSelectionChange
                 )
             } else if let detail, let bodyText, !bodyText.string.isEmpty {
@@ -1042,9 +1022,6 @@ private struct ChapterBlockBodyView: View {
                     detail: detail,
                     fallbackText: bodyText,
                     onOpenImage: onOpenImage,
-                    onContentTap: {
-                        onOpenNotes?(detail)
-                    },
                     onSelectionChange: onSelectionChange
                 )
             } else {
