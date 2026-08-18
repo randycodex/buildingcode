@@ -803,7 +803,7 @@ async function main() {
         !workspaceScript.text.includes('typeBadge.className = "saved-folder-type"') &&
         !workspaceScript.text.includes("saved-project-folder-icon") &&
         !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
-        workspaceScript.text.includes("async function renderSavedFolderContext(panel, savedInstance, paneID, folders)") &&
+        workspaceScript.text.includes("async function renderSavedFolderContext(panel, savedInstance, paneID, folders, options = {})") &&
         workspaceScript.text.includes("async function applyProjectSelectionIntent(controller, requestedIntent)") &&
         workspaceScript.text.includes('liveInstance.selectedFolderID = intent.kind === "project" ? intent.folderID : ""') &&
         !workspaceScript.text.includes("panes.push(await renderProjects())"),
@@ -1450,7 +1450,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-notebook-menu-motion-v359'),
+        webRoot.text.includes('/web/app.js?v=20260817-instant-project-selection-v360'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1619,7 +1619,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-notebook-menu-motion-v359'),
+      webRoot.text.includes('/web/styles.css?v=20260817-instant-project-selection-v360'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1885,7 +1885,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-notebook-menu-motion-v359'),
+      webRoot.text.includes('/web/styles.css?v=20260817-instant-project-selection-v360'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

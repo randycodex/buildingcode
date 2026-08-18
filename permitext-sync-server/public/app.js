@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-notebook-menu-motion-v359";
+} from "./offline-storage.js?v=20260817-instant-project-selection-v360";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -25066,7 +25066,7 @@ async function appendSavedProjectResearchConversations(container, identity) {
   container.append(section);
 }
 
-async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
+async function renderSavedFolderContext(panel, savedInstance, paneID, folders, options = {}) {
   const previousContext = panel.querySelector(".saved-folder-context");
   const inlineFilters = panel.querySelector(".saved-inline-filters");
   const planUsage = panel.querySelector(".saved-plan-usage");
@@ -25167,7 +25167,9 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       savedContent
     );
     context.append(savedSection);
-    await appendSavedProjectResearchConversations(context, identity);
+    if (!options.skipResearch) {
+      await appendSavedProjectResearchConversations(context, identity);
+    }
 
   } else {
     const controls = document.createElement("div");
@@ -25896,6 +25898,30 @@ function syncProjectSelectionControllerUI(controller) {
   tile.setAttribute("aria-busy", "true");
 }
 
+function renderProjectSelectionImmediately(controller, savedInstance, intent) {
+  if (activeWorkspaceID !== controller.workspaceID) return false;
+  const panel = track.querySelector(
+    `.saved-panel[data-pane-id="${CSS.escape(controller.paneID)}"]`
+  );
+  if (!panel?.isConnected) return false;
+
+  const selectedProjectID = intent.kind === "project" ? String(intent.folderID || "") : "";
+  panel.querySelectorAll(".saved-project-tile").forEach((tile) => {
+    const selected = intent.kind === "unassigned"
+      ? tile.classList.contains("is-unassigned-saved")
+      : Boolean(selectedProjectID && tile.dataset.projectId === selectedProjectID);
+    tile.classList.toggle("is-selected", selected);
+    if (selected) tile.setAttribute("aria-current", "true");
+    else tile.removeAttribute("aria-current");
+  });
+
+  const folders = intent.kind === "project" && intent.project ? [intent.project] : [];
+  void renderSavedFolderContext(panel, savedInstance, controller.paneID, folders, {
+    skipResearch: true
+  });
+  return true;
+}
+
 async function confirmLatestProjectSelectionIntent(controller, requestedIntent) {
   let intent = takeLatestProjectSelectionIntent(controller, requestedIntent);
   while (projectSelectionInstance(controller)) {
@@ -25959,6 +25985,7 @@ async function applyProjectSelectionIntent(controller, requestedIntent) {
   liveInstance.showAllSaved = false;
   liveInstance.folderQuery = "";
   liveInstance.evidenceSearchOpen = false;
+  renderProjectSelectionImmediately(controller, liveInstance, intent);
   saveWorkspaceState();
   await transitionProjectSelection(controller.paneID);
   return true;

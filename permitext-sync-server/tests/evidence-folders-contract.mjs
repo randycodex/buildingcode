@@ -333,6 +333,11 @@ const applyProjectSelectionSource = functionSource(appSource, "applyProjectSelec
 assert.match(applyProjectSelectionSource, /activateProjectStudio\(intent\.project,[\s\S]*?skipDiscardConfirmation: true/);
 assert.match(applyProjectSelectionSource, /deactivateProjectStudio\(openProjectDetails\(\)\[0\],[\s\S]*?skipDiscardConfirmation: true/);
 assert.match(applyProjectSelectionSource, /liveInstance\.selectedFolderID = intent\.kind === "project" \? intent\.folderID : "";[\s\S]*?liveInstance\.organizeUnassigned = intent\.kind === "unassigned"/);
+assert.match(applyProjectSelectionSource, /renderProjectSelectionImmediately\(controller, liveInstance, intent\)[\s\S]*?saveWorkspaceState\(\)/);
+const immediateProjectSelectionSource = functionSource(appSource, "renderProjectSelectionImmediately");
+assert.match(immediateProjectSelectionSource, /\.saved-project-tile[\s\S]*?classList\.toggle\("is-selected", selected\)/);
+assert.match(immediateProjectSelectionSource, /renderSavedFolderContext\(panel, savedInstance, controller\.paneID, folders, \{[\s\S]*?skipResearch: true/);
+assert.match(savedFolderContextSource, /if \(!options\.skipResearch\) \{[\s\S]*?appendSavedProjectResearchConversations/);
 assert.match(
   functionSource(appSource, "settleSavedPanelAfterProjectTransition"),
   /refreshSavedPanelInPlace/
