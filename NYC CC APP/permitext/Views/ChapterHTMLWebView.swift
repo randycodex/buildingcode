@@ -83,6 +83,8 @@ enum ChapterHTMLWebProcessWarmup {
 }
 
 private enum HTMLAssetPathResolver {
+    private static let readerViewportContent = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+
     static func resolveSharedAssetPaths(in html: String, readAccessURL: URL) -> String {
         let assetRoot = readAccessURL
             .appendingPathComponent("assets", isDirectory: true)
@@ -120,16 +122,24 @@ private enum HTMLAssetPathResolver {
         }
         </style>
         """
+        let hasViewport = html.range(
+            of: #"<meta\b[^>]*\bname\s*=\s*(['\"])viewport\1[^>]*>"#,
+            options: [.regularExpression, .caseInsensitive]
+        ) != nil
+        let viewportMeta = hasViewport
+            ? ""
+            : #"<meta name="viewport" content="\#(readerViewportContent)">"#
+        let bootstrapHead = viewportMeta + bootstrapStyle
 
         if html.range(of: "</head>", options: .caseInsensitive) != nil {
             return html.replacingOccurrences(
                 of: "</head>",
-                with: "\(bootstrapStyle)</head>",
+                with: "\(bootstrapHead)</head>",
                 options: .caseInsensitive
             )
         }
 
-        return bootstrapStyle + html
+        return bootstrapHead + html
     }
 }
 
@@ -283,6 +293,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         webView.scrollView.minimumZoomScale = 1
         webView.scrollView.maximumZoomScale = 1
         webView.scrollView.bouncesZoom = false
+        webView.scrollView.alwaysBounceHorizontal = false
+        webView.scrollView.showsHorizontalScrollIndicator = false
+        webView.scrollView.isDirectionalLockEnabled = true
         webView.isOpaque = true
         webView.allowsBackForwardNavigationGestures = false
         context.coordinator.parent = self
@@ -879,9 +892,24 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 var lastY = null;
                 var isHorizontalSwipe = false;
                 var directionLocked = false;
+                var pendingOffset = 0;
+                var offsetAnimationFrame = null;
+
+                function renderOffset(offset) {
+                  pendingOffset = offset;
+                  if (offsetAnimationFrame !== null) { return; }
+                  offsetAnimationFrame = window.requestAnimationFrame(function() {
+                    offsetAnimationFrame = null;
+                    node.style.setProperty('--nyccc-swipe-offset', pendingOffset + 'px');
+                  });
+                }
 
                 function resetSwipe(success) {
-                  node.classList.remove('nyccc-swipe-active', 'nyccc-swipe-reveal');
+                  if (offsetAnimationFrame !== null) {
+                    window.cancelAnimationFrame(offsetAnimationFrame);
+                    offsetAnimationFrame = null;
+                  }
+                  node.classList.remove('nyccc-swipe-preparing', 'nyccc-swipe-active', 'nyccc-swipe-reveal');
                   if (success) {
                     node.classList.add('nyccc-swipe-complete');
                     window.setTimeout(function() {
@@ -895,6 +923,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   lastY = null;
                   isHorizontalSwipe = false;
                   directionLocked = false;
+                  pendingOffset = 0;
                 }
 
                 node.addEventListener('touchstart', function(event) {
@@ -905,6 +934,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   startY = touch.clientY;
                   lastX = startX;
                   lastY = startY;
+                  node.classList.add('nyccc-swipe-preparing');
                 }, { passive: true });
 
                 node.addEventListener('touchmove', function(event) {
@@ -920,17 +950,17 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   }
                   if (!isHorizontalSwipe) { return; }
                   event.preventDefault();
-                  var offset = Math.max(-88, Math.min(0, dx));
+                  var offset = Math.max(-76, Math.min(0, dx * 0.86));
                   node.classList.add('nyccc-swipe-active');
-                  node.classList.toggle('nyccc-swipe-reveal', offset <= -28);
-                  node.style.setProperty('--nyccc-swipe-offset', offset + 'px');
+                  node.classList.toggle('nyccc-swipe-reveal', offset <= -24);
+                  renderOffset(offset);
                 }, { passive: false });
 
                 node.addEventListener('touchend', function() {
                   if (startX === null) { return; }
                   var dx = (lastX === null ? startX : lastX) - startX;
                   var dy = (lastY === null ? startY : lastY) - startY;
-                  var completed = isHorizontalSwipe && dx <= -68 && Math.abs(dx) > Math.abs(dy) * 1.25;
+                  var completed = isHorizontalSwipe && dx <= -58 && Math.abs(dx) > Math.abs(dy) * 1.25;
                   if (completed) {
                     toggleBookmarkForHeading(heading);
                   }
@@ -1455,6 +1485,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            if abs(scrollView.contentOffset.x) > 0.5 {
+                scrollView.contentOffset.x = 0
+            }
             reportScrollProgress(from: scrollView)
             scheduleVisibleAnchorReport()
         }
@@ -1658,6 +1691,13 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               -webkit-text-size-adjust: 100%;
               background: \(backgroundColor);
               color-scheme: \(isDark ? "dark" : "light");
+            }
+            html,
+            body {
+              width: 100% !important;
+              max-width: 100% !important;
+              overflow-x: hidden !important;
+              overscroll-behavior-x: none;
             }
             * {
               box-sizing: border-box;
@@ -1917,8 +1957,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-swipe-bookmark-target {
               position: relative !important;
-              transform: translateX(var(--nyccc-swipe-offset, 0px));
-              transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+              transform: translate3d(var(--nyccc-swipe-offset, 0px), 0, 0);
+              transition: transform 220ms cubic-bezier(0.22, 0.9, 0.28, 1);
+              touch-action: pan-y;
+            }
+            .nyccc-swipe-bookmark-target.nyccc-swipe-preparing {
+              -webkit-user-select: none;
+              user-select: none;
+              -webkit-touch-callout: none;
               will-change: transform;
             }
             .nyccc-swipe-bookmark-target.nyccc-swipe-active {

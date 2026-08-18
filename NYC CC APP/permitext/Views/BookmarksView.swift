@@ -244,6 +244,9 @@ struct BookmarksView: View {
             .onChange(of: library.bookmarks) { _, _ in
                 rebuildBookmarkCaches()
             }
+            .onChange(of: library.bookmarkRevision) { _, _ in
+                rebuildBookmarkCaches()
+            }
             .onChange(of: library.folderMembership) { _, _ in
                 rebuildBookmarkCaches()
             }

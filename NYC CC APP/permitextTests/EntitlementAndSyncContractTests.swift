@@ -141,6 +141,47 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
 }
 
 final class EntitlementAndSyncContractTests: XCTestCase {
+    func testPreparedChapterHTMLInjectsOneMobileViewportBeforeLoading() throws {
+        let directoryURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-reader-viewport-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directoryURL) }
+
+        let missingViewportURL = directoryURL.appendingPathComponent("missing.html")
+        try "<html><head></head><body>Chapter</body></html>".write(
+            to: missingViewportURL,
+            atomically: true,
+            encoding: .utf8
+        )
+        let preparedMissing = try XCTUnwrap(
+            PreparedChapterHTMLCache.preparedHTML(
+                chapterURL: missingViewportURL,
+                readAccessURL: directoryURL,
+                colorScheme: .dark
+            )
+        )
+        XCTAssertEqual(preparedMissing.components(separatedBy: "name=\"viewport\"").count - 1, 1)
+        XCTAssertTrue(preparedMissing.contains("width=device-width, initial-scale=1.0"))
+
+        let existingViewportURL = directoryURL.appendingPathComponent("existing.html")
+        try "<html><head><meta name='viewport' content='width=device-width'></head><body>Chapter</body></html>".write(
+            to: existingViewportURL,
+            atomically: true,
+            encoding: .utf8
+        )
+        let preparedExisting = try XCTUnwrap(
+            PreparedChapterHTMLCache.preparedHTML(
+                chapterURL: existingViewportURL,
+                readAccessURL: directoryURL,
+                colorScheme: .dark
+            )
+        )
+        XCTAssertEqual(
+            preparedExisting.lowercased().components(separatedBy: "name='viewport'").count - 1,
+            1
+        )
+    }
+
     private func isolatedEntitlementDefaults() -> UserDefaults {
         let suiteName = "permitext-tests-\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
