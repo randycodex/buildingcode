@@ -11,6 +11,11 @@ private struct PendingResearchVisualReview: Identifiable, Equatable {
     let review: ResearchSelectionReviewResponse
 }
 
+private struct PendingResearchDeletion: Identifiable, Equatable {
+    let id: String
+    let title: String
+}
+
 struct ResearchRequestReconciliation {
     static func matchesCompletedAttempt(
         messages: [ResearchMessage],
@@ -162,6 +167,8 @@ struct ResearchView: View {
     @State private var draftTitle = ""
     @State private var pendingAssignmentProjectID: String?
     @State private var showingAssignmentConfirmation = false
+    @State private var pendingDeletion: PendingResearchDeletion?
+    @State private var deletingConversationID: String?
     @State private var isVisible = false
     private let cache = ProjectHubOfflineCache()
 
@@ -225,6 +232,24 @@ struct ResearchView: View {
             } message: {
                 Text("Terra will use the destination Project’s current facts for future answers. Existing answers keep their original evidence and context.")
             }
+            .alert(
+                "Delete Research conversation?",
+                isPresented: Binding(
+                    get: { pendingDeletion != nil },
+                    set: { if !$0 { pendingDeletion = nil } }
+                ),
+                presenting: pendingDeletion
+            ) { pending in
+                Button("Delete Conversation", role: .destructive) {
+                    pendingDeletion = nil
+                    Task { await deleteConversation(id: pending.id) }
+                }
+                Button("Cancel", role: .cancel) {
+                    pendingDeletion = nil
+                }
+            } message: { pending in
+                Text("\u{201c}\(pending.title)\u{201d} will be permanently deleted from Permitext. This cannot be undone.")
+            }
             .task(id: library.signedInAccount?.appUserID) {
                 await loadHistory()
                 await openActiveConversationIfNeeded()
@@ -285,49 +310,62 @@ struct ResearchView: View {
     }
 
     private var historyView: some View {
-        ScrollView {
-            LazyVStack(spacing: 0) {
-                if let errorMessage {
-                    statusMessage(errorMessage)
-                }
-                if summaries.isEmpty && !isLoading {
-                    ContentUnavailableView(
-                        "No Research yet",
-                        image: "Astroid",
-                        description: Text("Start here or select enacted text in a Reader and tap the Astroid.")
-                    )
-                    .padding(.top, 70)
-                }
-                ForEach(summaries) { item in
-                    Button {
-                        library.activeResearchConversationID = item.id
-                    } label: {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(item.starterQuestion?.isEmpty == false ? item.starterQuestion! : item.title)
-                                .font(.body.weight(.semibold))
-                                .foregroundStyle(.primary)
-                                .multilineTextAlignment(.leading)
-                                .lineLimit(3)
-                            HStack(spacing: 8) {
-                                Text(projectName(for: item.primaryProjectID))
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(.secondary)
-                                Spacer()
-                                Label("\(item.sourceCount)", systemImage: "text.quote")
-                                Label("\(item.messageCount)", systemImage: "bubble.left")
-                            }
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+        List {
+            if let errorMessage {
+                statusMessage(errorMessage)
+                    .listRowBackground(Color.clear)
+            }
+
+            if summaries.isEmpty && !isLoading {
+                ContentUnavailableView(
+                    "No Research yet",
+                    image: "Astroid",
+                    description: Text("Start here or select enacted text in a Reader and tap the Astroid.")
+                )
+                .padding(.top, 70)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
+
+            ForEach(summaries) { item in
+                Button {
+                    library.activeResearchConversationID = item.id
+                } label: {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(researchTitle(for: item))
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(3)
+                        HStack(spacing: 8) {
+                            Text(projectName(for: item.primaryProjectID))
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Label("\(item.sourceCount)", systemImage: "text.quote")
+                            Label("\(item.messageCount)", systemImage: "bubble.left")
                         }
-                        .padding(.vertical, 15)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     }
-                    .buttonStyle(.plain)
-                    Divider()
+                    .padding(.vertical, 7)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.plain)
+                .disabled(deletingConversationID == item.id)
+                .listRowInsets(EdgeInsets(top: 8, leading: 18, bottom: 8, trailing: 18))
+                .listRowBackground(Color.clear)
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button(role: .destructive) {
+                        requestDeletion(id: item.id, title: researchTitle(for: item))
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
                 }
             }
-            .padding(.horizontal, 18)
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .refreshable { await loadHistory(forceNetwork: true) }
     }
 
@@ -355,8 +393,9 @@ struct ResearchView: View {
                         showingRename = true
                     }
                     Button("Delete", systemImage: "trash", role: .destructive) {
-                        Task { await deleteConversation() }
+                        requestDeletion(id: conversation.id, title: conversation.title)
                     }
+                    .disabled(deletingConversationID != nil)
                 } label: {
                     Image(systemName: "ellipsis")
                         .frame(width: 32, height: 32)
@@ -530,6 +569,28 @@ struct ResearchView: View {
         return library.folder(forBackendProjectID: projectID)?.name ?? "Project"
     }
 
+    private func researchTitle(for summary: ResearchConversationSummary) -> String {
+        let starterQuestion = summary.starterQuestion?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if let starterQuestion, !starterQuestion.isEmpty {
+            return starterQuestion
+        }
+        return summary.title
+    }
+
+    private func requestDeletion(id: String, title: String) {
+        guard deletingConversationID == nil else { return }
+        let normalizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let displayTitle = normalizedTitle.isEmpty ? "Untitled Research" : normalizedTitle
+        let confirmationTitle = displayTitle.count > 80
+            ? "\(displayTitle.prefix(79))…"
+            : displayTitle
+        pendingDeletion = PendingResearchDeletion(
+            id: id,
+            title: confirmationTitle
+        )
+    }
+
     private func loadHistory(forceNetwork: Bool = false) async {
         guard let account = library.signedInAccount else {
             summaries = []
@@ -549,12 +610,7 @@ struct ResearchView: View {
         do {
             let loaded = try await library.researchConversations()
             summaries = loaded
-            try? cache.store(
-                loaded,
-                accountID: account.appUserID,
-                projectID: "all-research",
-                scope: "research-history"
-            )
+            cacheHistory(loaded, accountID: account.appUserID)
             errorMessage = nil
         } catch {
             if summaries.isEmpty { errorMessage = error.localizedDescription }
@@ -823,16 +879,37 @@ struct ResearchView: View {
         }
     }
 
-    private func deleteConversation() async {
-        guard let id = conversation?.id else { return }
+    private func deleteConversation(id: String) async {
+        guard deletingConversationID == nil else { return }
+        deletingConversationID = id
+        defer { deletingConversationID = nil }
         do {
             try await library.deleteResearchConversation(id: id)
-            library.activeResearchConversationID = nil
-            conversation = nil
+            summaries.removeAll { $0.id == id }
+            if let account = library.signedInAccount {
+                cacheHistory(summaries, accountID: account.appUserID)
+            }
+            if library.activeResearchConversationID == id {
+                library.activeResearchConversationID = nil
+            }
+            if conversation?.id == id {
+                conversation = nil
+                failedQuestionAttempt = nil
+                questionErrorMessage = nil
+            }
             await loadHistory(forceNetwork: true)
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    private func cacheHistory(_ history: [ResearchConversationSummary], accountID: String) {
+        try? cache.store(
+            history,
+            accountID: accountID,
+            projectID: "all-research",
+            scope: "research-history"
+        )
     }
 
     private func cacheConversation(_ conversation: ResearchConversation) {
