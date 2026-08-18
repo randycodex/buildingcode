@@ -12644,6 +12644,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background-image: none;
 }
 
+.code-filter-menu.notebook-card-menu .notebook-card-list {
+  height: 0;
+  transition:
+    height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease,
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .notebook-card-menu.is-open .notebook-card-list {
   height: min(var(--notebook-card-list-height, 156px), 70vh);
   max-height: min(var(--notebook-card-list-height, 156px), 70vh);
@@ -12654,14 +12663,34 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .notebook-card-list-resize-handle {
   position: relative;
-  display: none;
-  height: 5px;
+  display: block;
+  height: 0;
+  overflow: hidden;
   cursor: row-resize;
+  opacity: 0;
+  pointer-events: none;
   touch-action: none;
+  transition:
+    height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease;
 }
 
 .notebook-card-menu.is-open .notebook-card-list-resize-handle {
-  display: block;
+  height: 5px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.code-filter-menu.notebook-card-menu.is-restoring .notebook-card-list,
+.notebook-card-menu.is-restoring .notebook-card-list-resize-handle {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-filter-menu.notebook-card-menu .notebook-card-list,
+  .notebook-card-list-resize-handle {
+    transition: none;
+  }
 }
 
 .notebook-card-list-resize-handle::after {

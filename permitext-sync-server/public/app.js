@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-instant-search-history-v357";
+} from "./offline-storage.js?v=20260817-notebook-menu-motion-v359";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,

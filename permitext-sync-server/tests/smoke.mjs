@@ -1450,7 +1450,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-instant-search-history-v357'),
+        webRoot.text.includes('/web/app.js?v=20260817-notebook-menu-motion-v359'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1581,10 +1581,13 @@ async function main() {
         workspaceStyles.text.includes(".notebook-card-rail.is-open {\n  padding-bottom: 0;") &&
         workspaceStyles.text.includes(".notebook-card-menu-toggle {\n  width: 100%;\n  min-height: 40px;\n  background: var(--menu-surface);") &&
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-flow: row;") &&
+        workspaceStyles.text.match(/\.code-filter-menu\.notebook-card-menu \.notebook-card-list \{[\s\S]*?height: 0;[\s\S]*?height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\),/) &&
         workspaceStyles.text.includes("padding-inline: var(--space-3);\n  border-radius: var(--radius-control);\n  background-color: var(--menu-surface);") &&
         workspaceStyles.text.includes("background-color: var(--menu-surface);\n  background-image: none;") &&
         workspaceStyles.text.includes(".notebook-card-menu.is-open .notebook-card-list {\n  height: min(var(--notebook-card-list-height, 156px), 70vh);\n  max-height: min(var(--notebook-card-list-height, 156px), 70vh);") &&
         workspaceScript.text.includes('cardListResizeHandle.className = "notebook-card-list-resize-handle"') &&
+        workspaceStyles.text.match(/\.notebook-card-list-resize-handle \{[\s\S]*?display: block;[\s\S]*?height: 0;[\s\S]*?opacity: 0;[\s\S]*?height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\),/) &&
+        workspaceStyles.text.includes(".code-filter-menu.notebook-card-menu.is-restoring .notebook-card-list,\n.notebook-card-menu.is-restoring .notebook-card-list-resize-handle {\n  transition: none;") &&
         workspaceStyles.text.includes(".notebook-card-list-resize-handle::after") &&
         workspaceScript.text.includes("const minimumCardListHeight = 156") &&
         workspaceScript.text.includes("Math.max(minimumCardListHeight, last.bottom - first.top)") &&
@@ -1616,7 +1619,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v351'),
+      webRoot.text.includes('/web/styles.css?v=20260817-notebook-menu-motion-v359'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1882,7 +1885,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-multicorpus-v351'),
+      webRoot.text.includes('/web/styles.css?v=20260817-notebook-menu-motion-v359'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
