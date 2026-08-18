@@ -158,7 +158,6 @@ struct ResearchView: View {
     @State private var errorMessage: String?
     @State private var questionErrorMessage: String?
     @State private var pendingVisualReview: PendingResearchVisualReview?
-    @State private var showingSettings = false
     @State private var showingRename = false
     @State private var draftTitle = ""
     @State private var pendingAssignmentProjectID: String?
@@ -200,10 +199,6 @@ struct ResearchView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
-            .sheet(isPresented: $showingSettings) {
-                NavigationStack { SettingsView() }
-                    .environmentObject(library)
-            }
             .sheet(item: $pendingVisualReview) { pending in
                 ResearchVisualReviewSheet(
                     review: pending.review,
@@ -281,16 +276,6 @@ struct ResearchView: View {
                     .disabled(isCreatingConversation)
                     .accessibilityLabel("New Research")
                 }
-
-                Button {
-                    showingSettings = true
-                } label: {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
-                        .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Settings")
             }
             .foregroundStyle(Color.appChrome)
         }

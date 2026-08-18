@@ -13,6 +13,8 @@ struct BookmarksView: View {
     @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
     @State private var cachedBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
     @State private var pendingExport: BookmarkExportRequest?
+    @State private var showingSettings = false
+    @State private var showingSignOutWarning = false
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
@@ -92,6 +94,91 @@ struct BookmarksView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Sort saved sections")
+    }
+
+    private var accountMenuSummary: String {
+        guard let account = library.signedInAccount else {
+            return "Not signed in · \(library.currentPlan.label)"
+        }
+        let displayName = account.displayName?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let username = account.publicUsername?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let accountName = [displayName, username]
+            .compactMap { value in
+                guard let value, !value.isEmpty else { return nil }
+                return value
+            }
+            .first ?? "Permitext account"
+        return "\(accountName) · \(library.currentPlan.label)"
+    }
+
+    private var accountMenuButton: some View {
+        Menu {
+            Section(accountMenuSummary) {
+                Button {
+                    showingSettings = true
+                } label: {
+                    Label("Account & Plan", systemImage: "person.crop.circle")
+                }
+
+                Button {
+                    showingSettings = true
+                } label: {
+                    Label("Sync: \(library.syncStatusTitle)", systemImage: syncStatusSystemImage)
+                }
+            }
+
+            Button {
+                showingSettings = true
+            } label: {
+                Label("Settings", systemImage: "gearshape")
+            }
+
+            if library.signedInAccount != nil {
+                Divider()
+
+                Button(role: .destructive) {
+                    if library.requiresSignOutConfirmation {
+                        showingSignOutWarning = true
+                    } else {
+                        library.signOut()
+                    }
+                } label: {
+                    Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                }
+            }
+        } label: {
+            Image(systemName: library.signedInAccount == nil ? "person.crop.circle" : "person.crop.circle.fill")
+                .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
+                .foregroundStyle(Color.appChrome)
+                .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Account and settings")
+    }
+
+    private var syncStatusSystemImage: String {
+        if library.signedInAccount == nil { return "icloud.slash" }
+        if library.isAccountBusy { return "arrow.triangle.2.circlepath" }
+        if !library.userContentSyncConflicts.isEmpty { return "exclamationmark.icloud" }
+        if library.pendingUserContentSyncCount > 0 { return "icloud.and.arrow.up" }
+        return "checkmark.icloud"
+    }
+
+    private var signOutWarningMessage: String {
+        let pendingCount = library.pendingUserContentSyncCount
+        let conflictCount = library.userContentSyncConflicts.count
+        var details: [String] = []
+        if pendingCount > 0 {
+            details.append("\(pendingCount) local change\(pendingCount == 1 ? " is" : "s are") waiting to sync")
+        }
+        if conflictCount > 0 {
+            details.append("\(conflictCount) conflict\(conflictCount == 1 ? " needs" : "s need") review")
+        }
+        let detail = details.joined(separator: ", and ")
+        return "\(detail.capitalized). Your work remains on this iPhone, but it will not sync until you sign in again."
     }
 
     private func bookmarkAccentColor(for codeSectionID: Int64?) -> Color {
@@ -208,6 +295,25 @@ struct BookmarksView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showingSettings) {
+                NavigationStack { SettingsView() }
+                    .environmentObject(library)
+            }
+            .confirmationDialog(
+                "Sign out before syncing?",
+                isPresented: $showingSignOutWarning,
+                titleVisibility: .visible
+            ) {
+                Button("Open Settings") {
+                    showingSettings = true
+                }
+                Button("Sign Out Anyway", role: .destructive) {
+                    library.signOut()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(signOutWarningMessage)
+            }
             .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         }
         .coordinateSpace(name: "savedScroll")
@@ -220,6 +326,7 @@ private var savedScreenHeader: some View {
             HStack(spacing: 6) {
                 sortButton
                 exportButton
+                accountMenuButton
             }
         }
 
