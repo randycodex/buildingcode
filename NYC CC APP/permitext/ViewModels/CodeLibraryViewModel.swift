@@ -91,6 +91,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var codeSections: [CodeSectionCategory] = []
     @Published private(set) var chapters: [CodeChapter] = []
     @Published private(set) var searchResults: [CodeSearchResult] = []
+    @Published private(set) var isSearchInProgress = false
     @Published private(set) var recentSearches: [String] = []
     @Published private(set) var pinnedSearches: [String] = []
     @Published private(set) var recentlyViewedSections: [RecentlyViewedEntry] = []
@@ -1442,25 +1443,60 @@ final class CodeLibraryViewModel: ObservableObject {
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedQuery.isEmpty else {
             searchResults = []
+            isSearchInProgress = false
             return
         }
+
+        isSearchInProgress = true
 
         if let authoredCodeStore {
             let selectedCodeSectionID = restrictToSelectedCodeSection ? self.selectedCodeSectionID : nil
             let workTask = Task.detached(priority: .userInitiated) {
-                authoredCodeStore.search(query: trimmedQuery, codeSectionID: selectedCodeSectionID)
+                authoredCodeStore.search(
+                    query: trimmedQuery,
+                    codeSectionID: selectedCodeSectionID,
+                    includeSnippets: false
+                )
             }
             activeSearchWorkTask = workTask
             searchTask = Task {
                 let results = await workTask.value
                 guard !Task.isCancelled, !workTask.isCancelled else { return }
                 searchResults = results
+                isSearchInProgress = false
+
+                // Titles and section numbers are enough to make Search usable
+                // immediately. Load passage previews for the first screen in
+                // the background instead of blocking every cold search on up
+                // to 200 individual prepared-section files.
+                guard !results.isEmpty else {
+                    activeSearchWorkTask = nil
+                    return
+                }
+                let snippetTask = Task.detached(priority: .utility) {
+                    authoredCodeStore.search(
+                        query: trimmedQuery,
+                        codeSectionID: selectedCodeSectionID,
+                        includeSnippets: true,
+                        resultLimit: 25
+                    )
+                }
+                activeSearchWorkTask = snippetTask
+                let enrichedResults = await snippetTask.value
+                guard !Task.isCancelled, !snippetTask.isCancelled else { return }
+                let enrichedByID = Dictionary(
+                    enrichedResults.map { ($0.id, $0) },
+                    uniquingKeysWith: { first, _ in first }
+                )
+                searchResults = results.map { enrichedByID[$0.id] ?? $0 }
+                activeSearchWorkTask = nil
             }
             return
         }
 
         guard let databaseURL = selectedVersion?.fileURL else {
             searchResults = []
+            isSearchInProgress = false
             return
         }
 
@@ -1477,6 +1513,7 @@ final class CodeLibraryViewModel: ObservableObject {
             let results = await workTask.value
             guard !Task.isCancelled, !workTask.isCancelled else { return }
             searchResults = results
+            isSearchInProgress = false
         }
     }
 
@@ -4464,6 +4501,10 @@ final class CodeLibraryViewModel: ObservableObject {
         chapterBodyNSTextCache.removeAllObjects()
         bookmarkedSectionIDs.removeAll()
         searchTask?.cancel()
+        activeSearchWorkTask?.cancel()
+        searchTask = nil
+        activeSearchWorkTask = nil
+        isSearchInProgress = false
     }
 
     private static func formattedTextCacheKey(sectionID: Int64, theme: ReaderTheme) -> NSString {

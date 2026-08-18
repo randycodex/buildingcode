@@ -1010,7 +1010,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         return blocks
     }
 
-    func search(query: String, codeSectionID: Int64? = nil) -> [CodeSearchResult] {
+    func search(
+        query: String,
+        codeSectionID: Int64? = nil,
+        includeSnippets: Bool = true,
+        resultLimit: Int = 200
+    ) -> [CodeSearchResult] {
         let signpostID = OSSignpostID(log: AppSignpost.search)
         os_signpost(.begin, log: AppSignpost.search, name: "search", signpostID: signpostID)
         defer { os_signpost(.end, log: AppSignpost.search, name: "search", signpostID: signpostID) }
@@ -1079,7 +1084,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 return lhs.indexed.chapter.chapterNumber.compare(rhs.indexed.chapter.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
             }
 
-        return hits.prefix(200).map { hit in
+        return hits.prefix(max(1, resultLimit)).map { hit in
             let indexed = hit.indexed
             return CodeSearchResult(
                 id: indexed.section.id,
@@ -1087,7 +1092,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 chapterNumber: indexed.chapter.chapterNumber,
                 sectionNumber: indexed.section.sectionNumber,
                 title: indexed.section.title,
-                snippet: Self.snippet(in: officialText(for: indexed), query: trimmed),
+                snippet: includeSnippets
+                    ? Self.snippet(in: officialText(for: indexed), query: trimmed)
+                    : "",
                 kind: indexed.section.kind
             )
         }

@@ -38,10 +38,9 @@ struct SearchView: View {
     @State private var cachedGroupedResults: [SearchResultGroup] = []
     @State private var cachedJumpBackInPages: [JumpBackInPage] = []
     @State private var jumpBackInPageIndex: Int = 0
-    @State private var didSeedCurrentCodeFilter = false
+    @State private var isSearchRequestPending = false
     @FocusState private var isSearchFieldFocused: Bool
 
-    private static let filterCodeSectionIDsDefaultsKey = "SearchView.filterCodeSectionIDs"
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let tabBarClearance: CGFloat = CodeScreenMetrics.searchTabBarClearance
     private let jumpBackInPageSize = CodeScreenMetrics.tileGridPageSize
@@ -65,13 +64,11 @@ struct SearchView: View {
     }
 
     private var searchTaskID: String {
-        "\(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(query)"
+        "\(library.selectedVersionFileName):\(library.selectedCodeSectionID ?? 0):\(library.isInitialContentLoaded):\(query)"
     }
 
     init() {
-        _searchFilterCodeSectionIDs = State(
-            initialValue: FilterIDsStorage.load(key: Self.filterCodeSectionIDsDefaultsKey)
-        )
+        _searchFilterCodeSectionIDs = State(initialValue: [])
     }
 
     var body: some View {
@@ -88,6 +85,8 @@ struct SearchView: View {
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         emptyQueryHistorySection
+                    } else if isSearchRequestPending || library.isSearchInProgress {
+                        searchLoadingState
                     } else if cachedFilteredResults.isEmpty {
                         noResultsState
                     } else if showsGroupedSearchResults {
@@ -150,7 +149,6 @@ struct SearchView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                seedCurrentCodeFilterIfNeeded()
                 rebuildSearchCaches()
                 rebuildJumpBackInCache()
                 if library.pendingDeepLinkedSectionID != nil {
@@ -158,8 +156,7 @@ struct SearchView: View {
                     return
                 }
             }
-            .onChange(of: searchFilterCodeSectionIDs) { _, newValue in
-                FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
+            .onChange(of: searchFilterCodeSectionIDs) { _, _ in
                 rebuildSearchCaches()
             }
             .onChange(of: library.searchResults) { _, _ in
@@ -185,6 +182,7 @@ struct SearchView: View {
             .task(id: searchTaskID) {
                 let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmedQuery.isEmpty else {
+                    isSearchRequestPending = false
                     // Only reset results if there's anything to clear —
                     // avoids cancelling an unrelated in-flight search task
                     // on initial appear.
@@ -194,12 +192,22 @@ struct SearchView: View {
                     return
                 }
 
+                isSearchRequestPending = true
+                guard library.isInitialContentLoaded else {
+                    // Cancel any search tied to content that is still being
+                    // replaced. The task identity includes readiness, so the
+                    // same query runs automatically once loading completes.
+                    library.search(query: "")
+                    return
+                }
+
                 try? await Task.sleep(for: .milliseconds(250))
                 guard !Task.isCancelled else { return }
                 library.search(
                     query: query,
                     restrictToSelectedCodeSection: library.isZoningResolutionSelected
                 )
+                isSearchRequestPending = false
             }
             .navigationDestination(for: SearchReaderRoute.self) { route in
                 SearchChapterReaderDestination(route: route)
@@ -330,6 +338,20 @@ struct SearchView: View {
         .padding(.top, 96)
     }
 
+    private var searchLoadingState: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .tint(accentColor)
+
+            Text(library.isInitialContentLoaded ? "Searching codes…" : "Loading codes…")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 112)
+        .accessibilityElement(children: .combine)
+    }
+
     private var resultCountLabel: String {
         let count = cachedFilteredResults.count
         return "\(count) \(count == 1 ? "result" : "results") in \(activeSearchScopeName)"
@@ -352,14 +374,6 @@ struct SearchView: View {
     private var noResultsGuidance: String {
         let base = "Nothing matched in \(activeSearchScopeName). Try a shorter phrase or a section number"
         return library.isZoningResolutionSelected ? "\(base)." : "\(base), or search all codes."
-    }
-
-    private func seedCurrentCodeFilterIfNeeded() {
-        guard !didSeedCurrentCodeFilter else { return }
-        didSeedCurrentCodeFilter = true
-        guard searchFilterCodeSectionIDs.isEmpty,
-              let selectedCodeSectionID = library.selectedCodeSectionID else { return }
-        searchFilterCodeSectionIDs = [selectedCodeSectionID]
     }
 
     private func handleSearchTabRetap() {
@@ -824,8 +838,7 @@ struct SearchView: View {
             accent: resultAccent.opacity(0.24)
         )
         let showsSeparateTitle = !displayTitle.isEmpty
-            && !snippet.isEmpty
-            && displayTitle.caseInsensitiveCompare(snippet) != .orderedSame
+            && (snippet.isEmpty || displayTitle.caseInsensitiveCompare(snippet) != .orderedSame)
 
         return HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
