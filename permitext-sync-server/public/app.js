@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-reader-save-toggle-v354";
+} from "./offline-storage.js?v=20260817-hide-empty-projects-v355";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -26163,21 +26163,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
     const visibleProjects = visibleRecords.filter(folderIsProject);
     clear(list);
     list.classList.toggle("is-showing-archive", showingArchived);
-    if (!visibleProjects.length) {
-      if (!showingArchived) {
-        const empty = document.createElement("p");
-        empty.className = "saved-projects-empty";
-        empty.textContent = "No Projects yet. Use New to create one.";
-        list.append(empty);
-      }
-    }
-
-    if (visibleProjects.length && !visibleProjects.some(folderIsProject)) {
-      const emptyProjects = document.createElement("p");
-      emptyProjects.className = "saved-projects-empty";
-      emptyProjects.textContent = showingArchived ? "No archived Projects." : "No Projects yet.";
-      list.append(emptyProjects);
-    }
 
     let draggedProjectID = "";
     const clearDropIndicators = () => {
@@ -26360,8 +26345,8 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
       });
       list.append(tile);
     });
-    if (!showingArchived) {
-      const unassignedCount = unassignedSavedEvidenceKeys(savedItems, projectSections, projects).size;
+    const unassignedCount = unassignedSavedEvidenceKeys(savedItems, projectSections, projects).size;
+    if (!showingArchived && unassignedCount > 0) {
       const unassignedTile = document.createElement("article");
       unassignedTile.className = "saved-project-tile is-reference is-unassigned-saved";
       unassignedTile.tabIndex = 0;

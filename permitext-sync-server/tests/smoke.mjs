@@ -758,6 +758,8 @@ async function main() {
         savedTemplateSource.includes('class="saved-column-scroll"') &&
         savedTemplateSource.includes('class="saved-projects-section code-filter-menu saved-projects-menu"') &&
         savedTemplateSource.includes('class="saved-project-list"') &&
+        !workspaceScript.text.includes("No Projects yet. Use New to create one.") &&
+        workspaceScript.text.includes("if (!showingArchived && unassignedCount > 0) {") &&
         savedTemplateSource.includes('class="code-filter-menu-toggle saved-projects-menu-toggle"') &&
         !savedTemplateSource.includes('class="saved-project-pages"') &&
         !savedTemplateSource.includes('class="saved-project-page-dots"') &&
@@ -1445,7 +1447,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-reader-save-toggle-v354'),
+        webRoot.text.includes('/web/app.js?v=20260817-hide-empty-projects-v355'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
