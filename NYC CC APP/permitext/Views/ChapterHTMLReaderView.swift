@@ -310,6 +310,9 @@ struct ChapterHTMLReaderView: View {
                             debugReaderPresentation = .html
                             nativeReaderFallbackMessage = message
 #endif
+                        },
+                        onNativeOpenReference: { section in
+                            inlineReferenceDestination = section
                         }
                     )
                 } else if hasActivatedHTMLReader {

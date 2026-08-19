@@ -263,6 +263,8 @@ private struct TableBlockView: View {
 struct NativeReaderTableBlockView: View {
     let table: NativeReaderRuntimeTable
     let baseURL: URL?
+    var searchQuery: String = ""
+    var activeMatchIndex: Int? = nil
 
     var body: some View {
         switch table.renderingClassification {
@@ -272,7 +274,12 @@ struct NativeReaderTableBlockView: View {
             if let sourceHTML = table.sourceHTML {
                 ScrollView(.horizontal) {
                     TableHTMLView(
-                        html: TableHTMLRenderer.html(forRawFragment: sourceHTML, tableID: table.id),
+                        html: TableHTMLRenderer.html(
+                            forRawFragment: sourceHTML,
+                            tableID: table.id,
+                            searchQuery: searchQuery,
+                            activeMatchIndex: activeMatchIndex
+                        ),
                         tableID: table.id,
                         baseURL: baseURL
                     )
@@ -861,9 +868,19 @@ private final class TableHTMLDocumentCache {
 }
 
 private enum TableHTMLRenderer {
-    static func html(forRawFragment fragment: String, tableID: String) -> String {
-        TableHTMLDocumentCache.shared.document(
-            for: "raw|\(tableID)|\(fragment.count)"
+    static func html(
+        forRawFragment fragment: String,
+        tableID: String,
+        searchQuery: String = "",
+        activeMatchIndex: Int? = nil
+    ) -> String {
+        let normalizedSearchQuery = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        let encodedSearchQuery = (try? JSONEncoder().encode(normalizedSearchQuery))
+            .flatMap { String(data: $0, encoding: .utf8) }
+            ?? "\"\""
+        let activeIndex = activeMatchIndex ?? -1
+        return TableHTMLDocumentCache.shared.document(
+            for: "raw|\(tableID)|\(fragment.count)|\(normalizedSearchQuery)|\(activeIndex)"
         ) {
             let bodyHTML = fragment
                 .replacingOccurrences(of: "<ScrollTable", with: "<div class=\"scroll-table\"", options: .caseInsensitive)
@@ -923,6 +940,16 @@ private enum TableHTMLRenderer {
             th, td[style*="bold"], b, strong {
               font-weight: 700;
             }
+            mark.native-reader-search-match {
+              padding: 0;
+              border-radius: 2px;
+              background: rgba(255, 214, 10, 0.42);
+              color: inherit;
+            }
+            mark.native-reader-search-match.active {
+              outline: 2px solid #007aff;
+              background: rgba(255, 214, 10, 0.72);
+            }
             @media (prefers-color-scheme: dark) {
               body { color: #f2f2f7; }
               table {
@@ -970,6 +997,56 @@ private enum TableHTMLRenderer {
                   row.remove();
                 }
               });
+              const query = \(encodedSearchQuery);
+              const activeMatchIndex = \(activeIndex);
+              if (query) {
+                const nodes = [];
+                const walker = document.createTreeWalker(
+                  document.querySelector('.table-wrap'),
+                  NodeFilter.SHOW_TEXT,
+                  {
+                    acceptNode(node) {
+                      const parent = node.parentElement;
+                      if (!parent || ['SCRIPT', 'STYLE', 'MARK'].includes(parent.tagName)) {
+                        return NodeFilter.FILTER_REJECT;
+                      }
+                      return node.nodeValue.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+                        ? NodeFilter.FILTER_ACCEPT
+                        : NodeFilter.FILTER_REJECT;
+                    }
+                  }
+                );
+                while (walker.nextNode()) nodes.push(walker.currentNode);
+
+                let matchNumber = 0;
+                nodes.forEach((node) => {
+                  const value = node.nodeValue;
+                  const lowerValue = value.toLocaleLowerCase();
+                  const lowerQuery = query.toLocaleLowerCase();
+                  const replacement = document.createDocumentFragment();
+                  let cursor = 0;
+                  let index = lowerValue.indexOf(lowerQuery, cursor);
+                  while (index >= 0) {
+                    if (index > cursor) replacement.append(value.slice(cursor, index));
+                    const mark = document.createElement('mark');
+                    mark.className = 'native-reader-search-match';
+                    if (matchNumber === activeMatchIndex) mark.classList.add('active');
+                    mark.textContent = value.slice(index, index + query.length);
+                    replacement.append(mark);
+                    matchNumber += 1;
+                    cursor = index + query.length;
+                    index = lowerValue.indexOf(lowerQuery, cursor);
+                  }
+                  if (cursor < value.length) replacement.append(value.slice(cursor));
+                  node.replaceWith(replacement);
+                });
+
+                const active = document.querySelector('mark.native-reader-search-match.active');
+                const wrapper = active?.closest('.table-wrap, .scroll-table, .xsl-table');
+                if (active && wrapper) {
+                  wrapper.scrollLeft = Math.max(0, active.offsetLeft - (wrapper.clientWidth / 2));
+                }
+              }
             })();
           </script>
         </body>

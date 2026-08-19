@@ -12,6 +12,7 @@ struct ChapterReaderView: View {
     var rememberedNativeBlockID: Binding<String?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
     var onNativeFallbackToHTML: ((String) -> Void)? = nil
+    var onNativeOpenReference: ((CodeSectionSummary) -> Void)? = nil
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var blocks: [CodeLibraryViewModel.ChapterReaderBlockSummary] = []
@@ -85,12 +86,15 @@ struct ChapterReaderView: View {
             if let nativeDocumentRoute {
                 NativeChapterTextReaderView(
                     chapter: chapter,
+                    initialSectionID: initialSectionID,
                     initialSectionNumber: initialSectionNumber ?? "",
                     initialAnchorID: initialAnchorID,
                     route: nativeDocumentRoute,
+                    rememberedSectionID: rememberedSectionID,
                     rememberedBlockID: rememberedNativeBlockID,
                     rememberedAnchorID: rememberedAnchorID,
-                    onFallbackToHTML: onNativeFallbackToHTML
+                    onFallbackToHTML: onNativeFallbackToHTML,
+                    onOpenReference: onNativeOpenReference
                 )
             } else {
                 ScrollViewReader { proxy in

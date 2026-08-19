@@ -3,22 +3,34 @@ import UIKit
 
 struct NativeChapterTextReaderView: View {
     let chapter: CodeChapter
+    let initialSectionID: Int64
     let initialSectionNumber: String
     let initialAnchorID: String?
     let route: NativeReaderDocumentRoute
+    var rememberedSectionID: Binding<Int64?> = .constant(nil)
     var rememberedBlockID: Binding<String?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
     var onFallbackToHTML: ((String) -> Void)?
+    var onOpenReference: ((CodeSectionSummary) -> Void)?
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openURL) private var openURL
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var document: NativeReaderRuntimeDocument?
     @State private var displayBlocks: [NativeReaderDisplayBlock] = []
+    @State private var sectionTargets: [NativeReaderSectionTarget] = []
     @State private var visibleBlockID: String?
+    @State private var currentSectionTargetID: String?
     @State private var pendingInitialBlockID: String?
     @State private var failureMessage: String?
     @State private var hasRequestedFallback = false
     @State private var expandedMedia: NativeReaderExpandedMedia?
+    @State private var isJumpPickerPresented = false
+    @State private var isSearchPresented = false
+    @State private var searchQuery = ""
+    @State private var searchMatches: [NativeReaderSearchMatch] = []
+    @State private var activeSearchMatchID: String?
+    @State private var lastRecordedSectionTargetID: String?
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -72,6 +84,16 @@ struct NativeChapterTextReaderView: View {
                         },
                         onMediaFailure: { message in
                             requestFallbackToHTML(message)
+                        },
+                        searchQuery: searchQuery,
+                        searchMatches: searchMatches.filter { $0.blockID == displayBlock.id },
+                        activeSearchMatchID: activeSearchMatchID,
+                        onResearchSelection: { selectedText in
+                            sendSelectionToResearch(
+                                selectedText,
+                                sourceBlockID: displayBlock.sourceBlockID,
+                                document: document
+                            )
                         }
                     )
                     .id(displayBlock.id)
@@ -87,8 +109,52 @@ struct NativeChapterTextReaderView: View {
             guard pendingInitialBlockID == nil else { return }
             persistLocation(blockID: newValue, document: document)
         }
+        .onChange(of: searchQuery) { _, query in
+            searchMatches = NativeReaderSearchIndex.matches(query: query, in: displayBlocks)
+            if !searchMatches.contains(where: { $0.id == activeSearchMatchID }) {
+                activeSearchMatchID = searchMatches.first?.id
+            }
+        }
         .task(id: pendingInitialBlockID) {
             await restoreInitialPosition(document: document, proxy: proxy)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            VStack(spacing: 0) {
+                if !searchMatches.isEmpty {
+                    searchNavigator(proxy: proxy, document: document)
+                }
+                jumpBar
+            }
+            .background(Color(uiColor: .systemGroupedBackground))
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isSearchPresented = true
+                } label: {
+                    Image(systemName: "text.page.badge.magnifyingglass")
+                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        .background(Color(uiColor: .systemBackground))
+                        .clipShape(Capsule(style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Search this chapter")
+            }
+        }
+        .sheet(isPresented: $isJumpPickerPresented) {
+            jumpPicker(proxy: proxy, document: document)
+        }
+        .fullScreenCover(isPresented: $isSearchPresented) {
+            NativeReaderSearchSheet(
+                title: chapter.displayLabel,
+                blocks: displayBlocks,
+                query: $searchQuery,
+                activeMatchID: activeSearchMatchID,
+                onSelect: { match in
+                    activateSearchMatch(match, proxy: proxy, document: document)
+                }
+            )
         }
         .overlay(alignment: .top) {
             CodeTopContentFade(alwaysVisible: true)
@@ -112,11 +178,17 @@ struct NativeChapterTextReaderView: View {
     private func loadDocument() async {
         document = nil
         displayBlocks = []
+        sectionTargets = []
         pendingInitialBlockID = nil
         visibleBlockID = nil
+        currentSectionTargetID = nil
         failureMessage = nil
         hasRequestedFallback = false
         expandedMedia = nil
+        searchQuery = ""
+        searchMatches = []
+        activeSearchMatchID = nil
+        lastRecordedSectionTargetID = nil
 
         do {
             let loaded = try await NativeReaderDocumentStore.shared.loadDocument(for: route)
@@ -128,7 +200,12 @@ struct NativeChapterTextReaderView: View {
                 initialAnchorID: initialAnchorID,
                 initialSectionNumber: initialSectionNumber
             )
-            displayBlocks = NativeReaderDisplayBlock.blocks(from: loaded.blocks)
+            let loadedDisplayBlocks = NativeReaderDisplayBlock.blocks(from: loaded.blocks)
+            displayBlocks = loadedDisplayBlocks
+            sectionTargets = NativeReaderSectionNavigator.targets(
+                in: loaded,
+                displayBlocks: loadedDisplayBlocks
+            )
             document = loaded
             persistLocation(blockID: initialBlockID, document: loaded)
             guard initialBlockID != loaded.blocks.first?.id else {
@@ -185,6 +262,7 @@ struct NativeChapterTextReaderView: View {
            rememberedAnchorID.wrappedValue != anchorID {
             rememberedAnchorID.wrappedValue = anchorID
         }
+        updateCurrentSection(blockID: blockID, document: document)
     }
 
     private func handleLink(
@@ -194,15 +272,265 @@ struct NativeChapterTextReaderView: View {
     ) {
         if let fragment = url.fragment?.removingPercentEncoding,
            let blockID = NativeReaderLocationResolver.blockID(forAnchorID: fragment, in: document) {
-            visibleBlockID = blockID
-            persistLocation(blockID: blockID, document: document)
-            withAnimation(.easeInOut(duration: 0.2)) {
-                proxy.scrollTo(blockID, anchor: .top)
-            }
+            scroll(to: blockID, proxy: proxy, document: document)
+            return
+        }
+        if let reference = NativeReaderLinkResolver.reference(for: url),
+           let destination = resolvedReference(reference) {
+            onOpenReference?(destination)
             return
         }
         guard url.scheme != nil else { return }
         openURL(url)
+    }
+
+    private var currentSectionTarget: NativeReaderSectionTarget? {
+        sectionTargets.first(where: { $0.id == currentSectionTargetID }) ?? sectionTargets.first
+    }
+
+    private var jumpBar: some View {
+        Button {
+            isJumpPickerPresented = true
+        } label: {
+            HStack(spacing: 8) {
+                Text(currentSectionTarget?.menuLabel ?? chapter.displayLabel)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: "chevron.down")
+                    .font(.caption2.weight(.semibold))
+            }
+            .font(.subheadline.weight(.medium))
+            .foregroundStyle(accentColor)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 11)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(sectionTargets.isEmpty)
+        .accessibilityLabel("Jump within chapter")
+        .accessibilityValue(currentSectionTarget?.menuLabel ?? chapter.displayLabel)
+        .padding(.horizontal, 16)
+        .padding(.top, 6)
+        .padding(.bottom, 8)
+    }
+
+    private func jumpPicker(
+        proxy: ScrollViewProxy,
+        document: NativeReaderRuntimeDocument
+    ) -> some View {
+        NavigationStack {
+            List(sectionTargets) { target in
+                Button {
+                    isJumpPickerPresented = false
+                    scroll(to: target.blockID, proxy: proxy, document: document)
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        Image(systemName: target.id == currentSectionTargetID ? "checkmark.circle.fill" : "circle")
+                            .foregroundStyle(target.id == currentSectionTargetID ? accentColor : .secondary)
+                            .accessibilityHidden(true)
+                        Text(target.menuLabel)
+                            .font(target.level <= 2 ? .body.weight(.semibold) : .callout.weight(.medium))
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .padding(.leading, target.menuIndent)
+                    .padding(.vertical, target.level <= 2 ? 6 : 3)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(target.menuLabel)
+                .accessibilityValue(target.id == currentSectionTargetID ? "Current section" : "")
+            }
+            .navigationTitle("Jump within chapter")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { isJumpPickerPresented = false }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func searchNavigator(
+        proxy: ScrollViewProxy,
+        document: NativeReaderRuntimeDocument
+    ) -> some View {
+        let activeIndex = searchMatches.firstIndex(where: { $0.id == activeSearchMatchID }) ?? 0
+        return HStack(spacing: 14) {
+            Button {
+                activateSearchMatch(
+                    searchMatches[(activeIndex - 1 + searchMatches.count) % searchMatches.count],
+                    proxy: proxy,
+                    document: document
+                )
+            } label: {
+                Image(systemName: "chevron.up")
+            }
+            .accessibilityLabel("Previous match")
+
+            Text("\(activeIndex + 1) of \(searchMatches.count)")
+                .font(.subheadline.monospacedDigit().weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .accessibilityLabel("Search match \(activeIndex + 1) of \(searchMatches.count)")
+
+            Button {
+                activateSearchMatch(
+                    searchMatches[(activeIndex + 1) % searchMatches.count],
+                    proxy: proxy,
+                    document: document
+                )
+            } label: {
+                Image(systemName: "chevron.down")
+            }
+            .accessibilityLabel("Next match")
+
+            Button {
+                searchQuery = ""
+                searchMatches = []
+                activeSearchMatchID = nil
+            } label: {
+                Image(systemName: "xmark")
+            }
+            .accessibilityLabel("Clear chapter search")
+        }
+        .font(.body.weight(.semibold))
+        .foregroundStyle(accentColor)
+        .padding(.horizontal, 22)
+        .padding(.vertical, 10)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+    }
+
+    private func activateSearchMatch(
+        _ match: NativeReaderSearchMatch,
+        proxy: ScrollViewProxy,
+        document: NativeReaderRuntimeDocument
+    ) {
+        activeSearchMatchID = match.id
+        scroll(to: match.blockID, proxy: proxy, document: document)
+    }
+
+    private func scroll(
+        to blockID: String,
+        proxy: ScrollViewProxy,
+        document: NativeReaderRuntimeDocument
+    ) {
+        visibleBlockID = blockID
+        persistLocation(blockID: blockID, document: document)
+        if reduceMotion {
+            proxy.scrollTo(blockID, anchor: .top)
+        } else {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                proxy.scrollTo(blockID, anchor: .top)
+            }
+        }
+    }
+
+    private func updateCurrentSection(
+        blockID: String,
+        document: NativeReaderRuntimeDocument
+    ) {
+        guard let target = NativeReaderSectionNavigator.target(
+            forDisplayBlockID: blockID,
+            in: document,
+            targets: sectionTargets
+        ) else { return }
+        if currentSectionTargetID != target.id {
+            currentSectionTargetID = target.id
+        }
+
+        if let summary = sectionSummary(for: target),
+           rememberedSectionID.wrappedValue != summary.id {
+            rememberedSectionID.wrappedValue = summary.id
+        }
+        guard lastRecordedSectionTargetID != target.id else { return }
+        lastRecordedSectionTargetID = target.id
+        if let sectionNumber = target.sectionNumber, !sectionNumber.isEmpty {
+            library.noteSectionOpened(
+                anchor: PublishedHTMLAnchor(
+                    sectionNumber: sectionNumber,
+                    title: target.title,
+                    anchorID: target.anchorID ?? target.blockID,
+                    level: target.level
+                ),
+                chapter: chapter
+            )
+        }
+    }
+
+    private func sendSelectionToResearch(
+        _ selectedText: String,
+        sourceBlockID: String,
+        document: NativeReaderRuntimeDocument
+    ) {
+        let normalized = selectedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalized.isEmpty else { return }
+        let target = NativeReaderSectionNavigator.target(
+            forSourceBlockID: sourceBlockID,
+            in: document,
+            targets: sectionTargets
+        )
+        let sectionID = target.flatMap(sectionSummary(for:))?.id
+            ?? rememberedSectionID.wrappedValue
+            ?? initialSectionID
+        library.sendToResearch(
+            ResearchSelectionRequest(
+                sectionID: String(sectionID),
+                selectedText: normalized
+            )
+        )
+    }
+
+    private func sectionSummary(for target: NativeReaderSectionTarget) -> CodeSectionSummary? {
+        guard let sectionNumber = target.sectionNumber else { return nil }
+        return library.sectionSummary(
+            sectionNumber: sectionNumber,
+            codeSectionID: chapter.codeSectionID
+        )
+    }
+
+    private func resolvedReference(_ reference: NativeReaderReference) -> CodeSectionSummary? {
+        let targetCodeSectionID = reference.codePrefix
+            .flatMap(codeSectionID(for:))
+            ?? chapter.codeSectionID
+
+        switch reference.kind {
+        case .section:
+            for candidate in reference.sectionNumberCandidates {
+                if let section = library.sectionSummary(
+                    sectionNumber: candidate,
+                    codeSectionID: targetCodeSectionID
+                ) {
+                    return section
+                }
+            }
+            return nil
+        case .chapter, .appendix:
+            guard let targetCodeSectionID,
+                  let targetChapter = library.chapters(for: targetCodeSectionID).first(where: {
+                      $0.chapterNumber.caseInsensitiveCompare(reference.token) == .orderedSame
+                  }) else { return nil }
+            return library.sections(for: targetChapter).first
+        }
+    }
+
+    private func codeSectionID(for prefix: String) -> Int64? {
+        let normalizedPrefix = prefix.uppercased()
+        return library.codeSections.first { codeSection in
+            let name = codeSection.name.lowercased()
+            switch normalizedPrefix {
+            case "BC": return name.contains("building") && !name.contains("existing")
+            case "EBC": return name.contains("existing building")
+            case "PC": return name.contains("plumbing")
+            case "MC": return name.contains("mechanical")
+            case "FGC": return name.contains("fuel gas")
+            case "AC": return name.contains("administrative")
+            case "FC": return name.contains("fire code")
+            case "ZR": return name.contains("zoning")
+            default: return false
+            }
+        }?.id
     }
 }
 
@@ -342,6 +670,391 @@ struct NativeReaderDisplayBlock: Identifiable, Equatable {
     }
 }
 
+struct NativeReaderSectionTarget: Identifiable, Hashable {
+    let id: String
+    let blockID: String
+    let sourceBlockID: String
+    let sourceOrder: Int
+    let sectionNumber: String?
+    let title: String
+    let anchorID: String?
+    let level: Int
+
+    var menuLabel: String {
+        title.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var menuIndent: CGFloat {
+        CGFloat(min(max(level - 2, 0), 3)) * 14
+    }
+}
+
+enum NativeReaderSectionNavigator {
+    static func targets(
+        in document: NativeReaderRuntimeDocument,
+        displayBlocks: [NativeReaderDisplayBlock]
+    ) -> [NativeReaderSectionTarget] {
+        let displayIDBySourceID = Dictionary(
+            displayBlocks.map { ($0.sourceBlockID, $0.id) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        let headingTargets = document.blocks.compactMap { block -> NativeReaderSectionTarget? in
+            guard block.kind == .heading,
+                  let displayBlockID = displayIDBySourceID[block.id] else { return nil }
+            let anchor = block.anchorIDs.first
+                ?? document.anchors.first(where: { $0.blockID == block.id })?.id
+            return NativeReaderSectionTarget(
+                id: block.id,
+                blockID: displayBlockID,
+                sourceBlockID: block.id,
+                sourceOrder: block.sourceOrder,
+                sectionNumber: sectionNumber(from: block.plainText, anchorID: anchor),
+                title: block.plainText,
+                anchorID: anchor,
+                level: min(max(block.headingLevel ?? 3, 1), 6)
+            )
+        }
+        guard headingTargets.isEmpty,
+              let firstDisplayBlock = displayBlocks.first,
+              let firstSourceBlock = document.blocks.first else {
+            return headingTargets
+        }
+        return [
+            NativeReaderSectionTarget(
+                id: firstSourceBlock.id,
+                blockID: firstDisplayBlock.id,
+                sourceBlockID: firstSourceBlock.id,
+                sourceOrder: firstSourceBlock.sourceOrder,
+                sectionNumber: document.metadata.chapterNumber,
+                title: document.metadata.chapterTitle ?? document.metadata.chapterIdentifier,
+                anchorID: document.anchors.first?.id,
+                level: 1
+            )
+        ]
+    }
+
+    static func target(
+        forDisplayBlockID blockID: String,
+        in document: NativeReaderRuntimeDocument,
+        targets: [NativeReaderSectionTarget]
+    ) -> NativeReaderSectionTarget? {
+        guard let sourceBlockID = NativeReaderDisplayBlock.sourceBlockID(for: blockID, in: document) else {
+            return nil
+        }
+        return target(forSourceBlockID: sourceBlockID, in: document, targets: targets)
+    }
+
+    static func target(
+        forSourceBlockID sourceBlockID: String,
+        in document: NativeReaderRuntimeDocument,
+        targets: [NativeReaderSectionTarget]
+    ) -> NativeReaderSectionTarget? {
+        guard let sourceOrder = document.blocks.first(where: { $0.id == sourceBlockID })?.sourceOrder else {
+            return nil
+        }
+        return targets.last(where: { $0.sourceOrder <= sourceOrder }) ?? targets.first
+    }
+
+    static func sectionNumber(from heading: String, anchorID: String?) -> String? {
+        let headingPattern = #"(?i)^\s*(?:(?:SECTION|ARTICLE|PART)\s+)?(?:(?:EBC|FGC|BC|PC|MC|AC|FC|ZR)\s+)?([A-Z]?\d+(?:[.\-]\d+)*(?:\([A-Za-z0-9]+\))?)\b"#
+        if let token = firstCapture(in: heading, pattern: headingPattern) {
+            return token.uppercased()
+        }
+        if let anchorID,
+           let referenceURL = NativeReaderLinkResolver.fragmentURL(anchorID),
+           let reference = NativeReaderLinkResolver.reference(for: referenceURL),
+           reference.kind == .section {
+            return reference.token
+        }
+        return nil
+    }
+
+    private static func firstCapture(in value: String, pattern: String) -> String? {
+        guard let expression = try? NSRegularExpression(pattern: pattern),
+              let match = expression.firstMatch(
+                  in: value,
+                  range: NSRange(location: 0, length: value.utf16.count)
+              ),
+              let range = Range(match.range(at: 1), in: value) else { return nil }
+        return String(value[range])
+    }
+}
+
+struct NativeReaderSearchMatch: Identifiable, Hashable {
+    let id: String
+    let blockID: String
+    let sourceBlockID: String
+    let range: NSRange
+    let snippet: String
+}
+
+enum NativeReaderSearchIndex {
+    static func matches(
+        query: String,
+        in blocks: [NativeReaderDisplayBlock]
+    ) -> [NativeReaderSearchMatch] {
+        let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedQuery.isEmpty else { return [] }
+
+        return blocks.flatMap { displayBlock in
+            let searchableText = searchableText(for: displayBlock.block)
+            return ranges(of: normalizedQuery, in: searchableText).map { range in
+                NativeReaderSearchMatch(
+                    id: "\(displayBlock.id):\(range.location):\(range.length)",
+                    blockID: displayBlock.id,
+                    sourceBlockID: displayBlock.sourceBlockID,
+                    range: range,
+                    snippet: snippet(in: searchableText, around: range)
+                )
+            }
+        }
+    }
+
+    static func ranges(of query: String, in text: String) -> [NSRange] {
+        let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let source = text as NSString
+        guard !normalizedQuery.isEmpty, source.length > 0 else { return [] }
+
+        var ranges: [NSRange] = []
+        var searchRange = NSRange(location: 0, length: source.length)
+        while searchRange.length > 0 {
+            let match = source.range(
+                of: normalizedQuery,
+                options: [.caseInsensitive, .diacriticInsensitive],
+                range: searchRange
+            )
+            guard match.location != NSNotFound, match.length > 0 else { break }
+            ranges.append(match)
+            let nextLocation = match.location + match.length
+            guard nextLocation < source.length else { break }
+            searchRange = NSRange(location: nextLocation, length: source.length - nextLocation)
+        }
+        return ranges
+    }
+
+    static func searchableText(for block: NativeReaderRuntimeBlock) -> String {
+        switch block.kind {
+        case .orderedList, .unorderedList:
+            return block.listItems.flatMap(flatten).map(\.plainText).joined(separator: "\n")
+        case .table:
+            guard let table = block.table else { return block.plainText }
+            return ([table.caption].compactMap { $0 }
+                + table.cells.map(\.plainText)
+                + table.footnotes)
+                .joined(separator: "\n")
+        case .image, .figure:
+            return (block.media.flatMap { [$0.accessibilityText, $0.caption].compactMap { $0 } }
+                + [block.caption].compactMap { $0 })
+                .joined(separator: "\n")
+        default:
+            return block.plainText
+        }
+    }
+
+    private static func flatten(_ item: NativeReaderRuntimeListItem) -> [NativeReaderRuntimeListItem] {
+        [item] + item.children.flatMap(flatten)
+    }
+
+    private static func snippet(in text: String, around range: NSRange) -> String {
+        let source = text as NSString
+        let start = max(0, range.location - 48)
+        let end = min(source.length, range.location + range.length + 72)
+        let fragment = source.substring(with: NSRange(location: start, length: end - start))
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return "\(start > 0 ? "…" : "")\(fragment)\(end < source.length ? "…" : "")"
+    }
+}
+
+private struct NativeReaderSearchSheet: View {
+    let title: String
+    let blocks: [NativeReaderDisplayBlock]
+    @Binding var query: String
+    let activeMatchID: String?
+    let onSelect: (NativeReaderSearchMatch) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @FocusState private var isSearchFocused: Bool
+
+    private var matches: [NativeReaderSearchMatch] {
+        NativeReaderSearchIndex.matches(query: query, in: blocks)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                HStack(spacing: 10) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    TextField("Search this chapter", text: $query)
+                        .font(.title3)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .submitLabel(.search)
+                        .focused($isSearchFocused)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .background(Color(uiColor: .secondarySystemBackground))
+                .clipShape(Capsule(style: .continuous))
+
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.title2.weight(.medium))
+                        .frame(width: 54, height: 54)
+                        .background(Color(uiColor: .secondarySystemBackground))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close search")
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 14)
+
+            Divider()
+
+            if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                ContentUnavailableView(
+                    "Search \(title)",
+                    systemImage: "text.page.badge.magnifyingglass",
+                    description: Text("Enter enacted text, a section number, or a phrase.")
+                )
+            } else if matches.isEmpty {
+                ContentUnavailableView.search(text: query)
+            } else {
+                List(matches) { match in
+                    Button {
+                        onSelect(match)
+                        dismiss()
+                    } label: {
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: match.id == activeMatchID ? "checkmark.circle.fill" : "text.magnifyingglass")
+                                .foregroundStyle(match.id == activeMatchID ? Color.accentColor : Color.secondary)
+                            Text(match.snippet)
+                                .font(.body)
+                                .foregroundStyle(.primary)
+                                .multilineTextAlignment(.leading)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(match.snippet)
+                    .accessibilityValue(match.id == activeMatchID ? "Current match" : "")
+                }
+                .listStyle(.plain)
+            }
+        }
+        .background(Color(uiColor: .systemBackground))
+        .onAppear { isSearchFocused = true }
+    }
+}
+
+enum NativeReaderReferenceKind: String, Hashable {
+    case section
+    case chapter
+    case appendix
+}
+
+struct NativeReaderReference: Hashable {
+    let kind: NativeReaderReferenceKind
+    let codePrefix: String?
+    let token: String
+
+    var sectionNumberCandidates: [String] {
+        guard kind == .section else { return [] }
+        var candidates = [token]
+        let withoutParenthetical = token.replacingOccurrences(
+            of: #"\([^)]*\)$"#,
+            with: "",
+            options: .regularExpression
+        )
+        if withoutParenthetical != token {
+            candidates.append(withoutParenthetical)
+        }
+        return candidates
+    }
+}
+
+enum NativeReaderLinkResolver {
+    private static let hashExpression = try! NSRegularExpression(
+        pattern: #"(?i)hash\s*:\s*['\"]#([^'\"]+)"#
+    )
+
+    static func linkURL(for rawTarget: String) -> URL? {
+        let target = rawTarget
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !target.isEmpty else { return nil }
+        let range = NSRange(location: 0, length: target.utf16.count)
+        if let match = hashExpression.firstMatch(in: target, range: range),
+           let fragmentRange = Range(match.range(at: 1), in: target) {
+            return fragmentURL(String(target[fragmentRange]))
+        }
+        return URL(string: target)
+    }
+
+    static func fragmentURL(_ fragment: String) -> URL? {
+        var components = URLComponents()
+        components.fragment = fragment.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+        return components.url
+    }
+
+    static func reference(for url: URL) -> NativeReaderReference? {
+        guard var fragment = url.fragment?.removingPercentEncoding,
+              !fragment.isEmpty else { return nil }
+        fragment = fragment.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+        if fragment.uppercased().hasPrefix("JD_") {
+            fragment.removeFirst(3)
+        }
+
+        var codePrefix: String?
+        for prefix in ["FGC", "EBC", "BC", "PC", "MC", "AC", "FC", "ZR"] {
+            if fragment.uppercased().hasPrefix(prefix) {
+                codePrefix = prefix
+                fragment.removeFirst(prefix.count)
+                break
+            }
+        }
+        if codePrefix == nil, fragment.hasPrefix("28-") {
+            codePrefix = "AC"
+        }
+
+        if let token = firstCapture(in: fragment, pattern: #"(?i)^(?:CH(?:APTER)?\.?)\s*([A-Z0-9-]+)"#) {
+            return NativeReaderReference(kind: .chapter, codePrefix: codePrefix, token: token.uppercased())
+        }
+        if let token = firstCapture(in: fragment, pattern: #"(?i)^APP(?:ENDIX)?\.?\s*([A-Z0-9-]+)"#) {
+            return NativeReaderReference(kind: .appendix, codePrefix: codePrefix, token: token.uppercased())
+        }
+
+        let stripped = fragment.replacingOccurrences(
+            of: #"(?i)^(?:TABLE|FIGURE|SECTION)\s*"#,
+            with: "",
+            options: .regularExpression
+        )
+        guard let token = firstCapture(
+            in: stripped,
+            pattern: #"^([A-Z]?\d+(?:[.\-]\d+)*(?:\([A-Za-z0-9]+\))?)"#
+        ) else { return nil }
+        return NativeReaderReference(
+            kind: .section,
+            codePrefix: codePrefix,
+            token: token.uppercased()
+        )
+    }
+
+    private static func firstCapture(in value: String, pattern: String) -> String? {
+        guard let expression = try? NSRegularExpression(pattern: pattern),
+              let match = expression.firstMatch(
+                  in: value,
+                  range: NSRange(location: 0, length: value.utf16.count)
+              ),
+              let range = Range(match.range(at: 1), in: value) else { return nil }
+        return String(value[range])
+    }
+}
+
 enum NativeReaderLocationResolver {
     static func initialBlockID(
         in document: NativeReaderRuntimeDocument,
@@ -425,6 +1138,10 @@ private struct NativeReaderTextBlockView: View {
     let onOpenLink: (URL) -> Void
     let onOpenMedia: (NativeReaderRuntimeMedia, UIImage) -> Void
     let onMediaFailure: (String) -> Void
+    let searchQuery: String
+    let searchMatches: [NativeReaderSearchMatch]
+    let activeSearchMatchID: String?
+    let onResearchSelection: (String) -> Void
 
     var body: some View {
         Group {
@@ -439,7 +1156,9 @@ private struct NativeReaderTextBlockView: View {
                     ordered: block.kind == .orderedList,
                     theme: theme,
                     accentColor: accentColor,
-                    onOpenLink: onOpenLink
+                    onOpenLink: onOpenLink,
+                    searchQuery: searchQuery,
+                    onResearchSelection: onResearchSelection
                 )
             case .caption:
                 selectableText(role: .caption)
@@ -463,7 +1182,9 @@ private struct NativeReaderTextBlockView: View {
                 if let table = block.table {
                     NativeReaderTableBlockView(
                         table: table,
-                        baseURL: route.sourceURL.deletingLastPathComponent()
+                        baseURL: route.sourceURL.deletingLastPathComponent(),
+                        searchQuery: searchQuery,
+                        activeMatchIndex: searchMatches.firstIndex(where: { $0.id == activeSearchMatchID })
                     )
                     .containerRelativeFrame(.horizontal)
                 }
@@ -474,6 +1195,15 @@ private struct NativeReaderTextBlockView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.leading, block.kind == .heading ? 0 : hierarchyIndentation)
         .padding(.bottom, bottomSpacing)
+        .overlay {
+            if !searchMatches.isEmpty,
+               [.table, .image, .figure].contains(block.kind) {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Color(uiColor: accentColor), lineWidth: activeBlockMatch ? 2 : 1)
+                    .accessibilityHidden(true)
+            }
+        }
+        .accessibilityValue(searchMatches.isEmpty ? "" : "\(searchMatches.count) search matches")
     }
 
     @ViewBuilder
@@ -507,10 +1237,17 @@ private struct NativeReaderTextBlockView: View {
                 fallbackText: block.plainText,
                 theme: theme,
                 role: role,
-                accentColor: accentColor
+                accentColor: accentColor,
+                highlightRanges: searchMatches.map(\.range),
+                activeHighlightRange: searchMatches.first(where: { $0.id == activeSearchMatchID })?.range
             ),
-            onOpenLink: onOpenLink
+            onOpenLink: onOpenLink,
+            onResearchSelection: onResearchSelection
         )
+    }
+
+    private var activeBlockMatch: Bool {
+        searchMatches.contains(where: { $0.id == activeSearchMatchID })
     }
 
     private var bottomSpacing: CGFloat {
@@ -665,6 +1402,8 @@ private struct NativeReaderListBlockView: View {
     let theme: ReaderTheme
     let accentColor: UIColor
     let onOpenLink: (URL) -> Void
+    let searchQuery: String
+    let onResearchSelection: (String) -> Void
 
     private var rows: [NativeReaderListRow] {
         items.flatMap { NativeReaderListRow.flatten($0) }
@@ -684,9 +1423,14 @@ private struct NativeReaderListBlockView: View {
                             fallbackText: row.plainText,
                             theme: theme,
                             role: .body,
-                            accentColor: accentColor
+                            accentColor: accentColor,
+                            highlightRanges: NativeReaderSearchIndex.ranges(
+                                of: searchQuery,
+                                in: row.plainText
+                            )
                         ),
-                        onOpenLink: onOpenLink
+                        onOpenLink: onOpenLink,
+                        onResearchSelection: onResearchSelection
                     )
                 }
                 .padding(.leading, CGFloat(max(row.depth, 0)) * 18)
@@ -738,7 +1482,9 @@ enum NativeReaderAttributedTextBuilder {
         fallbackText: String,
         theme: ReaderTheme,
         role: NativeReaderTypographyRole,
-        accentColor: UIColor
+        accentColor: UIColor,
+        highlightRanges: [NSRange] = [],
+        activeHighlightRange: NSRange? = nil
     ) -> NSAttributedString {
         let effectiveRuns = runs.isEmpty
             ? [NativeReaderRuntimeTextRun(text: fallbackText, styles: [], linkTarget: nil)]
@@ -755,6 +1501,24 @@ enum NativeReaderAttributedTextBuilder {
                         accentColor: accentColor
                     )
                 )
+            )
+        }
+        for range in highlightRanges where NSMaxRange(range) <= result.length {
+            result.addAttribute(
+                .backgroundColor,
+                value: accentColor.withAlphaComponent(0.18),
+                range: range
+            )
+        }
+        if let activeHighlightRange,
+           NSMaxRange(activeHighlightRange) <= result.length {
+            result.addAttributes(
+                [
+                    .backgroundColor: accentColor.withAlphaComponent(0.38),
+                    .underlineColor: accentColor,
+                    .underlineStyle: NSUnderlineStyle.single.rawValue
+                ],
+                range: activeHighlightRange
             )
         }
         return result
@@ -788,7 +1552,7 @@ enum NativeReaderAttributedTextBuilder {
             attributes[.baselineOffset] = -3
         }
         if let target = run.linkTarget,
-           let linkURL = URL(string: target.trimmingCharacters(in: .whitespacesAndNewlines)) {
+           let linkURL = NativeReaderLinkResolver.linkURL(for: target) {
             attributes[.link] = linkURL
             attributes[.foregroundColor] = accentColor
             attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue

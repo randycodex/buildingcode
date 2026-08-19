@@ -3131,4 +3131,127 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         let displayBlocks = NativeReaderDisplayBlock.blocks(from: [nestedHeading, nestedParagraph])
         XCTAssertEqual(displayBlocks.map(\.hierarchyIndentation), [24, 24])
     }
+
+    func testPhaseSixSearchIndexFindsOrderedCaseInsensitiveMatches() {
+        let paragraph = NativeReaderRuntimeBlock(
+            id: "search-paragraph",
+            kind: .paragraph,
+            sourceOrder: 4,
+            sectionID: "section-101",
+            anchorIDs: ["JD_BC101"],
+            plainText: "General requirements. A GENERAL rule remains generally applicable.",
+            runs: [],
+            headingLevel: nil,
+            listItems: []
+        )
+        let displayBlocks = NativeReaderDisplayBlock.blocks(from: [paragraph])
+
+        let matches = NativeReaderSearchIndex.matches(query: "general", in: displayBlocks)
+
+        XCTAssertEqual(matches.count, 3)
+        XCTAssertEqual(matches.map(\.blockID), Array(repeating: "search-paragraph", count: 3))
+        XCTAssertEqual(matches.map(\.range.location), matches.map(\.range.location).sorted())
+        XCTAssertTrue(matches.allSatisfy { $0.snippet.localizedCaseInsensitiveContains("general") })
+        XCTAssertTrue(NativeReaderSearchIndex.matches(query: "   ", in: displayBlocks).isEmpty)
+    }
+
+    func testPhaseSixSearchHighlightsActiveMatchWithoutLosingText() throws {
+        let source = "Scope and scope"
+        let ranges = NativeReaderSearchIndex.ranges(of: "scope", in: source)
+        let text = NativeReaderAttributedTextBuilder.attributedText(
+            runs: [NativeReaderRuntimeTextRun(text: source, styles: [.bold], linkTarget: nil)],
+            fallbackText: "",
+            theme: .default,
+            role: .body,
+            accentColor: .systemTeal,
+            highlightRanges: ranges,
+            activeHighlightRange: ranges.last
+        )
+
+        XCTAssertEqual(text.string, source)
+        XCTAssertEqual(ranges.count, 2)
+        XCTAssertNotNil(text.attribute(.backgroundColor, at: ranges[0].location, effectiveRange: nil))
+        XCTAssertEqual(
+            text.attribute(.underlineStyle, at: ranges[1].location, effectiveRange: nil) as? Int,
+            NSUnderlineStyle.single.rawValue
+        )
+        let font = try XCTUnwrap(text.attribute(.font, at: 0, effectiveRange: nil) as? UIFont)
+        XCTAssertTrue(font.fontDescriptor.symbolicTraits.contains(.traitBold))
+    }
+
+    func testPhaseSixSelectionMenuPreservesCopyShareAndAddsSingularSparkleResearch() {
+        let menu = ReaderSelectionMenuBuilder.menu(
+            selectedText: "  enacted requirement  ",
+            suggestedActions: [
+                UIAction(title: "Copy") { _ in },
+                UIAction(title: "Share") { _ in }
+            ],
+            onResearchSelection: { _ in }
+        )
+        let actions = menu.children.compactMap { $0 as? UIAction }
+
+        XCTAssertEqual(actions.map(\.title), ["Copy", "Share", "Research"])
+        XCTAssertEqual(ReaderSelectionMenuBuilder.researchSystemImageName, "sparkle")
+    }
+
+    func testPhaseSixLinkResolverDecodesAuthoredTemplatesAndCrossCodeAnchors() throws {
+        let templateURL = try XCTUnwrap(
+            NativeReaderLinkResolver.linkURL(
+                for: "{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-194709', hash: '#JD_MC702' }}"
+            )
+        )
+        XCTAssertEqual(templateURL.fragment, "JD_MC702")
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: templateURL),
+            NativeReaderReference(kind: .section, codePrefix: "MC", token: "702")
+        )
+
+        let tableURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_BCTable1607.1"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: tableURL),
+            NativeReaderReference(kind: .section, codePrefix: "BC", token: "1607.1")
+        )
+
+        let chapterURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_BCCh.16"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: chapterURL),
+            NativeReaderReference(kind: .chapter, codePrefix: "BC", token: "16")
+        )
+
+        let zoningURL = try XCTUnwrap(URL(string: "https://zr.planning.nyc.gov/article-i/chapter-1#11-122"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: zoningURL),
+            NativeReaderReference(kind: .section, codePrefix: nil, token: "11-122")
+        )
+        XCTAssertEqual(
+            NativeReaderSectionNavigator.sectionNumber(from: "SECTION BC 101 General", anchorID: nil),
+            "101"
+        )
+        XCTAssertEqual(
+            NativeReaderSectionNavigator.sectionNumber(from: "EBC 101 General", anchorID: nil),
+            "101"
+        )
+    }
+
+    func testPhaseSixSectionNavigatorTracksNearestPublishedHeading() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let sourcePath = "2026-existing-building-code/chapters/1.html"
+        let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+        let document = try await store.loadDocument(for: route)
+        let displayBlocks = NativeReaderDisplayBlock.blocks(from: document.blocks)
+        let targets = NativeReaderSectionNavigator.targets(in: document, displayBlocks: displayBlocks)
+        let lastDisplayBlock = try XCTUnwrap(displayBlocks.last)
+        let target = try XCTUnwrap(
+            NativeReaderSectionNavigator.target(
+                forDisplayBlockID: lastDisplayBlock.id,
+                in: document,
+                targets: targets
+            )
+        )
+
+        XCTAssertFalse(targets.isEmpty)
+        XCTAssertEqual(targets.map(\.sourceOrder), targets.map(\.sourceOrder).sorted())
+        XCTAssertLessThanOrEqual(target.sourceOrder, lastDisplayBlock.block.sourceOrder)
+        XCTAssertTrue(targets.allSatisfy { !$0.menuLabel.isEmpty })
+    }
 }

@@ -5,12 +5,33 @@ extension Notification.Name {
     static let nycccClearRichTextSelection = Notification.Name("nycccClearRichTextSelection")
 }
 
+enum ReaderSelectionMenuBuilder {
+    static let researchSystemImageName = "sparkle"
+
+    static func menu(
+        selectedText: String,
+        suggestedActions: [UIMenuElement],
+        onResearchSelection: @escaping (String) -> Void
+    ) -> UIMenu {
+        let normalized = selectedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalized.isEmpty else { return UIMenu(children: suggestedActions) }
+        let research = UIAction(
+            title: "Research",
+            image: UIImage(systemName: researchSystemImageName)
+        ) { _ in
+            onResearchSelection(normalized)
+        }
+        return UIMenu(children: suggestedActions + [research])
+    }
+}
+
 struct AttributedTextView: View {
     let attributedText: NSAttributedString
     var onOpenImage: ((UIImage) -> Void)? = nil
     var onContentTap: (() -> Void)? = nil
     var onSelectionChange: ((Bool) -> Void)? = nil
     var onOpenLink: ((URL) -> Void)? = nil
+    var onResearchSelection: ((String) -> Void)? = nil
     private let textBlocks: [AttributedTextBlock]
 
     @State private var availableWidth: CGFloat = 0
@@ -20,13 +41,15 @@ struct AttributedTextView: View {
         onOpenImage: ((UIImage) -> Void)? = nil,
         onContentTap: (() -> Void)? = nil,
         onSelectionChange: ((Bool) -> Void)? = nil,
-        onOpenLink: ((URL) -> Void)? = nil
+        onOpenLink: ((URL) -> Void)? = nil,
+        onResearchSelection: ((String) -> Void)? = nil
     ) {
         self.attributedText = attributedText
         self.onOpenImage = onOpenImage
         self.onContentTap = onContentTap
         self.onSelectionChange = onSelectionChange
         self.onOpenLink = onOpenLink
+        self.onResearchSelection = onResearchSelection
         self.textBlocks = Self.blocks(for: attributedText)
     }
 
@@ -42,7 +65,8 @@ struct AttributedTextView: View {
                         onOpenImage: onOpenImage,
                         onContentTap: onContentTap,
                         onSelectionChange: onSelectionChange,
-                        onOpenLink: onOpenLink
+                        onOpenLink: onOpenLink,
+                        onResearchSelection: onResearchSelection
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -55,7 +79,8 @@ struct AttributedTextView: View {
                             onOpenImage: onOpenImage,
                             onContentTap: onContentTap,
                             onSelectionChange: onSelectionChange,
-                            onOpenLink: onOpenLink
+                            onOpenLink: onOpenLink,
+                            onResearchSelection: onResearchSelection
                         )
                         .frame(
                             width: preferredTableWidth(for: block.attributedText, availableWidth: max(availableWidth, 1)),
@@ -151,13 +176,15 @@ private struct AttributedTextContainer: UIViewRepresentable {
     var onContentTap: (() -> Void)?
     var onSelectionChange: ((Bool) -> Void)?
     var onOpenLink: ((URL) -> Void)?
+    var onResearchSelection: ((String) -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(
             onOpenImage: onOpenImage,
             onContentTap: onContentTap,
             onSelectionChange: onSelectionChange,
-            onOpenLink: onOpenLink
+            onOpenLink: onOpenLink,
+            onResearchSelection: onResearchSelection
         )
     }
 
@@ -188,6 +215,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
         context.coordinator.onContentTap = onContentTap
         context.coordinator.onSelectionChange = onSelectionChange
         context.coordinator.onOpenLink = onOpenLink
+        context.coordinator.onResearchSelection = onResearchSelection
         uiView.attachmentTapHandler = { image in
             context.coordinator.onOpenImage?(image)
         }
@@ -297,21 +325,43 @@ private struct AttributedTextContainer: UIViewRepresentable {
         var onContentTap: (() -> Void)?
         var onSelectionChange: ((Bool) -> Void)?
         var onOpenLink: ((URL) -> Void)?
+        var onResearchSelection: ((String) -> Void)?
 
         init(
             onOpenImage: ((UIImage) -> Void)?,
             onContentTap: (() -> Void)?,
             onSelectionChange: ((Bool) -> Void)?,
-            onOpenLink: ((URL) -> Void)?
+            onOpenLink: ((URL) -> Void)?,
+            onResearchSelection: ((String) -> Void)?
         ) {
             self.onOpenImage = onOpenImage
             self.onContentTap = onContentTap
             self.onSelectionChange = onSelectionChange
             self.onOpenLink = onOpenLink
+            self.onResearchSelection = onResearchSelection
         }
 
         func textViewDidChangeSelection(_ textView: UITextView) {
             onSelectionChange?(textView.selectedRange.length > 0)
+        }
+
+        func textView(
+            _ textView: UITextView,
+            editMenuForTextIn range: NSRange,
+            suggestedActions: [UIMenuElement]
+        ) -> UIMenu? {
+            guard let onResearchSelection,
+                  let selectedRange = Range(range, in: textView.text),
+                  !selectedRange.isEmpty else {
+                return UIMenu(children: suggestedActions)
+            }
+
+            let selectedText = String(textView.text[selectedRange])
+            return ReaderSelectionMenuBuilder.menu(
+                selectedText: selectedText,
+                suggestedActions: suggestedActions,
+                onResearchSelection: onResearchSelection
+            )
         }
 
         func textView(
