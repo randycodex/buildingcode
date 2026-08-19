@@ -31,7 +31,8 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
           <section id="section-101"><h2><a id="anchor-101" href="#target">101 General</a></h2>
             <p>Exact enacted text.</p>
             <ol><li>First<ul><li>Nested</li></ul></li></ol>
-            <figure><img src="../assets/figure.jpg" width="640" height="480" alt="Diagram"><figcaption>Figure caption</figcaption></figure>
+            <figure class="code-figure"><span class="img"><img src="../assets/figure.jpg" width="640" height="480" alt="Diagram"></span><figcaption>Figure caption</figcaption></figure>
+            <p class="code-figure"><span class="img"><img src="../assets/figure.jpg" width="320" height="240" alt="Nested diagram"></span></p>
             <table><caption>Simple table</caption><tr><th>A</th><th>B</th></tr><tr><td>1</td><td>2</td></tr></table>
           </section>
         </body></html>
@@ -52,8 +53,19 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertEqual(chapter.images.first?.accessibilityText, "Diagram")
         XCTAssertEqual(chapter.images.first?.assetExists, true)
         XCTAssertEqual(chapter.images.first?.resolvedAssetPath, "sample-package/assets/figure.png")
+        XCTAssertTrue(chapter.unknownClassNames.isEmpty)
+        XCTAssertEqual(chapter.eligibility.state, .native)
         XCTAssertEqual(chapter.links.first?.target, "#target")
         XCTAssertNotNil(chapter.normalizedTextSHA256)
+
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: chapter
+        )
+        XCTAssertEqual(document.blocks.flatMap(\.media).count, 2)
+        XCTAssertEqual(document.blocks.flatMap(\.media).map(\.accessibilityText), ["Diagram", "Nested diagram"])
+        XCTAssertTrue(document.validation.imageInventoryMatches)
     }
 
     func testComplexTableAndUnknownMarkupReceiveExplicitFallbackClassification() throws {

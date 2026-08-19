@@ -20,8 +20,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 11",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 8",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/11.html",
@@ -68,7 +68,7 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Web,img",
+        "unknownClasses: Small,Web",
         "unsupportedBlocks: 24",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
@@ -88,8 +88,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 11",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 6",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/18.html",
@@ -125,8 +125,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 8",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 7",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/21.html",
@@ -143,8 +143,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Small-Bold,img",
-        "unsupportedBlocks: 31",
+        "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 26",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/23.html",
@@ -174,8 +174,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 5",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 4",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/26.html",
@@ -218,12 +218,11 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img",
-        "unsupportedBlocks: 1"
+
       ],
       "relativePath" : "2022-construction-codes/chapters/30.html",
       "sourceSHA256" : "bd60bb838ed8570ec0626aa714f7a7aada45b89ff896c03322d1ace0883e2c60",
-      "state" : "fullHTMLFallback"
+      "state" : "native"
     },
     {
       "reasons" : [
@@ -245,9 +244,9 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Web,img",
+        "unknownClasses: Small,Web",
         "unknownElements: intercodelink",
-        "unsupportedBlocks: 17",
+        "unsupportedBlocks: 15",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/33.html",
@@ -302,8 +301,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Small-Bold,img",
-        "unsupportedBlocks: 31",
+        "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 28",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/7.html",
@@ -356,7 +355,6 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img",
         "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt"
       ],
@@ -546,8 +544,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 11",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 8",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/11.html",
@@ -594,7 +592,7 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Web,img",
+        "unknownClasses: Small,Web",
         "unsupportedBlocks: 24",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
@@ -614,8 +612,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 11",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 6",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/18.html",
@@ -651,8 +649,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 8",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 7",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/21.html",
@@ -669,8 +667,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Small-Bold,img",
-        "unsupportedBlocks: 31",
+        "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 26",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/23.html",
@@ -700,8 +698,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 5",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 4",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/26.html",
@@ -744,12 +742,11 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img",
-        "unsupportedBlocks: 1"
+
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/30.html",
       "sourceSHA256" : "c01d5f106626f6cad8699aff02b2f0cd308c2c2a62e20d4c67a464ea50481bc1",
-      "state" : "fullHTMLFallback"
+      "state" : "native"
     },
     {
       "reasons" : [
@@ -771,9 +768,9 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Web,img",
+        "unknownClasses: Small,Web",
         "unknownElements: intercodelink",
-        "unsupportedBlocks: 17",
+        "unsupportedBlocks: 15",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/33.html",
@@ -828,8 +825,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Small-Bold,img",
-        "unsupportedBlocks: 31",
+        "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 28",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/7.html",
@@ -882,7 +879,6 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img",
         "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt"
       ],
@@ -946,7 +942,7 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Small-Bold,img",
+        "unknownClasses: Small,Small-Bold",
         "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
@@ -964,12 +960,11 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img",
-        "unsupportedBlocks: 1"
+
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/M.html",
       "sourceSHA256" : "e2100fdcfb29706b8db85b175769f099b24451fb0a10674c4b9b358292a5617b",
-      "state" : "fullHTMLFallback"
+      "state" : "native"
     },
     {
       "reasons" : [
@@ -1007,21 +1002,19 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img",
-        "unsupportedBlocks: 2"
+
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/R.html",
       "sourceSHA256" : "7790234c6c478050df6b4a8f105624a5d5b410eb21f9922c7d8357e85e6a8c74",
-      "state" : "fullHTMLFallback"
+      "state" : "native"
     },
     {
       "reasons" : [
-        "unknownClasses: img",
-        "unsupportedBlocks: 1"
+
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/S.html",
       "sourceSHA256" : "2db481c1559f46ab4a91fff5d29163654bea5a3ccb9e4ff9998e3ea3a5207721",
-      "state" : "fullHTMLFallback"
+      "state" : "native"
     },
     {
       "reasons" : [
@@ -1060,8 +1053,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 6",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 3.html",
@@ -1070,8 +1063,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 6",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 5",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
@@ -1080,8 +1073,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 11",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 9",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 5.html",
@@ -1168,8 +1161,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 2"
+        "unknownClasses: Small",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Appendices.html",
       "sourceSHA256" : "203524184351c776346dfc9b9bbae1a07023ed22fd9169d85aab1de989de9ef3",
@@ -1316,7 +1309,7 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,Small-Bold,img",
+        "unknownClasses: Small,Small-Bold",
         "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
@@ -1343,8 +1336,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 8",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 6",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 11.html",
@@ -1361,8 +1354,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 4",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 3",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 13.html",
@@ -1427,8 +1420,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 15",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
@@ -1437,8 +1430,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img",
-        "unsupportedBlocks: 15",
+        "unknownClasses: Small",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 7.html",
@@ -2394,12 +2387,11 @@
     },
     {
       "reasons" : [
-        "unknownClasses: code-figure",
-        "unsupportedBlocks: 1"
+
       ],
       "relativePath" : "2026-enacted-administrative-code/chapters/30000095.html",
       "sourceSHA256" : "2e8f5a2f5ec7ec26118f2e6569cbe3e9989b5c2c4266666b44d47ed12c6affdf",
-      "state" : "fullHTMLFallback"
+      "state" : "native"
     },
     {
       "reasons" : [

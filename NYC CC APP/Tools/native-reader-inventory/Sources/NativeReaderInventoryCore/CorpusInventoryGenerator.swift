@@ -970,7 +970,7 @@ public struct CorpusInventoryGenerator {
     private static let recognizedClassNames: Set<String> = [
         "clearfix", "rbox", "toc-destination", "jump", "subarticle", "article", "section", "subsection", "subsubsection",
         "paragraph", "normal-level", "ednotesm", "ednote", "history", "indent", "centered", "center", "text-left", "text-right",
-        "table", "xsl-table", "scrolltable", "caption", "figure", "image", "footnote", "footnotes", "source-note", "editor-note",
+        "table", "xsl-table", "scrolltable", "caption", "figure", "image", "img", "code-figure", "footnote", "footnotes", "source-note", "editor-note",
         "reserved"
     ]
 

@@ -297,18 +297,38 @@ private struct ImageDisplayWidthPreferenceKey: PreferenceKey {
     }
 }
 
-private struct ImageBlockView: View {
+struct ImageBlockView: View {
     let imageURL: URL
     let caption: String?
+    let accessibilityText: String?
+    let preferredAspectRatio: CGFloat?
     let onOpenImage: ((UIImage) -> Void)?
+    let onLoadFailure: ((String) -> Void)?
 
     @State private var loadedImage: UIImage?
     @State private var displayWidth: CGFloat?
     @State private var failedToLoad = false
+    @State private var loadAttempt = 0
+
+    init(
+        imageURL: URL,
+        caption: String?,
+        accessibilityText: String? = nil,
+        preferredAspectRatio: CGFloat? = nil,
+        onOpenImage: ((UIImage) -> Void)?,
+        onLoadFailure: ((String) -> Void)? = nil
+    ) {
+        self.imageURL = imageURL
+        self.caption = caption
+        self.accessibilityText = accessibilityText
+        self.preferredAspectRatio = preferredAspectRatio
+        self.onOpenImage = onOpenImage
+        self.onLoadFailure = onLoadFailure
+    }
 
     private var inlineLoadID: String {
         let bucket = displayWidth.map { ImageBlockCache.sizeBucket(forMaxPixelSize: $0 * UIScreen.main.scale * 2) } ?? 0
-        return "\(imageURL.path)|\(bucket)"
+        return "\(imageURL.path)|\(bucket)|\(loadAttempt)"
     }
 
     var body: some View {
@@ -331,6 +351,8 @@ private struct ImageBlockView: View {
                             .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(accessibilityLabel)
+                    .accessibilityHint("Opens the image full screen")
                 } else if failedToLoad {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
@@ -345,6 +367,14 @@ private struct ImageBlockView: View {
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                             .textSelection(.enabled)
+
+                        Button {
+                            loadAttempt += 1
+                        } label: {
+                            Label("Retry", systemImage: "arrow.clockwise")
+                                .font(.footnote.weight(.semibold))
+                        }
+                        .buttonStyle(.plain)
                     }
                     .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
                     .padding(CodeScreenMetrics.cardPadding)
@@ -357,7 +387,9 @@ private struct ImageBlockView: View {
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .aspectRatio(placeholderAspectRatio, contentMode: .fit)
+                    .frame(minHeight: 120)
                 }
             }
             .background {
@@ -378,33 +410,26 @@ private struct ImageBlockView: View {
         }
         .task(id: inlineLoadID) {
             failedToLoad = false
+            loadedImage = nil
             let bucket = displayWidth.map { ImageBlockCache.sizeBucket(forMaxPixelSize: $0 * UIScreen.main.scale * 2) }
             if let bucket, let cached = ImageBlockCache.shared.inlineImage(for: imageURL, sizeBucket: bucket) {
                 loadedImage = cached
                 return
             }
 
-            let data = await Task.detached(priority: .utility) {
-                try? Data(contentsOf: imageURL, options: [.mappedIfSafe])
+            let targetPixelSize = bucket ?? 2_048
+            let image = await Task.detached(priority: .utility) {
+                guard let data = try? Data(contentsOf: imageURL, options: [.mappedIfSafe]) else {
+                    return nil as UIImage?
+                }
+                return ImageBlockCache.downsampledImage(data: data, maxPixelSize: targetPixelSize)
             }.value
-            guard let data else {
-                failedToLoad = true
-                return
-            }
-
-            let image: UIImage?
-            if let bucket {
-                image = await Task.detached(priority: .utility) {
-                    ImageBlockCache.downsampledImage(data: data, maxPixelSize: bucket)
-                }.value
-            } else {
-                image = UIImage(data: data)
-            }
 
             guard let image,
                   image.size.width > 1 || image.size.height > 1
             else {
                 failedToLoad = true
+                onLoadFailure?("Unable to decode \(imageURL.lastPathComponent).")
                 return
             }
             if let bucket {
@@ -413,9 +438,17 @@ private struct ImageBlockView: View {
             loadedImage = image
         }
     }
+
+    private var accessibilityLabel: Text {
+        Text(accessibilityText ?? caption ?? "Code image")
+    }
+
+    private var placeholderAspectRatio: CGFloat {
+        min(max(preferredAspectRatio ?? (16 / 9), 0.35), 4)
+    }
 }
 
-private final class ImageBlockCache {
+final class ImageBlockCache {
     static let shared = ImageBlockCache()
 
     private let cache = NSCache<NSString, UIImage>()
@@ -464,10 +497,13 @@ private final class ImageBlockCache {
             return cached
         }
 
-        let data = await Task.detached(priority: .userInitiated) {
-            try? Data(contentsOf: url, options: [.mappedIfSafe])
+        let image = await Task.detached(priority: .userInitiated) {
+            guard let data = try? Data(contentsOf: url, options: [.mappedIfSafe]) else {
+                return nil as UIImage?
+            }
+            return Self.downsampledImage(data: data, maxPixelSize: 4_096)
         }.value
-        guard let data, let image = UIImage(data: data) else { return nil }
+        guard let image else { return nil }
         setFullImage(image, for: url)
         return image
     }

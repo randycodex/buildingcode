@@ -2780,9 +2780,9 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             .appendingPathComponent("new-york-city", isDirectory: true)
     }
 
-    func testDebugPilotRoutesAndLoadsOnlyValidatedTextDocuments() async throws {
+    func testDebugPilotRoutesAndLoadsValidatedPhaseThreeAndFourDocuments() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
-        XCTAssertEqual(NativeReaderDocumentStore.debugPilotSourcePaths.count, 2)
+        XCTAssertEqual(NativeReaderDocumentStore.debugPilotSourcePaths.count, 7)
 
         for sourcePath in NativeReaderDocumentStore.debugPilotSourcePaths.sorted() {
             let sourceURL = corpusRootURL.appendingPathComponent(sourcePath)
@@ -2791,14 +2791,91 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
 
             XCTAssertEqual(document.documentID, route.documentID)
             XCTAssertEqual(document.sourcePath, sourcePath)
-            XCTAssertTrue(document.isValidatedTextOnly)
+            XCTAssertTrue(document.isValidatedNativeContent)
             XCTAssertFalse(document.blocks.isEmpty)
-            XCTAssertTrue(document.blocks.allSatisfy { $0.kind.isTextOnly })
+            XCTAssertFalse(document.blocks.contains { [.table, .unsupportedHTML].contains($0.kind) })
         }
 
         let eligibleButNotPiloted = corpusRootURL
             .appendingPathComponent("2026-existing-building-code/chapters/2.html")
         XCTAssertNil(store.debugRoute(for: eligibleButNotPiloted))
+    }
+
+    func testPhaseFourMediaPilotsResolveBundledAssetsAndAccessibilityText() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let expectedMediaCounts = [
+            "2022-construction-codes/code-sections/building-code/chapters/30.html": 1,
+            "2022-construction-codes/code-sections/building-code/chapters/M.html": 2,
+            "2022-construction-codes/code-sections/building-code/chapters/R.html": 5,
+            "2022-construction-codes/code-sections/building-code/chapters/S.html": 15,
+            "2026-enacted-administrative-code/chapters/30000095.html": 3
+        ]
+
+        for (sourcePath, expectedCount) in expectedMediaCounts {
+            let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+            let document = try await store.loadDocument(for: route)
+            let media = document.blocks.flatMap(\.media)
+
+            XCTAssertEqual(media.count, expectedCount, sourcePath)
+            XCTAssertEqual(Set(media.map(\.id)).count, expectedCount, sourcePath)
+            for item in media {
+                let url = try XCTUnwrap(NativeReaderDocumentStore.resolvedMediaURL(for: item, route: route))
+                XCTAssertTrue(FileManager.default.fileExists(atPath: url.path), item.id)
+                XCTAssertNotNil(item.assetSHA256)
+            }
+            if sourcePath.contains("enacted-administrative-code") {
+                XCTAssertTrue(media.allSatisfy { $0.accessibilityText?.isEmpty == false })
+            }
+        }
+    }
+
+    func testMissingPhaseFourMediaAssetRequiresWholeChapterFallback() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let sourcePath = "2022-construction-codes/code-sections/building-code/chapters/30.html"
+        let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+        let temporaryRoot = FileManager.default.temporaryDirectory
+            .appendingPathComponent("native-reader-phase-4-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: temporaryRoot) }
+
+        let copiedSourceURL = temporaryRoot.appendingPathComponent(sourcePath)
+        try FileManager.default.createDirectory(
+            at: copiedSourceURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try FileManager.default.copyItem(at: route.sourceURL, to: copiedSourceURL)
+        let missingAssetRoute = NativeReaderDocumentRoute(
+            relativeSourcePath: route.relativeSourcePath,
+            sourceURL: copiedSourceURL,
+            documentURL: route.documentURL,
+            sourceSHA256: route.sourceSHA256,
+            documentID: route.documentID,
+            documentSHA256: route.documentSHA256,
+            compressedSHA256: route.compressedSHA256,
+            uncompressedByteCount: route.uncompressedByteCount,
+            compressedByteCount: route.compressedByteCount
+        )
+
+        do {
+            _ = try await store.loadDocument(for: missingAssetRoute)
+            XCTFail("A chapter with an unavailable media asset must not remain native.")
+        } catch let error as NativeReaderDocumentStoreError {
+            guard case .mediaValidationFailed(let reason) = error else {
+                return XCTFail("Unexpected error: \(error)")
+            }
+            XCTAssertTrue(reason.contains("unreadable asset") || reason.contains("unresolved asset"), reason)
+        }
+    }
+
+    func testUnusuallyLargeMapDownsamplesToRequestedPixelBound() throws {
+        let mapURL = corpusRootURL.appendingPathComponent(
+            "2026-zoning-resolution/assets/zr-140ad79f747c8e92-TransitZoneMap14.jpg"
+        )
+        let data = try Data(contentsOf: mapURL, options: [.mappedIfSafe])
+        let image = try XCTUnwrap(ImageBlockCache.downsampledImage(data: data, maxPixelSize: 512))
+        let maximumPixelDimension = max(image.size.width * image.scale, image.size.height * image.scale)
+
+        XCTAssertLessThanOrEqual(maximumPixelDimension, 512)
+        XCTAssertGreaterThan(data.count, 2_000_000)
     }
 
     func testNativeDocumentIntegrityFailureRequiresFallback() async throws {

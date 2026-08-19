@@ -437,11 +437,17 @@ private final class RichTextView: UITextView {
 
 struct ZoomableImageViewer: View {
     let image: UIImage
+    let accessibilityText: String?
     @Environment(\.dismiss) private var dismiss
     @State private var zoomScale: CGFloat = 1
     @State private var lastZoomScale: CGFloat = 1
     @State private var contentOffset: CGSize = .zero
     @State private var lastContentOffset: CGSize = .zero
+
+    init(image: UIImage, accessibilityText: String? = nil) {
+        self.image = image
+        self.accessibilityText = accessibilityText
+    }
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -469,6 +475,7 @@ struct ZoomableImageViewer: View {
                             }
                         }
                     }
+                    .accessibilityLabel(Text(accessibilityText ?? "Code image"))
             }
 
             Button {

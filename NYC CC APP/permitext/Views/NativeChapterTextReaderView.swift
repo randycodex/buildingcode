@@ -18,6 +18,7 @@ struct NativeChapterTextReaderView: View {
     @State private var pendingInitialBlockID: String?
     @State private var failureMessage: String?
     @State private var hasRequestedFallback = false
+    @State private var expandedMedia: NativeReaderExpandedMedia?
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -31,7 +32,7 @@ struct NativeChapterTextReaderView: View {
                 } else if let failureMessage {
                     failureView(message: failureMessage)
                 } else {
-                    ProgressView("Preparing native text…")
+                    ProgressView("Preparing native Reader…")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
@@ -40,6 +41,9 @@ struct NativeChapterTextReaderView: View {
             }
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .fullScreenCover(item: $expandedMedia) { media in
+            ZoomableImageViewer(image: media.image, accessibilityText: media.accessibilityText)
+        }
     }
 
     private func reader(
@@ -55,8 +59,19 @@ struct NativeChapterTextReaderView: View {
                         usesCompactSpacing: displayBlock.usesCompactSpacing,
                         theme: library.readerTheme,
                         accentColor: library.accentColor(for: chapter.codeSectionID),
+                        route: route,
                         onOpenLink: { url in
                             handleLink(url, document: document, proxy: proxy)
+                        },
+                        onOpenMedia: { media, image in
+                            expandedMedia = NativeReaderExpandedMedia(
+                                id: media.id,
+                                image: image,
+                                accessibilityText: media.accessibilityText ?? media.caption
+                            )
+                        },
+                        onMediaFailure: { message in
+                            requestFallbackToHTML(message)
                         }
                     )
                     .id(displayBlock.id)
@@ -101,6 +116,7 @@ struct NativeChapterTextReaderView: View {
         visibleBlockID = nil
         failureMessage = nil
         hasRequestedFallback = false
+        expandedMedia = nil
 
         do {
             let loaded = try await NativeReaderDocumentStore.shared.loadDocument(for: route)
@@ -121,12 +137,16 @@ struct NativeChapterTextReaderView: View {
             pendingInitialBlockID = initialBlockID
         } catch {
             guard !Task.isCancelled else { return }
-            let message = error.localizedDescription
-            failureMessage = message
-            guard !hasRequestedFallback else { return }
-            hasRequestedFallback = true
-            onFallbackToHTML?(message)
+            requestFallbackToHTML(error.localizedDescription)
         }
+    }
+
+    @MainActor
+    private func requestFallbackToHTML(_ message: String) {
+        failureMessage = message
+        guard !hasRequestedFallback else { return }
+        hasRequestedFallback = true
+        onFallbackToHTML?(message)
     }
 
     @MainActor
@@ -184,6 +204,12 @@ struct NativeChapterTextReaderView: View {
         guard url.scheme != nil else { return }
         openURL(url)
     }
+}
+
+private struct NativeReaderExpandedMedia: Identifiable {
+    let id: String
+    let image: UIImage
+    let accessibilityText: String?
 }
 
 struct NativeReaderDisplayBlock: Identifiable, Equatable {
@@ -395,7 +421,10 @@ private struct NativeReaderTextBlockView: View {
     let usesCompactSpacing: Bool
     let theme: ReaderTheme
     let accentColor: UIColor
+    let route: NativeReaderDocumentRoute
     let onOpenLink: (URL) -> Void
+    let onOpenMedia: (NativeReaderRuntimeMedia, UIImage) -> Void
+    let onMediaFailure: (String) -> Void
 
     var body: some View {
         Group {
@@ -423,7 +452,14 @@ private struct NativeReaderTextBlockView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             case .divider:
                 Divider()
-            case .table, .image, .figure, .unsupportedHTML:
+            case .image, .figure:
+                NativeReaderMediaBlockView(
+                    block: block,
+                    route: route,
+                    onOpenMedia: onOpenMedia,
+                    onMediaFailure: onMediaFailure
+                )
+            case .table, .unsupportedHTML:
                 EmptyView()
             }
         }
@@ -484,9 +520,78 @@ private struct NativeReaderTextBlockView: View {
             return 8
         case .divider:
             return 16
-        case .table, .image, .figure, .unsupportedHTML:
+        case .image, .figure:
+            return 14
+        case .table, .unsupportedHTML:
             return 0
         }
+    }
+}
+
+private struct NativeReaderMediaBlockView: View {
+    let block: NativeReaderRuntimeBlock
+    let route: NativeReaderDocumentRoute
+    let onOpenMedia: (NativeReaderRuntimeMedia, UIImage) -> Void
+    let onMediaFailure: (String) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(block.media) { media in
+                if let assetURL = NativeReaderDocumentStore.resolvedMediaURL(for: media, route: route) {
+                    ImageBlockView(
+                        imageURL: assetURL,
+                        caption: caption(for: media),
+                        accessibilityText: media.accessibilityText,
+                        preferredAspectRatio: media.authoredAspectRatio,
+                        onOpenImage: { image in
+                            onOpenMedia(media, image)
+                        },
+                        onLoadFailure: onMediaFailure
+                    )
+                } else {
+                    missingMedia(media)
+                        .task(id: media.id) {
+                            onMediaFailure("The native Reader could not resolve \(media.id).")
+                        }
+                }
+            }
+
+            if block.media.count > 1,
+               let caption = block.caption?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !caption.isEmpty {
+                Text(caption)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func caption(for media: NativeReaderRuntimeMedia) -> String? {
+        if let caption = media.caption?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !caption.isEmpty {
+            return caption
+        }
+        guard block.media.count == 1,
+              let caption = block.caption?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !caption.isEmpty else {
+            return nil
+        }
+        return caption
+    }
+
+    private func missingMedia(_ media: NativeReaderRuntimeMedia) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Image unavailable", systemImage: "exclamationmark.triangle.fill")
+                .font(.footnote.weight(.semibold))
+            Text(media.resolvedAssetPath ?? media.source ?? media.id)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+        }
+        .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
+        .padding(CodeScreenMetrics.cardPadding)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
     }
 }
 

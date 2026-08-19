@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+import ImageIO
 
 enum NativeReaderRuntimeBlockKind: String, Decodable, Sendable {
     case heading
@@ -53,6 +54,33 @@ struct NativeReaderRuntimeListItem: Decodable, Equatable, Identifiable, Sendable
     let children: [NativeReaderRuntimeListItem]
 }
 
+struct NativeReaderRuntimeMedia: Decodable, Equatable, Identifiable, Sendable {
+    let id: String
+    let element: String
+    let source: String?
+    let resolvedAssetPath: String?
+    let assetExists: Bool
+    let assetSHA256: String?
+    let width: String?
+    let height: String?
+    let caption: String?
+    let accessibilityText: String?
+    let sourceHTML: String?
+
+    var authoredAspectRatio: CGFloat? {
+        guard let width,
+              let height,
+              let widthValue = Double(width),
+              let heightValue = Double(height),
+              widthValue > 0,
+              heightValue > 0
+        else {
+            return nil
+        }
+        return CGFloat(widthValue / heightValue)
+    }
+}
+
 struct NativeReaderRuntimeBlock: Decodable, Equatable, Identifiable, Sendable {
     let id: String
     let kind: NativeReaderRuntimeBlockKind
@@ -63,6 +91,34 @@ struct NativeReaderRuntimeBlock: Decodable, Equatable, Identifiable, Sendable {
     let runs: [NativeReaderRuntimeTextRun]
     let headingLevel: Int?
     let listItems: [NativeReaderRuntimeListItem]
+    let media: [NativeReaderRuntimeMedia]
+    let caption: String?
+
+    init(
+        id: String,
+        kind: NativeReaderRuntimeBlockKind,
+        sourceOrder: Int,
+        sectionID: String?,
+        anchorIDs: [String],
+        plainText: String,
+        runs: [NativeReaderRuntimeTextRun],
+        headingLevel: Int?,
+        listItems: [NativeReaderRuntimeListItem],
+        media: [NativeReaderRuntimeMedia] = [],
+        caption: String? = nil
+    ) {
+        self.id = id
+        self.kind = kind
+        self.sourceOrder = sourceOrder
+        self.sectionID = sectionID
+        self.anchorIDs = anchorIDs
+        self.plainText = plainText
+        self.runs = runs
+        self.headingLevel = headingLevel
+        self.listItems = listItems
+        self.media = media
+        self.caption = caption
+    }
 }
 
 struct NativeReaderRuntimeAnchor: Decodable, Equatable, Identifiable, Sendable {
@@ -129,11 +185,25 @@ struct NativeReaderRuntimeDocument: Decodable, Equatable, Sendable {
     let validation: NativeReaderRuntimeValidation
 
     var isValidatedTextOnly: Bool {
+        isValidatedNativeContent
+            && blocks.allSatisfy { $0.kind.isTextOnly }
+    }
+
+    var isValidatedNativeContent: Bool {
         eligibility.state == .native
             && eligibility.reasons.isEmpty
             && validation.passesStructuralValidation
             && validation.unsupportedBlockCount == 0
-            && blocks.allSatisfy { $0.kind.isTextOnly }
+            && blocks.allSatisfy { block in
+                switch block.kind {
+                case .table, .unsupportedHTML:
+                    return false
+                case .image, .figure:
+                    return !block.media.isEmpty
+                default:
+                    return true
+                }
+            }
     }
 }
 
@@ -149,6 +219,27 @@ struct NativeReaderDocumentRoute: Hashable, Sendable {
     let compressedByteCount: Int
 
     var id: String { documentID }
+
+    var corpusRootURL: URL? {
+        let components = relativeSourcePath.split(separator: "/")
+        guard !components.isEmpty,
+              !relativeSourcePath.hasPrefix("/"),
+              !components.contains("..")
+        else {
+            return nil
+        }
+        var rootURL = sourceURL.standardizedFileURL
+        for _ in components {
+            rootURL.deleteLastPathComponent()
+        }
+        let rebuiltURL = components.reduce(rootURL) { partial, component in
+            partial.appendingPathComponent(String(component), isDirectory: false)
+        }
+        guard rebuiltURL.standardizedFileURL == sourceURL.standardizedFileURL else {
+            return nil
+        }
+        return rootURL.standardizedFileURL
+    }
 }
 
 enum NativeReaderDocumentStoreError: LocalizedError, Equatable {
@@ -161,7 +252,8 @@ enum NativeReaderDocumentStoreError: LocalizedError, Equatable {
     case decodingFailed(String)
     case documentContractMismatch(String)
     case sourceMismatch(String)
-    case nonTextContent(String)
+    case unsupportedContent(String)
+    case mediaValidationFailed(String)
 
     var errorDescription: String? {
         switch self {
@@ -183,8 +275,10 @@ enum NativeReaderDocumentStoreError: LocalizedError, Equatable {
             return "The generated native document failed its schema contract: \(reason)."
         case .sourceMismatch(let path):
             return "The authoritative HTML source failed its integrity check: \(path)."
-        case .nonTextContent(let path):
-            return "The chapter is outside the text-only native pilot: \(path)."
+        case .unsupportedContent(let path):
+            return "The chapter is outside the validated native Reader phases: \(path)."
+        case .mediaValidationFailed(let reason):
+            return "The chapter's native media failed validation: \(reason)."
         }
     }
 }
@@ -199,6 +293,11 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     #if DEBUG
     static let debugPilotSourcePaths: Set<String> = [
         "2022-construction-codes/code-sections/building-code/chapters/1.html",
+        "2022-construction-codes/code-sections/building-code/chapters/30.html",
+        "2022-construction-codes/code-sections/building-code/chapters/M.html",
+        "2022-construction-codes/code-sections/building-code/chapters/R.html",
+        "2022-construction-codes/code-sections/building-code/chapters/S.html",
+        "2026-enacted-administrative-code/chapters/30000095.html",
         "2026-existing-building-code/chapters/1.html"
     ]
     #endif
@@ -341,15 +440,69 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         else {
             throw NativeReaderDocumentStoreError.documentContractMismatch(route.relativeSourcePath)
         }
-        guard document.isValidatedTextOnly else {
-            throw NativeReaderDocumentStoreError.nonTextContent(route.relativeSourcePath)
+        guard document.isValidatedNativeContent else {
+            throw NativeReaderDocumentStoreError.unsupportedContent(route.relativeSourcePath)
         }
         guard let sourceData = try? Data(contentsOf: route.sourceURL),
               sha256(sourceData) == route.sourceSHA256
         else {
             throw NativeReaderDocumentStoreError.sourceMismatch(route.relativeSourcePath)
         }
+        try validateMedia(in: document, for: route)
         return document
+    }
+
+    static func resolvedMediaURL(
+        for media: NativeReaderRuntimeMedia,
+        route: NativeReaderDocumentRoute
+    ) -> URL? {
+        guard media.assetExists,
+              let relativePath = media.resolvedAssetPath,
+              let corpusRootURL = route.corpusRootURL
+        else {
+            return nil
+        }
+        return resolvedDocumentURL(relativePath: relativePath, corpusRootURL: corpusRootURL)
+    }
+
+    private static func validateMedia(
+        in document: NativeReaderRuntimeDocument,
+        for route: NativeReaderDocumentRoute
+    ) throws {
+        let media = document.blocks.flatMap(\.media)
+        guard Set(media.map(\.id)).count == media.count else {
+            throw NativeReaderDocumentStoreError.mediaValidationFailed("duplicate media IDs in \(route.relativeSourcePath)")
+        }
+
+        for item in media {
+            guard let assetURL = resolvedMediaURL(for: item, route: route) else {
+                throw NativeReaderDocumentStoreError.mediaValidationFailed(
+                    "unresolved asset \(item.id) in \(route.relativeSourcePath)"
+                )
+            }
+            guard let data = try? Data(contentsOf: assetURL, options: [.mappedIfSafe]) else {
+                throw NativeReaderDocumentStoreError.mediaValidationFailed(
+                    "unreadable asset \(assetURL.lastPathComponent)"
+                )
+            }
+            guard let expectedHash = item.assetSHA256,
+                  sha256(data) == expectedHash else {
+                throw NativeReaderDocumentStoreError.mediaValidationFailed(
+                    "integrity mismatch for \(assetURL.lastPathComponent)"
+                )
+            }
+            guard let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
+                  CGImageSourceGetCount(imageSource) > 0,
+                  let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any],
+                  let pixelWidth = properties[kCGImagePropertyPixelWidth] as? NSNumber,
+                  let pixelHeight = properties[kCGImagePropertyPixelHeight] as? NSNumber,
+                  pixelWidth.intValue > 0,
+                  pixelHeight.intValue > 0 else {
+                throw NativeReaderDocumentStoreError.mediaValidationFailed(
+                    "undecodable asset \(assetURL.lastPathComponent)"
+                )
+            }
+        }
     }
 
     private static func relativePath(for url: URL, below rootURL: URL) -> String? {

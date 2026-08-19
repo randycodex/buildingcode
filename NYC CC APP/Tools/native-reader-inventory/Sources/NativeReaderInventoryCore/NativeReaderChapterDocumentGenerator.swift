@@ -40,6 +40,36 @@ public struct NativeReaderChapterDocumentGenerator {
             drafts: &drafts
         )
 
+        let structuralMediaPairs = contentElements
+            .filter(isTopLevelMediaElement)
+            .compactMap { element -> (element: XMLElement, media: NativeReaderMedia)? in
+                guard let media = makeMedia(
+                    element: element,
+                    inventory: inventory,
+                    sourceOrderByElement: sourceOrderByElement,
+                    sourceRoot: sourceRoot
+                ) else {
+                    return nil
+                }
+                return (element, media)
+            }
+        var representedMediaIDs = Set(drafts.flatMap { $0.media.map(\.id) })
+        for pair in structuralMediaPairs where !representedMediaIDs.contains(pair.media.id) {
+            let mediaDraft = makeDraft(
+                element: pair.element,
+                forcedText: nil,
+                forcedKind: .image,
+                sectionID: sectionID(for: pair.element),
+                inventory: inventory,
+                sourceOrderByElement: sourceOrderByElement,
+                sourceRoot: sourceRoot,
+                sequence: drafts.count
+            )
+            let insertionIndex = drafts.firstIndex { $0.sourceOrder > mediaDraft.sourceOrder } ?? drafts.endIndex
+            drafts.insert(mediaDraft, at: insertionIndex)
+            representedMediaIDs.insert(pair.media.id)
+        }
+
         let anchorMappings = makeAnchorMappings(
             inventory: inventory,
             drafts: drafts,
@@ -59,16 +89,7 @@ public struct NativeReaderChapterDocumentGenerator {
         let structuralTables = contentElements
             .filter { normalizedName($0) == "table" }
             .map { makeTable(element: $0, inventory: inventory, sourceOrderByElement: sourceOrderByElement) }
-        let structuralMedia = contentElements
-            .filter(isTopLevelMediaElement)
-            .compactMap {
-                makeMedia(
-                    element: $0,
-                    inventory: inventory,
-                    sourceOrderByElement: sourceOrderByElement,
-                    sourceRoot: sourceRoot
-                )
-            }
+        let structuralMedia = structuralMediaPairs.map(\.media)
         let validation = validate(
             inventory: inventory,
             body: body,
@@ -659,7 +680,10 @@ public struct NativeReaderChapterDocumentGenerator {
                     && table.footnotes == source.footnotes
             }
 
-        let imageInventoryMatches = structuralMedia.count == inventory.images.count
+        let renderedMedia = blocks.flatMap(\.media).sorted { $0.id < $1.id }
+        let validatedStructuralMedia = structuralMedia.sorted { $0.id < $1.id }
+        let imageInventoryMatches = renderedMedia == validatedStructuralMedia
+            && structuralMedia.count == inventory.images.count
             && zip(structuralMedia, inventory.images).allSatisfy { media, source in
                 media.element == source.element
                     && media.source == source.source
