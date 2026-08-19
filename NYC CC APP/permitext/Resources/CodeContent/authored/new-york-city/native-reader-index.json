@@ -23,63 +23,63 @@
     },
     {
       "blockCount" : 1824,
-      "compressedByteCount" : 311926,
-      "compressedSHA256" : "f5c1420b782f058b171e1da8e818b03a966ae2c486c95bd490f605338fad89c0",
+      "compressedByteCount" : 311923,
+      "compressedSHA256" : "80a126bd069496e21bf03a5f8646a4d74fdc8825d1c8d4e25bae0a0648a7c844",
       "documentID" : "16ef78ca6f679332ec52f9a573dedae3cf8007261cd9cde0b04fbe362ea9f8bb",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/16ef78ca6f679332ec52f9a573dedae3cf8007261cd9cde0b04fbe362ea9f8bb.json.lzfse",
-      "documentSHA256" : "8fceccf4da3e2061efe9a0c5128b3350dacf4bd3ef88469eb790fbc4968bfe30",
+      "documentSHA256" : "33f4bd95d3745d18be716aa39bb99569592a3eaee66f85fc37e87b82e181c11b",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 14",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/10.html",
       "sourceSHA256" : "4fd0fc8a3f660169cc57543509e861f4872c905932965e1eb75eaf9738a0f193",
-      "uncompressedByteCount" : 1900750
+      "uncompressedByteCount" : 1900740
     },
     {
       "blockCount" : 896,
-      "compressedByteCount" : 139908,
-      "compressedSHA256" : "9dad3334267ea009476059cd9c05005235c6ac9be553ecee8d5c1b4fb95df707",
+      "compressedByteCount" : 139904,
+      "compressedSHA256" : "8bd25b59237eb921ba9a8dee99e440f4ce7efbf3b5877074bf3923053b204afb",
       "documentID" : "b53c49dddf9dac0e7b08e18791d76ccd639100d060756eec33773e8ca0f57fa9",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/b53c49dddf9dac0e7b08e18791d76ccd639100d060756eec33773e8ca0f57fa9.json.lzfse",
-      "documentSHA256" : "d448e925dcebb578fd21de378b1fd9251dbb500b3344b151e43c5c42507cd3b7",
+      "documentSHA256" : "7954c08aa9f98329815fd732af309d0939c68d757d483c573cf655c63b36e217",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 8",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/11.html",
       "sourceSHA256" : "692ec25dd8edbc6c1a36394f4902d75765540d12e55a3b7321bfb0d4d2d875ab",
-      "uncompressedByteCount" : 872515
+      "uncompressedByteCount" : 872505
     },
     {
       "blockCount" : 353,
-      "compressedByteCount" : 53687,
-      "compressedSHA256" : "02bfd448e8b6607901a52f0d0801c63f8ffad05a3f2ae29ed45b1cf5ef3eb9d3",
+      "compressedByteCount" : 53677,
+      "compressedSHA256" : "fb45f0be28dae4402a032f869d74137b48ae690923f98d3d64138ee5c174e620",
       "documentID" : "6ec4fb90de42cf4d1c76c2c3e6b86cfe3f0de8cc1f6f3ecffe739a7ea59a92a6",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/6ec4fb90de42cf4d1c76c2c3e6b86cfe3f0de8cc1f6f3ecffe739a7ea59a92a6.json.lzfse",
-      "documentSHA256" : "fea0f0b68816e4f7d12a29945df8b00f972af548827efce7b2b4771a6bcc924c",
+      "documentSHA256" : "4c47c8c5b50b50d3d0505b47583eb25f4c7fd28f76dfbfaeb6de58ca3baadcea",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small,Web",
           "unsupportedBlocks: 4",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/12.html",
       "sourceSHA256" : "75e244f730d9ec6c3d5532f55279ac29569c060d6eb9ec43889a958627dc0ee3",
-      "uncompressedByteCount" : 385477
+      "uncompressedByteCount" : 385467
     },
     {
       "blockCount" : 7,
@@ -101,123 +101,123 @@
     },
     {
       "blockCount" : 423,
-      "compressedByteCount" : 62156,
-      "compressedSHA256" : "8cb2985024f1575cd4ba910fb91862644983a931ae1ebb73a19f8dd7b116bb67",
+      "compressedByteCount" : 62154,
+      "compressedSHA256" : "621fe2a0c851cf19e347267eb14d82c30110d6b4c85eb61fd51c1b01dbe498b2",
       "documentID" : "066eae4701885b05038bfb1449adf63a4cf1c65e356eefb72a52788530b7dbaa",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/066eae4701885b05038bfb1449adf63a4cf1c65e356eefb72a52788530b7dbaa.json.lzfse",
-      "documentSHA256" : "13cb72a51300bcc2e8d36553943066eb2bcba2e8eb32629996dfa117fa62446f",
+      "documentSHA256" : "40e9526da29df531a1a44ef773392b4d2ba19c292fe5865d771629a87f6c037d",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/14.html",
       "sourceSHA256" : "cf44bb32a571c3d02b1fa1df266da049d64271ca1589ed5a9dde6c4e08031df0",
-      "uncompressedByteCount" : 445835
+      "uncompressedByteCount" : 445825
     },
     {
       "blockCount" : 527,
-      "compressedByteCount" : 86518,
-      "compressedSHA256" : "cfdc5bc2d08698dd86315eba9e9ac2532725012fb4f68474da33ba87d2e45d9c",
+      "compressedByteCount" : 86515,
+      "compressedSHA256" : "ad3568517e4a17fc1a0bdbfc09820490e555e244bf0669eb23f3dd615eb19e32",
       "documentID" : "f437a2da7186b494cb571320b8f6720d1ffd0e6ad539163b1db7496f35d5c576",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/f437a2da7186b494cb571320b8f6720d1ffd0e6ad539163b1db7496f35d5c576.json.lzfse",
-      "documentSHA256" : "5ca167c0ca58f80d64c7ffb415745208fa275da016a95f9af54b886cd4d32fc1",
+      "documentSHA256" : "153899bd738c3ab306cae67cc2acf37d6f589be014caf430dfa0d4bfa7158154",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 14",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/15.html",
       "sourceSHA256" : "85332a18b5e820942716ee2e0bf8194e4d2c570f79f950a3c435c3156eb602db",
-      "uncompressedByteCount" : 667728
+      "uncompressedByteCount" : 667718
     },
     {
       "blockCount" : 857,
-      "compressedByteCount" : 172918,
-      "compressedSHA256" : "1ac9347a9f28026c59b6ad0468c0300bfd67a6cec74b120f3c8d8708f886d9a8",
+      "compressedByteCount" : 172916,
+      "compressedSHA256" : "a72fe36022cfcb45683ee52313ff11897f34972ac5271097ff4fced0f43f4415",
       "documentID" : "545ea0f145151e594e6fc00376f57214a49cd0b102e38fce8508d909e4b8d22f",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/545ea0f145151e594e6fc00376f57214a49cd0b102e38fce8508d909e4b8d22f.json.lzfse",
-      "documentSHA256" : "2cf1a09865cb3ea96e69a8e577779bcd471e7efcaeba8d2576c32e10fa64dac9",
+      "documentSHA256" : "dd19387453a5d57d027eb3b04ed7d147004aa9fd8af1b1bbdf01124fd0dd51b4",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small,Web",
           "unsupportedBlocks: 24",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/16.html",
       "sourceSHA256" : "216dc8c6716b3eef10964e2ea0af640a4d3b51d9a11e1d9829409ee46f859930",
-      "uncompressedByteCount" : 1538024
+      "uncompressedByteCount" : 1538014
     },
     {
       "blockCount" : 644,
-      "compressedByteCount" : 121572,
-      "compressedSHA256" : "3bb282b6f7b9ec8208621f364d12c4559c2905822c68868ab516f4b71bc788e3",
+      "compressedByteCount" : 121564,
+      "compressedSHA256" : "5d6b46c6e478d02c44c00d1336b7af15aa1b91727d062e6eb24d64e0884fe98d",
       "documentID" : "3d6797975f00ae884ec6d2b69f87d3869157cc6b8e183240d3ebaba24bc4fe95",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/3d6797975f00ae884ec6d2b69f87d3869157cc6b8e183240d3ebaba24bc4fe95.json.lzfse",
-      "documentSHA256" : "02f5e5453fa0e1fa674a8db7481d2707577c08ae92fe8aed847d5a6f3f4314a3",
+      "documentSHA256" : "847519c533de9187eabac2d394b9a686ee471d6208d9dbefe05be36c71c71a77",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 14",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/17.html",
       "sourceSHA256" : "1408771baf4e6d8f5538f1938047dc0aba368be4bab6dd8c9d4738d2939bc3a5",
-      "uncompressedByteCount" : 1028170
+      "uncompressedByteCount" : 1028149
     },
     {
       "blockCount" : 1232,
-      "compressedByteCount" : 212857,
-      "compressedSHA256" : "98604c09a2b8c47d3f9cf23d30fb825c2585695e414e8c23661f1d9b41b33f4f",
+      "compressedByteCount" : 212856,
+      "compressedSHA256" : "beca99a5a799a537dad2d44e5f47d99a7dbf3b13ff8588f870700f81dce9dbf6",
       "documentID" : "efc8d41a93adb3a81e5875a26802d9511bd6f3239b17bbd38595b52870d4cd64",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/efc8d41a93adb3a81e5875a26802d9511bd6f3239b17bbd38595b52870d4cd64.json.lzfse",
-      "documentSHA256" : "61cf06183abf1b420042837668f3aba1c4b3f679761f7717be23dbffc5422660",
+      "documentSHA256" : "f3c772419903bb283849253a0ebae52efa874daad94d09b8d22e9242875163fb",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 6",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/18.html",
       "sourceSHA256" : "7920ebe767cf353a28799158284eac29016761a7488763bd35c06f627ea8d67e",
-      "uncompressedByteCount" : 1296395
+      "uncompressedByteCount" : 1296385
     },
     {
       "blockCount" : 591,
-      "compressedByteCount" : 89490,
-      "compressedSHA256" : "e1031abbe273fe8f674a3fb55291900c9681d11214ad4f1d2cb51b0d3d0e83a6",
+      "compressedByteCount" : 89479,
+      "compressedSHA256" : "ffb8a453c1a519009ac02fd1b621fe8778dd785f6cbacfb8fdddebb8da516e74",
       "documentID" : "7c6b50f71ec0caa01e49b42420db0435ff15de0e916be4214a2b843d91d0fe0a",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/7c6b50f71ec0caa01e49b42420db0435ff15de0e916be4214a2b843d91d0fe0a.json.lzfse",
-      "documentSHA256" : "36c3824c2d99040f69a66f010b1a9b2afb68eba973a43c4ff94ac4a0fc2bda7d",
+      "documentSHA256" : "c0d34ada05c56c40f386cd345801c8a5a3513fc4129044db833e99490df94f09",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/19.html",
       "sourceSHA256" : "79314936331c5c9dfb88031b3c5b081018275ec0ac90559f23b016d5d46c731b",
-      "uncompressedByteCount" : 536947
+      "uncompressedByteCount" : 536937
     },
     {
       "blockCount" : 92,
@@ -258,23 +258,23 @@
     },
     {
       "blockCount" : 537,
-      "compressedByteCount" : 85963,
-      "compressedSHA256" : "cbd996b8883e986b55028aeee1670ff0e628cbf4b8b7d2560875b4a6c0fb730f",
+      "compressedByteCount" : 85954,
+      "compressedSHA256" : "994923dde1b66e105bc0651e097e52f3f014d9f44c2e29f94affe3c5073a85c6",
       "documentID" : "7a06347f0484e32bfc9bec5df40827cf0843c2612bf15b644ccd94c909c75ff9",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/7a06347f0484e32bfc9bec5df40827cf0843c2612bf15b644ccd94c909c75ff9.json.lzfse",
-      "documentSHA256" : "7c937385b2e2a2b2a81bc11ded8d46f9802039aa46ff59188aef4c17a4706639",
+      "documentSHA256" : "ea6bb842d9f374e2110fade245f87df687ed3ff7444337dac232995216a10814",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 7",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/21.html",
       "sourceSHA256" : "fc11cae5ebefd37f337d8de722263d76bb16a42a6d0fe612753156203e593554",
-      "uncompressedByteCount" : 571178
+      "uncompressedByteCount" : 571168
     },
     {
       "blockCount" : 202,
@@ -296,84 +296,84 @@
     },
     {
       "blockCount" : 716,
-      "compressedByteCount" : 200717,
-      "compressedSHA256" : "2c4103f87649387c1316b06ade1c46eda1192dbf12ef6d116c8e4bb5d7d1e7b3",
+      "compressedByteCount" : 200708,
+      "compressedSHA256" : "91856385f4ccfaf07ff8f1c26400989cbd00aa16828bf712b971a9c9709eff56",
       "documentID" : "250baaee48d6078759be1e5713f3f215cbad0b8aab5d2ac3d63199ce49edb5e5",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/250baaee48d6078759be1e5713f3f215cbad0b8aab5d2ac3d63199ce49edb5e5.json.lzfse",
-      "documentSHA256" : "292543173e72c04ddbe0d170875fa74e0d2521bbb3cce278f90601352bf94ecd",
+      "documentSHA256" : "7f5c8891d78fcda86b537ee8c6ac602df5698a167bd5e6d3cbbb9402c9336900",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 26",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/23.html",
       "sourceSHA256" : "25a6caf728a7e0013cfad6b1621f4e48214751b06c863eac7dd89664c82fa892",
-      "uncompressedByteCount" : 4760676
+      "uncompressedByteCount" : 4760655
     },
     {
       "blockCount" : 269,
-      "compressedByteCount" : 36468,
-      "compressedSHA256" : "2a182445ab8e26e27371e646233da3423afc2e3f8d3ae1716c5350df184c8fb3",
+      "compressedByteCount" : 36469,
+      "compressedSHA256" : "69db56615fc8678d3136ac070914bb802b8361eef8b18af5b493f2c99eefd313",
       "documentID" : "257d12061b95bb154f4633de5204a445ea539af0a4d4ccf7202805bae6c5ac18",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/257d12061b95bb154f4633de5204a445ea539af0a4d4ccf7202805bae6c5ac18.json.lzfse",
-      "documentSHA256" : "1e98ff34c8ab774f941fd249bbaf3de0b3ae438cef9bfde0be3aeb4d09b569f1",
+      "documentSHA256" : "48222ebace1204b2c8a9e68b5099a6431b1ec61a06391800a7ee1be23d0761e5",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unknownElements: intercodelink",
           "unsupportedBlocks: 3",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/24.html",
       "sourceSHA256" : "d158b03cc543b164a5051bdbc28c864b6dc9ba3b4257042bb01c19df36cf6090",
-      "uncompressedByteCount" : 278096
+      "uncompressedByteCount" : 278086
     },
     {
       "blockCount" : 193,
-      "compressedByteCount" : 29016,
-      "compressedSHA256" : "d5693135817ef4b3ad63f9500a4dfedb257ff8f5cebec121b5864842178e0ee8",
+      "compressedByteCount" : 29013,
+      "compressedSHA256" : "2960daf4440c4f0fbc1403d4da4eecb53878c4a1928fa10d0b7e0abf5d54999c",
       "documentID" : "b336f62b4ddd07eb1ae9f464fcda167ad76fd38912d2bacf1f91a6c781038ce1",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/b336f62b4ddd07eb1ae9f464fcda167ad76fd38912d2bacf1f91a6c781038ce1.json.lzfse",
-      "documentSHA256" : "7653a3200a27585252826a1aa55c357323859490b507e9bf299a8d2bc9c9153f",
+      "documentSHA256" : "01d598182cb2ede2cb0bfa874d38ca556309e2bdacd03a44f6bd6a382e910070",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 7",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/25.html",
       "sourceSHA256" : "80b9f96c081769827649d95a0e20901fed1d4e42676b133d22e83d2ae0940212",
-      "uncompressedByteCount" : 237147
+      "uncompressedByteCount" : 237137
     },
     {
       "blockCount" : 357,
-      "compressedByteCount" : 56245,
-      "compressedSHA256" : "cf18c2361c2328ba8f2c4b17e9352e093415fe6ba361e1723d57ac809116b63c",
+      "compressedByteCount" : 56233,
+      "compressedSHA256" : "b450e260e96a8b04451678018e8a34f2d536364890e6359ca8fe6a20c509e393",
       "documentID" : "a3bab3ac6ef31d8d00f7020ddf3edc9d9200df401b280404b7283fb3065ad2a8",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/a3bab3ac6ef31d8d00f7020ddf3edc9d9200df401b280404b7283fb3065ad2a8.json.lzfse",
-      "documentSHA256" : "aa28459c9dcede87e7f72fd135753d6b16307274490a17f5fbb54d41468ba8e6",
+      "documentSHA256" : "4e8b0441c025a95699ac1f26b43375235fccc7e9ab8f9698ba3ee4d80919a2f5",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 4",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/26.html",
       "sourceSHA256" : "7aa75ec56923b60638333cf24a8111e8de847d843cb325d1420761f0f3f15f17",
-      "uncompressedByteCount" : 452614
+      "uncompressedByteCount" : 452604
     },
     {
       "blockCount" : 119,
@@ -431,23 +431,23 @@
     },
     {
       "blockCount" : 573,
-      "compressedByteCount" : 80131,
-      "compressedSHA256" : "a4fb6838cad4da9ea394b9f2163132d71b754f2497ed22f58f6f12704deb75e1",
+      "compressedByteCount" : 80124,
+      "compressedSHA256" : "2b594f4a7a30309097f20dc3142287916df47b38d2bf315cadc347f05d1f5d75",
       "documentID" : "9608f7dc3ac46c84e88c3e59f2364f7ed15a9a3476bed5af3a893b61e1a10000",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/9608f7dc3ac46c84e88c3e59f2364f7ed15a9a3476bed5af3a893b61e1a10000.json.lzfse",
-      "documentSHA256" : "cc34d9e2051b50b5e1fce3b0938ff8d5ec148ee1369236366e5c22f8f754f681",
+      "documentSHA256" : "167ef6df44363d9fa56a5234ddba312a249663daf7d91398c5c323078a8a4764",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/3.html",
       "sourceSHA256" : "3d3cbd7ffcea8b43cc1962e35ec41a4808550f7c366fa006b2fe6659bf8b2984",
-      "uncompressedByteCount" : 633843
+      "uncompressedByteCount" : 633822
     },
     {
       "blockCount" : 399,
@@ -507,24 +507,24 @@
     },
     {
       "blockCount" : 3280,
-      "compressedByteCount" : 548797,
-      "compressedSHA256" : "ee86edad1c99059a7af1ac51e19c946017e2c2ea8da819043f5ff2761fc42ea1",
+      "compressedByteCount" : 548789,
+      "compressedSHA256" : "43ac926348b718a5e55aa001babd7fe18ad36a32ff237e1dc734a9c71d1edef0",
       "documentID" : "313777a213315342946819e9f7e5e6a9e6a1ed73956a1d7161f57130e131f85b",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/313777a213315342946819e9f7e5e6a9e6a1ed73956a1d7161f57130e131f85b.json.lzfse",
-      "documentSHA256" : "896e655b5243eb8d4c39d9e42a32961b9eab51fe8ea31656f30650eba19dc8f0",
+      "documentSHA256" : "c92e8d316a38d6d79a91679f91d7c39b540a8b1910db43df8fd05142a015aab3",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small,Web",
           "unknownElements: intercodelink",
           "unsupportedBlocks: 15",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/33.html",
       "sourceSHA256" : "659f1a7bdd959776b43659e436e14919e1387d2d714c85ef839b7abb3c4c13c3",
-      "uncompressedByteCount" : 3210898
+      "uncompressedByteCount" : 3210888
     },
     {
       "blockCount" : 1,
@@ -564,123 +564,123 @@
     },
     {
       "blockCount" : 1807,
-      "compressedByteCount" : 303012,
-      "compressedSHA256" : "e7a975253e5449b6c89bb980896fe7c8b3559033c58640ac978ec9671b302a51",
+      "compressedByteCount" : 303000,
+      "compressedSHA256" : "465427df9325c4971305291a191fc4086a21668399f50262f6aad3bcdfe7c10b",
       "documentID" : "cc1fe387e1ed9f7328100bb95efb0f50093725df8950c2100c5e9a5d43d7f59e",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/cc1fe387e1ed9f7328100bb95efb0f50093725df8950c2100c5e9a5d43d7f59e.json.lzfse",
-      "documentSHA256" : "35828acb35709a4d0f56da9cfa80292f3a1549c78f17295aa53a0ab6be8820fc",
+      "documentSHA256" : "d05ae672bcc179dc3779d4f8ce12a0b91ac1a79b9a9845993931425e0afd01a2",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 11",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/4.html",
       "sourceSHA256" : "6063dbe9fa9179c795ee0d912dc41cd576dfa1eb307a4212bbf8ef0d377cb7d6",
-      "uncompressedByteCount" : 1904495
+      "uncompressedByteCount" : 1904485
     },
     {
       "blockCount" : 363,
-      "compressedByteCount" : 73273,
-      "compressedSHA256" : "a4b38dfdeede1a24e9c6d0f4a4d6081d2e0d640467f02e9ce85d0cba4def359a",
+      "compressedByteCount" : 73265,
+      "compressedSHA256" : "71b3062d3192d676170a5cad7ccedf130e76e51595e9aed753b5962c1bae5728",
       "documentID" : "d2e16803f9a9d9b0566b50931775901cf12d0c44f1ab2d6779eefcb5966b1f83",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/d2e16803f9a9d9b0566b50931775901cf12d0c44f1ab2d6779eefcb5966b1f83.json.lzfse",
-      "documentSHA256" : "1cd543eb12297911e3b943d34a613bb1f0d719d98b88478fe9e40bc0950f6d22",
+      "documentSHA256" : "2b72e8bef8df2d3e01cf50109b197a330862b62441ff8f6d98e5221d62c448a0",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 5",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/5.html",
       "sourceSHA256" : "6562530cfcb211c3f58582cff7723119233c9f29392ae941ec2e5ced2e647fab",
-      "uncompressedByteCount" : 1353645
+      "uncompressedByteCount" : 1353624
     },
     {
       "blockCount" : 82,
-      "compressedByteCount" : 15376,
-      "compressedSHA256" : "8efda19fecad8876759bb39c57cd5d130ac6c02e742d4e37c86cc12cfdc98826",
+      "compressedByteCount" : 15372,
+      "compressedSHA256" : "efc9c63e287e5619f663349cf58cc05b1bbdb5764f18f88815fca4988370aea1",
       "documentID" : "5f14ae8f79c155126ada0522a17a4d499be1b74a45263d7abaa09b416920d404",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/5f14ae8f79c155126ada0522a17a4d499be1b74a45263d7abaa09b416920d404.json.lzfse",
-      "documentSHA256" : "3c8617e7b51b0e09b7e56f453451d5a977cb8871d420855b28ebf44951205267",
+      "documentSHA256" : "21a93e8149fb64ce9b0181801f2ec958b423f518c037ab6da2ba6ef9af1c8b2a",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/6.html",
       "sourceSHA256" : "38d14455bf298079738d668f3f5c05b4d032d1de4171f76278a11b6e70e27c52",
-      "uncompressedByteCount" : 149417
+      "uncompressedByteCount" : 149407
     },
     {
       "blockCount" : 1550,
-      "compressedByteCount" : 333225,
-      "compressedSHA256" : "506f5886dea5a2e450c45482dac5675115b2060afee420980693847063bb0de6",
+      "compressedByteCount" : 333212,
+      "compressedSHA256" : "e6e2b00f3e5a8f293d3cdc32858b79863ae6aa6d39b9d3c6af778922b2ac68b5",
       "documentID" : "1db2ef2bdc3299e1b9ae28d0fa8b1924558cee684af07d614514f10ad6a10bcf",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/1db2ef2bdc3299e1b9ae28d0fa8b1924558cee684af07d614514f10ad6a10bcf.json.lzfse",
-      "documentSHA256" : "53f0a957616f4323253982eb460f7002919e9944a4a428578db3872eacf9cccd",
+      "documentSHA256" : "50823421b4cf7220d06b0cc5a1a58455cf7f3d0b0d4aed3f8aad64d5aa8a1dc0",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 28",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/7.html",
       "sourceSHA256" : "c6c023d433a5e445b461cf90fe6e0ddd8213c937e562bfdb48cc130e85674b97",
-      "uncompressedByteCount" : 3433338
+      "uncompressedByteCount" : 3433317
     },
     {
       "blockCount" : 167,
-      "compressedByteCount" : 23174,
-      "compressedSHA256" : "6fa6e4ed3f9d120921340fdce9c14cbf56486185b4049a0466db6ad9a787e641",
+      "compressedByteCount" : 23169,
+      "compressedSHA256" : "09491ad74420bdcb859a45d99c85d984985d0f009c6ad624580b9a39187075c5",
       "documentID" : "7d193f7bcfeb95e33dcd37a778e93f894a9f3ddaa3689fff3f68d75752f55c9c",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/7d193f7bcfeb95e33dcd37a778e93f894a9f3ddaa3689fff3f68d75752f55c9c.json.lzfse",
-      "documentSHA256" : "71b054644e07d7845a7492c6069e3dbc42166414ff5671ea0ff668294523915a",
+      "documentSHA256" : "c62311bdfcf02e29b0f9c2e5b9de87fd4309b8d70a97f56610a2295e8fb82dd8",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/8.html",
       "sourceSHA256" : "e6fe86675f8afaff92823110bc1ee2c6a7803b934f0ffe85dc41bbdcaabb9967",
-      "uncompressedByteCount" : 206711
+      "uncompressedByteCount" : 206701
     },
     {
       "blockCount" : 1805,
-      "compressedByteCount" : 290502,
-      "compressedSHA256" : "438a4119a8355d5cdba98e269b7efdacb0c21de974ede8501c8679352322edea",
+      "compressedByteCount" : 290495,
+      "compressedSHA256" : "109611ea48d71a1c7ccc90e6319e6041d934cf34cf34bc2c934f7ac06119d8e9",
       "documentID" : "5c445e73549f402fb5ef8710a7f4280fea5cc34a05341cd0e97cb985fb02c69f",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/5c445e73549f402fb5ef8710a7f4280fea5cc34a05341cd0e97cb985fb02c69f.json.lzfse",
-      "documentSHA256" : "d8a3f0fb242fe65c60ff4aaf4097c86ac2a664d1ac013e20a0e7552ebd948251",
+      "documentSHA256" : "2279686f5d6b2c8b2ddce1d112fbada25a18bce191ef7485e499e818c17195fb",
       "eligibility" : {
         "reasons" : [
           "unknownElements: intercodelink",
           "unsupportedBlocks: 4",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/9.html",
       "sourceSHA256" : "b4a6e90d7961d9a3a597a7af06d78871c5ce0ce0f4bdb4730cc1163ea999cee8",
-      "uncompressedByteCount" : 1658121
+      "uncompressedByteCount" : 1658111
     },
     {
       "blockCount" : 1,
@@ -757,22 +757,22 @@
     },
     {
       "blockCount" : 144,
-      "compressedByteCount" : 20146,
-      "compressedSHA256" : "c325c693d745f36b5cc20979d39bd99b927b3ee0952c83be04901a0662490e9a",
+      "compressedByteCount" : 20143,
+      "compressedSHA256" : "f99e80265e1ee7913c7d86f891200841077bb6036e93e3d513ed67c0df8d5d4f",
       "documentID" : "bd69be5ee55b798fdda043c71e5791b58c523d83de095d008b9d728f90702823",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/bd69be5ee55b798fdda043c71e5791b58c523d83de095d008b9d728f90702823.json.lzfse",
-      "documentSHA256" : "127d2f33b2f8ac5b164ff72b6a1cf54fb765a55628509dc2949e4e7386285e94",
+      "documentSHA256" : "c3411023671da277a91e59fc10e6576d831880cce27bcb6eeeb19e5d932c1b8c",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 3",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/E.html",
       "sourceSHA256" : "15390104a54eb39408de478411ada0970a81c941bd69cf4a893fc5f9894d7b17",
-      "uncompressedByteCount" : 145456
+      "uncompressedByteCount" : 145446
     },
     {
       "blockCount" : 28,
@@ -794,44 +794,44 @@
     },
     {
       "blockCount" : 606,
-      "compressedByteCount" : 107848,
-      "compressedSHA256" : "0951e0d1379ab17fc6ec6ff39969faac465630d110cd57ff5a5ae92b438ff58e",
+      "compressedByteCount" : 107844,
+      "compressedSHA256" : "a0c9b6bfb0568042825effb84212442e8e2c9389ba39c4aba4d3d3b26c6f02f0",
       "documentID" : "753205ef2c88a08abe378563aebdf1a3225069ce901eead44d93b535558243c4",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/753205ef2c88a08abe378563aebdf1a3225069ce901eead44d93b535558243c4.json.lzfse",
-      "documentSHA256" : "8ca2898522f999927d27991f548acc65c64d2190c24a5df21a7a491ddf482185",
+      "documentSHA256" : "93e7c5d5bfd09506dba904578c9af41a15b22f2c2b6e28e9e360fab11b1f65c7",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small,Web",
           "unknownElements: intercodelink",
           "unsupportedBlocks: 6",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/G.html",
       "sourceSHA256" : "34ce0e653cca922df51f64c085e1d363485ed3cda478d4a9eb261e33d6d16c1e",
-      "uncompressedByteCount" : 737690
+      "uncompressedByteCount" : 737680
     },
     {
       "blockCount" : 187,
-      "compressedByteCount" : 26731,
-      "compressedSHA256" : "37c60b67d3cd1ac19806458dc7b012999f8e5ae49ee8f453733c14f57ba80bf5",
+      "compressedByteCount" : 26728,
+      "compressedSHA256" : "4075ef74b999948453add5ce5fb5be7da89e04ac83025981c4f19aeb16eecc6e",
       "documentID" : "66a177ec91b08b1dbd1a44f2653cef2ce9af1f6b301889761924160968e11e3e",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/66a177ec91b08b1dbd1a44f2653cef2ce9af1f6b301889761924160968e11e3e.json.lzfse",
-      "documentSHA256" : "931196eb039db1d082f427c7c999e4890db1e7eb0e7e0a31aa1dd5dc902a49d7",
+      "documentSHA256" : "2816aba5025c5977f1f372eb85621fdf7e51a525104585c9f1a3cb363e0d940d",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/H.html",
       "sourceSHA256" : "f6c6f37046898d0715e842f31f123861154a051dcbae6be3e628600e512a4055",
-      "uncompressedByteCount" : 190977
+      "uncompressedByteCount" : 190967
     },
     {
       "blockCount" : 1,
@@ -1034,22 +1034,22 @@
     },
     {
       "blockCount" : 556,
-      "compressedByteCount" : 124747,
-      "compressedSHA256" : "6e1491cfd3db5f395daaa536e68ba1429bca61c5f6adf5817fa71de3a686fdb6",
+      "compressedByteCount" : 124738,
+      "compressedSHA256" : "fa781411e81e92ba6336e6cb673baeb09ed409e5a8d91d86389131c5165b8427",
       "documentID" : "7b9ce00ff86e90ae0fc993fd85ccd657223871455a22c2086f9271cfdfe3cf45",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/7b9ce00ff86e90ae0fc993fd85ccd657223871455a22c2086f9271cfdfe3cf45.json.lzfse",
-      "documentSHA256" : "8749b10c70029d1f232c3bb2b9de4a593df00f56c7afcfc931307e8cf2dd99c0",
+      "documentSHA256" : "7a5aefe0ddd6da635eed4ae5a66565850dc4fa4ace0660969e6dacb7d6134f36",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/Q.html",
       "sourceSHA256" : "56cd829ce0b96972ac7b5469a3b2e89c54bc51064301f4f4cbdbcd5da10b41b3",
-      "uncompressedByteCount" : 855551
+      "uncompressedByteCount" : 855541
     },
     {
       "blockCount" : 71,
@@ -1089,23 +1089,23 @@
     },
     {
       "blockCount" : 196,
-      "compressedByteCount" : 26775,
-      "compressedSHA256" : "c5bd5ea30b584664c68e38c44ce9871d9c340685dd2d4aad4d1af3916c8e0c55",
+      "compressedByteCount" : 26769,
+      "compressedSHA256" : "923a7a2990cc8447db1332743d1caa8ab1b4f0e53830acd2a7913b54f2ca76c6",
       "documentID" : "c1d7a00cf74a561529f99ccf886d8cad688429cd82609b5b262bb2bfb43bf9ea",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/c1d7a00cf74a561529f99ccf886d8cad688429cd82609b5b262bb2bfb43bf9ea.json.lzfse",
-      "documentSHA256" : "deaaf55e856900661039c2a0275bccf3769aa8564b8c0594ead2602b9830ceb7",
+      "documentSHA256" : "8c62dc499f74a749318d23c1939ac2554b31e240f5c6da81be70e08fe50d855e",
       "eligibility" : {
         "reasons" : [
           "unknownElements: intercodelink",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/U.html",
       "sourceSHA256" : "2cccd89fe3c8e1f8757e2f5848e11b78fcfbf210553ceffd6640e95567d62fa9",
-      "uncompressedByteCount" : 203509
+      "uncompressedByteCount" : 203499
     },
     {
       "blockCount" : 306,
@@ -1127,63 +1127,63 @@
     },
     {
       "blockCount" : 1824,
-      "compressedByteCount" : 312080,
-      "compressedSHA256" : "f3680964af8acd3c023fdfa170fe216ae201ff7b2b5abaa9db2a76b30503682d",
+      "compressedByteCount" : 312077,
+      "compressedSHA256" : "9549045055e94a2d13abb20907aac0da9d6a4ef8776b6c23b3a03179669b3cb6",
       "documentID" : "ee077be7319ca1668e45193c0a878f9bd6e677da83f219ee657da3fb73c7c7c2",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/ee077be7319ca1668e45193c0a878f9bd6e677da83f219ee657da3fb73c7c7c2.json.lzfse",
-      "documentSHA256" : "377567c2c750152376585cce1aa05d29b65a33b8749689f27f1d554d98edca33",
+      "documentSHA256" : "e95b9eb0de98261582a8852b25bb6f9726056a8fb08385a6b3af407880928231",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 14",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/10.html",
       "sourceSHA256" : "bcd0144f59fce3902beff150683b665769367cfcc81e27a2555c6b615333e23f",
-      "uncompressedByteCount" : 1951856
+      "uncompressedByteCount" : 1951846
     },
     {
       "blockCount" : 896,
-      "compressedByteCount" : 140402,
-      "compressedSHA256" : "c42f91f74f90a99d97c0acc41f907cd9190b2c172186a6d7d0fe8826f569f0de",
+      "compressedByteCount" : 140391,
+      "compressedSHA256" : "e4dc1ddea06f280fd184afa13feae761d7abf78d6fca38ff54e2c39b0c781668",
       "documentID" : "88c5df950743b0a2e7d6e33418c17da00ce07bbf00bb3783d7d99b94b8ad178f",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/88c5df950743b0a2e7d6e33418c17da00ce07bbf00bb3783d7d99b94b8ad178f.json.lzfse",
-      "documentSHA256" : "94e4ff9afd6f8ba07f462383301a9f0aa0a032b5dc1f1380ca611d543ab6cd40",
+      "documentSHA256" : "de939eac4ea4d414885e5c3a29ec16d738ee37c89d5cdf672df618b1ca333ce2",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 8",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/11.html",
       "sourceSHA256" : "bf004b8f4dd9dfc69e1e3f672bbdb0a4d99cf5166284480c56a2aa3f6d867d96",
-      "uncompressedByteCount" : 897769
+      "uncompressedByteCount" : 897759
     },
     {
       "blockCount" : 353,
-      "compressedByteCount" : 54103,
-      "compressedSHA256" : "b073f26732f3089ceeff885c466666a4c23bad82c0500530818183c2fc24d88a",
+      "compressedByteCount" : 54097,
+      "compressedSHA256" : "55f50954777d1e07c9aa515ddb56f348dc27d78f330df8a9eb28b183a3e18156",
       "documentID" : "ff70b630a8428b3c6728489834e0897d07a85f0f269668450c5580478c1a2889",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/ff70b630a8428b3c6728489834e0897d07a85f0f269668450c5580478c1a2889.json.lzfse",
-      "documentSHA256" : "1f17dbea3d86d7f3036e52f37dc53bc76b9f6751424a5acc2696578fd00fa91e",
+      "documentSHA256" : "7654bc1439251c72406d7668f263450f42278171e4b10fba3e5236bc5f37eb28",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small,Web",
           "unsupportedBlocks: 4",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/12.html",
       "sourceSHA256" : "a71385f66d2008c0d5dced2c7b45ef6c042f32e3831cd45760e91929c973c5a2",
-      "uncompressedByteCount" : 395395
+      "uncompressedByteCount" : 395385
     },
     {
       "blockCount" : 7,
@@ -1205,123 +1205,123 @@
     },
     {
       "blockCount" : 423,
-      "compressedByteCount" : 62573,
-      "compressedSHA256" : "c70d0fdcaa4497197815730a3c772a5f34eeec0a1b9eb888675af67852c6ec12",
+      "compressedByteCount" : 62570,
+      "compressedSHA256" : "692ae8d663e9d196e39ca144c8f88e4661666464115b0f41131d2a814a5abef0",
       "documentID" : "de750e3bcfc4ac96678400426b7b90286a6dea91db65e7d5f392213aaacd7bba",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/de750e3bcfc4ac96678400426b7b90286a6dea91db65e7d5f392213aaacd7bba.json.lzfse",
-      "documentSHA256" : "8abe4fe4a2e8773f5cd27594b26dc249f23c19034085f6853b884600c3a15412",
+      "documentSHA256" : "1e7f29a318cc17c2daa960a224e46f9b1f0d1faf8c8a732b2f6966136f3f529a",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/14.html",
       "sourceSHA256" : "eb031d425a6cb7cf09d7090a00c8371d7e8c7e2e11677f4ae15eed3d65050c9e",
-      "uncompressedByteCount" : 457713
+      "uncompressedByteCount" : 457703
     },
     {
       "blockCount" : 527,
-      "compressedByteCount" : 86629,
-      "compressedSHA256" : "79e2d71eef7cd593a4f3cee6458581f31937380c18928ce9040c2b30a00dabed",
+      "compressedByteCount" : 86621,
+      "compressedSHA256" : "02addbc6d59fe72b4cb1af6218c809b12e058cfc6c3b9d4ad1a320b6ccadf002",
       "documentID" : "a72ef96405c4fd314ef9cc57095f28b4b69bf2e524570b244cccf0b9b0d79d51",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/a72ef96405c4fd314ef9cc57095f28b4b69bf2e524570b244cccf0b9b0d79d51.json.lzfse",
-      "documentSHA256" : "c62318e63e206d7dad1124f8d551a3b94bd1472bf86a1239d0e081d1b173ca6d",
+      "documentSHA256" : "8b546d36ff9de0ded264c668f8c5a2d48ec17119406263d5e7689b3055299b0c",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 14",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/15.html",
       "sourceSHA256" : "fcdc0f8913c23d34d2cfd9803318682e5a76ae4615c2e438587d59dbe6c6828c",
-      "uncompressedByteCount" : 682518
+      "uncompressedByteCount" : 682508
     },
     {
       "blockCount" : 857,
-      "compressedByteCount" : 172935,
-      "compressedSHA256" : "5f3b4d50baeb15d4d22d745a9a1e25d43442316e2a893d1f4932a43c91aef22a",
+      "compressedByteCount" : 172932,
+      "compressedSHA256" : "9c807f54c1b22b896c7301982a98d6fe575b5bc443db7c8d2915600c70539384",
       "documentID" : "0d56b3833993b170158f8eab0360d527430cbb796eacf053e356fabcf231ebde",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/0d56b3833993b170158f8eab0360d527430cbb796eacf053e356fabcf231ebde.json.lzfse",
-      "documentSHA256" : "dceb72c76060c268609c92c97dc63ae7cdc5a90ec6fe5c8386008127c322f281",
+      "documentSHA256" : "2c1b65d1315b5e72cb0cba91d39462a89230e2f8b04d4f48cd2dd6bc0a39fb01",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small,Web",
           "unsupportedBlocks: 24",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/16.html",
       "sourceSHA256" : "352dc482792897e172b737677bd02007ddd7f505f8ec2016691a911f57d2dbac",
-      "uncompressedByteCount" : 1564598
+      "uncompressedByteCount" : 1564588
     },
     {
       "blockCount" : 644,
-      "compressedByteCount" : 121663,
-      "compressedSHA256" : "1755735094c048a648f9f1d2fa2b2b831593505bc9126b2f6be113ba5692e305",
+      "compressedByteCount" : 121644,
+      "compressedSHA256" : "6e253f16d4f983fdf6e70d693129e14e1a24ee9857db2c3ad4a9482fd3e2a52d",
       "documentID" : "fdc62da6879d03cd7b7af4473b4acd1132fb2a6cf792feb6b2bbce218d27c1e5",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/fdc62da6879d03cd7b7af4473b4acd1132fb2a6cf792feb6b2bbce218d27c1e5.json.lzfse",
-      "documentSHA256" : "8354a54da6c59cdbfe200d4da9873550361969be4348b63eff3992cf02cd286f",
+      "documentSHA256" : "c3db6cf89f5eb1cb232e8cced67b6e82d121835e0d8e9fd3f1d58aa427ea6944",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 14",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/17.html",
       "sourceSHA256" : "ed591a675906939695fd07332fdb4634c311b1a4ff8acc378cb37297019410c5",
-      "uncompressedByteCount" : 1046236
+      "uncompressedByteCount" : 1046215
     },
     {
       "blockCount" : 1232,
-      "compressedByteCount" : 213279,
-      "compressedSHA256" : "bea9ac66686f5fed0420b4b6c08744a7f6d116203c58eb8fb859f3569bbeb67d",
+      "compressedByteCount" : 213277,
+      "compressedSHA256" : "d11bbeaed17564db5e8344f0eeba3b2b60fd8fac36a3b98755f3186468cce9a8",
       "documentID" : "e355d3b56808d53289549e9be897a331fca168d9c14f0641b3acf5710ef4e722",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/e355d3b56808d53289549e9be897a331fca168d9c14f0641b3acf5710ef4e722.json.lzfse",
-      "documentSHA256" : "54c1b1d5295cbbea228e90d60b0129ff40dca961b3d6be2686da17fdfbf9a31c",
+      "documentSHA256" : "2ab5fcb0132a1a12a27fae3b27064bb690d57b45839ff6a48d9ec6da6c34749a",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 6",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/18.html",
       "sourceSHA256" : "4e1738c8861a94a0c92b187384f1031648624146c30c8e0c473ff5c90fe7d225",
-      "uncompressedByteCount" : 1330957
+      "uncompressedByteCount" : 1330947
     },
     {
       "blockCount" : 591,
-      "compressedByteCount" : 90265,
-      "compressedSHA256" : "88c192e220ee789209bf63d65ed5f1f87291b619c23c352ea226b35c2978353b",
+      "compressedByteCount" : 90255,
+      "compressedSHA256" : "be06bf708611e21bfe348a7c32ad06f62c4ebc7290344ba4883e59129b2a1595",
       "documentID" : "cca58248fef2411d6078312d4416a23be8424ba8ead512e747ed48bd6394e630",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/cca58248fef2411d6078312d4416a23be8424ba8ead512e747ed48bd6394e630.json.lzfse",
-      "documentSHA256" : "39329e1505cd1d0e1b022b7e9169a519b180adcd641ac38d0b1993955f088209",
+      "documentSHA256" : "56b5fafdbb70912ea3096d89b561e00b62fd858ac6654109f26a7affb9d8a2b0",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/19.html",
       "sourceSHA256" : "f6f9eecdb15ea033bdc31e7f9976faf5b2d9a4376e854bfbd38fcec4f4501361",
-      "uncompressedByteCount" : 553529
+      "uncompressedByteCount" : 553519
     },
     {
       "blockCount" : 92,
@@ -1362,23 +1362,23 @@
     },
     {
       "blockCount" : 537,
-      "compressedByteCount" : 86575,
-      "compressedSHA256" : "582f3df12026a4ed1dc48f9779d899c3d8f8b24e87f66d76492ac984f176a288",
+      "compressedByteCount" : 86567,
+      "compressedSHA256" : "c7328e64aebfab527b507180ad0f18c2a7c620ab132ab3b0fc26e8ea8b52c1e2",
       "documentID" : "c5c8cac824bd6ab9fe6a11d21af28c436b309fa5a0705ae9827bea0f63c823eb",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/c5c8cac824bd6ab9fe6a11d21af28c436b309fa5a0705ae9827bea0f63c823eb.json.lzfse",
-      "documentSHA256" : "73d013fb163a983f2e74f3c3f7e477c372c04b05586bdf6584384e76bab73467",
+      "documentSHA256" : "1fe4d7fe2b8efa10f57de8a0cbfebdc77846f5b39b068b165df68eb988790a11",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 7",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/21.html",
       "sourceSHA256" : "b54f8bc2961b133878703a5fb37733b4150ef876ecef35e5e77cf11359e38493",
-      "uncompressedByteCount" : 586632
+      "uncompressedByteCount" : 586622
     },
     {
       "blockCount" : 202,
@@ -1400,84 +1400,84 @@
     },
     {
       "blockCount" : 716,
-      "compressedByteCount" : 199862,
-      "compressedSHA256" : "964f68cac0e841f52a355098ce780c922e593723e3e0b177df71c8032172867b",
+      "compressedByteCount" : 199855,
+      "compressedSHA256" : "1dd4e08dc7d83bd947c31ae9e645f7d62ad0fbd1293e5526a9564f3eff26b488",
       "documentID" : "63cb0589b2e8facc2948c808ec8633e9780a5f86ab603e52177329521b787327",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/63cb0589b2e8facc2948c808ec8633e9780a5f86ab603e52177329521b787327.json.lzfse",
-      "documentSHA256" : "37292f16cb99f4c0ef7a9d04e12599e3a62f41cabe69b445a92f3aa856525e42",
+      "documentSHA256" : "2badb9bea219a28135167429a3043f3a8c7a828086e360dc4aeacad0eca0290a",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 26",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/23.html",
       "sourceSHA256" : "07039cd8e1daa941abc5215a4b135f226e271eba4100e409f8529ded55802b5d",
-      "uncompressedByteCount" : 4781574
+      "uncompressedByteCount" : 4781553
     },
     {
       "blockCount" : 269,
-      "compressedByteCount" : 36463,
-      "compressedSHA256" : "d1c869fb6bdde4f1eb194f449a8b683dce77e8392f4177e0d8e17df55f75cba4",
+      "compressedByteCount" : 36460,
+      "compressedSHA256" : "7397d49a283f8e7fe01b9e8b0ac03f0311951f9289eb090c35174aae966da18b",
       "documentID" : "77a44e9ff1d309e8f5ec37fc1563b742a48d471edd3b21ff612156718fad3521",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/77a44e9ff1d309e8f5ec37fc1563b742a48d471edd3b21ff612156718fad3521.json.lzfse",
-      "documentSHA256" : "bdacc225050b8b88aa1afd98f629aae53b777b96c1acf87ea9178ad68f5bf4ee",
+      "documentSHA256" : "2a230b08c0db7d687055ab3dd00e1da538067cbae9e66d76b63b29164f277e4e",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unknownElements: intercodelink",
           "unsupportedBlocks: 3",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/24.html",
       "sourceSHA256" : "858689fae83778a2ff879ed3aa11098429efeda2c39e2932d3f170dc5538b78e",
-      "uncompressedByteCount" : 285662
+      "uncompressedByteCount" : 285652
     },
     {
       "blockCount" : 193,
-      "compressedByteCount" : 29089,
-      "compressedSHA256" : "21be84c2985cf671d7ac792c57d2894a5b4163c3dc1a413d79edfeff44b1e929",
+      "compressedByteCount" : 29087,
+      "compressedSHA256" : "dedf9141459a057a5b672acf2adad49f885905e7cf740b2e953c694cc2cb26f6",
       "documentID" : "c92c4f34098405b2cc1429f905f591e250a30e46c17c567cbad5c0403eba52ac",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/c92c4f34098405b2cc1429f905f591e250a30e46c17c567cbad5c0403eba52ac.json.lzfse",
-      "documentSHA256" : "8875c8c9246a849ae9317be08f6aca24f56dd98eff72d2157b3961136a873051",
+      "documentSHA256" : "ecb222025c3e201719d6f36ae01458453a332671fe2ef795857a9667c1bb9e42",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 7",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/25.html",
       "sourceSHA256" : "8ca2dcfc416e78a3b5df4659765a075da7da134445727048951ef2a800921426",
-      "uncompressedByteCount" : 242585
+      "uncompressedByteCount" : 242575
     },
     {
       "blockCount" : 357,
-      "compressedByteCount" : 56698,
-      "compressedSHA256" : "8c048eab044c981e852646e2570b3f388418cf5894981e4d99e9164fa88acba4",
+      "compressedByteCount" : 56695,
+      "compressedSHA256" : "25cac4d70e99db5a32f99ce392d6322acdc6b99faf653597d6acea3253c539dc",
       "documentID" : "86c4a614817d8db93f2d426a1a82492455863c8f4b1be602ef37f685931a2507",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/86c4a614817d8db93f2d426a1a82492455863c8f4b1be602ef37f685931a2507.json.lzfse",
-      "documentSHA256" : "ee5336e501777d703eea31bf3a18b634d6b3c407f5515d23b8b05de4577b78f1",
+      "documentSHA256" : "cd2299f52b60beada355a348356eb21e1858149887dbd7e7bdebfc1df24ad26e",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 4",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/26.html",
       "sourceSHA256" : "2525647744d9627d0615cf47969683e5030c945cddf598167711086b6038fc08",
-      "uncompressedByteCount" : 462696
+      "uncompressedByteCount" : 462686
     },
     {
       "blockCount" : 119,
@@ -1535,23 +1535,23 @@
     },
     {
       "blockCount" : 573,
-      "compressedByteCount" : 80285,
-      "compressedSHA256" : "64044b4e64ac23c154ff7aa3f4a74e55cf0f44ed4c052a46fdf88f208e6d6c6e",
+      "compressedByteCount" : 80277,
+      "compressedSHA256" : "48facbb78463aad79630ec5776c48a58b2e1c59d0af9db4b95fb2c21a18d7d79",
       "documentID" : "6681de21e4ab7500db89fc271b436f2c74d5d7058d9485285f43e355f584794a",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/6681de21e4ab7500db89fc271b436f2c74d5d7058d9485285f43e355f584794a.json.lzfse",
-      "documentSHA256" : "a4e9cbd30f4e8dc14e795590fabc5cf1401135f18a3146e39131ddd55c332a59",
+      "documentSHA256" : "4ed5d9914fb60f58c503dd72f3d11207ab662ad0326838231778cbdd76e0e821",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/3.html",
       "sourceSHA256" : "c4cff72fc1a6532d82f62969922bb6116b698253a87897c82af4c2dbb7a974ce",
-      "uncompressedByteCount" : 649921
+      "uncompressedByteCount" : 649900
     },
     {
       "blockCount" : 399,
@@ -1611,24 +1611,24 @@
     },
     {
       "blockCount" : 3280,
-      "compressedByteCount" : 549287,
-      "compressedSHA256" : "128eb6efde9e548c69f62ab5d8585d8e04224a6e22ed327ac4024952dfb15017",
+      "compressedByteCount" : 549275,
+      "compressedSHA256" : "978671b65d4d41ececdee29f6031a2facbf189b309c479057ad7d0e82f61c16c",
       "documentID" : "100ae36944dc14a207454679a206c99873ebc3e94ede66ccd9aa98c6e5916760",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/100ae36944dc14a207454679a206c99873ebc3e94ede66ccd9aa98c6e5916760.json.lzfse",
-      "documentSHA256" : "e9bb6588281f6521e941c99a21dec9dd7943a257a24cbfcac6c76a2be32875bc",
+      "documentSHA256" : "a3183dbe044cd97d839ed62ce9732240d626f8e7de5a136e89b1628c7d6df5d2",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small,Web",
           "unknownElements: intercodelink",
           "unsupportedBlocks: 15",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/33.html",
       "sourceSHA256" : "d8d7c56ec7de33c6ab8f81c495b646247061cfe1b77ddd8b21d66387a6dc2505",
-      "uncompressedByteCount" : 3303418
+      "uncompressedByteCount" : 3303408
     },
     {
       "blockCount" : 1,
@@ -1668,123 +1668,123 @@
     },
     {
       "blockCount" : 1807,
-      "compressedByteCount" : 303492,
-      "compressedSHA256" : "02ae0c55b32e5071f01644918671a6b242d0aceee9674b8f0cb839366b221739",
+      "compressedByteCount" : 303482,
+      "compressedSHA256" : "5a0fa79ae5947d493597c53fb6513a999498251fc4d37571d465b971f7f078f7",
       "documentID" : "30ae021a0b53c2fd4290269ba6c56737852cb3c22c2e8a90dd3ddda5e8b4ab2e",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/30ae021a0b53c2fd4290269ba6c56737852cb3c22c2e8a90dd3ddda5e8b4ab2e.json.lzfse",
-      "documentSHA256" : "64fff3b8115971925d25321541802313e476df379a33361764f11ed8575d46d1",
+      "documentSHA256" : "21d240db17deb55ab4372a144d6cc15b8856292478b2d0323b3182edf7645e6f",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 11",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/4.html",
       "sourceSHA256" : "e82c0e1e3b4c5ccfd36d4097b009ab71759ef6496b23e9d1f60c339456d32bde",
-      "uncompressedByteCount" : 1955125
+      "uncompressedByteCount" : 1955115
     },
     {
       "blockCount" : 363,
-      "compressedByteCount" : 73398,
-      "compressedSHA256" : "d56ac6b3342b03b8d00bb016a021bdfe8ba0fe6a435a840b79f4de192e7fd31d",
+      "compressedByteCount" : 73393,
+      "compressedSHA256" : "987d57f7afcdef0ff949cea8ef0fa982561654dc1de81f094e4977799e1b8afe",
       "documentID" : "0ad357a4310d1bfb3a2aac8fedd92056710d5c82d022d8d4cbbf6872eb2d0712",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/0ad357a4310d1bfb3a2aac8fedd92056710d5c82d022d8d4cbbf6872eb2d0712.json.lzfse",
-      "documentSHA256" : "9658bbcc1300a1265bf8a7c4caa52f596fdc6be37c99061fa2a4f4238d06e970",
+      "documentSHA256" : "0eab9334d1552456330bd02804ecae432d6054dd973a576ee17cc7bbf32532fa",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 5",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/5.html",
       "sourceSHA256" : "8be1c74764933f929f408fc1435bc5380007a7d2813907555c70f4d399bbf9fd",
-      "uncompressedByteCount" : 1363843
+      "uncompressedByteCount" : 1363822
     },
     {
       "blockCount" : 82,
-      "compressedByteCount" : 15427,
-      "compressedSHA256" : "1afe198fe5747201f1a420b0e082ae0200bde65b5dcecd2492dda9631dbf6811",
+      "compressedByteCount" : 15424,
+      "compressedSHA256" : "33133a204a724654b84542bdc5c7b73b1c8da0a514274fab1cc074686dd34dbc",
       "documentID" : "9a521183b8a0faee77dfad29198b7b3078de444831c3903ee184989ddce0a036",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/9a521183b8a0faee77dfad29198b7b3078de444831c3903ee184989ddce0a036.json.lzfse",
-      "documentSHA256" : "5bfe61514c3e2e746647713c2a1ae8b0e4c5ca30efffb2f9951d09f5c6187313",
+      "documentSHA256" : "9dbb90a26befaffd55fb319343a41e1ef58a2daa793871f57d98a9e6d0a224a1",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/6.html",
       "sourceSHA256" : "669cc602dbe1e5015bc9b2b15925070dbaeed56e811b7caec7e51b8ab4690e77",
-      "uncompressedByteCount" : 151747
+      "uncompressedByteCount" : 151737
     },
     {
       "blockCount" : 1550,
-      "compressedByteCount" : 333687,
-      "compressedSHA256" : "08969bd5b396a651f7f573cf8f5edd8100df974244e20ce52134fbdd4d79e194",
+      "compressedByteCount" : 333683,
+      "compressedSHA256" : "8469644ef339c8a9403fee5dd6d5f63fffe4226dab982318d74910ce7c23e502",
       "documentID" : "cd71ab0aa600335b7cb4230ff6f6abe1cd8c3f44ea5ee7bbc189f07a03692cc9",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/cd71ab0aa600335b7cb4230ff6f6abe1cd8c3f44ea5ee7bbc189f07a03692cc9.json.lzfse",
-      "documentSHA256" : "a1a5e44497e37095760a3094e04037deeca2b5670623aa602db8f7bdccecb2b7",
+      "documentSHA256" : "9ad1619527a656223dc2da97bc97a8a0de05ee564f25fcc180f2be8648d97159",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 28",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/7.html",
       "sourceSHA256" : "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51",
-      "uncompressedByteCount" : 3479305
+      "uncompressedByteCount" : 3479284
     },
     {
       "blockCount" : 167,
-      "compressedByteCount" : 23235,
-      "compressedSHA256" : "454029a73e3281b86e20d08f1e564fa277a31916c447c06f56f854535bd1c861",
+      "compressedByteCount" : 23232,
+      "compressedSHA256" : "37431c2c9750f87114ae3c6625e8047d1bc20e36804e9a07a26e36467aa22a08",
       "documentID" : "ab026191878c50e16bcf263557e0c528ff780425a8a960a06dd178c6e41074bf",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/ab026191878c50e16bcf263557e0c528ff780425a8a960a06dd178c6e41074bf.json.lzfse",
-      "documentSHA256" : "7d073b75cac9442bf28e2eab03e739b5f9f20137842a0b15e0f6bdf9a7df1b5b",
+      "documentSHA256" : "ea0273bfcc338ce3833bea4730b119bf3f53420eaf5b52a7462fc9e4d2a0b904",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/8.html",
       "sourceSHA256" : "0ad395a685999f3fc380f5400736ec19da47740ca4c2be7b791cca75332d53a1",
-      "uncompressedByteCount" : 211421
+      "uncompressedByteCount" : 211411
     },
     {
       "blockCount" : 1805,
-      "compressedByteCount" : 290617,
-      "compressedSHA256" : "0103f2200de3b01c9b3545ad0007b48fe42946d01a806f1f780bb3ce0b5d7454",
+      "compressedByteCount" : 290608,
+      "compressedSHA256" : "7e3697a6c2a2e9a4196406f5aa93c0900557cb18403efbf15c961e69e325b2c6",
       "documentID" : "f914def0725c12d12acacd3f4b2ff4894534c67a339eabd376b59ef7f1c614c1",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/f914def0725c12d12acacd3f4b2ff4894534c67a339eabd376b59ef7f1c614c1.json.lzfse",
-      "documentSHA256" : "b76ce6e9bb79a39c1c8a7cc8387252f5f51b0a8627577de4403f1f76436e88c0",
+      "documentSHA256" : "1bfbab25de1703979de8cb0f967470031038cb89a82cbe5687a410138ed27756",
       "eligibility" : {
         "reasons" : [
           "unknownElements: intercodelink",
           "unsupportedBlocks: 4",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/9.html",
       "sourceSHA256" : "88d0b3180d4e535df4013fa144cd5c4e41ab24d025c66a91c3cbe70f35b0e1ff",
-      "uncompressedByteCount" : 1708695
+      "uncompressedByteCount" : 1708685
     },
     {
       "blockCount" : 1,
@@ -1861,22 +1861,22 @@
     },
     {
       "blockCount" : 144,
-      "compressedByteCount" : 20181,
-      "compressedSHA256" : "c51da9f114021c0c0e8ad9672fab7b9d08b649e2e590092dd14b28fa81b0e1e1",
+      "compressedByteCount" : 20177,
+      "compressedSHA256" : "f7342177ea2b898c533721211cb9d580f66da16bf8bc7375d83d259453a9bb9f",
       "documentID" : "d889cf84faf5f2f3d533b3c4516ad72d4bc5f5b215bc38f133fe15adee32d12f",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/d889cf84faf5f2f3d533b3c4516ad72d4bc5f5b215bc38f133fe15adee32d12f.json.lzfse",
-      "documentSHA256" : "96f515b053ed603bb26b606ba702e9b1d83f47ae817b0fba67f6850be986ea85",
+      "documentSHA256" : "3b6bff770c1cd2738d2cf369e4163702cc56f0a0f6648d475e6632bfecfa4abb",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 3",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/E.html",
       "sourceSHA256" : "2bd36dbb09dcb70bd17145f78281075de8f65e6f5d090bd81f57147025c0f175",
-      "uncompressedByteCount" : 149522
+      "uncompressedByteCount" : 149512
     },
     {
       "blockCount" : 28,
@@ -1898,44 +1898,44 @@
     },
     {
       "blockCount" : 606,
-      "compressedByteCount" : 108812,
-      "compressedSHA256" : "fffa68ac9114e3e444b8e7c2e617076e3c7e48c85bc5f967b05c03739ba090af",
+      "compressedByteCount" : 108809,
+      "compressedSHA256" : "4e336d612636b2f23b23ee66a9c00d1972dcb2dbbbeec3875138925f33e194df",
       "documentID" : "0686d2c40d63abaa8ba4f83515032a5020f70e7181bc6186e9e6e72f6dd6f7ac",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/0686d2c40d63abaa8ba4f83515032a5020f70e7181bc6186e9e6e72f6dd6f7ac.json.lzfse",
-      "documentSHA256" : "2d754ec3fd4e4bf9df0537e8caee22620d88a2c66c8edae7754d11a84da24494",
+      "documentSHA256" : "20cb8bda12df72551536dc22a037a83fed515b9ef96b4800e246acca200524a1",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small,Web",
           "unknownElements: intercodelink",
           "unsupportedBlocks: 6",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/G.html",
       "sourceSHA256" : "45b4fac13859d74694245b1407873555b6ef24351ee537562640667911b3495e",
-      "uncompressedByteCount" : 754692
+      "uncompressedByteCount" : 754682
     },
     {
       "blockCount" : 187,
-      "compressedByteCount" : 26737,
-      "compressedSHA256" : "e9d6b9d9fd5e1adb28a7212a896700b55db80295de35ff057486ad7f55d60a50",
+      "compressedByteCount" : 26727,
+      "compressedSHA256" : "8f1360278629075c13f46d264bedeae2434201a4009cf100ba2e9fd38cb85bf3",
       "documentID" : "dcdb7b49d177c465cc2733956f824dbc9f88c8dd7bb781a4dbd1f5c6f0d9469b",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/dcdb7b49d177c465cc2733956f824dbc9f88c8dd7bb781a4dbd1f5c6f0d9469b.json.lzfse",
-      "documentSHA256" : "597e1207180e2ca35ceb1a63296ea33775cc6b3f8b6f44cf15db9e40fdda5584",
+      "documentSHA256" : "bd2d37153c4caae3afef332f5721497f7898e8c20cf28bfacf03bcae7cd86389",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/H.html",
       "sourceSHA256" : "b7eec1ac59fc1d338ce1a68e4fa340cbc861dd87b65f4e60dd5aff3a1e3ab876",
-      "uncompressedByteCount" : 196247
+      "uncompressedByteCount" : 196237
     },
     {
       "blockCount" : 1,
@@ -1975,23 +1975,23 @@
     },
     {
       "blockCount" : 539,
-      "compressedByteCount" : 200926,
-      "compressedSHA256" : "8680819c5837827dadcc3ddf2ea56e467215848766e2b001ebd66137fb78317e",
+      "compressedByteCount" : 200910,
+      "compressedSHA256" : "b6b8e8aebbfdfb3a479839c2c840a31bef6e002ccff006bab29ff0d2fc932298",
       "documentID" : "43280cec2645ec72241a710da38db93de42bae0a06c81fe6b16b582ae6b1f2f3",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/43280cec2645ec72241a710da38db93de42bae0a06c81fe6b16b582ae6b1f2f3.json.lzfse",
-      "documentSHA256" : "1393969947889ae344a6c821147a1e37446a4c43174a2f6ddc50aca90f63e41f",
+      "documentSHA256" : "20988295a8f330a0788e7f34900cce9716fda498398a283863a42e4d74cb290e",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/K.html",
       "sourceSHA256" : "59bdb0ab7abd731cfd2a3fab0ff90a4ef632bdb4e8a3b90ce251e33287ba15ef",
-      "uncompressedByteCount" : 1584009
+      "uncompressedByteCount" : 1583988
     },
     {
       "blockCount" : 1,
@@ -2086,22 +2086,22 @@
     },
     {
       "blockCount" : 556,
-      "compressedByteCount" : 124753,
-      "compressedSHA256" : "eefe549ec3dd9f8cd97d4ec8bf02306f6c3d2f2012fe85a91091fad2ea7ce8b7",
+      "compressedByteCount" : 124751,
+      "compressedSHA256" : "d908254adf84c616e4bb078ce47aa2d1c039af9921eeaacf8da3306ef96057a6",
       "documentID" : "132612ebc5ae73ab4dcfb865c31b9d928490c18256a2e9dcf05c3f4338dbb0c8",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/132612ebc5ae73ab4dcfb865c31b9d928490c18256a2e9dcf05c3f4338dbb0c8.json.lzfse",
-      "documentSHA256" : "ae70b9c6269493850a38c74d2f4b671245c2b268a28e4c52ff4b705c58eab63c",
+      "documentSHA256" : "d8922e811c94807c84ac1699f8ac9231aa93f70eac1a817e6bbb107abaac0c53",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/Q.html",
       "sourceSHA256" : "27361c0d2410936a4fc128088e1f058784b2f7c0ddd7f9b5d6742609280982bf",
-      "uncompressedByteCount" : 871153
+      "uncompressedByteCount" : 871143
     },
     {
       "blockCount" : 71,
@@ -2142,41 +2142,41 @@
     {
       "blockCount" : 196,
       "compressedByteCount" : 26818,
-      "compressedSHA256" : "9b692e8ad14a26486fa1b27965dd5081332651c1771ef314c0be710099579a42",
+      "compressedSHA256" : "99d5cfbac4d4cf85ff1e4f24dddc924ef7f36504cd7c3dfc32424c9a9333343f",
       "documentID" : "9d5264832f8c0e7b4e3b9b331f6031aef01cb24d89077252bfcb12d7bfc553c1",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/9d5264832f8c0e7b4e3b9b331f6031aef01cb24d89077252bfcb12d7bfc553c1.json.lzfse",
-      "documentSHA256" : "b53d3726c84cb52ff443d226ca85deab59ff099e91f33d997a9a2e7b1adc6397",
+      "documentSHA256" : "ca9dffeae6e30b382d24f095e0d741d7f02ac2d12cb710fa644bba6170aaf7c0",
       "eligibility" : {
         "reasons" : [
           "unknownElements: intercodelink",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/U.html",
       "sourceSHA256" : "039bc66bf8522e89d8fe74631ede7a6b53f08cda58a6df10326e26fe694a4928",
-      "uncompressedByteCount" : 209031
+      "uncompressedByteCount" : 209021
     },
     {
       "blockCount" : 103,
-      "compressedByteCount" : 18215,
-      "compressedSHA256" : "9a86bf52c75a867711f42b7ef56639c9bb2c0d21c36f75e7328f6b66f3b6a715",
+      "compressedByteCount" : 18194,
+      "compressedSHA256" : "851df370c2df6d206f877bf530b9a8486d30324e9c774df974fdf3e51f8c3e14",
       "documentID" : "d8a1cd0d1a7a161933eea09281e94241568b08658f80b75bf6684cebd9a04c5d",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/d8a1cd0d1a7a161933eea09281e94241568b08658f80b75bf6684cebd9a04c5d.json.lzfse",
-      "documentSHA256" : "0de97820140ad725db76b632ff40947d2f3ba5ac6f4974aa781c0fd920f7a588",
+      "documentSHA256" : "d99c353773983c09c496e147e565a916918fbf25f802b74c8aafebd553c18699",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Appendices.html",
       "sourceSHA256" : "1c54dc9c5a3367d6e8646b29d92a0f4743bea3690e292312dd6da9dd041ef822",
-      "uncompressedByteCount" : 128224
+      "uncompressedByteCount" : 128214
     },
     {
       "blockCount" : 192,
@@ -2216,83 +2216,83 @@
     },
     {
       "blockCount" : 375,
-      "compressedByteCount" : 59358,
-      "compressedSHA256" : "e937bdefdb09d14176b2d6cb2df6ede7f617d5dcc25e39f5a4f6be57d93198aa",
+      "compressedByteCount" : 59355,
+      "compressedSHA256" : "d8df3beeea6e446e0ffbddc4219e3e09cd23c5cb957c61e379fb4ebbdfed9150",
       "documentID" : "4afd2fa34c29dca0d369e6bc0b200d89688e0b7dde9d87b5c5894b4a7f58de9a",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/4afd2fa34c29dca0d369e6bc0b200d89688e0b7dde9d87b5c5894b4a7f58de9a.json.lzfse",
-      "documentSHA256" : "37c74f49119a6c50609900028d5c6b5e737bdcd0f67cc267f65125f8b7d25255",
+      "documentSHA256" : "f50e4800f300c5b4a18efba8748f4f02b362ba7d1580198b629f659336561301",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 3.html",
       "sourceSHA256" : "6d7604d86fdb114d298ee755f64bca8691b564bd49a4b8a6f655d0378a8d42c1",
-      "uncompressedByteCount" : 453682
+      "uncompressedByteCount" : 453672
     },
     {
       "blockCount" : 587,
-      "compressedByteCount" : 122853,
-      "compressedSHA256" : "473676bd41868f05252a260790130545a54055140e6a03640a805b8b73f6b2b9",
+      "compressedByteCount" : 122851,
+      "compressedSHA256" : "f9f930cd46f1ee79a24da215e3dab124e9858b16fc1a04a6b3498e0fe9e87a98",
       "documentID" : "999af04e0f60595896f64baa67da6b0ccd7a8cedad5273d37f983fe4ec9433e5",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/999af04e0f60595896f64baa67da6b0ccd7a8cedad5273d37f983fe4ec9433e5.json.lzfse",
-      "documentSHA256" : "36425a2a1009ebc2660d5acc573080c316d8a259311a877a1e28bf9755f6331a",
+      "documentSHA256" : "17224e86dcf47cbf35cc7ad0eff069dfdf0e8941c062851befab78884513d0c0",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 5",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
       "sourceSHA256" : "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2",
-      "uncompressedByteCount" : 2188746
+      "uncompressedByteCount" : 2188736
     },
     {
       "blockCount" : 640,
-      "compressedByteCount" : 184688,
-      "compressedSHA256" : "815da25429613c44fc805d0e3f5f1317a89fb94cb8451dc71ef65c50547c9ba5",
+      "compressedByteCount" : 184684,
+      "compressedSHA256" : "159c243df7a97f4a688d1c2caf518247ba59195a8ae3b10867f0f25c14d4cf77",
       "documentID" : "43b38b130828805e2434cbf9222feaa1b06c9e3a8ba51426737d92846367244a",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/43b38b130828805e2434cbf9222feaa1b06c9e3a8ba51426737d92846367244a.json.lzfse",
-      "documentSHA256" : "9ebf4d9c46d5c9c5196c6402901d2d0e053ebc23771169cfe84ed885b992c449",
+      "documentSHA256" : "fc029d347f58428132c1c9c10e541cd009ac0c24c2946c6f56e432d5abe2b6c0",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 9",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 5.html",
       "sourceSHA256" : "59410139a4ce7a9e910d8b582b4eafdcccc75d9bb4301a689b5dd6959359a726",
-      "uncompressedByteCount" : 6961206
+      "uncompressedByteCount" : 6961196
     },
     {
       "blockCount" : 340,
-      "compressedByteCount" : 44828,
-      "compressedSHA256" : "e40f06ff0f8cdf23400d2e64889991cfecf8af9cf90ec46e2886e0eb21cc9890",
+      "compressedByteCount" : 44825,
+      "compressedSHA256" : "7710018a17f4e1aa160c73733a3f29ab6aa5486b46b5d4e8098054aba1ed69e4",
       "documentID" : "4199be34cf6f738f0f90265667d7f94df3579d5f8bc06b2490ccdccf34d67c75",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/4199be34cf6f738f0f90265667d7f94df3579d5f8bc06b2490ccdccf34d67c75.json.lzfse",
-      "documentSHA256" : "d28cc9c5600d2a7bf6fdbd33d61fbea9e6c3ece9a3336fe17ea26c26c4483483",
+      "documentSHA256" : "4ffb6ffd40f3c36512eec8e216626101434dddee0b568a07e17bc975d8567cb7",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 6.html",
       "sourceSHA256" : "f5d86bc21452a5a69e24c938f211aa41c1e5ee72c7b8a5f32bbd45907025d344",
-      "uncompressedByteCount" : 341063
+      "uncompressedByteCount" : 341053
     },
     {
       "blockCount" : 21,
@@ -2314,43 +2314,43 @@
     },
     {
       "blockCount" : 9,
-      "compressedByteCount" : 9045,
-      "compressedSHA256" : "2f46972e39c5927686a4c82862109f9678bb543940090adf45a3a2a8fe24d770",
+      "compressedByteCount" : 9043,
+      "compressedSHA256" : "f156e9f95a96ef4c342c534c31411270dc7a386c5ac91cef8a38c429236241f9",
       "documentID" : "0f904db1672fa3b36f51ac95fe0b6ddd192f4f0fb77ca8ba462fdb17fb1d68bf",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/0f904db1672fa3b36f51ac95fe0b6ddd192f4f0fb77ca8ba462fdb17fb1d68bf.json.lzfse",
-      "documentSHA256" : "464c785b37fe771c9aa2a1b6709129cb8720a26c9014b1d3dcb3ed44c8025929",
+      "documentSHA256" : "e0fc85b1c324d92fbc8945bfc4693f8bb7fad90dc6da9dc8870f3e05c742b9d8",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 8.html",
       "sourceSHA256" : "4ead405702e5ab2e63c65dee192f28864ea084fcda0d75f2336a85c42f6d6c38",
-      "uncompressedByteCount" : 200039
+      "uncompressedByteCount" : 200029
     },
     {
       "blockCount" : 1692,
-      "compressedByteCount" : 324995,
-      "compressedSHA256" : "951c55abdec3bbe3df5d0e73a72b92c4d12b26eebae85f96c911a8a87992cce2",
+      "compressedByteCount" : 324980,
+      "compressedSHA256" : "6315642156c55e7805c8cc1e2f82f926a9c37c8d47acb7922ddcc63cca55cb22",
       "documentID" : "d6d08b1adde9fa5ce91646946aa42a78c34cfa6dd0bc1c4ea65b6b92fea60260",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/d6d08b1adde9fa5ce91646946aa42a78c34cfa6dd0bc1c4ea65b6b92fea60260.json.lzfse",
-      "documentSHA256" : "613a4b6aff636234a2f4f321bbf7817afc33ab2293d533ad23f2abb128d0fddd",
+      "documentSHA256" : "7e1c441934e6c2df2c4d295fde6913c8ac865099cffc3d123a853e215bed12bd",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Chapter,Small,Small-Bold",
+          "unknownClasses: Chapter,Small",
           "unknownElements: intercodelink",
           "unsupportedBlocks: 14",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
       "sourceSHA256" : "ca8188132a0300c58cbe0945a5df15a7eb07221a3b51f0b9d4cba7ada6c5e738",
-      "uncompressedByteCount" : 2326314
+      "uncompressedByteCount" : 2326293
     },
     {
       "blockCount" : 756,
@@ -2374,43 +2374,43 @@
     },
     {
       "blockCount" : 1402,
-      "compressedByteCount" : 231890,
-      "compressedSHA256" : "961bbc6778872fd2540dbe618256f92a336d2fcd023bc7f39c6c2afa541a3485",
+      "compressedByteCount" : 231880,
+      "compressedSHA256" : "84ebd521bb241c78a001bcb1ad96d68c5dd9f049ce3fecddac94c38b467703e4",
       "documentID" : "bced4685a9893d76720760899541c07ac8293db3103f4c2b7c8b735530489007",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/bced4685a9893d76720760899541c07ac8293db3103f4c2b7c8b735530489007.json.lzfse",
-      "documentSHA256" : "3798a5f570bc6ec19cff677ead6b4848625f14c29ce6667ff3e24eaa8870ce09",
+      "documentSHA256" : "707eba8a5a1da78852f722e9c01f8c52ca93a9056d43e5f2f54b5eb36e30a198",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Chapter,Web",
           "unsupportedBlocks: 5",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html",
       "sourceSHA256" : "89b43d26332c45c9b7c561b21e303a9455d81af6d738fd9b56f259a5ff2578b5",
-      "uncompressedByteCount" : 1507489
+      "uncompressedByteCount" : 1507479
     },
     {
       "blockCount" : 1306,
-      "compressedByteCount" : 209507,
-      "compressedSHA256" : "2f60784d72feb3a81b6c410965e4a48c04cd3a88ed4296c3405e8a8b872388a9",
+      "compressedByteCount" : 209495,
+      "compressedSHA256" : "7427a7ef0849cc395fe13d4f27b6a09012b760e0d21a9c52feacc4e8d0cd7103",
       "documentID" : "179e518dd1acb3596c7bf96e87a9b4cfd68d9d7693b061c6581819153b849c12",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/179e518dd1acb3596c7bf96e87a9b4cfd68d9d7693b061c6581819153b849c12.json.lzfse",
-      "documentSHA256" : "bba764da09e93f6cfa76e238a5b2c62776316a1b7b676c4ae28ab29de0c4edc3",
+      "documentSHA256" : "d9dd1a4ede36624a76f565e066505a90e450ba33e63257f674ac84d5e33318bf",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Chapter",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 4.html",
       "sourceSHA256" : "bc488baee3a986c5b4d5039eab233adbc2c23181823b6f59f2f6615df1db979c",
-      "uncompressedByteCount" : 1432710
+      "uncompressedByteCount" : 1432700
     },
     {
       "blockCount" : 395,
@@ -2473,81 +2473,81 @@
     {
       "blockCount" : 148,
       "compressedByteCount" : 24058,
-      "compressedSHA256" : "bfed1b78e34a6ea02c5178ee37ae9f402af435d0782efdb2b69976861e62e807",
+      "compressedSHA256" : "f86818cb4aa066e34126515bfaecb9957c5accaf924eeb1b5b4c1f9b210080e8",
       "documentID" : "2f7efc0cf187309135abcd3756c8198e2833b9793bff7978a3b6a384cd7f3df6",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/2f7efc0cf187309135abcd3756c8198e2833b9793bff7978a3b6a384cd7f3df6.json.lzfse",
-      "documentSHA256" : "1eb6159bf75459e970a2dcc0c2b1f3f37625738e4e1c7260021b4114ae5e2e40",
+      "documentSHA256" : "bf8c82b3f50813453d11c389e1926830071d0d574f946d794bffc7b5eecab263",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 10.html",
       "sourceSHA256" : "f3808ee0a331eea569841bea13f0bc9b791468203108ad8873e5ce3dd78d4ed4",
-      "uncompressedByteCount" : 184320
+      "uncompressedByteCount" : 184310
     },
     {
       "blockCount" : 344,
-      "compressedByteCount" : 66025,
-      "compressedSHA256" : "eceee62100929dc2ddf22bf6eaa72ac18d044add4ad9ca57c31ad2e0eeb98603",
+      "compressedByteCount" : 66016,
+      "compressedSHA256" : "f555fa523fc3ef672f3607aae493036806f94e7adf479fc150d20b7dcaf03840",
       "documentID" : "5b1ce12167d75fdcc2266459942a71a8e60cc54fa261735b96721c27b35a9231",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/5b1ce12167d75fdcc2266459942a71a8e60cc54fa261735b96721c27b35a9231.json.lzfse",
-      "documentSHA256" : "b21b55a14a74a20ba0b81592eec898b5e0e1c71473ee5536e4e8a2886db20053",
+      "documentSHA256" : "05cdbee83b4254780764c0e69f8c33838b7a89198234cc68adc8bc29a4998610",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 11.html",
       "sourceSHA256" : "a4902064a65ef25640d91444499b166e02b7146c13d8458e47613017c942dedb",
-      "uncompressedByteCount" : 679020
+      "uncompressedByteCount" : 678999
     },
     {
       "blockCount" : 318,
-      "compressedByteCount" : 41769,
-      "compressedSHA256" : "c114de817505b93acb2f22d6658a2d6765b3398f16d4f47a160856449ac3e3bd",
+      "compressedByteCount" : 41756,
+      "compressedSHA256" : "60ad67a02ce85841db8407450c1f26c395c739c95e07da08ab815e2770d5543e",
       "documentID" : "bb4fb9edfc9a8b5b9ec93e18bb9576c1cd0f2f9cdf3ec256ba2ae623fa71bf12",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/bb4fb9edfc9a8b5b9ec93e18bb9576c1cd0f2f9cdf3ec256ba2ae623fa71bf12.json.lzfse",
-      "documentSHA256" : "cd19ef5564e64909c4e5211fd99f932f5d5b4c6049a3decb832380b0540a696a",
+      "documentSHA256" : "93cfe590e63de00b775edbcddf0e9f1af86c60be6724ea8abf769c264702bca9",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 5",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 12.html",
       "sourceSHA256" : "a652971e4e608887a716c9365c92742407d34b33c3a09f1716866a6291b95af7",
-      "uncompressedByteCount" : 329989
+      "uncompressedByteCount" : 329979
     },
     {
       "blockCount" : 443,
-      "compressedByteCount" : 66738,
-      "compressedSHA256" : "07285034877f83e55b33a1ee7afd1cc4687eba71efbee57740ab7dd3bddf1fdd",
+      "compressedByteCount" : 66735,
+      "compressedSHA256" : "7446df0d4359bde69a13149d14e1519da428431276c4582f08f6caf4de4cc233",
       "documentID" : "f8bb313006df173bad1409f0049b95c2049e1d1742e9177061f059ef783b7b3d",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/f8bb313006df173bad1409f0049b95c2049e1d1742e9177061f059ef783b7b3d.json.lzfse",
-      "documentSHA256" : "3c2dbb36f212ed0a74760fd2b084ae4d841260157ddae20f2f26abd14170490a",
+      "documentSHA256" : "e4e2c4a377f125ab8b8ca054e873b8e942c5697f3051742aeb88f9c0210f36cd",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 5",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 13.html",
       "sourceSHA256" : "0362e3d4e7627ffe2b8cdb3eb10929063928ce33eb3c262f8dd7f5cb131783a6",
-      "uncompressedByteCount" : 455098
+      "uncompressedByteCount" : 455088
     },
     {
       "blockCount" : 57,
@@ -2569,22 +2569,22 @@
     },
     {
       "blockCount" : 9,
-      "compressedByteCount" : 19820,
-      "compressedSHA256" : "622fb00d65c53ce342f7863b9c49c7e7c29bf4899c2062eb506719e3b4f13541",
+      "compressedByteCount" : 19818,
+      "compressedSHA256" : "66fe9533ac2ef21045f67f59f96c47d54513020a981c23f9135ca9a61cb23df3",
       "documentID" : "1753042b320d56b046b613d3b97c5b6a2d5f686984f82d5a18b9cdbc0a493007",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/1753042b320d56b046b613d3b97c5b6a2d5f686984f82d5a18b9cdbc0a493007.json.lzfse",
-      "documentSHA256" : "6ba80dd403c67effb2e579efac40646537b85aaef7964001971b640b2d6ef739",
+      "documentSHA256" : "ec51365a51870752834eb300e4e66dc1abde4a203a9597addefeaeb566fbc77a",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 15.html",
       "sourceSHA256" : "b66ce87f9df8d3281c030ac23a60e554352d3f5685a2c0da77c7910effea1eb0",
-      "uncompressedByteCount" : 351076
+      "uncompressedByteCount" : 351066
     },
     {
       "blockCount" : 388,
@@ -2606,83 +2606,83 @@
     },
     {
       "blockCount" : 313,
-      "compressedByteCount" : 49930,
-      "compressedSHA256" : "9d097547d7a9d374fd75fc6e93d81d49f6f5dbc77f1674da1c5d80bba902f8c8",
+      "compressedByteCount" : 49928,
+      "compressedSHA256" : "6d3efa15006f8013b1f2ce85b65bcda3996766fb2ad791af4301a32117ffc502",
       "documentID" : "7fa9c6bee82a2270a32af5635997b89cf9f009e80eeb430766ea1bb18436e7f1",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/7fa9c6bee82a2270a32af5635997b89cf9f009e80eeb430766ea1bb18436e7f1.json.lzfse",
-      "documentSHA256" : "ceea0d02058a044bc7b87fd642b2862f65479d86a8bda13dafd6b51a0ac2cebd",
+      "documentSHA256" : "5edd925406d11cefca4d7ce7133bdf31dc708200d90cf3d0c435e65a3ee780e0",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 3",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 3.html",
       "sourceSHA256" : "efe381e5d059fcfc45a8edfb98667e210d986eb2ad13e5c99f157d728049030c",
-      "uncompressedByteCount" : 388509
+      "uncompressedByteCount" : 388499
     },
     {
       "blockCount" : 112,
-      "compressedByteCount" : 32093,
-      "compressedSHA256" : "019a9ff0638f2994247202038016162753709a37594823c0a6305cd29a57e75f",
+      "compressedByteCount" : 32089,
+      "compressedSHA256" : "b8748b6e0dacf664a16524ee40bec3f61ca93ab7b6299639f2e4749beebe0988",
       "documentID" : "a8d718cab5f4b8e9747e6a14322540f7ba7d4bdc3a50306cc2a89c5d3faab3fc",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/a8d718cab5f4b8e9747e6a14322540f7ba7d4bdc3a50306cc2a89c5d3faab3fc.json.lzfse",
-      "documentSHA256" : "5f1af1b22c88cded4ba63d67f1afe625fb90cdce10788c571842b99a6e14f660",
+      "documentSHA256" : "adcef7824909d9222f0aff8ec3cca7294ade64425de305dab59a940fd2df6277",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 12",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 4.html",
       "sourceSHA256" : "aa987a57bc2d68b95016e8e5fae77e5e4982ce7e80f6fb92081c850075bda40d",
-      "uncompressedByteCount" : 461506
+      "uncompressedByteCount" : 461496
     },
     {
       "blockCount" : 786,
-      "compressedByteCount" : 132173,
-      "compressedSHA256" : "553c961c942cbacda2ee89e894fcbd5f6c3aabb657d91a470bd952edccc93857",
+      "compressedByteCount" : 132160,
+      "compressedSHA256" : "996622453f0b1e1c5c79bc261d3481d4c7660c64bf8d4a4782f50be940fdceef",
       "documentID" : "f16e9c41666f36ec77f3e9f277c5b719417810c3837f8ea55ba268f87ad73043",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/f16e9c41666f36ec77f3e9f277c5b719417810c3837f8ea55ba268f87ad73043.json.lzfse",
-      "documentSHA256" : "eb1c6337bd2f17a558a57b1137c9cf2bf2bddb4ef6be16f6dc979c6c9795be28",
+      "documentSHA256" : "94614c9f339c026166fb52f71bbc30ddd1d8521300524d5456f577e5983ba63d",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 10",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 5.html",
       "sourceSHA256" : "28f46999f485048d8c06e1410e4b00c9442f1fe90b8dc8643081434274579fbe",
-      "uncompressedByteCount" : 847121
+      "uncompressedByteCount" : 847100
     },
     {
       "blockCount" : 494,
-      "compressedByteCount" : 74216,
-      "compressedSHA256" : "925e92370173d942abf7721f96b5a34167d0c6d7a5882a45ac0e041a3f5d494a",
+      "compressedByteCount" : 74215,
+      "compressedSHA256" : "81f4d3f8d950c6cbc6a98b323df94f9ae7506ba08609802465a4d42c9b7f266f",
       "documentID" : "033e69b7b7239e946a6e1e6b18ce887d0e6af30e51eec7cc45dd7c80afc1f3d6",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/033e69b7b7239e946a6e1e6b18ce887d0e6af30e51eec7cc45dd7c80afc1f3d6.json.lzfse",
-      "documentSHA256" : "fd1e4ef8b7642ab24231ed94b5ac947351cef24fad3820b8fced3d0f54e8a381",
+      "documentSHA256" : "fb40c279e3a9b75fbdc1954345fde48f3f3664271a9278af859d9516f84bfa3a",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 6.html",
       "sourceSHA256" : "42e85c923a0a99c78726c2aebf70929d2b7e3037e369653fcfd4e0e0c5c554c9",
-      "uncompressedByteCount" : 502043
+      "uncompressedByteCount" : 502033
     },
     {
       "blockCount" : 93,
@@ -2704,23 +2704,23 @@
     },
     {
       "blockCount" : 331,
-      "compressedByteCount" : 52986,
-      "compressedSHA256" : "668927b99df643ca37464f47d193c032bd82998051c90c2c1bc405734168c4ae",
+      "compressedByteCount" : 52982,
+      "compressedSHA256" : "5685edb74d8f6fe0e6490b521d17a783f9d92ee11104ccc8b33bdb9386f8f150",
       "documentID" : "9601df856b3345354982eef58fefc8231ab644c4cf986a995e41321b996a2359",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/9601df856b3345354982eef58fefc8231ab644c4cf986a995e41321b996a2359.json.lzfse",
-      "documentSHA256" : "5637b6f1d597d303b5488334febb3b307c3a4bd34cc920d2a4bbab69e2c9f7b1",
+      "documentSHA256" : "34b18fc924cbf9fa3fb3e293b7a30d91faf3683ef3d76aa402b52bd75c92471b",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 6",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 8.html",
       "sourceSHA256" : "4b085c7e523cd28b54692695c482e8de2a797d0b3b5a59eb77e489d83f7615b9",
-      "uncompressedByteCount" : 388426
+      "uncompressedByteCount" : 388416
     },
     {
       "blockCount" : 275,
@@ -2742,23 +2742,23 @@
     },
     {
       "blockCount" : 71,
-      "compressedByteCount" : 34235,
-      "compressedSHA256" : "ded747b978291e848e606a37e1f862e0550604bb7f7e54dafed755d4dcf65420",
+      "compressedByteCount" : 34220,
+      "compressedSHA256" : "d36a406c107dc0ed57ebc0c483562ab6b92d966117bf8ac207af2747643a9d53",
       "documentID" : "bbb2c83850450376ee2ce3418ec42453b1fa30c40a129199818d7c498dc8ab0d",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/bbb2c83850450376ee2ce3418ec42453b1fa30c40a129199818d7c498dc8ab0d.json.lzfse",
-      "documentSHA256" : "50de4967fa164eec9b6d46fc834faf94f65494c24236f471a4fb2b17195712b6",
+      "documentSHA256" : "6af6c23b339f96b18328fa81f55b78899dc5d3164bfeb595055a3a51a22989ab",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Appendices.html",
       "sourceSHA256" : "58bb32662feb39f1454f2422b65ee7bcbaaa82dfb139710c8ec21fd890d9f3b6",
-      "uncompressedByteCount" : 744643
+      "uncompressedByteCount" : 744622
     },
     {
       "blockCount" : 222,
@@ -2799,23 +2799,23 @@
     },
     {
       "blockCount" : 285,
-      "compressedByteCount" : 49271,
-      "compressedSHA256" : "b3723abaacee02c68b339516f98d71b8fafb4b6640e5c768436ba54e054a7f9e",
+      "compressedByteCount" : 49267,
+      "compressedSHA256" : "557d395fee751aa6b1a7e3b17d39d9eb3be96f6b5c6e6a0708a706a7aa30793d",
       "documentID" : "477468b7bab8b99ac678c62e055e9d397f71ee0911298445747f53d681160957",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/477468b7bab8b99ac678c62e055e9d397f71ee0911298445747f53d681160957.json.lzfse",
-      "documentSHA256" : "51c7490546f55bf17c94b8d264d43169a2bd09702f89de5a6abbc911f04d8aec",
+      "documentSHA256" : "462bb168f5fcae20aed22cc886c27435fdc20cac8fdaefe2dbe6d820009230e8",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 6",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 11.html",
       "sourceSHA256" : "a4be09ada1250f543c43a4e6779112ec1e7134d539dd03ae3410c99ca876b70d",
-      "uncompressedByteCount" : 421791
+      "uncompressedByteCount" : 421781
     },
     {
       "blockCount" : 20,
@@ -2837,62 +2837,62 @@
     },
     {
       "blockCount" : 279,
-      "compressedByteCount" : 36295,
-      "compressedSHA256" : "12436832471f709216f057a53fcccba5a1fbc714e81650b46bfcc1080df2b690",
+      "compressedByteCount" : 36293,
+      "compressedSHA256" : "29a71682805f6cfe8b1efea39994c7f768f2bc987bb5c13cb6c2eb2d19f3da00",
       "documentID" : "fd4f35039177fe91514926a0e85db681189bb0ab81eb1efea68355cf86a26109",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/fd4f35039177fe91514926a0e85db681189bb0ab81eb1efea68355cf86a26109.json.lzfse",
-      "documentSHA256" : "ef59214e5c13ff18f2bd660dc341b6446f729290fc1e33fda85f7d15213f9c51",
+      "documentSHA256" : "b73086eddf7518d5ed04fc40551f76a4684f8b818bd1cdfa3f37bfb475e7d8c5",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 3",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 13.html",
       "sourceSHA256" : "d43ba3ac8d75e225a7d70bb73184b71afe445112625362b8fedf20bd9244bf26",
-      "uncompressedByteCount" : 291505
+      "uncompressedByteCount" : 291495
     },
     {
       "blockCount" : 60,
-      "compressedByteCount" : 12440,
-      "compressedSHA256" : "fe1ec1acbd4de097f99f55d30a3417ed00274da2ee1a3e8fb57264fa73948fe5",
+      "compressedByteCount" : 12439,
+      "compressedSHA256" : "1ee4ca2a62d27acbd038cf6c23f41ece2af436e29aed0b3e362ae3e7572913cd",
       "documentID" : "ef5929253fa0f63b934b35f517b56da9046f857ce32833b29f905f9c286c008d",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/ef5929253fa0f63b934b35f517b56da9046f857ce32833b29f905f9c286c008d.json.lzfse",
-      "documentSHA256" : "c5bfad929db954eb487b1bfdfb92554b1610c32f882ec32140015ade4838af22",
+      "documentSHA256" : "17bdacf1cc166e3096fa0b8ea7ed4c983105864230b477d07bbc4dc4521eb811",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 4",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 14.html",
       "sourceSHA256" : "e72b7a247a57cc5fc69542080b44b7f7c0f5ae94de56141900e734996bf6d243",
-      "uncompressedByteCount" : 115457
+      "uncompressedByteCount" : 115447
     },
     {
       "blockCount" : 11,
-      "compressedByteCount" : 22492,
-      "compressedSHA256" : "3365f2978e67a0e23f91bb5b0cc34f4b2eae699605dab0ca8eeee4ed723d9e31",
+      "compressedByteCount" : 22483,
+      "compressedSHA256" : "e2de030d672e000a6d7bedb0f5c8fc8fa03e25d4a6047e01dddd739893f7f2f0",
       "documentID" : "d273825e4482291d7714943214813c4bb3da99d5eb0951f67b31825924c8f23e",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/d273825e4482291d7714943214813c4bb3da99d5eb0951f67b31825924c8f23e.json.lzfse",
-      "documentSHA256" : "7a9de32ff2d6f974c6f8dc8ff0ad9f2bfec6c4593b7fe13af3848a529e062b16",
+      "documentSHA256" : "75f6a20204ddebf43a89cf25788b13bf00bc5b1d334519514f43ca483636189d",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 1",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 15.html",
       "sourceSHA256" : "a43c08ec934e47393928551045a472637afaa54e05840882a7050499b357da4b",
-      "uncompressedByteCount" : 522144
+      "uncompressedByteCount" : 522134
     },
     {
       "blockCount" : 328,
@@ -2914,44 +2914,44 @@
     },
     {
       "blockCount" : 232,
-      "compressedByteCount" : 34953,
-      "compressedSHA256" : "8cf34502899ae1b94ac59bcb0dff87748093347b797e5319bb66f826380d324a",
+      "compressedByteCount" : 34951,
+      "compressedSHA256" : "dc5b97b81e0f63647ee1f23683f5edfc6036c3389e07e91d4b832fa60fc7c1b1",
       "documentID" : "5b637e9d4a13a45a25e1588329b06218dd77e03edeff6056ad4cf80230386c38",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/5b637e9d4a13a45a25e1588329b06218dd77e03edeff6056ad4cf80230386c38.json.lzfse",
-      "documentSHA256" : "38916015fbe61e0f5960664d9a66a94f9d2035bb68f4e37b2c721f480ebe8ee6",
+      "documentSHA256" : "5c9351a9e84cddafd7f2a134eba4287d9bd26f97689b6620c95998fb405c1ef5",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 3.html",
       "sourceSHA256" : "219d1015e05530a5da54a8fe61c9c87f5ddd929d6af52b82316ede92e77c5f72",
-      "uncompressedByteCount" : 248933
+      "uncompressedByteCount" : 248923
     },
     {
       "blockCount" : 373,
-      "compressedByteCount" : 66011,
-      "compressedSHA256" : "e3a18597ea9341b0c975b272e39f12c27b6749aef3d95e6a18e3657f34c2e52e",
+      "compressedByteCount" : 66001,
+      "compressedSHA256" : "82941f6ff3f44539c946f22eb8c28a396f425d8c25dd6b5990b593ae1f662874",
       "documentID" : "a8413cdc8ad46a36c8196e0e50bb4741a8bc53373ab45285b0037f4ddbc8f31c",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/a8413cdc8ad46a36c8196e0e50bb4741a8bc53373ab45285b0037f4ddbc8f31c.json.lzfse",
-      "documentSHA256" : "22229fe34c8428ff186009bd67576280a1295d739d088958490fe332353b02c7",
+      "documentSHA256" : "639c6f3c5650e8f30ff48a5393ada0809ad6e241caeb1bdfd09f8757bbcde94f",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unknownElements: intercodelink",
           "unsupportedBlocks: 3",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 4.html",
       "sourceSHA256" : "e24b3242e8e14af6fe95a8876bd57fe6500a3f8d04f0ecf85f183c7cc19d66cc",
-      "uncompressedByteCount" : 510323
+      "uncompressedByteCount" : 510313
     },
     {
       "blockCount" : 85,
@@ -2973,82 +2973,82 @@
     },
     {
       "blockCount" : 474,
-      "compressedByteCount" : 83582,
-      "compressedSHA256" : "589e0ebf29494713d85de24821c3bead22e56687c38d72da16f2ac563b06c59b",
+      "compressedByteCount" : 83580,
+      "compressedSHA256" : "114a022e6e2246e14cac4b7b797b8f7f6489d869be697e213f15d59d07b9c827",
       "documentID" : "37db16a65b820e00a139a9bfafa71b38b80672006214b41a37ad2f260af3d2a8",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/37db16a65b820e00a139a9bfafa71b38b80672006214b41a37ad2f260af3d2a8.json.lzfse",
-      "documentSHA256" : "af8c32b12a463ad12a7751302470bd5832237d7f23a05c1efc82dca4e7e4bd10",
+      "documentSHA256" : "776ffc84ea1595751ec80a0cbf2f5671a06f5b06d71e31c7e87b378c36032fc3",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 14",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
       "sourceSHA256" : "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
-      "uncompressedByteCount" : 639992
+      "uncompressedByteCount" : 639982
     },
     {
       "blockCount" : 380,
-      "compressedByteCount" : 66119,
-      "compressedSHA256" : "4e26fe4738f6aa1c37f9f6739db62bc0ad6bd8eeb1e23dbb10f9995bc4449620",
+      "compressedByteCount" : 66110,
+      "compressedSHA256" : "123d757f834828a73c57c928b46588dea13aa357e75b8a133138cac557b27b24",
       "documentID" : "5841542d589b97a5e3438b9668f4b939a6ca684f06d3b0756a0dfaad1d752ea5",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/5841542d589b97a5e3438b9668f4b939a6ca684f06d3b0756a0dfaad1d752ea5.json.lzfse",
-      "documentSHA256" : "1bac3700e75526c381f68c27ecb9d88622bd3bb50f9187e461b55839d6550e81",
+      "documentSHA256" : "6a48d0a15196be98203079ee504d2f6d6fa07b521bbd6d8350a4ef820705734a",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: Small",
           "unsupportedBlocks: 14",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 7.html",
       "sourceSHA256" : "b8667ab777f7c9ec5584e75d4513026d649e9d5f9e8e64d6590b8cafb35b157b",
-      "uncompressedByteCount" : 593254
+      "uncompressedByteCount" : 593244
     },
     {
       "blockCount" : 100,
-      "compressedByteCount" : 14614,
-      "compressedSHA256" : "419255a75b295e36713f4930ff5505ad4ee7a65312472fd8a5dc68040b34a414",
+      "compressedByteCount" : 14616,
+      "compressedSHA256" : "6b1dddbfb4aef1d11d81e7f3182502290c87e9b3c155a270f89249d918fd68dc",
       "documentID" : "6c328e8a3ba67ad7218cb8ffeed0295b810ae67ec99491db79f29a843cec18fc",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/6c328e8a3ba67ad7218cb8ffeed0295b810ae67ec99491db79f29a843cec18fc.json.lzfse",
-      "documentSHA256" : "8b630ad37c3317917cb0ccf2fdd1fd6a9418d951898d27bd198fa04f62b71e2b",
+      "documentSHA256" : "9c2f9b9fe406cd7a93fcb7a7f1d45ed859ec2c5c73bfe9f90a43330d2a644935",
       "eligibility" : {
         "reasons" : [
           "unsupportedBlocks: 2",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 8.html",
       "sourceSHA256" : "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b",
-      "uncompressedByteCount" : 110050
+      "uncompressedByteCount" : 110040
     },
     {
       "blockCount" : 182,
-      "compressedByteCount" : 35813,
-      "compressedSHA256" : "530974e7d5fda8e18dccd8f44f0a60b4e584ed099688ab8655eb2c636b404609",
+      "compressedByteCount" : 35804,
+      "compressedSHA256" : "7ce286c1b6c0362c952d43361d68a34f55dcf1eaa5a6649aacf4a8c5634cbb86",
       "documentID" : "a9880e680400b595af1d532cbed815f71fdebb588a0e8897051bc9a9dfdebf50",
       "documentPath" : "2022-construction-codes/prepared/native-reader-v1/chapters/a9880e680400b595af1d532cbed815f71fdebb588a0e8897051bc9a9dfdebf50.json.lzfse",
-      "documentSHA256" : "9e446e83a2d11903455b4d8946661074c3d5a3042c8bbd34cf14478f050b09a9",
+      "documentSHA256" : "c4819c53bcdb2783ef9b78a309287b095657341c9849c9ce983eb97584e9e605",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Small,Small-Bold",
+          "unknownClasses: Small",
           "unsupportedBlocks: 7",
-          "unsupportedCSS: margin-bottom=10pt,word-wrap"
+          "unsupportedCSS: margin-bottom=10pt"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 9.html",
       "sourceSHA256" : "26021bd9e00af5f59c2f16b0944645d69e82050d79d4da20ee92924fef887edf",
-      "uncompressedByteCount" : 473251
+      "uncompressedByteCount" : 473230
     },
     {
       "blockCount" : 15,
@@ -6417,54 +6417,51 @@
       "uncompressedByteCount" : 50353
     },
     {
-      "blockCount" : 3,
-      "compressedByteCount" : 14482,
-      "compressedSHA256" : "53ca854c174ed05192cf369b141ddfd45cd7c8b1300d0f071748b4deeae546ca",
+      "blockCount" : 12,
+      "compressedByteCount" : 34033,
+      "compressedSHA256" : "e6ca33cddeb8f3396c373b3135c4dd9e8289e36a52a6096130a28ad2a22bf0a6",
       "documentID" : "03fa1f1529dda8c9fb594ff7a9a5a27e29fd85e8d4e5814276e6d25ec131fcc2",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/03fa1f1529dda8c9fb594ff7a9a5a27e29fd85e8d4e5814276e6d25ec131fcc2.json.lzfse",
-      "documentSHA256" : "18885f0eb9d58a39ad9c6206b276e07c1cbd813e885d5431b5797f66e4e750e3",
+      "documentSHA256" : "ca4655e77e955535ad107500f83f13717d90f5c1bfa3f0d32cf835e764f2f9fa",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: sec-link-inline",
-          "unsupportedBlocks: 1",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "isolatedHTMLTableCount: 2"
         ],
-        "state" : "fullHTMLFallback"
+        "state" : "nativeWithTableFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-B-21239.html",
       "sourceSHA256" : "a5303ea8351e73a57549324c75bfd97d5c30a7f59dc37ee2bb69dc400ab4fd5c",
-      "uncompressedByteCount" : 352518
+      "uncompressedByteCount" : 1301566
     },
     {
-      "blockCount" : 3,
-      "compressedByteCount" : 134698,
-      "compressedSHA256" : "927feecbb16fc70e14076253f1930e3e8019aa76dd2cbbf5ef3a2e991dd7a56d",
+      "blockCount" : 13,
+      "compressedByteCount" : 447868,
+      "compressedSHA256" : "bed35ef3853e21efa4ec1bd4404ff7d4aee985c3aaed3015ed7385eeb173e0fc",
       "documentID" : "bd7409537976128bf70dbeb2226a153ced1b929aafc24bcb82eb161e78ad1072",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/bd7409537976128bf70dbeb2226a153ced1b929aafc24bcb82eb161e78ad1072.json.lzfse",
-      "documentSHA256" : "a4a9488ed7b601a03bd1791d3df2d151eefc6b5c6d6d145e153f95b7a83b2a50",
+      "documentSHA256" : "ae1beb191651911b29088af9d018d671a5a1292c33fefacea06e70f47de0adc8",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: appendix-c-row,appendix-c-table,appendix-c-table-header,sec-link-inline",
-          "unsupportedBlocks: 1"
+          "oversizedIsolatedHTMLTableCount: 1"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21242.html",
       "sourceSHA256" : "98d11ca7996f8a196ba898b45def3193ea973b427027eb54d846601fd0141dc1",
-      "uncompressedByteCount" : 1661249
+      "uncompressedByteCount" : 7646310
     },
     {
       "blockCount" : 3,
-      "compressedByteCount" : 21722,
-      "compressedSHA256" : "b073e1a50d2d4bbb2d79b3480c42a884a057d262b048b1e9410d9148392759d1",
+      "compressedByteCount" : 21709,
+      "compressedSHA256" : "1e6bfbc83d49c5bae92fa2c80c8d2ec12b1f5b0564b8778193a6cdc8b3016215",
       "documentID" : "476ce738e7ce1729a9dc86b67470dd902862a7304575926abf33fbb8cea304b4",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/476ce738e7ce1729a9dc86b67470dd902862a7304575926abf33fbb8cea304b4.json.lzfse",
-      "documentSHA256" : "37148a031085fb9772e04ab717b22cf73575bf8da4c187cf1af02cdeb193a00c",
+      "documentSHA256" : "88f5778623c0b438ac27ca0d04679b476565fce0733eb5c3d723f876b20cb79e",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: appendix-c-row,appendix-c-table,appendix-c-table-header,center-align,sec-link-inline",
+          "unknownClasses: center-align,sec-link-inline",
           "unsupportedBlocks: 1"
         ],
         "state" : "fullHTMLFallback"
@@ -6472,26 +6469,25 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21243.html",
       "sourceSHA256" : "c858942cad347812bd640f6d75acf04242aff2ce6808dd6dc22295524f31c0ee",
-      "uncompressedByteCount" : 176293
+      "uncompressedByteCount" : 176237
     },
     {
-      "blockCount" : 3,
-      "compressedByteCount" : 8920,
-      "compressedSHA256" : "c3c46b48494dc280a7e8f06d3789e13366f145496c81ea4b4acc2bced05bbb60",
+      "blockCount" : 8,
+      "compressedByteCount" : 24151,
+      "compressedSHA256" : "f31ad1169f9a21ad792aef71221ccb82431a4a3e337245bc47a7bf37cda368a5",
       "documentID" : "94693c79b14c6a5c8888848a949cc091b621a749fe7089a82ab721cec55175fa",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/94693c79b14c6a5c8888848a949cc091b621a749fe7089a82ab721cec55175fa.json.lzfse",
-      "documentSHA256" : "48cfc813b8c30364bc0dace11591a80655a8a81d9041dfde0b55fd6722c90cfa",
+      "documentSHA256" : "d8f77c60d3f317f09918e8dc2f24f4966d795451b3fe444dfd3e9d34349fa746",
       "eligibility" : {
         "reasons" : [
-          "unsupportedBlocks: 1",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "isolatedHTMLTableCount: 1"
         ],
-        "state" : "fullHTMLFallback"
+        "state" : "nativeWithTableFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-D-21241.html",
       "sourceSHA256" : "2898db2c55e0bfa6ac466bc10e01e150adadff5ab54d9d86099717a36022bcf6",
-      "uncompressedByteCount" : 303189
+      "uncompressedByteCount" : 1200951
     },
     {
       "blockCount" : 3,
@@ -6513,24 +6509,22 @@
       "uncompressedByteCount" : 195108
     },
     {
-      "blockCount" : 3,
-      "compressedByteCount" : 5867,
-      "compressedSHA256" : "62450468d2585763807015c21abb4a99c69dfc90704c0153dafdbc82722e259d",
+      "blockCount" : 9,
+      "compressedByteCount" : 14316,
+      "compressedSHA256" : "969aec5b9c4aebae63da29de177e14b31048eb0fb466b6b1fb663444ac7ec160",
       "documentID" : "3e94b67bfc260210ea6df741eace7c63597a0df178595a89751054e5a1557267",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/3e94b67bfc260210ea6df741eace7c63597a0df178595a89751054e5a1557267.json.lzfse",
-      "documentSHA256" : "27b5fad8545558ea8e7d684cdde7afc7eea99fb377559643a87e3d4329514956",
+      "documentSHA256" : "e61dbfa9b67254530552930f73225c67b4bbdbef5c19359beb82c1e5ea21fdf2",
       "eligibility" : {
         "reasons" : [
-          "unknownElements: font",
-          "unsupportedBlocks: 1",
-          "unsupportedCSS: text-wrap-mode"
+          "isolatedHTMLTableCount: 1"
         ],
-        "state" : "fullHTMLFallback"
+        "state" : "nativeWithTableFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21424.html",
       "sourceSHA256" : "543e65d83d51661197f14703c553629bba982a44d7babc36266ac7916a21c4a3",
-      "uncompressedByteCount" : 271399
+      "uncompressedByteCount" : 768943
     },
     {
       "blockCount" : 3,
@@ -6628,23 +6622,22 @@
     },
     {
       "blockCount" : 3,
-      "compressedByteCount" : 3695,
-      "compressedSHA256" : "6974a98b6a32dfeb8920ab5d52903f1e0ac2513569b31286e41c202fe7d6ba9a",
+      "compressedByteCount" : 3630,
+      "compressedSHA256" : "e683b12bcb0d07f39382596092cddbb0a6782ef7c8c73257ae3a1d67ab3c40c8",
       "documentID" : "0efb5c6b94fec96d10fa938db6ad4b92c8ebc534b99ef1b4bc17cb0205c5d66c",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/0efb5c6b94fec96d10fa938db6ad4b92c8ebc534b99ef1b4bc17cb0205c5d66c.json.lzfse",
-      "documentSHA256" : "bc3596fdddc5c84f36c89e1dfc6b4f8675fe41ddd538a280534ccdfe03cf4030",
+      "documentSHA256" : "1f24d37b4afe1adf25317f281c01cc2e4b1df43414db55146dc60399e6b65913",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,sec-link-inline",
-          "unsupportedBlocks: 1",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 1"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-G-21235.html",
       "sourceSHA256" : "1eeac3ec544120588a0c1bf6a211816d42aec1a22df21e74208e75f498cecb63",
-      "uncompressedByteCount" : 68279
+      "uncompressedByteCount" : 68039
     },
     {
       "blockCount" : 3,
@@ -6686,23 +6679,22 @@
     },
     {
       "blockCount" : 3,
-      "compressedByteCount" : 10770,
-      "compressedSHA256" : "29dc02944172fa32fbbb3cdcdfabc0836c5930d6a8a78b6079704c076e934def",
+      "compressedByteCount" : 10715,
+      "compressedSHA256" : "e43c8dd3a825d6379d36c8472c51173031238b136ba72a718f1329a2d1f2d63e",
       "documentID" : "14242370248e860730e99a5ae9c9d1406e0efafa0c50606243468aef5597ce9a",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/14242370248e860730e99a5ae9c9d1406e0efafa0c50606243468aef5597ce9a.json.lzfse",
-      "documentSHA256" : "12d42b008869c01dfb86b4e57587f747fe7fdde2370fb567b799efc4629f3df4",
+      "documentSHA256" : "9c87361a04ec2c51aa448fbe309a727d447d8a05c9935e4d9af29925361768d7",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: embedded-entity,pb_after,sec-link-inline",
-          "unsupportedBlocks: 1",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 1"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-J-21237.html",
       "sourceSHA256" : "33d12da063f30b4b1487d27399129b999d04644c8130eaa7c3e94e88b9e853de",
-      "uncompressedByteCount" : 116955
+      "uncompressedByteCount" : 116715
     },
     {
       "blockCount" : 3,
@@ -6838,35 +6830,34 @@
     },
     {
       "blockCount" : 72,
-      "compressedByteCount" : 31178,
-      "compressedSHA256" : "1010d4d3159aa4f8b76acf3d540dd310bf300f0bf804c42cd095ede33d357721",
+      "compressedByteCount" : 31158,
+      "compressedSHA256" : "13491d27f3fe55e45de2ab9c8473b8bff98e603ac1c259e9caa36550bba202b3",
       "documentID" : "fe7a149dc5ec581f1b3d854b3e2b55f517ada2807f6dd115c0e0557c00035269",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/fe7a149dc5ec581f1b3d854b3e2b55f517ada2807f6dd115c0e0557c00035269.json.lzfse",
-      "documentSHA256" : "732f1a80c33f9ebcdd8530177aa7e8ab2788589b205627fc41d7236db3ae7206",
+      "documentSHA256" : "15d14f57836740f234c2582ae266a5fb7df538b685de81dbcfad8c7a740230c5",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: embedded-entity,pseudo-li,sec-link-inline",
           "unknownElements: center",
-          "unsupportedBlocks: 30",
-          "unsupportedCSS: tab-stops,text-autospace"
+          "unsupportedBlocks: 30"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-2.html",
       "sourceSHA256" : "645bf96b88a69b1c5451b84358ddfdf9840a4fc1e9ac6dd1babe796b30f5bcb8",
-      "uncompressedByteCount" : 765204
+      "uncompressedByteCount" : 765161
     },
     {
       "blockCount" : 282,
-      "compressedByteCount" : 589078,
-      "compressedSHA256" : "a968453fec7713c56c9f071548a785860be20705912b8963a21128dc60431e71",
+      "compressedByteCount" : 589155,
+      "compressedSHA256" : "a0b93e476b9c9b219b67175f4c294be456a18872460f7ddb79fdfd97b64467aa",
       "documentID" : "d3c6f2528ee16aac76318f384436c8dc0d24280bd2a7ac3b66ce08802e7b35c0",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/d3c6f2528ee16aac76318f384436c8dc0d24280bd2a7ac3b66ce08802e7b35c0.json.lzfse",
-      "documentSHA256" : "93b45fa2eddb460fd1d1ba29503a875f9088a5d5724fd723eaa90de5c0de7a64",
+      "documentSHA256" : "17554fb0c7a13fe809fe26aa640eba89a5d76f4c4debc86b144177b8d2dbf9e1",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: Default,MsoNormal,MsoTableGrid,center-align,embedded-entity,sec-link-inline",
+          "unknownClasses: MsoNormal,center-align,embedded-entity,sec-link-inline",
           "unsupportedBlocks: 70",
           "unsupportedCSS: counter-reset,mso-themecolor,tab-stops"
         ],
@@ -6875,47 +6866,46 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-3.html",
       "sourceSHA256" : "7e7bea321dc809d2777ceaac6af1a53d41f10f55c71b0c8c0bac8df171cc87c4",
-      "uncompressedByteCount" : 2055782
+      "uncompressedByteCount" : 2055897
     },
     {
-      "blockCount" : 161,
-      "compressedByteCount" : 50862,
-      "compressedSHA256" : "107314ec877264b6f563640d331533b6f06839e24d8f838ced3a16883993b66c",
+      "blockCount" : 167,
+      "compressedByteCount" : 51755,
+      "compressedSHA256" : "9910a16f40598f918d011469d87666b0a3ccc019d44cd1dbb411b6f27c64a3ce",
       "documentID" : "27c4a4245a55741426eeaef6086ee5bcadd06abd4561ddbc6c16604e342343bb",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/27c4a4245a55741426eeaef6086ee5bcadd06abd4561ddbc6c16604e342343bb.json.lzfse",
-      "documentSHA256" : "6bd23b6af9646b830e8fa2dadaa07233d0d808cbe097930014dfd3c536ba9997",
+      "documentSHA256" : "2e9afb7336db7d0772ceac560f0b9740b36b971e939e5d284f80ca16be12bf6e",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 56",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedBlocks: 55",
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-4.html",
       "sourceSHA256" : "269c27017d281b92bc26e19734399da4fd33edda0ec8b7a00579ed445c60248e",
-      "uncompressedByteCount" : 505854
+      "uncompressedByteCount" : 523748
     },
     {
-      "blockCount" : 216,
-      "compressedByteCount" : 65779,
-      "compressedSHA256" : "ed88f88043ad473c612260ae4519e55eee3cb99fe74bb1f800fa06f23f4ab12d",
+      "blockCount" : 222,
+      "compressedByteCount" : 66591,
+      "compressedSHA256" : "082024a8db17ba8227deb21b73f8563dcdb2a8e6ce16749b29a93d07741bce16",
       "documentID" : "c84573b0215d44e4a890451016963e456758506a7b95ec51df8a16939c3ddad7",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/c84573b0215d44e4a890451016963e456758506a7b95ec51df8a16939c3ddad7.json.lzfse",
-      "documentSHA256" : "fb7346212d5382f89f6a7c8543daa2f045ee4892e1c618b9662b0630b3b8663a",
+      "documentSHA256" : "ca8a00a7cafccd5a91edc250d6239ec7e494142534427273a351d26af5f769cb",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: MsoBodyText,MsoNoSpacing,MsoTableGrid,center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 60",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,text-autospace"
+          "unknownClasses: center-align,pseudo-li,sec-link-inline",
+          "unsupportedBlocks: 59"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-5.html",
       "sourceSHA256" : "d98ff7d4469889b2fdcfb9d6087e6e3b7e29e44569c79569bd5dc65b980528cb",
-      "uncompressedByteCount" : 671244
+      "uncompressedByteCount" : 682963
     },
     {
       "blockCount" : 98,
@@ -6976,125 +6966,124 @@
       "uncompressedByteCount" : 40292
     },
     {
-      "blockCount" : 223,
-      "compressedByteCount" : 98458,
-      "compressedSHA256" : "e2b2fb4ccb97914d2c06ada7a4f48ca820c98d4a127977ed3bb4b9dde20d82d5",
+      "blockCount" : 242,
+      "compressedByteCount" : 101190,
+      "compressedSHA256" : "f02fea4ef38abcc9fad4577a376e1cd6c698eec761d3e49d2067d3bd227868b0",
       "documentID" : "1e510ebaf7eef43817867ee76f364ad7394f369bd77486ad9cd5c5be6435d2eb",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1e510ebaf7eef43817867ee76f364ad7394f369bd77486ad9cd5c5be6435d2eb.json.lzfse",
-      "documentSHA256" : "08304d9c96fdeb6cdd4038e0aee6f0b7ad7b8f7cebe6e17144bd6b3926c40646",
+      "documentSHA256" : "7319114f67421e12492949ff7cc9fd98ba00044918ce1958ea7fd341c89cd2b4",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: embedded-entity,pseudo-li,sec-link-inline",
           "unknownElements: center",
-          "unsupportedBlocks: 97",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedBlocks: 94",
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-2.html",
       "sourceSHA256" : "e28f2859301cc7bc4781db5469895e2b0cc4fe298148636f74d64a8954ec5132",
-      "uncompressedByteCount" : 1956813
+      "uncompressedByteCount" : 2032685
     },
     {
-      "blockCount" : 142,
-      "compressedByteCount" : 49467,
-      "compressedSHA256" : "b5be5cd3a3cbb28ce82f22322719b37e645c6001768020b933b826d51cfbdeb2",
+      "blockCount" : 153,
+      "compressedByteCount" : 51835,
+      "compressedSHA256" : "b4b15377ffa4751ede0eae3f2cd43a0bf137fdc56c58843dbc31fa7e607b7735",
       "documentID" : "89c667c99ad6b5b9ae06cc0e5eeb7e96bc71954500fd8108b2d2b5cc1c6ed4d2",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/89c667c99ad6b5b9ae06cc0e5eeb7e96bc71954500fd8108b2d2b5cc1c6ed4d2.json.lzfse",
-      "documentSHA256" : "a50da98d83ed101b6e7e24407789f2295987666ffc0672a8403ec1d44c68d2c7",
+      "documentSHA256" : "ccb7282ace8dd5529de6ac2d9610b41a4b856b1a6607bcefdb90921542c47fc8",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 54",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedBlocks: 52",
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-3.html",
       "sourceSHA256" : "e8de405283a15dacc888b0bf85ece878f70672bad6ec661002e5fee4eee2eea5",
-      "uncompressedByteCount" : 568943
+      "uncompressedByteCount" : 638144
     },
     {
-      "blockCount" : 59,
-      "compressedByteCount" : 11873,
-      "compressedSHA256" : "62425f46d56adfd0d8baf3a9b1e214f230b490025965113cb6962cc7a0b2c38d",
+      "blockCount" : 65,
+      "compressedByteCount" : 13185,
+      "compressedSHA256" : "c2b294f329d1a61c51ddac951345eb1478947e7871645e94ea6d4ce500f2df08",
       "documentID" : "b95945729cf0ddf49f3d3a7ba4c9e2c2f43f07db72329a593823eca477e11cb1",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/b95945729cf0ddf49f3d3a7ba4c9e2c2f43f07db72329a593823eca477e11cb1.json.lzfse",
-      "documentSHA256" : "8b542529de75e2e40d146bf18c49f187281086fcd0a1be9872fdc305a4660237",
+      "documentSHA256" : "ff6a2199c99fa13e2fab8fcb350c73aaf2eca41cddcdf8c3de0cf23b8f00e4f7",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 11",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 10"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-4.html",
       "sourceSHA256" : "06946026ae72c74688aba007a6f0c145a2bc9947f10979dec5f4803bb0f3e0ba",
-      "uncompressedByteCount" : 98677
+      "uncompressedByteCount" : 164935
     },
     {
       "blockCount" : 105,
-      "compressedByteCount" : 28588,
-      "compressedSHA256" : "091d27f44562c34ce1a9915ce28355b4d135f50b7bcc49b86eb0dbcc1508a293",
+      "compressedByteCount" : 28534,
+      "compressedSHA256" : "5e35dd3730dcb8e0b76dee02668d9289651ba8bc840517c3b96df8d261a10786",
       "documentID" : "7aafe7b5a13bd2edddbdf3992c894f32415f19672e9ff06224d35f5ad77458d4",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/7aafe7b5a13bd2edddbdf3992c894f32415f19672e9ff06224d35f5ad77458d4.json.lzfse",
-      "documentSHA256" : "20c25ff3e27df2c1d67ce615c8216ecb584593faeea08db66ead6c498aaa7571",
+      "documentSHA256" : "0c4afbb152ee9264870349249dc3bbe01e5135824a7d554391950c3e84fe5603",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: pseudo-li,sec-link-inline",
           "unsupportedBlocks: 30",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-5.html",
       "sourceSHA256" : "169e27750be4f1a9b0ac39650b990a700e294d0a8b2faab45791f4160dfeb400",
-      "uncompressedByteCount" : 221212
+      "uncompressedByteCount" : 221007
     },
     {
-      "blockCount" : 200,
-      "compressedByteCount" : 63590,
-      "compressedSHA256" : "00676ee2b1a67b625abd2f7d2099cf38dc826773bc7b962ecddb1d96acc810b2",
+      "blockCount" : 205,
+      "compressedByteCount" : 64466,
+      "compressedSHA256" : "f5a623b402756fe2b0f59ee400e93312c22503725ae71235a8942e21c75762f8",
       "documentID" : "f9b467f9a7029b230c485680516699efcee45985fdbcf034eca3dacb4f64c129",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/f9b467f9a7029b230c485680516699efcee45985fdbcf034eca3dacb4f64c129.json.lzfse",
-      "documentSHA256" : "744bc051751b6ae355fa80bc8d5c3b75145b6bbed2f7302b06ea641ff265f61c",
+      "documentSHA256" : "d7b797ad9ab5de84ad1ee42f18b3b69bb5ecb91f258dc408d7761a6ead1ce526",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: MsoBodyText,MsoNoSpacing,MsoTableGrid,TableParagraph,center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 58",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset,position,tab-stops,top"
+          "unknownClasses: MsoBodyText,MsoNoSpacing,center-align,pseudo-li,sec-link-inline",
+          "unsupportedBlocks: 57",
+          "unsupportedCSS: counter-reset,tab-stops"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-6.html",
       "sourceSHA256" : "7311a5b2447f38777e0eb14cf5ee5882b5f93d365a126c04bfa8af3cc0683656",
-      "uncompressedByteCount" : 596726
+      "uncompressedByteCount" : 608310
     },
     {
-      "blockCount" : 200,
-      "compressedByteCount" : 86364,
-      "compressedSHA256" : "f483be596bff93df193173d4141baa3690cd8f7db1e744be3cdf6a23d411c167",
+      "blockCount" : 215,
+      "compressedByteCount" : 91990,
+      "compressedSHA256" : "9799a2dbf8837079b5ef79b655b40d76e99202c797900e7fa495c694a0404a41",
       "documentID" : "c730e00243c9b27788bfa890dd3fb2f5a628a4ed757f8548066b407266450648",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/c730e00243c9b27788bfa890dd3fb2f5a628a4ed757f8548066b407266450648.json.lzfse",
-      "documentSHA256" : "92007164bbd03713f10b3d792a444b15c3ad7ed947b4508c2c6dd3e773975574",
+      "documentSHA256" : "f431798bfbb7b866597c4d627eaff721fb68dd605e366ff7546c476e7f8ff93d",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 57",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedBlocks: 54",
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-7.html",
       "sourceSHA256" : "60d997e649cbc24e91b741c9cd13af1b53bf7667fb4fadfcd84f4b0804ef571f",
-      "uncompressedByteCount" : 772264
+      "uncompressedByteCount" : 1190778
     },
     {
       "blockCount" : 16,
@@ -7116,85 +7105,83 @@
       "uncompressedByteCount" : 20962
     },
     {
-      "blockCount" : 334,
-      "compressedByteCount" : 100503,
-      "compressedSHA256" : "94f289e390e4e4b0f4223cc25ee38db1b57a4954a090925e8f2fcdeab1c4762c",
+      "blockCount" : 340,
+      "compressedByteCount" : 101462,
+      "compressedSHA256" : "8339bf17e86f667dc8ae40d02f4eac7680e887000465bdd6a9fddf6233650d48",
       "documentID" : "4171563dac0e5e6f8c75f20e8360308daaae1355f46857669cdc94063e6292fa",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/4171563dac0e5e6f8c75f20e8360308daaae1355f46857669cdc94063e6292fa.json.lzfse",
-      "documentSHA256" : "0eac3e2014b88c139c473cc34280beeb38aa7c857305c0c43cbb70f5c3dda6e9",
+      "documentSHA256" : "481ccbc165fd29cfafc3e6f8ebdf7b3bc382d95d19b046f954fcc3161bc7a36b",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,embedded-entity,pseudo-li,sec-link-inline",
           "unknownElements: center",
-          "unsupportedBlocks: 84",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 83"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-2.html",
       "sourceSHA256" : "d4572c54cf1dcb92480d961d5c482aa03e0cc206a26547c95605bd6713cf3422",
-      "uncompressedByteCount" : 1391147
+      "uncompressedByteCount" : 1405684
     },
     {
       "blockCount" : 160,
-      "compressedByteCount" : 39997,
-      "compressedSHA256" : "ce1b32cc4567b1b6b35d03fd2aa9824777c1dace8d2e801043887b71499cdc42",
+      "compressedByteCount" : 39985,
+      "compressedSHA256" : "6117cebfa26e6ea4d7ebe8cf49d9549a80e63b96ebeedf20914b32c6b1470e20",
       "documentID" : "29161b62bc8e5c241be71969b03fbdb3018f99dbd0b98ca332257987175cc5e7",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/29161b62bc8e5c241be71969b03fbdb3018f99dbd0b98ca332257987175cc5e7.json.lzfse",
-      "documentSHA256" : "c26ebd3ae86e31779200b561d7c2162f8e604d0be1e96be7ff44edf94ab2880f",
+      "documentSHA256" : "8cf9f8766ec9d704d2cb94e2caf8d5c9087242c8c1644f367c2d5b265363d707",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
           "unsupportedBlocks: 31",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-3.html",
       "sourceSHA256" : "9c38dd2851ea53647fcbfae7c8ce47b4304113ea07211b30dcbee60032cb1850",
-      "uncompressedByteCount" : 345006
+      "uncompressedByteCount" : 344852
     },
     {
       "blockCount" : 163,
-      "compressedByteCount" : 37867,
-      "compressedSHA256" : "e6298f119e0fdcf8f4d2ffe2058a72b30460dfec7dda55f5343a751e12a4e316",
+      "compressedByteCount" : 37803,
+      "compressedSHA256" : "3159c4ae002576549cf1f2a40ff78c04dfba7ab9adec844b9ff71fa872c162eb",
       "documentID" : "4c58134de154aa07a30ac8e316630c1d34f3e1b557c81ee57388ae41eca66365",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/4c58134de154aa07a30ac8e316630c1d34f3e1b557c81ee57388ae41eca66365.json.lzfse",
-      "documentSHA256" : "a81aa7ed51d42d61a86d42ecc0940b7d7005964e477f156125704bb0e1094077",
+      "documentSHA256" : "d6aced7a4e5bbfaca156899fe0bce50ac9ffe6db512b4980c55a0f9757e4f726",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: MsoBodyText,MsoTableGrid,center-align,pseudo-li,sec-link-inline",
+          "unknownClasses: center-align,pseudo-li,sec-link-inline",
           "unsupportedBlocks: 36",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,tab-stops,text-autospace"
+          "unsupportedCSS: tab-stops"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-4.html",
       "sourceSHA256" : "ec9c8821302bdfa0cebf84efd37dd931673ca76635ab1c96c2a97148b9b006e8",
-      "uncompressedByteCount" : 349539
+      "uncompressedByteCount" : 349277
     },
     {
       "blockCount" : 123,
-      "compressedByteCount" : 61947,
-      "compressedSHA256" : "74be309aed59a93ec3ba5f0954e98f3eb1d690cfe2a2c6367f1e60a68afd2491",
+      "compressedByteCount" : 61889,
+      "compressedSHA256" : "397616ddb4cbe82ba13019877716d2ff2a48cae821ca56b7abc50d5a34882b18",
       "documentID" : "aa1703d96c92f40172818a231b28dd62712a7d8835a5f38200d0ef817a1c3113",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/aa1703d96c92f40172818a231b28dd62712a7d8835a5f38200d0ef817a1c3113.json.lzfse",
-      "documentSHA256" : "f43c7ccdc30ccca5ce87ef42914b41857a32f500667c30e80b7d81fa171692c8",
+      "documentSHA256" : "4b9e046d04f341f7bc8c5b04622b2224f33219475a307a1a40aa2387a89d2e04",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: MsoNoSpacing,center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 55",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 55"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-1.html",
       "sourceSHA256" : "44201f9a4cf549c5571ca5c6cf4ab3e4a3d41dcbb9e457940f053870e526ba89",
-      "uncompressedByteCount" : 560482
+      "uncompressedByteCount" : 560242
     },
     {
       "blockCount" : 22,
@@ -7217,23 +7204,23 @@
     },
     {
       "blockCount" : 273,
-      "compressedByteCount" : 149325,
-      "compressedSHA256" : "ce21bbf4645c74047b925cc17c55dc29c206f37458dd9a6160e9bd9739910f67",
+      "compressedByteCount" : 149253,
+      "compressedSHA256" : "b1445052bdc75dd1eb7445baf69c7cb48d585915b8dfa99290ca4e552a9cdbc3",
       "documentID" : "fa40b3f10b8564d744ae77293f835ad31f0611adb1287bf6372111e21e47f3ce",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/fa40b3f10b8564d744ae77293f835ad31f0611adb1287bf6372111e21e47f3ce.json.lzfse",
-      "documentSHA256" : "31a4e6980672f0f8aa7e003ef0719a9e300f0f84825ef0c1bd5275e550fa8466",
+      "documentSHA256" : "b5bfb3ce7a0abcd0f31d65b723551244a4eeed7d84ad2a4f88b1c3cfb99d6cf2",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
           "unsupportedBlocks: 101",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-3.html",
       "sourceSHA256" : "a264fdd4224df6441f75eb1bfba69ccbe63c273c86a25454b4cc4fec9428dd3c",
-      "uncompressedByteCount" : 1304448
+      "uncompressedByteCount" : 1304226
     },
     {
       "blockCount" : 70,
@@ -7256,23 +7243,22 @@
     },
     {
       "blockCount" : 70,
-      "compressedByteCount" : 18030,
-      "compressedSHA256" : "709ea8b728e1c9bf9da94de9ef6d68c9a8bd43a09b4fbfb1c40945a8b1a20c3b",
+      "compressedByteCount" : 17969,
+      "compressedSHA256" : "71ec8228f914fd546fd370297d0c19f08a13a874984d3cb3694215a2cd46c047",
       "documentID" : "6d75f5be4ffe170ff13076910bbd0f0b2ef4942361d6d170ff395bbdc0ef9209",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/6d75f5be4ffe170ff13076910bbd0f0b2ef4942361d6d170ff395bbdc0ef9209.json.lzfse",
-      "documentSHA256" : "41fb1dae4eda6e46f02a61da04d286c8ce112e34eb028ea1603b75ee80c5adb4",
+      "documentSHA256" : "b07d12e8d12db016b7e544010cfbaf8693a358c253b0e82e81c02fd6845020c8",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 13",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 13"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-5.html",
       "sourceSHA256" : "de2666640c14d70cdfc7e9b3ccf5bedb3f98dd28bce943f7d89660aaa0cf9e7b",
-      "uncompressedByteCount" : 164642
+      "uncompressedByteCount" : 164402
     },
     {
       "blockCount" : 81,
@@ -7315,14 +7301,14 @@
     },
     {
       "blockCount" : 150,
-      "compressedByteCount" : 46549,
-      "compressedSHA256" : "47c67fa71cb804250bdc198a91d74f1e05be6621efc4c53f839f4efe443f2253",
+      "compressedByteCount" : 46546,
+      "compressedSHA256" : "964f996883940fad44cf29cda08bc7e0d8a1e38d6dd93175c902ebf9f9a0caae",
       "documentID" : "7a9092ad7178eab736b30925bb0f5b95a0dfecd4f0158081bfa09d6b9539f123",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/7a9092ad7178eab736b30925bb0f5b95a0dfecd4f0158081bfa09d6b9539f123.json.lzfse",
-      "documentSHA256" : "4457727027330f0d457bf37aac95acee2c0c807129b311eb186c5888a10b352b",
+      "documentSHA256" : "026672614b4fae3efc3a29efb27b8ad5ecf248b24824c032b39af503fbbb37b4",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: MsoTableGrid,pseudo-li,sec-link-inline",
+          "unknownClasses: pseudo-li,sec-link-inline",
           "unsupportedBlocks: 40",
           "unsupportedCSS: tab-stops"
         ],
@@ -7331,7 +7317,7 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-8.html",
       "sourceSHA256" : "7a33afa8465542516c1d2ec1db4f0753d3388f8f11d8de882baaca386d581e33",
-      "uncompressedByteCount" : 396514
+      "uncompressedByteCount" : 396501
     },
     {
       "blockCount" : 23,
@@ -7428,43 +7414,42 @@
     },
     {
       "blockCount" : 37,
-      "compressedByteCount" : 9283,
-      "compressedSHA256" : "f83c8e4347522ad8578e16903bb52e6ed8304bf18a1ef83801b04b80c37bb86e",
+      "compressedByteCount" : 9224,
+      "compressedSHA256" : "e32354bb88176a1924acd4b69214b5535167561b03fe401b039630c3567935d2",
       "documentID" : "673e1f41d3307493b7cd15e2027fda664967ec53e6ce2b356d09f3352aa638e1",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/673e1f41d3307493b7cd15e2027fda664967ec53e6ce2b356d09f3352aa638e1.json.lzfse",
-      "documentSHA256" : "5870ab7e2d7bd82ab70449289809e5d7104b84b32b1f47e6391b815d64f940b8",
+      "documentSHA256" : "01edf09ffbae90dbbc42087430bee503870ad9a30e5364e0a397f01f7cc0127a",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 6",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 6"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-1.html",
       "sourceSHA256" : "1f4bf2da8dc6dd4709bcedb3cd1ce54bd480c9809d91582f114a505ea2de6909",
-      "uncompressedByteCount" : 72275
+      "uncompressedByteCount" : 72035
     },
     {
       "blockCount" : 321,
-      "compressedByteCount" : 714216,
-      "compressedSHA256" : "124cada6ceb1e03f08f73c806b8334a06f77cf76ca449b81a7e87bff6c4f3e34",
+      "compressedByteCount" : 714170,
+      "compressedSHA256" : "ac39cdc9a77b65541c035fe04bc03b120f9c0d471a09030e2b63e42175d52526",
       "documentID" : "8a9d79ca37f844749b17b38e1cf2cfff337082e87d133ae9f5cffbb4dea586fc",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/8a9d79ca37f844749b17b38e1cf2cfff337082e87d133ae9f5cffbb4dea586fc.json.lzfse",
-      "documentSHA256" : "c76f966cba9de952392244440f0a0c8986d8f8874443b18c89a531241ead22a0",
+      "documentSHA256" : "0b9f3d9f76708d163feb8d7378854565da85d8453122be636edfc699f11aa12d",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: MsoNormal,center-align,pseudo-li,sec-link-inline",
           "unsupportedBlocks: 110",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset,tab-stops"
+          "unsupportedCSS: counter-reset,tab-stops"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-2.html",
       "sourceSHA256" : "e67138b12bd498709980a6dcdec765840dacd3b5929b3b8f6e5be1be56d96f30",
-      "uncompressedByteCount" : 2024394
+      "uncompressedByteCount" : 2024172
     },
     {
       "blockCount" : 48,
@@ -7487,63 +7472,61 @@
     },
     {
       "blockCount" : 133,
-      "compressedByteCount" : 40127,
-      "compressedSHA256" : "68a2daa494345bcc062dcdedea1bcdec1ed93f184aa89c3574105794fc619f4d",
+      "compressedByteCount" : 40065,
+      "compressedSHA256" : "cc4a5182a5b914099e2a2546a58c77f66d7c1e57cb194b6880da9bd35bf311f5",
       "documentID" : "b9c3fa5dae397d1209b6bbc22d3528340be69d497d63ba3fea8a15e81194ed3c",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/b9c3fa5dae397d1209b6bbc22d3528340be69d497d63ba3fea8a15e81194ed3c.json.lzfse",
-      "documentSHA256" : "d819d9dd6e6e574b36cd2f86c9084033648fff626fa230d5a60c9a9425ae529f",
+      "documentSHA256" : "2ec9504dabe4f534131b74e74dcd222745b41b6591679afda45e4a5fd9a81265",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 26",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 26"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-4.html",
       "sourceSHA256" : "2b91e184cda0ef651f548cfc5e0fdf06edd8b990e3f84055fc577fb557a22287",
-      "uncompressedByteCount" : 314419
+      "uncompressedByteCount" : 314179
     },
     {
-      "blockCount" : 20,
-      "compressedByteCount" : 9636,
-      "compressedSHA256" : "db630f005f1a063bf36fa9de23eaaff64fe9c52eaf09bcd04576d9721621d10a",
+      "blockCount" : 32,
+      "compressedByteCount" : 11734,
+      "compressedSHA256" : "fca376fd3a44c51ca7f50dd638003b05c3bb72c1794bab3d8271b9040cd50d12",
       "documentID" : "ff37c902ca8dc93a444fd9a8ba9545d65f3b254ad479f458bb1cff49ca3aae7e",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/ff37c902ca8dc93a444fd9a8ba9545d65f3b254ad479f458bb1cff49ca3aae7e.json.lzfse",
-      "documentSHA256" : "8397bb1240426b1100dadf025ef6cca7d0c0d4ed4d3b921d99ad4fa86a895b8e",
+      "documentSHA256" : "1471429004450f1a6240c49124b45a847ae77b0998f891e0d3d12d0bf8af457a",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 14",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 12"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-5.html",
       "sourceSHA256" : "83ffbee5f17c136cf531774bcfabed5d025686361da1117c93a91c89934f8e0d",
-      "uncompressedByteCount" : 87386
+      "uncompressedByteCount" : 166804
     },
     {
       "blockCount" : 79,
-      "compressedByteCount" : 31742,
-      "compressedSHA256" : "47acbf656b5d1a3fabaee49b90ce420f5ca97772f9cbcaffcb93aff3f1e25f27",
+      "compressedByteCount" : 31711,
+      "compressedSHA256" : "480dfcbd693dce2c3f10f5181a4d601b523981fe547bddcda87a27dfc2e0df51",
       "documentID" : "746190adaa9c20bba9da8d6e4376d7903989cc67698218442ced49f53fb99749",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/746190adaa9c20bba9da8d6e4376d7903989cc67698218442ced49f53fb99749.json.lzfse",
-      "documentSHA256" : "84245e98597d83a6c4cacf54d5e7568c81c0a8a9e8741960796c1aebce3afb20",
+      "documentSHA256" : "15cc762d41f131fdedea44040c7183aad766fb423ff0f77923b283846b8efcc0",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: pseudo-li,sec-link-inline",
           "unsupportedBlocks: 28",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-6.html",
       "sourceSHA256" : "e92c05322d7d30361af8855d8ce9b214d41295711d4c46bd39f2a16a3be0c15d",
-      "uncompressedByteCount" : 251733
+      "uncompressedByteCount" : 251511
     },
     {
       "blockCount" : 11,
@@ -7584,43 +7567,43 @@
     },
     {
       "blockCount" : 309,
-      "compressedByteCount" : 70250,
-      "compressedSHA256" : "5e70d03046ae3cf29ccf1f62052053f9de8ca111cb7c52abf1876aae7a861ebc",
+      "compressedByteCount" : 70190,
+      "compressedSHA256" : "e2a07a42d456e1f071e70d027be43501a3cddcd9444e56ecf3c1d9e220a6955c",
       "documentID" : "6574c13fafab526a66310491a25f407a1e50cfd843678a06d1a1c718159d81f5",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/6574c13fafab526a66310491a25f407a1e50cfd843678a06d1a1c718159d81f5.json.lzfse",
-      "documentSHA256" : "47a889fed2bc7ad04956322f3d0dc36b2d309d7a2ed13c2383c7a94e3642517e",
+      "documentSHA256" : "a7b5ded978a8f5a952ec024b9c040e5bde8727ad517480de212683072a344f19",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
           "unsupportedBlocks: 43",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-3.html",
       "sourceSHA256" : "c9ddedbcaa50271037efa45c00637ae96579d825d24f1dce36c45132b647c8f8",
-      "uncompressedByteCount" : 535041
+      "uncompressedByteCount" : 534819
     },
     {
       "blockCount" : 311,
-      "compressedByteCount" : 115299,
-      "compressedSHA256" : "66a95eccfc0b04f4a999e83991b63d5eb98eb3489a02fc2f3aed0bef453ef838",
+      "compressedByteCount" : 115252,
+      "compressedSHA256" : "acdb1346cd678f256595f969becb1bf89f74c89293b0820fc5b7ba91b59ad579",
       "documentID" : "13b32f4886d2d5a2a119f0164001c3b08911ee9d4095930ccceb1b085c3c020b",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/13b32f4886d2d5a2a119f0164001c3b08911ee9d4095930ccceb1b085c3c020b.json.lzfse",
-      "documentSHA256" : "4dc58b841085077346aa007d4b72919c00b8d9396e0acc0f1402cec1215f9503",
+      "documentSHA256" : "0afd985986ddd6f6719aebe3c85cfd0c0177f2cd49d4f94dc6d8f452267373a6",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,embedded-entity,pseudo-li,sec-link-inline",
           "unsupportedBlocks: 68",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-4.html",
       "sourceSHA256" : "1476b5ff7774efa59e85d612482583cfe3c88df904d690670b6c693d1e6f0dc6",
-      "uncompressedByteCount" : 874326
+      "uncompressedByteCount" : 874104
     },
     {
       "blockCount" : 55,
@@ -7681,63 +7664,61 @@
     },
     {
       "blockCount" : 110,
-      "compressedByteCount" : 34076,
-      "compressedSHA256" : "bb52c3211a44c5852bcf131991959fec03f2a2f0c892b4a2a3fc74fea20caeba",
+      "compressedByteCount" : 34021,
+      "compressedSHA256" : "f61610052ed4078af0e915f94a3ed9dce0c3930f5f8746b9e1a08280ff29aa4d",
       "documentID" : "4bad2d77d413192676242cd1b9961baf435bd9ae249706dfef48bcba1a67356c",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/4bad2d77d413192676242cd1b9961baf435bd9ae249706dfef48bcba1a67356c.json.lzfse",
-      "documentSHA256" : "899917f2474c58ac9f0d1e247100b54f5e9a5b88956c9f98084cd7548e20e0ea",
+      "documentSHA256" : "fe5e783fd0e5e454d27eda5d5d8315c84ffafb4c2d7efeedfae914a4776d51f8",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 26",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 26"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-8.html",
       "sourceSHA256" : "5b6986da797451307b42c6f234a254b49badda18dd810bf2155676db872d8a8e",
-      "uncompressedByteCount" : 284274
+      "uncompressedByteCount" : 284034
     },
     {
       "blockCount" : 33,
-      "compressedByteCount" : 13873,
-      "compressedSHA256" : "77b40faf1e60d907de9a635a4e622bc9d521a1d0a1e4c7f6de0ea45e3ce0d63b",
+      "compressedByteCount" : 13809,
+      "compressedSHA256" : "35d5091ab51ad51cd1caa9fd45435143662e67fd0e88eabde89253c21e8e9e7d",
       "documentID" : "3e045659fa4ff3d924a897ef50352fa97bc17c726e7ec87b0b48b07ee9d20c8f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/3e045659fa4ff3d924a897ef50352fa97bc17c726e7ec87b0b48b07ee9d20c8f.json.lzfse",
-      "documentSHA256" : "5ae9f831ea4cb175a51b02eddc15b176baeb65ecf9ca197d22b0068f7e717285",
+      "documentSHA256" : "eb550b31362433661e5bbb0de52b1fc7f869c37f1a843d878bb3a1733b09db63",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 11",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 11"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-9.html",
       "sourceSHA256" : "b17ef6baae572accdafebe6aa561962a388c3b4e2f8513d0f9e5c66b9e91d97c",
-      "uncompressedByteCount" : 88565
+      "uncompressedByteCount" : 88325
     },
     {
-      "blockCount" : 286,
-      "compressedByteCount" : 210060,
-      "compressedSHA256" : "733adb29675cb0d3b9d55be1844b82ee4a09912970dcb1983bb43ca771d77006",
+      "blockCount" : 295,
+      "compressedByteCount" : 212236,
+      "compressedSHA256" : "ebcf7126f20037f6a7699074836c216620dffa00e5542ce1bb08969a313db197",
       "documentID" : "0ac89f3ef985a26c00db5ce5cccf2e929498d9691dd8825f85fccec105d0ecca",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/0ac89f3ef985a26c00db5ce5cccf2e929498d9691dd8825f85fccec105d0ecca.json.lzfse",
-      "documentSHA256" : "f1645495ee7157afd25e339c48234248f1e42e30907b3c5426854b87fe8dda02",
+      "documentSHA256" : "be5e352b9e9118961ee7b8e98a97979875c13a93b50b6b7e1f14d31d578aca10",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: MsoNormal,center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 121",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedBlocks: 120",
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-1.html",
       "sourceSHA256" : "db87bf030b1f85a84099c3628e807ec63e3de4925f91dd6d13845f468983fcce",
-      "uncompressedByteCount" : 2362933
+      "uncompressedByteCount" : 2436247
     },
     {
       "blockCount" : 54,
@@ -7779,23 +7760,22 @@
     },
     {
       "blockCount" : 83,
-      "compressedByteCount" : 21998,
-      "compressedSHA256" : "5cbf95f8fd179f3a44240e46922026f75e7fd5a2d86f7b37a642d43d34bd299d",
+      "compressedByteCount" : 21936,
+      "compressedSHA256" : "ee81d2353e8a5fb5e7e5bba0acbb4201368ee898afe374a9c284068e3f86d8fe",
       "documentID" : "87e9033a553cbc525c836d17f5882617461cf63d08f3586a6418c270d4969876",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/87e9033a553cbc525c836d17f5882617461cf63d08f3586a6418c270d4969876.json.lzfse",
-      "documentSHA256" : "d368eac61d3fd9e2f9d711e4938066d371b67706baf4fcebf01cd5490888125e",
+      "documentSHA256" : "e283f028fc7aed900d291a64f0be5aeebb0214b17976ee60506506dcc3ecda61",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: MsoNormal,center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 22",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 22"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-4.html",
       "sourceSHA256" : "d6271c8b8d87abe6ba4f6140c3dd44d03140baf90fddfca26b0e504cd3e8d7d7",
-      "uncompressedByteCount" : 167886
+      "uncompressedByteCount" : 167646
     },
     {
       "blockCount" : 8,
@@ -7894,23 +7874,22 @@
     },
     {
       "blockCount" : 175,
-      "compressedByteCount" : 45859,
-      "compressedSHA256" : "df539d15623836638d114f4d3db21597ee759a0fe6cf6a33e277985db764bab2",
+      "compressedByteCount" : 45803,
+      "compressedSHA256" : "f931301743d60a8b4cc2772707b396196de936ec296ba9febe389750ae41c020",
       "documentID" : "8964f73f35c9d3b27b6c453fb665e1f3ff7421e09f4264bbb44bda46ee771c51",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/8964f73f35c9d3b27b6c453fb665e1f3ff7421e09f4264bbb44bda46ee771c51.json.lzfse",
-      "documentSHA256" : "a093636479e26a277ebe801d2172065e87a8f67cde95011844f294c6b9567f6f",
+      "documentSHA256" : "0f2a0cd182fd1f9a9dac2d7a56cf30990447d551e9dfeb3983242dc14e305fbb",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 51",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 51"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-1.html",
       "sourceSHA256" : "0ae0e59cc0811aca9418bef4bc5d77743aeb37a41a0689055f91c1e2a15ffd0c",
-      "uncompressedByteCount" : 339869
+      "uncompressedByteCount" : 339629
     },
     {
       "blockCount" : 53,
@@ -7971,23 +7950,23 @@
     },
     {
       "blockCount" : 108,
-      "compressedByteCount" : 53847,
-      "compressedSHA256" : "24e2207a92f2207df5c6feecb42af90c028b4bf8c269cf40b90e4bdb84fb2460",
+      "compressedByteCount" : 53790,
+      "compressedSHA256" : "2a1aa8a0c4be0d69e3ab244c969d3d59f39487da2d9ab4ac39a1875805cabf14",
       "documentID" : "82bc1ad909e9127b6d9e200db7f2eb3bb94ae47a0444c31e31cc8b0d5443807f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/82bc1ad909e9127b6d9e200db7f2eb3bb94ae47a0444c31e31cc8b0d5443807f.json.lzfse",
-      "documentSHA256" : "b72eb994cbea05d132c0efb408b15a78dc9b3cab9a100db4c0af55e3fd9d9d4a",
+      "documentSHA256" : "7ac01c1f9deefb817341c16a8a000db09fa4c7942ff6c482e9fa8388f966f73e",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
           "unsupportedBlocks: 41",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,mso-ansi-language,mso-ascii-theme-font,mso-bidi-language,mso-bidi-theme-font,mso-fareast-font-family,mso-fareast-language,mso-fareast-theme-font,mso-hansi-theme-font"
+          "unsupportedCSS: mso-ansi-language,mso-ascii-theme-font,mso-bidi-language,mso-bidi-theme-font,mso-fareast-font-family,mso-fareast-language,mso-fareast-theme-font,mso-hansi-theme-font"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-5.html",
       "sourceSHA256" : "d548d7d3bb1ee26528a1f0d816725215f67135c7d921ec9ad9acdf9d555a1b27",
-      "uncompressedByteCount" : 409308
+      "uncompressedByteCount" : 409086
     },
     {
       "blockCount" : 48,
@@ -8049,25 +8028,23 @@
       "uncompressedByteCount" : 48308
     },
     {
-      "blockCount" : 110,
-      "compressedByteCount" : 20531,
-      "compressedSHA256" : "c7bb5425688cac1f508ae3d96e1d18d189ab09f5656651f0030214cfeb432c44",
+      "blockCount" : 122,
+      "compressedByteCount" : 22318,
+      "compressedSHA256" : "78f5ecf51f15f37d5f31230f87b8705c0c47b091b40727c204b1d251c325fd6f",
       "documentID" : "7bb908ec4a959a069c1d4bf76640077680485a8612a090d5da26355bede651ef",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/7bb908ec4a959a069c1d4bf76640077680485a8612a090d5da26355bede651ef.json.lzfse",
-      "documentSHA256" : "0e31397e0de83f69cfac854fd040cf08c18c3200e6a147795bc2f4f12d735224",
+      "documentSHA256" : "27f2d2e9821a02e133e2ed8222344528061a12bc12545e0cfddb5caa18ae61c5",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: MsoNormal,embedded-entity,pseudo-li,sec-link-inline",
-          "unknownElements: font",
-          "unsupportedBlocks: 22",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,text-autospace"
+          "unsupportedBlocks: 20"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-9.html",
       "sourceSHA256" : "cb0805bcc229f41df404b5b795930f52c44143fd12a4fe6a1e8a65884d2488e9",
-      "uncompressedByteCount" : 144626
+      "uncompressedByteCount" : 180931
     },
     {
       "blockCount" : 54,
@@ -8166,43 +8143,41 @@
     },
     {
       "blockCount" : 96,
-      "compressedByteCount" : 24310,
-      "compressedSHA256" : "c58037b5f9662234441557b915bca80bba87d9e014cd32e25cb0f293d5a1d2f5",
+      "compressedByteCount" : 24262,
+      "compressedSHA256" : "d7c274275f11868a0a921a3730cd8e2d011a0ffdc670f52767cc7dfe6adf5e67",
       "documentID" : "01facdbad52c6c182f6e7d29ed5bd68156da3016277801d9abb839540d21ad54",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/01facdbad52c6c182f6e7d29ed5bd68156da3016277801d9abb839540d21ad54.json.lzfse",
-      "documentSHA256" : "595f6fbfdbb2d74145429b109883bdcb85eb0c1b162f94d6b9295e117f256e8d",
+      "documentSHA256" : "eff9ad0170cbdb1647bd6ef5c487f138da0a7c50596f1d0c9ef1601a2be362a8",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 29",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 29"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-6.html",
       "sourceSHA256" : "85249aa26d2c95f2881e3c7cdaed25b0bc52fb8c101adc550dfe4fe48eb483aa",
-      "uncompressedByteCount" : 169821
+      "uncompressedByteCount" : 169581
     },
     {
       "blockCount" : 222,
-      "compressedByteCount" : 66324,
-      "compressedSHA256" : "5fb9ea8227c7725f03c4be1550fb7d88d05bb362c4e0eade824a0538ac28535d",
+      "compressedByteCount" : 66279,
+      "compressedSHA256" : "ecd493af6e0758cfc7c8281213ca317ca21c94053b2b9a90bbf9b13d57391677",
       "documentID" : "3eea46c60acac9b0a0c7cf6472d8faf301250564d0e597252fc78595caa913c9",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/3eea46c60acac9b0a0c7cf6472d8faf301250564d0e597252fc78595caa913c9.json.lzfse",
-      "documentSHA256" : "3a2d84c569e08ea36bbbb9474545bcec41db5ed72fd53ec9550b1765bf51b863",
+      "documentSHA256" : "cee4573cfa1a4732ddaff7ba43d9957d085a67f49261dfe73c4f6725656beddb",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: MsoNormal,center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 73",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 73"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-7.html",
       "sourceSHA256" : "f8fbcf99160f22c6639222aa2dd5f1b797eb6e797113c43b0d7f318882739a15",
-      "uncompressedByteCount" : 506886
+      "uncompressedByteCount" : 506680
     },
     {
       "blockCount" : 22,
@@ -8226,23 +8201,22 @@
     },
     {
       "blockCount" : 76,
-      "compressedByteCount" : 59372,
-      "compressedSHA256" : "8fac6a71d780e140da98879462181852c59865a0ee36e611d77ba5f4661c098d",
+      "compressedByteCount" : 59310,
+      "compressedSHA256" : "c174412760e162e6cbafab149cde07e07a98d016279954ff24903b46fe5154df",
       "documentID" : "eadddbd49271ad9cd2a615080be442fb64d2611667e89ad8c4658963c19cb34e",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/eadddbd49271ad9cd2a615080be442fb64d2611667e89ad8c4658963c19cb34e.json.lzfse",
-      "documentSHA256" : "60c9102751c86a03488d2b64898db48951bf67bd221f9ebd1bef1ab6ebcb08f3",
+      "documentSHA256" : "993f6a43903512f59a30c1eb57b61473806eb7c7bfcd6facb6fcce7ce97887f0",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 33",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 33"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-9.html",
       "sourceSHA256" : "6f37add14a6d29b8ddc51d72837cf124671e66a7ed107abda4d0637641bb210c",
-      "uncompressedByteCount" : 337757
+      "uncompressedByteCount" : 337517
     },
     {
       "blockCount" : 57,
@@ -8265,23 +8239,23 @@
     },
     {
       "blockCount" : 37,
-      "compressedByteCount" : 10944,
-      "compressedSHA256" : "a4e652a83991988e5397fbdc4b3a3aecb1153d3ece02e8f498ebad3d9febdfc0",
+      "compressedByteCount" : 10879,
+      "compressedSHA256" : "cf4d6350cde0b06bedf80a7b2a056abfd241bff4e362659019e17ac477696862",
       "documentID" : "70928050675843b01c26b3cd39fbdd63c968549ca519bef5ab1b135e66352bf3",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/70928050675843b01c26b3cd39fbdd63c968549ca519bef5ab1b135e66352bf3.json.lzfse",
-      "documentSHA256" : "2934049479fdd85ccfdeb91a5762ac3dccae47d3e1b4c6db0d0b9b89d9cd4f3d",
+      "documentSHA256" : "7d3b489aabd9642b75dcb190394f11feb2be8df3502fdda4430c8c0b1a577ad4",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
           "unsupportedBlocks: 5",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-2.html",
       "sourceSHA256" : "06098443111788474a217b8c1594257611ad06353588c2c9c359bdc7852dfe53",
-      "uncompressedByteCount" : 99424
+      "uncompressedByteCount" : 99202
     },
     {
       "blockCount" : 176,
@@ -8323,23 +8297,22 @@
     },
     {
       "blockCount" : 100,
-      "compressedByteCount" : 20356,
-      "compressedSHA256" : "d56dc8f0bc7408e0f3fab8bcf6abfc088a2af1c4a167e48597af17a0a741d554",
+      "compressedByteCount" : 20297,
+      "compressedSHA256" : "a03d04d1a8d0af2037fbd2c3bbc261882217ddfbd376ece75319fa05eeaacbd9",
       "documentID" : "e1f8a5d2ad123d888045603ce0eee49cbb1e196117e984e97c76e3a40bfa9d24",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/e1f8a5d2ad123d888045603ce0eee49cbb1e196117e984e97c76e3a40bfa9d24.json.lzfse",
-      "documentSHA256" : "0e332b6f1cd8c2f25dfbce3b6ec7f1fea029485d8b1e8c254808c5211798bb9e",
+      "documentSHA256" : "33b2df38c7ed2c8a7c86551829fb59a5dd36158a0add2fa1b44b28c46a9674db",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 20",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 20"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-5.html",
       "sourceSHA256" : "12bc6e64a17d946bd260b610a101f544663a6ca7fbdf1911467d904a9007ff95",
-      "uncompressedByteCount" : 144993
+      "uncompressedByteCount" : 144753
     },
     {
       "blockCount" : 90,
@@ -8459,123 +8432,118 @@
     },
     {
       "blockCount" : 95,
-      "compressedByteCount" : 27852,
-      "compressedSHA256" : "211a95b89280a11c8e72b6f613bedcffe2a7cc8ccb5b4bd08ccac1fa25decb34",
+      "compressedByteCount" : 27798,
+      "compressedSHA256" : "71e8ba06664ff1d15fceb5ff12a04a9b9078a8045fa998a8167b70fef74d8852",
       "documentID" : "1525360d40c09dc787d8ad4150e8c3e4a7c2a72d5cf184b31532d9cdc4213466",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1525360d40c09dc787d8ad4150e8c3e4a7c2a72d5cf184b31532d9cdc4213466.json.lzfse",
-      "documentSHA256" : "fc7317792402184c181896dec53d817fc8924f9a29eb67d2e4f5a20d13f35622",
+      "documentSHA256" : "0d9c82e12ea75920fbd796f7617e094b23c6465171dbc49769e33ef64fc3e764",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
           "unsupportedBlocks: 31",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
+          "unsupportedCSS: counter-reset"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-4.html",
       "sourceSHA256" : "9b4d92ef7dd58cf5613b0dad878fbbe68d841d25d8365af869f80ab6e9a5becc",
-      "uncompressedByteCount" : 213332
+      "uncompressedByteCount" : 213110
     },
     {
       "blockCount" : 79,
-      "compressedByteCount" : 16506,
-      "compressedSHA256" : "dc6e7253d04851600c63772fa46273aba4906648fed0a4283baa8d02fb6a9c3e",
+      "compressedByteCount" : 16454,
+      "compressedSHA256" : "21988bda5f52f12cc8cc508130b736f6d329f3f0cdd9498b5450eae75ad40d4b",
       "documentID" : "1d75a632be701dd8fe2cac5ad4208bb489e47a0d36b6ce2797458d5c7936bd10",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1d75a632be701dd8fe2cac5ad4208bb489e47a0d36b6ce2797458d5c7936bd10.json.lzfse",
-      "documentSHA256" : "e2790a205ebda1aff499cbfab9e0402294b256cab36e328e0030ea77f311e6ea",
+      "documentSHA256" : "f42fb689501b5ac62f5980e25e628a627ddbdba4c5a4d44ef712706035436258",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 13",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 13"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-5.html",
       "sourceSHA256" : "a58c3db452336bd414fbc6b98f8802bb1f9b22359b87b86d3c933a0021b9f414",
-      "uncompressedByteCount" : 131149
+      "uncompressedByteCount" : 130909
     },
     {
       "blockCount" : 100,
-      "compressedByteCount" : 24317,
-      "compressedSHA256" : "3db33c1addde4932018e5add90e247403244241ed07885c078d1347f13b3a7cb",
+      "compressedByteCount" : 24259,
+      "compressedSHA256" : "480a773c71e172cdd246e6d5b910b2bfcabb76a272ddbcf380bcfbca1aa4aba0",
       "documentID" : "52b1a2201ec049e08d3837cd433095a6fde80a907ddbfba705ed261d5bb3c32b",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/52b1a2201ec049e08d3837cd433095a6fde80a907ddbfba705ed261d5bb3c32b.json.lzfse",
-      "documentSHA256" : "34f242fbf0f8bea9ac793b1c4c8d4e9d199c0148b90da085337ce6f0c94f64b7",
+      "documentSHA256" : "0e3194c5b509b2e9449912fa2fbab75dc7f0aee01746023dc25cace957d4824d",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 23",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 23"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-6.html",
       "sourceSHA256" : "779018603239e036c35f3cdb010f21b0954dfd007a5eb5d3bc94c9a2c233afe1",
-      "uncompressedByteCount" : 187502
+      "uncompressedByteCount" : 187262
     },
     {
       "blockCount" : 30,
-      "compressedByteCount" : 10890,
-      "compressedSHA256" : "4c5796753e1c5261b1b807f6716fd1e49fffa5f848dc6b7fbeeb682808fa1980",
+      "compressedByteCount" : 10822,
+      "compressedSHA256" : "712e1af52c07abe7b9e74d8bc84b1d8d7a237602019c22c0ffcbadec4c00b3f6",
       "documentID" : "5f9d51cfda9b974120b73d1a275f90f8df9ff0ddf4854a3ed57f04d5fb6cee03",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/5f9d51cfda9b974120b73d1a275f90f8df9ff0ddf4854a3ed57f04d5fb6cee03.json.lzfse",
-      "documentSHA256" : "f1ce687edf00b5f5c999c012fdc5a34775d39443d996b22bbf2f4b3ac8508443",
+      "documentSHA256" : "8223d9107e2b4455137621375a7e52e1780d7c225404e7e63ef6d920cac2830a",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 12",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 12"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-7.html",
       "sourceSHA256" : "825a4ee6e01b6465c82026c49ef464d7808f797ffbf74d4f115b0ecebdd918da",
-      "uncompressedByteCount" : 88877
+      "uncompressedByteCount" : 88637
     },
     {
       "blockCount" : 61,
-      "compressedByteCount" : 14891,
-      "compressedSHA256" : "9ab9484853d51d19ffb548e6a9458382e95c763aa832a45e06c299951565f079",
+      "compressedByteCount" : 14831,
+      "compressedSHA256" : "6fef05fcec9b04163b9e74b2b43c6a0be8599ba11b5f3c4d1e57bc1850ded27a",
       "documentID" : "5021bec1bfa9eab5d1ca8e719e73bc648caef8ce4e0c9b6c59b1103af2b4f324",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/5021bec1bfa9eab5d1ca8e719e73bc648caef8ce4e0c9b6c59b1103af2b4f324.json.lzfse",
-      "documentSHA256" : "64489002d481f6e293e98cc774b486c747ad998f59a703985e553204b29cace3",
+      "documentSHA256" : "909cda6a28ece59e120be02c188f0c785aea1cc0447170c88bfadca51527d278",
       "eligibility" : {
         "reasons" : [
-          "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 12",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unknownClasses: pseudo-li,sec-link-inline",
+          "unsupportedBlocks: 12"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-8.html",
       "sourceSHA256" : "56ac8655053eaae70aca9e1fae452451aab2b765b50e5aed990bece78cc4e4e2",
-      "uncompressedByteCount" : 108658
+      "uncompressedByteCount" : 108405
     },
     {
       "blockCount" : 168,
-      "compressedByteCount" : 52623,
-      "compressedSHA256" : "2dd443bee8c87ce9c5103a7e98f08de9b4855a03d1607e1786f336df463a6e18",
+      "compressedByteCount" : 52566,
+      "compressedSHA256" : "8408dd7bb2bff64a410be60c92ec68958f5ebaf0dfe887491d33d98e24757e30",
       "documentID" : "0c21f0d352d34a55b87c5c73ec95f57c8c6f1ab52b0e86b6dd71bde19a14f7dc",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/0c21f0d352d34a55b87c5c73ec95f57c8c6f1ab52b0e86b6dd71bde19a14f7dc.json.lzfse",
-      "documentSHA256" : "c26829fd534647bde980db6252a4b8dc7b28658d594dabad23d1a2249f6f99b3",
+      "documentSHA256" : "c1fc25cfa1f4f6c04f760c240bc00b14d9b1cab14eafe5fe6057c16b253cc3f9",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 56",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 56"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-9.html",
       "sourceSHA256" : "3c4a636fb9f6b759117f932888fbf646394031290037e6ca15489bf42c833d07",
-      "uncompressedByteCount" : 427395
+      "uncompressedByteCount" : 427155
     },
     {
       "blockCount" : 54,
@@ -8617,23 +8585,22 @@
     },
     {
       "blockCount" : 45,
-      "compressedByteCount" : 15620,
-      "compressedSHA256" : "3159059dd39e6df79668dbf4b4f68968a951ff65be14646a3319a7b9775a0bca",
+      "compressedByteCount" : 15582,
+      "compressedSHA256" : "9017106932eb637144e50e48e55798f3ac9f221ab39c8d1a0afd5b7036a7e8ab",
       "documentID" : "013b84547ec76d1e4b7b510ca97a4aebd25fd57ab66abfb584a47f9c7a9dc19f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/013b84547ec76d1e4b7b510ca97a4aebd25fd57ab66abfb584a47f9c7a9dc19f.json.lzfse",
-      "documentSHA256" : "6170511464a8dcdf934747897781d82d98f572be301d0935de79ce71efd61bd3",
+      "documentSHA256" : "f715931ef7946d637201e10d17ecce907c2f5657921e4a27551f29f7c508ab4d",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: center-align,pseudo-li,sec-link-inline",
-          "unsupportedBlocks: 15",
-          "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
+          "unsupportedBlocks: 15"
         ],
         "state" : "fullHTMLFallback"
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-3.html",
       "sourceSHA256" : "92c1064dc686840af5c4962a0a0b286152fcf3ed490f0380d86120d57403284c",
-      "uncompressedByteCount" : 109080
+      "uncompressedByteCount" : 108840
     },
     {
       "blockCount" : 111,
@@ -8676,11 +8643,11 @@
     },
     {
       "blockCount" : 71,
-      "compressedByteCount" : 13621,
-      "compressedSHA256" : "6b5ee96ba8c53b39bd67c6af685b544e9deb4dd319a880afb85548551fb05fae",
+      "compressedByteCount" : 13634,
+      "compressedSHA256" : "62d8bc40b0e3ac879a8e5c38843a9183922feecbb9c0031c353f9cbd330f8615",
       "documentID" : "5f0c5234e14df90d877019365fff0007d5d9685775a5a8484d4c72d6943fba48",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/5f0c5234e14df90d877019365fff0007d5d9685775a5a8484d4c72d6943fba48.json.lzfse",
-      "documentSHA256" : "2976e6aee16ebe73ebfd8fa48aabcb47556aaf6121e430e19870f7efcb9f95b2",
+      "documentSHA256" : "0496c25543cdf363df0eaf2685dae0c3ea09ea8280cc7c44e655db1bafaec873",
       "eligibility" : {
         "reasons" : [
           "unknownClasses: sec-link-inline",
@@ -8691,7 +8658,7 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-6.html",
       "sourceSHA256" : "7695da27ac1365ca3b601957c059cb126df95c500128dbd06a4d72a2c97a7f04",
-      "uncompressedByteCount" : 87914
+      "uncompressedByteCount" : 87931
     }
   ],
   "parserSchemaVersion" : "native-reader-document-v1",

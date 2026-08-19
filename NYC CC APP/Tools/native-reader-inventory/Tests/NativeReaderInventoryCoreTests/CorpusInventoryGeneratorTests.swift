@@ -89,6 +89,60 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertTrue(chapter.eligibility.reasons.contains { $0.contains("unknownElements") })
     }
 
+    func testComplexTableContainsUnknownFormattingInsideIsolatedBoundary() throws {
+        let root = try makeTemporaryDirectory()
+        let chapters = root.appendingPathComponent("sample-package/chapters", isDirectory: true)
+        try FileManager.default.createDirectory(at: chapters, withIntermediateDirectories: true)
+        let chapterURL = chapters.appendingPathComponent("isolated.html")
+        try """
+        <html><body><h2 id="isolated">Isolated table</h2><p>Supported chapter text.</p>
+        <table style="border-collapse: collapse"><caption>Exact caption</caption>
+          <tr><th colspan="2">Header</th></tr>
+          <tr><td class="unreviewed-cell" style="mystery-property: value">A</td><td>B</td></tr>
+          <tfoot><tr><td colspan="2" class="table-footnote">Exact footnote</td></tr></tfoot>
+        </table></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let generator = CorpusInventoryGenerator()
+        let chapter = generator.analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: chapter
+        )
+
+        XCTAssertEqual(chapter.unknownClassNames, ["unreviewed-cell"])
+        XCTAssertEqual(chapter.unsupportedCSSProperties, ["mystery-property"])
+        XCTAssertEqual(chapter.tables.first?.renderingClassification, .isolatedHTML)
+        XCTAssertEqual(chapter.eligibility.state, .nativeWithTableFallback)
+        XCTAssertEqual(chapter.eligibility.reasons, ["isolatedHTMLTableCount: 1"])
+        XCTAssertEqual(document.eligibility, chapter.eligibility)
+        XCTAssertEqual(document.validation.unsupportedBlockCount, 0)
+        XCTAssertTrue(document.validation.passesStructuralValidation)
+        let table = try XCTUnwrap(document.blocks.compactMap(\.table).first)
+        XCTAssertEqual(table.caption, "Exact caption")
+        XCTAssertEqual(table.footnotes, ["Exact footnote"])
+        XCTAssertTrue(table.sourceHTML?.contains("unreviewed-cell") == true)
+        XCTAssertTrue(table.sourceHTML?.contains("mystery-property") == true)
+    }
+
+    func testOversizedIsolatedTableKeepsWholeChapterOnHTML() throws {
+        let root = try makeTemporaryDirectory()
+        let chapters = root.appendingPathComponent("sample-package/chapters", isDirectory: true)
+        try FileManager.default.createDirectory(at: chapters, withIntermediateDirectories: true)
+        let chapterURL = chapters.appendingPathComponent("oversized.html")
+        let rows = (0...250).map { "<tr><td style='border: 1px solid black'>\($0)</td></tr>" }.joined()
+        try "<html><body><h2>Oversized</h2><table>\(rows)</table></body></html>"
+            .write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let chapter = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+
+        XCTAssertEqual(chapter.tables.first?.rowCount, 251)
+        XCTAssertEqual(chapter.tables.first?.renderingClassification, .isolatedHTML)
+        XCTAssertEqual(chapter.eligibility.state, .fullHTMLFallback)
+        XCTAssertEqual(chapter.eligibility.reasons, ["oversizedIsolatedHTMLTableCount: 1"])
+    }
+
     func testGenerationDiscoversOnlyNonPreparedChapterHTMLAndIsDeterministic() throws {
         let root = try makeTemporaryDirectory()
         let authoredChapter = root.appendingPathComponent("package/chapters/A.html")

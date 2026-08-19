@@ -2782,7 +2782,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
 
     func testDebugPilotRoutesAndLoadsValidatedPhaseThreeAndFourDocuments() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
-        XCTAssertEqual(NativeReaderDocumentStore.debugPilotSourcePaths.count, 7)
+        XCTAssertEqual(NativeReaderDocumentStore.debugPilotSourcePaths.count, 8)
 
         for sourcePath in NativeReaderDocumentStore.debugPilotSourcePaths.sorted() {
             let sourceURL = corpusRootURL.appendingPathComponent(sourcePath)
@@ -2793,12 +2793,39 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             XCTAssertEqual(document.sourcePath, sourcePath)
             XCTAssertTrue(document.isValidatedNativeContent)
             XCTAssertFalse(document.blocks.isEmpty)
-            XCTAssertFalse(document.blocks.contains { [.table, .unsupportedHTML].contains($0.kind) })
+            XCTAssertFalse(document.blocks.contains { $0.kind == .unsupportedHTML })
+            if sourcePath != "2026-zoning-resolution/chapters/APP-D-21241.html" {
+                XCTAssertFalse(document.blocks.contains { $0.kind == .table })
+            }
         }
 
         let eligibleButNotPiloted = corpusRootURL
             .appendingPathComponent("2026-existing-building-code/chapters/2.html")
         XCTAssertNil(store.debugRoute(for: eligibleButNotPiloted))
+    }
+
+    func testPhaseFiveComplexTablePilotUsesBoundedIsolatedHTML() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let sourcePath = "2026-zoning-resolution/chapters/APP-D-21241.html"
+        let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+        let document = try await store.loadDocument(for: route)
+        let tables = document.blocks.compactMap(\.table)
+
+        XCTAssertEqual(document.eligibility.state, .nativeWithTableFallback)
+        XCTAssertEqual(document.eligibility.reasons, ["isolatedHTMLTableCount: 1"])
+        XCTAssertEqual(tables.count, 1)
+        let table = try XCTUnwrap(tables.first)
+        XCTAssertEqual(table.rowCount, 139)
+        XCTAssertEqual(table.columnCount, 5)
+        XCTAssertEqual(table.renderingClassification, .isolatedHTML)
+        XCTAssertTrue(table.classificationReasons.contains("mergedCells"))
+        XCTAssertTrue(table.classificationReasons.contains("customBorders"))
+        XCTAssertTrue(table.sourceHTML?.localizedCaseInsensitiveContains("<table") == true)
+        XCTAssertEqual(Set(table.cells.map(\.id)).count, table.cells.count)
+
+        let oversizedSource = corpusRootURL
+            .appendingPathComponent("2026-zoning-resolution/chapters/APP-C-21242.html")
+        XCTAssertNil(store.debugRoute(for: oversizedSource))
     }
 
     func testPhaseFourMediaPilotsResolveBundledAssetsAndAccessibilityText() async throws {

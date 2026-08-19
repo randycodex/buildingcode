@@ -260,6 +260,97 @@ private struct TableBlockView: View {
     }
 }
 
+struct NativeReaderTableBlockView: View {
+    let table: NativeReaderRuntimeTable
+    let baseURL: URL?
+
+    var body: some View {
+        switch table.renderingClassification {
+        case .nativeSimple:
+            nativeSimpleTable
+        case .isolatedHTML:
+            if let sourceHTML = table.sourceHTML {
+                ScrollView(.horizontal) {
+                    TableHTMLView(
+                        html: TableHTMLRenderer.html(forRawFragment: sourceHTML, tableID: table.id),
+                        tableID: table.id,
+                        baseURL: baseURL
+                    )
+                    .frame(width: isolatedTableWidth)
+                }
+                .scrollIndicators(.visible)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityLabel(table.caption ?? "Code table")
+            }
+        }
+    }
+
+    private var isolatedTableWidth: CGFloat {
+        CGFloat(max(table.columnCount, 1)) * 132
+    }
+
+    private var nativeSimpleTable: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let caption = table.caption, !caption.isEmpty {
+                Text(caption)
+                    .font(.subheadline.weight(.semibold))
+                    .textSelection(.enabled)
+            }
+
+            ScrollView(.horizontal) {
+                simpleGrid
+            }
+            .scrollIndicators(.visible)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            ForEach(Array(table.footnotes.enumerated()), id: \.offset) { _, footnote in
+                Text(footnote)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var simpleGrid: some View {
+        let cellsByPosition = Dictionary(
+            uniqueKeysWithValues: table.cells.map { ("\($0.row)-\($0.column)", $0) }
+        )
+        return Grid(horizontalSpacing: 0, verticalSpacing: 0) {
+            ForEach(0..<table.rowCount, id: \.self) { row in
+                GridRow {
+                    ForEach(0..<table.columnCount, id: \.self) { column in
+                        let cell = cellsByPosition["\(row)-\(column)"]
+                        Text(cell?.plainText ?? "")
+                            .font(cell?.isHeader == true ? .body.weight(.semibold) : .body)
+                            .frame(width: 132, alignment: .leading)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 7)
+                            .background(
+                                cell?.isHeader == true
+                                    ? Color(uiColor: .secondarySystemGroupedBackground)
+                                    : Color.clear
+                            )
+                            .overlay(alignment: .bottom) {
+                                Color(uiColor: .separator).frame(height: 0.5)
+                            }
+                            .overlay(alignment: .trailing) {
+                                Color(uiColor: .separator).frame(width: 0.5)
+                            }
+                            .textSelection(.enabled)
+                            .accessibilityAddTraits(cell?.isHeader == true ? .isHeader : [])
+                    }
+                }
+            }
+        }
+        .overlay {
+            Rectangle()
+                .stroke(Color(uiColor: .separator), lineWidth: 0.5)
+        }
+    }
+}
+
 private struct TableCaptionTextView: View {
     let text: String
 
@@ -579,9 +670,13 @@ private struct TableHTMLView: View {
     var body: some View {
         Group {
             if shouldLoad {
-                TableWebView(html: html, tableID: tableID, baseURL: baseURL, height: $height)
-                    .id(tableID)
-                    .frame(height: height)
+                GeometryReader { proxy in
+                    TableWebView(html: html, tableID: tableID, baseURL: baseURL, height: $height)
+                        .id(tableID)
+                        .frame(width: proxy.size.width, height: height)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: height)
             } else {
                 HStack(spacing: 8) {
                     ProgressView()
@@ -634,7 +729,14 @@ private struct TableWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
-        webView.scrollView.isScrollEnabled = false
+        // The web document is sized to its full vertical content, so its own
+        // scroll view has no vertical range. Keep touch delivery enabled for
+        // the inner `.table-wrap` horizontal overflow container.
+        webView.scrollView.isScrollEnabled = true
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
+        webView.scrollView.alwaysBounceHorizontal = false
+        webView.scrollView.alwaysBounceVertical = false
+        webView.scrollView.showsVerticalScrollIndicator = false
         webView.scrollView.backgroundColor = .clear
         webView.isOpaque = false
         webView.backgroundColor = .clear
@@ -777,6 +879,9 @@ private enum TableHTMLRenderer {
             html, body {
               margin: 0;
               padding: 0;
+              width: 100%;
+              max-width: 100%;
+              overflow-x: hidden;
               background: transparent;
               color: #111111;
               font: -apple-system-body;
@@ -800,6 +905,12 @@ private enum TableHTMLRenderer {
               line-height: 1.35;
               border: 1px solid #c7c7cc;
               background: rgba(242, 242, 247, 0.78);
+            }
+            caption {
+              caption-side: top;
+              padding: 0 0 8px;
+              text-align: left;
+              font-weight: 600;
             }
             th, td {
               padding: 7px 9px;

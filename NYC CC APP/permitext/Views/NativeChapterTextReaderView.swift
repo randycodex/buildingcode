@@ -459,7 +459,15 @@ private struct NativeReaderTextBlockView: View {
                     onOpenMedia: onOpenMedia,
                     onMediaFailure: onMediaFailure
                 )
-            case .table, .unsupportedHTML:
+            case .table:
+                if let table = block.table {
+                    NativeReaderTableBlockView(
+                        table: table,
+                        baseURL: route.sourceURL.deletingLastPathComponent()
+                    )
+                    .containerRelativeFrame(.horizontal)
+                }
+            case .unsupportedHTML:
                 EmptyView()
             }
         }
@@ -522,7 +530,9 @@ private struct NativeReaderTextBlockView: View {
             return 16
         case .image, .figure:
             return 14
-        case .table, .unsupportedHTML:
+        case .table:
+            return 16
+        case .unsupportedHTML:
             return 0
         }
     }

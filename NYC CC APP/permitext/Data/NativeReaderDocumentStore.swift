@@ -54,6 +54,41 @@ struct NativeReaderRuntimeListItem: Decodable, Equatable, Identifiable, Sendable
     let children: [NativeReaderRuntimeListItem]
 }
 
+enum NativeReaderRuntimeTableRenderingClassification: String, Decodable, Sendable {
+    case nativeSimple
+    case isolatedHTML
+}
+
+struct NativeReaderRuntimeTableCell: Decodable, Equatable, Identifiable, Sendable {
+    let row: Int
+    let column: Int
+    let rowSpan: Int
+    let columnSpan: Int
+    let isHeader: Bool
+    let plainText: String
+    let runs: [NativeReaderRuntimeTextRun]
+    let anchorIDs: [String]
+    let linkTargets: [String]
+    let classNames: [String]
+    let inlineStyle: String?
+    let borderSignatures: [String]
+
+    var id: String { "\(row)-\(column)" }
+}
+
+struct NativeReaderRuntimeTable: Decodable, Equatable, Identifiable, Sendable {
+    let id: String
+    let rowCount: Int
+    let columnCount: Int
+    let cells: [NativeReaderRuntimeTableCell]
+    let caption: String?
+    let footnotes: [String]
+    let renderingClassification: NativeReaderRuntimeTableRenderingClassification
+    let classificationReasons: [String]
+    let structureSHA256: String
+    let sourceHTML: String?
+}
+
 struct NativeReaderRuntimeMedia: Decodable, Equatable, Identifiable, Sendable {
     let id: String
     let element: String
@@ -91,6 +126,7 @@ struct NativeReaderRuntimeBlock: Decodable, Equatable, Identifiable, Sendable {
     let runs: [NativeReaderRuntimeTextRun]
     let headingLevel: Int?
     let listItems: [NativeReaderRuntimeListItem]
+    let table: NativeReaderRuntimeTable?
     let media: [NativeReaderRuntimeMedia]
     let caption: String?
 
@@ -104,6 +140,7 @@ struct NativeReaderRuntimeBlock: Decodable, Equatable, Identifiable, Sendable {
         runs: [NativeReaderRuntimeTextRun],
         headingLevel: Int?,
         listItems: [NativeReaderRuntimeListItem],
+        table: NativeReaderRuntimeTable? = nil,
         media: [NativeReaderRuntimeMedia] = [],
         caption: String? = nil
     ) {
@@ -116,6 +153,7 @@ struct NativeReaderRuntimeBlock: Decodable, Equatable, Identifiable, Sendable {
         self.runs = runs
         self.headingLevel = headingLevel
         self.listItems = listItems
+        self.table = table
         self.media = media
         self.caption = caption
     }
@@ -190,13 +228,14 @@ struct NativeReaderRuntimeDocument: Decodable, Equatable, Sendable {
     }
 
     var isValidatedNativeContent: Bool {
-        eligibility.state == .native
-            && eligibility.reasons.isEmpty
+        supportsPhaseFiveEligibility
             && validation.passesStructuralValidation
             && validation.unsupportedBlockCount == 0
             && blocks.allSatisfy { block in
                 switch block.kind {
-                case .table, .unsupportedHTML:
+                case .table:
+                    return block.table != nil
+                case .unsupportedHTML:
                     return false
                 case .image, .figure:
                     return !block.media.isEmpty
@@ -204,6 +243,21 @@ struct NativeReaderRuntimeDocument: Decodable, Equatable, Sendable {
                     return true
                 }
             }
+    }
+
+    private var supportsPhaseFiveEligibility: Bool {
+        switch eligibility.state {
+        case .native:
+            return eligibility.reasons.isEmpty
+        case .nativeWithTableFallback:
+            return !eligibility.reasons.isEmpty
+                && eligibility.reasons.allSatisfy { $0.hasPrefix("isolatedHTMLTableCount: ") }
+                && blocks.contains {
+                    $0.table?.renderingClassification == .isolatedHTML
+                }
+        case .fullHTMLFallback, .invalidContent:
+            return false
+        }
     }
 }
 
@@ -254,6 +308,7 @@ enum NativeReaderDocumentStoreError: LocalizedError, Equatable {
     case sourceMismatch(String)
     case unsupportedContent(String)
     case mediaValidationFailed(String)
+    case tableValidationFailed(String)
 
     var errorDescription: String? {
         switch self {
@@ -279,6 +334,8 @@ enum NativeReaderDocumentStoreError: LocalizedError, Equatable {
             return "The chapter is outside the validated native Reader phases: \(path)."
         case .mediaValidationFailed(let reason):
             return "The chapter's native media failed validation: \(reason)."
+        case .tableValidationFailed(let reason):
+            return "The chapter's native table failed validation: \(reason)."
         }
     }
 }
@@ -298,7 +355,8 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         "2022-construction-codes/code-sections/building-code/chapters/R.html",
         "2022-construction-codes/code-sections/building-code/chapters/S.html",
         "2026-enacted-administrative-code/chapters/30000095.html",
-        "2026-existing-building-code/chapters/1.html"
+        "2026-existing-building-code/chapters/1.html",
+        "2026-zoning-resolution/chapters/APP-D-21241.html"
     ]
     #endif
 
@@ -346,8 +404,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
               Self.debugPilotSourcePaths.contains(relativePath),
               case .success(let index) = indexResult,
               let entry = index.entries.first(where: { $0.relativePath == relativePath }),
-              entry.eligibility.state == .native,
-              entry.eligibility.reasons.isEmpty,
+              Self.supportsDebugEligibility(entry.eligibility),
               entry.passesStructuralValidation,
               let documentURL = Self.resolvedDocumentURL(
                   relativePath: entry.documentPath,
@@ -448,8 +505,107 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         else {
             throw NativeReaderDocumentStoreError.sourceMismatch(route.relativeSourcePath)
         }
+        try validateTables(in: document, for: route)
         try validateMedia(in: document, for: route)
         return document
+    }
+
+    private static func supportsDebugEligibility(_ eligibility: NativeReaderRuntimeEligibility) -> Bool {
+        switch eligibility.state {
+        case .native:
+            return eligibility.reasons.isEmpty
+        case .nativeWithTableFallback:
+            return !eligibility.reasons.isEmpty
+                && eligibility.reasons.allSatisfy { $0.hasPrefix("isolatedHTMLTableCount: ") }
+        case .fullHTMLFallback, .invalidContent:
+            return false
+        }
+    }
+
+    private static func validateTables(
+        in document: NativeReaderRuntimeDocument,
+        for route: NativeReaderDocumentRoute
+    ) throws {
+        let tables = document.blocks.compactMap(\.table)
+        guard Set(tables.map(\.id)).count == tables.count else {
+            throw NativeReaderDocumentStoreError.tableValidationFailed(
+                "duplicate table IDs in \(route.relativeSourcePath)"
+            )
+        }
+
+        for table in tables {
+            guard table.rowCount >= 0,
+                  table.columnCount >= 0,
+                  !table.structureSHA256.isEmpty,
+                  Set(table.cells.map(\.id)).count == table.cells.count else {
+                throw NativeReaderDocumentStoreError.tableValidationFailed(
+                    "invalid table metadata for \(table.id)"
+                )
+            }
+
+            var occupied: Set<String> = []
+            for cell in table.cells {
+                guard cell.row >= 0,
+                      cell.column >= 0,
+                      cell.rowSpan > 0,
+                      cell.columnSpan > 0,
+                      cell.row + cell.rowSpan <= table.rowCount,
+                      cell.column + cell.columnSpan <= table.columnCount else {
+                    throw NativeReaderDocumentStoreError.tableValidationFailed(
+                        "out-of-range cell in \(table.id)"
+                    )
+                }
+                for row in cell.row..<(cell.row + cell.rowSpan) {
+                    for column in cell.column..<(cell.column + cell.columnSpan) {
+                        guard occupied.insert("\(row)-\(column)").inserted else {
+                            throw NativeReaderDocumentStoreError.tableValidationFailed(
+                                "overlapping cells in \(table.id)"
+                            )
+                        }
+                    }
+                }
+            }
+
+            switch table.renderingClassification {
+            case .nativeSimple:
+                guard table.rowCount > 0,
+                      table.columnCount > 0,
+                      table.columnCount <= 6,
+                      table.cells.count == table.rowCount * table.columnCount,
+                      table.cells.allSatisfy({
+                          $0.rowSpan == 1
+                              && $0.columnSpan == 1
+                              && $0.classNames.isEmpty
+                              && $0.inlineStyle == nil
+                              && $0.borderSignatures.isEmpty
+                              && $0.linkTargets.isEmpty
+                              && $0.runs.allSatisfy { $0.styles.isEmpty && $0.linkTarget == nil }
+                      }),
+                      table.classificationReasons.isEmpty,
+                      table.sourceHTML == nil else {
+                    throw NativeReaderDocumentStoreError.tableValidationFailed(
+                        "unsupported native-simple structure in \(table.id)"
+                    )
+                }
+            case .isolatedHTML:
+                guard table.rowCount <= 250,
+                      table.cells.count <= 2_500,
+                      !table.classificationReasons.isEmpty,
+                      let sourceHTML = table.sourceHTML,
+                      sourceHTML.range(of: "<table", options: .caseInsensitive) != nil else {
+                    throw NativeReaderDocumentStoreError.tableValidationFailed(
+                        "missing isolated HTML for \(table.id)"
+                    )
+                }
+            }
+        }
+
+        if document.eligibility.state == .nativeWithTableFallback,
+           !tables.contains(where: { $0.renderingClassification == .isolatedHTML }) {
+            throw NativeReaderDocumentStoreError.tableValidationFailed(
+                "eligibility requires an isolated table in \(route.relativeSourcePath)"
+            )
+        }
     }
 
     static func resolvedMediaURL(

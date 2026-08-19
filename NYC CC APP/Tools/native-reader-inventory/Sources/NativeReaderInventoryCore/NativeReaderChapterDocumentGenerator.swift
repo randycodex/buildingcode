@@ -248,7 +248,11 @@ public struct NativeReaderChapterDocumentGenerator {
             if shouldIgnore(element), normalizeText(element.stringValue ?? "").isEmpty {
                 continue
             }
-            if containsUnsupportedMarkup(element, inventory: inventory) {
+            if containsUnsupportedMarkup(
+                element,
+                inventory: inventory,
+                sourceOrderByElement: sourceOrderByElement
+            ) {
                 drafts.append(
                     makeDraft(
                         element: element,
@@ -448,15 +452,43 @@ public struct NativeReaderChapterDocumentGenerator {
         ["codeoptions", "annotationdrawer", "meta", "base", "style", "script", "title"].contains(normalizedName(element))
     }
 
-    private func containsUnsupportedMarkup(_ element: XMLElement, inventory: ChapterInventory) -> Bool {
+    private func containsUnsupportedMarkup(
+        _ element: XMLElement,
+        inventory: ChapterInventory,
+        sourceOrderByElement: [ObjectIdentifier: Int]
+    ) -> Bool {
         let unknownElements = Set(inventory.unknownElementNames)
         let unknownClasses = Set(inventory.unknownClassNames.map { $0.lowercased() })
         let unsupportedCSS = Set(inventory.unsupportedCSSProperties)
         return flattenedElements(from: element).contains { candidate in
+            if isInsideIsolatedTable(
+                candidate,
+                inventory: inventory,
+                sourceOrderByElement: sourceOrderByElement
+            ) {
+                return false
+            }
             if unknownElements.contains(normalizedName(candidate)) { return true }
             if classTokens(candidate).contains(where: { unknownClasses.contains($0.lowercased()) }) { return true }
             return inlineCSSProperties(candidate).contains(where: unsupportedCSS.contains)
         }
+    }
+
+    private func isInsideIsolatedTable(
+        _ element: XMLElement,
+        inventory: ChapterInventory,
+        sourceOrderByElement: [ObjectIdentifier: Int]
+    ) -> Bool {
+        var candidate: XMLElement? = element
+        while let current = candidate {
+            if normalizedName(current) == "table",
+               let sourceOrder = sourceOrderByElement[ObjectIdentifier(current)] {
+                return inventory.tables.first(where: { $0.sourceOrder == sourceOrder })?
+                    .renderingClassification == .isolatedHTML
+            }
+            candidate = current.parent as? XMLElement
+        }
+        return false
     }
 
     private func makeListItems(

@@ -142,9 +142,13 @@ public struct CorpusInventoryGenerator {
         let sectionCount = contentElements.filter(isSectionBoundary).count
         let normalizedText = normalizeText(body.stringValue ?? "")
         let lists = makeListInventory(elements: contentElements)
-        let tables = contentElements
-            .filter { normalizedName($0) == "table" }
-            .map { tableInventory(for: $0, sourceOrderByElement: sourceOrderByElement) }
+        let tableElements = contentElements.filter { normalizedName($0) == "table" }
+        let tables = tableElements.map {
+            tableInventory(for: $0, sourceOrderByElement: sourceOrderByElement)
+        }
+        let isolatedTableElements = Set(zip(tableElements, tables).compactMap { element, table in
+            table.renderingClassification == .isolatedHTML ? ObjectIdentifier(element) : nil
+        })
         let images = contentElements
             .filter { ["img", "svg"].contains(normalizedName($0)) && nearestAncestor(named: "svg", from: $0) == nil }
             .map {
@@ -166,6 +170,19 @@ public struct CorpusInventoryGenerator {
         let unknownElements = elementNames.filter { !Self.recognizedElementNames.contains($0) }
         let unknownClasses = classNames.filter { !isRecognizedClassName($0) }
         let unsupportedCSS = cssProperties.filter { !Self.supportedInlineCSSProperties.contains($0) }
+        // Unknown markup that is wholly contained by an isolated table is not a
+        // chapter-level blocker. The original table fragment is rendered by the
+        // existing table WebView, while the complete chapter still falls back if
+        // the same construct appears anywhere outside that boundary.
+        let chapterLevelElements = contentElements.filter {
+            !isInsideIsolatedTable($0, isolatedTableElements: isolatedTableElements)
+        }
+        let blockingUnknownElements = sortedUnique(chapterLevelElements.map(normalizedName))
+            .filter { !Self.recognizedElementNames.contains($0) }
+        let blockingUnknownClasses = sortedUnique(chapterLevelElements.flatMap(classTokens))
+            .filter { !isRecognizedClassName($0) }
+        let blockingUnsupportedCSS = sortedUnique(chapterLevelElements.flatMap(inlineCSSProperties))
+            .filter { !Self.supportedInlineCSSProperties.contains($0) }
         let parserMessages = structuralMessages(
             normalizedText: normalizedText,
             bodyWasFound: normalizedName(body) == "body",
@@ -177,9 +194,9 @@ public struct CorpusInventoryGenerator {
             duplicateAnchorIDs: stableAnchorResult.duplicates,
             images: images,
             tables: tables,
-            unknownElements: unknownElements,
-            unknownClasses: unknownClasses,
-            unsupportedCSS: unsupportedCSS
+            unknownElements: blockingUnknownElements,
+            unknownClasses: blockingUnknownClasses,
+            unsupportedCSS: blockingUnsupportedCSS
         )
 
         return ChapterInventory(
@@ -494,11 +511,25 @@ public struct CorpusInventoryGenerator {
         ]
         let embeddedElements = sortedUnique(descendants.map(normalizedName).filter { !permittedInsideTable.contains($0) })
 
+        let hasCellFormatting = cells.contains { cell in
+            !classTokens(cell).isEmpty
+                || nonEmpty(attribute("style", in: cell)) != nil
+                || !flattenedElements(from: cell).dropFirst().isEmpty
+        }
+        let hasCellLinks = cells.contains { cell in
+            flattenedElements(from: cell).dropFirst().contains {
+                ["a", "link", "area"].contains(normalizedName($0))
+            }
+        }
+
         var reasons: [String] = []
+        if rows.isEmpty || cells.isEmpty || logicalColumnCount == 0 { reasons.append("emptyTable") }
         if maximumRowSpan > 1 || maximumColumnSpan > 1 { reasons.append("mergedCells") }
         if headerRows > 1 { reasons.append("multiRowHeader") }
         if logicalColumnCount > 6 { reasons.append("wideTable") }
         if !borderSignatures.isEmpty { reasons.append("customBorders") }
+        if hasCellFormatting { reasons.append("formattedCells") }
+        if hasCellLinks { reasons.append("linkedCells") }
         if !embeddedElements.isEmpty { reasons.append("embeddedContent") }
         let renderingClassification: TableRenderingClassification = reasons.isEmpty ? .nativeSimple : .isolatedHTML
 
@@ -621,6 +652,17 @@ public struct CorpusInventoryGenerator {
         if !unsupportedCSS.isEmpty { fallbackReasons.append("unsupportedCSS: \(unsupportedCSS.joined(separator: ","))") }
         if !fallbackReasons.isEmpty {
             return NativeReaderEligibility(state: .fullHTMLFallback, reasons: fallbackReasons)
+        }
+
+        let oversizedIsolatedTableCount = tables.filter {
+            $0.renderingClassification == .isolatedHTML
+                && ($0.rowCount > 250 || $0.cellCount > 2_500)
+        }.count
+        if oversizedIsolatedTableCount > 0 {
+            return NativeReaderEligibility(
+                state: .fullHTMLFallback,
+                reasons: ["oversizedIsolatedHTMLTableCount: \(oversizedIsolatedTableCount)"]
+            )
         }
 
         let isolatedHTMLTableCount = tables.filter { $0.renderingClassification == .isolatedHTML }.count
@@ -910,6 +952,20 @@ public struct CorpusInventoryGenerator {
             parent = current.parent as? XMLElement
         }
         return nil
+    }
+
+    private func isInsideIsolatedTable(
+        _ element: XMLElement,
+        isolatedTableElements: Set<ObjectIdentifier>
+    ) -> Bool {
+        var candidate: XMLElement? = element
+        while let current = candidate {
+            if normalizedName(current) == "table" {
+                return isolatedTableElements.contains(ObjectIdentifier(current))
+            }
+            candidate = current.parent as? XMLElement
+        }
+        return false
     }
 
     private func normalizedName(_ element: XMLElement) -> String {
