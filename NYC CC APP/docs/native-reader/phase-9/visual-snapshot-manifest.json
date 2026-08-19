@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "corpusSHA256": "0709f1f425bd47b29fe89543cb604065c511802869ea6c08c6181273b5c49d88",
+  "parserSchemaVersion": "native-reader-document-v2",
+  "simulator": {
+    "name": "iPhone 17 Pro",
+    "udid": "C9635051-D686-4415-99AA-9DA90CC9DC59",
+    "runtime": "iOS 26.5",
+    "permanentSimulatorCount": 1,
+    "bundleIdentifier": "com.randycodex.permitext"
+  },
+  "items": [
+    {
+      "file": "2022-construction-light-w320-portrait-standard.png",
+      "collection": "2022-construction-codes",
+      "relativePath": "2022-construction-codes/chapters/1.html",
+      "appearance": "light",
+      "effectiveWidth": 320,
+      "orientation": "portrait",
+      "contentSize": "large",
+      "reviewStatus": "reviewed",
+      "reviewNotes": "Narrow-width headings, hierarchy, emphasis, wrapping, and indentation render without clipping.",
+      "sha256": "0540474ea9b05e86dfa289879885fd47410a169945e9aa33dfe2ff1e581bbaef"
+    },
+    {
+      "file": "2025-specialty-dark-w375-portrait-standard.png",
+      "collection": "2025-specialty-codes",
+      "relativePath": "2025-specialty-codes/chapters/32000001.html",
+      "appearance": "dark",
+      "effectiveWidth": 375,
+      "orientation": "portrait",
+      "contentSize": "large",
+      "reviewStatus": "reviewed",
+      "reviewNotes": "Dark-mode contrast is clear and authored curly quotes survive UTF-8 DOM recovery without mojibake.",
+      "sha256": "d893ec50a0a303d8173ec4c0a28413506b858163bd98cd8eac66ca36747fd141"
+    },
+    {
+      "file": "2026-enacted-light-w402-portrait-axxxl.png",
+      "collection": "2026-enacted-administrative-code",
+      "relativePath": "2026-enacted-administrative-code/chapters/30000001.html",
+      "appearance": "light",
+      "effectiveWidth": 402,
+      "orientation": "portrait",
+      "contentSize": "accessibility-extra-extra-extra-large",
+      "reviewStatus": "reviewed",
+      "reviewNotes": "Accessibility text size preserves section hierarchy, wrapping, and readable enacted-text annotations.",
+      "sha256": "0e5dca896e3afe9d0c2f14a77920840f50ef2dc83e3848b289d39349f68e335e"
+    },
+    {
+      "file": "2026-existing-dark-w720-landscape-standard.png",
+      "collection": "2026-existing-building-code",
+      "relativePath": "2026-existing-building-code/chapters/1.html",
+      "appearance": "dark",
+      "effectiveWidth": 720,
+      "orientation": "landscape",
+      "contentSize": "large",
+      "reviewStatus": "reviewed",
+      "reviewNotes": "Landscape layout uses the requested effective width with intact hierarchy, callout, and line wrapping.",
+      "sha256": "4bac4db3573c8e99e5db4f6e5fca400023b00aedc986f8be47994d14f5dd64be"
+    },
+    {
+      "file": "2026-zoning-table-light-w402-portrait-standard.png",
+      "collection": "2026-zoning-resolution",
+      "relativePath": "2026-zoning-resolution/chapters/APP-B-21239.html",
+      "appearance": "light",
+      "effectiveWidth": 402,
+      "orientation": "portrait",
+      "contentSize": "large",
+      "verticalPageOffset": 1,
+      "reviewStatus": "reviewed",
+      "reviewNotes": "The bounded table fallback preserves cell borders, exact authored text, links, and horizontal overflow.",
+      "sha256": "82bc988831f9b5838adcdb5cecb87231e540d8a3bbe611ad685e6dc3c76fabd2"
+    }
+  ]
+}

@@ -364,7 +364,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
 
     static let supportedIndexSchemaVersion = 1
     static let supportedDocumentSchemaVersion = 1
-    static let supportedParserSchemaVersion = "native-reader-document-v1"
+    static let supportedParserSchemaVersion = "native-reader-document-v2"
 
     #if DEBUG
     static let debugPilotSourcePaths: Set<String> = [
@@ -445,7 +445,22 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         #if DEBUG
         guard let corpusRootURL,
               let relativePath = Self.relativePath(for: chapterURL, below: corpusRootURL),
-              Self.debugPilotSourcePaths.contains(relativePath),
+              Self.debugPilotSourcePaths.contains(relativePath)
+        else {
+            return nil
+        }
+        return await debugValidatedRoute(forRelativeSourcePath: relativePath)
+        #else
+        _ = chapterURL
+        return nil
+        #endif
+    }
+
+    func debugValidatedRoute(forRelativeSourcePath relativePath: String) async -> NativeReaderDocumentRoute? {
+        #if DEBUG
+        guard let corpusRootURL,
+              !relativePath.hasPrefix("/"),
+              !relativePath.split(separator: "/").contains(".."),
               case .success(let index) = await indexTask.value,
               let entry = index.entries.first(where: { $0.relativePath == relativePath }),
               Self.supportsDebugEligibility(entry.eligibility),
@@ -460,7 +475,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
 
         return NativeReaderDocumentRoute(
             relativeSourcePath: relativePath,
-            sourceURL: chapterURL.standardizedFileURL,
+            sourceURL: corpusRootURL.appendingPathComponent(relativePath).standardizedFileURL,
             documentURL: documentURL,
             sourceSHA256: entry.sourceSHA256,
             documentID: entry.documentID,
@@ -470,8 +485,22 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
             compressedByteCount: entry.compressedByteCount
         )
         #else
-        _ = chapterURL
+        _ = relativePath
         return nil
+        #endif
+    }
+
+    func debugValidatedSourcePaths() async -> [String] {
+        #if DEBUG
+        guard case .success(let index) = await indexTask.value else { return [] }
+        return index.entries.compactMap { entry in
+            guard Self.supportsDebugEligibility(entry.eligibility),
+                  entry.passesStructuralValidation
+            else { return nil }
+            return entry.relativePath
+        }.sorted()
+        #else
+        return []
         #endif
     }
 

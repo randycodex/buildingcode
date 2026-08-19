@@ -4029,6 +4029,6 @@
     }
   ],
   "corpusSHA256" : "0709f1f425bd47b29fe89543cb604065c511802869ea6c08c6181273b5c49d88",
-  "parserSchemaVersion" : "native-reader-document-v1",
-  "schemaVersion" : 2
+  "parserSchemaVersion" : "native-reader-document-v2",
+  "schemaVersion" : 3
 }

@@ -224,9 +224,59 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertEqual(first.blocks.compactMap(\.table).first?.columnCount, 2)
         XCTAssertEqual(first.blocks.compactMap(\.table).first?.cells.map(\.column), [0, 1, 1])
         XCTAssertEqual(
+            first.blocks.compactMap(\.table).first?.structureSHA256,
+            inventory.tables.first?.structureSHA256
+        )
+        XCTAssertEqual(
             try CorpusInventoryGenerator.encodedCompactJSON(first),
             try CorpusInventoryGenerator.encodedCompactJSON(second)
         )
+    }
+
+    func testExactTableMatrixSignatureCoversCoordinatesSpansHeadersAndText() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("package/chapters/table.html")
+        try FileManager.default.createDirectory(at: chapterURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try """
+        <html><body><table><caption>Matrix</caption>
+          <tr><th rowspan="2" id="head">Heading</th><td><a href="#target">One</a></td></tr>
+          <tr><td>Two</td></tr><tfoot><tr><td colspan="2" class="footnote">Note</td></tr></tfoot>
+        </table></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+        let sourceTable = try XCTUnwrap(inventory.tables.first)
+        let nativeTable = try XCTUnwrap(document.blocks.compactMap(\.table).first)
+
+        XCTAssertEqual(sourceTable.structureSHA256, nativeTable.structureSHA256)
+        XCTAssertTrue(document.validation.tableStructuresMatch)
+        XCTAssertEqual(sourceTable.footnotes, ["Note"])
+        XCTAssertEqual(nativeTable.cells.map(\.column), [0, 1, 1, 0])
+    }
+
+    func testUTF8AuthoredPunctuationSurvivesDOMRecovery() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("package/chapters/utf8.html")
+        try FileManager.default.createDirectory(at: chapterURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let enactedText = "The “New York City Energy Conservation Code”—© 2026."
+        try "<section id='utf8'><p>\(enactedText)</p></section>"
+            .write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+
+        XCTAssertTrue(document.blocks.map(\.plainText).joined(separator: " ").contains(enactedText))
+        XCTAssertFalse(document.blocks.map(\.plainText).joined().contains("â"))
+        XCTAssertTrue(document.validation.normalizedTextMatches)
     }
 
     func testUnsupportedDocumentBlockPreservesRecoveredSourceAndRoutesToHTML() throws {

@@ -1,6 +1,7 @@
 import XCTest
 import SQLite3
 import UIKit
+import CryptoKit
 @testable import permitext
 
 private actor SyncPullRecorder {
@@ -2963,6 +2964,152 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             .appendingPathComponent("2026-existing-building-code/chapters/2.html")
         let ineligibleRoute = await store.debugRoute(for: eligibleButNotPiloted)
         XCTAssertNil(ineligibleRoute)
+    }
+
+    func testPhaseNineAllEligibleDocumentsPassSemanticAndAssetParity() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let sourcePaths = await store.debugValidatedSourcePaths()
+
+        XCTAssertGreaterThan(sourcePaths.count, 200)
+        XCTAssertEqual(Set(sourcePaths.map { $0.split(separator: "/").first.map(String.init) }), [
+            "2022-construction-codes",
+            "2025-specialty-codes",
+            "2026-enacted-administrative-code",
+            "2026-existing-building-code",
+            "2026-zoning-resolution"
+        ])
+
+        for sourcePath in sourcePaths {
+            let resolvedRoute = await store.debugValidatedRoute(
+                forRelativeSourcePath: sourcePath
+            )
+            let route = try XCTUnwrap(
+                resolvedRoute,
+                sourcePath
+            )
+            let document = try await store.loadDocument(for: route)
+
+            XCTAssertEqual(document.sourcePath, sourcePath)
+            XCTAssertTrue(document.isValidatedNativeContent, sourcePath)
+            XCTAssertTrue(document.validation.normalizedTextMatches, sourcePath)
+            XCTAssertTrue(document.validation.anchorSequenceMatches, sourcePath)
+            XCTAssertTrue(document.validation.linkTargetsMatch, sourcePath)
+            XCTAssertTrue(document.validation.tableStructuresMatch, sourcePath)
+            XCTAssertTrue(document.validation.imageInventoryMatches, sourcePath)
+            XCTAssertEqual(document.validation.unsupportedBlockCount, 0, sourcePath)
+            XCTAssertFalse(document.blocks.contains { $0.kind == .unsupportedHTML }, sourcePath)
+            let renderedText = document.blocks.map(\.plainText).joined(separator: " ")
+            XCTAssertFalse(renderedText.contains("â"), "UTF-8 mojibake: \(sourcePath)")
+            XCTAssertFalse(renderedText.contains("Ã"), "UTF-8 mojibake: \(sourcePath)")
+            XCTAssertFalse(renderedText.contains("Â"), "UTF-8 mojibake: \(sourcePath)")
+
+            for table in document.blocks.compactMap(\.table) {
+                XCTAssertEqual(table.structureSHA256.count, 64, "\(sourcePath): \(table.id)")
+                XCTAssertEqual(Set(table.cells.map(\.id)).count, table.cells.count, sourcePath)
+                if table.renderingClassification == .isolatedHTML {
+                    XCTAssertTrue(table.sourceHTML?.localizedCaseInsensitiveContains("<table") == true, sourcePath)
+                }
+            }
+
+            for media in document.blocks.flatMap(\.media) {
+                let assetURL = try XCTUnwrap(
+                    NativeReaderDocumentStore.resolvedMediaURL(for: media, route: route),
+                    "\(sourcePath): \(media.id)"
+                )
+                XCTAssertNotNil(
+                    UIImage(contentsOfFile: assetURL.path),
+                    "Bundled media must decode: \(sourcePath): \(assetURL.lastPathComponent)"
+                )
+            }
+        }
+    }
+
+    func testPhaseNineRepresentativeCodeCollectionsAndFallbackRouting() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let representativePaths = [
+            "2022-construction-codes/chapters/1.html",
+            "2025-specialty-codes/chapters/32000001.html",
+            "2026-enacted-administrative-code/chapters/30000001.html",
+            "2026-existing-building-code/chapters/1.html",
+            "2026-zoning-resolution/chapters/APP-B-21239.html"
+        ]
+
+        for sourcePath in representativePaths {
+            let resolvedRoute = await store.debugValidatedRoute(
+                forRelativeSourcePath: sourcePath
+            )
+            let route = try XCTUnwrap(
+                resolvedRoute,
+                sourcePath
+            )
+            let document = try await store.loadDocument(for: route)
+            XCTAssertTrue(document.isValidatedNativeContent, sourcePath)
+            XCTAssertFalse(document.blocks.isEmpty, sourcePath)
+        }
+
+        let unsupportedPath = "2026-zoning-resolution/chapters/APP-C-21242.html"
+        let unsupportedRoute = await store.debugValidatedRoute(
+            forRelativeSourcePath: unsupportedPath
+        )
+        XCTAssertNil(unsupportedRoute)
+    }
+
+    func testPhaseNineVisualSnapshotManifestCoversRequiredTraitMatrix() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let checkoutMarker = projectRoot
+            .appendingPathComponent("permitext/Views/NativeChapterTextReaderView.swift")
+
+        // Physical-device test processes cannot read the Mac checkout. The
+        // simulator suite validates the committed screenshots and manifest.
+        guard FileManager.default.fileExists(atPath: checkoutMarker.path) else { return }
+
+        let phaseNineRoot = projectRoot
+            .appendingPathComponent("docs/native-reader/phase-9", isDirectory: true)
+        let manifestURL = phaseNineRoot.appendingPathComponent("visual-snapshot-manifest.json")
+        let manifestData = try Data(contentsOf: manifestURL)
+        let manifest = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: manifestData) as? [String: Any]
+        )
+        let items = try XCTUnwrap(manifest["items"] as? [[String: Any]])
+
+        XCTAssertEqual(manifest["schemaVersion"] as? Int, 1)
+        XCTAssertEqual(
+            manifest["corpusSHA256"] as? String,
+            "0709f1f425bd47b29fe89543cb604065c511802869ea6c08c6181273b5c49d88"
+        )
+        XCTAssertEqual(manifest["parserSchemaVersion"] as? String, "native-reader-document-v2")
+        XCTAssertEqual(items.count, 5)
+        XCTAssertEqual(Set(items.compactMap { $0["collection"] as? String }), [
+            "2022-construction-codes",
+            "2025-specialty-codes",
+            "2026-enacted-administrative-code",
+            "2026-existing-building-code",
+            "2026-zoning-resolution"
+        ])
+        XCTAssertEqual(Set(items.compactMap { $0["appearance"] as? String }), ["light", "dark"])
+        XCTAssertEqual(Set(items.compactMap { $0["orientation"] as? String }), ["portrait", "landscape"])
+        XCTAssertEqual(Set(items.compactMap { $0["effectiveWidth"] as? Int }), [320, 375, 402, 720])
+        XCTAssertTrue(
+            items.contains { ($0["contentSize"] as? String) == "accessibility-extra-extra-extra-large" }
+        )
+
+        for item in items {
+            let fileName = try XCTUnwrap(item["file"] as? String)
+            let expectedHash = try XCTUnwrap(item["sha256"] as? String)
+            let screenshotURL = phaseNineRoot
+                .appendingPathComponent("screenshots", isDirectory: true)
+                .appendingPathComponent(fileName)
+            let screenshotData = try Data(contentsOf: screenshotURL)
+            let actualHash = SHA256.hash(data: screenshotData)
+                .map { String(format: "%02x", $0) }
+                .joined()
+
+            XCTAssertEqual(item["reviewStatus"] as? String, "reviewed", fileName)
+            XCTAssertEqual(actualHash, expectedHash, fileName)
+            XCTAssertGreaterThan(screenshotData.count, 50_000, fileName)
+        }
     }
 
     func testPhaseFiveComplexTablePilotUsesBoundedIsolatedHTML() async throws {

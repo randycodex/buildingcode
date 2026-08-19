@@ -46,6 +46,18 @@ struct PermitextApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
+#if DEBUG
+                if let snapshotConfiguration = NativeReaderPhase9SnapshotConfiguration.active {
+                    NativeReaderPhase9SnapshotHarness(configuration: snapshotConfiguration)
+                } else if library.isInitialContentLoaded {
+                    PermitextRootNavigation()
+                } else {
+                    AppLaunchLoadingView(
+                        progress: library.initialLoadProgress,
+                        message: library.statusMessage ?? "Loading code library..."
+                    )
+                }
+#else
                 if library.isInitialContentLoaded {
                     PermitextRootNavigation()
                 } else {
@@ -54,6 +66,7 @@ struct PermitextApp: App {
                         message: library.statusMessage ?? "Loading code library..."
                     )
                 }
+#endif
             }
             .environmentObject(library)
             .tint(Color.appChrome)

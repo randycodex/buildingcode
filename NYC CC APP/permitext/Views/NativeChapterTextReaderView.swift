@@ -1339,6 +1339,137 @@ private struct NativeReaderTextBlockView: View {
     }
 }
 
+#if DEBUG
+struct NativeReaderPhase9SnapshotConfiguration: Equatable {
+    static let sourceArgument = "--native-reader-phase9-source"
+    static let widthArgument = "--native-reader-phase9-width"
+
+    let relativeSourcePath: String
+    let contentWidth: CGFloat
+
+    static var active: Self? {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let sourceIndex = arguments.firstIndex(of: sourceArgument),
+              arguments.indices.contains(sourceIndex + 1)
+        else { return nil }
+        let relativeSourcePath = arguments[sourceIndex + 1]
+        let requestedWidth: CGFloat
+        if let widthIndex = arguments.firstIndex(of: widthArgument),
+           arguments.indices.contains(widthIndex + 1),
+           let parsedWidth = Double(arguments[widthIndex + 1]) {
+            requestedWidth = CGFloat(parsedWidth)
+        } else {
+            requestedWidth = 402
+        }
+        guard !relativeSourcePath.isEmpty,
+              !relativeSourcePath.hasPrefix("/"),
+              !relativeSourcePath.split(separator: "/").contains(".."),
+              requestedWidth >= 280
+        else { return nil }
+        return Self(relativeSourcePath: relativeSourcePath, contentWidth: requestedWidth)
+    }
+}
+
+struct NativeReaderPhase9SnapshotHarness: View {
+    let configuration: NativeReaderPhase9SnapshotConfiguration
+
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var route: NativeReaderDocumentRoute?
+    @State private var preparedDocument: NativeReaderPreparedDocument?
+    @State private var failureMessage: String?
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
+                Group {
+                    if let route, let preparedDocument {
+                        snapshotReader(route: route, preparedDocument: preparedDocument)
+                    } else if let failureMessage {
+                        ContentUnavailableView(
+                            "Phase 9 snapshot failed",
+                            systemImage: "exclamationmark.triangle.fill",
+                            description: Text(failureMessage)
+                        )
+                    } else {
+                        ProgressView("Preparing Phase 9 snapshot…")
+                    }
+                }
+                .frame(width: min(configuration.contentWidth, geometry.size.width))
+                .frame(maxHeight: .infinity)
+                .background(Color(uiColor: .systemBackground))
+                .clipped()
+            }
+        }
+        .task(id: configuration.relativeSourcePath) {
+            await loadSnapshot()
+        }
+    }
+
+    private func snapshotReader(
+        route: NativeReaderDocumentRoute,
+        preparedDocument: NativeReaderPreparedDocument
+    ) -> some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                ForEach(preparedDocument.displayBlocks) { displayBlock in
+                    NativeReaderTextBlockView(
+                        block: displayBlock.block,
+                        hierarchyIndentation: displayBlock.hierarchyIndentation,
+                        usesCompactSpacing: displayBlock.usesCompactSpacing,
+                        theme: library.readerTheme,
+                        accentColor: library.accentColor(
+                            for: preparedDocument.document.metadata.codeSectionID
+                        ),
+                        route: route,
+                        onOpenLink: { _ in },
+                        onOpenMedia: { _, _ in },
+                        onMediaFailure: { _ in },
+                        searchQuery: "",
+                        searchMatches: [],
+                        activeSearchMatchID: nil,
+                        onResearchSelection: { _ in }
+                    )
+                }
+            }
+            .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+            .padding(.top, CodeScreenMetrics.topTitlePadding)
+            .padding(.bottom, 28)
+        }
+        .overlay(alignment: .topTrailing) {
+            Text("Phase 9 snapshot ready")
+                .font(.caption2)
+                .foregroundStyle(.clear)
+                .accessibilityIdentifier("phase9-snapshot-ready")
+        }
+    }
+
+    @MainActor
+    private func loadSnapshot() async {
+        failureMessage = nil
+        route = nil
+        preparedDocument = nil
+        guard let loadedRoute = await NativeReaderDocumentStore.shared.debugValidatedRoute(
+            forRelativeSourcePath: configuration.relativeSourcePath
+        ) else {
+            failureMessage = "The requested chapter is not eligible for validated native rendering."
+            return
+        }
+        do {
+            let loadedDocument = try await NativeReaderDocumentStore.shared.loadPreparedDocument(
+                for: loadedRoute
+            )
+            guard !Task.isCancelled else { return }
+            route = loadedRoute
+            preparedDocument = loadedDocument
+        } catch {
+            guard !Task.isCancelled else { return }
+            failureMessage = error.localizedDescription
+        }
+    }
+}
+#endif
+
 private struct NativeReaderMediaBlockView: View {
     let block: NativeReaderRuntimeBlock
     let route: NativeReaderDocumentRoute

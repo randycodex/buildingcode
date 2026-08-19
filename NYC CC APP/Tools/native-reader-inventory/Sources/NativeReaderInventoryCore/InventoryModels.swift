@@ -76,6 +76,7 @@ public struct TableInventory: Codable, Equatable, Sendable {
     public let hasMultiRowHeader: Bool
     public let caption: String?
     public let footnotes: [String]
+    public let structureSHA256: String
     public let borderSignatures: [String]
     public let embeddedElementNames: [String]
     public let renderingClassification: TableRenderingClassification
@@ -93,6 +94,7 @@ public struct TableInventory: Codable, Equatable, Sendable {
         hasMultiRowHeader: Bool,
         caption: String?,
         footnotes: [String],
+        structureSHA256: String,
         borderSignatures: [String],
         embeddedElementNames: [String],
         renderingClassification: TableRenderingClassification,
@@ -109,6 +111,7 @@ public struct TableInventory: Codable, Equatable, Sendable {
         self.hasMultiRowHeader = hasMultiRowHeader
         self.caption = caption
         self.footnotes = footnotes
+        self.structureSHA256 = structureSHA256
         self.borderSignatures = borderSignatures
         self.embeddedElementNames = embeddedElementNames
         self.renderingClassification = renderingClassification

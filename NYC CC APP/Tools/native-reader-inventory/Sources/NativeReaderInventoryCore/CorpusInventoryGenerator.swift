@@ -19,8 +19,8 @@ public enum CorpusInventoryError: LocalizedError {
 }
 
 public struct CorpusInventoryGenerator {
-    public static let schemaVersion = 2
-    public static let parserSchemaVersion = "native-reader-document-v1"
+    public static let schemaVersion = 3
+    public static let parserSchemaVersion = "native-reader-document-v2"
     public static let parserEngine = "libxml2 HTML recovery DOM (xmllint --html --xmlout) + Foundation XMLDocument"
 
     private let fileManager: FileManager
@@ -279,6 +279,7 @@ public struct CorpusInventoryGenerator {
         }
 
         let process = Process()
+        let input = Pipe()
         let output = Pipe()
         process.executableURL = parserURL
         process.arguments = [
@@ -289,11 +290,19 @@ public struct CorpusInventoryGenerator {
             "--nonet",
             "--dropdtd",
             "--encode", "UTF-8",
-            fileURL.path
+            "-"
         ]
+        process.standardInput = input
         process.standardOutput = output
         process.standardError = FileHandle.nullDevice
+        var utf8SourceData = Data([0xEF, 0xBB, 0xBF])
+        utf8SourceData.append(try Data(contentsOf: fileURL))
+        let sourceData = utf8SourceData
         try process.run()
+        DispatchQueue.global(qos: .utility).async {
+            input.fileHandleForWriting.write(sourceData)
+            input.fileHandleForWriting.closeFile()
+        }
         let normalizedData = output.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
         guard process.terminationStatus == 0, !normalizedData.isEmpty else {
@@ -503,6 +512,59 @@ public struct CorpusInventoryGenerator {
             guard name == "tfoot" || classes.contains(where: { $0.contains("footnote") }) else { return nil }
             return nonEmpty(normalizeText(element.stringValue ?? ""))
         })
+        var occupied: Set<TableGridPosition> = []
+        var signatureCells: [TableCellSignature] = []
+        var signatureColumnCount = 0
+        for (rowIndex, rowCells) in cellsByRow.enumerated() {
+            var columnIndex = 0
+            for cell in rowCells {
+                while occupied.contains(TableGridPosition(row: rowIndex, column: columnIndex)) {
+                    columnIndex += 1
+                }
+                let rowSpan = positiveInteger(attribute("rowspan", in: cell))
+                let columnSpan = positiveInteger(attribute("colspan", in: cell))
+                for occupiedRow in rowIndex..<(rowIndex + rowSpan) {
+                    for occupiedColumn in columnIndex..<(columnIndex + columnSpan) {
+                        occupied.insert(TableGridPosition(row: occupiedRow, column: occupiedColumn))
+                    }
+                }
+                let cellElements = flattenedElements(from: cell)
+                let anchorIDs = orderedUnique(cellElements.flatMap { candidate -> [String] in
+                    var values: [String] = []
+                    if let id = nonEmpty(attribute("id", in: candidate)) { values.append(id) }
+                    if normalizedName(candidate) == "a",
+                       let name = nonEmpty(attribute("name", in: candidate)) {
+                        values.append(name)
+                    }
+                    return values
+                })
+                let linkTargets = cellElements.compactMap { candidate -> String? in
+                    guard ["a", "link", "area"].contains(normalizedName(candidate)) else { return nil }
+                    return nonEmpty(attribute("href", in: candidate)) ?? nonEmpty(attribute("to", in: candidate))
+                }
+                signatureCells.append(
+                    TableCellSignature(
+                        row: rowIndex,
+                        column: columnIndex,
+                        rowSpan: rowSpan,
+                        columnSpan: columnSpan,
+                        isHeader: normalizedName(cell) == "th",
+                        plainText: normalizeText(cell.stringValue ?? ""),
+                        anchorIDs: anchorIDs,
+                        linkTargets: linkTargets
+                    )
+                )
+                columnIndex += columnSpan
+                signatureColumnCount = max(signatureColumnCount, columnIndex)
+            }
+        }
+        let structureSHA256 = sha256(Data(tableSignature(
+            rowCount: rows.count,
+            columnCount: signatureColumnCount,
+            cells: signatureCells,
+            caption: caption,
+            footnotes: footnotes
+        ).utf8))
         let borderSignatures = sortedUnique(cells.flatMap(borderSignaturesForElement) + borderSignaturesForElement(table))
         let permittedInsideTable: Set<String> = [
             "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col",
@@ -545,6 +607,7 @@ public struct CorpusInventoryGenerator {
             hasMultiRowHeader: headerRows > 1,
             caption: caption,
             footnotes: footnotes,
+            structureSHA256: structureSHA256,
             borderSignatures: borderSignatures,
             embeddedElementNames: embeddedElements,
             renderingClassification: renderingClassification,
@@ -984,6 +1047,21 @@ public struct CorpusInventoryGenerator {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    private func tableSignature(
+        rowCount: Int,
+        columnCount: Int,
+        cells: [TableCellSignature],
+        caption: String?,
+        footnotes: [String]
+    ) -> String {
+        (["rows=\(rowCount)", "columns=\(columnCount)", "caption=\(caption ?? "")"]
+            + cells.map {
+                "\($0.row)|\($0.column)|\($0.rowSpan)|\($0.columnSpan)|\($0.isHeader)|\($0.plainText)|\($0.anchorIDs.joined(separator: ","))|\($0.linkTargets.joined(separator: ","))"
+            }
+            + footnotes.map { "footnote=\($0)" })
+            .joined(separator: "\n")
+    }
+
     private func positiveInteger(_ value: String?) -> Int {
         max(Int(value ?? "") ?? 1, 1)
     }
@@ -996,6 +1074,11 @@ public struct CorpusInventoryGenerator {
 
     private func sortedUnique(_ values: [String]) -> [String] {
         Array(Set(values.filter { !$0.isEmpty })).sorted()
+    }
+
+    private func orderedUnique(_ values: [String]) -> [String] {
+        var seen: Set<String> = []
+        return values.filter { seen.insert($0).inserted }
     }
 
     private func counts(_ values: [String]) -> [String: Int] {
@@ -1011,6 +1094,22 @@ public struct CorpusInventoryGenerator {
 
     private func sha256(_ data: Data) -> String {
         SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private struct TableGridPosition: Hashable {
+        let row: Int
+        let column: Int
+    }
+
+    private struct TableCellSignature {
+        let row: Int
+        let column: Int
+        let rowSpan: Int
+        let columnSpan: Int
+        let isHeader: Bool
+        let plainText: String
+        let anchorIDs: [String]
+        let linkTargets: [String]
     }
 
     private static let recognizedElementNames: Set<String> = [

@@ -197,15 +197,24 @@ public struct NativeReaderChapterDocumentGenerator {
             throw NativeReaderDocumentGenerationError.parserUnavailable
         }
         let process = Process()
+        let input = Pipe()
         let output = Pipe()
         process.executableURL = parserURL
         process.arguments = [
             "--html", "--xmlout", "--recover", "--nowarning", "--nonet", "--dropdtd",
-            "--encode", "UTF-8", fileURL.path
+            "--encode", "UTF-8", "-"
         ]
+        process.standardInput = input
         process.standardOutput = output
         process.standardError = FileHandle.nullDevice
+        var utf8SourceData = Data([0xEF, 0xBB, 0xBF])
+        utf8SourceData.append(try Data(contentsOf: fileURL))
+        let sourceData = utf8SourceData
         try process.run()
+        DispatchQueue.global(qos: .utility).async {
+            input.fileHandleForWriting.write(sourceData)
+            input.fileHandleForWriting.closeFile()
+        }
         let normalizedData = output.fileHandleForReading.readDataToEndOfFile()
         process.waitUntilExit()
         guard process.terminationStatus == 0, !normalizedData.isEmpty else {
@@ -710,6 +719,7 @@ public struct NativeReaderChapterDocumentGenerator {
                     && (table.cells.map(\.columnSpan).max() ?? 1) == source.maximumColumnSpan
                     && table.caption == source.caption
                     && table.footnotes == source.footnotes
+                    && table.structureSHA256 == source.structureSHA256
             }
 
         let renderedMedia = blocks.flatMap(\.media).sorted { $0.id < $1.id }
