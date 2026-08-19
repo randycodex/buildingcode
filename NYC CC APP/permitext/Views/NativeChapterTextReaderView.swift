@@ -13,7 +13,9 @@ struct NativeChapterTextReaderView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openURL) private var openURL
     @State private var document: NativeReaderRuntimeDocument?
+    @State private var displayBlocks: [NativeReaderDisplayBlock] = []
     @State private var visibleBlockID: String?
+    @State private var pendingInitialBlockID: String?
     @State private var failureMessage: String?
     @State private var hasRequestedFallback = false
 
@@ -34,7 +36,7 @@ struct NativeChapterTextReaderView: View {
                 }
             }
             .task(id: route.id) {
-                await loadDocument(proxy: proxy)
+                await loadDocument()
             }
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
@@ -46,10 +48,11 @@ struct NativeChapterTextReaderView: View {
     ) -> some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(NativeReaderDisplayBlock.blocks(from: document.blocks)) { displayBlock in
+                ForEach(displayBlocks) { displayBlock in
                     NativeReaderTextBlockView(
                         block: displayBlock.block,
                         hierarchyIndentation: displayBlock.hierarchyIndentation,
+                        usesCompactSpacing: displayBlock.usesCompactSpacing,
                         theme: library.readerTheme,
                         accentColor: library.accentColor(for: chapter.codeSectionID),
                         onOpenLink: { url in
@@ -66,7 +69,11 @@ struct NativeChapterTextReaderView: View {
         }
         .scrollPosition(id: $visibleBlockID, anchor: .top)
         .onChange(of: visibleBlockID) { _, newValue in
+            guard pendingInitialBlockID == nil else { return }
             persistLocation(blockID: newValue, document: document)
+        }
+        .task(id: pendingInitialBlockID) {
+            await restoreInitialPosition(document: document, proxy: proxy)
         }
         .overlay(alignment: .top) {
             CodeTopContentFade(alwaysVisible: true)
@@ -87,15 +94,17 @@ struct NativeChapterTextReaderView: View {
     }
 
     @MainActor
-    private func loadDocument(proxy: ScrollViewProxy) async {
+    private func loadDocument() async {
         document = nil
+        displayBlocks = []
+        pendingInitialBlockID = nil
+        visibleBlockID = nil
         failureMessage = nil
         hasRequestedFallback = false
 
         do {
             let loaded = try await NativeReaderDocumentStore.shared.loadDocument(for: route)
             guard !Task.isCancelled else { return }
-            document = loaded
             let initialBlockID = NativeReaderLocationResolver.initialBlockID(
                 in: loaded,
                 rememberedBlockID: rememberedBlockID.wrappedValue,
@@ -103,15 +112,13 @@ struct NativeChapterTextReaderView: View {
                 initialAnchorID: initialAnchorID,
                 initialSectionNumber: initialSectionNumber
             )
+            displayBlocks = NativeReaderDisplayBlock.blocks(from: loaded.blocks)
+            document = loaded
             persistLocation(blockID: initialBlockID, document: loaded)
             guard initialBlockID != loaded.blocks.first?.id else {
-                visibleBlockID = nil
                 return
             }
-            visibleBlockID = initialBlockID
-            await Task.yield()
-            guard !Task.isCancelled, let initialBlockID else { return }
-            proxy.scrollTo(initialBlockID, anchor: .top)
+            pendingInitialBlockID = initialBlockID
         } catch {
             guard !Task.isCancelled else { return }
             let message = error.localizedDescription
@@ -122,9 +129,32 @@ struct NativeChapterTextReaderView: View {
         }
     }
 
+    @MainActor
+    private func restoreInitialPosition(
+        document: NativeReaderRuntimeDocument,
+        proxy: ScrollViewProxy
+    ) async {
+        guard let targetBlockID = pendingInitialBlockID else { return }
+
+        // The lazy stack is inserted only after the document finishes loading.
+        // Give SwiftUI a layout pass before asking its proxy for an off-screen
+        // target, then repeat once for slower physical-device layout.
+        await Task.yield()
+        try? await Task.sleep(for: .milliseconds(60))
+        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+        visibleBlockID = targetBlockID
+        proxy.scrollTo(targetBlockID, anchor: .top)
+
+        try? await Task.sleep(for: .milliseconds(120))
+        guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
+        proxy.scrollTo(targetBlockID, anchor: .top)
+        pendingInitialBlockID = nil
+        persistLocation(blockID: targetBlockID, document: document)
+    }
+
     private func persistLocation(blockID: String?, document: NativeReaderRuntimeDocument) {
         guard let blockID,
-              document.blocks.contains(where: { $0.id == blockID })
+              NativeReaderDisplayBlock.sourceBlockID(for: blockID, in: document) != nil
         else {
             return
         }
@@ -157,22 +187,132 @@ struct NativeChapterTextReaderView: View {
 }
 
 struct NativeReaderDisplayBlock: Identifiable, Equatable {
+    let id: String
+    let sourceBlockID: String
     let block: NativeReaderRuntimeBlock
     let hierarchyIndentation: CGFloat
-
-    var id: String { block.id }
+    let usesCompactSpacing: Bool
 
     static func blocks(from blocks: [NativeReaderRuntimeBlock]) -> [NativeReaderDisplayBlock] {
         var currentIndentation: CGFloat = 0
-        return blocks.map { block in
+        return blocks.flatMap { block in
             if block.kind == .heading {
                 currentIndentation = NativeReaderHeadingPresentation(block: block).indentation
             }
-            return NativeReaderDisplayBlock(
-                block: block,
-                hierarchyIndentation: currentIndentation
+            let expandedBlocks = provisionDisplayBlocks(from: block)
+            return expandedBlocks.map { expandedBlock in
+                NativeReaderDisplayBlock(
+                    id: expandedBlock.block.id,
+                    sourceBlockID: block.id,
+                    block: expandedBlock.block,
+                    hierarchyIndentation: currentIndentation,
+                    usesCompactSpacing: expandedBlock.usesCompactSpacing
+                )
+            }
+        }
+    }
+
+    static func sourceBlockID(
+        for displayBlockID: String,
+        in document: NativeReaderRuntimeDocument
+    ) -> String? {
+        document.blocks.first(where: { block in
+            displayBlockID == block.id || displayBlockID.hasPrefix(block.id + "::segment-")
+        })?.id
+    }
+
+    private static func provisionDisplayBlocks(
+        from block: NativeReaderRuntimeBlock
+    ) -> [(block: NativeReaderRuntimeBlock, usesCompactSpacing: Bool)] {
+        guard block.kind == .paragraph else {
+            return [(block, false)]
+        }
+
+        let sourceRuns = block.runs.isEmpty
+            ? [NativeReaderRuntimeTextRun(text: block.plainText, styles: [], linkTarget: nil)]
+            : block.runs
+        let lines = textLines(from: sourceRuns)
+        guard lines.filter({ isProvisionLine(text(from: $0)) }).count >= 2 else {
+            return [(block, false)]
+        }
+
+        var segments: [[NativeReaderRuntimeTextRun]] = []
+        var currentSegment: [NativeReaderRuntimeTextRun] = []
+        for line in lines {
+            if isProvisionLine(text(from: line)), !currentSegment.isEmpty {
+                segments.append(currentSegment)
+                currentSegment = []
+            }
+            if !currentSegment.isEmpty {
+                currentSegment.append(
+                    NativeReaderRuntimeTextRun(text: "\n", styles: [], linkTarget: nil)
+                )
+            }
+            currentSegment.append(contentsOf: line)
+        }
+        if !currentSegment.isEmpty {
+            segments.append(currentSegment)
+        }
+
+        return segments.enumerated().map { index, runs in
+            let displayID = index == 0 ? block.id : block.id + "::segment-" + String(index)
+            return (
+                NativeReaderRuntimeBlock(
+                    id: displayID,
+                    kind: block.kind,
+                    sourceOrder: block.sourceOrder,
+                    sectionID: block.sectionID,
+                    anchorIDs: block.anchorIDs,
+                    plainText: text(from: runs),
+                    runs: runs,
+                    headingLevel: block.headingLevel,
+                    listItems: block.listItems
+                ),
+                true
             )
         }
+    }
+
+    private static func textLines(
+        from runs: [NativeReaderRuntimeTextRun]
+    ) -> [[NativeReaderRuntimeTextRun]] {
+        var lines: [[NativeReaderRuntimeTextRun]] = [[]]
+        for run in runs {
+            let fragments = run.text.split(separator: "\n", omittingEmptySubsequences: false)
+            for (index, fragment) in fragments.enumerated() {
+                if index > 0 {
+                    lines.append([])
+                }
+                guard !fragment.isEmpty else { continue }
+                lines[lines.count - 1].append(
+                    NativeReaderRuntimeTextRun(
+                        text: String(fragment),
+                        styles: run.styles,
+                        linkTarget: run.linkTarget
+                    )
+                )
+            }
+        }
+        return lines.filter { !text(from: $0).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    }
+
+    private static func text(from runs: [NativeReaderRuntimeTextRun]) -> String {
+        runs.map(\.text).joined()
+    }
+
+    private static func isProvisionLine(_ text: String) -> Bool {
+        guard let token = text
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .split(whereSeparator: { $0.isWhitespace })
+            .first
+        else {
+            return false
+        }
+        let number = token.trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
+        let components = number.split(separator: ".")
+        return components.count >= 2
+            && components.first?.count == 3
+            && components.allSatisfy { !$0.isEmpty && $0.allSatisfy(\.isNumber) }
     }
 }
 
@@ -185,7 +325,8 @@ enum NativeReaderLocationResolver {
         initialSectionNumber: String
     ) -> String? {
         if let rememberedBlockID,
-           document.blocks.contains(where: { $0.id == rememberedBlockID }) {
+           NativeReaderDisplayBlock.blocks(from: document.blocks)
+               .contains(where: { $0.id == rememberedBlockID }) {
             return rememberedBlockID
         }
         for anchorID in [rememberedAnchorID, initialAnchorID].compactMap({ $0 }) {
@@ -227,7 +368,8 @@ enum NativeReaderLocationResolver {
         for blockID: String,
         in document: NativeReaderRuntimeDocument
     ) -> String? {
-        if let block = document.blocks.first(where: { $0.id == blockID }) {
+        let sourceBlockID = NativeReaderDisplayBlock.sourceBlockID(for: blockID, in: document)
+        if let block = document.blocks.first(where: { $0.id == sourceBlockID }) {
             if let anchorID = block.anchorIDs.first {
                 return anchorID
             }
@@ -235,7 +377,7 @@ enum NativeReaderLocationResolver {
                 return sectionID
             }
         }
-        return document.anchors.first(where: { $0.blockID == blockID })?.id
+        return document.anchors.first(where: { $0.blockID == sourceBlockID })?.id
     }
 
     private static func normalizedSectionNumber(_ value: String) -> String {
@@ -250,6 +392,7 @@ enum NativeReaderLocationResolver {
 private struct NativeReaderTextBlockView: View {
     let block: NativeReaderRuntimeBlock
     let hierarchyIndentation: CGFloat
+    let usesCompactSpacing: Bool
     let theme: ReaderTheme
     let accentColor: UIColor
     let onOpenLink: (URL) -> Void
@@ -331,6 +474,9 @@ private struct NativeReaderTextBlockView: View {
         case .heading:
             return NativeReaderHeadingPresentation(block: block).level <= 2 ? 14 : 8
         case .paragraph, .orderedList, .unorderedList:
+            if usesCompactSpacing {
+                return 3
+            }
             return max(CGFloat(theme.paragraphSpacing), 8)
         case .sourceNote, .editorNote:
             return 14

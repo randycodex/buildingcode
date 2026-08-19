@@ -2771,11 +2771,10 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
 final class NativeReaderPhase3ContractTests: XCTestCase {
     private var corpusRootURL: URL {
-        URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("permitext", isDirectory: true)
-            .appendingPathComponent("Resources", isDirectory: true)
+        guard let resourceURL = Bundle.main.resourceURL else {
+            preconditionFailure("The host app must expose its bundled resources.")
+        }
+        return resourceURL
             .appendingPathComponent("CodeContent", isDirectory: true)
             .appendingPathComponent("authored", isDirectory: true)
             .appendingPathComponent("new-york-city", isDirectory: true)
@@ -2860,6 +2859,63 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             NativeReaderLocationResolver.blockID(forAnchorID: anchor.id, in: document),
             anchorBlockID
         )
+
+        let segmentedBlock = try XCTUnwrap(
+            NativeReaderDisplayBlock.blocks(from: document.blocks)
+                .first(where: { $0.id != $0.sourceBlockID })
+        )
+        XCTAssertEqual(
+            NativeReaderLocationResolver.initialBlockID(
+                in: document,
+                rememberedBlockID: segmentedBlock.id,
+                rememberedAnchorID: nil,
+                initialAnchorID: nil,
+                initialSectionNumber: ""
+            ),
+            segmentedBlock.id
+        )
+        XCTAssertEqual(
+            NativeReaderDisplayBlock.sourceBlockID(for: segmentedBlock.id, in: document),
+            segmentedBlock.sourceBlockID
+        )
+    }
+
+    func testLineBreakProvisionsBecomeStableDisplayBlocks() {
+        let paragraph = NativeReaderRuntimeBlock(
+            id: "authored-paragraph",
+            kind: .paragraph,
+            sourceOrder: 0,
+            sectionID: "ebc-101",
+            anchorIDs: ["rid-ebc-101"],
+            plainText: "101.1 General.\nFirst continuation.\n101.2 Scope.\nSecond continuation.",
+            runs: [
+                NativeReaderRuntimeTextRun(
+                    text: "101.1 General.\nFirst continuation.\n",
+                    styles: [.bold],
+                    linkTarget: nil
+                ),
+                NativeReaderRuntimeTextRun(
+                    text: "101.2 Scope.\nSecond continuation.",
+                    styles: [],
+                    linkTarget: nil
+                )
+            ],
+            headingLevel: nil,
+            listItems: []
+        )
+
+        let displayBlocks = NativeReaderDisplayBlock.blocks(from: [paragraph])
+
+        XCTAssertEqual(displayBlocks.map(\.id), ["authored-paragraph", "authored-paragraph::segment-1"])
+        XCTAssertEqual(displayBlocks.map(\.sourceBlockID), ["authored-paragraph", "authored-paragraph"])
+        XCTAssertEqual(
+            displayBlocks.map(\.block.plainText),
+            ["101.1 General.\nFirst continuation.", "101.2 Scope.\nSecond continuation."]
+        )
+        XCTAssertTrue(displayBlocks.allSatisfy(\.usesCompactSpacing))
+        XCTAssertEqual(displayBlocks.first?.block.runs.first?.styles, [.bold])
+        XCTAssertEqual(displayBlocks.last?.block.sectionID, paragraph.sectionID)
+        XCTAssertEqual(displayBlocks.last?.block.anchorIDs, paragraph.anchorIDs)
     }
 
     func testReaderContextsPersistNativeBlocksIndependently() {
