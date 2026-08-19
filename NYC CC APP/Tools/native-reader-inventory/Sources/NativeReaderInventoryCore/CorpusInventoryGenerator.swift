@@ -19,8 +19,8 @@ public enum CorpusInventoryError: LocalizedError {
 }
 
 public struct CorpusInventoryGenerator {
-    public static let schemaVersion = 1
-    public static let parserSchemaVersion = "native-reader-inventory-v1"
+    public static let schemaVersion = 2
+    public static let parserSchemaVersion = "native-reader-document-v1"
     public static let parserEngine = "libxml2 HTML recovery DOM (xmllint --html --xmlout) + Foundation XMLDocument"
 
     private let fileManager: FileManager
@@ -212,12 +212,43 @@ public struct CorpusInventoryGenerator {
         )
     }
 
+    public func analyzeChapterResult(fileURL: URL, sourceRoot: URL) -> NativeReaderChapterAnalysis {
+        let inventory = analyzeChapter(fileURL: fileURL, sourceRoot: sourceRoot)
+        let documentGenerator = NativeReaderChapterDocumentGenerator(fileManager: fileManager)
+        do {
+            return NativeReaderChapterAnalysis(
+                inventory: inventory,
+                document: try documentGenerator.generate(
+                    fileURL: fileURL,
+                    sourceRoot: sourceRoot,
+                    inventory: inventory
+                )
+            )
+        } catch {
+            return NativeReaderChapterAnalysis(
+                inventory: inventory,
+                document: documentGenerator.fallbackDocument(
+                    fileURL: fileURL,
+                    sourceRoot: sourceRoot,
+                    inventory: inventory,
+                    message: error.localizedDescription
+                )
+            )
+        }
+    }
+
     public static func encodedJSON<T: Encodable>(_ value: T) throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         var data = try encoder.encode(value)
         data.append(0x0A)
         return data
+    }
+
+    public static func encodedCompactJSON<T: Encodable>(_ value: T) throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return try encoder.encode(value)
     }
 
     private func parsedDocument(fileURL: URL) throws -> XMLDocument {

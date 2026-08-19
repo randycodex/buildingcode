@@ -11,6 +11,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/10.html",
@@ -20,6 +21,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/11.html",
@@ -29,6 +31,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Web",
+        "unsupportedBlocks: 4",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/12.html",
@@ -46,6 +49,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/14.html",
@@ -55,6 +59,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/15.html",
@@ -64,6 +69,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Web,img",
+        "unsupportedBlocks: 24",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/16.html",
@@ -73,6 +79,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/17.html",
@@ -82,6 +89,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/18.html",
@@ -91,6 +99,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/19.html",
@@ -99,7 +108,8 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink"
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/chapters/2.html",
       "sourceSHA256" : "1df5c0160a9f6199e155f375beb6e75b6c303061ac7a51bca8abb9534efd5425",
@@ -116,6 +126,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 8",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/21.html",
@@ -133,6 +144,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold,img",
+        "unsupportedBlocks: 31",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/23.html",
@@ -141,8 +153,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink",
         "unknownClasses: Small",
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 3",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/24.html",
@@ -152,6 +165,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 7",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/25.html",
@@ -161,6 +175,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 5",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/26.html",
@@ -194,6 +209,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/3.html",
@@ -202,7 +218,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img"
+        "unknownClasses: img",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/chapters/30.html",
       "sourceSHA256" : "bd60bb838ed8570ec0626aa714f7a7aada45b89ff896c03322d1ace0883e2c60",
@@ -210,7 +227,8 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink"
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/chapters/31.html",
       "sourceSHA256" : "ff7db8ecc7467a75c86c96ed21a6ce0a85270e911439ca0406526555c8817d48",
@@ -218,7 +236,8 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink"
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/chapters/32.html",
       "sourceSHA256" : "504d44780f09672b310e8942f339ba4fb3e606d3ca523382d1ab2355a50487e8",
@@ -226,8 +245,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink",
         "unknownClasses: Small,Web,img",
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 17",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/33.html",
@@ -253,6 +273,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/4.html",
@@ -262,6 +283,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 5",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/5.html",
@@ -271,6 +293,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/6.html",
@@ -280,6 +303,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold,img",
+        "unsupportedBlocks: 31",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/7.html",
@@ -289,6 +313,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/8.html",
@@ -298,6 +323,7 @@
     {
       "reasons" : [
         "unknownElements: intercodelink",
+        "unsupportedBlocks: 4",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/9.html",
@@ -331,6 +357,7 @@
     {
       "reasons" : [
         "unknownClasses: img",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt"
       ],
       "relativePath" : "2022-construction-codes/chapters/D.html",
@@ -339,6 +366,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 3",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/E.html",
@@ -355,8 +383,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink",
         "unknownClasses: Small,Web",
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 6",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/G.html",
@@ -366,6 +395,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/H.html",
@@ -438,7 +468,8 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink"
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/chapters/N.html",
       "sourceSHA256" : "74d3c9ad44f523cbb57468fa63d58f17fd5557a19893cbc810a7a74707418715",
@@ -462,6 +493,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/Q.html",
@@ -487,6 +519,7 @@
     {
       "reasons" : [
         "unknownElements: intercodelink",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/chapters/U.html",
@@ -504,6 +537,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/10.html",
@@ -513,6 +547,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/11.html",
@@ -522,6 +557,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Web",
+        "unsupportedBlocks: 4",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/12.html",
@@ -539,6 +575,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/14.html",
@@ -548,6 +585,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/15.html",
@@ -557,6 +595,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Web,img",
+        "unsupportedBlocks: 24",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/16.html",
@@ -566,6 +605,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/17.html",
@@ -575,6 +615,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/18.html",
@@ -584,6 +625,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/19.html",
@@ -592,7 +634,8 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink"
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/2.html",
       "sourceSHA256" : "4a0755055c2bc5bec21d0e8403d2bde5bd31aacfe993df9f4f85296d2f23559c",
@@ -609,6 +652,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 8",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/21.html",
@@ -626,6 +670,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold,img",
+        "unsupportedBlocks: 31",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/23.html",
@@ -634,8 +679,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink",
         "unknownClasses: Small",
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 3",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/24.html",
@@ -645,6 +691,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 7",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/25.html",
@@ -654,6 +701,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 5",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/26.html",
@@ -687,6 +735,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/3.html",
@@ -695,7 +744,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img"
+        "unknownClasses: img",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/30.html",
       "sourceSHA256" : "c01d5f106626f6cad8699aff02b2f0cd308c2c2a62e20d4c67a464ea50481bc1",
@@ -703,7 +753,8 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink"
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/31.html",
       "sourceSHA256" : "e4bb5ac00027a50b07b1a24c31a3861d9bc155a700a6c0528cf61cdc3b56e24c",
@@ -711,7 +762,8 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink"
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/32.html",
       "sourceSHA256" : "523b437643a8f5cec7f969a7a12bfbe9dbd7906de8dbd1e0f93627a18727b22b",
@@ -719,8 +771,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink",
         "unknownClasses: Small,Web,img",
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 17",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/33.html",
@@ -746,6 +799,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/4.html",
@@ -755,6 +809,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 5",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/5.html",
@@ -764,6 +819,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/6.html",
@@ -773,6 +829,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold,img",
+        "unsupportedBlocks: 31",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/7.html",
@@ -782,6 +839,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/8.html",
@@ -791,6 +849,7 @@
     {
       "reasons" : [
         "unknownElements: intercodelink",
+        "unsupportedBlocks: 4",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/9.html",
@@ -824,6 +883,7 @@
     {
       "reasons" : [
         "unknownClasses: img",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/D.html",
@@ -832,6 +892,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 3",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/E.html",
@@ -848,8 +909,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink",
         "unknownClasses: Small,Web",
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 6",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/G.html",
@@ -859,6 +921,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/H.html",
@@ -884,6 +947,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold,img",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/K.html",
@@ -900,7 +964,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img"
+        "unknownClasses: img",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/M.html",
       "sourceSHA256" : "e2100fdcfb29706b8db85b175769f099b24451fb0a10674c4b9b358292a5617b",
@@ -908,7 +973,8 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink"
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/N.html",
       "sourceSHA256" : "0402989d0ed95b172cd396dc92037ad5d9f77fd7a9df98568508dad157820fc1",
@@ -932,6 +998,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/Q.html",
@@ -940,7 +1007,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img"
+        "unknownClasses: img",
+        "unsupportedBlocks: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/R.html",
       "sourceSHA256" : "7790234c6c478050df6b4a8f105624a5d5b410eb21f9922c7d8357e85e6a8c74",
@@ -948,7 +1016,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: img"
+        "unknownClasses: img",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/S.html",
       "sourceSHA256" : "2db481c1559f46ab4a91fff5d29163654bea5a3ccb9e4ff9998e3ea3a5207721",
@@ -957,6 +1026,7 @@
     {
       "reasons" : [
         "unknownElements: intercodelink",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/U.html",
@@ -965,6 +1035,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Appendices.html",
@@ -990,6 +1061,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 6",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 3.html",
@@ -999,6 +1071,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 6",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
@@ -1008,6 +1081,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 5.html",
@@ -1017,6 +1091,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 6.html",
@@ -1033,6 +1108,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 8.html",
@@ -1041,8 +1117,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink",
         "unknownClasses: Chapter,Small,Small-Bold",
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
@@ -1051,8 +1128,9 @@
     },
     {
       "reasons" : [
+        "unknownClasses: Chapter",
         "unknownElements: intercodelink",
-        "unknownClasses: Chapter"
+        "unsupportedBlocks: 4"
       ],
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 2.html",
       "sourceSHA256" : "71500da148c284bd0565399b684be0b514725ef517bdf0bd2566b7aba7b0bc87",
@@ -1061,6 +1139,7 @@
     {
       "reasons" : [
         "unknownClasses: Chapter,Web",
+        "unsupportedBlocks: 5",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html",
@@ -1070,6 +1149,7 @@
     {
       "reasons" : [
         "unknownClasses: Chapter",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 4.html",
@@ -1078,8 +1158,9 @@
     },
     {
       "reasons" : [
+        "unknownClasses: Chapter",
         "unknownElements: intercodelink",
-        "unknownClasses: Chapter"
+        "unsupportedBlocks: 4"
       ],
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 5.html",
       "sourceSHA256" : "5dc10705f6847976a6232f87771f1579ce2db7cfffb63109fbebd11655134f66",
@@ -1087,7 +1168,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Small,img"
+        "unknownClasses: Small,img",
+        "unsupportedBlocks: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Appendices.html",
       "sourceSHA256" : "203524184351c776346dfc9b9bbae1a07023ed22fd9169d85aab1de989de9ef3",
@@ -1095,7 +1177,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: Web"
+        "unknownClasses: Web",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
       "sourceSHA256" : "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
@@ -1104,6 +1187,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 10.html",
@@ -1113,6 +1197,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 11.html",
@@ -1121,6 +1206,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 5",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 12.html",
@@ -1130,6 +1216,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 5",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 13.html",
@@ -1146,6 +1233,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 15.html",
@@ -1163,6 +1251,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 3",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 3.html",
@@ -1172,6 +1261,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 12",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 4.html",
@@ -1181,6 +1271,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 10",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 5.html",
@@ -1190,6 +1281,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 6.html",
@@ -1207,6 +1299,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 6",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 8.html",
@@ -1224,6 +1317,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold,img",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Appendices.html",
@@ -1232,7 +1326,8 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink"
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
       "sourceSHA256" : "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
@@ -1249,6 +1344,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 8",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 11.html",
@@ -1266,6 +1362,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 4",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 13.html",
@@ -1275,6 +1372,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 4",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 14.html",
@@ -1283,6 +1381,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 1",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 15.html",
@@ -1300,6 +1399,7 @@
     {
       "reasons" : [
         "unknownClasses: Small",
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 3.html",
@@ -1308,8 +1408,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: intercodelink",
         "unknownClasses: Small",
+        "unknownElements: intercodelink",
+        "unsupportedBlocks: 3",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 4.html",
@@ -1327,6 +1428,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 15",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
@@ -1336,6 +1438,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,img",
+        "unsupportedBlocks: 15",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 7.html",
@@ -1344,6 +1447,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 2",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 8.html",
@@ -1353,6 +1457,7 @@
     {
       "reasons" : [
         "unknownClasses: Small,Small-Bold",
+        "unsupportedBlocks: 7",
         "unsupportedCSS: margin-bottom=10pt,word-wrap"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 9.html",
@@ -2289,7 +2394,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: code-figure"
+        "unknownClasses: code-figure",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-enacted-administrative-code/chapters/30000095.html",
       "sourceSHA256" : "2e8f5a2f5ec7ec26118f2e6569cbe3e9989b5c2c4266666b44d47ed12c6affdf",
@@ -2858,6 +2964,7 @@
     {
       "reasons" : [
         "unknownClasses: sec-link-inline",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-B-21239.html",
@@ -2866,7 +2973,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: appendix-c-row,appendix-c-table,appendix-c-table-header,sec-link-inline"
+        "unknownClasses: appendix-c-row,appendix-c-table,appendix-c-table-header,sec-link-inline",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21242.html",
       "sourceSHA256" : "98d11ca7996f8a196ba898b45def3193ea973b427027eb54d846601fd0141dc1",
@@ -2874,7 +2982,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: appendix-c-row,appendix-c-table,appendix-c-table-header,center-align,sec-link-inline"
+        "unknownClasses: appendix-c-row,appendix-c-table,appendix-c-table-header,center-align,sec-link-inline",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21243.html",
       "sourceSHA256" : "c858942cad347812bd640f6d75acf04242aff2ce6808dd6dc22295524f31c0ee",
@@ -2882,6 +2991,7 @@
     },
     {
       "reasons" : [
+        "unsupportedBlocks: 1",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-D-21241.html",
@@ -2890,7 +3000,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pb_after,pseudo-li,sec-link-inline"
+        "unknownClasses: pb_after,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-E-21240.html",
       "sourceSHA256" : "a775e688fd9d000419cf7fd732316605675ce8c631f3827d578be22b9e4632a0",
@@ -2899,6 +3010,7 @@
     {
       "reasons" : [
         "unknownElements: font",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: text-wrap-mode"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21424.html",
@@ -2915,7 +3027,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: embedded-entity"
+        "unknownClasses: embedded-entity",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21766.html",
       "sourceSHA256" : "54ef475f2609d4db8870803ba47b0b120e29f40712c232628dde46fd1a540b0d",
@@ -2923,7 +3036,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: embedded-entity"
+        "unknownClasses: embedded-entity",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21767.html",
       "sourceSHA256" : "203f69ca468c370f233c78fded836dc1e4cb8a1029541ab5d82c2c96e0eaf376",
@@ -2931,7 +3045,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: embedded-entity"
+        "unknownClasses: embedded-entity",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21768.html",
       "sourceSHA256" : "d344ee75ab62736fbf9deddf7c94143c860304c89d4b8e0ba829177eb897c3ea",
@@ -2939,7 +3054,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: embedded-entity"
+        "unknownClasses: embedded-entity",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21769.html",
       "sourceSHA256" : "73db16950fa50789f4b6adc02a881b85a6d8fa560e28c982535e3ef5d83e3dfd",
@@ -2948,6 +3064,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,sec-link-inline",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-G-21235.html",
@@ -2956,7 +3073,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: center-align,sec-link-inline"
+        "unknownClasses: center-align,sec-link-inline",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-H-21233.html",
       "sourceSHA256" : "aa73ca975ee5ffae323c809425830d057e9cf9d9a6e1b042b28da87678f4e6cd",
@@ -2964,7 +3082,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: center-align,embedded-entity,pb_after"
+        "unknownClasses: center-align,embedded-entity,pb_after",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-I-21238.html",
       "sourceSHA256" : "5ce3744d5a016f95f4a184269d760d6720e1b48299ab555d967a7fda3adea218",
@@ -2973,6 +3092,7 @@
     {
       "reasons" : [
         "unknownClasses: embedded-entity,pb_after,sec-link-inline",
+        "unsupportedBlocks: 1",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-J-21237.html",
@@ -2981,7 +3101,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pb_after,sec-link-inline"
+        "unknownClasses: pb_after,sec-link-inline",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/APP-K-21498.html",
       "sourceSHA256" : "ffc86aa7c3ccd07a627f3a27c86e256e396b57921aed9cd812ace16629130f8e",
@@ -2989,7 +3110,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 22"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/I-1.html",
       "sourceSHA256" : "c6b02d1addf11062d55358da4ac972567519d42658be6383c1f68181cffa2eff",
@@ -3005,7 +3127,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: MsoNormal,pseudo-li,sec-link-inline"
+        "unknownClasses: MsoNormal,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 32"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/I-3.html",
       "sourceSHA256" : "7a08333daab30bcf00cb2c07d07c03aa3e8f41839a8c7976188aefde651fb214",
@@ -3013,7 +3136,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 11"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/I-5.html",
       "sourceSHA256" : "8789beafc1746c189c7fc386975119c9abbe0634fd6c98685ed848d61518198b",
@@ -3021,7 +3145,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: center-align,pseudo-li,sec-link-inline"
+        "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 22"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/I-6.html",
       "sourceSHA256" : "cb6a4a14ec15cc90165167d9fd99f3e7007eae94a43b1db72ac01b84f88b1754",
@@ -3029,7 +3154,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li"
+        "unknownClasses: pseudo-li",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-1.html",
       "sourceSHA256" : "c98cd142235189041073d457b3d19035f7b2682b11cefd81b5ab03e48e52f2a1",
@@ -3037,8 +3163,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: center",
         "unknownClasses: embedded-entity,pseudo-li,sec-link-inline",
+        "unknownElements: center",
+        "unsupportedBlocks: 30",
         "unsupportedCSS: tab-stops,text-autospace"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-2.html",
@@ -3048,6 +3175,7 @@
     {
       "reasons" : [
         "unknownClasses: Default,MsoNormal,MsoTableGrid,center-align,embedded-entity,sec-link-inline",
+        "unsupportedBlocks: 70",
         "unsupportedCSS: counter-reset,mso-themecolor,tab-stops"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-3.html",
@@ -3057,6 +3185,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 56",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-4.html",
@@ -3066,6 +3195,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoBodyText,MsoNoSpacing,MsoTableGrid,center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 60",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,text-autospace"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-5.html",
@@ -3074,7 +3204,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 16"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-6.html",
       "sourceSHA256" : "c5d41c23e251710b258b2d64d51920b9aa66cbf3d01f6b6c8c5b1509f797a607",
@@ -3083,6 +3214,7 @@
     {
       "reasons" : [
         "unknownClasses: embedded-entity,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: counter-reset,text-autospace"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/II-7.html",
@@ -3091,7 +3223,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li"
+        "unknownClasses: pseudo-li",
+        "unsupportedBlocks: 1"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-1.html",
       "sourceSHA256" : "8f65b2f1fcb452a2ac8c3e84d925e869f33365bc8f29d71005b315c99749e109",
@@ -3099,8 +3232,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: center",
         "unknownClasses: embedded-entity,pseudo-li,sec-link-inline",
+        "unknownElements: center",
+        "unsupportedBlocks: 97",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-2.html",
@@ -3110,6 +3244,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 54",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-3.html",
@@ -3119,6 +3254,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-4.html",
@@ -3128,6 +3264,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 30",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-5.html",
@@ -3137,6 +3274,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoBodyText,MsoNoSpacing,MsoTableGrid,TableParagraph,center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 58",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset,position,tab-stops,top"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-6.html",
@@ -3146,6 +3284,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 57",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/III-7.html",
@@ -3154,7 +3293,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li"
+        "unknownClasses: pseudo-li",
+        "unsupportedBlocks: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IV-1.html",
       "sourceSHA256" : "ecd86a7459926af4779ff4dc7f372c20beddce67703cfed0addeaa734f050572",
@@ -3162,8 +3302,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: center",
         "unknownClasses: center-align,embedded-entity,pseudo-li,sec-link-inline",
+        "unknownElements: center",
+        "unsupportedBlocks: 84",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IV-2.html",
@@ -3173,6 +3314,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 31",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IV-3.html",
@@ -3182,6 +3324,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoBodyText,MsoTableGrid,center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 36",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,tab-stops,text-autospace"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IV-4.html",
@@ -3191,6 +3334,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoNoSpacing,center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 55",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-1.html",
@@ -3199,7 +3343,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 7"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-2.html",
       "sourceSHA256" : "338ff548ebc2c67ce8ac5494e6e786082f135234cc75caf4cd59e18df5813d83",
@@ -3208,6 +3353,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 101",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-3.html",
@@ -3216,7 +3362,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: MsoNormal,pseudo-li,sec-link-inline"
+        "unknownClasses: MsoNormal,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 18"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-4.html",
       "sourceSHA256" : "0547f77db9f28d1c4fcf92a6e4bf3c1edb6bcd8fbda3a766cd979a52d268ad1a",
@@ -3225,6 +3372,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 13",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-5.html",
@@ -3234,6 +3382,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoNormal,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 27",
         "unsupportedCSS: counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-6.html",
@@ -3242,7 +3391,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 29"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-7.html",
       "sourceSHA256" : "693a095ae7a59392dd316fc3347d606bc64afa218948bc6a1690f372bf9ca3c1",
@@ -3251,6 +3401,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoTableGrid,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 40",
         "unsupportedCSS: tab-stops"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-8.html",
@@ -3259,7 +3410,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 8"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/IX-9.html",
       "sourceSHA256" : "683a42f167dae1291542f7970e17e1f55935af765bad2dffa3fb4297932da6db",
@@ -3283,7 +3435,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: sec-link-inline"
+        "unknownClasses: sec-link-inline",
+        "unsupportedBlocks: 2"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/V-3.html",
       "sourceSHA256" : "a62c30edebef3c391d31badc43e7539d3ff3b201e86033ee7746247e68b6c83c",
@@ -3291,7 +3444,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: sec-link-inline"
+        "unknownClasses: sec-link-inline",
+        "unsupportedBlocks: 7"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/V-4.html",
       "sourceSHA256" : "e5bd9f74844e088989e20fa5783d2daf7ca733bf882794f2c977305bb9fd644d",
@@ -3300,6 +3454,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 6",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-1.html",
@@ -3309,6 +3464,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoNormal,center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 110",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset,tab-stops"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-2.html",
@@ -3317,7 +3473,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 13"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-3.html",
       "sourceSHA256" : "e7940f08049bc0019eb6e8072cc4d5dffbf8e3b682cf0fc3454d12007ed7d9a8",
@@ -3326,6 +3483,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 26",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-4.html",
@@ -3335,6 +3493,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 14",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-5.html",
@@ -3344,6 +3503,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 28",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VI-6.html",
@@ -3360,7 +3520,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 5"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-2.html",
       "sourceSHA256" : "28b78cad060bc3ee4470308c00c5b4ec5786c16d4de74dfe44241623f0ed4cba",
@@ -3369,6 +3530,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 43",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-3.html",
@@ -3378,6 +3540,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,embedded-entity,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 68",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-4.html",
@@ -3386,7 +3549,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: sec-link-inline"
+        "unknownClasses: sec-link-inline",
+        "unsupportedBlocks: 5"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-5.html",
       "sourceSHA256" : "a5bfec6dcb352f5f9f30b0cedb6798c3c27dbcbc0dd61ac6e79f14bcf5e43d15",
@@ -3394,7 +3558,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 3"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-6.html",
       "sourceSHA256" : "40b1fd90f688c25325ce6f42d2f6e1fb1bfbb742500b72726f55d4c4af7b92b9",
@@ -3402,7 +3567,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 10"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-7.html",
       "sourceSHA256" : "b710a40c930bfb6f738e9143acd17def26b6910d54cd802921ac212b67b0b431",
@@ -3411,6 +3577,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 26",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-8.html",
@@ -3420,6 +3587,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VII-9.html",
@@ -3429,6 +3597,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoNormal,center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 121",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-1.html",
@@ -3437,7 +3606,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 16"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-2.html",
       "sourceSHA256" : "930c910eb6d9f9b3276f4a463243052c7726660cef28382af8e9dc5473576ac6",
@@ -3445,7 +3615,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 4"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-3.html",
       "sourceSHA256" : "49096041d1c00e40cacd290f5fa5cf101a73a50874d71c02bdc1268972a3286d",
@@ -3454,6 +3625,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoNormal,center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 22",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-4.html",
@@ -3462,7 +3634,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: MsoNormal,pseudo-li,sec-link-inline"
+        "unknownClasses: MsoNormal,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 6"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-5.html",
       "sourceSHA256" : "ad9b173485f98dacf8d8fb7c72edac1669133bc61a7aa10402b09f5e5cfab4c4",
@@ -3470,7 +3643,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 12"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-6.html",
       "sourceSHA256" : "3dcff2aeed2a35b26b303599795164fcbf081b62b04963ab0e72de4d9320cfc2",
@@ -3478,7 +3652,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 28"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-7.html",
       "sourceSHA256" : "d652bd0cd8458f7fd789e8be40d99e7c0229442c47e50a02d24f87cedf388e9b",
@@ -3486,7 +3661,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 11"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-8.html",
       "sourceSHA256" : "38954f6a1155796fc6cf22df1a0e147f72176d9bfc3aaf4b89de02ab0e9ca804",
@@ -3494,7 +3670,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 5"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/VIII-9.html",
       "sourceSHA256" : "ff2a0bf7296ce91a51d1d72c16df23182a9fa927ea9cecafed10469cf6e842b6",
@@ -3503,6 +3680,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 51",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-1.html",
@@ -3511,7 +3689,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: center-align,pseudo-li,sec-link-inline"
+        "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 9"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-2.html",
       "sourceSHA256" : "9f826fff1d6b9e696830a2a476b50cc34c4496008bd1191f7ef5817009694eb4",
@@ -3519,7 +3698,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 6"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-3.html",
       "sourceSHA256" : "c004d6912210142d269bf1dde3eeadb0397e444d155ae9f1e2600646598d4b67",
@@ -3527,7 +3707,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 42"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-4.html",
       "sourceSHA256" : "5c592a96e85e3cb11f4761f57c45314a7f27714cb3b2ac932373bec6ed57e624",
@@ -3536,6 +3717,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 41",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,mso-ansi-language,mso-ascii-theme-font,mso-bidi-language,mso-bidi-theme-font,mso-fareast-font-family,mso-fareast-language,mso-fareast-theme-font,mso-hansi-theme-font"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-5.html",
@@ -3544,7 +3726,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 8"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-6.html",
       "sourceSHA256" : "7eea2893d017333d0485dc4294444f24fd7200539cb95e219ea021c4885703c0",
@@ -3553,6 +3736,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 59",
         "unsupportedCSS: counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-7.html",
@@ -3562,6 +3746,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 7",
         "unsupportedCSS: counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-8.html",
@@ -3570,8 +3755,9 @@
     },
     {
       "reasons" : [
-        "unknownElements: font",
         "unknownClasses: MsoNormal,embedded-entity,pseudo-li,sec-link-inline",
+        "unknownElements: font",
+        "unsupportedBlocks: 22",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,text-autospace"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/X-9.html",
@@ -3580,7 +3766,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 7"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-1.html",
       "sourceSHA256" : "9ddfb498806c200d26dfbc134b1fa4bb33eb1a02da7dcd4f047be261d6b03022",
@@ -3588,7 +3775,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 13"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-2.html",
       "sourceSHA256" : "36fbead84211045d101e6565ab28ca17051f9df2102a9f0a4c43858e11ca71a8",
@@ -3596,7 +3784,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 11"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-3.html",
       "sourceSHA256" : "6b6d572a0817dcc41e7610138ef082b5684773f263ebc9fb96ff158393f4e19e",
@@ -3604,7 +3793,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 5"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-4.html",
       "sourceSHA256" : "0e15dd449d30b7e98fe384688dbee536084eb6b0df1a9ee15e80f7e591fd8e6d",
@@ -3612,7 +3802,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: MsoNormal,pseudo-li,sec-link-inline"
+        "unknownClasses: MsoNormal,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 14"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-5.html",
       "sourceSHA256" : "70762c31de45beb090a7d1c17f44e193660643eae33515295db2fa78ecd4b0f4",
@@ -3621,6 +3812,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 29",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-6.html",
@@ -3630,6 +3822,7 @@
     {
       "reasons" : [
         "unknownClasses: MsoNormal,center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 73",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-7.html",
@@ -3639,6 +3832,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 8",
         "unsupportedCSS: counter-reset,tab-stops"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-8.html",
@@ -3648,6 +3842,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 33",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XI-9.html",
@@ -3656,7 +3851,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: sec-link-inline"
+        "unknownClasses: sec-link-inline",
+        "unsupportedBlocks: 12"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-1.html",
       "sourceSHA256" : "3eeac684da827b3d9a24492233d54b8bbcdafa55e204ecbf286761b0c9596751",
@@ -3665,6 +3861,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 5",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-2.html",
@@ -3673,7 +3870,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 29"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-3.html",
       "sourceSHA256" : "e47ecaae7114646c3de8220b4eaa3a66f22e49649be8e7bd1abe1b562231f972",
@@ -3681,7 +3879,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 23"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-4.html",
       "sourceSHA256" : "d12f3f5e4e73c0130bf801a48c5f4e6465fcb0ce1c5cd1d9be370c469fa15360",
@@ -3690,6 +3889,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 20",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-5.html",
@@ -3699,6 +3899,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 20",
         "unsupportedCSS: counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-6.html",
@@ -3715,7 +3916,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 22"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XII-8.html",
       "sourceSHA256" : "39d07fa713db1ecdefb3be29578411d774aea27c51b92a4afe6b4291038aff1f",
@@ -3724,6 +3926,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 30",
         "unsupportedCSS: counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-1.html",
@@ -3733,6 +3936,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 10",
         "unsupportedCSS: counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-2.html",
@@ -3741,7 +3945,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 18"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-3.html",
       "sourceSHA256" : "ce62f878500c98f853a0e39cc16040f3f8fc0faf8e94f40eea4c6fff55fad5b1",
@@ -3750,6 +3955,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 31",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width,counter-reset"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-4.html",
@@ -3759,6 +3965,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 13",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-5.html",
@@ -3768,6 +3975,7 @@
     {
       "reasons" : [
         "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 23",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-6.html",
@@ -3777,6 +3985,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 12",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-7.html",
@@ -3786,6 +3995,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 12",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-8.html",
@@ -3795,6 +4005,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 56",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIII-9.html",
@@ -3803,7 +4014,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 10"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-1.html",
       "sourceSHA256" : "ae4914e78aedbb442cae91a0c2c10ae00a34a57242625ed28c0003ea9c885c7e",
@@ -3811,7 +4023,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 27"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-2.html",
       "sourceSHA256" : "0dffa6162e36b6d0f6181e56ee0a8901de959cf31df586397e61d4ea9569940d",
@@ -3820,6 +4033,7 @@
     {
       "reasons" : [
         "unknownClasses: center-align,pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 15",
         "unsupportedCSS: border-bottom-color,border-bottom-style,border-bottom-width,border-left-color,border-left-style,border-left-width,border-right-color,border-right-style,border-right-width,border-top-color,border-top-style,border-top-width"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-3.html",
@@ -3828,7 +4042,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: pseudo-li,sec-link-inline"
+        "unknownClasses: pseudo-li,sec-link-inline",
+        "unsupportedBlocks: 26"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-4.html",
       "sourceSHA256" : "3f83e2f773b0dd95a2ca644b9394f39e3bdcc197b3299c44b69a98226dbc8727",
@@ -3837,6 +4052,7 @@
     {
       "reasons" : [
         "unknownClasses: sec-link-inline",
+        "unsupportedBlocks: 11",
         "unsupportedCSS: text-autospace"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-5.html",
@@ -3845,7 +4061,8 @@
     },
     {
       "reasons" : [
-        "unknownClasses: sec-link-inline"
+        "unknownClasses: sec-link-inline",
+        "unsupportedBlocks: 9"
       ],
       "relativePath" : "2026-zoning-resolution/chapters/XIV-6.html",
       "sourceSHA256" : "7695da27ac1365ca3b601957c059cb126df95c500128dbd06a4d72a2c97a7f04",
@@ -3853,6 +4070,6 @@
     }
   ],
   "corpusSHA256" : "0709f1f425bd47b29fe89543cb604065c511802869ea6c08c6181273b5c49d88",
-  "parserSchemaVersion" : "native-reader-inventory-v1",
-  "schemaVersion" : 1
+  "parserSchemaVersion" : "native-reader-document-v1",
+  "schemaVersion" : 2
 }

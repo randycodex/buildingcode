@@ -121,6 +121,72 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertEqual(chapter.eligibility.reasons, ["duplicateAnchorIDs", "missingMediaAsset"])
     }
 
+    func testNativeDocumentPreservesTextAnchorsLinksListsAndTableMatrixDeterministically() throws {
+        let root = try makeTemporaryDirectory()
+        let packageRoot = root.appendingPathComponent("sample-package", isDirectory: true)
+        let chapters = packageRoot.appendingPathComponent("chapters", isDirectory: true)
+        try FileManager.default.createDirectory(at: chapters, withIntermediateDirectories: true)
+        try """
+        {
+          "codeSections": [{"id": 7, "name": "Building Code"}],
+          "chapters": [{"id": 42, "codeSectionID": 7, "chapterNumber": "1", "title": "General"}]
+        }
+        """.write(to: packageRoot.appendingPathComponent("bundle.json"), atomically: true, encoding: .utf8)
+        let chapterURL = chapters.appendingPathComponent("1.html")
+        try """
+        <html><body><section id="section-101"><h2>101 <strong>General</strong></h2>
+        <p>Exact <a href="#section-102">linked</a> enacted text.</p>
+        <ol><li>First<ul><li>Nested</li></ul></li><li>Second</li></ol>
+        <table><caption>Values</caption><tr><th rowspan="2">A</th><th>B</th></tr><tr><td>C</td></tr></table>
+        </section><section id="section-102"><h2>102 End</h2><p>Done.</p></section></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventoryGenerator = CorpusInventoryGenerator()
+        let inventory = inventoryGenerator.analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let documentGenerator = NativeReaderChapterDocumentGenerator()
+        let first = try documentGenerator.generate(fileURL: chapterURL, sourceRoot: root, inventory: inventory)
+        let second = try documentGenerator.generate(fileURL: chapterURL, sourceRoot: root, inventory: inventory)
+
+        XCTAssertEqual(first, second)
+        XCTAssertTrue(first.validation.passesStructuralValidation, "\(first.validation)")
+        XCTAssertEqual(first.metadata.chapterID, 42)
+        XCTAssertEqual(first.metadata.codeSectionID, 7)
+        XCTAssertEqual(first.anchors.map(\.id), ["section-101", "section-102"])
+        XCTAssertTrue(first.anchors.allSatisfy { $0.blockID != nil })
+        XCTAssertEqual(first.links.map(\.target), ["#section-102"])
+        XCTAssertEqual(first.blocks.filter { $0.kind == .orderedList }.first?.listItems.count, 2)
+        XCTAssertEqual(first.blocks.compactMap(\.table).first?.columnCount, 2)
+        XCTAssertEqual(first.blocks.compactMap(\.table).first?.cells.map(\.column), [0, 1, 1])
+        XCTAssertEqual(
+            try CorpusInventoryGenerator.encodedCompactJSON(first),
+            try CorpusInventoryGenerator.encodedCompactJSON(second)
+        )
+    }
+
+    func testUnsupportedDocumentBlockPreservesRecoveredSourceAndRoutesToHTML() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("package/chapters/2.html")
+        try FileManager.default.createDirectory(at: chapterURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try """
+        <html><body><section id="two"><p>Supported.</p><mystery-widget>Unsupported exact text.</mystery-widget></section></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+
+        XCTAssertEqual(document.eligibility.state, .fullHTMLFallback)
+        XCTAssertEqual(document.validation.unsupportedBlockCount, 1)
+        XCTAssertTrue(document.validation.normalizedTextMatches)
+        XCTAssertTrue(document.blocks.contains { block in
+            block.kind == .unsupportedHTML
+                && block.sourceHTML?.contains("Unsupported exact text.") == true
+        })
+    }
+
     private func makeTemporaryDirectory() throws -> URL {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("native-reader-inventory-tests-\(UUID().uuidString)", isDirectory: true)

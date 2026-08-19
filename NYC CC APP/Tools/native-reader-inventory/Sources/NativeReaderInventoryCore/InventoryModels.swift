@@ -190,7 +190,7 @@ public struct ChapterInventory: Codable, Equatable, Sendable {
     public let unknownElementNames: [String]
     public let unknownClassNames: [String]
     public let unsupportedCSSProperties: [String]
-    public let eligibility: NativeReaderEligibility
+    public var eligibility: NativeReaderEligibility
 
     public init(
         relativePath: String,
