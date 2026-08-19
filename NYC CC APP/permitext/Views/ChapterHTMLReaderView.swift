@@ -71,6 +71,7 @@ struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
     var rememberedNativeSectionID: Binding<Int64?> = .constant(nil)
+    var rememberedNativeBlockID: Binding<String?> = .constant(nil)
     var rememberedAnchorID: Binding<String?> = .constant(nil)
     var rememberedScrollOffset: Binding<Double?> = .constant(nil)
 
@@ -102,6 +103,7 @@ struct ChapterHTMLReaderView: View {
     @State private var htmlReloadTrigger = 0
 #if DEBUG
     @State private var debugReaderPresentation: DebugChapterReaderPresentation = .html
+    @State private var nativeReaderFallbackMessage: String?
 #endif
 
     private var accentColor: Color {
@@ -142,9 +144,14 @@ struct ChapterHTMLReaderView: View {
         htmlStore.chapterURL(chapterNumber: chapter.chapterNumber)
     }
 
+    private var nativeReaderRoute: NativeReaderDocumentRoute? {
+        guard let chapterURL else { return nil }
+        return NativeReaderDocumentStore.shared.debugRoute(for: chapterURL)
+    }
+
     private var usesNativeDebugReader: Bool {
 #if DEBUG
-        debugReaderPresentation == .native
+        debugReaderPresentation == .native && nativeReaderRoute != nil
 #else
         false
 #endif
@@ -288,11 +295,22 @@ struct ChapterHTMLReaderView: View {
     var body: some View {
         Group {
             if let chapterURL, let readAccessURL {
-                if usesNativeDebugReader {
+                if usesNativeDebugReader, let nativeReaderRoute {
                     ChapterReaderView(
                         chapter: chapter,
                         initialSectionID: initialSection.id,
-                        rememberedSectionID: rememberedNativeSectionID
+                        rememberedSectionID: rememberedNativeSectionID,
+                        nativeDocumentRoute: nativeReaderRoute,
+                        initialSectionNumber: initialSection.sectionNumber,
+                        initialAnchorID: restoredInitialAnchor?.anchorID,
+                        rememberedNativeBlockID: rememberedNativeBlockID,
+                        rememberedAnchorID: rememberedAnchorID,
+                        onNativeFallbackToHTML: { message in
+#if DEBUG
+                            debugReaderPresentation = .html
+                            nativeReaderFallbackMessage = message
+#endif
+                        }
                     )
                 } else if hasActivatedHTMLReader {
                     htmlReader(chapterURL: chapterURL, readAccessURL: readAccessURL)
@@ -423,16 +441,37 @@ struct ChapterHTMLReaderView: View {
         .onDisappear {
             chapterSearchQuery = ""
         }
+#if DEBUG
+        .alert(
+            "Native reader used HTML fallback",
+            isPresented: Binding(
+                get: { nativeReaderFallbackMessage != nil },
+                set: { if !$0 { nativeReaderFallbackMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                nativeReaderFallbackMessage = nil
+            }
+        } message: {
+            Text(nativeReaderFallbackMessage ?? "The native pilot could not validate this chapter.")
+        }
+#endif
     }
 
 #if DEBUG
     private var debugReaderSelector: some View {
         Menu {
             Picker("Reader presentation", selection: $debugReaderPresentation) {
-                ForEach(DebugChapterReaderPresentation.allCases) { presentation in
-                    Text(presentation.title)
-                        .tag(presentation)
+                Text(DebugChapterReaderPresentation.html.title)
+                    .tag(DebugChapterReaderPresentation.html)
+                if nativeReaderRoute != nil {
+                    Text(DebugChapterReaderPresentation.native.title)
+                        .tag(DebugChapterReaderPresentation.native)
                 }
+            }
+            if nativeReaderRoute == nil {
+                Label("Native pilot unavailable for this chapter", systemImage: "lock.fill")
+                    .foregroundStyle(.secondary)
             }
         } label: {
             Image(systemName: "ladybug.fill")

@@ -1,5 +1,6 @@
 import XCTest
 import SQLite3
+import UIKit
 @testable import permitext
 
 private actor SyncPullRecorder {
@@ -2765,5 +2766,209 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(decoded.document[1].content?[1].href, "https://example.com/source")
         XCTAssertEqual(decoded.document[3].content?.first?.props?.referenceKind, "canonicalSection")
         XCTAssertEqual(decoded.document[4].props.caption, "Existing condition")
+    }
+}
+
+final class NativeReaderPhase3ContractTests: XCTestCase {
+    private var corpusRootURL: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("permitext", isDirectory: true)
+            .appendingPathComponent("Resources", isDirectory: true)
+            .appendingPathComponent("CodeContent", isDirectory: true)
+            .appendingPathComponent("authored", isDirectory: true)
+            .appendingPathComponent("new-york-city", isDirectory: true)
+    }
+
+    func testDebugPilotRoutesAndLoadsOnlyValidatedTextDocuments() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        XCTAssertEqual(NativeReaderDocumentStore.debugPilotSourcePaths.count, 2)
+
+        for sourcePath in NativeReaderDocumentStore.debugPilotSourcePaths.sorted() {
+            let sourceURL = corpusRootURL.appendingPathComponent(sourcePath)
+            let route = try XCTUnwrap(store.debugRoute(for: sourceURL), sourcePath)
+            let document = try await store.loadDocument(for: route)
+
+            XCTAssertEqual(document.documentID, route.documentID)
+            XCTAssertEqual(document.sourcePath, sourcePath)
+            XCTAssertTrue(document.isValidatedTextOnly)
+            XCTAssertFalse(document.blocks.isEmpty)
+            XCTAssertTrue(document.blocks.allSatisfy { $0.kind.isTextOnly })
+        }
+
+        let eligibleButNotPiloted = corpusRootURL
+            .appendingPathComponent("2026-existing-building-code/chapters/2.html")
+        XCTAssertNil(store.debugRoute(for: eligibleButNotPiloted))
+    }
+
+    func testNativeDocumentIntegrityFailureRequiresFallback() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let sourcePath = try XCTUnwrap(NativeReaderDocumentStore.debugPilotSourcePaths.sorted().first)
+        let sourceURL = corpusRootURL.appendingPathComponent(sourcePath)
+        let route = try XCTUnwrap(store.debugRoute(for: sourceURL))
+        let invalidRoute = NativeReaderDocumentRoute(
+            relativeSourcePath: route.relativeSourcePath,
+            sourceURL: route.sourceURL,
+            documentURL: route.documentURL,
+            sourceSHA256: route.sourceSHA256,
+            documentID: route.documentID,
+            documentSHA256: route.documentSHA256,
+            compressedSHA256: String(repeating: "0", count: 64),
+            uncompressedByteCount: route.uncompressedByteCount,
+            compressedByteCount: route.compressedByteCount
+        )
+
+        do {
+            _ = try await store.loadDocument(for: invalidRoute)
+            XCTFail("A document with a mismatched compressed hash must not render natively.")
+        } catch let error as NativeReaderDocumentStoreError {
+            XCTAssertEqual(error, .hashMismatch(sourcePath))
+        }
+    }
+
+    func testStableBlockAndAnchorLocationResolution() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let sourcePath = "2026-existing-building-code/chapters/1.html"
+        let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+        let document = try await store.loadDocument(for: route)
+        let anchor = try XCTUnwrap(document.anchors.first(where: { $0.blockID != nil }))
+        let anchorBlockID = try XCTUnwrap(anchor.blockID)
+        let rememberedBlockID = try XCTUnwrap(document.blocks.last?.id)
+
+        XCTAssertEqual(
+            NativeReaderLocationResolver.initialBlockID(
+                in: document,
+                rememberedBlockID: rememberedBlockID,
+                rememberedAnchorID: anchor.id,
+                initialAnchorID: nil,
+                initialSectionNumber: ""
+            ),
+            rememberedBlockID
+        )
+        XCTAssertEqual(
+            NativeReaderLocationResolver.initialBlockID(
+                in: document,
+                rememberedBlockID: "missing-block",
+                rememberedAnchorID: anchor.id,
+                initialAnchorID: nil,
+                initialSectionNumber: ""
+            ),
+            anchorBlockID
+        )
+        XCTAssertEqual(
+            NativeReaderLocationResolver.blockID(forAnchorID: anchor.id, in: document),
+            anchorBlockID
+        )
+    }
+
+    func testReaderContextsPersistNativeBlocksIndependently() {
+        let chapterID: Int64 = -9_900_003
+        defer {
+            BrowserContextID.persistNativeBlockID(nil, for: chapterID, context: .primary)
+            BrowserContextID.persistNativeBlockID(nil, for: chapterID, context: .secondary)
+        }
+
+        XCTAssertNotEqual(
+            BrowserContextID.primary.chapterNativeBlockDefaultsKey(for: chapterID),
+            BrowserContextID.secondary.chapterNativeBlockDefaultsKey(for: chapterID)
+        )
+        BrowserContextID.persistNativeBlockID("reader-one-block", for: chapterID, context: .primary)
+        BrowserContextID.persistNativeBlockID("reader-two-block", for: chapterID, context: .secondary)
+
+        XCTAssertEqual(
+            BrowserContextID.storedNativeBlockID(for: chapterID, context: .primary),
+            "reader-one-block"
+        )
+        XCTAssertEqual(
+            BrowserContextID.storedNativeBlockID(for: chapterID, context: .secondary),
+            "reader-two-block"
+        )
+    }
+
+    func testAttributedTextPreservesInlineFormattingAndLinks() throws {
+        let url = try XCTUnwrap(URL(string: "#section-102"))
+        let text = NativeReaderAttributedTextBuilder.attributedText(
+            runs: [
+                NativeReaderRuntimeTextRun(
+                    text: "Linked provision",
+                    styles: [.bold, .italic, .underline],
+                    linkTarget: url.absoluteString
+                )
+            ],
+            fallbackText: "",
+            theme: .default,
+            role: .body,
+            accentColor: .systemBlue
+        )
+        let attributes = text.attributes(at: 0, effectiveRange: nil)
+        let font = try XCTUnwrap(attributes[.font] as? UIFont)
+
+        XCTAssertTrue(font.fontDescriptor.symbolicTraits.contains(.traitBold))
+        XCTAssertTrue(font.fontDescriptor.symbolicTraits.contains(.traitItalic))
+        XCTAssertEqual(attributes[.underlineStyle] as? Int, NSUnderlineStyle.single.rawValue)
+        XCTAssertEqual((attributes[.link] as? URL)?.fragment, "section-102")
+
+        let plainText = NativeReaderAttributedTextBuilder.attributedText(
+            runs: [NativeReaderRuntimeTextRun(text: "Body", styles: [], linkTarget: nil)],
+            fallbackText: "",
+            theme: .default,
+            role: .body,
+            accentColor: .systemBlue
+        )
+        let plainFont = try XCTUnwrap(plainText.attribute(.font, at: 0, effectiveRange: nil) as? UIFont)
+        XCTAssertEqual(plainFont.familyName, UIFont.systemFont(ofSize: 12).familyName)
+    }
+
+    func testNativeHeadingPresentationRecoversPublishedHierarchy() {
+        func heading(_ text: String, sourceLevel: Int) -> NativeReaderRuntimeBlock {
+            NativeReaderRuntimeBlock(
+                id: text,
+                kind: .heading,
+                sourceOrder: 0,
+                sectionID: nil,
+                anchorIDs: [],
+                plainText: text,
+                runs: [],
+                headingLevel: sourceLevel,
+                listItems: []
+            )
+        }
+
+        XCTAssertEqual(
+            NativeReaderHeadingPresentation(block: heading("Chapter 1: Administration", sourceLevel: 6)),
+            NativeReaderHeadingPresentation(level: 1, style: .chapter)
+        )
+        XCTAssertEqual(
+            NativeReaderHeadingPresentation(block: heading("Section BC 101: General", sourceLevel: 6)),
+            NativeReaderHeadingPresentation(level: 2, style: .majorSection)
+        )
+        XCTAssertEqual(
+            NativeReaderHeadingPresentation(block: heading("101.4 Referenced codes.", sourceLevel: 6)),
+            NativeReaderHeadingPresentation(level: 3, style: .provision)
+        )
+        XCTAssertEqual(
+            NativeReaderHeadingPresentation(block: heading("101.4.2.1 Prior code buildings.", sourceLevel: 6)),
+            NativeReaderHeadingPresentation(level: 5, style: .provision)
+        )
+        XCTAssertEqual(
+            NativeReaderHeadingPresentation(block: heading("EBC 101 GENERAL", sourceLevel: 3)),
+            NativeReaderHeadingPresentation(level: 3, style: .provision)
+        )
+
+        let nestedHeading = heading("101.4.2.1 Prior code buildings.", sourceLevel: 6)
+        let nestedParagraph = NativeReaderRuntimeBlock(
+            id: "nested-paragraph",
+            kind: .paragraph,
+            sourceOrder: 1,
+            sectionID: nil,
+            anchorIDs: [],
+            plainText: "Nested body",
+            runs: [],
+            headingLevel: nil,
+            listItems: []
+        )
+        let displayBlocks = NativeReaderDisplayBlock.blocks(from: [nestedHeading, nestedParagraph])
+        XCTAssertEqual(displayBlocks.map(\.hierarchyIndentation), [24, 24])
     }
 }

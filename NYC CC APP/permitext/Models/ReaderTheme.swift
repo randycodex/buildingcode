@@ -297,9 +297,9 @@ private extension ReaderFontChoice {
         switch self {
         case .sfPro:
             #if canImport(UIKit)
-            return UIFont(name: "SFProText-Regular", size: size)
-                ?? UIFont(name: ".SFUIText-Regular", size: size)
-                ?? .systemFont(ofSize: size)
+            // System font APIs are the supported way to request SF Pro. Hidden
+            // `.SFUIText-*` names can resolve to Times New Roman on newer iOS.
+            return .systemFont(ofSize: size)
             #else
             return .systemFont(ofSize: size)
             #endif
@@ -345,9 +345,7 @@ private extension ReaderFontChoice {
         switch self {
         case .sfPro:
             #if canImport(UIKit)
-            return UIFont(name: "SFProText-Semibold", size: size)
-                ?? UIFont(name: ".SFUIText-Semibold", size: size)
-                ?? .systemFont(ofSize: size, weight: .semibold)
+            return .systemFont(ofSize: size, weight: .semibold)
             #else
             return .boldSystemFont(ofSize: size)
             #endif

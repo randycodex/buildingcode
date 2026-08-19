@@ -10,6 +10,7 @@ struct AttributedTextView: View {
     var onOpenImage: ((UIImage) -> Void)? = nil
     var onContentTap: (() -> Void)? = nil
     var onSelectionChange: ((Bool) -> Void)? = nil
+    var onOpenLink: ((URL) -> Void)? = nil
     private let textBlocks: [AttributedTextBlock]
 
     @State private var availableWidth: CGFloat = 0
@@ -18,12 +19,14 @@ struct AttributedTextView: View {
         attributedText: NSAttributedString,
         onOpenImage: ((UIImage) -> Void)? = nil,
         onContentTap: (() -> Void)? = nil,
-        onSelectionChange: ((Bool) -> Void)? = nil
+        onSelectionChange: ((Bool) -> Void)? = nil,
+        onOpenLink: ((URL) -> Void)? = nil
     ) {
         self.attributedText = attributedText
         self.onOpenImage = onOpenImage
         self.onContentTap = onContentTap
         self.onSelectionChange = onSelectionChange
+        self.onOpenLink = onOpenLink
         self.textBlocks = Self.blocks(for: attributedText)
     }
 
@@ -38,7 +41,8 @@ struct AttributedTextView: View {
                         fillImagesToWidth: true,
                         onOpenImage: onOpenImage,
                         onContentTap: onContentTap,
-                        onSelectionChange: onSelectionChange
+                        onSelectionChange: onSelectionChange,
+                        onOpenLink: onOpenLink
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -50,7 +54,8 @@ struct AttributedTextView: View {
                             fillImagesToWidth: false,
                             onOpenImage: onOpenImage,
                             onContentTap: onContentTap,
-                            onSelectionChange: onSelectionChange
+                            onSelectionChange: onSelectionChange,
+                            onOpenLink: onOpenLink
                         )
                         .frame(
                             width: preferredTableWidth(for: block.attributedText, availableWidth: max(availableWidth, 1)),
@@ -145,12 +150,14 @@ private struct AttributedTextContainer: UIViewRepresentable {
     var onOpenImage: ((UIImage) -> Void)?
     var onContentTap: (() -> Void)?
     var onSelectionChange: ((Bool) -> Void)?
+    var onOpenLink: ((URL) -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(
             onOpenImage: onOpenImage,
             onContentTap: onContentTap,
-            onSelectionChange: onSelectionChange
+            onSelectionChange: onSelectionChange,
+            onOpenLink: onOpenLink
         )
     }
 
@@ -180,6 +187,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
         context.coordinator.onOpenImage = onOpenImage
         context.coordinator.onContentTap = onContentTap
         context.coordinator.onSelectionChange = onSelectionChange
+        context.coordinator.onOpenLink = onOpenLink
         uiView.attachmentTapHandler = { image in
             context.coordinator.onOpenImage?(image)
         }
@@ -288,19 +296,33 @@ private struct AttributedTextContainer: UIViewRepresentable {
         var onOpenImage: ((UIImage) -> Void)?
         var onContentTap: (() -> Void)?
         var onSelectionChange: ((Bool) -> Void)?
+        var onOpenLink: ((URL) -> Void)?
 
         init(
             onOpenImage: ((UIImage) -> Void)?,
             onContentTap: (() -> Void)?,
-            onSelectionChange: ((Bool) -> Void)?
+            onSelectionChange: ((Bool) -> Void)?,
+            onOpenLink: ((URL) -> Void)?
         ) {
             self.onOpenImage = onOpenImage
             self.onContentTap = onContentTap
             self.onSelectionChange = onSelectionChange
+            self.onOpenLink = onOpenLink
         }
 
         func textViewDidChangeSelection(_ textView: UITextView) {
             onSelectionChange?(textView.selectedRange.length > 0)
+        }
+
+        func textView(
+            _ textView: UITextView,
+            primaryActionFor textItem: UITextItem,
+            defaultAction: UIAction
+        ) -> UIAction? {
+            guard case .link(let link) = textItem.content, let onOpenLink else { return defaultAction }
+            return UIAction { _ in
+                onOpenLink(link)
+            }
         }
     }
 }

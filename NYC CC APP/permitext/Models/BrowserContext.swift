@@ -159,6 +159,10 @@ enum BrowserContextID: String, Hashable, CaseIterable, Identifiable {
         rawValue + ".chapterAnchor." + String(chapterID)
     }
 
+    func chapterNativeBlockDefaultsKey(for chapterID: Int64) -> String {
+        rawValue + ".chapterNativeBlock." + String(chapterID)
+    }
+
     func chapterScrollOffsetDefaultsKey(for chapterID: Int64) -> String {
         rawValue + ".chapterScrollOffset." + String(chapterID)
     }
@@ -207,6 +211,21 @@ enum BrowserContextID: String, Hashable, CaseIterable, Identifiable {
             UserDefaults.standard.set(trimmed, forKey: context.chapterAnchorDefaultsKey(for: chapterID))
         } else {
             UserDefaults.standard.removeObject(forKey: context.chapterAnchorDefaultsKey(for: chapterID))
+        }
+    }
+
+    static func storedNativeBlockID(for chapterID: Int64, context: BrowserContextID) -> String? {
+        let key = context.chapterNativeBlockDefaultsKey(for: chapterID)
+        let value = UserDefaults.standard.string(forKey: key)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return (value?.isEmpty == false) ? value : nil
+    }
+
+    static func persistNativeBlockID(_ blockID: String?, for chapterID: Int64, context: BrowserContextID) {
+        let trimmed = blockID?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let trimmed, !trimmed.isEmpty {
+            UserDefaults.standard.set(trimmed, forKey: context.chapterNativeBlockDefaultsKey(for: chapterID))
+        } else {
+            UserDefaults.standard.removeObject(forKey: context.chapterNativeBlockDefaultsKey(for: chapterID))
         }
     }
 

@@ -23,6 +23,7 @@ struct BrowseView: View {
     @State private var hasSeededBrowseSection = false
     @State private var pendingReaderCodeSectionName: String?
     @State private var rememberedSectionIDs: [Int64: Int64] = [:]
+    @State private var rememberedNativeBlockIDs: [Int64: String] = [:]
     @State private var rememberedAnchorIDs: [Int64: String] = [:]
     @State private var rememberedScrollOffsets: [Int64: Double] = [:]
     private let tabBarClearance: CGFloat = 104
@@ -211,6 +212,7 @@ struct BrowseView: View {
                 chapter: chapter,
                 initialSection: initialSection,
                 rememberedNativeSectionID: rememberedSectionID,
+                rememberedNativeBlockID: rememberedNativeBlockBinding(for: chapter.id),
                 rememberedAnchorID: rememberedAnchorID,
                 rememberedScrollOffset: rememberedScrollOffset
             )
@@ -550,6 +552,30 @@ struct BrowseView: View {
                     rememberedAnchorIDs.removeValue(forKey: chapterID)
                 }
                 BrowserContextID.persistAnchorID(
+                    trimmed,
+                    for: chapterID,
+                    context: browserContext
+                )
+            }
+        )
+    }
+
+    private func rememberedNativeBlockBinding(for chapterID: Int64) -> Binding<String?> {
+        Binding(
+            get: {
+                rememberedNativeBlockIDs[chapterID] ?? BrowserContextID.storedNativeBlockID(
+                    for: chapterID,
+                    context: browserContext
+                )
+            },
+            set: { newValue in
+                let trimmed = newValue?.trimmingCharacters(in: .whitespacesAndNewlines)
+                if let trimmed, !trimmed.isEmpty {
+                    rememberedNativeBlockIDs[chapterID] = trimmed
+                } else {
+                    rememberedNativeBlockIDs.removeValue(forKey: chapterID)
+                }
+                BrowserContextID.persistNativeBlockID(
                     trimmed,
                     for: chapterID,
                     context: browserContext
