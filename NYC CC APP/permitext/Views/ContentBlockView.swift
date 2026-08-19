@@ -272,22 +272,15 @@ struct NativeReaderTableBlockView: View {
             nativeSimpleTable
         case .isolatedHTML:
             if let sourceHTML = table.sourceHTML {
-                ScrollView(.horizontal) {
-                    TableHTMLView(
-                        html: TableHTMLRenderer.html(
-                            forRawFragment: sourceHTML,
-                            tableID: table.id,
-                            searchQuery: searchQuery,
-                            activeMatchIndex: activeMatchIndex
-                        ),
-                        tableID: table.id,
-                        baseURL: baseURL
-                    )
-                    .frame(width: isolatedTableWidth)
-                }
-                .scrollIndicators(.visible)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .accessibilityLabel(table.caption ?? "Code table")
+                NativeReaderPreparedTableHTMLView(
+                    sourceHTML: sourceHTML,
+                    tableID: table.id,
+                    baseURL: baseURL,
+                    searchQuery: searchQuery,
+                    activeMatchIndex: activeMatchIndex,
+                    tableWidth: isolatedTableWidth,
+                    accessibilityLabel: table.caption ?? "Code table"
+                )
             }
         }
     }
@@ -355,6 +348,84 @@ struct NativeReaderTableBlockView: View {
             Rectangle()
                 .stroke(Color(uiColor: .separator), lineWidth: 0.5)
         }
+    }
+}
+
+private struct NativeReaderPreparedTableHTMLView: View {
+    let sourceHTML: String
+    let tableID: String
+    let baseURL: URL?
+    let searchQuery: String
+    let activeMatchIndex: Int?
+    let tableWidth: CGFloat
+    let accessibilityLabel: String
+
+    @State private var html: String?
+
+    var body: some View {
+        ScrollView(.horizontal) {
+            Group {
+                if let html {
+                    TableHTMLView(html: html, tableID: tableID, baseURL: baseURL)
+                } else {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                        Text("Preparing table")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(minHeight: 80, alignment: .leading)
+                }
+            }
+            .frame(width: tableWidth)
+        }
+        .scrollIndicators(.visible)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityLabel(accessibilityLabel)
+        .task(id: preparationID) {
+            html = nil
+            let signpostID = OSSignpostID(log: AppSignpost.reader)
+            os_signpost(
+                .begin,
+                log: AppSignpost.reader,
+                name: "tableHTMLPrepare",
+                signpostID: signpostID,
+                "%{public}@",
+                tableID
+            )
+            defer {
+                os_signpost(
+                    .end,
+                    log: AppSignpost.reader,
+                    name: "tableHTMLPrepare",
+                    signpostID: signpostID
+                )
+            }
+            let work = Task.detached(priority: .utility) {
+                guard !Task.isCancelled else { throw CancellationError() }
+                return TableHTMLRenderer.html(
+                    forRawFragment: sourceHTML,
+                    tableID: tableID,
+                    searchQuery: searchQuery,
+                    activeMatchIndex: activeMatchIndex
+                )
+            }
+            do {
+                html = try await withTaskCancellationHandler {
+                    try await work.value
+                } onCancel: {
+                    work.cancel()
+                }
+            } catch is CancellationError {
+                return
+            } catch {
+                return
+            }
+        }
+    }
+
+    private var preparationID: String {
+        "\(tableID)|\(sourceHTML.hashValue)|\(searchQuery)|\(activeMatchIndex ?? -1)"
     }
 }
 
@@ -509,6 +580,23 @@ struct ImageBlockView: View {
         .task(id: inlineLoadID) {
             failedToLoad = false
             loadedImage = nil
+            let signpostID = OSSignpostID(log: AppSignpost.reader)
+            os_signpost(
+                .begin,
+                log: AppSignpost.reader,
+                name: "imageDecode",
+                signpostID: signpostID,
+                "%{public}@",
+                imageURL.lastPathComponent
+            )
+            defer {
+                os_signpost(
+                    .end,
+                    log: AppSignpost.reader,
+                    name: "imageDecode",
+                    signpostID: signpostID
+                )
+            }
             let bucket = displayWidth.map { ImageBlockCache.sizeBucket(forMaxPixelSize: $0 * UIScreen.main.scale * 2) }
             if let bucket, let cached = ImageBlockCache.shared.inlineImage(for: imageURL, sizeBucket: bucket) {
                 loadedImage = cached
@@ -516,12 +604,20 @@ struct ImageBlockView: View {
             }
 
             let targetPixelSize = bucket ?? 2_048
-            let image = await Task.detached(priority: .utility) {
+            let work = Task.detached(priority: .utility) {
+                guard !Task.isCancelled else { return nil as UIImage? }
                 guard let data = try? Data(contentsOf: imageURL, options: [.mappedIfSafe]) else {
                     return nil as UIImage?
                 }
+                guard !Task.isCancelled else { return nil }
                 return ImageBlockCache.downsampledImage(data: data, maxPixelSize: targetPixelSize)
-            }.value
+            }
+            let image = await withTaskCancellationHandler {
+                await work.value
+            } onCancel: {
+                work.cancel()
+            }
+            guard !Task.isCancelled else { return }
 
             guard let image,
                   image.size.width > 1 || image.size.height > 1
@@ -606,6 +702,34 @@ final class ImageBlockCache {
         return image
     }
 
+    func prefetchInlineImages(from urls: [URL], maxPixelSize: Int) async {
+        let bucket = Self.sizeBucket(forMaxPixelSize: CGFloat(maxPixelSize))
+        for url in urls {
+            guard !Task.isCancelled else { return }
+            if inlineImage(for: url, sizeBucket: bucket) != nil { continue }
+            let work = Task.detached(priority: .utility) {
+                guard !Task.isCancelled,
+                      let data = try? Data(contentsOf: url, options: [.mappedIfSafe])
+                else { return nil as UIImage? }
+                guard !Task.isCancelled else { return nil }
+                return Self.downsampledImage(data: data, maxPixelSize: bucket)
+            }
+            let image = await withTaskCancellationHandler {
+                await work.value
+            } onCancel: {
+                work.cancel()
+            }
+            guard !Task.isCancelled else { return }
+            if let image {
+                setInlineImage(image, for: url, sizeBucket: bucket)
+            }
+        }
+    }
+
+    func removeAll() {
+        cache.removeAllObjects()
+    }
+
     private func inlineCacheKey(url: URL, sizeBucket: Int) -> NSString {
         "\(url.path)|\(sizeBucket)" as NSString
     }
@@ -656,6 +780,11 @@ private final class ContentBlockImageURLCache {
 
         missingCache.setObject(key, forKey: key)
         return nil
+    }
+
+    func removeAll() {
+        cache.removeAllObjects()
+        missingCache.removeAllObjects()
     }
 }
 
@@ -777,6 +906,13 @@ private struct TableWebView: UIViewRepresentable {
         var readAccessURL: URL?
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            os_signpost(
+                .event,
+                log: AppSignpost.reader,
+                name: "tableLoad",
+                "%{public}@",
+                tableID ?? "unknown"
+            )
             measureHeight(in: webView, remainingPasses: 4)
         }
 
@@ -844,6 +980,11 @@ private enum TableHTMLHeightCache {
             heights.removeValue(forKey: evicted)
         }
     }
+
+    static func removeAll() {
+        heights.removeAll(keepingCapacity: false)
+        keys.removeAll(keepingCapacity: false)
+    }
 }
 
 private final class TableHTMLDocumentCache {
@@ -864,6 +1005,19 @@ private final class TableHTMLDocumentCache {
         let html = build()
         cache.setObject(html as NSString, forKey: cacheKey, cost: html.utf8.count)
         return html
+    }
+
+    func removeAll() {
+        cache.removeAllObjects()
+    }
+}
+
+enum ContentBlockRuntimeCaches {
+    static func handleMemoryWarning() {
+        ImageBlockCache.shared.removeAll()
+        ContentBlockImageURLCache.shared.removeAll()
+        TableHTMLHeightCache.removeAll()
+        TableHTMLDocumentCache.shared.removeAll()
     }
 }
 

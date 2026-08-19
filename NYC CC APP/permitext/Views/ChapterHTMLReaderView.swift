@@ -24,6 +24,10 @@ private enum ChapterSearchEntryCache {
         cache.setObject(CachedChapterSearchEntries(entries), forKey: key, cost: memoryCost(entries))
     }
 
+    static func removeAll() {
+        cache.removeAllObjects()
+    }
+
     static func key(
         chapterURL: URL,
         chapterID: Int64,
@@ -48,6 +52,12 @@ private enum ChapterSearchEntryCache {
 
     private static func stringMemoryCost(_ value: String) -> Int {
         max(value.utf8.count, value.utf16.count * 2)
+    }
+}
+
+enum ChapterHTMLReaderRuntimeCaches {
+    static func handleMemoryWarning() {
+        ChapterSearchEntryCache.removeAll()
     }
 }
 
@@ -101,6 +111,7 @@ struct ChapterHTMLReaderView: View {
     @State private var inlineReferenceDestination: CodeSectionSummary?
     @State private var htmlLoadState: ChapterHTMLLoadState = .loading
     @State private var htmlReloadTrigger = 0
+    @State private var nativeReaderRoute: NativeReaderDocumentRoute?
 #if DEBUG
     @State private var debugReaderPresentation: DebugChapterReaderPresentation = .html
     @State private var nativeReaderFallbackMessage: String?
@@ -142,11 +153,6 @@ struct ChapterHTMLReaderView: View {
 
     private var chapterURL: URL? {
         htmlStore.chapterURL(chapterNumber: chapter.chapterNumber)
-    }
-
-    private var nativeReaderRoute: NativeReaderDocumentRoute? {
-        guard let chapterURL else { return nil }
-        return NativeReaderDocumentStore.shared.debugRoute(for: chapterURL)
     }
 
     private var usesNativeDebugReader: Bool {
@@ -382,6 +388,11 @@ struct ChapterHTMLReaderView: View {
             }
         }
         .tint(accentColor)
+        .task(id: chapterURL?.standardizedFileURL.path) {
+            nativeReaderRoute = nil
+            guard let chapterURL else { return }
+            nativeReaderRoute = await NativeReaderDocumentStore.shared.debugRoute(for: chapterURL)
+        }
         .onAppear {
             ensureHTMLStoreCached()
             library.noteChapterOpened(chapter: chapter)

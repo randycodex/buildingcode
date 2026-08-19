@@ -8,6 +8,8 @@ enum AppSignpost {
     static let bundle = OSLog(subsystem: subsystem, category: "Bundle")
     static let search = OSLog(subsystem: subsystem, category: "Search")
     static let startup = OSLog(subsystem: subsystem, category: "Startup")
+    static let projects = OSLog(subsystem: subsystem, category: "Projects")
+    static let memory = OSLog(subsystem: subsystem, category: "Memory")
 }
 
 struct UserContentSyncPreviewReport: Hashable, Sendable {

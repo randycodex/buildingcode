@@ -1,3 +1,4 @@
+import os.signpost
 import SwiftUI
 import UIKit
 
@@ -16,6 +17,7 @@ struct NativeChapterTextReaderView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.openURL) private var openURL
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @State private var document: NativeReaderRuntimeDocument?
     @State private var displayBlocks: [NativeReaderDisplayBlock] = []
     @State private var sectionTargets: [NativeReaderSectionTarget] = []
@@ -31,6 +33,7 @@ struct NativeChapterTextReaderView: View {
     @State private var searchMatches: [NativeReaderSearchMatch] = []
     @State private var activeSearchMatchID: String?
     @State private var lastRecordedSectionTargetID: String?
+    @State private var nearbyMediaPrefetchTask: Task<Void, Never>?
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -48,13 +51,23 @@ struct NativeChapterTextReaderView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .task(id: route.id) {
+            .task(id: "\(route.id)|\(isBrowserTabActive)") {
+                guard isBrowserTabActive else { return }
                 await loadDocument()
             }
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .fullScreenCover(item: $expandedMedia) { media in
             ZoomableImageViewer(image: media.image, accessibilityText: media.accessibilityText)
+        }
+        .onChange(of: isBrowserTabActive) { _, isActive in
+            guard !isActive else { return }
+            nearbyMediaPrefetchTask?.cancel()
+            nearbyMediaPrefetchTask = nil
+        }
+        .onDisappear {
+            nearbyMediaPrefetchTask?.cancel()
+            nearbyMediaPrefetchTask = nil
         }
     }
 
@@ -108,6 +121,7 @@ struct NativeChapterTextReaderView: View {
         .onChange(of: visibleBlockID) { _, newValue in
             guard pendingInitialBlockID == nil else { return }
             persistLocation(blockID: newValue, document: document)
+            scheduleNearbyMediaPrefetch(around: newValue, document: document)
         }
         .onChange(of: searchQuery) { _, query in
             searchMatches = NativeReaderSearchIndex.matches(query: query, in: displayBlocks)
@@ -176,6 +190,10 @@ struct NativeChapterTextReaderView: View {
 
     @MainActor
     private func loadDocument() async {
+        if let document, document.documentID == route.documentID {
+            scheduleNearbyMediaPrefetch(around: visibleBlockID, document: document)
+            return
+        }
         document = nil
         displayBlocks = []
         sectionTargets = []
@@ -189,10 +207,13 @@ struct NativeChapterTextReaderView: View {
         searchMatches = []
         activeSearchMatchID = nil
         lastRecordedSectionTargetID = nil
+        nearbyMediaPrefetchTask?.cancel()
+        nearbyMediaPrefetchTask = nil
 
         do {
-            let loaded = try await NativeReaderDocumentStore.shared.loadDocument(for: route)
+            let prepared = try await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route)
             guard !Task.isCancelled else { return }
+            let loaded = prepared.document
             let initialBlockID = NativeReaderLocationResolver.initialBlockID(
                 in: loaded,
                 rememberedBlockID: rememberedBlockID.wrappedValue,
@@ -200,14 +221,18 @@ struct NativeChapterTextReaderView: View {
                 initialAnchorID: initialAnchorID,
                 initialSectionNumber: initialSectionNumber
             )
-            let loadedDisplayBlocks = NativeReaderDisplayBlock.blocks(from: loaded.blocks)
-            displayBlocks = loadedDisplayBlocks
-            sectionTargets = NativeReaderSectionNavigator.targets(
-                in: loaded,
-                displayBlocks: loadedDisplayBlocks
-            )
+            displayBlocks = prepared.displayBlocks
+            sectionTargets = prepared.sectionTargets
             document = loaded
             persistLocation(blockID: initialBlockID, document: loaded)
+            scheduleNearbyMediaPrefetch(around: initialBlockID, document: loaded)
+            os_signpost(
+                .event,
+                log: AppSignpost.reader,
+                name: "nativeChapterReady",
+                "blocks=%{public}d",
+                prepared.displayBlocks.count
+            )
             guard initialBlockID != loaded.blocks.first?.id else {
                 return
             }
@@ -215,6 +240,36 @@ struct NativeChapterTextReaderView: View {
         } catch {
             guard !Task.isCancelled else { return }
             requestFallbackToHTML(error.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func scheduleNearbyMediaPrefetch(
+        around displayBlockID: String?,
+        document: NativeReaderRuntimeDocument
+    ) {
+        nearbyMediaPrefetchTask?.cancel()
+        nearbyMediaPrefetchTask = nil
+        guard let displayBlockID,
+              let sourceBlockID = NativeReaderDisplayBlock.sourceBlockID(
+                  for: displayBlockID,
+                  in: document
+              ),
+              let focusedIndex = document.blocks.firstIndex(where: { $0.id == sourceBlockID })
+        else { return }
+
+        let startIndex = max(document.blocks.startIndex, focusedIndex - 2)
+        let endIndex = min(document.blocks.endIndex, focusedIndex + 3)
+        let urls = document.blocks[startIndex..<endIndex]
+            .flatMap(\.media)
+            .compactMap { NativeReaderDocumentStore.resolvedMediaURL(for: $0, route: route) }
+        guard !urls.isEmpty else { return }
+
+        nearbyMediaPrefetchTask = Task(priority: .utility) {
+            await ImageBlockCache.shared.prefetchInlineImages(
+                from: Array(Set(urls)),
+                maxPixelSize: 1_600
+            )
         }
     }
 
@@ -549,7 +604,7 @@ private struct NativeReaderExpandedMedia: Identifiable {
     let accessibilityText: String?
 }
 
-struct NativeReaderDisplayBlock: Identifiable, Equatable {
+struct NativeReaderDisplayBlock: Identifiable, Equatable, Sendable {
     let id: String
     let sourceBlockID: String
     let block: NativeReaderRuntimeBlock
@@ -679,7 +734,7 @@ struct NativeReaderDisplayBlock: Identifiable, Equatable {
     }
 }
 
-struct NativeReaderSectionTarget: Identifiable, Hashable {
+struct NativeReaderSectionTarget: Identifiable, Hashable, Sendable {
     let id: String
     let blockID: String
     let sourceBlockID: String
@@ -1161,6 +1216,7 @@ private struct NativeReaderTextBlockView: View {
                 selectableText(role: .body)
             case .orderedList, .unorderedList:
                 NativeReaderListBlockView(
+                    cachePrefix: route.id,
                     items: block.listItems,
                     ordered: block.kind == .orderedList,
                     theme: theme,
@@ -1240,16 +1296,15 @@ private struct NativeReaderTextBlockView: View {
     }
 
     private func selectableText(role: NativeReaderTypographyRole) -> some View {
-        AttributedTextView(
-            attributedText: NativeReaderAttributedTextBuilder.attributedText(
-                runs: block.runs,
-                fallbackText: block.plainText,
-                theme: theme,
-                role: role,
-                accentColor: accentColor,
-                highlightRanges: searchMatches.map(\.range),
-                activeHighlightRange: searchMatches.first(where: { $0.id == activeSearchMatchID })?.range
-            ),
+        NativeReaderPreparedAttributedTextView(
+            cacheID: "\(route.id)|\(block.id)|\(role.cacheComponent)",
+            runs: block.runs,
+            fallbackText: block.plainText,
+            theme: theme,
+            role: role,
+            accentColor: accentColor,
+            highlightRanges: searchMatches.map(\.range),
+            activeHighlightRange: searchMatches.first(where: { $0.id == activeSearchMatchID })?.range,
             onOpenLink: onOpenLink,
             onResearchSelection: onResearchSelection
         )
@@ -1406,6 +1461,7 @@ struct NativeReaderHeadingPresentation: Equatable {
 }
 
 private struct NativeReaderListBlockView: View {
+    let cachePrefix: String
     let items: [NativeReaderRuntimeListItem]
     let ordered: Bool
     let theme: ReaderTheme
@@ -1426,17 +1482,16 @@ private struct NativeReaderListBlockView: View {
                         .font(theme.swiftUIFont(emphasized: true))
                         .foregroundStyle(Color(uiColor: accentColor))
                         .frame(minWidth: 18, alignment: .trailing)
-                    AttributedTextView(
-                        attributedText: NativeReaderAttributedTextBuilder.attributedText(
-                            runs: row.runs,
-                            fallbackText: row.plainText,
-                            theme: theme,
-                            role: .body,
-                            accentColor: accentColor,
-                            highlightRanges: NativeReaderSearchIndex.ranges(
-                                of: searchQuery,
-                                in: row.plainText
-                            )
+                    NativeReaderPreparedAttributedTextView(
+                        cacheID: "\(cachePrefix)|list|\(row.id)",
+                        runs: row.runs,
+                        fallbackText: row.plainText,
+                        theme: theme,
+                        role: .body,
+                        accentColor: accentColor,
+                        highlightRanges: NativeReaderSearchIndex.ranges(
+                            of: searchQuery,
+                            in: row.plainText
                         ),
                         onOpenLink: onOpenLink,
                         onResearchSelection: onResearchSelection
@@ -1476,13 +1531,174 @@ private struct NativeReaderListRow: Identifiable {
     }
 }
 
-enum NativeReaderTypographyRole: Equatable {
+enum NativeReaderTypographyRole: Equatable, Sendable {
     case majorHeading(level: Int)
     case heading(level: Int)
     case body
     case caption
     case footnote
     case note
+
+    var cacheComponent: String {
+        switch self {
+        case .majorHeading(let level):
+            return "major-heading-\(level)"
+        case .heading(let level):
+            return "heading-\(level)"
+        case .body:
+            return "body"
+        case .caption:
+            return "caption"
+        case .footnote:
+            return "footnote"
+        case .note:
+            return "note"
+        }
+    }
+}
+
+private final class CachedNativeReaderAttributedText: NSObject, @unchecked Sendable {
+    let value: NSAttributedString
+
+    init(_ value: NSAttributedString) {
+        self.value = value
+    }
+}
+
+final class NativeReaderAttributedTextCache: @unchecked Sendable {
+    static let shared = NativeReaderAttributedTextCache()
+
+    private let cache: NSCache<NSString, CachedNativeReaderAttributedText> = {
+        let cache = NSCache<NSString, CachedNativeReaderAttributedText>()
+        cache.countLimit = 256
+        cache.totalCostLimit = 24 * 1024 * 1024
+        return cache
+    }()
+
+    private init() {}
+
+    func attributedText(
+        cacheKey: String,
+        runs: [NativeReaderRuntimeTextRun],
+        fallbackText: String,
+        theme: ReaderTheme,
+        role: NativeReaderTypographyRole,
+        accentColor: UIColor,
+        highlightRanges: [NSRange],
+        activeHighlightRange: NSRange?
+    ) async throws -> NSAttributedString {
+        let key = cacheKey as NSString
+        if let cached = cache.object(forKey: key) {
+            return cached.value
+        }
+
+        let work = Task.detached(priority: .userInitiated) {
+            try Task.checkCancellation()
+            let value = NativeReaderAttributedTextBuilder.attributedText(
+                runs: runs,
+                fallbackText: fallbackText,
+                theme: theme,
+                role: role,
+                accentColor: accentColor,
+                highlightRanges: highlightRanges,
+                activeHighlightRange: activeHighlightRange
+            )
+            try Task.checkCancellation()
+            return CachedNativeReaderAttributedText(value)
+        }
+        let prepared = try await withTaskCancellationHandler {
+            try await work.value
+        } onCancel: {
+            work.cancel()
+        }
+        let value = prepared.value
+        cache.setObject(
+            CachedNativeReaderAttributedText(value),
+            forKey: key,
+            cost: max(value.length * 4, fallbackText.utf8.count)
+        )
+        return value
+    }
+
+    func removeAll() {
+        cache.removeAllObjects()
+    }
+}
+
+private struct NativeReaderPreparedAttributedTextView: View {
+    let cacheID: String
+    let runs: [NativeReaderRuntimeTextRun]
+    let fallbackText: String
+    let theme: ReaderTheme
+    let role: NativeReaderTypographyRole
+    let accentColor: UIColor
+    let highlightRanges: [NSRange]
+    var activeHighlightRange: NSRange? = nil
+    let onOpenLink: (URL) -> Void
+    let onResearchSelection: (String) -> Void
+
+    @State private var attributedText: NSAttributedString?
+
+    var body: some View {
+        Group {
+            if let attributedText {
+                AttributedTextView(
+                    attributedText: attributedText,
+                    onOpenLink: onOpenLink,
+                    onResearchSelection: onResearchSelection
+                )
+            } else {
+                Text(fallbackText)
+                    .font(theme.swiftUIFont(emphasized: role.isHeading))
+                    .foregroundStyle(role.usesAccentColor ? Color(uiColor: accentColor) : .primary)
+                    .textSelection(.enabled)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .task(id: taskID) {
+            attributedText = nil
+            do {
+                attributedText = try await NativeReaderAttributedTextCache.shared.attributedText(
+                    cacheKey: taskID,
+                    runs: runs,
+                    fallbackText: fallbackText,
+                    theme: theme,
+                    role: role,
+                    accentColor: accentColor,
+                    highlightRanges: highlightRanges,
+                    activeHighlightRange: activeHighlightRange
+                )
+            } catch is CancellationError {
+                return
+            } catch {
+                attributedText = NSAttributedString(string: fallbackText)
+            }
+        }
+    }
+
+    private var taskID: String {
+        let highlights = highlightRanges.map { "\($0.location):\($0.length)" }.joined(separator: ",")
+        let active = activeHighlightRange.map { "\($0.location):\($0.length)" } ?? "none"
+        return "\(cacheID)|\(theme.hashValue)|\(accentColor.hash)|\(highlights)|\(active)"
+    }
+}
+
+private extension NativeReaderTypographyRole {
+    var isHeading: Bool {
+        switch self {
+        case .majorHeading, .heading:
+            return true
+        case .body, .caption, .footnote, .note:
+            return false
+        }
+    }
+
+    var usesAccentColor: Bool {
+        if case .majorHeading = self {
+            return true
+        }
+        return false
+    }
 }
 
 enum NativeReaderAttributedTextBuilder {

@@ -1,6 +1,7 @@
 import CryptoKit
 import Foundation
 import ImageIO
+import os.signpost
 
 enum NativeReaderRuntimeBlockKind: String, Decodable, Sendable {
     case heading
@@ -296,6 +297,24 @@ struct NativeReaderDocumentRoute: Hashable, Sendable {
     }
 }
 
+struct NativeReaderPreparedDocument: Equatable, Sendable {
+    let document: NativeReaderRuntimeDocument
+    let displayBlocks: [NativeReaderDisplayBlock]
+    let sectionTargets: [NativeReaderSectionTarget]
+    let estimatedMemoryCost: Int
+}
+
+struct NativeReaderDocumentStoreMetrics: Equatable, Sendable {
+    let requestCount: Int
+    let cacheHitCount: Int
+    let diskLoadCount: Int
+    let cancellationCount: Int
+    let evictionCount: Int
+    let memoryWarningCount: Int
+    let cachedDocumentCount: Int
+    let cachedMemoryCost: Int
+}
+
 enum NativeReaderDocumentStoreError: LocalizedError, Equatable {
     case indexUnavailable
     case invalidIndex(String)
@@ -381,8 +400,30 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         let passesStructuralValidation: Bool
     }
 
+    private struct PreparedCacheEntry {
+        let preparedDocument: NativeReaderPreparedDocument
+        var accessOrder: UInt64
+    }
+
+    private struct MutableMetrics {
+        var requestCount = 0
+        var cacheHitCount = 0
+        var diskLoadCount = 0
+        var cancellationCount = 0
+        var evictionCount = 0
+        var memoryWarningCount = 0
+    }
+
+    static let preparedDocumentCountLimit = 4
+    static let preparedDocumentCostLimit = 48 * 1024 * 1024
+
     private let corpusRootURL: URL?
-    private let indexResult: Result<Index, NativeReaderDocumentStoreError>
+    private let indexTask: Task<Result<Index, NativeReaderDocumentStoreError>, Never>
+    private let stateLock = NSLock()
+    private var preparedDocuments: [String: PreparedCacheEntry] = [:]
+    private var preparedDocumentMemoryCost = 0
+    private var nextAccessOrder: UInt64 = 0
+    private var mutableMetrics = MutableMetrics()
 
     convenience init(resourceURL: URL? = Bundle.main.resourceURL) {
         let corpusRootURL = resourceURL?
@@ -393,16 +434,19 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     }
 
     init(corpusRootURL: URL?) {
-        self.corpusRootURL = corpusRootURL?.standardizedFileURL
-        indexResult = Self.loadIndex(corpusRootURL: corpusRootURL)
+        let standardizedRootURL = corpusRootURL?.standardizedFileURL
+        self.corpusRootURL = standardizedRootURL
+        indexTask = Task.detached(priority: .utility) {
+            Self.loadIndex(corpusRootURL: standardizedRootURL)
+        }
     }
 
-    func debugRoute(for chapterURL: URL) -> NativeReaderDocumentRoute? {
+    func debugRoute(for chapterURL: URL) async -> NativeReaderDocumentRoute? {
         #if DEBUG
         guard let corpusRootURL,
               let relativePath = Self.relativePath(for: chapterURL, below: corpusRootURL),
               Self.debugPilotSourcePaths.contains(relativePath),
-              case .success(let index) = indexResult,
+              case .success(let index) = await indexTask.value,
               let entry = index.entries.first(where: { $0.relativePath == relativePath }),
               Self.supportsDebugEligibility(entry.eligibility),
               entry.passesStructuralValidation,
@@ -432,9 +476,111 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     }
 
     func loadDocument(for route: NativeReaderDocumentRoute) async throws -> NativeReaderRuntimeDocument {
-        try await Task.detached(priority: .userInitiated) {
-            try Self.loadDocumentSynchronously(for: route)
-        }.value
+        try await loadPreparedDocument(for: route).document
+    }
+
+    func loadPreparedDocument(for route: NativeReaderDocumentRoute) async throws -> NativeReaderPreparedDocument {
+        if let cached = cachedPreparedDocument(for: route.documentID) {
+            return cached
+        }
+
+        let signpostID = OSSignpostID(log: AppSignpost.reader)
+        os_signpost(
+            .begin,
+            log: AppSignpost.reader,
+            name: "nativeDocumentPrepare",
+            signpostID: signpostID,
+            "%{public}@",
+            route.relativeSourcePath
+        )
+        let work = Task.detached(priority: .userInitiated) {
+            let document = try Self.loadDocumentSynchronously(for: route)
+            try Task.checkCancellation()
+            let displayBlocks = NativeReaderDisplayBlock.blocks(from: document.blocks)
+            try Task.checkCancellation()
+            let sectionTargets = NativeReaderSectionNavigator.targets(
+                in: document,
+                displayBlocks: displayBlocks
+            )
+            let derivedCost = displayBlocks.reduce(0) { partial, block in
+                partial
+                    + block.id.utf8.count
+                    + block.sourceBlockID.utf8.count
+                    + block.block.plainText.utf8.count
+                    + 128
+            }
+            return NativeReaderPreparedDocument(
+                document: document,
+                displayBlocks: displayBlocks,
+                sectionTargets: sectionTargets,
+                estimatedMemoryCost: max(route.uncompressedByteCount + derivedCost, 1)
+            )
+        }
+
+        do {
+            let prepared = try await withTaskCancellationHandler {
+                try await work.value
+            } onCancel: {
+                work.cancel()
+            }
+            try Task.checkCancellation()
+            storePreparedDocument(prepared, for: route.documentID)
+            recordDiskLoad()
+            os_signpost(
+                .end,
+                log: AppSignpost.reader,
+                name: "nativeDocumentPrepare",
+                signpostID: signpostID,
+                "blocks=%{public}d cost=%{public}d",
+                prepared.displayBlocks.count,
+                prepared.estimatedMemoryCost
+            )
+            return prepared
+        } catch {
+            if error is CancellationError || Task.isCancelled {
+                recordCancellation()
+            }
+            os_signpost(
+                .end,
+                log: AppSignpost.reader,
+                name: "nativeDocumentPrepare",
+                signpostID: signpostID,
+                "failed"
+            )
+            throw error
+        }
+    }
+
+    func handleMemoryWarning() {
+        stateLock.lock()
+        mutableMetrics.memoryWarningCount += 1
+        preparedDocuments.removeAll(keepingCapacity: true)
+        preparedDocumentMemoryCost = 0
+        stateLock.unlock()
+    }
+
+    func metrics() -> NativeReaderDocumentStoreMetrics {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return NativeReaderDocumentStoreMetrics(
+            requestCount: mutableMetrics.requestCount,
+            cacheHitCount: mutableMetrics.cacheHitCount,
+            diskLoadCount: mutableMetrics.diskLoadCount,
+            cancellationCount: mutableMetrics.cancellationCount,
+            evictionCount: mutableMetrics.evictionCount,
+            memoryWarningCount: mutableMetrics.memoryWarningCount,
+            cachedDocumentCount: preparedDocuments.count,
+            cachedMemoryCost: preparedDocumentMemoryCost
+        )
+    }
+
+    func resetPreparedDocumentsForTesting() {
+        stateLock.lock()
+        preparedDocuments.removeAll(keepingCapacity: false)
+        preparedDocumentMemoryCost = 0
+        nextAccessOrder = 0
+        mutableMetrics = MutableMetrics()
+        stateLock.unlock()
     }
 
     private static func loadIndex(corpusRootURL: URL?) -> Result<Index, NativeReaderDocumentStoreError> {
@@ -463,6 +609,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     private static func loadDocumentSynchronously(
         for route: NativeReaderDocumentRoute
     ) throws -> NativeReaderRuntimeDocument {
+        try Task.checkCancellation()
         guard let compressedData = try? Data(contentsOf: route.documentURL) else {
             throw NativeReaderDocumentStoreError.documentUnavailable(route.relativeSourcePath)
         }
@@ -472,6 +619,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         guard sha256(compressedData) == route.compressedSHA256 else {
             throw NativeReaderDocumentStoreError.hashMismatch(route.relativeSourcePath)
         }
+        try Task.checkCancellation()
         guard let documentData = try? (compressedData as NSData).decompressed(using: .lzfse) as Data else {
             throw NativeReaderDocumentStoreError.decompressionFailed(route.relativeSourcePath)
         }
@@ -481,6 +629,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         guard sha256(documentData) == route.documentSHA256 else {
             throw NativeReaderDocumentStoreError.hashMismatch(route.relativeSourcePath)
         }
+        try Task.checkCancellation()
 
         let document: NativeReaderRuntimeDocument
         do {
@@ -505,9 +654,61 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         else {
             throw NativeReaderDocumentStoreError.sourceMismatch(route.relativeSourcePath)
         }
+        try Task.checkCancellation()
         try validateTables(in: document, for: route)
+        try Task.checkCancellation()
         try validateMedia(in: document, for: route)
         return document
+    }
+
+    private func cachedPreparedDocument(for documentID: String) -> NativeReaderPreparedDocument? {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        mutableMetrics.requestCount += 1
+        guard var entry = preparedDocuments[documentID] else { return nil }
+        mutableMetrics.cacheHitCount += 1
+        nextAccessOrder &+= 1
+        entry.accessOrder = nextAccessOrder
+        preparedDocuments[documentID] = entry
+        return entry.preparedDocument
+    }
+
+    private func storePreparedDocument(_ prepared: NativeReaderPreparedDocument, for documentID: String) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        guard prepared.estimatedMemoryCost <= Self.preparedDocumentCostLimit else { return }
+
+        if let previous = preparedDocuments.removeValue(forKey: documentID) {
+            preparedDocumentMemoryCost -= previous.preparedDocument.estimatedMemoryCost
+        }
+        nextAccessOrder &+= 1
+        preparedDocuments[documentID] = PreparedCacheEntry(
+            preparedDocument: prepared,
+            accessOrder: nextAccessOrder
+        )
+        preparedDocumentMemoryCost += prepared.estimatedMemoryCost
+
+        while preparedDocuments.count > Self.preparedDocumentCountLimit
+                || preparedDocumentMemoryCost > Self.preparedDocumentCostLimit {
+            guard let oldest = preparedDocuments.min(by: { $0.value.accessOrder < $1.value.accessOrder }) else {
+                break
+            }
+            preparedDocumentMemoryCost -= oldest.value.preparedDocument.estimatedMemoryCost
+            preparedDocuments.removeValue(forKey: oldest.key)
+            mutableMetrics.evictionCount += 1
+        }
+    }
+
+    private func recordDiskLoad() {
+        stateLock.lock()
+        mutableMetrics.diskLoadCount += 1
+        stateLock.unlock()
+    }
+
+    private func recordCancellation() {
+        stateLock.lock()
+        mutableMetrics.cancellationCount += 1
+        stateLock.unlock()
     }
 
     private static func supportsDebugEligibility(_ eligibility: NativeReaderRuntimeEligibility) -> Bool {
@@ -534,6 +735,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         }
 
         for table in tables {
+            try Task.checkCancellation()
             guard table.rowCount >= 0,
                   table.columnCount >= 0,
                   !table.structureSHA256.isEmpty,
@@ -631,6 +833,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         }
 
         for item in media {
+            try Task.checkCancellation()
             guard let assetURL = resolvedMediaURL(for: item, route: route) else {
                 throw NativeReaderDocumentStoreError.mediaValidationFailed(
                     "unresolved asset \(item.id) in \(route.relativeSourcePath)"

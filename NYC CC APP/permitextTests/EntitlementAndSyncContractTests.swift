@@ -2945,7 +2945,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
 
         for sourcePath in NativeReaderDocumentStore.debugPilotSourcePaths.sorted() {
             let sourceURL = corpusRootURL.appendingPathComponent(sourcePath)
-            let route = try XCTUnwrap(store.debugRoute(for: sourceURL), sourcePath)
+            let resolvedRoute = await store.debugRoute(for: sourceURL)
+            let route = try XCTUnwrap(resolvedRoute, sourcePath)
             let document = try await store.loadDocument(for: route)
 
             XCTAssertEqual(document.documentID, route.documentID)
@@ -2960,13 +2961,15 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
 
         let eligibleButNotPiloted = corpusRootURL
             .appendingPathComponent("2026-existing-building-code/chapters/2.html")
-        XCTAssertNil(store.debugRoute(for: eligibleButNotPiloted))
+        let ineligibleRoute = await store.debugRoute(for: eligibleButNotPiloted)
+        XCTAssertNil(ineligibleRoute)
     }
 
     func testPhaseFiveComplexTablePilotUsesBoundedIsolatedHTML() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let sourcePath = "2026-zoning-resolution/chapters/APP-D-21241.html"
-        let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+        let resolvedRoute = await store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath))
+        let route = try XCTUnwrap(resolvedRoute)
         let document = try await store.loadDocument(for: route)
         let tables = document.blocks.compactMap(\.table)
 
@@ -2984,7 +2987,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
 
         let oversizedSource = corpusRootURL
             .appendingPathComponent("2026-zoning-resolution/chapters/APP-C-21242.html")
-        XCTAssertNil(store.debugRoute(for: oversizedSource))
+        let oversizedRoute = await store.debugRoute(for: oversizedSource)
+        XCTAssertNil(oversizedRoute)
     }
 
     func testPhaseFourMediaPilotsResolveBundledAssetsAndAccessibilityText() async throws {
@@ -2998,7 +3002,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         ]
 
         for (sourcePath, expectedCount) in expectedMediaCounts {
-            let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+            let resolvedRoute = await store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath))
+            let route = try XCTUnwrap(resolvedRoute)
             let document = try await store.loadDocument(for: route)
             let media = document.blocks.flatMap(\.media)
 
@@ -3018,7 +3023,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
     func testMissingPhaseFourMediaAssetRequiresWholeChapterFallback() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let sourcePath = "2022-construction-codes/code-sections/building-code/chapters/30.html"
-        let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+        let resolvedRoute = await store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath))
+        let route = try XCTUnwrap(resolvedRoute)
         let temporaryRoot = FileManager.default.temporaryDirectory
             .appendingPathComponent("native-reader-phase-4-\(UUID().uuidString)", isDirectory: true)
         defer { try? FileManager.default.removeItem(at: temporaryRoot) }
@@ -3068,7 +3074,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let sourcePath = try XCTUnwrap(NativeReaderDocumentStore.debugPilotSourcePaths.sorted().first)
         let sourceURL = corpusRootURL.appendingPathComponent(sourcePath)
-        let route = try XCTUnwrap(store.debugRoute(for: sourceURL))
+        let resolvedRoute = await store.debugRoute(for: sourceURL)
+        let route = try XCTUnwrap(resolvedRoute)
         let invalidRoute = NativeReaderDocumentRoute(
             relativeSourcePath: route.relativeSourcePath,
             sourceURL: route.sourceURL,
@@ -3092,7 +3099,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
     func testStableBlockAndAnchorLocationResolution() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let sourcePath = "2026-existing-building-code/chapters/1.html"
-        let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+        let resolvedRoute = await store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath))
+        let route = try XCTUnwrap(resolvedRoute)
         let document = try await store.loadDocument(for: route)
         let anchor = try XCTUnwrap(document.anchors.first(where: { $0.blockID != nil }))
         let anchorBlockID = try XCTUnwrap(anchor.blockID)
@@ -3395,7 +3403,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
     func testPhaseSixSectionNavigatorTracksNearestPublishedHeading() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let sourcePath = "2026-existing-building-code/chapters/1.html"
-        let route = try XCTUnwrap(store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath)))
+        let resolvedRoute = await store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath))
+        let route = try XCTUnwrap(resolvedRoute)
         let document = try await store.loadDocument(for: route)
         let displayBlocks = NativeReaderDisplayBlock.blocks(from: document.blocks)
         let targets = NativeReaderSectionNavigator.targets(in: document, displayBlocks: displayBlocks)
@@ -3412,5 +3421,58 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertEqual(targets.map(\.sourceOrder), targets.map(\.sourceOrder).sorted())
         XCTAssertLessThanOrEqual(target.sourceOrder, lastDisplayBlock.block.sourceOrder)
         XCTAssertTrue(targets.allSatisfy { !$0.menuLabel.isEmpty })
+    }
+
+    func testPhaseEightPreparedDocumentCacheIsBoundedAndPurgedOnMemoryWarning() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        store.resetPreparedDocumentsForTesting()
+        let sourcePath = "2026-existing-building-code/chapters/1.html"
+        let resolvedRoute = await store.debugRoute(for: corpusRootURL.appendingPathComponent(sourcePath))
+        let route = try XCTUnwrap(resolvedRoute)
+
+        let first = try await store.loadPreparedDocument(for: route)
+        let second = try await store.loadPreparedDocument(for: route)
+        XCTAssertEqual(first, second)
+
+        var metrics = store.metrics()
+        XCTAssertEqual(metrics.requestCount, 2)
+        XCTAssertEqual(metrics.cacheHitCount, 1)
+        XCTAssertEqual(metrics.diskLoadCount, 1)
+        XCTAssertEqual(metrics.cachedDocumentCount, 1)
+        XCTAssertLessThanOrEqual(
+            metrics.cachedMemoryCost,
+            NativeReaderDocumentStore.preparedDocumentCostLimit
+        )
+
+        store.handleMemoryWarning()
+        metrics = store.metrics()
+        XCTAssertEqual(metrics.memoryWarningCount, 1)
+        XCTAssertEqual(metrics.cachedDocumentCount, 0)
+        XCTAssertEqual(metrics.cachedMemoryCost, 0)
+
+        _ = try await store.loadPreparedDocument(for: route)
+        metrics = store.metrics()
+        XCTAssertEqual(metrics.diskLoadCount, 2)
+        XCTAssertEqual(metrics.cachedDocumentCount, 1)
+    }
+
+    func testPhaseEightPreparedDocumentCacheNeverExceedsCountOrMemoryLimits() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        store.resetPreparedDocumentsForTesting()
+
+        for sourcePath in NativeReaderDocumentStore.debugPilotSourcePaths.sorted() {
+            let sourceURL = corpusRootURL.appendingPathComponent(sourcePath)
+            guard let route = await store.debugRoute(for: sourceURL) else { continue }
+            _ = try await store.loadPreparedDocument(for: route)
+            let metrics = store.metrics()
+            XCTAssertLessThanOrEqual(
+                metrics.cachedDocumentCount,
+                NativeReaderDocumentStore.preparedDocumentCountLimit
+            )
+            XCTAssertLessThanOrEqual(
+                metrics.cachedMemoryCost,
+                NativeReaderDocumentStore.preparedDocumentCostLimit
+            )
+        }
     }
 }

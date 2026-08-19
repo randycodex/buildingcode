@@ -81,6 +81,7 @@ final class UserDataStore: UserContentRepository {
     }
 
     private let connection: SQLiteConnection
+    let databaseURL: URL
     private let isoFormatter = ISO8601DateFormatter()
     private let jsonEncoder = JSONEncoder()
     private let jsonDecoder = JSONDecoder()
@@ -118,8 +119,14 @@ final class UserDataStore: UserContentRepository {
     }
 
     init(databaseURL: URL) throws {
+        self.databaseURL = databaseURL.standardizedFileURL
         connection = try SQLiteConnection(path: databaseURL.path, readOnly: false)
         try createSchema()
+    }
+
+    init(readOnlyDatabaseURL databaseURL: URL) throws {
+        self.databaseURL = databaseURL.standardizedFileURL
+        connection = try SQLiteConnection(path: databaseURL.path, readOnly: true)
     }
 
     func bookmarkedSectionIDs(codeVersion: String) throws -> [Int64] {

@@ -186,6 +186,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var sqliteChapterLoader: SQLiteChapterLoader?
     private var authoredCodeStore: AuthoredCodeStore?
     private let projectPresentationBuilder = ProjectPresentationBuilder()
+    private let projectPresentationSnapshotBuilder = ProjectPresentationSnapshotBuilder()
     private let selectedVersionDefaultsKey = "selectedCodeVersionFileName"
     private let selectedJurisdictionDefaultsKey = "selectedJurisdictionKey"
     private let selectedCodeSectionDefaultsKey = "selectedCodeSectionID"
@@ -1834,10 +1835,34 @@ final class CodeLibraryViewModel: ObservableObject {
         let generation = projectPresentationRefreshGeneration
         projectPresentationRefreshTask?.cancel()
         projectPresentationRefreshTask = Task { [weak self] in
+            let signpostID = OSSignpostID(log: AppSignpost.projects)
+            os_signpost(
+                .begin,
+                log: AppSignpost.projects,
+                name: "projectHydration",
+                signpostID: signpostID
+            )
+            defer {
+                os_signpost(
+                    .end,
+                    log: AppSignpost.projects,
+                    name: "projectHydration",
+                    signpostID: signpostID
+                )
+            }
             do {
                 try await Task.sleep(for: delay)
                 guard !Task.isCancelled, let self else { return }
-                let snapshot = try self.projectPresentationSnapshot()
+                let snapshot: ProjectPresentationSnapshot
+                if let store = self.userContentRepository as? UserDataStore {
+                    snapshot = try await self.projectPresentationSnapshotBuilder.build(
+                        databaseURL: store.databaseURL,
+                        folders: self.folders,
+                        availableVersions: self.availableVersions
+                    )
+                } else {
+                    snapshot = try self.projectPresentationSnapshot()
+                }
                 let presentation = try await self.projectPresentationBuilder.build(snapshot)
                 try Task.checkCancellation()
                 guard generation == self.projectPresentationRefreshGeneration else { return }
@@ -1864,35 +1889,6 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let userContentRepository else {
             return ProjectPresentationSnapshot(folders: [], versions: [:], catalog: [])
         }
-
-        var sectionIDsByFolderAndVersion: [Int64: [String: [Int64]]] = [:]
-        var requiredCodeVersions = Set<String>()
-        for folder in folders {
-            let references = try userContentRepository.evidenceReferences(inFolder: folder.id)
-            for reference in references {
-                sectionIDsByFolderAndVersion[folder.id, default: [:]][reference.codeVersion, default: []]
-                    .append(reference.sectionID)
-                requiredCodeVersions.insert(reference.codeVersion)
-            }
-        }
-
-        var versions: [String: ProjectEvidenceVersionSnapshot] = [:]
-        for codeVersion in requiredCodeVersions {
-            versions[codeVersion] = ProjectEvidenceVersionSnapshot(
-                sectionIDsByFolderID: Dictionary(
-                    uniqueKeysWithValues: folders.map { folder in
-                        let ids = sectionIDsByFolderAndVersion[folder.id]?[codeVersion] ?? []
-                        return (folder.id, Array(Set(ids)).sorted())
-                    }
-                ),
-                bookmarkedSectionIDs: Set(try userContentRepository.bookmarkedSectionIDs(codeVersion: codeVersion)),
-                notesBySectionID: try userContentRepository.noteEntries(codeVersion: codeVersion),
-                tagsBySectionID: try userContentRepository.tagsBySectionID(codeVersion: codeVersion),
-                annotationEntries: try userContentRepository.annotationEntries(codeVersion: codeVersion),
-                bookmarkCreatedAtBySectionID: try userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: codeVersion)
-            )
-        }
-
         let fallbackCatalog = locator.availableCodeVersions()
         let catalog = Dictionary(
             (availableVersions + fallbackCatalog).map {
@@ -1900,7 +1896,11 @@ final class CodeLibraryViewModel: ObservableObject {
             },
             uniquingKeysWith: { first, _ in first }
         ).values.sorted { $0.fileName < $1.fileName }
-        return ProjectPresentationSnapshot(folders: folders, versions: versions, catalog: catalog)
+        return try ProjectPresentationSnapshotAssembler.build(
+            repository: userContentRepository,
+            folders: folders,
+            catalog: catalog
+        )
     }
 
     @discardableResult
@@ -3643,6 +3643,24 @@ final class CodeLibraryViewModel: ObservableObject {
             codeVersion: selectedVersion.codeVersion
         )
 
+        let signpostID = OSSignpostID(log: AppSignpost.reader)
+        os_signpost(
+            .begin,
+            log: AppSignpost.reader,
+            name: "bookmarkMutation",
+            signpostID: signpostID,
+            "sectionID=%{public}lld",
+            sectionID
+        )
+        defer {
+            os_signpost(
+                .end,
+                log: AppSignpost.reader,
+                name: "bookmarkMutation",
+                signpostID: signpostID
+            )
+        }
+
         do {
             try userContentRepository.toggleBookmark(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
             scheduleProjectPresentationRefresh()
@@ -4590,6 +4608,26 @@ final class CodeLibraryViewModel: ObservableObject {
         isSearchInProgress = false
     }
 
+    func suspendReaderWarmups() {
+        lastChapterPreloadTask?.cancel()
+        codeSectionWarmupTask?.cancel()
+        chapterWarmupTasks.values.forEach { $0.cancel() }
+        startupWarmupTask?.cancel()
+        lastChapterPreloadTask = nil
+        codeSectionWarmupTask = nil
+        chapterWarmupTasks.removeAll(keepingCapacity: false)
+        startupWarmupTask = nil
+    }
+
+    func handleMemoryWarning() {
+        suspendReaderWarmups()
+        sectionDetailCache.removeAllObjects()
+        formattedNSTextCache.removeAllObjects()
+        chapterBodyNSTextCache.removeAllObjects()
+        warmedChapterIDs.removeAll(keepingCapacity: false)
+        os_signpost(.event, log: AppSignpost.memory, name: "readerCachesPurged")
+    }
+
     private static func formattedTextCacheKey(sectionID: Int64, theme: ReaderTheme) -> NSString {
         "\(sectionID)|\(theme.hashValue)" as NSString
     }
@@ -4656,6 +4694,81 @@ struct ProjectPresentationSnapshot: Sendable {
 struct ProjectPresentationResult: Sendable, Equatable {
     let rowsByFolderID: [Int64: [BookmarkedSection]]
     let recordCountByFolderID: [Int64: Int]
+}
+
+private enum ProjectPresentationSnapshotAssembler {
+    static func build(
+        repository: UserContentRepository,
+        folders: [CodeFolder],
+        catalog: [BundledCodeVersion]
+    ) throws -> ProjectPresentationSnapshot {
+        var sectionIDsByFolderAndVersion: [Int64: [String: [Int64]]] = [:]
+        var requiredCodeVersions = Set<String>()
+        for folder in folders {
+            try Task.checkCancellation()
+            let references = try repository.evidenceReferences(inFolder: folder.id)
+            for reference in references {
+                sectionIDsByFolderAndVersion[folder.id, default: [:]][reference.codeVersion, default: []]
+                    .append(reference.sectionID)
+                requiredCodeVersions.insert(reference.codeVersion)
+            }
+        }
+
+        var versions: [String: ProjectEvidenceVersionSnapshot] = [:]
+        for codeVersion in requiredCodeVersions {
+            try Task.checkCancellation()
+            versions[codeVersion] = ProjectEvidenceVersionSnapshot(
+                sectionIDsByFolderID: Dictionary(
+                    uniqueKeysWithValues: folders.map { folder in
+                        let ids = sectionIDsByFolderAndVersion[folder.id]?[codeVersion] ?? []
+                        return (folder.id, Array(Set(ids)).sorted())
+                    }
+                ),
+                bookmarkedSectionIDs: Set(try repository.bookmarkedSectionIDs(codeVersion: codeVersion)),
+                notesBySectionID: try repository.noteEntries(codeVersion: codeVersion),
+                tagsBySectionID: try repository.tagsBySectionID(codeVersion: codeVersion),
+                annotationEntries: try repository.annotationEntries(codeVersion: codeVersion),
+                bookmarkCreatedAtBySectionID: try repository.bookmarkCreatedAtBySectionID(codeVersion: codeVersion)
+            )
+        }
+
+        return ProjectPresentationSnapshot(folders: folders, versions: versions, catalog: catalog)
+    }
+}
+
+actor ProjectPresentationSnapshotBuilder {
+    private let locator = BundleDatabaseLocator()
+    private var repositoriesByPath: [String: UserDataStore] = [:]
+
+    func build(
+        databaseURL: URL,
+        folders: [CodeFolder],
+        availableVersions: [BundledCodeVersion]
+    ) throws -> ProjectPresentationSnapshot {
+        try Task.checkCancellation()
+        let path = databaseURL.standardizedFileURL.path
+        let repository: UserDataStore
+        if let cached = repositoriesByPath[path] {
+            repository = cached
+        } else {
+            let loaded = try UserDataStore(readOnlyDatabaseURL: databaseURL)
+            repositoriesByPath[path] = loaded
+            repository = loaded
+        }
+
+        let fallbackCatalog = locator.availableCodeVersions()
+        let catalog = Dictionary(
+            (availableVersions + fallbackCatalog).map {
+                (UserContentSyncCodeVersion.server($0.codeVersion), $0)
+            },
+            uniquingKeysWith: { first, _ in first }
+        ).values.sorted { $0.fileName < $1.fileName }
+        return try ProjectPresentationSnapshotAssembler.build(
+            repository: repository,
+            folders: folders,
+            catalog: catalog
+        )
+    }
 }
 
 enum BookmarkPresentationReducer {

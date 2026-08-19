@@ -179,6 +179,10 @@ enum PreparedChapterHTMLCache {
         }
     }
 
+    static func removeAll() {
+        cache.removeAllObjects()
+    }
+
     private static func cacheKey(chapterURL: URL, colorScheme: ColorScheme) -> NSString {
         "\(chapterURL.path)|\(colorScheme == .dark ? "dark" : "light")" as NSString
     }

@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import os.signpost
 
 extension Notification.Name {
     static let nycccClearRichTextSelection = Notification.Name("nycccClearRichTextSelection")
@@ -19,6 +20,13 @@ enum ReaderSelectionMenuBuilder {
             title: "Research",
             image: UIImage(systemName: researchSystemImageName)
         ) { _ in
+            os_signpost(
+                .event,
+                log: AppSignpost.reader,
+                name: "researchSelection",
+                "characters=%{public}d",
+                normalized.count
+            )
             onResearchSelection(normalized)
         }
         return UIMenu(children: suggestedActions + [research])
@@ -326,6 +334,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
         var onSelectionChange: ((Bool) -> Void)?
         var onOpenLink: ((URL) -> Void)?
         var onResearchSelection: ((String) -> Void)?
+        private var hadSelection = false
 
         init(
             onOpenImage: ((UIImage) -> Void)?,
@@ -342,7 +351,18 @@ private struct AttributedTextContainer: UIViewRepresentable {
         }
 
         func textViewDidChangeSelection(_ textView: UITextView) {
-            onSelectionChange?(textView.selectedRange.length > 0)
+            let hasSelection = textView.selectedRange.length > 0
+            if hasSelection, !hadSelection {
+                os_signpost(
+                    .event,
+                    log: AppSignpost.reader,
+                    name: "textSelection",
+                    "characters=%{public}d",
+                    textView.selectedRange.length
+                )
+            }
+            hadSelection = hasSelection
+            onSelectionChange?(hasSelection)
         }
 
         func textView(

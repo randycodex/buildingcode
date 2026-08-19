@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import os.signpost
 
 @main
 struct PermitextApp: App {
@@ -131,9 +132,24 @@ struct PermitextApp: App {
                     }
                 case .inactive, .background:
                     library.stopForegroundAutomaticSync()
+                    library.suspendReaderWarmups()
                 @unknown default:
                     break
                 }
+            }
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: UIApplication.didReceiveMemoryWarningNotification
+                )
+            ) { _ in
+                library.handleMemoryWarning()
+                PreparedChapterHTMLCache.removeAll()
+                ChapterHTMLReaderRuntimeCaches.handleMemoryWarning()
+                ContentBlockRuntimeCaches.handleMemoryWarning()
+                NativeReaderAttributedTextCache.shared.removeAll()
+                NativeReaderDocumentStore.shared.handleMemoryWarning()
+                os_signpost(.event, log: AppSignpost.memory, name: "memoryWarningHandled")
+                os_log(.info, log: AppSignpost.memory, "memoryWarningHandled")
             }
             .onOpenURL { url in
                 library.handleOpenURL(url)
