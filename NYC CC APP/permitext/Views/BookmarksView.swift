@@ -1241,7 +1241,10 @@ struct ProjectView: View {
         }
         .onAppear {
             isProjectHubVisible = true
-            library.refreshBookmarks()
+            // Reader and save-sheet mutations already publish bookmark and
+            // Project rows optimistically. Avoid re-reading and rebuilding the
+            // full Saved library simply because this destination appeared;
+            // pull-to-refresh remains the explicit reconciliation path.
             library.noteProjectOpened(folderID)
         }
         .onDisappear {

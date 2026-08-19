@@ -850,128 +850,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 } catch (error) {}
               }
 
-              function toggleBookmarkForHeading(heading) {
-                if (!heading) { return; }
-                var anchorID = heading.id || '';
-                var sectionNumber = sectionNumberForHeading(heading);
-                if (!anchorID && !sectionNumber) { return; }
-                try {
-                  window.webkit.messageHandlers.\(Coordinator.openSectionMessageName).postMessage({
-                    action: 'toggleBookmark',
-                    anchorID: anchorID,
-                    sectionNumber: sectionNumber
-                  });
-                } catch (error) {}
-              }
-
-              function installParagraphBookmarkSwipe(heading, node) {
-                if (!heading || !node || node.dataset.nycccBookmarkSwipeReady === 'true') { return; }
-                node.dataset.nycccBookmarkSwipeReady = 'true';
-                node.classList.add('nyccc-swipe-bookmark-target');
-
-                var indicator = document.createElement('span');
-                indicator.className = 'nyccc-swipe-bookmark-indicator';
-                indicator.setAttribute('aria-hidden', 'true');
-                indicator.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4Z"></path></svg>';
-                node.appendChild(indicator);
-
-                var accessibilityButton = document.createElement('button');
-                accessibilityButton.type = 'button';
-                accessibilityButton.className = 'nyccc-bookmark-accessibility-action';
-                accessibilityButton.setAttribute('aria-label', 'Toggle bookmark for this paragraph');
-                accessibilityButton.addEventListener('click', function(event) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  toggleBookmarkForHeading(heading);
-                });
-                node.appendChild(accessibilityButton);
-
-                var startX = null;
-                var startY = null;
-                var lastX = null;
-                var lastY = null;
-                var isHorizontalSwipe = false;
-                var directionLocked = false;
-                var pendingOffset = 0;
-                var offsetAnimationFrame = null;
-
-                function renderOffset(offset) {
-                  pendingOffset = offset;
-                  if (offsetAnimationFrame !== null) { return; }
-                  offsetAnimationFrame = window.requestAnimationFrame(function() {
-                    offsetAnimationFrame = null;
-                    node.style.setProperty('--nyccc-swipe-offset', pendingOffset + 'px');
-                  });
-                }
-
-                function resetSwipe(success) {
-                  if (offsetAnimationFrame !== null) {
-                    window.cancelAnimationFrame(offsetAnimationFrame);
-                    offsetAnimationFrame = null;
-                  }
-                  node.classList.remove('nyccc-swipe-preparing', 'nyccc-swipe-active', 'nyccc-swipe-reveal');
-                  if (success) {
-                    node.classList.add('nyccc-swipe-complete');
-                    window.setTimeout(function() {
-                      node.classList.remove('nyccc-swipe-complete');
-                    }, 420);
-                  }
-                  node.style.removeProperty('--nyccc-swipe-offset');
-                  startX = null;
-                  startY = null;
-                  lastX = null;
-                  lastY = null;
-                  isHorizontalSwipe = false;
-                  directionLocked = false;
-                  pendingOffset = 0;
-                }
-
-                node.addEventListener('touchstart', function(event) {
-                  if (event.touches.length !== 1) { return; }
-                  if (window.getSelection && String(window.getSelection()).trim().length > 0) { return; }
-                  var touch = event.touches[0];
-                  startX = touch.clientX;
-                  startY = touch.clientY;
-                  lastX = startX;
-                  lastY = startY;
-                  node.classList.add('nyccc-swipe-preparing');
-                }, { passive: true });
-
-                node.addEventListener('touchmove', function(event) {
-                  if (startX === null || event.touches.length !== 1) { return; }
-                  var touch = event.touches[0];
-                  lastX = touch.clientX;
-                  lastY = touch.clientY;
-                  var dx = lastX - startX;
-                  var dy = lastY - startY;
-                  if (!directionLocked && Math.abs(dx) + Math.abs(dy) > 10) {
-                    isHorizontalSwipe = dx < 0 && Math.abs(dx) > Math.abs(dy) * 1.25;
-                    directionLocked = true;
-                  }
-                  if (!isHorizontalSwipe) { return; }
-                  event.preventDefault();
-                  var offset = Math.max(-76, Math.min(0, dx * 0.86));
-                  node.classList.add('nyccc-swipe-active');
-                  node.classList.toggle('nyccc-swipe-reveal', offset <= -24);
-                  renderOffset(offset);
-                }, { passive: false });
-
-                node.addEventListener('touchend', function() {
-                  if (startX === null) { return; }
-                  var dx = (lastX === null ? startX : lastX) - startX;
-                  var dy = (lastY === null ? startY : lastY) - startY;
-                  var completed = isHorizontalSwipe && dx <= -58 && Math.abs(dx) > Math.abs(dy) * 1.25;
-                  if (completed) {
-                    toggleBookmarkForHeading(heading);
-                  }
-                  resetSwipe(completed);
-                }, { passive: true });
-
-                node.addEventListener('touchcancel', function() {
-                  resetSwipe(false);
-                }, { passive: true });
-              }
-
               function openInlineReference(sectionNumber, codePrefix) {
                 if (!sectionNumber) { return; }
                 try {
@@ -1258,7 +1136,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     if (node.dataset.nycccSectionTapReady === 'true') { return; }
                     node.dataset.nycccSectionTapReady = 'true';
                     node.classList.add('nyccc-section-open-target');
-                    installParagraphBookmarkSwipe(heading, node);
                     node.addEventListener('click', function(event) {
                       if (event.target.closest('a, button')) { return; }
                       if (window.getSelection && String(window.getSelection()).trim().length > 0) { return; }
@@ -1954,63 +1831,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .nyccc-inline-reference:focus-visible {
               outline: 2px solid \(accentHex) !important;
               outline-offset: 2px !important;
-            }
-            .nyccc-swipe-bookmark-target {
-              position: relative !important;
-              transform: translate3d(var(--nyccc-swipe-offset, 0px), 0, 0);
-              transition: transform 220ms cubic-bezier(0.22, 0.9, 0.28, 1);
-              touch-action: pan-y;
-            }
-            .nyccc-swipe-bookmark-target.nyccc-swipe-preparing {
-              -webkit-user-select: none;
-              user-select: none;
-              -webkit-touch-callout: none;
-              will-change: transform;
-            }
-            .nyccc-swipe-bookmark-target.nyccc-swipe-active {
-              transition: none;
-            }
-            .nyccc-swipe-bookmark-indicator {
-              position: absolute !important;
-              top: 50% !important;
-              right: -3rem !important;
-              display: inline-flex !important;
-              align-items: center !important;
-              justify-content: center !important;
-              width: 2.25rem !important;
-              height: 2.25rem !important;
-              border-radius: 999px !important;
-              color: \(accentHex) !important;
-              background: color-mix(in srgb, \(accentHex) 18%, transparent) !important;
-              opacity: 0 !important;
-              transform: translateY(-50%) scale(0.82) !important;
-              transition: opacity 120ms ease, transform 120ms ease !important;
-              pointer-events: none !important;
-            }
-            .nyccc-swipe-bookmark-target.nyccc-swipe-reveal .nyccc-swipe-bookmark-indicator,
-            .nyccc-swipe-bookmark-target.nyccc-swipe-complete .nyccc-swipe-bookmark-indicator {
-              opacity: 1 !important;
-              transform: translateY(-50%) scale(1) !important;
-            }
-            .nyccc-swipe-bookmark-indicator svg {
-              width: 1.05rem !important;
-              height: 1.05rem !important;
-              fill: currentColor !important;
-              stroke: currentColor !important;
-              stroke-width: 1.8 !important;
-              stroke-linecap: round !important;
-              stroke-linejoin: round !important;
-            }
-            .nyccc-bookmark-accessibility-action {
-              position: absolute !important;
-              width: 1px !important;
-              height: 1px !important;
-              padding: 0 !important;
-              margin: -1px !important;
-              overflow: hidden !important;
-              clip: rect(0, 0, 0, 0) !important;
-              white-space: nowrap !important;
-              border: 0 !important;
             }
             .Section.nyccc-collapsible-heading h6::before {
               content: "" !important;

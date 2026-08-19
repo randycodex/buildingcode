@@ -289,27 +289,36 @@ struct NativeChapterTextReaderView: View {
     }
 
     private var jumpBar: some View {
-        Button {
-            isJumpPickerPresented = true
-        } label: {
-            HStack(spacing: 8) {
-                Text(currentSectionTarget?.menuLabel ?? chapter.displayLabel)
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Image(systemName: "chevron.down")
-                    .font(.caption2.weight(.semibold))
+        HStack(spacing: 10) {
+            Button {
+                isJumpPickerPresented = true
+            } label: {
+                HStack(spacing: 8) {
+                    Text(currentSectionTarget?.menuLabel ?? chapter.displayLabel)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Image(systemName: "chevron.down")
+                        .font(.caption2.weight(.semibold))
+                }
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(accentColor)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 11)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(accentColor)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 11)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .buttonStyle(.plain)
+            .disabled(sectionTargets.isEmpty)
+            .accessibilityLabel("Jump within chapter")
+            .accessibilityValue(currentSectionTarget?.menuLabel ?? chapter.displayLabel)
+
+            ReaderCurrentSectionBookmarkButton(
+                sectionID: currentSectionTarget.flatMap(sectionSummary(for:))?.id
+                    ?? rememberedSectionID.wrappedValue
+                    ?? initialSectionID,
+                accentColor: accentColor
+            )
         }
-        .buttonStyle(.plain)
-        .disabled(sectionTargets.isEmpty)
-        .accessibilityLabel("Jump within chapter")
-        .accessibilityValue(currentSectionTarget?.menuLabel ?? chapter.displayLabel)
         .padding(.horizontal, 16)
         .padding(.top, 6)
         .padding(.bottom, 8)

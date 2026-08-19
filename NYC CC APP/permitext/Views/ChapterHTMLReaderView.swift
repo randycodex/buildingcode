@@ -172,6 +172,19 @@ struct ChapterHTMLReaderView: View {
         return jumpTargets.first?.menuLabel ?? ""
     }
 
+    private var currentBookmarkSectionID: Int64? {
+        if let selectedAnchor,
+           let section = sectionSummary(
+               for: ChapterHTMLSectionTarget(
+                   anchorID: selectedAnchor.anchorID,
+                   sectionNumber: selectedAnchor.sectionNumber
+               )
+           ) {
+            return section.id
+        }
+        return initialSection.id
+    }
+
     private var jumpTargets: [ChapterHTMLJumpTarget] {
         let chapterNumber = normalizedSectionNumber(chapter.chapterNumber)
         let sectionAnchors = anchors.filter {
@@ -372,7 +385,6 @@ struct ChapterHTMLReaderView: View {
         .onAppear {
             ensureHTMLStoreCached()
             library.noteChapterOpened(chapter: chapter)
-            library.refreshBookmarks()
             if targetAnchorID == nil {
                 let anchor = restoredInitialAnchor
                 selectedAnchor = anchor
@@ -569,8 +581,6 @@ struct ChapterHTMLReaderView: View {
             onOpenSectionForAnchor: { target in
                 if target.action == "openReference" {
                     openInlineReference(target)
-                } else if target.action == "toggleBookmark" {
-                    toggleBookmark(for: target)
                 }
             },
             onResearchSelection: { target in
@@ -652,6 +662,10 @@ struct ChapterHTMLReaderView: View {
             .buttonStyle(.plain)
             .disabled(jumpTargets.isEmpty)
 
+            ReaderCurrentSectionBookmarkButton(
+                sectionID: currentBookmarkSectionID,
+                accentColor: accentColor
+            )
         }
         .padding(.horizontal, 16)
         .padding(.top, 6)
@@ -790,13 +804,6 @@ struct ChapterHTMLReaderView: View {
         }
 
         return nil
-    }
-
-    private func toggleBookmark(for target: ChapterHTMLSectionTarget) {
-        guard let section = sectionSummary(for: target) else { return }
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        _ = library.toggleBookmark(sectionID: section.id)
-        recomputeSavedDecorations()
     }
 
     private func openInlineReference(_ target: ChapterHTMLSectionTarget) {

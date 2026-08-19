@@ -19,8 +19,6 @@ struct ChapterReaderView: View {
     @State private var selectedJumpSectionID: Int64?
     @State private var pendingScrollSectionID: Int64?
     @State private var expandedInlineImage: UIImage?
-    @State private var visibleBookmarkedSectionIDs: Set<Int64> = []
-    @State private var visibleBookmarkedSectionNumbers: Set<String> = []
     @State private var duplicateHeadingSectionIDs: Set<Int64> = []
     @State private var hasActiveTextSelection = false
     @State private var isJumpPickerPresented = false
@@ -215,16 +213,12 @@ struct ChapterReaderView: View {
             await loadBlocks(with: proxy)
         }
         .onAppear {
-            syncVisibleSavedState()
             updateScrollProgress(from: lastBlockOffsets)
         }
         .onChange(of: isBrowserTabActive) { _, isActive in
             if isActive {
                 updateScrollProgress(from: lastBlockOffsets)
             }
-        }
-        .onChange(of: library.bookmarkRevision) { _, _ in
-            syncVisibleSavedState()
         }
         .onDisappear {
             focusedSectionUpdateTask?.cancel()
@@ -249,12 +243,6 @@ struct ChapterReaderView: View {
 
     private func visibleBlockSection(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> some View {
         let depth = block.sectionNumber.hierarchyIndentLevel
-        let normalizedSectionNumber = block.sectionNumber
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
-            .uppercased()
-        let isBookmarked = visibleBookmarkedSectionIDs.contains(block.id)
-            || visibleBookmarkedSectionNumbers.contains(normalizedSectionNumber)
         let showsHierarchyBar = block.kind != .textBlock
         let barWidth: CGFloat = showsHierarchyBar ? hierarchyBarWidth(forDepth: depth) : 0
         let barOpacity: Double = showsHierarchyBar ? hierarchyBarOpacity(forDepth: depth) : 0
@@ -311,16 +299,6 @@ struct ChapterReaderView: View {
             CodeHairline().padding(.top, 2)
         }
         .id(block.id)
-        .modifier(
-            ParagraphBookmarkSwipeModifier(
-                isBookmarked: isBookmarked,
-                accentColor: accentColor,
-                onToggle: {
-                    _ = library.toggleBookmark(sectionID: block.id)
-                    syncVisibleSavedState()
-                }
-            )
-        )
         .background(
             GeometryReader { geo in
                 Color.clear.preference(
@@ -409,6 +387,10 @@ struct ChapterReaderView: View {
             .buttonStyle(.plain)
             .disabled(visibleJumpBlocks.isEmpty)
 
+            ReaderCurrentSectionBookmarkButton(
+                sectionID: pendingFocusedSectionID ?? selectedJumpSectionID ?? blocks.first?.id,
+                accentColor: accentColor
+            )
         }
         .padding(.horizontal, 16)
         .padding(.top, 6)
@@ -491,7 +473,6 @@ struct ChapterReaderView: View {
             : initialSectionID
 
         blocks = summaries
-        syncVisibleSavedState()
         refreshDuplicateHeadingSet()
         selectedJumpSectionID = initialLoadSectionID
         scrollPositionSectionID = initialLoadSectionID
@@ -622,21 +603,6 @@ struct ChapterReaderView: View {
         }
     }
 
-    private func syncVisibleSavedState() {
-        visibleBookmarkedSectionIDs = Set(
-            blocks.map(\.id).filter { library.isBookmarked(sectionID: $0) }
-        )
-        visibleBookmarkedSectionNumbers = Set(
-            blocks.compactMap { block in
-                guard library.isBookmarked(sectionID: block.id) else { return nil }
-                return block.sectionNumber
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                    .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
-                    .uppercased()
-            }
-        )
-    }
-
     private func jumpLabel(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> String {
         block.kind == .textBlock ? block.displayTitle : "\(block.sectionNumber) \(block.displayTitle)"
     }
@@ -712,6 +678,41 @@ struct ChapterReaderView: View {
             }
             self.pendingScrollSectionID = nil
         }
+    }
+}
+
+struct ReaderCurrentSectionBookmarkButton: View {
+    let sectionID: Int64?
+    let accentColor: Color
+
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var displayedIsBookmarked = false
+
+    var body: some View {
+        Button {
+            guard let sectionID else { return }
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            displayedIsBookmarked.toggle()
+            displayedIsBookmarked = library.toggleBookmark(sectionID: sectionID)
+        } label: {
+            Image(systemName: displayedIsBookmarked ? "bookmark.fill" : "bookmark")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(displayedIsBookmarked ? accentColor : Color.secondary)
+                .frame(width: 44, height: 44)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(sectionID == nil)
+        .accessibilityLabel(displayedIsBookmarked ? "Remove current section bookmark" : "Save current section")
+        .accessibilityValue(displayedIsBookmarked ? "Saved" : "Not saved")
+        .onAppear { synchronizeState() }
+        .onChange(of: sectionID) { _, _ in synchronizeState() }
+        .onChange(of: library.bookmarkRevision) { _, _ in synchronizeState() }
+    }
+
+    private func synchronizeState() {
+        displayedIsBookmarked = sectionID.map { library.isBookmarked(sectionID: $0) } ?? false
     }
 }
 
@@ -958,68 +959,6 @@ private struct ChapterNoteProjectPickerSheet: View {
         }
         .presentationDetents([.medium, .large])
         .tint(accentColor)
-    }
-}
-
-private struct ParagraphBookmarkSwipeModifier: ViewModifier {
-    let isBookmarked: Bool
-    let accentColor: Color
-    let onToggle: () -> Void
-
-    @GestureState private var dragTranslation: CGSize = .zero
-    @State private var didCompleteSwipe = false
-
-    private var horizontalOffset: CGFloat {
-        let dx = dragTranslation.width
-        let dy = dragTranslation.height
-        guard dx < 0, abs(dx) > abs(dy) * 1.25 else { return 0 }
-        return max(dx, -88)
-    }
-
-    func body(content: Content) -> some View {
-        ZStack(alignment: .trailing) {
-            Image(systemName: isBookmarked ? "bookmark.slash.fill" : "bookmark.fill")
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(accentColor)
-                .frame(width: 44, height: 44)
-                .background(accentColor.opacity(0.16), in: Circle())
-                .padding(.trailing, 8)
-                .opacity(horizontalOffset <= -28 || didCompleteSwipe ? 1 : 0)
-                .scaleEffect(horizontalOffset <= -68 || didCompleteSwipe ? 1 : 0.84)
-                .allowsHitTesting(false)
-
-            content
-                .offset(x: horizontalOffset)
-        }
-        .contentShape(Rectangle())
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 18, coordinateSpace: .local)
-                .updating($dragTranslation) { value, state, _ in
-                    let dx = value.translation.width
-                    let dy = value.translation.height
-                    guard dx < 0, abs(dx) > abs(dy) * 1.25 else { return }
-                    state = value.translation
-                }
-                .onEnded { value in
-                    let dx = value.translation.width
-                    let dy = value.translation.height
-                    guard dx <= -68, abs(dx) > abs(dy) * 1.25 else { return }
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    onToggle()
-                    withAnimation(.easeOut(duration: 0.16)) {
-                        didCompleteSwipe = true
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.42) {
-                        withAnimation(.easeOut(duration: 0.16)) {
-                            didCompleteSwipe = false
-                        }
-                    }
-                }
-        )
-        .accessibilityAction(named: Text(isBookmarked ? "Remove paragraph bookmark" : "Bookmark paragraph")) {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            onToggle()
-        }
     }
 }
 

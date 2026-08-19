@@ -1660,6 +1660,165 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testPhaseSevenBookmarkPresentationReducerAppliesImmediateSaveAndRemoveState() {
+        let plainBookmark = BookmarkedSection(
+            id: 101,
+            codeVersion: "nyc-test",
+            chapterNumber: "1",
+            chapterTitle: "Administration",
+            sectionNumber: "101.1",
+            title: "Scope"
+        )
+        let notedBookmark = BookmarkedSection(
+            id: 202,
+            codeVersion: "nyc-test",
+            chapterNumber: "2",
+            chapterTitle: "Definitions",
+            sectionNumber: "202.1",
+            title: "General",
+            noteBody: "Keep this note"
+        )
+        let paragraphEvidence = BookmarkedSection(
+            id: 202,
+            annotationBlockID: "paragraph-2",
+            codeVersion: "nyc-test",
+            chapterNumber: "2",
+            chapterTitle: "Definitions",
+            sectionNumber: "202.1",
+            title: "General",
+            noteBody: "Paragraph note"
+        )
+
+        let removedPlain = BookmarkPresentationReducer.updatedRows(
+            [plainBookmark],
+            sectionID: 101,
+            isBookmarked: false,
+            newSectionRow: nil
+        )
+        XCTAssertTrue(removedPlain.isEmpty)
+
+        let retainedEvidence = BookmarkPresentationReducer.updatedRows(
+            [notedBookmark, paragraphEvidence],
+            sectionID: 202,
+            isBookmarked: false,
+            newSectionRow: nil
+        )
+        XCTAssertEqual(retainedEvidence.count, 2)
+        XCTAssertTrue(retainedEvidence.allSatisfy { !$0.isBookmarked })
+
+        let added = BookmarkPresentationReducer.updatedRows(
+            [],
+            sectionID: 101,
+            isBookmarked: true,
+            newSectionRow: plainBookmark
+        )
+        XCTAssertEqual(added.map(\.id), [101])
+        XCTAssertTrue(added.allSatisfy(\.isBookmarked))
+    }
+
+    func testPhaseSevenProjectPresentationBuildsFromAnImmutableSnapshot() async throws {
+        let databaseURL = try temporaryLegacySearchDatabase()
+        defer { try? FileManager.default.removeItem(at: databaseURL) }
+
+        let codeVersion = "nyc-phase-seven-test"
+        let folder = CodeFolder(
+            id: 77,
+            clientID: "phase-seven-folder",
+            ownerID: UserDataDefaults.localOwnerID,
+            visibility: .personal,
+            syncState: .localOnly,
+            deletedAt: nil,
+            codeVersion: codeVersion,
+            name: "Phase Seven",
+            address: "",
+            description: "",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .project,
+            sortOrder: 0,
+            createdAt: Date(timeIntervalSince1970: 10),
+            updatedAt: Date(timeIntervalSince1970: 10)
+        )
+        let snapshot = ProjectPresentationSnapshot(
+            folders: [folder],
+            versions: [
+                codeVersion: ProjectEvidenceVersionSnapshot(
+                    sectionIDsByFolderID: [folder.id: [1]],
+                    bookmarkedSectionIDs: [1],
+                    notesBySectionID: [:],
+                    tagsBySectionID: [:],
+                    annotationEntries: [],
+                    bookmarkCreatedAtBySectionID: [1: Date(timeIntervalSince1970: 20)]
+                )
+            ],
+            catalog: [
+                BundledCodeVersion(
+                    fileName: "phase-seven.sqlite",
+                    fileURL: databaseURL,
+                    codeVersion: codeVersion,
+                    contentKind: .sqlite,
+                    authoredCodeID: nil,
+                    jurisdictionID: nil,
+                    jurisdictionName: "New York City",
+                    authoredHTMLBundlePath: nil
+                )
+            ]
+        )
+
+        let result = try await ProjectPresentationBuilder().build(snapshot)
+
+        XCTAssertEqual(result.recordCountByFolderID[folder.id], 1)
+        XCTAssertEqual(result.rowsByFolderID[folder.id]?.map(\.id), [1])
+        XCTAssertEqual(result.rowsByFolderID[folder.id]?.first?.title, "Fire resistance")
+    }
+
+    func testPhaseSevenCurrentSectionBookmarkControlReplacesParagraphSwipeImplementations() throws {
+        let currentSectionControl = ReaderCurrentSectionBookmarkButton(
+            sectionID: nil,
+            accentColor: .orange
+        )
+        XCTAssertNil(currentSectionControl.sectionID)
+
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let htmlSourceURL = projectRoot.appendingPathComponent("permitext/Views/ChapterHTMLWebView.swift")
+        // Swift source files are available to simulator tests running from the
+        // Mac checkout, but not inside a physical-device test process. The
+        // device still compiles and constructs the production control above;
+        // retain the stronger source-removal assertions wherever the checkout
+        // is reachable.
+        guard FileManager.default.fileExists(atPath: htmlSourceURL.path) else { return }
+        let htmlSource = try String(
+            contentsOf: htmlSourceURL,
+            encoding: .utf8
+        )
+        let chapterSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/ChapterReaderView.swift"),
+            encoding: .utf8
+        )
+        let nativeSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/NativeChapterTextReaderView.swift"),
+            encoding: .utf8
+        )
+        let htmlReaderSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/ChapterHTMLReaderView.swift"),
+            encoding: .utf8
+        )
+        let projectsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/BookmarksView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertFalse(htmlSource.contains("installParagraphBookmarkSwipe"))
+        XCTAssertFalse(htmlSource.contains("nyccc-swipe-bookmark"))
+        XCTAssertFalse(htmlSource.contains("action: 'toggleBookmark'"))
+        XCTAssertFalse(chapterSource.contains("ParagraphBookmarkSwipeModifier"))
+        XCTAssertTrue(chapterSource.contains("struct ReaderCurrentSectionBookmarkButton"))
+        XCTAssertTrue(nativeSource.contains("ReaderCurrentSectionBookmarkButton"))
+        XCTAssertTrue(htmlReaderSource.contains("ReaderCurrentSectionBookmarkButton"))
+        XCTAssertEqual(projectsSource.components(separatedBy: "library.refreshBookmarks()").count - 1, 1)
+    }
+
     func testQueuedBookmarkDeleteSurvivesPullUntilItUploads() throws {
         let databaseURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-delete-merge-\(UUID().uuidString).sqlite")
