@@ -115,7 +115,7 @@ struct AttributedTextView: View {
     private static func blocks(for text: NSAttributedString) -> [AttributedTextBlock] {
         let nsText = text.string as NSString
         guard nsText.length > 0 else {
-            return [AttributedTextBlock(kind: .flow, attributedText: text)]
+            return [AttributedTextBlock(id: 0, kind: .flow, attributedText: text)]
         }
 
         var blocks: [AttributedTextBlock] = []
@@ -129,15 +129,27 @@ struct AttributedTextView: View {
             if let lastIndex = blocks.indices.last, blocks[lastIndex].kind == paragraphKind {
                 let combined = NSMutableAttributedString(attributedString: blocks[lastIndex].attributedText)
                 combined.append(paragraphText)
-                blocks[lastIndex] = AttributedTextBlock(kind: paragraphKind, attributedText: combined)
+                blocks[lastIndex] = AttributedTextBlock(
+                    id: blocks[lastIndex].id,
+                    kind: paragraphKind,
+                    attributedText: combined
+                )
             } else {
-                blocks.append(AttributedTextBlock(kind: paragraphKind, attributedText: paragraphText))
+                blocks.append(
+                    AttributedTextBlock(
+                        id: blocks.count,
+                        kind: paragraphKind,
+                        attributedText: paragraphText
+                    )
+                )
             }
 
             location = paragraphRange.upperBound
         }
 
-        return blocks.isEmpty ? [AttributedTextBlock(kind: .flow, attributedText: text)] : blocks
+        return blocks.isEmpty
+            ? [AttributedTextBlock(id: 0, kind: .flow, attributedText: text)]
+            : blocks
     }
 
     private static func containsTable(in text: NSAttributedString) -> Bool {
@@ -163,7 +175,7 @@ private struct AttributedTextBlock: Identifiable {
         case table
     }
 
-    let id = UUID()
+    let id: Int
     let kind: Kind
     let attributedText: NSAttributedString
 }
@@ -234,29 +246,64 @@ private struct AttributedTextContainer: UIViewRepresentable {
             context.coordinator.onSelectionChange?(hasSelection)
         }
 
-        let renderedText = renderedAttributedText()
-        if !uiView.attributedText.isEqual(to: renderedText) {
-            uiView.attributedText = renderedText
+        let contentSizeCategory = uiView.traitCollection.preferredContentSizeCategory
+        if context.coordinator.requiresTextUpdate(
+            source: attributedText,
+            contentWidth: contentWidth,
+            fillImagesToWidth: fillImagesToWidth,
+            contentSizeCategory: contentSizeCategory
+        ) {
+            let renderedText = renderedAttributedText()
+            if !uiView.attributedText.isEqual(to: renderedText) {
+                uiView.attributedText = renderedText
+            }
+            context.coordinator.didUpdateText(
+                source: attributedText,
+                contentWidth: contentWidth,
+                fillImagesToWidth: fillImagesToWidth,
+                contentSizeCategory: contentSizeCategory
+            )
         }
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: RichTextView, context: Context) -> CGSize? {
         let width = max(max(contentWidth, proposal.width ?? contentWidth), 1)
+        let contentSizeCategory = uiView.traitCollection.preferredContentSizeCategory
+        if let cachedSize = context.coordinator.cachedMeasuredSize(
+            source: attributedText,
+            width: width,
+            contentSizeCategory: contentSizeCategory
+        ) {
+            return cachedSize
+        }
         let fittingSize = CGSize(width: width, height: .greatestFiniteMagnitude)
         let measuredSize = uiView.sizeThatFits(fittingSize)
-        return CGSize(width: width, height: ceil(measuredSize.height))
+        let result = CGSize(width: width, height: ceil(measuredSize.height))
+        context.coordinator.storeMeasuredSize(
+            result,
+            source: attributedText,
+            width: width,
+            contentSizeCategory: contentSizeCategory
+        )
+        return result
     }
 
     private func renderedAttributedText() -> NSAttributedString {
         guard attributedText.length > 0 else { return attributedText }
 
-        let rendered = NSMutableAttributedString(attributedString: attributedText)
-        let fullRange = NSRange(location: 0, length: rendered.length)
-        var replacements: [(NSRange, NSAttributedString)] = []
+        let fullRange = NSRange(location: 0, length: attributedText.length)
+        var attachments: [(NSRange, NSTextAttachment)] = []
 
-        rendered.enumerateAttribute(.attachment, in: fullRange) { value, range, _ in
+        attributedText.enumerateAttribute(.attachment, in: fullRange) { value, range, _ in
             guard let attachment = value as? NSTextAttachment else { return }
-            guard let sourceImage = image(from: attachment) else { return }
+            attachments.append((range, attachment))
+        }
+        guard !attachments.isEmpty else { return attributedText }
+
+        let rendered = NSMutableAttributedString(attributedString: attributedText)
+        var replacements: [(NSRange, NSAttributedString)] = []
+        for (range, attachment) in attachments {
+            guard let sourceImage = image(from: attachment) else { continue }
 
             let replacementAttachment = ReaderImageAttachment()
             replacementAttachment.sourceImage = sourceImage
@@ -272,7 +319,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
             )
 
             let replacement = NSMutableAttributedString(attachment: replacementAttachment)
-            let attributes = rendered.attributes(at: range.location, effectiveRange: nil)
+            let attributes = attributedText.attributes(at: range.location, effectiveRange: nil)
                 .filter { $0.key != .attachment }
             replacement.addAttributes(attributes, range: NSRange(location: 0, length: replacement.length))
             replacements.append((range, replacement))
@@ -335,6 +382,14 @@ private struct AttributedTextContainer: UIViewRepresentable {
         var onOpenLink: ((URL) -> Void)?
         var onResearchSelection: ((String) -> Void)?
         private var hadSelection = false
+        private weak var lastRenderedSource: NSAttributedString?
+        private var lastRenderedContentWidth: CGFloat?
+        private var lastRenderedFillImagesToWidth: Bool?
+        private var lastRenderedContentSizeCategory: UIContentSizeCategory?
+        private weak var measuredSource: NSAttributedString?
+        private var measuredWidth: CGFloat?
+        private var measuredContentSizeCategory: UIContentSizeCategory?
+        private var measuredSize: CGSize?
 
         init(
             onOpenImage: ((UIImage) -> Void)?,
@@ -348,6 +403,57 @@ private struct AttributedTextContainer: UIViewRepresentable {
             self.onSelectionChange = onSelectionChange
             self.onOpenLink = onOpenLink
             self.onResearchSelection = onResearchSelection
+        }
+
+        func requiresTextUpdate(
+            source: NSAttributedString,
+            contentWidth: CGFloat,
+            fillImagesToWidth: Bool,
+            contentSizeCategory: UIContentSizeCategory
+        ) -> Bool {
+            lastRenderedSource !== source
+                || lastRenderedContentWidth != contentWidth
+                || lastRenderedFillImagesToWidth != fillImagesToWidth
+                || lastRenderedContentSizeCategory != contentSizeCategory
+        }
+
+        func didUpdateText(
+            source: NSAttributedString,
+            contentWidth: CGFloat,
+            fillImagesToWidth: Bool,
+            contentSizeCategory: UIContentSizeCategory
+        ) {
+            lastRenderedSource = source
+            lastRenderedContentWidth = contentWidth
+            lastRenderedFillImagesToWidth = fillImagesToWidth
+            lastRenderedContentSizeCategory = contentSizeCategory
+            measuredSource = nil
+            measuredWidth = nil
+            measuredContentSizeCategory = nil
+            measuredSize = nil
+        }
+
+        func cachedMeasuredSize(
+            source: NSAttributedString,
+            width: CGFloat,
+            contentSizeCategory: UIContentSizeCategory
+        ) -> CGSize? {
+            guard measuredSource === source,
+                  measuredWidth == width,
+                  measuredContentSizeCategory == contentSizeCategory else { return nil }
+            return measuredSize
+        }
+
+        func storeMeasuredSize(
+            _ size: CGSize,
+            source: NSAttributedString,
+            width: CGFloat,
+            contentSizeCategory: UIContentSizeCategory
+        ) {
+            measuredSource = source
+            measuredWidth = width
+            measuredContentSizeCategory = contentSizeCategory
+            measuredSize = size
         }
 
         func textViewDidChangeSelection(_ textView: UITextView) {

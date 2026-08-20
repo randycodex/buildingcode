@@ -404,6 +404,26 @@ public struct NativeReaderChapterAnalysis: Codable, Equatable, Sendable {
     }
 }
 
+public enum NativeReaderRolloutTier: String, Codable, CaseIterable, Sendable {
+    case textOnly
+    case media
+    case nativeTable
+    case isolatedTableFallback
+
+    public init(blocks: [NativeReaderBlock]) {
+        let tables = blocks.compactMap(\.table)
+        if tables.contains(where: { $0.renderingClassification == .isolatedHTML }) {
+            self = .isolatedTableFallback
+        } else if !tables.isEmpty {
+            self = .nativeTable
+        } else if blocks.contains(where: { !$0.media.isEmpty }) {
+            self = .media
+        } else {
+            self = .textOnly
+        }
+    }
+}
+
 public struct NativeReaderDocumentIndexEntry: Codable, Equatable, Sendable {
     public let relativePath: String
     public let sourceSHA256: String
@@ -414,6 +434,7 @@ public struct NativeReaderDocumentIndexEntry: Codable, Equatable, Sendable {
     public let uncompressedByteCount: Int
     public let compressedByteCount: Int
     public let blockCount: Int
+    public let rolloutTier: NativeReaderRolloutTier
     public let eligibility: NativeReaderEligibility
     public let passesStructuralValidation: Bool
 
@@ -427,6 +448,7 @@ public struct NativeReaderDocumentIndexEntry: Codable, Equatable, Sendable {
         uncompressedByteCount: Int,
         compressedByteCount: Int,
         blockCount: Int,
+        rolloutTier: NativeReaderRolloutTier,
         eligibility: NativeReaderEligibility,
         passesStructuralValidation: Bool
     ) {
@@ -439,6 +461,7 @@ public struct NativeReaderDocumentIndexEntry: Codable, Equatable, Sendable {
         self.uncompressedByteCount = uncompressedByteCount
         self.compressedByteCount = compressedByteCount
         self.blockCount = blockCount
+        self.rolloutTier = rolloutTier
         self.eligibility = eligibility
         self.passesStructuralValidation = passesStructuralValidation
     }
@@ -453,7 +476,7 @@ public struct NativeReaderDocumentIndex: Codable, Equatable, Sendable {
     public let entries: [NativeReaderDocumentIndexEntry]
 
     public init(corpusSHA256: String, entries: [NativeReaderDocumentIndexEntry]) {
-        schemaVersion = 1
+        schemaVersion = 2
         documentSchemaVersion = NativeReaderChapterDocument.schemaVersion
         parserSchemaVersion = CorpusInventoryGenerator.parserSchemaVersion
         compression = "lzfse"

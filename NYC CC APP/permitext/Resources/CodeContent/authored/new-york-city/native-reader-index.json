@@ -18,6 +18,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "10456f1c1e57f252281af38744468b6981d5a7f02d03b997d21f3056e4651927",
       "uncompressedByteCount" : 294238
     },
@@ -38,6 +39,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/10.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4fd0fc8a3f660169cc57543509e861f4872c905932965e1eb75eaf9738a0f193",
       "uncompressedByteCount" : 1900740
     },
@@ -58,6 +60,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/11.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "692ec25dd8edbc6c1a36394f4902d75765540d12e55a3b7321bfb0d4d2d875ab",
       "uncompressedByteCount" : 872505
     },
@@ -78,6 +81,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/12.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "75e244f730d9ec6c3d5532f55279ac29569c060d6eb9ec43889a958627dc0ee3",
       "uncompressedByteCount" : 385467
     },
@@ -96,6 +100,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/13.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0da138a63020ee54ad091529ecb082b1a5f2d1c7e036f2e9d49887aeda5e5e4f",
       "uncompressedByteCount" : 6339
     },
@@ -116,6 +121,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/14.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "cf44bb32a571c3d02b1fa1df266da049d64271ca1589ed5a9dde6c4e08031df0",
       "uncompressedByteCount" : 445825
     },
@@ -136,6 +142,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/15.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "85332a18b5e820942716ee2e0bf8194e4d2c570f79f950a3c435c3156eb602db",
       "uncompressedByteCount" : 667718
     },
@@ -156,6 +163,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/16.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "216dc8c6716b3eef10964e2ea0af640a4d3b51d9a11e1d9829409ee46f859930",
       "uncompressedByteCount" : 1538014
     },
@@ -176,6 +184,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/17.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "1408771baf4e6d8f5538f1938047dc0aba368be4bab6dd8c9d4738d2939bc3a5",
       "uncompressedByteCount" : 1028149
     },
@@ -196,6 +205,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/18.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "7920ebe767cf353a28799158284eac29016761a7488763bd35c06f627ea8d67e",
       "uncompressedByteCount" : 1296385
     },
@@ -216,6 +226,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/19.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "79314936331c5c9dfb88031b3c5b081018275ec0ac90559f23b016d5d46c731b",
       "uncompressedByteCount" : 536937
     },
@@ -235,6 +246,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "1df5c0160a9f6199e155f375beb6e75b6c303061ac7a51bca8abb9534efd5425",
       "uncompressedByteCount" : 1738724
     },
@@ -253,6 +265,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/20.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "87c692a714034b2a4725bf50c2f7bd82a163315a74bdfb46d4458cc8849759b4",
       "uncompressedByteCount" : 15965
     },
@@ -273,6 +286,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/21.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "fc11cae5ebefd37f337d8de722263d76bb16a42a6d0fe612753156203e593554",
       "uncompressedByteCount" : 571168
     },
@@ -291,6 +305,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/22.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "9da48b7a35e8ae5a48cbcc18a7ea5a145362fcda515e26e698eac4d3f5d162c1",
       "uncompressedByteCount" : 174161
     },
@@ -311,6 +326,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/23.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "25a6caf728a7e0013cfad6b1621f4e48214751b06c863eac7dd89664c82fa892",
       "uncompressedByteCount" : 4760655
     },
@@ -332,6 +348,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/24.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d158b03cc543b164a5051bdbc28c864b6dc9ba3b4257042bb01c19df36cf6090",
       "uncompressedByteCount" : 278086
     },
@@ -352,6 +369,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/25.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "80b9f96c081769827649d95a0e20901fed1d4e42676b133d22e83d2ae0940212",
       "uncompressedByteCount" : 237137
     },
@@ -372,6 +390,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/26.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "7aa75ec56923b60638333cf24a8111e8de847d843cb325d1420761f0f3f15f17",
       "uncompressedByteCount" : 452604
     },
@@ -390,6 +409,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/27.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a53e5ecf80338fd5a704746806e40c04e8090ef46f2c285a049b72c875fd9351",
       "uncompressedByteCount" : 99123
     },
@@ -408,6 +428,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/28.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f800be8efa0667cb6c46c52bfc6c1b953f8acf4fe7cbe2ea08f85e2d91fb6c1d",
       "uncompressedByteCount" : 4741
     },
@@ -426,6 +447,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/29.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "28f5e44c3d9d92260117e527162f9aa4e149a8798a2ec62e9e3a46d5c30f3205",
       "uncompressedByteCount" : 4568
     },
@@ -446,6 +468,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3d3cbd7ffcea8b43cc1962e35ec41a4808550f7c366fa006b2fe6659bf8b2984",
       "uncompressedByteCount" : 633822
     },
@@ -464,6 +487,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/30.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "bd60bb838ed8570ec0626aa714f7a7aada45b89ff896c03322d1ace0883e2c60",
       "uncompressedByteCount" : 348667
     },
@@ -483,6 +507,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/31.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ff7db8ecc7467a75c86c96ed21a6ce0a85270e911439ca0406526555c8817d48",
       "uncompressedByteCount" : 386160
     },
@@ -502,6 +527,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/32.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "504d44780f09672b310e8942f339ba4fb3e606d3ca523382d1ab2355a50487e8",
       "uncompressedByteCount" : 196574
     },
@@ -523,6 +549,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/33.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "659f1a7bdd959776b43659e436e14919e1387d2d714c85ef839b7abb3c4c13c3",
       "uncompressedByteCount" : 3210888
     },
@@ -541,6 +568,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/34.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "db3cb68f79a00bc23955172fdbb547ac8492362294204e352373e0ed6cd111a7",
       "uncompressedByteCount" : 1762
     },
@@ -559,6 +587,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/35.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f1d3d273da361a0bb228ff56655ac5b4b6110cb2f972db67d3db22765f677ba8",
       "uncompressedByteCount" : 1300743
     },
@@ -579,6 +608,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6063dbe9fa9179c795ee0d912dc41cd576dfa1eb307a4212bbf8ef0d377cb7d6",
       "uncompressedByteCount" : 1904485
     },
@@ -599,6 +629,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6562530cfcb211c3f58582cff7723119233c9f29392ae941ec2e5ced2e647fab",
       "uncompressedByteCount" : 1353624
     },
@@ -619,6 +650,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "38d14455bf298079738d668f3f5c05b4d032d1de4171f76278a11b6e70e27c52",
       "uncompressedByteCount" : 149407
     },
@@ -639,6 +671,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/7.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "c6c023d433a5e445b461cf90fe6e0ddd8213c937e562bfdb48cc130e85674b97",
       "uncompressedByteCount" : 3433317
     },
@@ -659,6 +692,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e6fe86675f8afaff92823110bc1ee2c6a7803b934f0ffe85dc41bbdcaabb9967",
       "uncompressedByteCount" : 206701
     },
@@ -679,6 +713,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/9.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b4a6e90d7961d9a3a597a7af06d78871c5ce0ce0f4bdb4730cc1163ea999cee8",
       "uncompressedByteCount" : 1658111
     },
@@ -697,6 +732,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/A.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "db8dfff86f4f8349dd6a55661dfb7ec2e1b0496879b51a574f10f90cd2096ef5",
       "uncompressedByteCount" : 1756
     },
@@ -715,6 +751,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/B.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "610afa28d365ec545e56b7927652fe1b59996a3bc045340e3b2f76d625325578",
       "uncompressedByteCount" : 1756
     },
@@ -733,6 +770,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/C.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "fb20b429ac5e8b70c98090ddf79452a27a6bcc573e5c381c3c02f1d53b9f9c29",
       "uncompressedByteCount" : 1756
     },
@@ -752,6 +790,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/D.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "d841a28ce203bfa10a76d6c67acbfc919581eaa1b229447cebd76d98ec82b2fe",
       "uncompressedByteCount" : 90822
     },
@@ -771,6 +810,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/E.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "15390104a54eb39408de478411ada0970a81c941bd69cf4a893fc5f9894d7b17",
       "uncompressedByteCount" : 145446
     },
@@ -789,6 +829,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/F.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "850d9e829df4c1fc8e07b52b3e76cea36ce94aca518e98ae68d1d3533c8f9cad",
       "uncompressedByteCount" : 27939
     },
@@ -810,6 +851,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/G.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "34ce0e653cca922df51f64c085e1d363485ed3cda478d4a9eb261e33d6d16c1e",
       "uncompressedByteCount" : 737680
     },
@@ -830,6 +872,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/H.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f6c6f37046898d0715e842f31f123861154a051dcbae6be3e628600e512a4055",
       "uncompressedByteCount" : 190967
     },
@@ -848,6 +891,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/I.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "453c84417b3e154e413263a060e5162fa3c1e271dfbb71f461ec037e96b384da",
       "uncompressedByteCount" : 1754
     },
@@ -866,6 +910,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/J.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "275cf1e10c5ef2324cc759f6a35900d4be8d28126c4d0d0a8aa5db12b95ef712",
       "uncompressedByteCount" : 1784
     },
@@ -884,6 +929,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/K.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "c70c0c070012d80770942dd760239f874c131912e0058f21fcc8ebc5e598506b",
       "uncompressedByteCount" : 1568548
     },
@@ -902,6 +948,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/K1.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "c70c0c070012d80770942dd760239f874c131912e0058f21fcc8ebc5e598506b",
       "uncompressedByteCount" : 1569101
     },
@@ -920,6 +967,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/K2.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "c70c0c070012d80770942dd760239f874c131912e0058f21fcc8ebc5e598506b",
       "uncompressedByteCount" : 1569112
     },
@@ -938,6 +986,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/K3.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "c70c0c070012d80770942dd760239f874c131912e0058f21fcc8ebc5e598506b",
       "uncompressedByteCount" : 1569110
     },
@@ -956,6 +1005,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/L.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "17d6251ca03bd563fa1fee5cb11c8376786fb6a7a31fefd1b4aa87455536e2c1",
       "uncompressedByteCount" : 1756
     },
@@ -974,6 +1024,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/M.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "d33fba28df1843d3f8861ec83bdf59501c92803231ec6b6716becf47ab31b26c",
       "uncompressedByteCount" : 21776
     },
@@ -993,6 +1044,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/N.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "74d3c9ad44f523cbb57468fa63d58f17fd5557a19893cbc810a7a74707418715",
       "uncompressedByteCount" : 39470
     },
@@ -1011,6 +1063,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/O.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "9cfff670775d0302df9e2ea383511770fa23eab705e65dab09eff3aea7981786",
       "uncompressedByteCount" : 1756
     },
@@ -1029,6 +1082,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/P.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "17bc37e89a9da2012bd7cbc38b3ada15dccd2e094043ca1bd8ada0521e6a6685",
       "uncompressedByteCount" : 1756
     },
@@ -1048,6 +1102,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/Q.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "56cd829ce0b96972ac7b5469a3b2e89c54bc51064301f4f4cbdbcd5da10b41b3",
       "uncompressedByteCount" : 855541
     },
@@ -1066,6 +1121,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/R.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "3c7d63bb6db9c8c8f061eab39cace3fc7db4da8fd3c6072ada32fb674e577203",
       "uncompressedByteCount" : 63189
     },
@@ -1084,6 +1140,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/S.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "4b2c58610be338040db8f4005408fede6f77ec7dad716bde9fa6fbc49b76cefe",
       "uncompressedByteCount" : 29749
     },
@@ -1104,6 +1161,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/chapters/U.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2cccd89fe3c8e1f8757e2f5848e11b78fcfbf210553ceffd6640e95567d62fa9",
       "uncompressedByteCount" : 203499
     },
@@ -1122,6 +1180,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "505be29790433a13dbb0c867c8371637dbc69c30f9a11d55f3c1dd62be485029",
       "uncompressedByteCount" : 302840
     },
@@ -1142,6 +1201,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/10.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "bcd0144f59fce3902beff150683b665769367cfcc81e27a2555c6b615333e23f",
       "uncompressedByteCount" : 1951846
     },
@@ -1162,6 +1222,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/11.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "bf004b8f4dd9dfc69e1e3f672bbdb0a4d99cf5166284480c56a2aa3f6d867d96",
       "uncompressedByteCount" : 897759
     },
@@ -1182,6 +1243,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/12.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a71385f66d2008c0d5dced2c7b45ef6c042f32e3831cd45760e91929c973c5a2",
       "uncompressedByteCount" : 395385
     },
@@ -1200,6 +1262,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/13.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "274981b54d2c714f495208a45ceb282607bf51f43739984fd4a578ca059e51b5",
       "uncompressedByteCount" : 6569
     },
@@ -1220,6 +1283,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/14.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "eb031d425a6cb7cf09d7090a00c8371d7e8c7e2e11677f4ae15eed3d65050c9e",
       "uncompressedByteCount" : 457703
     },
@@ -1240,6 +1304,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/15.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "fcdc0f8913c23d34d2cfd9803318682e5a76ae4615c2e438587d59dbe6c6828c",
       "uncompressedByteCount" : 682508
     },
@@ -1260,6 +1325,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/16.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "352dc482792897e172b737677bd02007ddd7f505f8ec2016691a911f57d2dbac",
       "uncompressedByteCount" : 1564588
     },
@@ -1280,6 +1346,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/17.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ed591a675906939695fd07332fdb4634c311b1a4ff8acc378cb37297019410c5",
       "uncompressedByteCount" : 1046215
     },
@@ -1300,6 +1367,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/18.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "4e1738c8861a94a0c92b187384f1031648624146c30c8e0c473ff5c90fe7d225",
       "uncompressedByteCount" : 1330947
     },
@@ -1320,6 +1388,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/19.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f6f9eecdb15ea033bdc31e7f9976faf5b2d9a4376e854bfbd38fcec4f4501361",
       "uncompressedByteCount" : 553519
     },
@@ -1339,6 +1408,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4a0755055c2bc5bec21d0e8403d2bde5bd31aacfe993df9f4f85296d2f23559c",
       "uncompressedByteCount" : 1741334
     },
@@ -1357,6 +1427,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/20.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a4d12b64eee8e6be662e670e77210372c182a6ab7644e2b99e39ed6477c6313b",
       "uncompressedByteCount" : 16503
     },
@@ -1377,6 +1448,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/21.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "b54f8bc2961b133878703a5fb37733b4150ef876ecef35e5e77cf11359e38493",
       "uncompressedByteCount" : 586622
     },
@@ -1395,6 +1467,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/22.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c55f9c46ca525bf128e633df49528146c879c0fa3d7cb61dfee139a71dfb1554",
       "uncompressedByteCount" : 179851
     },
@@ -1415,6 +1488,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/23.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "07039cd8e1daa941abc5215a4b135f226e271eba4100e409f8529ded55802b5d",
       "uncompressedByteCount" : 4781553
     },
@@ -1436,6 +1510,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/24.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "858689fae83778a2ff879ed3aa11098429efeda2c39e2932d3f170dc5538b78e",
       "uncompressedByteCount" : 285652
     },
@@ -1456,6 +1531,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/25.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8ca2dcfc416e78a3b5df4659765a075da7da134445727048951ef2a800921426",
       "uncompressedByteCount" : 242575
     },
@@ -1476,6 +1552,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/26.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "2525647744d9627d0615cf47969683e5030c945cddf598167711086b6038fc08",
       "uncompressedByteCount" : 462686
     },
@@ -1494,6 +1571,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/27.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7c3727d1764bf6f0b22babb011e6c8aa96dbbb48858414a088f27dfb2608de47",
       "uncompressedByteCount" : 102489
     },
@@ -1512,6 +1590,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/28.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "12c570bf1048bdf6b4cec7ab6063070d69ef459c489f7a20183d429f2164a162",
       "uncompressedByteCount" : 4887
     },
@@ -1530,6 +1609,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/29.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c37e98bf8ce0851990d419a47374c5a1dc4f813020378de0832c76798409441a",
       "uncompressedByteCount" : 4714
     },
@@ -1550,6 +1630,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c4cff72fc1a6532d82f62969922bb6116b698253a87897c82af4c2dbb7a974ce",
       "uncompressedByteCount" : 649900
     },
@@ -1568,6 +1649,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/30.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "c01d5f106626f6cad8699aff02b2f0cd308c2c2a62e20d4c67a464ea50481bc1",
       "uncompressedByteCount" : 359929
     },
@@ -1587,6 +1669,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/31.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e4bb5ac00027a50b07b1a24c31a3861d9bc155a700a6c0528cf61cdc3b56e24c",
       "uncompressedByteCount" : 398654
     },
@@ -1606,6 +1689,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/32.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "523b437643a8f5cec7f969a7a12bfbe9dbd7906de8dbd1e0f93627a18727b22b",
       "uncompressedByteCount" : 203076
     },
@@ -1627,6 +1711,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/33.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "d8d7c56ec7de33c6ab8f81c495b646247061cfe1b77ddd8b21d66387a6dc2505",
       "uncompressedByteCount" : 3303408
     },
@@ -1645,6 +1730,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/34.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "bccb6b0766229ca9dda6a93b0693a2c0c8fddab9b86ed27915f6193c47718601",
       "uncompressedByteCount" : 1824
     },
@@ -1663,6 +1749,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/35.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a495ab6fd15581c0d22af3dd9f5783bd2a3066e9f5ca0af39fa4d200243d4daa",
       "uncompressedByteCount" : 1301029
     },
@@ -1683,6 +1770,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e82c0e1e3b4c5ccfd36d4097b009ab71759ef6496b23e9d1f60c339456d32bde",
       "uncompressedByteCount" : 1955115
     },
@@ -1703,6 +1791,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8be1c74764933f929f408fc1435bc5380007a7d2813907555c70f4d399bbf9fd",
       "uncompressedByteCount" : 1363822
     },
@@ -1723,6 +1812,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "669cc602dbe1e5015bc9b2b15925070dbaeed56e811b7caec7e51b8ab4690e77",
       "uncompressedByteCount" : 151737
     },
@@ -1743,6 +1833,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/7.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51",
       "uncompressedByteCount" : 3479284
     },
@@ -1763,6 +1854,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0ad395a685999f3fc380f5400736ec19da47740ca4c2be7b791cca75332d53a1",
       "uncompressedByteCount" : 211411
     },
@@ -1783,6 +1875,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/9.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "88d0b3180d4e535df4013fa144cd5c4e41ab24d025c66a91c3cbe70f35b0e1ff",
       "uncompressedByteCount" : 1708685
     },
@@ -1801,6 +1894,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/A.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "cf05dd5ec45df6ce1a22dc8fc8787525f7a70e518c93b34c5c24c5db1e95fd42",
       "uncompressedByteCount" : 1818
     },
@@ -1819,6 +1913,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/B.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2e4c233e0f26d5d22fa99886529b18e6c6a0c923c6c1cb0002129bee76cddff5",
       "uncompressedByteCount" : 1818
     },
@@ -1837,6 +1932,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/C.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "dd3e0b29103e9b8bf001feaa6852c03c0c1776e65081d91b0102dc4c9b67e5fc",
       "uncompressedByteCount" : 1818
     },
@@ -1856,6 +1952,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/D.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "6437a7fe991f0b6a9239d3d6231d99e0cb5338bcf26d9cbee3c94875a42378f6",
       "uncompressedByteCount" : 92020
     },
@@ -1875,6 +1972,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/E.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2bd36dbb09dcb70bd17145f78281075de8f65e6f5d090bd81f57147025c0f175",
       "uncompressedByteCount" : 149512
     },
@@ -1893,6 +1991,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/F.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3f41cc98640016f804b029b8b33069906421c44a1080e39f2af6517f08678a59",
       "uncompressedByteCount" : 28757
     },
@@ -1914,6 +2013,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/G.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "45b4fac13859d74694245b1407873555b6ef24351ee537562640667911b3495e",
       "uncompressedByteCount" : 754682
     },
@@ -1934,6 +2034,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/H.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b7eec1ac59fc1d338ce1a68e4fa340cbc861dd87b65f4e60dd5aff3a1e3ab876",
       "uncompressedByteCount" : 196237
     },
@@ -1952,6 +2053,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/I.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "999793756885d23ac80adcea6873ae79252536b667b1b0f80b1c9b643d25bb03",
       "uncompressedByteCount" : 1816
     },
@@ -1970,6 +2072,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/J.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "184b95770fa645990db7c82e27ffe67368307c0e60c3d16ee345c9ab2704cd96",
       "uncompressedByteCount" : 1846
     },
@@ -1990,6 +2093,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/K.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "59bdb0ab7abd731cfd2a3fab0ff90a4ef632bdb4e8a3b90ce251e33287ba15ef",
       "uncompressedByteCount" : 1583988
     },
@@ -2008,6 +2112,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/L.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "30af2b46af19efe1932f591500089be60a8ceacb68ded61bd9286e6cb0abebd2",
       "uncompressedByteCount" : 1818
     },
@@ -2026,6 +2131,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/M.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "e2100fdcfb29706b8db85b175769f099b24451fb0a10674c4b9b358292a5617b",
       "uncompressedByteCount" : 22651
     },
@@ -2045,6 +2151,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/N.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0402989d0ed95b172cd396dc92037ad5d9f77fd7a9df98568508dad157820fc1",
       "uncompressedByteCount" : 40652
     },
@@ -2063,6 +2170,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/O.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6345ada6864a7a033b50947c7726d26f85d0f3bfdced496cfb309bab5102cf68",
       "uncompressedByteCount" : 1818
     },
@@ -2081,6 +2189,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/P.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2e510c0560a9aa9c4c54b4362158aaded2bf31b1a6e09db63bee6a566fa8efb5",
       "uncompressedByteCount" : 1818
     },
@@ -2100,6 +2209,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/Q.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "27361c0d2410936a4fc128088e1f058784b2f7c0ddd7f9b5d6742609280982bf",
       "uncompressedByteCount" : 871143
     },
@@ -2118,6 +2228,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/R.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "7790234c6c478050df6b4a8f105624a5d5b410eb21f9922c7d8357e85e6a8c74",
       "uncompressedByteCount" : 65866
     },
@@ -2136,6 +2247,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/S.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "2db481c1559f46ab4a91fff5d29163654bea5a3ccb9e4ff9998e3ea3a5207721",
       "uncompressedByteCount" : 33404
     },
@@ -2156,6 +2268,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/U.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "039bc66bf8522e89d8fe74631ede7a6b53f08cda58a6df10326e26fe694a4928",
       "uncompressedByteCount" : 209021
     },
@@ -2175,6 +2288,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Appendices.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "1c54dc9c5a3367d6e8646b29d92a0f4743bea3690e292312dd6da9dd041ef822",
       "uncompressedByteCount" : 128214
     },
@@ -2193,6 +2307,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2902bcb46986e226a24962b9c6f1fc2620db2fd8ad4f23ab66a48f4c3455120d",
       "uncompressedByteCount" : 180076
     },
@@ -2211,6 +2326,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "9ae9ad171256adc3b19eec429ceae4046bdfea3635d9e8149db6cbed03109ed7",
       "uncompressedByteCount" : 277146
     },
@@ -2231,6 +2347,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 3.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "6d7604d86fdb114d298ee755f64bca8691b564bd49a4b8a6f655d0378a8d42c1",
       "uncompressedByteCount" : 453672
     },
@@ -2251,6 +2368,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2",
       "uncompressedByteCount" : 2188736
     },
@@ -2271,6 +2389,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 5.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "59410139a4ce7a9e910d8b582b4eafdcccc75d9bb4301a689b5dd6959359a726",
       "uncompressedByteCount" : 6961196
     },
@@ -2291,6 +2410,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f5d86bc21452a5a69e24c938f211aa41c1e5ee72c7b8a5f32bbd45907025d344",
       "uncompressedByteCount" : 341053
     },
@@ -2309,6 +2429,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "dc34971622d1652bfa15eb6bc85572750bbb1029a6e62be892ead383f742dc0a",
       "uncompressedByteCount" : 20189
     },
@@ -2328,6 +2449,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4ead405702e5ab2e63c65dee192f28864ea084fcda0d75f2336a85c42f6d6c38",
       "uncompressedByteCount" : 200029
     },
@@ -2349,6 +2471,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ca8188132a0300c58cbe0945a5df15a7eb07221a3b51f0b9d4cba7ada6c5e738",
       "uncompressedByteCount" : 2326293
     },
@@ -2369,6 +2492,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "71500da148c284bd0565399b684be0b514725ef517bdf0bd2566b7aba7b0bc87",
       "uncompressedByteCount" : 921659
     },
@@ -2389,6 +2513,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "89b43d26332c45c9b7c561b21e303a9455d81af6d738fd9b56f259a5ff2578b5",
       "uncompressedByteCount" : 1507479
     },
@@ -2409,6 +2534,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "bc488baee3a986c5b4d5039eab233adbc2c23181823b6f59f2f6615df1db979c",
       "uncompressedByteCount" : 1432700
     },
@@ -2429,6 +2555,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "5dc10705f6847976a6232f87771f1579ce2db7cfffb63109fbebd11655134f66",
       "uncompressedByteCount" : 463497
     },
@@ -2448,6 +2575,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Appendices.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "203524184351c776346dfc9b9bbae1a07023ed22fd9169d85aab1de989de9ef3",
       "uncompressedByteCount" : 15228
     },
@@ -2467,6 +2595,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7262ed2f7308776e9147cc9632b502c4dd3e95f13679cb2ba38c05c6ad620141",
       "uncompressedByteCount" : 161763
     },
@@ -2487,6 +2616,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 10.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f3808ee0a331eea569841bea13f0bc9b791468203108ad8873e5ce3dd78d4ed4",
       "uncompressedByteCount" : 184310
     },
@@ -2507,6 +2637,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 11.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a4902064a65ef25640d91444499b166e02b7146c13d8458e47613017c942dedb",
       "uncompressedByteCount" : 678999
     },
@@ -2526,6 +2657,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 12.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a652971e4e608887a716c9365c92742407d34b33c3a09f1716866a6291b95af7",
       "uncompressedByteCount" : 329979
     },
@@ -2546,6 +2678,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 13.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0362e3d4e7627ffe2b8cdb3eb10929063928ce33eb3c262f8dd7f5cb131783a6",
       "uncompressedByteCount" : 455088
     },
@@ -2564,6 +2697,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 14.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "da5b6013f445e91662f5a395e0dedf06a9ad63f06c8d0c2838373fe886670d3f",
       "uncompressedByteCount" : 51460
     },
@@ -2583,6 +2717,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 15.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b66ce87f9df8d3281c030ac23a60e554352d3f5685a2c0da77c7910effea1eb0",
       "uncompressedByteCount" : 351066
     },
@@ -2601,6 +2736,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "538d412dd3d0fdb5a07d66c9049d2b1c942aca702f9a998c199ebf841b609b86",
       "uncompressedByteCount" : 366200
     },
@@ -2621,6 +2757,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "efe381e5d059fcfc45a8edfb98667e210d986eb2ad13e5c99f157d728049030c",
       "uncompressedByteCount" : 388499
     },
@@ -2641,6 +2778,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "aa987a57bc2d68b95016e8e5fae77e5e4982ce7e80f6fb92081c850075bda40d",
       "uncompressedByteCount" : 461496
     },
@@ -2661,6 +2799,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "28f46999f485048d8c06e1410e4b00c9442f1fe90b8dc8643081434274579fbe",
       "uncompressedByteCount" : 847100
     },
@@ -2681,6 +2820,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "42e85c923a0a99c78726c2aebf70929d2b7e3037e369653fcfd4e0e0c5c554c9",
       "uncompressedByteCount" : 502033
     },
@@ -2699,6 +2839,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f7b54cf4ad3aa95d297eb42e51bcb2d0d9360fb14d87ac88fd5494f2410ac459",
       "uncompressedByteCount" : 98569
     },
@@ -2719,6 +2860,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4b085c7e523cd28b54692695c482e8de2a797d0b3b5a59eb77e489d83f7615b9",
       "uncompressedByteCount" : 388416
     },
@@ -2737,6 +2879,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 9.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "5eabbb6e0e677b2f27035c6848fbdab8778dcbe87d47af3fe434e1a16a7e81b2",
       "uncompressedByteCount" : 241394
     },
@@ -2757,6 +2900,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Appendices.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "58bb32662feb39f1454f2422b65ee7bcbaaa82dfb139710c8ec21fd890d9f3b6",
       "uncompressedByteCount" : 744622
     },
@@ -2776,6 +2920,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "cc2b970f6e023ba6f66657169ddff26af3b7433b2e8e8e4827624c6f4fb92f77",
       "uncompressedByteCount" : 220676
     },
@@ -2794,6 +2939,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 10.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "cace7bf8f05c9ea8b16ea8afa66e0095b02846a97e4bf5401ae6ccc6ad0be288",
       "uncompressedByteCount" : 91118
     },
@@ -2814,6 +2960,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 11.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "a4be09ada1250f543c43a4e6779112ec1e7134d539dd03ae3410c99ca876b70d",
       "uncompressedByteCount" : 421781
     },
@@ -2832,6 +2979,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 12.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a2b57ba2a1314f47418ae9b46008c6bf7ee1faa1f43247313ef81f70a5794d45",
       "uncompressedByteCount" : 16710
     },
@@ -2852,6 +3000,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 13.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "d43ba3ac8d75e225a7d70bb73184b71afe445112625362b8fedf20bd9244bf26",
       "uncompressedByteCount" : 291495
     },
@@ -2872,6 +3021,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 14.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e72b7a247a57cc5fc69542080b44b7f7c0f5ae94de56141900e734996bf6d243",
       "uncompressedByteCount" : 115447
     },
@@ -2891,6 +3041,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 15.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a43c08ec934e47393928551045a472637afaa54e05840882a7050499b357da4b",
       "uncompressedByteCount" : 522134
     },
@@ -2909,6 +3060,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f8eb789a247a8c84bfcb95324a8d7b77120daad7f6682bd50773d89dd12a29a5",
       "uncompressedByteCount" : 297703
     },
@@ -2929,6 +3081,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "219d1015e05530a5da54a8fe61c9c87f5ddd929d6af52b82316ede92e77c5f72",
       "uncompressedByteCount" : 248923
     },
@@ -2950,6 +3103,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e24b3242e8e14af6fe95a8876bd57fe6500a3f8d04f0ecf85f183c7cc19d66cc",
       "uncompressedByteCount" : 510313
     },
@@ -2968,6 +3122,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "970775ced4ab2323588f288fb1929386b684f042d9ab35fe8972151dead4707d",
       "uncompressedByteCount" : 80363
     },
@@ -2988,6 +3143,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
       "uncompressedByteCount" : 639982
     },
@@ -3008,6 +3164,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 7.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "b8667ab777f7c9ec5584e75d4513026d649e9d5f9e8e64d6590b8cafb35b157b",
       "uncompressedByteCount" : 593244
     },
@@ -3027,6 +3184,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c59e54a1e8557fead7bc6bc99876738b6b892937a43a49ddd6d6e22fc5ae837b",
       "uncompressedByteCount" : 110040
     },
@@ -3047,6 +3205,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 9.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "26021bd9e00af5f59c2f16b0944645d69e82050d79d4da20ee92924fef887edf",
       "uncompressedByteCount" : 473230
     },
@@ -3065,6 +3224,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000001.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b5019c6366179486b696a3d6c22045c3b9bc23ee85d05510b76e9d0844cb3273",
       "uncompressedByteCount" : 53410
     },
@@ -3083,6 +3243,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000002.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6086572db6fbe347d9ff9d28fdb6285093b35526be0c58229313a6d44b502ebe",
       "uncompressedByteCount" : 66606
     },
@@ -3101,6 +3262,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000003.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "01884eafc6290e93e60027899f88247311b479bb40ee45ad34df12b8f7b04a11",
       "uncompressedByteCount" : 23831
     },
@@ -3119,6 +3281,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000004.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "beceefae6f78b815e33d7c684987b6dc2e8016414079ba5589c24caa0ac9d61b",
       "uncompressedByteCount" : 292626
     },
@@ -3137,6 +3300,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000005.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7cd40d547b0742357dd98415c52bb87b08cb9c90cdc667fc92eeefa437aa11c9",
       "uncompressedByteCount" : 42708
     },
@@ -3155,6 +3319,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000006.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7142fe9a5a8a6c0dd077648ac06d054bf593c71547f4b68059c40b751436d7da",
       "uncompressedByteCount" : 25824
     },
@@ -3173,6 +3338,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000007.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "757a45126fc8cbf50e01b2e984203300f486b025b850537181d2b25a04cc881b",
       "uncompressedByteCount" : 96313
     },
@@ -3191,6 +3357,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000008.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d832ef9d0841f6370bdd53b586ab2990214ee2ac8bcbe420cf43f38925406933",
       "uncompressedByteCount" : 120946
     },
@@ -3209,6 +3376,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000009.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ecfb35c7fa039d54d55f97b22446665022a10965ce1269b49c12eb56f441ca83",
       "uncompressedByteCount" : 28154
     },
@@ -3227,6 +3395,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000010.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b02a77d5d5359370292643777fa170bf1efd1c54326e03096434a0a2de1544df",
       "uncompressedByteCount" : 1013789
     },
@@ -3245,6 +3414,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000011.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "58ddbab16686265ee03f16b329de17a79918e8d376f9dd6e5cb181b7ce5ec39f",
       "uncompressedByteCount" : 67351
     },
@@ -3263,6 +3433,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000012.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b957d4129de86476164d0e4af10d88c821772169032d21999e50364b832a821d",
       "uncompressedByteCount" : 44110
     },
@@ -3281,6 +3452,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000013.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "04b326010afbf452d5c7ff07f8a6930202292bd4388bc4eb721a9503cd615a74",
       "uncompressedByteCount" : 2309234
     },
@@ -3299,6 +3471,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000014.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "61bd5646cc1f9e0cde2f0961d74f2783e1c3aaf34d6f2730195a27d825b29927",
       "uncompressedByteCount" : 53796
     },
@@ -3317,6 +3490,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000015.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "891a9b3ec14dfb2b4f8b4a50194ff9a68fddc8b0eb186cf735285a2621209ee8",
       "uncompressedByteCount" : 34005
     },
@@ -3335,6 +3509,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000016.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c384e6dacf3af4857874b8d2e6a4268230cebda544ebb78e4f62936eb3432656",
       "uncompressedByteCount" : 119407
     },
@@ -3353,6 +3528,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000017.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "79765e3bf54855d6ce3d01b30cfcff6d73476406e82894071094c7725706051b",
       "uncompressedByteCount" : 89966
     },
@@ -3371,6 +3547,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000018.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6b0b6f83ec26d004b87c8675850f32c2a34e6b2116982795c4d849f6901da1b1",
       "uncompressedByteCount" : 59152
     },
@@ -3389,6 +3566,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000019.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6105f324491ff62ea6a2c5f840705ea94509972b686ab844a2a20fef13083b24",
       "uncompressedByteCount" : 77691
     },
@@ -3407,6 +3585,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000020.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a6a194f38ae157f97e836618e9c2c4f8013be29372c48d1fa9f78ae3fc99dfd8",
       "uncompressedByteCount" : 111133
     },
@@ -3425,6 +3604,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000021.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f21ff07260984690ed96d84d31b4a7ee321b8dacb5e37bd3a582386069bd5245",
       "uncompressedByteCount" : 235872
     },
@@ -3443,6 +3623,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2025-specialty-codes/chapters/32000022.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "95bf7480beb78077baa437d86efe8a6c97b06115417ccd1684ebd6d7dbbe6d2a",
       "uncompressedByteCount" : 36297
     },
@@ -3461,6 +3642,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000001.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3413a9aada8bc8ea0b754328bccece5d815620515b4d680caa76bd44decd69e8",
       "uncompressedByteCount" : 1126286
     },
@@ -3479,6 +3661,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000002.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3590ea9e5189ee3dfab48a05dd1c726621976c095d31ec7dca26b67ce6fb046f",
       "uncompressedByteCount" : 663740
     },
@@ -3497,6 +3680,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000003.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2118ac6a5ccd5d2e07a8c7fc8128d324624ff0ccc009122cec52c17445e3f012",
       "uncompressedByteCount" : 364417
     },
@@ -3515,6 +3699,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000004.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "cdd7fb08504ef77153d92bcef46227211dd894c5c654c0b1a9bf30a106a69a82",
       "uncompressedByteCount" : 88488
     },
@@ -3533,6 +3718,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000005.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "869b89300134fb1b7041e649d3940359763761d41f5b3d88fbbc4175d628e4b2",
       "uncompressedByteCount" : 513487
     },
@@ -3551,6 +3737,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000006.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0b5b0e481ac8a0ffc01bea7bc75b0c03bfb6e801e31aac4031fb6ca73a522ae6",
       "uncompressedByteCount" : 180191
     },
@@ -3569,6 +3756,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000007.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "51071da7f85128405fdc8ac26e20a879383471759574efa746142edaf24c62f6",
       "uncompressedByteCount" : 85976
     },
@@ -3587,6 +3775,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000008.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "519f53d128a71da90dc6cdca924c31ee03605a07b1bee7f870c56d582b747448",
       "uncompressedByteCount" : 133305
     },
@@ -3605,6 +3794,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000009.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "44529cdc001aa21b6fa18e4a4b98d4595ac83f313c2712e033e3fd84a08a95be",
       "uncompressedByteCount" : 65235
     },
@@ -3623,6 +3813,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000010.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "5fc7924b9b18396e2b292be66c9e13ea363d700cce9ddecf2ae9fde7bdc1a6d7",
       "uncompressedByteCount" : 75243
     },
@@ -3641,6 +3832,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000011.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "65aabdf50e3923d275c9338dd61f2539e42088b6921f120a5fae67d9087be94d",
       "uncompressedByteCount" : 30321
     },
@@ -3659,6 +3851,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000012.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4e66940092220dbdf2426f9e0165993c17f5bd14e8b5ec6a9c7ae5f8d33ee3bf",
       "uncompressedByteCount" : 199841
     },
@@ -3677,6 +3870,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000013.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d70265c5fd7090d87589de90d41badf9e19beb6d2ddaf1b65cda4b544fc6a7c0",
       "uncompressedByteCount" : 79448
     },
@@ -3695,6 +3889,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000014.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7e6ad173fd0e0fe415589c41f9f0923a30806873cfc74148994c0511f7de1384",
       "uncompressedByteCount" : 310993
     },
@@ -3713,6 +3908,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000015.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "537a3a39eb29352a6273e96cb10719b0c345fb6b061634e868ef1844dfb40d61",
       "uncompressedByteCount" : 116467
     },
@@ -3731,6 +3927,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000016.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a80e5b3f99b14dfc765db505d619c88a9fc9b5a62849174b6091d6a31b31996e",
       "uncompressedByteCount" : 749848
     },
@@ -3749,6 +3946,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000017.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "36066bf1c1ee4388cf97aefd1c8f1845672376cb171953ec6dbf9326b323b0d6",
       "uncompressedByteCount" : 29203
     },
@@ -3767,6 +3965,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000018.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "10259fd92920cd584f9125f9a65e6feb1eaadc65b2eab5a687f3ae7b09c67756",
       "uncompressedByteCount" : 29193
     },
@@ -3785,6 +3984,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000019.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f7d271b3400f228deb61bb70e7ab787052e97e800b1d4aea4c4e809af6a1703d",
       "uncompressedByteCount" : 68039
     },
@@ -3803,6 +4003,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000020.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "280c31f00db5545620023fff8d6f79e687d96b3f453d0af5a21842b28dace006",
       "uncompressedByteCount" : 81285
     },
@@ -3821,6 +4022,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000021.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3cc36664cfa01d538a8cdbd144185ac1778e94220c9ef069b2ada6db06cac5ab",
       "uncompressedByteCount" : 537534
     },
@@ -3839,6 +4041,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000022.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a64f32174db67f78a76a5307ef171d278f98c0b0f384c9e3b84f5edf00a4e106",
       "uncompressedByteCount" : 403439
     },
@@ -3857,6 +4060,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000023.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c4ff3e997760f8702d6339c7d79df1b051228d5ad856da0f4c8b9b12b5c55a5a",
       "uncompressedByteCount" : 29244
     },
@@ -3875,6 +4079,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000024.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "594c07348e7b3a44fbfa84b1e327d8549adfd216fcd9d14b398b7123dc2c8386",
       "uncompressedByteCount" : 6135
     },
@@ -3893,6 +4098,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000025.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b0ceef041e32d15422e67e661f27ff15add1bee484f02ba46039a1814c6c800b",
       "uncompressedByteCount" : 139129
     },
@@ -3911,6 +4117,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000026.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "9cb9bd3a6c9c437b594e60c34d735da51acf307700d4904513b0fbf572f4d199",
       "uncompressedByteCount" : 36601
     },
@@ -3929,6 +4136,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000027.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "451e2c52a167ade178caad1562daf6330e6e20b0030ec1619def249e8f274c8b",
       "uncompressedByteCount" : 93975
     },
@@ -3947,6 +4155,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000028.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "aaffb169b7c9c1d14ea9a2265aa452466f8f5350ec6474e1c2d5368c76afa205",
       "uncompressedByteCount" : 72212
     },
@@ -3965,6 +4174,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000029.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "38fde199154fc469bfabe12fe127653bf6ffc12c9e82492c258306dc6515d743",
       "uncompressedByteCount" : 19295
     },
@@ -3983,6 +4193,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000030.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "5637451cef9a343fa708f3ddc274981b96fa6605465640a0a1b80a56968c9f33",
       "uncompressedByteCount" : 19873
     },
@@ -4001,6 +4212,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000031.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "09e1d0d0c405912107311f8c2ba5153368093c9a7eec66d6342c2d311d1124c7",
       "uncompressedByteCount" : 6879
     },
@@ -4019,6 +4231,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000032.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ecd2c8ba077ea6942105c8e9ce4a4ca8244902d7598b4c65b2c5fea801d6fd79",
       "uncompressedByteCount" : 53966
     },
@@ -4037,6 +4250,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000033.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ffa177f9bf1b5a1bebff5bee0a08ca04ecc818b567c04a6a9404efe16888fa0c",
       "uncompressedByteCount" : 10178
     },
@@ -4055,6 +4269,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000034.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e503dab021c4e589696603a997d8fef6f80bd8629810d2db5526657c909addd9",
       "uncompressedByteCount" : 10842
     },
@@ -4073,6 +4288,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000035.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "41e0fcd21b4ad911896add7be79d10d654b782fe532da9ff6d605b537f3bc937",
       "uncompressedByteCount" : 16128
     },
@@ -4091,6 +4307,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000036.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b0e23c50dceecd247fe77fc443bbaafcbcb1b6820a4b446434b9dedf88302c25",
       "uncompressedByteCount" : 70553
     },
@@ -4109,6 +4326,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000037.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d481ca66f01920ca8876191356c9cf0b432148ca25ebda868315a4486a2431c2",
       "uncompressedByteCount" : 4684
     },
@@ -4127,6 +4345,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000038.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "934424113ae32ce5819f66081d340d3161e3bca941563ec5bf48e7697a4620a3",
       "uncompressedByteCount" : 10106
     },
@@ -4145,6 +4364,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000039.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7556c6747095bbc6e54a134c54c9a2812a40bfaa2ec84cfc1e19ef82ad57cef7",
       "uncompressedByteCount" : 35051
     },
@@ -4163,6 +4383,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000040.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c2c649c4d44d8e6846a71d0db4d251e410ee6748a44faee3af7286e491b9e5c7",
       "uncompressedByteCount" : 33827
     },
@@ -4181,6 +4402,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000041.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c5a7ba368cc8db09638569105e4fb5c99626e6b7fbe1b7390fbe46af49cce4dc",
       "uncompressedByteCount" : 34471
     },
@@ -4199,6 +4421,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000042.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "32cc5551c717fb978a5532c69e44bc6d8ec0ac9922b07f6f9689b751cb17e3af",
       "uncompressedByteCount" : 19675
     },
@@ -4217,6 +4440,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000043.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "efa3dd7cff3431a9f67423d2508f016a271ad401a06e3f05f2a1fac51325c27c",
       "uncompressedByteCount" : 12496
     },
@@ -4235,6 +4459,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000044.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "189643c16c9f7c8dfd5d93a85d308bd9e8e1e579b35573334397e158c415577f",
       "uncompressedByteCount" : 26568
     },
@@ -4253,6 +4478,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000045.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "71b2911888d15134f0017f1b4f854d4337dcc01c6e4d94ede358b9c485a4edb3",
       "uncompressedByteCount" : 13820
     },
@@ -4271,6 +4497,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000046.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c66b47f0c8d4a226467fe718012e2524741911c8f84b5f73278dfc28b147f6d4",
       "uncompressedByteCount" : 26318
     },
@@ -4289,6 +4516,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000047.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b118644985b2f78db09591399188be586722a41f11e858aa184359fee6311ef7",
       "uncompressedByteCount" : 21828
     },
@@ -4307,6 +4535,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000048.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "cd072060fbac4fb759db16867df9296f2a89b38f0c091c9d860ec1c2e143477f",
       "uncompressedByteCount" : 69626
     },
@@ -4325,6 +4554,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000049.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0ffa5d370afcc13e014b13b35a830525c23f364ffd0582a852d1bbfca1115c65",
       "uncompressedByteCount" : 61515
     },
@@ -4343,6 +4573,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000050.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "99479305ba7fa3e3a4057b189c8af69a60b7a2130fd0cc29494973167f372149",
       "uncompressedByteCount" : 26996
     },
@@ -4361,6 +4592,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000051.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d8e3cb936d37b233ee399ee459e1aa2a2d9daf1447196daa04cee9c1a5ac7bcc",
       "uncompressedByteCount" : 79955
     },
@@ -4379,6 +4611,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000052.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2b389c1b190e997982612c65b760bb2d84f57656928101fd08b8747a8aee1ec5",
       "uncompressedByteCount" : 6085
     },
@@ -4397,6 +4630,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000053.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8f54d88d8b803464cf25e6c21338ee66f49067a049d3fc1d1941cbd33f150333",
       "uncompressedByteCount" : 22609
     },
@@ -4415,6 +4649,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000054.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b15253d43bcff2182a88abbd6473e4b201b6800869da46fa3e36998ab2fa3e31",
       "uncompressedByteCount" : 13860
     },
@@ -4433,6 +4668,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000055.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "58aeddf967f1ea7e4a32f4e76e0f977990da33eefadfcb3f7127f262ec750b46",
       "uncompressedByteCount" : 16367
     },
@@ -4451,6 +4687,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000056.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ff095638bd42f9c15609c903827b701ea4d386903d75019515f0868efb4b3755",
       "uncompressedByteCount" : 37237
     },
@@ -4469,6 +4706,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000057.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "986706ddc9cf4c6a4acbcdb2b116472c63b47b859948c9a10e0057ead7465453",
       "uncompressedByteCount" : 91761
     },
@@ -4487,6 +4725,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000058.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "17126b4b7ba1241d37028751ae589c17e904c5cbe510f31029d6533fbeef0d32",
       "uncompressedByteCount" : 115703
     },
@@ -4505,6 +4744,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000059.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b178226eeb7569c737985b116a809eb8a323ab245f84528f8d6ec99cda27b338",
       "uncompressedByteCount" : 328237
     },
@@ -4523,6 +4763,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000060.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ea29eaf2e36dd5c227a61f6a3d0d8c8806842703476a65bc7bccc3b8f294ff49",
       "uncompressedByteCount" : 208375
     },
@@ -4541,6 +4782,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000061.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "00e694a6de32d4e18ce57126b239a005ec4748c4697a84913b58df7d5a3af561",
       "uncompressedByteCount" : 110400
     },
@@ -4559,6 +4801,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000062.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2ce8d85f4296d37bb70aa82cb9b0287faa8a77c484e52ff17329ff0223be0d13",
       "uncompressedByteCount" : 471096
     },
@@ -4577,6 +4820,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000063.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "daaa48149d8c0e4f4ff2357e0887b91c8510ba0e04f54e8739df0c4c0bf950ac",
       "uncompressedByteCount" : 533586
     },
@@ -4595,6 +4839,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000064.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "9581aa4e07a326121dd5771c650fa2ed218c991ac5c4f27fdf462f24afe6d8c8",
       "uncompressedByteCount" : 468726
     },
@@ -4613,6 +4858,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000065.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c478ba60363df7b7e6661567d28d54a50633beb1394a0b4c21a6c8edf3499f20",
       "uncompressedByteCount" : 309131
     },
@@ -4631,6 +4877,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000066.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "20313dc1afe34cfdeac4b4eceb5bf22c3eeaba6fb6948c121b608da65dd83ee2",
       "uncompressedByteCount" : 151862
     },
@@ -4649,6 +4896,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000067.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c65126a7a49f6aff86426a13c273a18eead1dc0af8ff51e234c0cbac9dc96dbf",
       "uncompressedByteCount" : 566758
     },
@@ -4667,6 +4915,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000068.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4288e1b54f752eaa11bb12d5992d4ab6dd2a6a7a40dd03ccc69acb2053b6d9b1",
       "uncompressedByteCount" : 639428
     },
@@ -4685,6 +4934,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000069.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d8bb7f95d620159a89e97b618f93ebd35455e75dd68f376db0aa979582b093b8",
       "uncompressedByteCount" : 391691
     },
@@ -4703,6 +4953,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000070.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8b383c1b1b0c28e2086027f949b7cf8d19cb2975de8e64a6d7039d6cd2f32469",
       "uncompressedByteCount" : 72719
     },
@@ -4721,6 +4972,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000071.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "969ce6e9ca8f558b6e1784d94fdef8c24932d060ce5aec3f3774cd06e60b4ed4",
       "uncompressedByteCount" : 442179
     },
@@ -4739,6 +4991,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000072.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3a6a4648740246391c266c5740a6cf3e7a48cce02e3c5884bdc04d9bd7042e0f",
       "uncompressedByteCount" : 381171
     },
@@ -4757,6 +5010,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000073.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0824de950274afbb8973ce5654b13049a0cdb92119f35c26151d4db3fc0cfacc",
       "uncompressedByteCount" : 164865
     },
@@ -4775,6 +5029,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000074.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b7ec3d57e6cb548ba1589c18381aae16f9fbbe20c31aec106d15291eb36d2786",
       "uncompressedByteCount" : 569369
     },
@@ -4793,6 +5048,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000075.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "198235b5533fa28440e25ed33ed12c73e9bc095884f23d3e6b819678f5fa9348",
       "uncompressedByteCount" : 115861
     },
@@ -4811,6 +5067,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000076.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "98e0264a699151652d9ef2cf0d1f62ee4366fc23e58f219f76459d10e35ed6df",
       "uncompressedByteCount" : 646931
     },
@@ -4829,6 +5086,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000077.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "dcc196eed865ed4bad3efa726df9b3855dd8e7cf40ade22bd37c19c5372a6066",
       "uncompressedByteCount" : 134999
     },
@@ -4847,6 +5105,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000078.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "80734cb3ad49feb8aec1bc3e5795c859a62bcb5930a4f56aa803a810d50df7b2",
       "uncompressedByteCount" : 806057
     },
@@ -4865,6 +5124,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000079.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7545311ec4d903e2c89289d5a4a37ddb66fd06c0f4fe8fba4e98dd17ef90f52e",
       "uncompressedByteCount" : 255099
     },
@@ -4883,6 +5143,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000080.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a76f2a1f60ad0b632c400189a4f8cf48aaeee90dd0315243560a0ff8b08690d2",
       "uncompressedByteCount" : 289612
     },
@@ -4901,6 +5162,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000081.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2584178f90403fb03f0ba046060a16775248e557aab7da57d17c47f332c01103",
       "uncompressedByteCount" : 486722
     },
@@ -4919,6 +5181,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000082.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8279efad48d8079e9d3459e1d685710b3bbf75998eeda0ecceff437644e306ea",
       "uncompressedByteCount" : 1776158
     },
@@ -4937,6 +5200,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000083.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7cea96983124e5739524400bb7665df8a7f9f365ed6935e5a72cf835ccc23f7d",
       "uncompressedByteCount" : 670527
     },
@@ -4955,6 +5219,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000084.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f6b389e21ac626e792f8158321345573ae139c51594481ca467614ebb483221a",
       "uncompressedByteCount" : 1046974
     },
@@ -4973,6 +5238,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000085.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "de62f353a0f85670d0cb1145ecef7209c71ea646ad4a39f25af55f2d57f52ef3",
       "uncompressedByteCount" : 1011460
     },
@@ -4991,6 +5257,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000086.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "752276014d29365cbaed6f1de59f8dd5628de0908b9306530a0b9e37b496db19",
       "uncompressedByteCount" : 350334
     },
@@ -5009,6 +5276,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000087.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "008adf1118821edac54a731ea23fbff6cf76c04be2dbceed0ef2cf210eab4f83",
       "uncompressedByteCount" : 4388294
     },
@@ -5027,6 +5295,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000088.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2b64013a712f50d3fb37cc72f16966812f6129888a960569df18ea1049c4d355",
       "uncompressedByteCount" : 31035823
     },
@@ -5045,6 +5314,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000089.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f067ca8cf87b8905e5583fda70183035d7dc75f65838c1fd822cc07e005c6619",
       "uncompressedByteCount" : 4772147
     },
@@ -5063,6 +5333,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000090.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "699da4ccb6cba04855aa4606165d58a832636da69002d600d4907a65760b1121",
       "uncompressedByteCount" : 8384677
     },
@@ -5081,6 +5352,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000091.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "713c59dd1db7b93f9cf9670663fa3a48593c98cd4444976a7dd30d05f92734ca",
       "uncompressedByteCount" : 4767038
     },
@@ -5099,6 +5371,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000092.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8916bc1217efac021873f32e31f72b24463a1db8ec06e4a3baab74a5fe0e61e1",
       "uncompressedByteCount" : 1043661
     },
@@ -5117,6 +5390,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000093.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2ec5ada812bd0eca9a8fab7b969f9d135d941be902ac025e3a8783d14b8e1555",
       "uncompressedByteCount" : 3546670
     },
@@ -5135,6 +5409,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000094.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f71b10b3882c7c52da6d0d363aa169f96f36b2c9fd712415611df8600277b7be",
       "uncompressedByteCount" : 7551
     },
@@ -5153,6 +5428,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000095.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "2e8f5a2f5ec7ec26118f2e6569cbe3e9989b5c2c4266666b44d47ed12c6affdf",
       "uncompressedByteCount" : 12519720
     },
@@ -5171,6 +5447,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000096.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d332e90da2d9b036f751ec93386f8c4aa2e3e857ade9ba3ae83fc7bf61d0b587",
       "uncompressedByteCount" : 29882
     },
@@ -5189,6 +5466,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000097.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "95107e495c92c1419f044333f27c07b0ce6858f37ef276145d65e2d4b01cc6e8",
       "uncompressedByteCount" : 49325
     },
@@ -5207,6 +5485,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000098.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "2d50c83a5297ec535d98764b3a3aaeb8361d99c4c7a158027368b2234c9d11cf",
       "uncompressedByteCount" : 30706
     },
@@ -5225,6 +5504,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000099.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "944c528c0dfab84a60aa153af4713946de04b67601f8dd9e42c76b9fa3d57706",
       "uncompressedByteCount" : 19154
     },
@@ -5243,6 +5523,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000100.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4a057756a6f2a4be9306ecf1b5bd2a181f96e445d9b0981baba3efe838236a27",
       "uncompressedByteCount" : 9140
     },
@@ -5261,6 +5542,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000101.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "061cab634df0b84728d3c8f3cd3f1b3152e00d53e79df075030ab557634eb75e",
       "uncompressedByteCount" : 18704
     },
@@ -5279,6 +5561,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000102.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "faebf46ac1d1626564d0db3bb26fb91da6c04a259232f0af2b1bdb7c1747de79",
       "uncompressedByteCount" : 15450
     },
@@ -5297,6 +5580,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000103.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4f6b59f29f1457ee09117445e7f6336c56c052b5cbfc43ce9e8a6733985724f1",
       "uncompressedByteCount" : 56029
     },
@@ -5315,6 +5599,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000104.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a20a9a3f69645060156ed4eca61d0bb974f77c8323a29f0f3ee14b8080752e95",
       "uncompressedByteCount" : 38630
     },
@@ -5333,6 +5618,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000105.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "36fb2659c6bf82f7feb3adc2526e9c7c6916821ed8dd266b37b2f7ff254c76ed",
       "uncompressedByteCount" : 68485
     },
@@ -5351,6 +5637,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000106.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7444958f5bf2dbc61ea7cc225efb4d7453fdb2a18fdecb55b2e1d107d34664c0",
       "uncompressedByteCount" : 26576
     },
@@ -5369,6 +5656,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000107.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3c2419016ab23c6f35ba1ee6c0c144b77771eda7870230c1a04e4ab8f09ae396",
       "uncompressedByteCount" : 9400
     },
@@ -5387,6 +5675,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000108.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "fc7539b4ec9fe8f649b79f8607e0e32d4411330003d5e2f3c3c459a422e4bd5a",
       "uncompressedByteCount" : 24016
     },
@@ -5405,6 +5694,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000109.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ecbf65e97d5aaaac62224ed71fbac90a3855829270a4282843e1ce4cd3370126",
       "uncompressedByteCount" : 85285
     },
@@ -5423,6 +5713,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000110.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f6af6ec61d3d39ea41fb698b26b77a1695568f3dc654441432fc8e809f33b6bc",
       "uncompressedByteCount" : 23472
     },
@@ -5441,6 +5732,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000111.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "abb515e8034cac05d030080379d00c1f7cfea6809890506d902e8c65c621afdf",
       "uncompressedByteCount" : 352870
     },
@@ -5459,6 +5751,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000112.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "28473603e882675ccbe2400fe66a57b2a3b029ae397f7356a70b844e210fd564",
       "uncompressedByteCount" : 33420
     },
@@ -5477,6 +5770,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000113.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "32709529b2e8f77c098e2b27c9d9d2fed17e5b7a679735fe91e95dc18f2d4c32",
       "uncompressedByteCount" : 52301
     },
@@ -5495,6 +5789,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000114.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "5d8ee5ace7f563e627844da4d5ff6028638807f09c362ee3cbe2d9be13945a3a",
       "uncompressedByteCount" : 25306
     },
@@ -5513,6 +5808,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000115.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "387e83464687574bdf5876c18c1f2b3544e66bd86439cefdc2e5db662ffa2b11",
       "uncompressedByteCount" : 26722
     },
@@ -5531,6 +5827,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000116.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "168852ecfca80fcb650b2d17b6ec4847407c205325b54e01fde4aeccfe3756af",
       "uncompressedByteCount" : 30004
     },
@@ -5549,6 +5846,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000117.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "9bfdbaf3dbce221cef15b5aa05aee874f303a3869ab502901ddbbd39021f31ae",
       "uncompressedByteCount" : 66029
     },
@@ -5567,6 +5865,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000118.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4f3803351524bd7450779f8ccd3bd41f9a96f9170282341b1b0a0d4b7f49c807",
       "uncompressedByteCount" : 27262
     },
@@ -5585,6 +5884,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000119.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "985019e16698944923794856cc2741bf373d06579259a9170d29e9782fb424c0",
       "uncompressedByteCount" : 84052
     },
@@ -5603,6 +5903,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000120.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "41744575cf7812580447bac026f7b38d02df08dfe198a5ee8944ebd75338ae00",
       "uncompressedByteCount" : 45190
     },
@@ -5621,6 +5922,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000121.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "46a0a1e897a27b6b914bacb011dded858a930d6a8fc1c01bb076b65470127011",
       "uncompressedByteCount" : 98371
     },
@@ -5639,6 +5941,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000122.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8da1464f658dcabe25450567539372b9fa20a05fde7d0ebf0ef2db6128209b71",
       "uncompressedByteCount" : 96460
     },
@@ -5657,6 +5960,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000123.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "03769196dc8847a671df2711e8c5c7018c7d83b05cd397b28a223d596e573719",
       "uncompressedByteCount" : 86840
     },
@@ -5675,6 +5979,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000124.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "122516f30411b500ce5134051af322fc694bfbc5d53942120f3e1fd653e68035",
       "uncompressedByteCount" : 108759
     },
@@ -5693,6 +5998,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000125.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f45a36ef7355916f2123901aadfbe67d23465c91a265693b8b07826b8e8c1484",
       "uncompressedByteCount" : 103750
     },
@@ -5711,6 +6017,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000126.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7d8a4ff12cab71c046403bcd0d3fab572db96b62dc38d11ff20a84582a97ccf4",
       "uncompressedByteCount" : 234836
     },
@@ -5729,6 +6036,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000127.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c12aecba920fcb5f6eac5ebfc96dbc66735b2725a0951df66989800f13edc47d",
       "uncompressedByteCount" : 214742
     },
@@ -5747,6 +6055,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000128.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "721f21c2b461b3f2235e0834a727f0c977898663aa5b64a27ab2f3fa5965368f",
       "uncompressedByteCount" : 52335
     },
@@ -5765,6 +6074,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000129.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "eb3e2a603f080fa29d4165be0f5484f73f3e5b24e90e79ed8c3d377d806bc2ea",
       "uncompressedByteCount" : 323295
     },
@@ -5783,6 +6093,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000130.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e0457dcdf2083315edca77cf5c04a3fe5cc792811249d42fcf66e8d1fcdaa8c2",
       "uncompressedByteCount" : 29014
     },
@@ -5801,6 +6112,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000131.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7d71c95ec90ca2495ae7ab74b71685266bb36dd285a1af0221e668b6f4be83b4",
       "uncompressedByteCount" : 76814
     },
@@ -5819,6 +6131,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000132.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "1f8a30b0717399b0d6e67bd4d2aa570baddb51aac2aa3ee135f7309dd73df7ba",
       "uncompressedByteCount" : 66663
     },
@@ -5837,6 +6150,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000133.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7f6e3d68fe9db9b834f33e5a9dbec95f494baad093764bcdefc54984385812e4",
       "uncompressedByteCount" : 85012
     },
@@ -5855,6 +6169,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-enacted-administrative-code/chapters/30000134.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c84445ea35795a2d891ed8f5b5b30acc98ece500fbecc4aabb71709a70f861c3",
       "uncompressedByteCount" : 87336
     },
@@ -5873,6 +6188,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7bd1b414e1191192a31b4883bf2dabfeb5bcc188c30dfe6625725fac6d25bea6",
       "uncompressedByteCount" : 108514
     },
@@ -5891,6 +6207,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/10.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "755e4fa11ad91fc01213413cb2607438bf742101b7e654a544dee71016e591ee",
       "uncompressedByteCount" : 76008
     },
@@ -5909,6 +6226,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/11.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d6b7837df1c06f866ee667f0f2a299a6c0747d28c2392f71bdce520580396472",
       "uncompressedByteCount" : 45389
     },
@@ -5927,6 +6245,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/12.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "90b9d5e06d7955f879b57b4413a57e3b034d33ad9bde3de290297cff75e7e870",
       "uncompressedByteCount" : 4267
     },
@@ -5945,6 +6264,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/13.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a6fa9d88f7a145d433fd12ee4a357f0a415d5a086b4e12a091749d4b3915b2c2",
       "uncompressedByteCount" : 17816
     },
@@ -5963,6 +6283,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/14.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "32a04bdb5abb725aaaf1d5ffe771874c42305ff8c1513b4ce0e040254de4154a",
       "uncompressedByteCount" : 13969
     },
@@ -5981,6 +6302,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/15.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "41c5e50d1aa87d569150b54efda7a1cb0a4e48f03a574f503778bfa6ac3acd8f",
       "uncompressedByteCount" : 59316
     },
@@ -5999,6 +6321,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/16.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d0c0bad88659e602f055ae18c13afcfd95d909f4900a2566a1ab0c9bfbe45ce6",
       "uncompressedByteCount" : 13089
     },
@@ -6017,6 +6340,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "939c0dc49ac7ec9632e7409ba738388b48ef7d52e04ed51339e4b9a3b74b6196",
       "uncompressedByteCount" : 38935
     },
@@ -6035,6 +6359,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "276a79e369b70647246f99644c346819a9e9239ef4d0a00e131084327d6cecc5",
       "uncompressedByteCount" : 190297
     },
@@ -6053,6 +6378,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "28a6d74970a54b904ec061fe9934581300198c03f9802e214d08abb12d178b2b",
       "uncompressedByteCount" : 4253
     },
@@ -6071,6 +6397,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d6acfe085e5aad4c5f2caac3c35fd0b5c57dbeb4a7e54175bc5531f44ea8777d",
       "uncompressedByteCount" : 84764
     },
@@ -6089,6 +6416,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6bffefa6ca52b85ba24192b551b867fe5e099a817ed6456481c7ef25f3811e06",
       "uncompressedByteCount" : 27729
     },
@@ -6107,6 +6435,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "30eb322f4a200c14c88ac7f9318b85876f26e100aab68e909c0ba5c134936cbb",
       "uncompressedByteCount" : 100911
     },
@@ -6125,6 +6454,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6fb9b8858a4b54c667cb3cda215c0e3b1112854c73162d6ac50b403764b7828d",
       "uncompressedByteCount" : 224016
     },
@@ -6143,6 +6473,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/9.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "478a17b777dd88a55d72afed3011e68094bd43b8ee3afda1302635f3e7d8b6d9",
       "uncompressedByteCount" : 56855
     },
@@ -6161,6 +6492,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/A1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "07290aef0d45e61173af514c95124fe1803c6c3bcb8561864eb6ad6eee8c3cb8",
       "uncompressedByteCount" : 16357
     },
@@ -6179,6 +6511,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/A2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "49dbdf8c3326bf3d4fe13affc3768a3643e96fbd7a25af98587c2b29a3cb75ab",
       "uncompressedByteCount" : 4267
     },
@@ -6197,6 +6530,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/A3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7413c7b6e516aaf97677a10615198bfade92e0a0bdd030ee0b749813792d2a4b",
       "uncompressedByteCount" : 7272
     },
@@ -6215,6 +6549,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/A4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d735f8fb62d294f4476e24984b49a680fb446d644b51f18fcfa62115716ab54f",
       "uncompressedByteCount" : 11600
     },
@@ -6233,6 +6568,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "9e944e07902e94a08592f6a67cb0656807c840cc2619956db3291fdac4fa589f",
       "uncompressedByteCount" : 31486
     },
@@ -6251,6 +6587,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D10.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6329e037d071fd84a523bb3d54b5c89a3e515e2f072408ce4db75aa8266f3b8c",
       "uncompressedByteCount" : 11962
     },
@@ -6269,6 +6606,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "5dd10e6a40f872670648d1fbea115a30e21b699726e1c8aaa533107e01df7db8",
       "uncompressedByteCount" : 45232
     },
@@ -6287,6 +6625,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "5afcadc02ae4e72720dac4a28c66f9aeab1cbeeda9da1d83049e0695a4b5cd3c",
       "uncompressedByteCount" : 105966
     },
@@ -6305,6 +6644,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8758746e18b6f9919fd2408ffb5c65cc614dfd2b3c5f36bb655f03c8365815ee",
       "uncompressedByteCount" : 7367
     },
@@ -6323,6 +6663,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "337c218dfc3371736af29947ecf75550c43deddadad7441264b434bc3d4fcb74",
       "uncompressedByteCount" : 22336
     },
@@ -6341,6 +6682,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7a0308986e8507c35b13a526553a23b391d92cc7fe397d42d740ea6905e88e7c",
       "uncompressedByteCount" : 51431
     },
@@ -6359,6 +6701,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6ef3854f0480c5e1d3a79f6a35b059a50db9ee816e3e396ced2d4965464ba5b7",
       "uncompressedByteCount" : 133705
     },
@@ -6377,6 +6720,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3b6d11af90c0d9ee0d4719829ab81df697bbe134668e2ccc996dd08a6704515a",
       "uncompressedByteCount" : 4267
     },
@@ -6395,6 +6739,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/D9.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "02d2991e98263a6f84c6c60be2f6ea917bafeed2406333a7ce91afca5185db86",
       "uncompressedByteCount" : 4966
     },
@@ -6413,6 +6758,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-existing-building-code/chapters/H.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ea574c5ec87da777662b078eb45d7e295a98f3c3760d86838ec6a27b8790e2d0",
       "uncompressedByteCount" : 50353
     },
@@ -6431,6 +6777,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-B-21239.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "a5303ea8351e73a57549324c75bfd97d5c30a7f59dc37ee2bb69dc400ab4fd5c",
       "uncompressedByteCount" : 1301566
     },
@@ -6449,6 +6796,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21242.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "98d11ca7996f8a196ba898b45def3193ea973b427027eb54d846601fd0141dc1",
       "uncompressedByteCount" : 7646310
     },
@@ -6468,6 +6816,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21243.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c858942cad347812bd640f6d75acf04242aff2ce6808dd6dc22295524f31c0ee",
       "uncompressedByteCount" : 176237
     },
@@ -6486,6 +6835,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-D-21241.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "2898db2c55e0bfa6ac466bc10e01e150adadff5ab54d9d86099717a36022bcf6",
       "uncompressedByteCount" : 1200951
     },
@@ -6505,6 +6855,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-E-21240.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "a775e688fd9d000419cf7fd732316605675ce8c631f3827d578be22b9e4632a0",
       "uncompressedByteCount" : 195108
     },
@@ -6523,6 +6874,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21424.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "543e65d83d51661197f14703c553629bba982a44d7babc36266ac7916a21c4a3",
       "uncompressedByteCount" : 768943
     },
@@ -6541,6 +6893,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21765.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "d6b3cc18a5062870bec943f3411fbd1d4811dd167ba2b5bb4b6f09b4a7fc5027",
       "uncompressedByteCount" : 49675
     },
@@ -6560,6 +6913,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21766.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "54ef475f2609d4db8870803ba47b0b120e29f40712c232628dde46fd1a540b0d",
       "uncompressedByteCount" : 113727
     },
@@ -6579,6 +6933,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21767.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "203f69ca468c370f233c78fded836dc1e4cb8a1029541ab5d82c2c96e0eaf376",
       "uncompressedByteCount" : 39769
     },
@@ -6598,6 +6953,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21768.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "d344ee75ab62736fbf9deddf7c94143c860304c89d4b8e0ba829177eb897c3ea",
       "uncompressedByteCount" : 933669
     },
@@ -6617,6 +6973,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21769.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "73db16950fa50789f4b6adc02a881b85a6d8fa560e28c982535e3ef5d83e3dfd",
       "uncompressedByteCount" : 7105
     },
@@ -6636,6 +6993,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-G-21235.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "1eeac3ec544120588a0c1bf6a211816d42aec1a22df21e74208e75f498cecb63",
       "uncompressedByteCount" : 68039
     },
@@ -6655,6 +7013,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-H-21233.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "aa73ca975ee5ffae323c809425830d057e9cf9d9a6e1b042b28da87678f4e6cd",
       "uncompressedByteCount" : 16087
     },
@@ -6674,6 +7033,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-I-21238.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "5ce3744d5a016f95f4a184269d760d6720e1b48299ab555d967a7fda3adea218",
       "uncompressedByteCount" : 22606
     },
@@ -6693,6 +7053,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-J-21237.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "33d12da063f30b4b1487d27399129b999d04644c8130eaa7c3e94e88b9e853de",
       "uncompressedByteCount" : 116715
     },
@@ -6712,6 +7073,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-K-21498.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "ffc86aa7c3ccd07a627f3a27c86e256e396b57921aed9cd812ace16629130f8e",
       "uncompressedByteCount" : 14191
     },
@@ -6731,6 +7093,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c6b02d1addf11062d55358da4ac972567519d42658be6383c1f68181cffa2eff",
       "uncompressedByteCount" : 303423
     },
@@ -6749,6 +7112,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-2.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "0b0cdde386c1b528283801feafeb7be07bc21d4dc90a1b5926da63738a8e0075",
       "uncompressedByteCount" : 1939643
     },
@@ -6768,6 +7132,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-3.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "7a08333daab30bcf00cb2c07d07c03aa3e8f41839a8c7976188aefde651fb214",
       "uncompressedByteCount" : 251095
     },
@@ -6787,6 +7152,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8789beafc1746c189c7fc386975119c9abbe0634fd6c98685ed848d61518198b",
       "uncompressedByteCount" : 75698
     },
@@ -6806,6 +7172,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-6.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "cb6a4a14ec15cc90165167d9fd99f3e7007eae94a43b1db72ac01b84f88b1754",
       "uncompressedByteCount" : 122956
     },
@@ -6825,6 +7192,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c98cd142235189041073d457b3d19035f7b2682b11cefd81b5ab03e48e52f2a1",
       "uncompressedByteCount" : 25261
     },
@@ -6845,6 +7213,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-2.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "645bf96b88a69b1c5451b84358ddfdf9840a4fc1e9ac6dd1babe796b30f5bcb8",
       "uncompressedByteCount" : 765161
     },
@@ -6865,6 +7234,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-3.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "7e7bea321dc809d2777ceaac6af1a53d41f10f55c71b0c8c0bac8df171cc87c4",
       "uncompressedByteCount" : 2055897
     },
@@ -6885,6 +7255,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-4.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "269c27017d281b92bc26e19734399da4fd33edda0ec8b7a00579ed445c60248e",
       "uncompressedByteCount" : 523748
     },
@@ -6904,6 +7275,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-5.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "d98ff7d4469889b2fdcfb9d6087e6e3b7e29e44569c79569bd5dc65b980528cb",
       "uncompressedByteCount" : 682963
     },
@@ -6923,6 +7295,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c5d41c23e251710b258b2d64d51920b9aa66cbf3d01f6b6c8c5b1509f797a607",
       "uncompressedByteCount" : 140774
     },
@@ -6943,6 +7316,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-7.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "2ca5b9adf9bed2b3b90ed985ee551ee94d544181c4cfb2e4291df0fd420ddb63",
       "uncompressedByteCount" : 251075
     },
@@ -6962,6 +7336,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8f65b2f1fcb452a2ac8c3e84d925e869f33365bc8f29d71005b315c99749e109",
       "uncompressedByteCount" : 40292
     },
@@ -6983,6 +7358,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-2.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "e28f2859301cc7bc4781db5469895e2b0cc4fe298148636f74d64a8954ec5132",
       "uncompressedByteCount" : 2032685
     },
@@ -7003,6 +7379,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-3.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "e8de405283a15dacc888b0bf85ece878f70672bad6ec661002e5fee4eee2eea5",
       "uncompressedByteCount" : 638144
     },
@@ -7022,6 +7399,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-4.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "06946026ae72c74688aba007a6f0c145a2bc9947f10979dec5f4803bb0f3e0ba",
       "uncompressedByteCount" : 164935
     },
@@ -7042,6 +7420,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-5.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "169e27750be4f1a9b0ac39650b990a700e294d0a8b2faab45791f4160dfeb400",
       "uncompressedByteCount" : 221007
     },
@@ -7062,6 +7441,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-6.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "7311a5b2447f38777e0eb14cf5ee5882b5f93d365a126c04bfa8af3cc0683656",
       "uncompressedByteCount" : 608310
     },
@@ -7082,6 +7462,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-7.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "60d997e649cbc24e91b741c9cd13af1b53bf7667fb4fadfcd84f4b0804ef571f",
       "uncompressedByteCount" : 1190778
     },
@@ -7101,6 +7482,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ecd86a7459926af4779ff4dc7f372c20beddce67703cfed0addeaa734f050572",
       "uncompressedByteCount" : 20962
     },
@@ -7121,6 +7503,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-2.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "d4572c54cf1dcb92480d961d5c482aa03e0cc206a26547c95605bd6713cf3422",
       "uncompressedByteCount" : 1405684
     },
@@ -7141,6 +7524,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-3.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "9c38dd2851ea53647fcbfae7c8ce47b4304113ea07211b30dcbee60032cb1850",
       "uncompressedByteCount" : 344852
     },
@@ -7161,6 +7545,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ec9c8821302bdfa0cebf84efd37dd931673ca76635ab1c96c2a97148b9b006e8",
       "uncompressedByteCount" : 349277
     },
@@ -7180,6 +7565,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-1.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "44201f9a4cf549c5571ca5c6cf4ab3e4a3d41dcbb9e457940f053870e526ba89",
       "uncompressedByteCount" : 560242
     },
@@ -7199,6 +7585,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "338ff548ebc2c67ce8ac5494e6e786082f135234cc75caf4cd59e18df5813d83",
       "uncompressedByteCount" : 41377
     },
@@ -7219,6 +7606,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a264fdd4224df6441f75eb1bfba69ccbe63c273c86a25454b4cc4fec9428dd3c",
       "uncompressedByteCount" : 1304226
     },
@@ -7238,6 +7626,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0547f77db9f28d1c4fcf92a6e4bf3c1edb6bcd8fbda3a766cd979a52d268ad1a",
       "uncompressedByteCount" : 134875
     },
@@ -7257,6 +7646,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-5.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "de2666640c14d70cdfc7e9b3ccf5bedb3f98dd28bce943f7d89660aaa0cf9e7b",
       "uncompressedByteCount" : 164402
     },
@@ -7277,6 +7667,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "46a14e4c97981b77487912c1dc229c2018b04d4feedff5d9570f8c3332fd1ce8",
       "uncompressedByteCount" : 267066
     },
@@ -7296,6 +7687,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "693a095ae7a59392dd316fc3347d606bc64afa218948bc6a1690f372bf9ca3c1",
       "uncompressedByteCount" : 247060
     },
@@ -7316,6 +7708,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7a33afa8465542516c1d2ec1db4f0753d3388f8f11d8de882baaca386d581e33",
       "uncompressedByteCount" : 396501
     },
@@ -7335,6 +7728,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-9.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "683a42f167dae1291542f7970e17e1f55935af765bad2dffa3fb4297932da6db",
       "uncompressedByteCount" : 35167
     },
@@ -7353,6 +7747,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/V-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c2980179ccd5548ebbc81d20a5aa278671dd60158a3976f0af25dd08456cf559",
       "uncompressedByteCount" : 10280
     },
@@ -7371,6 +7766,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/V-2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "668561614e4c6257096841b153dc132464957a68dcd2f0bca81a9216027b54ad",
       "uncompressedByteCount" : 263144
     },
@@ -7390,6 +7786,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/V-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a62c30edebef3c391d31badc43e7539d3ff3b201e86033ee7746247e68b6c83c",
       "uncompressedByteCount" : 13400
     },
@@ -7409,6 +7806,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/V-4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e5bd9f74844e088989e20fa5783d2daf7ca733bf882794f2c977305bb9fd644d",
       "uncompressedByteCount" : 73510
     },
@@ -7428,6 +7826,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-1.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "1f4bf2da8dc6dd4709bcedb3cd1ce54bd480c9809d91582f114a505ea2de6909",
       "uncompressedByteCount" : 72035
     },
@@ -7448,6 +7847,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-2.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "e67138b12bd498709980a6dcdec765840dacd3b5929b3b8f6e5be1be56d96f30",
       "uncompressedByteCount" : 2024172
     },
@@ -7467,6 +7867,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e7940f08049bc0019eb6e8072cc4d5dffbf8e3b682cf0fc3454d12007ed7d9a8",
       "uncompressedByteCount" : 103780
     },
@@ -7486,6 +7887,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-4.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "2b91e184cda0ef651f548cfc5e0fdf06edd8b990e3f84055fc577fb557a22287",
       "uncompressedByteCount" : 314179
     },
@@ -7505,6 +7907,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-5.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "83ffbee5f17c136cf531774bcfabed5d025686361da1117c93a91c89934f8e0d",
       "uncompressedByteCount" : 166804
     },
@@ -7525,6 +7928,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e92c05322d7d30361af8855d8ce9b214d41295711d4c46bd39f2a16a3be0c15d",
       "uncompressedByteCount" : 251511
     },
@@ -7543,6 +7947,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "f77c5490bbe5676e097ef2ffbb751919f0575fbfdedcfc7e5e5b0364003f6fc6",
       "uncompressedByteCount" : 8741
     },
@@ -7562,6 +7967,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "28b78cad060bc3ee4470308c00c5b4ec5786c16d4de74dfe44241623f0ed4cba",
       "uncompressedByteCount" : 64335
     },
@@ -7582,6 +7988,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c9ddedbcaa50271037efa45c00637ae96579d825d24f1dce36c45132b647c8f8",
       "uncompressedByteCount" : 534819
     },
@@ -7602,6 +8009,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-4.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "1476b5ff7774efa59e85d612482583cfe3c88df904d690670b6c693d1e6f0dc6",
       "uncompressedByteCount" : 874104
     },
@@ -7621,6 +8029,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a5bfec6dcb352f5f9f30b0cedb6798c3c27dbcbc0dd61ac6e79f14bcf5e43d15",
       "uncompressedByteCount" : 87405
     },
@@ -7640,6 +8049,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "40b1fd90f688c25325ce6f42d2f6e1fb1bfbb742500b72726f55d4c4af7b92b9",
       "uncompressedByteCount" : 49556
     },
@@ -7659,6 +8069,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "b710a40c930bfb6f738e9143acd17def26b6910d54cd802921ac212b67b0b431",
       "uncompressedByteCount" : 115401
     },
@@ -7678,6 +8089,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "5b6986da797451307b42c6f234a254b49badda18dd810bf2155676db872d8a8e",
       "uncompressedByteCount" : 284034
     },
@@ -7697,6 +8109,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-9.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "b17ef6baae572accdafebe6aa561962a388c3b4e2f8513d0f9e5c66b9e91d97c",
       "uncompressedByteCount" : 88325
     },
@@ -7717,6 +8130,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-1.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "db87bf030b1f85a84099c3628e807ec63e3de4925f91dd6d13845f468983fcce",
       "uncompressedByteCount" : 2436247
     },
@@ -7736,6 +8150,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "930c910eb6d9f9b3276f4a463243052c7726660cef28382af8e9dc5473576ac6",
       "uncompressedByteCount" : 99828
     },
@@ -7755,6 +8170,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "49096041d1c00e40cacd290f5fa5cf101a73a50874d71c02bdc1268972a3286d",
       "uncompressedByteCount" : 14860
     },
@@ -7774,6 +8190,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d6271c8b8d87abe6ba4f6140c3dd44d03140baf90fddfca26b0e504cd3e8d7d7",
       "uncompressedByteCount" : 167646
     },
@@ -7793,6 +8210,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ad9b173485f98dacf8d8fb7c72edac1669133bc61a7aa10402b09f5e5cfab4c4",
       "uncompressedByteCount" : 34913
     },
@@ -7812,6 +8230,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3dcff2aeed2a35b26b303599795164fcbf081b62b04963ab0e72de4d9320cfc2",
       "uncompressedByteCount" : 54671
     },
@@ -7831,6 +8250,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d652bd0cd8458f7fd789e8be40d99e7c0229442c47e50a02d24f87cedf388e9b",
       "uncompressedByteCount" : 291340
     },
@@ -7850,6 +8270,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "38954f6a1155796fc6cf22df1a0e147f72176d9bfc3aaf4b89de02ab0e9ca804",
       "uncompressedByteCount" : 85687
     },
@@ -7869,6 +8290,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-9.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ff2a0bf7296ce91a51d1d72c16df23182a9fa927ea9cecafed10469cf6e842b6",
       "uncompressedByteCount" : 86614
     },
@@ -7888,6 +8310,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0ae0e59cc0811aca9418bef4bc5d77743aeb37a41a0689055f91c1e2a15ffd0c",
       "uncompressedByteCount" : 339629
     },
@@ -7907,6 +8330,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-2.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "9f826fff1d6b9e696830a2a476b50cc34c4496008bd1191f7ef5817009694eb4",
       "uncompressedByteCount" : 257449
     },
@@ -7926,6 +8350,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "c004d6912210142d269bf1dde3eeadb0397e444d155ae9f1e2600646598d4b67",
       "uncompressedByteCount" : 46571
     },
@@ -7945,6 +8370,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "5c592a96e85e3cb11f4761f57c45314a7f27714cb3b2ac932373bec6ed57e624",
       "uncompressedByteCount" : 274710
     },
@@ -7965,6 +8391,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-5.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "d548d7d3bb1ee26528a1f0d816725215f67135c7d921ec9ad9acdf9d555a1b27",
       "uncompressedByteCount" : 409086
     },
@@ -7984,6 +8411,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "7eea2893d017333d0485dc4294444f24fd7200539cb95e219ea021c4885703c0",
       "uncompressedByteCount" : 71245
     },
@@ -8004,6 +8432,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "78b0999a943dfb54124731594b6a59084a21fafa21a44770f1fbe7a2d2ceb17b",
       "uncompressedByteCount" : 372525
     },
@@ -8024,6 +8453,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "8e5ee12c8658b2601662cac5b139fe5913971e8629e3496916e1bf0e19994d5c",
       "uncompressedByteCount" : 48308
     },
@@ -8043,6 +8473,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-9.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "cb0805bcc229f41df404b5b795930f52c44143fd12a4fe6a1e8a65884d2488e9",
       "uncompressedByteCount" : 180931
     },
@@ -8062,6 +8493,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "9ddfb498806c200d26dfbc134b1fa4bb33eb1a02da7dcd4f047be261d6b03022",
       "uncompressedByteCount" : 62066
     },
@@ -8081,6 +8513,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "36fbead84211045d101e6565ab28ca17051f9df2102a9f0a4c43858e11ca71a8",
       "uncompressedByteCount" : 87751
     },
@@ -8100,6 +8533,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "6b6d572a0817dcc41e7610138ef082b5684773f263ebc9fb96ff158393f4e19e",
       "uncompressedByteCount" : 63395
     },
@@ -8119,6 +8553,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0e15dd449d30b7e98fe384688dbee536084eb6b0df1a9ee15e80f7e591fd8e6d",
       "uncompressedByteCount" : 27555
     },
@@ -8138,6 +8573,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "70762c31de45beb090a7d1c17f44e193660643eae33515295db2fa78ecd4b0f4",
       "uncompressedByteCount" : 99213
     },
@@ -8157,6 +8593,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "85249aa26d2c95f2881e3c7cdaed25b0bc52fb8c101adc550dfe4fe48eb483aa",
       "uncompressedByteCount" : 169581
     },
@@ -8176,6 +8613,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-7.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "f8fbcf99160f22c6639222aa2dd5f1b797eb6e797113c43b0d7f318882739a15",
       "uncompressedByteCount" : 506680
     },
@@ -8196,6 +8634,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-8.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "5e06173d405e62bf279cdd2cbeee0445d0a5f27cf7dcf6e04720553a28cd85f1",
       "uncompressedByteCount" : 46839
     },
@@ -8215,6 +8654,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-9.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "6f37add14a6d29b8ddc51d72837cf124671e66a7ed107abda4d0637641bb210c",
       "uncompressedByteCount" : 337517
     },
@@ -8234,6 +8674,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3eeac684da827b3d9a24492233d54b8bbcdafa55e204ecbf286761b0c9596751",
       "uncompressedByteCount" : 64709
     },
@@ -8254,6 +8695,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "06098443111788474a217b8c1594257611ad06353588c2c9c359bdc7852dfe53",
       "uncompressedByteCount" : 99202
     },
@@ -8273,6 +8715,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "e47ecaae7114646c3de8220b4eaa3a66f22e49649be8e7bd1abe1b562231f972",
       "uncompressedByteCount" : 243070
     },
@@ -8292,6 +8735,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "d12f3f5e4e73c0130bf801a48c5f4e6465fcb0ce1c5cd1d9be370c469fa15360",
       "uncompressedByteCount" : 266313
     },
@@ -8311,6 +8755,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "12bc6e64a17d946bd260b610a101f544663a6ca7fbdf1911467d904a9007ff95",
       "uncompressedByteCount" : 144753
     },
@@ -8331,6 +8776,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "68077827bf149e61298a3a3a335666cbd8f30e7d85e678dfb2a78967b6177f57",
       "uncompressedByteCount" : 115861
     },
@@ -8349,6 +8795,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ae7306d1ce82e5c9d5ee7415d69a4c7fdc3088a78063289e316fccc5789b036d",
       "uncompressedByteCount" : 289604
     },
@@ -8368,6 +8815,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "39d07fa713db1ecdefb3be29578411d774aea27c51b92a4afe6b4291038aff1f",
       "uncompressedByteCount" : 170561
     },
@@ -8388,6 +8836,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "aa9164755a2f91c963b6524479224a0e07834f63d6a1d32e3eba48b0a4a17142",
       "uncompressedByteCount" : 277610
     },
@@ -8408,6 +8857,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "4c55ec690f79a986502d91fc46d0ad55b3c231dc3e71d9583cbf5ed90d7d5e2e",
       "uncompressedByteCount" : 60927
     },
@@ -8427,6 +8877,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ce62f878500c98f853a0e39cc16040f3f8fc0faf8e94f40eea4c6fff55fad5b1",
       "uncompressedByteCount" : 113096
     },
@@ -8447,6 +8898,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-4.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "9b4d92ef7dd58cf5613b0dad878fbbe68d841d25d8365af869f80ab6e9a5becc",
       "uncompressedByteCount" : 213110
     },
@@ -8466,6 +8918,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "a58c3db452336bd414fbc6b98f8802bb1f9b22359b87b86d3c933a0021b9f414",
       "uncompressedByteCount" : 130909
     },
@@ -8485,6 +8938,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-6.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "779018603239e036c35f3cdb010f21b0954dfd007a5eb5d3bc94c9a2c233afe1",
       "uncompressedByteCount" : 187262
     },
@@ -8504,6 +8958,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-7.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "825a4ee6e01b6465c82026c49ef464d7808f797ffbf74d4f115b0ecebdd918da",
       "uncompressedByteCount" : 88637
     },
@@ -8523,6 +8978,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-8.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "56ac8655053eaae70aca9e1fae452451aab2b765b50e5aed990bece78cc4e4e2",
       "uncompressedByteCount" : 108405
     },
@@ -8542,6 +8998,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-9.html",
+      "rolloutTier" : "media",
       "sourceSHA256" : "3c4a636fb9f6b759117f932888fbf646394031290037e6ca15489bf42c833d07",
       "uncompressedByteCount" : 427155
     },
@@ -8561,6 +9018,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-1.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "ae4914e78aedbb442cae91a0c2c10ae00a34a57242625ed28c0003ea9c885c7e",
       "uncompressedByteCount" : 87834
     },
@@ -8580,6 +9038,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-2.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "0dffa6162e36b6d0f6181e56ee0a8901de959cf31df586397e61d4ea9569940d",
       "uncompressedByteCount" : 195917
     },
@@ -8599,6 +9058,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-3.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "92c1064dc686840af5c4962a0a0b286152fcf3ed490f0380d86120d57403284c",
       "uncompressedByteCount" : 108840
     },
@@ -8618,6 +9078,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-4.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "3f83e2f773b0dd95a2ca644b9394f39e3bdcc197b3299c44b69a98226dbc8727",
       "uncompressedByteCount" : 204297
     },
@@ -8638,6 +9099,7 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-5.html",
+      "rolloutTier" : "textOnly",
       "sourceSHA256" : "1f0e7d1081e76527379b809eadfa37e8f32648078dd6c1779d6caa8051dbba68",
       "uncompressedByteCount" : 189272
     },
@@ -8657,10 +9119,11 @@
       },
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-6.html",
+      "rolloutTier" : "isolatedTableFallback",
       "sourceSHA256" : "7695da27ac1365ca3b601957c059cb126df95c500128dbd06a4d72a2c97a7f04",
       "uncompressedByteCount" : 87931
     }
   ],
   "parserSchemaVersion" : "native-reader-document-v2",
-  "schemaVersion" : 1
+  "schemaVersion" : 2
 }

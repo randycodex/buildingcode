@@ -22,11 +22,17 @@ enum AppSQLiteError: Error, LocalizedError {
     }
 }
 
-final class SQLiteConnection {
+final class SQLiteConnection: @unchecked Sendable {
     private var handle: OpaquePointer?
+    private let accessLock = NSRecursiveLock()
 
     init(path: String, readOnly: Bool) throws {
-        let flags = readOnly ? SQLITE_OPEN_READONLY : (SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE)
+        // Explicitly request SQLite's serialized connection mode. User-content
+        // sync can resume on a cooperative executor while UI mutations are
+        // still using the same connection, so relying on the process-wide
+        // SQLite threading default is not sufficient here.
+        let flags = (readOnly ? SQLITE_OPEN_READONLY : (SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE))
+            | SQLITE_OPEN_FULLMUTEX
         if sqlite3_open_v2(path, &handle, flags, nil) != SQLITE_OK {
             let message = handle.flatMap { String(cString: sqlite3_errmsg($0)) } ?? "Unable to open SQLite database."
             throw AppSQLiteError.openFailed(message)
@@ -46,19 +52,29 @@ final class SQLiteConnection {
     }
 
     deinit {
+        accessLock.lock()
         sqlite3_close(handle)
+        accessLock.unlock()
     }
 
     func execute(_ sql: String) throws {
-        guard sqlite3_exec(handle, sql, nil, nil, nil) == SQLITE_OK else {
-            throw AppSQLiteError.executeFailed(lastErrorMessage())
+        try withExclusiveAccess {
+            guard sqlite3_exec(handle, sql, nil, nil, nil) == SQLITE_OK else {
+                throw AppSQLiteError.executeFailed(lastErrorMessage())
+            }
         }
     }
 
     func prepare(_ sql: String) throws -> OpaquePointer {
+        // Hold the recursive lock for the complete prepared-statement
+        // lifecycle. `finalize(_:)` releases it, preventing another executor
+        // from stepping or finalizing work on this connection in between.
+        accessLock.lock()
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(handle, sql, -1, &statement, nil) == SQLITE_OK, let statement else {
-            throw AppSQLiteError.prepareFailed(lastErrorMessage())
+            let message = lastErrorMessage()
+            accessLock.unlock()
+            throw AppSQLiteError.prepareFailed(message)
         }
         return statement
     }
@@ -72,6 +88,7 @@ final class SQLiteConnection {
     }
 
     func finalize(_ statement: OpaquePointer) {
+        defer { accessLock.unlock() }
         sqlite3_finalize(statement)
     }
 
@@ -94,7 +111,9 @@ final class SQLiteConnection {
     }
 
     func lastInsertedRowID() -> Int64 {
-        sqlite3_last_insert_rowid(handle)
+        withExclusiveAccess {
+            sqlite3_last_insert_rowid(handle)
+        }
     }
 
     func int64(at index: Int32, in statement: OpaquePointer) -> Int64 {
@@ -123,5 +142,11 @@ final class SQLiteConnection {
 
     private func lastErrorMessage() -> String {
         handle.flatMap { String(cString: sqlite3_errmsg($0)) } ?? "Unknown SQLite error"
+    }
+
+    func withExclusiveAccess<Result>(_ operation: () throws -> Result) rethrows -> Result {
+        accessLock.lock()
+        defer { accessLock.unlock() }
+        return try operation()
     }
 }

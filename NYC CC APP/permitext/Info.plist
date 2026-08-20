@@ -26,6 +26,8 @@
 	<false/>
 	<key>PermitextBackendAPIBaseURL</key>
 	<string>https://permitext-sync.vercel.app</string>
+	<key>PermitextNativeReaderRolloutStage</key>
+	<string>$(NATIVE_READER_ROLLOUT_STAGE)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

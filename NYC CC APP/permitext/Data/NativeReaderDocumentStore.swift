@@ -179,6 +179,86 @@ struct NativeReaderRuntimeEligibility: Decodable, Equatable, Sendable {
     let reasons: [String]
 }
 
+enum NativeReaderRolloutTier: String, Decodable, CaseIterable, Sendable {
+    case textOnly
+    case media
+    case nativeTable
+    case isolatedTableFallback
+}
+
+enum NativeReaderRolloutStage: Int, CaseIterable, Sendable {
+    case disabled
+    case textOnly
+    case media
+    case nativeTable
+    case isolatedTableFallback
+
+    var featureFlagValue: String {
+        switch self {
+        case .disabled: "off"
+        case .textOnly: "text-only"
+        case .media: "media"
+        case .nativeTable: "native-tables"
+        case .isolatedTableFallback: "isolated-table-fallback"
+        }
+    }
+
+    init?(featureFlagValue: String) {
+        guard let stage = Self.allCases.first(where: {
+            $0.featureFlagValue == featureFlagValue.lowercased()
+        }) else { return nil }
+        self = stage
+    }
+
+    func includes(_ tier: NativeReaderRolloutTier) -> Bool {
+        switch tier {
+        case .textOnly:
+            return rawValue >= Self.textOnly.rawValue
+        case .media:
+            return rawValue >= Self.media.rawValue
+        case .nativeTable:
+            return rawValue >= Self.nativeTable.rawValue
+        case .isolatedTableFallback:
+            return rawValue >= Self.isolatedTableFallback.rawValue
+        }
+    }
+}
+
+enum NativeReaderRolloutPolicy {
+    static let stageArgument = "--native-reader-rollout-stage"
+    static let infoPlistKey = "PermitextNativeReaderRolloutStage"
+
+    static var activeStage: NativeReaderRolloutStage {
+        resolvedStage(
+            arguments: ProcessInfo.processInfo.arguments,
+            bundledValue: Bundle.main.object(forInfoDictionaryKey: infoPlistKey) as? String
+        )
+    }
+
+    static func resolvedStage(
+        arguments: [String],
+        bundledValue: String? = nil
+    ) -> NativeReaderRolloutStage {
+        if let index = arguments.firstIndex(of: stageArgument) {
+            guard arguments.indices.contains(index + 1),
+                  let requestedStage = NativeReaderRolloutStage(
+                      featureFlagValue: arguments[index + 1]
+                  ) else {
+                return .disabled
+            }
+            return requestedStage
+        }
+        if let bundledValue, !bundledValue.isEmpty {
+            return NativeReaderRolloutStage(featureFlagValue: bundledValue) ?? .disabled
+        }
+#if DEBUG
+        return .isolatedTableFallback
+#else
+        return .disabled
+#endif
+    }
+}
+
 struct NativeReaderRuntimeValidation: Decodable, Equatable, Sendable {
     let normalizedTextMatches: Bool
     let anchorSequenceMatches: Bool
@@ -226,6 +306,20 @@ struct NativeReaderRuntimeDocument: Decodable, Equatable, Sendable {
     var isValidatedTextOnly: Bool {
         isValidatedNativeContent
             && blocks.allSatisfy { $0.kind.isTextOnly }
+    }
+
+    var rolloutTier: NativeReaderRolloutTier {
+        let tables = blocks.compactMap(\.table)
+        if tables.contains(where: { $0.renderingClassification == .isolatedHTML }) {
+            return .isolatedTableFallback
+        }
+        if !tables.isEmpty {
+            return .nativeTable
+        }
+        if blocks.contains(where: { !$0.media.isEmpty }) {
+            return .media
+        }
+        return .textOnly
     }
 
     var isValidatedNativeContent: Bool {
@@ -362,7 +456,7 @@ enum NativeReaderDocumentStoreError: LocalizedError, Equatable {
 final class NativeReaderDocumentStore: @unchecked Sendable {
     static let shared = NativeReaderDocumentStore()
 
-    static let supportedIndexSchemaVersion = 1
+    static let supportedIndexSchemaVersion = 2
     static let supportedDocumentSchemaVersion = 1
     static let supportedParserSchemaVersion = "native-reader-document-v2"
 
@@ -396,6 +490,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         let compressedSHA256: String
         let uncompressedByteCount: Int
         let compressedByteCount: Int
+        let rolloutTier: NativeReaderRolloutTier
         let eligibility: NativeReaderRuntimeEligibility
         let passesStructuralValidation: Bool
     }
@@ -458,13 +553,83 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
 
     func debugValidatedRoute(forRelativeSourcePath relativePath: String) async -> NativeReaderDocumentRoute? {
         #if DEBUG
+        return await validatedRoute(
+            forRelativeSourcePath: relativePath,
+            rolloutStage: nil
+        )
+        #else
+        _ = relativePath
+        return nil
+        #endif
+    }
+
+    func rolloutRoute(
+        for chapterURL: URL,
+        stage: NativeReaderRolloutStage = NativeReaderRolloutPolicy.activeStage
+    ) async -> NativeReaderDocumentRoute? {
+        guard stage != .disabled,
+              let corpusRootURL,
+              let relativePath = Self.relativePath(for: chapterURL, below: corpusRootURL)
+        else { return nil }
+        return await validatedRoute(
+            forRelativeSourcePath: relativePath,
+            rolloutStage: stage
+        )
+    }
+
+    func debugValidatedSourcePaths() async -> [String] {
+        #if DEBUG
+        guard case .success(let index) = await indexTask.value else { return [] }
+        return index.entries.compactMap { entry in
+            guard Self.supportsValidatedEligibility(entry.eligibility),
+                  entry.passesStructuralValidation
+            else { return nil }
+            return entry.relativePath
+        }.sorted()
+        #else
+        return []
+        #endif
+    }
+
+    func debugRolloutSourcePaths(for stage: NativeReaderRolloutStage) async -> [String] {
+        #if DEBUG
+        guard stage != .disabled,
+              case .success(let index) = await indexTask.value else { return [] }
+        return index.entries.compactMap { entry in
+            guard Self.supportsValidatedEligibility(entry.eligibility),
+                  entry.passesStructuralValidation,
+                  stage.includes(entry.rolloutTier)
+            else { return nil }
+            return entry.relativePath
+        }.sorted()
+        #else
+        _ = stage
+        return []
+        #endif
+    }
+
+    func debugRolloutTier(forRelativeSourcePath relativePath: String) async -> NativeReaderRolloutTier? {
+        #if DEBUG
+        guard case .success(let index) = await indexTask.value else { return nil }
+        return index.entries.first(where: { $0.relativePath == relativePath })?.rolloutTier
+        #else
+        _ = relativePath
+        return nil
+        #endif
+    }
+
+    private func validatedRoute(
+        forRelativeSourcePath relativePath: String,
+        rolloutStage: NativeReaderRolloutStage?
+    ) async -> NativeReaderDocumentRoute? {
         guard let corpusRootURL,
               !relativePath.hasPrefix("/"),
               !relativePath.split(separator: "/").contains(".."),
               case .success(let index) = await indexTask.value,
               let entry = index.entries.first(where: { $0.relativePath == relativePath }),
-              Self.supportsDebugEligibility(entry.eligibility),
+              Self.supportsValidatedEligibility(entry.eligibility),
               entry.passesStructuralValidation,
+              rolloutStage.map({ $0.includes(entry.rolloutTier) }) ?? true,
               let documentURL = Self.resolvedDocumentURL(
                   relativePath: entry.documentPath,
                   corpusRootURL: corpusRootURL
@@ -484,24 +649,6 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
             uncompressedByteCount: entry.uncompressedByteCount,
             compressedByteCount: entry.compressedByteCount
         )
-        #else
-        _ = relativePath
-        return nil
-        #endif
-    }
-
-    func debugValidatedSourcePaths() async -> [String] {
-        #if DEBUG
-        guard case .success(let index) = await indexTask.value else { return [] }
-        return index.entries.compactMap { entry in
-            guard Self.supportsDebugEligibility(entry.eligibility),
-                  entry.passesStructuralValidation
-            else { return nil }
-            return entry.relativePath
-        }.sorted()
-        #else
-        return []
-        #endif
     }
 
     func loadDocument(for route: NativeReaderDocumentRoute) async throws -> NativeReaderRuntimeDocument {
@@ -740,7 +887,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         stateLock.unlock()
     }
 
-    private static func supportsDebugEligibility(_ eligibility: NativeReaderRuntimeEligibility) -> Bool {
+    private static func supportsValidatedEligibility(_ eligibility: NativeReaderRuntimeEligibility) -> Bool {
         switch eligibility.state {
         case .native:
             return eligibility.reasons.isEmpty

@@ -61,8 +61,7 @@ enum ChapterHTMLReaderRuntimeCaches {
     }
 }
 
-#if DEBUG
-private enum DebugChapterReaderPresentation: String, CaseIterable, Identifiable {
+private enum ChapterReaderPresentation: String, CaseIterable, Identifiable {
     case html
     case native
 
@@ -70,12 +69,11 @@ private enum DebugChapterReaderPresentation: String, CaseIterable, Identifiable 
 
     var title: String {
         switch self {
-        case .html: "HTML (Default)"
-        case .native: "Native (Comparison)"
+        case .html: "HTML (Diagnostic)"
+        case .native: "Native (Rollout Default)"
         }
     }
 }
-#endif
 
 struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
@@ -112,10 +110,9 @@ struct ChapterHTMLReaderView: View {
     @State private var htmlLoadState: ChapterHTMLLoadState = .loading
     @State private var htmlReloadTrigger = 0
     @State private var nativeReaderRoute: NativeReaderDocumentRoute?
-#if DEBUG
-    @State private var debugReaderPresentation: DebugChapterReaderPresentation = .html
+    @State private var readerPresentation: ChapterReaderPresentation = .html
     @State private var nativeReaderFallbackMessage: String?
-#endif
+    @State private var rolloutRouteResolved = NativeReaderRolloutPolicy.activeStage == .disabled
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -155,12 +152,12 @@ struct ChapterHTMLReaderView: View {
         htmlStore.chapterURL(chapterNumber: chapter.chapterNumber)
     }
 
-    private var usesNativeDebugReader: Bool {
-#if DEBUG
-        debugReaderPresentation == .native && nativeReaderRoute != nil
-#else
-        false
-#endif
+    private var usesNativeRolloutReader: Bool {
+        readerPresentation == .native && nativeReaderRoute != nil
+    }
+
+    private var isRolloutRouteResolved: Bool {
+        rolloutRouteResolved
     }
 
     private var readAccessURL: URL? {
@@ -314,7 +311,9 @@ struct ChapterHTMLReaderView: View {
     var body: some View {
         Group {
             if let chapterURL, let readAccessURL {
-                if usesNativeDebugReader, let nativeReaderRoute {
+                if !isRolloutRouteResolved {
+                    chapterLoadingShell
+                } else if usesNativeRolloutReader, let nativeReaderRoute {
                     ChapterReaderView(
                         chapter: chapter,
                         initialSectionID: initialSection.id,
@@ -325,10 +324,8 @@ struct ChapterHTMLReaderView: View {
                         rememberedNativeBlockID: rememberedNativeBlockID,
                         rememberedAnchorID: rememberedAnchorID,
                         onNativeFallbackToHTML: { message in
-#if DEBUG
-                            debugReaderPresentation = .html
+                            readerPresentation = .html
                             nativeReaderFallbackMessage = message
-#endif
                         },
                         onNativeOpenReference: { section in
                             inlineReferenceDestination = section
@@ -379,10 +376,10 @@ struct ChapterHTMLReaderView: View {
             }
 
             ToolbarItemGroup(placement: .topBarTrailing) {
-#if DEBUG
-                debugReaderSelector
-#endif
-                if !usesNativeDebugReader {
+                if NativeReaderRolloutPolicy.activeStage != .disabled {
+                    readerDiagnosticSelector
+                }
+                if !usesNativeRolloutReader {
                     chapterSearchToolbarButton
                 }
             }
@@ -390,8 +387,26 @@ struct ChapterHTMLReaderView: View {
         .tint(accentColor)
         .task(id: chapterURL?.standardizedFileURL.path) {
             nativeReaderRoute = nil
-            guard let chapterURL else { return }
-            nativeReaderRoute = await NativeReaderDocumentStore.shared.debugRoute(for: chapterURL)
+            readerPresentation = .html
+            nativeReaderFallbackMessage = nil
+            let rolloutStage = NativeReaderRolloutPolicy.activeStage
+            guard rolloutStage != .disabled else {
+                rolloutRouteResolved = true
+                return
+            }
+            rolloutRouteResolved = false
+            guard let chapterURL else {
+                rolloutRouteResolved = true
+                return
+            }
+            let resolvedRoute = await NativeReaderDocumentStore.shared.rolloutRoute(
+                for: chapterURL,
+                stage: rolloutStage
+            )
+            guard !Task.isCancelled else { return }
+            nativeReaderRoute = resolvedRoute
+            readerPresentation = resolvedRoute == nil ? .html : .native
+            rolloutRouteResolved = true
         }
         .onAppear {
             ensureHTMLStoreCached()
@@ -420,8 +435,10 @@ struct ChapterHTMLReaderView: View {
             lastRecordedVisibleAnchorID = nil
             chapterSearchQuery = ""
         }
-        .task(id: "\(chapter.id)|\(usesNativeDebugReader)") {
-            guard hasActivatedHTMLReader, !usesNativeDebugReader else { return }
+        .task(id: "\(chapter.id)|\(usesNativeRolloutReader)|\(isRolloutRouteResolved)") {
+            guard isRolloutRouteResolved,
+                  hasActivatedHTMLReader,
+                  !usesNativeRolloutReader else { return }
             if anchors.isEmpty {
                 await loadAnchors()
             }
@@ -460,14 +477,17 @@ struct ChapterHTMLReaderView: View {
                 .environmentObject(library)
         }
         .overlay(alignment: .top) {
-            if chapterURL != nil, readAccessURL != nil, hasActivatedHTMLReader, !usesNativeDebugReader {
+            if chapterURL != nil,
+               readAccessURL != nil,
+               isRolloutRouteResolved,
+               hasActivatedHTMLReader,
+               !usesNativeRolloutReader {
                 CodeTopContentFade(alwaysVisible: true)
             }
         }
         .onDisappear {
             chapterSearchQuery = ""
         }
-#if DEBUG
         .alert(
             "Native reader used HTML fallback",
             isPresented: Binding(
@@ -479,26 +499,32 @@ struct ChapterHTMLReaderView: View {
                 nativeReaderFallbackMessage = nil
             }
         } message: {
-            Text(nativeReaderFallbackMessage ?? "The native pilot could not validate this chapter.")
+            Text(nativeReaderFallbackMessage ?? "The native reader could not validate this chapter.")
         }
-#endif
     }
 
-#if DEBUG
-    private var debugReaderSelector: some View {
+    private var readerDiagnosticSelector: some View {
         Menu {
-            Picker("Reader presentation", selection: $debugReaderPresentation) {
-                Text(DebugChapterReaderPresentation.html.title)
-                    .tag(DebugChapterReaderPresentation.html)
+            Picker("Reader presentation", selection: $readerPresentation) {
                 if nativeReaderRoute != nil {
-                    Text(DebugChapterReaderPresentation.native.title)
-                        .tag(DebugChapterReaderPresentation.native)
+                    Text(ChapterReaderPresentation.native.title)
+                        .tag(ChapterReaderPresentation.native)
                 }
+                Text(ChapterReaderPresentation.html.title)
+                    .tag(ChapterReaderPresentation.html)
             }
             if nativeReaderRoute == nil {
-                Label("Native pilot unavailable for this chapter", systemImage: "lock.fill")
+                Label(
+                    "Native rollout unavailable at this stage or for this chapter",
+                    systemImage: "lock.fill"
+                )
                     .foregroundStyle(.secondary)
             }
+            Label(
+                "Stage: \(NativeReaderRolloutPolicy.activeStage.featureFlagValue)",
+                systemImage: "flag.fill"
+            )
+            .foregroundStyle(.secondary)
         } label: {
             Image(systemName: "ladybug.fill")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
@@ -506,10 +532,9 @@ struct ChapterHTMLReaderView: View {
                 .background(Color(uiColor: .systemBackground))
                 .clipShape(Capsule(style: .continuous))
         }
-        .accessibilityLabel("Debug reader mode")
-        .accessibilityValue(debugReaderPresentation.title)
+        .accessibilityLabel("Internal reader mode")
+        .accessibilityValue(readerPresentation.title)
     }
-#endif
 
     private var chapterLoadingShell: some View {
         pageBackgroundColor

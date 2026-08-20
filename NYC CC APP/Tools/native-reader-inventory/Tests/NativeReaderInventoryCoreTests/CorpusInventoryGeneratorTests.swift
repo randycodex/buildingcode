@@ -66,6 +66,7 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertEqual(document.blocks.flatMap(\.media).count, 2)
         XCTAssertEqual(document.blocks.flatMap(\.media).map(\.accessibilityText), ["Diagram", "Nested diagram"])
         XCTAssertTrue(document.validation.imageInventoryMatches)
+        XCTAssertEqual(NativeReaderRolloutTier(blocks: document.blocks), .nativeTable)
     }
 
     func testComplexTableAndUnknownMarkupReceiveExplicitFallbackClassification() throws {
@@ -124,6 +125,7 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertEqual(table.footnotes, ["Exact footnote"])
         XCTAssertTrue(table.sourceHTML?.contains("unreviewed-cell") == true)
         XCTAssertTrue(table.sourceHTML?.contains("mystery-property") == true)
+        XCTAssertEqual(NativeReaderRolloutTier(blocks: document.blocks), .isolatedTableFallback)
     }
 
     func testOversizedIsolatedTableKeepsWholeChapterOnHTML() throws {
@@ -277,6 +279,7 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertTrue(document.blocks.map(\.plainText).joined(separator: " ").contains(enactedText))
         XCTAssertFalse(document.blocks.map(\.plainText).joined().contains("â"))
         XCTAssertTrue(document.validation.normalizedTextMatches)
+        XCTAssertEqual(NativeReaderRolloutTier(blocks: document.blocks), .textOnly)
     }
 
     func testUnsupportedDocumentBlockPreservesRecoveredSourceAndRoutesToHTML() throws {

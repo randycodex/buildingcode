@@ -265,6 +265,40 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(try scalarInt("PRAGMA foreign_keys;", connection: connection), 1)
     }
 
+    func testSQLiteConnectionSerializesConcurrentStatementLifetimes() async throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-sqlite-serialized-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        let connection = try SQLiteConnection(path: databaseURL.path, readOnly: false)
+        try connection.execute("CREATE TABLE concurrent_writes (value INTEGER NOT NULL);")
+
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for worker in 0..<8 {
+                group.addTask {
+                    for index in 0..<40 {
+                        let statement = try connection.prepare(
+                            "INSERT INTO concurrent_writes (value) VALUES (?);"
+                        )
+                        defer { connection.finalize(statement) }
+                        sqlite3_bind_int64(statement, 1, Int64(worker * 40 + index))
+                        _ = try connection.step(statement)
+                    }
+                }
+            }
+            try await group.waitForAll()
+        }
+
+        XCTAssertEqual(
+            try scalarInt("SELECT COUNT(*) FROM concurrent_writes;", connection: connection),
+            320
+        )
+    }
+
     func testLegacySQLiteFTSSearchTreatsOperatorsAndMalformedSyntaxAsLiteralText() throws {
         let databaseURL = try temporaryLegacySearchDatabase()
         defer { try? FileManager.default.removeItem(at: databaseURL) }
@@ -2988,8 +3022,12 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
                 sourcePath
             )
             let document = try await store.loadDocument(for: route)
+            let indexedRolloutTier = await store.debugRolloutTier(
+                forRelativeSourcePath: sourcePath
+            )
 
             XCTAssertEqual(document.sourcePath, sourcePath)
+            XCTAssertEqual(indexedRolloutTier, document.rolloutTier, sourcePath)
             XCTAssertTrue(document.isValidatedNativeContent, sourcePath)
             XCTAssertTrue(document.validation.normalizedTextMatches, sourcePath)
             XCTAssertTrue(document.validation.anchorSequenceMatches, sourcePath)
@@ -3110,6 +3148,368 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             XCTAssertEqual(actualHash, expectedHash, fileName)
             XCTAssertGreaterThan(screenshotData.count, 50_000, fileName)
         }
+    }
+
+    func testPhaseTenFeatureFlagDefaultsInternalDebugToNativeAndFailsClosed() {
+        XCTAssertEqual(
+            NativeReaderRolloutPolicy.resolvedStage(arguments: ["permitext"]),
+            .isolatedTableFallback
+        )
+        XCTAssertEqual(
+            NativeReaderRolloutPolicy.resolvedStage(
+                arguments: ["permitext"],
+                bundledValue: "media"
+            ),
+            .media
+        )
+        XCTAssertEqual(
+            NativeReaderRolloutPolicy.resolvedStage(
+                arguments: [
+                    "permitext",
+                    NativeReaderRolloutPolicy.stageArgument,
+                    "text-only"
+                ],
+                bundledValue: "off"
+            ),
+            .textOnly
+        )
+        XCTAssertEqual(
+            NativeReaderRolloutPolicy.resolvedStage(
+                arguments: ["permitext"],
+                bundledValue: "unknown-stage"
+            ),
+            .disabled
+        )
+        for stage in NativeReaderRolloutStage.allCases {
+            XCTAssertEqual(
+                NativeReaderRolloutPolicy.resolvedStage(arguments: [
+                    "permitext",
+                    NativeReaderRolloutPolicy.stageArgument,
+                    stage.featureFlagValue
+                ]),
+                stage
+            )
+        }
+        XCTAssertEqual(
+            NativeReaderRolloutPolicy.resolvedStage(arguments: [
+                "permitext",
+                NativeReaderRolloutPolicy.stageArgument,
+                "unknown-stage"
+            ]),
+            .disabled
+        )
+        XCTAssertFalse(NativeReaderRolloutStage.media.includes(.nativeTable))
+        XCTAssertTrue(NativeReaderRolloutStage.nativeTable.includes(.nativeTable))
+        XCTAssertFalse(NativeReaderRolloutStage.nativeTable.includes(.isolatedTableFallback))
+        XCTAssertEqual(
+            NativeReaderRolloutPolicy.resolvedStage(arguments: [
+                "permitext",
+                NativeReaderRolloutPolicy.stageArgument
+            ]),
+            .disabled
+        )
+    }
+
+    func testPhaseTenRolloutStagesAreMonotonicAndCoverEveryValidatedTier() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let stages: [NativeReaderRolloutStage] = [
+            .textOnly,
+            .media,
+            .nativeTable,
+            .isolatedTableFallback
+        ]
+        var previousPaths: Set<String> = []
+        var observedTiers: Set<NativeReaderRolloutTier> = []
+        var rolloutCounts: [Int] = []
+
+        let disabledPaths = await store.debugRolloutSourcePaths(for: .disabled)
+        XCTAssertTrue(disabledPaths.isEmpty)
+
+        for stage in stages {
+            let paths = Set(await store.debugRolloutSourcePaths(for: stage))
+            rolloutCounts.append(paths.count)
+            XCTAssertTrue(paths.isSuperset(of: previousPaths), stage.featureFlagValue)
+            XCTAssertGreaterThanOrEqual(paths.count, previousPaths.count, stage.featureFlagValue)
+            for path in paths {
+                let resolvedTier = await store.debugRolloutTier(
+                    forRelativeSourcePath: path
+                )
+                let tier = try XCTUnwrap(
+                    resolvedTier,
+                    path
+                )
+                XCTAssertTrue(stage.includes(tier), path)
+                observedTiers.insert(tier)
+            }
+            previousPaths = paths
+        }
+
+        XCTAssertEqual(observedTiers, [.textOnly, .media, .isolatedTableFallback])
+        XCTAssertEqual(rolloutCounts, [233, 239, 239, 242])
+        let allValidatedPaths = await store.debugValidatedSourcePaths()
+        XCTAssertEqual(
+            previousPaths,
+            Set(allValidatedPaths)
+        )
+    }
+
+    func testPhaseTenRoutingHonorsEveryStageAndKeepsInvalidContentOnHTML() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let allPaths = await store.debugValidatedSourcePaths()
+        var representativePathByTier: [NativeReaderRolloutTier: String] = [:]
+        for path in allPaths where representativePathByTier.count < NativeReaderRolloutTier.allCases.count {
+            if let tier = await store.debugRolloutTier(forRelativeSourcePath: path),
+               representativePathByTier[tier] == nil {
+                representativePathByTier[tier] = path
+            }
+        }
+
+        let observedTiers: Set<NativeReaderRolloutTier> = [
+            .textOnly,
+            .media,
+            .isolatedTableFallback
+        ]
+        XCTAssertEqual(Set(representativePathByTier.keys), observedTiers)
+        for tier in observedTiers {
+            let path = try XCTUnwrap(representativePathByTier[tier])
+            let sourceURL = corpusRootURL.appendingPathComponent(path)
+            for stage in NativeReaderRolloutStage.allCases {
+                let route = await store.rolloutRoute(for: sourceURL, stage: stage)
+                XCTAssertEqual(route != nil, stage.includes(tier), "\(stage.featureFlagValue): \(path)")
+            }
+        }
+
+        let invalidSourceURL = corpusRootURL.appendingPathComponent(
+            "2026-zoning-resolution/chapters/APP-C-21242.html"
+        )
+        let invalidRoute = await store.rolloutRoute(
+            for: invalidSourceURL,
+            stage: .isolatedTableFallback
+        )
+        XCTAssertNil(invalidRoute)
+    }
+
+    func testPhaseTenBuildFlagsKeepNormalReleaseOffAndRetainHTMLDiagnostics() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let projectURL = projectRoot.appendingPathComponent(
+            "NYC CC APP.xcodeproj/project.pbxproj"
+        )
+        guard FileManager.default.fileExists(atPath: projectURL.path) else { return }
+
+        let projectSource = try String(contentsOf: projectURL, encoding: .utf8)
+        let readerSource = try String(
+            contentsOf: projectRoot.appendingPathComponent(
+                "permitext/Views/ChapterHTMLReaderView.swift"
+            ),
+            encoding: .utf8
+        )
+        let infoData = try Data(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Info.plist")
+        )
+        let info = try XCTUnwrap(
+            PropertyListSerialization.propertyList(from: infoData, format: nil)
+                as? [String: Any]
+        )
+
+        XCTAssertEqual(
+            info[NativeReaderRolloutPolicy.infoPlistKey] as? String,
+            "$(NATIVE_READER_ROLLOUT_STAGE)"
+        )
+        XCTAssertTrue(
+            projectSource.contains(
+                "NATIVE_READER_ROLLOUT_STAGE = \"isolated-table-fallback\";"
+            )
+        )
+        XCTAssertTrue(projectSource.contains("NATIVE_READER_ROLLOUT_STAGE = off;"))
+        XCTAssertTrue(readerSource.contains("Native (Rollout Default)"))
+        XCTAssertTrue(readerSource.contains("HTML (Diagnostic)"))
+        XCTAssertTrue(
+            readerSource.contains(
+                "NativeReaderRolloutPolicy.activeStage != .disabled"
+            )
+        )
+    }
+
+    func testNativeReaderScrollPersistenceIsDebouncedAndTextRowsKeepStableIdentity() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let nativeReaderURL = projectRoot
+            .appendingPathComponent("permitext/Views/NativeChapterTextReaderView.swift")
+        let attributedTextURL = projectRoot
+            .appendingPathComponent("permitext/Views/AttributedTextView.swift")
+
+        // Source contracts run in the simulator checkout. Physical-device
+        // tests still exercise the compiled implementation.
+        guard FileManager.default.fileExists(atPath: nativeReaderURL.path) else { return }
+        let nativeReaderSource = try String(contentsOf: nativeReaderURL, encoding: .utf8)
+        let attributedTextSource = try String(contentsOf: attributedTextURL, encoding: .utf8)
+
+        XCTAssertTrue(nativeReaderSource.contains("scheduleSettledScrollWork"))
+        XCTAssertTrue(nativeReaderSource.contains("Task.sleep(for: .milliseconds(250))"))
+        XCTAssertTrue(nativeReaderSource.contains(".onScrollPhaseChange"))
+        XCTAssertTrue(nativeReaderSource.contains("guard !scrollState.isScrollActive"))
+        XCTAssertTrue(nativeReaderSource.contains("phase == .decelerating"))
+        XCTAssertFalse(nativeReaderSource.contains("NativeReaderModernScrollPositionModifier"))
+        XCTAssertFalse(nativeReaderSource.contains(".scrollPosition($scrollPosition)"))
+        XCTAssertTrue(nativeReaderSource.contains(".equatable()"))
+        XCTAssertTrue(nativeReaderSource.contains("NativeReaderTextBlockView: View, Equatable"))
+        XCTAssertTrue(nativeReaderSource.contains("attributedText: baseAttributedText"))
+        XCTAssertTrue(nativeReaderSource.contains("cache.countLimit = 256"))
+        XCTAssertTrue(nativeReaderSource.contains("cache.totalCostLimit = 24 * 1024 * 1024"))
+        XCTAssertFalse(nativeReaderSource.contains(".onScrollTargetVisibilityChange"))
+        XCTAssertTrue(nativeReaderSource.contains("NativeReaderBlockOffsetModifier"))
+        XCTAssertTrue(nativeReaderSource.contains("NativeReaderVisibleBlockResolver.topBlockID"))
+        XCTAssertTrue(nativeReaderSource.contains(".opacity(pendingInitialBlockID == nil ? 1 : 0)"))
+        XCTAssertTrue(nativeReaderSource.contains(".allowsHitTesting(pendingInitialBlockID == nil)"))
+        XCTAssertTrue(nativeReaderSource.contains("transaction.animation = nil"))
+        XCTAssertTrue(nativeReaderSource.contains("if pendingInitialBlockID != nil"))
+        XCTAssertFalse(nativeReaderSource.contains(".scrollPosition(id: $visibleBlockID"))
+        XCTAssertFalse(nativeReaderSource.contains("Text(fallbackText)"))
+        XCTAssertTrue(nativeReaderSource.contains("NativeReaderAttributedTextPrefetchPlanner.indexRange"))
+        XCTAssertTrue(nativeReaderSource.contains("Task.detached(priority: .utility)"))
+        XCTAssertTrue(nativeReaderSource.contains("aheadCount: Int = 24"))
+        XCTAssertTrue(attributedTextSource.contains("let id: Int"))
+        XCTAssertFalse(attributedTextSource.contains("let id = UUID()"))
+        XCTAssertTrue(attributedTextSource.contains("requiresTextUpdate"))
+        XCTAssertTrue(attributedTextSource.contains("cachedMeasuredSize"))
+        XCTAssertTrue(attributedTextSource.contains("guard !attachments.isEmpty else { return attributedText }"))
+    }
+
+    func testNativeReaderVisibleBlockResolutionObservesWithoutReassertingScrollPosition() {
+        XCTAssertEqual(
+            NativeReaderVisibleBlockResolver.topBlockID(
+                from: ["previous": -24, "current": 8, "next": 90],
+                threshold: 10
+            ),
+            "current"
+        )
+        XCTAssertEqual(
+            NativeReaderVisibleBlockResolver.topBlockID(
+                from: ["first": 24, "second": 90],
+                threshold: 10
+            ),
+            "first"
+        )
+        XCTAssertNil(
+            NativeReaderVisibleBlockResolver.topBlockID(from: [:], threshold: 10)
+        )
+    }
+
+    func testNativeReaderTextPrefetchWindowIsBoundedAndDirectional() {
+        XCTAssertEqual(
+            NativeReaderAttributedTextPrefetchPlanner.indexRange(
+                blockCount: 100,
+                centerIndex: 10,
+                direction: 1
+            ),
+            6..<35
+        )
+        XCTAssertEqual(
+            NativeReaderAttributedTextPrefetchPlanner.indexRange(
+                blockCount: 100,
+                centerIndex: 10,
+                direction: -1
+            ),
+            0..<15
+        )
+        XCTAssertEqual(
+            NativeReaderAttributedTextPrefetchPlanner.indexRange(
+                blockCount: 100,
+                centerIndex: 98,
+                direction: 1
+            ),
+            94..<100
+        )
+        XCTAssertEqual(
+            NativeReaderAttributedTextPrefetchPlanner.indexRange(
+                blockCount: 0,
+                centerIndex: 0,
+                direction: 1
+            ),
+            0..<0
+        )
+    }
+
+    func testNativeReaderNearbyTextPrewarmsTheBoundedFinalCache() async throws {
+        let cache = NativeReaderAttributedTextCache.shared
+        cache.removeAll()
+        defer { cache.removeAll() }
+        let cacheID = "prefetched-row"
+        let theme = ReaderTheme.default
+        let accentColor = UIColor.systemBlue
+        await cache.prewarm(
+            items: [
+                NativeReaderAttributedTextPrefetchItem(
+                    cacheID: cacheID,
+                    runs: [
+                        NativeReaderRuntimeTextRun(
+                            text: "PREFETCHED",
+                            styles: [.bold],
+                            linkTarget: nil
+                        )
+                    ],
+                    fallbackText: "",
+                    role: .body
+                )
+            ],
+            theme: theme,
+            accentColor: accentColor
+        )
+
+        let cached = cache.baseAttributedText(
+            cacheKey: NativeReaderAttributedTextCacheKey.base(
+                cacheID: cacheID,
+                theme: theme,
+                accentColor: accentColor
+            ),
+            runs: [],
+            fallbackText: "cache miss",
+            theme: theme,
+            role: .note,
+            accentColor: .systemRed
+        )
+        XCTAssertEqual(cached.string, "PREFETCHED")
+    }
+
+    func testNativeReaderNormalRowsUseFinalBoundedAttributedTextImmediately() throws {
+        let cache = NativeReaderAttributedTextCache.shared
+        cache.removeAll()
+        defer { cache.removeAll() }
+        let cacheKey = "final-row-typography"
+        let first = cache.baseAttributedText(
+            cacheKey: cacheKey,
+            runs: [
+                NativeReaderRuntimeTextRun(
+                    text: "SECTION 101",
+                    styles: [.bold],
+                    linkTarget: nil
+                )
+            ],
+            fallbackText: "",
+            theme: .default,
+            role: .majorHeading(level: 2),
+            accentColor: .systemBlue
+        )
+        let second = cache.baseAttributedText(
+            cacheKey: cacheKey,
+            runs: [],
+            fallbackText: "ignored because the cached final row wins",
+            theme: .default,
+            role: .body,
+            accentColor: .systemRed
+        )
+
+        XCTAssertTrue(first === second)
+        XCTAssertEqual(first.string, "SECTION 101")
+        let font = try XCTUnwrap(first.attribute(.font, at: 0, effectiveRange: nil) as? UIFont)
+        XCTAssertTrue(font.fontDescriptor.symbolicTraits.contains(.traitBold))
+        XCTAssertTrue(
+            (first.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor)?
+                .isEqual(UIColor.systemBlue) == true
+        )
     }
 
     func testPhaseFiveComplexTablePilotUsesBoundedIsolatedHTML() async throws {

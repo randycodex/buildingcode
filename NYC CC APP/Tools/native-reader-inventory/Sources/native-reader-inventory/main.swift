@@ -226,6 +226,7 @@ private func analyzeChaptersInIsolatedWorkers(
                         uncompressedByteCount: documentData.count,
                         compressedByteCount: compressedData.count,
                         blockCount: analysis.document.blocks.count,
+                        rolloutTier: NativeReaderRolloutTier(blocks: analysis.document.blocks),
                         eligibility: analysis.document.eligibility,
                         passesStructuralValidation: analysis.document.validation.passesStructuralValidation
                     )

@@ -1702,67 +1702,69 @@ final class UserDataStore: UserContentRepository {
             .filter { !$0.isEmpty }
             .filter { seen.insert($0.lowercased()).inserted }
 
-        try connection.execute("BEGIN IMMEDIATE TRANSACTION;")
-        do {
-            let delete = try connection.prepare(
-                """
-                DELETE FROM bookmark_tags
-                WHERE code_version = ? AND section_id = ? AND block_id = ?;
-                """
-            )
-            defer { connection.finalize(delete) }
-            try connection.bind(text: codeVersion, index: 1, to: delete)
-            sqlite3_bind_int64(delete, 2, sectionID)
-            try connection.bind(text: normalizedBlockID, index: 3, to: delete)
-            _ = try connection.step(delete)
-
-            if !cleaned.isEmpty {
-                let timestamp = isoFormatter.string(from: Date())
-                let insert = try connection.prepare(
+        try connection.withExclusiveAccess {
+            try connection.execute("BEGIN IMMEDIATE TRANSACTION;")
+            do {
+                let delete = try connection.prepare(
                     """
-                    INSERT INTO bookmark_tags (
-                        code_version, section_id, block_id, tag, created_at, updated_at, client_id,
-                        owner_id, visibility, sync_state
+                    DELETE FROM bookmark_tags
+                    WHERE code_version = ? AND section_id = ? AND block_id = ?;
+                    """
+                )
+                defer { connection.finalize(delete) }
+                try connection.bind(text: codeVersion, index: 1, to: delete)
+                sqlite3_bind_int64(delete, 2, sectionID)
+                try connection.bind(text: normalizedBlockID, index: 3, to: delete)
+                _ = try connection.step(delete)
+
+                if !cleaned.isEmpty {
+                    let timestamp = isoFormatter.string(from: Date())
+                    let insert = try connection.prepare(
+                        """
+                        INSERT INTO bookmark_tags (
+                            code_version, section_id, block_id, tag, created_at, updated_at, client_id,
+                            owner_id, visibility, sync_state
+                        )
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                        """
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-                    """
-                )
-                defer { connection.finalize(insert) }
+                    defer { connection.finalize(insert) }
 
-                for tag in cleaned {
-                    sqlite3_reset(insert)
-                    sqlite3_clear_bindings(insert)
-                    try connection.bind(text: codeVersion, index: 1, to: insert)
-                    sqlite3_bind_int64(insert, 2, sectionID)
-                    try connection.bind(text: normalizedBlockID, index: 3, to: insert)
-                    try connection.bind(text: tag, index: 4, to: insert)
-                    try connection.bind(text: timestamp, index: 5, to: insert)
-                    try connection.bind(text: timestamp, index: 6, to: insert)
-                    try connection.bind(text: UUID().uuidString, index: 7, to: insert)
-                    try connection.bind(text: localOwnerID, index: 8, to: insert)
-                    try connection.bind(text: personalVisibility, index: 9, to: insert)
-                    try connection.bind(text: pendingSyncState, index: 10, to: insert)
-                    _ = try connection.step(insert)
+                    for tag in cleaned {
+                        sqlite3_reset(insert)
+                        sqlite3_clear_bindings(insert)
+                        try connection.bind(text: codeVersion, index: 1, to: insert)
+                        sqlite3_bind_int64(insert, 2, sectionID)
+                        try connection.bind(text: normalizedBlockID, index: 3, to: insert)
+                        try connection.bind(text: tag, index: 4, to: insert)
+                        try connection.bind(text: timestamp, index: 5, to: insert)
+                        try connection.bind(text: timestamp, index: 6, to: insert)
+                        try connection.bind(text: UUID().uuidString, index: 7, to: insert)
+                        try connection.bind(text: localOwnerID, index: 8, to: insert)
+                        try connection.bind(text: personalVisibility, index: 9, to: insert)
+                        try connection.bind(text: pendingSyncState, index: 10, to: insert)
+                        _ = try connection.step(insert)
+                    }
                 }
-            }
 
-            try connection.execute("COMMIT;")
-            var values = ["tags": cleaned.joined(separator: "\n")]
-            if !normalizedBlockID.isEmpty {
-                values["blockID"] = normalizedBlockID
-            }
-            enqueueSyncOperationIfPossible(
-                entityType: .tagSet,
-                operationType: .replace,
-                payload: SyncQueuePayload(
-                    codeVersion: codeVersion,
-                    sectionID: sectionID,
-                    values: values
+                try connection.execute("COMMIT;")
+                var values = ["tags": cleaned.joined(separator: "\n")]
+                if !normalizedBlockID.isEmpty {
+                    values["blockID"] = normalizedBlockID
+                }
+                enqueueSyncOperationIfPossible(
+                    entityType: .tagSet,
+                    operationType: .replace,
+                    payload: SyncQueuePayload(
+                        codeVersion: codeVersion,
+                        sectionID: sectionID,
+                        values: values
+                    )
                 )
-            )
-        } catch {
-            try? connection.execute("ROLLBACK;")
-            throw error
+            } catch {
+                try? connection.execute("ROLLBACK;")
+                throw error
+            }
         }
     }
 
@@ -3387,13 +3389,15 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func performTransaction(_ updates: () throws -> Void) throws {
-        try connection.execute("BEGIN IMMEDIATE TRANSACTION;")
-        do {
-            try updates()
-            try connection.execute("COMMIT;")
-        } catch {
-            try? connection.execute("ROLLBACK;")
-            throw error
+        try connection.withExclusiveAccess {
+            try connection.execute("BEGIN IMMEDIATE TRANSACTION;")
+            do {
+                try updates()
+                try connection.execute("COMMIT;")
+            } catch {
+                try? connection.execute("ROLLBACK;")
+                throw error
+            }
         }
     }
 

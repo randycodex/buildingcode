@@ -2,6 +2,8 @@ import os.signpost
 import SwiftUI
 import UIKit
 
+private let nativeReaderLegacyScrollCoordinateSpace = "nativeReaderScroll"
+
 struct NativeChapterTextReaderView: View {
     let chapter: CodeChapter
     let initialSectionID: Int64
@@ -21,7 +23,7 @@ struct NativeChapterTextReaderView: View {
     @State private var document: NativeReaderRuntimeDocument?
     @State private var displayBlocks: [NativeReaderDisplayBlock] = []
     @State private var sectionTargets: [NativeReaderSectionTarget] = []
-    @State private var visibleBlockID: String?
+    @StateObject private var scrollState = NativeReaderScrollState()
     @State private var currentSectionTargetID: String?
     @State private var pendingInitialBlockID: String?
     @State private var failureMessage: String?
@@ -33,6 +35,7 @@ struct NativeChapterTextReaderView: View {
     @State private var searchMatches: [NativeReaderSearchMatch] = []
     @State private var activeSearchMatchID: String?
     @State private var lastRecordedSectionTargetID: String?
+    @State private var settledScrollTask: Task<Void, Never>?
     @State private var nearbyMediaPrefetchTask: Task<Void, Never>?
 
     private var accentColor: Color {
@@ -62,12 +65,30 @@ struct NativeChapterTextReaderView: View {
         }
         .onChange(of: isBrowserTabActive) { _, isActive in
             guard !isActive else { return }
+            settledScrollTask?.cancel()
+            settledScrollTask = nil
+            if let document, let visibleBlockID = scrollState.visibleBlockID {
+                persistLocation(blockID: visibleBlockID, document: document)
+            }
             nearbyMediaPrefetchTask?.cancel()
             nearbyMediaPrefetchTask = nil
+            scrollState.textPrefetchTask?.cancel()
+            scrollState.textPrefetchTask = nil
+            scrollState.isScrollActive = false
+            scrollState.isDecelerating = false
         }
         .onDisappear {
+            settledScrollTask?.cancel()
+            settledScrollTask = nil
+            if let document, let visibleBlockID = scrollState.visibleBlockID {
+                persistLocation(blockID: visibleBlockID, document: document)
+            }
             nearbyMediaPrefetchTask?.cancel()
             nearbyMediaPrefetchTask = nil
+            scrollState.textPrefetchTask?.cancel()
+            scrollState.textPrefetchTask = nil
+            scrollState.isScrollActive = false
+            scrollState.isDecelerating = false
         }
     }
 
@@ -75,53 +96,18 @@ struct NativeChapterTextReaderView: View {
         document: NativeReaderRuntimeDocument,
         proxy: ScrollViewProxy
     ) -> some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(displayBlocks) { displayBlock in
-                    NativeReaderTextBlockView(
-                        block: displayBlock.block,
-                        hierarchyIndentation: displayBlock.hierarchyIndentation,
-                        usesCompactSpacing: displayBlock.usesCompactSpacing,
-                        theme: library.readerTheme,
-                        accentColor: library.accentColor(for: chapter.codeSectionID),
-                        route: route,
-                        onOpenLink: { url in
-                            handleLink(url, document: document, proxy: proxy)
-                        },
-                        onOpenMedia: { media, image in
-                            expandedMedia = NativeReaderExpandedMedia(
-                                id: media.id,
-                                image: image,
-                                accessibilityText: media.accessibilityText ?? media.caption
-                            )
-                        },
-                        onMediaFailure: { message in
-                            requestFallbackToHTML(message)
-                        },
-                        searchQuery: searchQuery,
-                        searchMatches: searchMatches.filter { $0.blockID == displayBlock.id },
-                        activeSearchMatchID: activeSearchMatchID,
-                        onResearchSelection: { selectedText in
-                            sendSelectionToResearch(
-                                selectedText,
-                                sourceBlockID: displayBlock.sourceBlockID,
-                                document: document
-                            )
-                        }
-                    )
-                    .id(displayBlock.id)
-                }
-            }
-            .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
-            .padding(.top, CodeScreenMetrics.topTitlePadding)
-            .padding(.bottom, 28)
-            .scrollTargetLayout()
+        trackedReaderScroll(document: document, proxy: proxy)
+        .opacity(pendingInitialBlockID == nil ? 1 : 0)
+        .allowsHitTesting(pendingInitialBlockID == nil)
+        .accessibilityHidden(pendingInitialBlockID != nil)
+        .transaction { transaction in
+            transaction.animation = nil
         }
-        .scrollPosition(id: $visibleBlockID, anchor: .top)
-        .onChange(of: visibleBlockID) { _, newValue in
-            guard pendingInitialBlockID == nil else { return }
-            persistLocation(blockID: newValue, document: document)
-            scheduleNearbyMediaPrefetch(around: newValue, document: document)
+        .overlay {
+            if pendingInitialBlockID != nil {
+                ProgressView("Preparing native Reader…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
         .onChange(of: searchQuery) { _, query in
             searchMatches = NativeReaderSearchIndex.matches(query: query, in: displayBlocks)
@@ -138,6 +124,11 @@ struct NativeChapterTextReaderView: View {
                     searchNavigator(proxy: proxy, document: document)
                 }
                 jumpBar
+            }
+            .opacity(pendingInitialBlockID == nil ? 1 : 0)
+            .accessibilityHidden(pendingInitialBlockID != nil)
+            .transaction { transaction in
+                transaction.animation = nil
             }
             .background(Color(uiColor: .systemGroupedBackground))
         }
@@ -175,6 +166,115 @@ struct NativeChapterTextReaderView: View {
         }
     }
 
+    @ViewBuilder
+    private func trackedReaderScroll(
+        document: NativeReaderRuntimeDocument,
+        proxy: ScrollViewProxy
+    ) -> some View {
+        if #available(iOS 18.0, *) {
+            readerScrollView(document: document, proxy: proxy)
+                .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
+                .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
+                    visibleBlockDidChange(
+                        NativeReaderVisibleBlockResolver.topBlockID(
+                            from: offsets,
+                            threshold: CodeScreenMetrics.topTitlePadding + 1
+                        ),
+                        document: document
+                    )
+                }
+                .onScrollPhaseChange { _, newPhase in
+                    scrollPhaseDidChange(newPhase, document: document)
+                }
+        } else {
+            readerScrollView(document: document, proxy: proxy)
+                .coordinateSpace(name: nativeReaderLegacyScrollCoordinateSpace)
+                .onPreferenceChange(NativeReaderBlockOffsetPreferenceKey.self) { offsets in
+                    visibleBlockDidChange(
+                        NativeReaderVisibleBlockResolver.topBlockID(
+                            from: offsets,
+                            threshold: CodeScreenMetrics.topTitlePadding + 1
+                        ),
+                        document: document
+                    )
+                }
+        }
+    }
+
+    private func readerScrollView(
+        document: NativeReaderRuntimeDocument,
+        proxy: ScrollViewProxy
+    ) -> some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                ForEach(displayBlocks) { displayBlock in
+                    NativeReaderTextBlockView(
+                        block: displayBlock.block,
+                        hierarchyIndentation: displayBlock.hierarchyIndentation,
+                        usesCompactSpacing: displayBlock.usesCompactSpacing,
+                        theme: library.readerTheme,
+                        accentColor: library.accentColor(for: chapter.codeSectionID),
+                        route: route,
+                        onOpenLink: { url in
+                            handleLink(url, document: document, proxy: proxy)
+                        },
+                        onOpenMedia: { media, image in
+                            expandedMedia = NativeReaderExpandedMedia(
+                                id: media.id,
+                                image: image,
+                                accessibilityText: media.accessibilityText ?? media.caption
+                            )
+                        },
+                        onMediaFailure: { message in
+                            requestFallbackToHTML(message)
+                        },
+                        searchQuery: searchQuery,
+                        searchMatches: searchMatches.filter { $0.blockID == displayBlock.id },
+                        activeSearchMatchID: activeSearchMatchID,
+                        onResearchSelection: { selectedText in
+                            sendSelectionToResearch(
+                                selectedText,
+                                sourceBlockID: displayBlock.sourceBlockID,
+                                document: document
+                            )
+                        }
+                    )
+                    .equatable()
+                    .id(displayBlock.id)
+                    .modifier(NativeReaderBlockOffsetModifier(blockID: displayBlock.id))
+                }
+            }
+            .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+            .padding(.top, CodeScreenMetrics.topTitlePadding)
+            .padding(.bottom, 28)
+            .scrollTargetLayout()
+        }
+    }
+
+    @MainActor
+    private func visibleBlockDidChange(
+        _ blockID: String?,
+        document: NativeReaderRuntimeDocument
+    ) {
+        guard pendingInitialBlockID == nil,
+              let blockID,
+              scrollState.visibleBlockID != blockID else { return }
+        let previousBlockID = scrollState.visibleBlockID
+        scrollState.visibleBlockID = blockID
+        updateCurrentSectionPresentation(
+            blockID: blockID,
+            document: document,
+            updatesRememberedSection: !scrollState.isScrollActive
+        )
+        if !scrollState.isDecelerating {
+            scheduleNearbyTextPrefetch(
+                around: blockID,
+                previousBlockID: previousBlockID
+            )
+        }
+        scheduleSettledScrollWork(around: blockID, document: document)
+    }
+
     private func failureView(message: String) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Using HTML reader", systemImage: "arrow.uturn.backward.circle.fill")
@@ -191,14 +291,16 @@ struct NativeChapterTextReaderView: View {
     @MainActor
     private func loadDocument() async {
         if let document, document.documentID == route.documentID {
-            scheduleNearbyMediaPrefetch(around: visibleBlockID, document: document)
+            scheduleNearbyMediaPrefetch(around: scrollState.visibleBlockID, document: document)
             return
         }
         document = nil
         displayBlocks = []
         sectionTargets = []
         pendingInitialBlockID = nil
-        visibleBlockID = nil
+        scrollState.visibleBlockID = nil
+        scrollState.isScrollActive = false
+        scrollState.isDecelerating = false
         currentSectionTargetID = nil
         failureMessage = nil
         hasRequestedFallback = false
@@ -207,8 +309,13 @@ struct NativeChapterTextReaderView: View {
         searchMatches = []
         activeSearchMatchID = nil
         lastRecordedSectionTargetID = nil
+        settledScrollTask?.cancel()
+        settledScrollTask = nil
         nearbyMediaPrefetchTask?.cancel()
         nearbyMediaPrefetchTask = nil
+        scrollState.textPrefetchTask?.cancel()
+        scrollState.textPrefetchTask = nil
+        scrollState.lastTextPrefetchCenterIndex = nil
 
         do {
             let prepared = try await NativeReaderDocumentStore.shared.loadPreparedDocument(for: route)
@@ -221,10 +328,33 @@ struct NativeChapterTextReaderView: View {
                 initialAnchorID: initialAnchorID,
                 initialSectionNumber: initialSectionNumber
             )
+            if let initialBlockID,
+               let initialIndex = prepared.displayBlocks.firstIndex(where: { $0.id == initialBlockID }) {
+                let range = NativeReaderAttributedTextPrefetchPlanner.indexRange(
+                    blockCount: prepared.displayBlocks.count,
+                    centerIndex: initialIndex,
+                    direction: 1
+                )
+                let items = NativeReaderAttributedTextPrefetchPlanner.items(
+                    for: prepared.displayBlocks[range],
+                    routeID: route.id
+                )
+                await NativeReaderAttributedTextCache.shared.prewarm(
+                    items: items,
+                    theme: library.readerTheme,
+                    accentColor: library.accentColor(for: chapter.codeSectionID)
+                )
+                guard !Task.isCancelled else { return }
+                scrollState.lastTextPrefetchCenterIndex = initialIndex
+            }
             displayBlocks = prepared.displayBlocks
             sectionTargets = prepared.sectionTargets
+            let requiresInitialRestore = initialBlockID != loaded.blocks.first?.id
+            pendingInitialBlockID = requiresInitialRestore ? initialBlockID : nil
             document = loaded
-            persistLocation(blockID: initialBlockID, document: loaded)
+            if !requiresInitialRestore {
+                persistLocation(blockID: initialBlockID, document: loaded)
+            }
             scheduleNearbyMediaPrefetch(around: initialBlockID, document: loaded)
             os_signpost(
                 .event,
@@ -233,13 +363,31 @@ struct NativeChapterTextReaderView: View {
                 "blocks=%{public}d",
                 prepared.displayBlocks.count
             )
-            guard initialBlockID != loaded.blocks.first?.id else {
-                return
-            }
-            pendingInitialBlockID = initialBlockID
         } catch {
             guard !Task.isCancelled else { return }
             requestFallbackToHTML(error.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func scheduleSettledScrollWork(
+        around displayBlockID: String?,
+        document: NativeReaderRuntimeDocument
+    ) {
+        settledScrollTask?.cancel()
+        settledScrollTask = nil
+        guard !scrollState.isScrollActive, let displayBlockID else { return }
+
+        settledScrollTask = Task { @MainActor in
+            do {
+                try await Task.sleep(for: .milliseconds(250))
+            } catch {
+                return
+            }
+            guard !Task.isCancelled, scrollState.visibleBlockID == displayBlockID else { return }
+            persistLocation(blockID: displayBlockID, document: document)
+            scheduleNearbyMediaPrefetch(around: displayBlockID, document: document)
+            settledScrollTask = nil
         }
     }
 
@@ -274,6 +422,44 @@ struct NativeChapterTextReaderView: View {
     }
 
     @MainActor
+    private func scheduleNearbyTextPrefetch(
+        around displayBlockID: String,
+        previousBlockID: String?
+    ) {
+        guard let centerIndex = displayBlocks.firstIndex(where: { $0.id == displayBlockID })
+        else { return }
+        if let lastCenter = scrollState.lastTextPrefetchCenterIndex,
+           abs(centerIndex - lastCenter) < 4 {
+            return
+        }
+
+        let previousIndex = previousBlockID.flatMap { previousID in
+            displayBlocks.firstIndex(where: { $0.id == previousID })
+        }
+        let direction = previousIndex.map { centerIndex >= $0 ? 1 : -1 } ?? 1
+        let range = NativeReaderAttributedTextPrefetchPlanner.indexRange(
+            blockCount: displayBlocks.count,
+            centerIndex: centerIndex,
+            direction: direction
+        )
+        let items = NativeReaderAttributedTextPrefetchPlanner.items(
+            for: displayBlocks[range],
+            routeID: route.id
+        )
+        guard !items.isEmpty else { return }
+
+        scrollState.lastTextPrefetchCenterIndex = centerIndex
+        scrollState.textPrefetchTask?.cancel()
+        scrollState.textPrefetchTask = Task { @MainActor in
+            await NativeReaderAttributedTextCache.shared.prewarm(
+                items: items,
+                theme: library.readerTheme,
+                accentColor: library.accentColor(for: chapter.codeSectionID)
+            )
+        }
+    }
+
+    @MainActor
     private func requestFallbackToHTML(_ message: String) {
         failureMessage = message
         guard !hasRequestedFallback else { return }
@@ -294,7 +480,7 @@ struct NativeChapterTextReaderView: View {
         await Task.yield()
         try? await Task.sleep(for: .milliseconds(60))
         guard !Task.isCancelled, pendingInitialBlockID == targetBlockID else { return }
-        visibleBlockID = targetBlockID
+        scrollState.visibleBlockID = targetBlockID
         proxy.scrollTo(targetBlockID, anchor: .top)
 
         try? await Task.sleep(for: .milliseconds(120))
@@ -304,12 +490,36 @@ struct NativeChapterTextReaderView: View {
         persistLocation(blockID: targetBlockID, document: document)
     }
 
+    @available(iOS 18.0, *)
+    @MainActor
+    private func scrollPhaseDidChange(
+        _ phase: ScrollPhase,
+        document: NativeReaderRuntimeDocument
+    ) {
+        scrollState.isScrollActive = phase.isScrolling
+        scrollState.isDecelerating = phase == .decelerating
+
+        guard phase == .idle,
+              pendingInitialBlockID == nil,
+              let visibleBlockID = scrollState.visibleBlockID else { return }
+        scheduleNearbyTextPrefetch(
+            around: visibleBlockID,
+            previousBlockID: nil
+        )
+        scheduleSettledScrollWork(around: visibleBlockID, document: document)
+    }
+
     private func persistLocation(blockID: String?, document: NativeReaderRuntimeDocument) {
         guard let blockID,
               NativeReaderDisplayBlock.sourceBlockID(for: blockID, in: document) != nil
         else {
             return
         }
+        rememberLocation(blockID: blockID, document: document)
+        recordCurrentSection(blockID: blockID, document: document)
+    }
+
+    private func rememberLocation(blockID: String, document: NativeReaderRuntimeDocument) {
         if rememberedBlockID.wrappedValue != blockID {
             rememberedBlockID.wrappedValue = blockID
         }
@@ -317,7 +527,7 @@ struct NativeChapterTextReaderView: View {
            rememberedAnchorID.wrappedValue != anchorID {
             rememberedAnchorID.wrappedValue = anchorID
         }
-        updateCurrentSection(blockID: blockID, document: document)
+        updateCurrentSectionPresentation(blockID: blockID, document: document)
     }
 
     private func handleLink(
@@ -480,7 +690,7 @@ struct NativeChapterTextReaderView: View {
         proxy: ScrollViewProxy,
         document: NativeReaderRuntimeDocument
     ) {
-        visibleBlockID = blockID
+        scrollState.visibleBlockID = blockID
         persistLocation(blockID: blockID, document: document)
         if reduceMotion {
             proxy.scrollTo(blockID, anchor: .top)
@@ -491,9 +701,10 @@ struct NativeChapterTextReaderView: View {
         }
     }
 
-    private func updateCurrentSection(
+    private func updateCurrentSectionPresentation(
         blockID: String,
-        document: NativeReaderRuntimeDocument
+        document: NativeReaderRuntimeDocument,
+        updatesRememberedSection: Bool = true
     ) {
         guard let target = NativeReaderSectionNavigator.target(
             forDisplayBlockID: blockID,
@@ -504,10 +715,22 @@ struct NativeChapterTextReaderView: View {
             currentSectionTargetID = target.id
         }
 
-        if let summary = sectionSummary(for: target),
+        if updatesRememberedSection,
+           let summary = sectionSummary(for: target),
            rememberedSectionID.wrappedValue != summary.id {
             rememberedSectionID.wrappedValue = summary.id
         }
+    }
+
+    private func recordCurrentSection(
+        blockID: String,
+        document: NativeReaderRuntimeDocument
+    ) {
+        guard let target = NativeReaderSectionNavigator.target(
+            forDisplayBlockID: blockID,
+            in: document,
+            targets: sectionTargets
+        ) else { return }
         guard lastRecordedSectionTargetID != target.id else { return }
         lastRecordedSectionTargetID = target.id
         if let sectionNumber = target.sectionNumber, !sectionNumber.isEmpty {
@@ -595,6 +818,59 @@ struct NativeChapterTextReaderView: View {
             default: return false
             }
         }?.id
+    }
+}
+
+@MainActor
+private final class NativeReaderScrollState: ObservableObject {
+    var visibleBlockID: String?
+    var isScrollActive = false
+    var isDecelerating = false
+    var lastTextPrefetchCenterIndex: Int?
+    var textPrefetchTask: Task<Void, Never>?
+}
+
+enum NativeReaderVisibleBlockResolver {
+    static func topBlockID(
+        from offsets: [String: CGFloat],
+        threshold: CGFloat
+    ) -> String? {
+        guard !offsets.isEmpty else { return nil }
+        let aboveOrAt = offsets.filter { $0.value <= threshold }
+        if let closestAbove = aboveOrAt.max(by: { $0.value < $1.value })?.key {
+            return closestAbove
+        }
+        return offsets.min(by: { $0.value < $1.value })?.key
+    }
+}
+
+private struct NativeReaderBlockOffsetModifier: ViewModifier {
+    let blockID: String
+
+    func body(content: Content) -> some View {
+        content.background(
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: NativeReaderBlockOffsetPreferenceKey.self,
+                    value: [
+                        blockID: geometry.frame(
+                            in: .named(nativeReaderLegacyScrollCoordinateSpace)
+                        ).minY
+                    ]
+                )
+            }
+        )
+    }
+}
+
+private struct NativeReaderBlockOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: [String: CGFloat] = [:]
+
+    static func reduce(
+        value: inout [String: CGFloat],
+        nextValue: () -> [String: CGFloat]
+    ) {
+        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
     }
 }
 
@@ -1192,7 +1468,7 @@ enum NativeReaderLocationResolver {
     }
 }
 
-private struct NativeReaderTextBlockView: View {
+private struct NativeReaderTextBlockView: View, Equatable {
     let block: NativeReaderRuntimeBlock
     let hierarchyIndentation: CGFloat
     let usesCompactSpacing: Bool
@@ -1206,6 +1482,18 @@ private struct NativeReaderTextBlockView: View {
     let searchMatches: [NativeReaderSearchMatch]
     let activeSearchMatchID: String?
     let onResearchSelection: (String) -> Void
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.block == rhs.block
+            && lhs.hierarchyIndentation == rhs.hierarchyIndentation
+            && lhs.usesCompactSpacing == rhs.usesCompactSpacing
+            && lhs.theme == rhs.theme
+            && lhs.accentColor.isEqual(rhs.accentColor)
+            && lhs.route == rhs.route
+            && lhs.searchQuery == rhs.searchQuery
+            && lhs.searchMatches == rhs.searchMatches
+            && lhs.activeSearchMatchID == rhs.activeSearchMatchID
+    }
 
     var body: some View {
         Group {
@@ -1296,8 +1584,13 @@ private struct NativeReaderTextBlockView: View {
     }
 
     private func selectableText(role: NativeReaderTypographyRole) -> some View {
-        NativeReaderPreparedAttributedTextView(
-            cacheID: "\(route.id)|\(block.id)|\(role.cacheComponent)",
+        let cacheID = NativeReaderAttributedTextCacheKey.block(
+            routeID: route.id,
+            blockID: block.id,
+            role: role
+        )
+        return NativeReaderPreparedAttributedTextView(
+            cacheID: cacheID,
             runs: block.runs,
             fallbackText: block.plainText,
             theme: theme,
@@ -1608,13 +1901,17 @@ private struct NativeReaderListBlockView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
             ForEach(rows) { row in
+                let cacheID = NativeReaderAttributedTextCacheKey.list(
+                    routeID: cachePrefix,
+                    rowID: row.id
+                )
                 HStack(alignment: .top, spacing: 8) {
                     Text(marker(for: row))
                         .font(theme.swiftUIFont(emphasized: true))
                         .foregroundStyle(Color(uiColor: accentColor))
                         .frame(minWidth: 18, alignment: .trailing)
                     NativeReaderPreparedAttributedTextView(
-                        cacheID: "\(cachePrefix)|list|\(row.id)",
+                        cacheID: cacheID,
                         runs: row.runs,
                         fallbackText: row.plainText,
                         theme: theme,
@@ -1662,6 +1959,28 @@ private struct NativeReaderListRow: Identifiable {
     }
 }
 
+enum NativeReaderAttributedTextCacheKey {
+    static func block(
+        routeID: String,
+        blockID: String,
+        role: NativeReaderTypographyRole
+    ) -> String {
+        "\(routeID)|\(blockID)|\(role.cacheComponent)"
+    }
+
+    static func list(routeID: String, rowID: String) -> String {
+        "\(routeID)|list|\(rowID)"
+    }
+
+    static func base(
+        cacheID: String,
+        theme: ReaderTheme,
+        accentColor: UIColor
+    ) -> String {
+        "\(cacheID)|\(theme.hashValue)|\(accentColor.hash)|base"
+    }
+}
+
 enum NativeReaderTypographyRole: Equatable, Sendable {
     case majorHeading(level: Int)
     case heading(level: Int)
@@ -1688,6 +2007,97 @@ enum NativeReaderTypographyRole: Equatable, Sendable {
     }
 }
 
+struct NativeReaderAttributedTextPrefetchItem: Equatable, Sendable {
+    let cacheID: String
+    let runs: [NativeReaderRuntimeTextRun]
+    let fallbackText: String
+    let role: NativeReaderTypographyRole
+}
+
+enum NativeReaderAttributedTextPrefetchPlanner {
+    static func indexRange(
+        blockCount: Int,
+        centerIndex: Int,
+        direction: Int,
+        behindCount: Int = 4,
+        aheadCount: Int = 24
+    ) -> Range<Int> {
+        guard blockCount > 0 else { return 0..<0 }
+        let center = min(max(centerIndex, 0), blockCount - 1)
+        if direction >= 0 {
+            return max(0, center - behindCount)..<min(blockCount, center + aheadCount + 1)
+        }
+        return max(0, center - aheadCount)..<min(blockCount, center + behindCount + 1)
+    }
+
+    static func items(
+        for displayBlocks: ArraySlice<NativeReaderDisplayBlock>,
+        routeID: String
+    ) -> [NativeReaderAttributedTextPrefetchItem] {
+        displayBlocks.flatMap { displayBlock in
+            items(for: displayBlock.block, routeID: routeID)
+        }
+    }
+
+    private static func items(
+        for block: NativeReaderRuntimeBlock,
+        routeID: String
+    ) -> [NativeReaderAttributedTextPrefetchItem] {
+        if block.kind == .orderedList || block.kind == .unorderedList {
+            return block.listItems.flatMap { listItems(for: $0, routeID: routeID) }
+        }
+
+        let role: NativeReaderTypographyRole?
+        switch block.kind {
+        case .heading:
+            let presentation = NativeReaderHeadingPresentation(block: block)
+            role = presentation.style == .provision
+                ? .heading(level: presentation.level)
+                : .majorHeading(level: presentation.level)
+        case .paragraph:
+            role = .body
+        case .caption:
+            role = .caption
+        case .footnote:
+            role = .footnote
+        case .sourceNote, .editorNote:
+            role = .note
+        default:
+            role = nil
+        }
+        guard let role else { return [] }
+        return [
+            NativeReaderAttributedTextPrefetchItem(
+                cacheID: NativeReaderAttributedTextCacheKey.block(
+                    routeID: routeID,
+                    blockID: block.id,
+                    role: role
+                ),
+                runs: block.runs,
+                fallbackText: block.plainText,
+                role: role
+            )
+        ]
+    }
+
+    private static func listItems(
+        for item: NativeReaderRuntimeListItem,
+        routeID: String
+    ) -> [NativeReaderAttributedTextPrefetchItem] {
+        [
+            NativeReaderAttributedTextPrefetchItem(
+                cacheID: NativeReaderAttributedTextCacheKey.list(
+                    routeID: routeID,
+                    rowID: item.id
+                ),
+                runs: item.runs,
+                fallbackText: item.plainText,
+                role: .body
+            )
+        ] + item.children.flatMap { listItems(for: $0, routeID: routeID) }
+    }
+}
+
 private final class CachedNativeReaderAttributedText: NSObject, @unchecked Sendable {
     let value: NSAttributedString
 
@@ -1707,6 +2117,67 @@ final class NativeReaderAttributedTextCache: @unchecked Sendable {
     }()
 
     private init() {}
+
+    func baseAttributedText(
+        cacheKey: String,
+        runs: [NativeReaderRuntimeTextRun],
+        fallbackText: String,
+        theme: ReaderTheme,
+        role: NativeReaderTypographyRole,
+        accentColor: UIColor
+    ) -> NSAttributedString {
+        let key = cacheKey as NSString
+        if let cached = cache.object(forKey: key) {
+            return cached.value
+        }
+        let value = NativeReaderAttributedTextBuilder.attributedText(
+            runs: runs,
+            fallbackText: fallbackText,
+            theme: theme,
+            role: role,
+            accentColor: accentColor
+        )
+        cache.setObject(
+            CachedNativeReaderAttributedText(value),
+            forKey: key,
+            cost: max(value.length * 4, fallbackText.utf8.count)
+        )
+        return value
+    }
+
+    func prewarm(
+        items: [NativeReaderAttributedTextPrefetchItem],
+        theme: ReaderTheme,
+        accentColor: UIColor
+    ) async {
+        guard !items.isEmpty else { return }
+        let work = Task.detached(priority: .utility) { [self] in
+            for item in items {
+                try Task.checkCancellation()
+                _ = baseAttributedText(
+                    cacheKey: NativeReaderAttributedTextCacheKey.base(
+                        cacheID: item.cacheID,
+                        theme: theme,
+                        accentColor: accentColor
+                    ),
+                    runs: item.runs,
+                    fallbackText: item.fallbackText,
+                    theme: theme,
+                    role: item.role,
+                    accentColor: accentColor
+                )
+            }
+        }
+        do {
+            try await withTaskCancellationHandler {
+                try await work.value
+            } onCancel: {
+                work.cancel()
+            }
+        } catch {
+            return
+        }
+    }
 
     func attributedText(
         cacheKey: String,
@@ -1779,14 +2250,19 @@ private struct NativeReaderPreparedAttributedTextView: View {
                     onResearchSelection: onResearchSelection
                 )
             } else {
-                Text(fallbackText)
-                    .font(theme.swiftUIFont(emphasized: role.isHeading))
-                    .foregroundStyle(role.usesAccentColor ? Color(uiColor: accentColor) : .primary)
-                    .textSelection(.enabled)
+                AttributedTextView(
+                    attributedText: baseAttributedText,
+                    onOpenLink: onOpenLink,
+                    onResearchSelection: onResearchSelection
+                )
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .task(id: taskID) {
+            guard hasHighlights else {
+                attributedText = nil
+                return
+            }
             attributedText = nil
             do {
                 attributedText = try await NativeReaderAttributedTextCache.shared.attributedText(
@@ -1802,33 +2278,38 @@ private struct NativeReaderPreparedAttributedTextView: View {
             } catch is CancellationError {
                 return
             } catch {
-                attributedText = NSAttributedString(string: fallbackText)
+                attributedText = nil
             }
         }
+    }
+
+    private var baseAttributedText: NSAttributedString {
+        NativeReaderAttributedTextCache.shared.baseAttributedText(
+            cacheKey: baseTaskID,
+            runs: runs,
+            fallbackText: fallbackText,
+            theme: theme,
+            role: role,
+            accentColor: accentColor
+        )
+    }
+
+    private var hasHighlights: Bool {
+        !highlightRanges.isEmpty || activeHighlightRange != nil
+    }
+
+    private var baseTaskID: String {
+        NativeReaderAttributedTextCacheKey.base(
+            cacheID: cacheID,
+            theme: theme,
+            accentColor: accentColor
+        )
     }
 
     private var taskID: String {
         let highlights = highlightRanges.map { "\($0.location):\($0.length)" }.joined(separator: ",")
         let active = activeHighlightRange.map { "\($0.location):\($0.length)" } ?? "none"
         return "\(cacheID)|\(theme.hashValue)|\(accentColor.hash)|\(highlights)|\(active)"
-    }
-}
-
-private extension NativeReaderTypographyRole {
-    var isHeading: Bool {
-        switch self {
-        case .majorHeading, .heading:
-            return true
-        case .body, .caption, .footnote, .note:
-            return false
-        }
-    }
-
-    var usesAccentColor: Bool {
-        if case .majorHeading = self {
-            return true
-        }
-        return false
     }
 }
 
