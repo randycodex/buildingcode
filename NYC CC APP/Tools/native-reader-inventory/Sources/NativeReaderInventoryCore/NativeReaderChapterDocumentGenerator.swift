@@ -207,9 +207,7 @@ public struct NativeReaderChapterDocumentGenerator {
         process.standardInput = input
         process.standardOutput = output
         process.standardError = FileHandle.nullDevice
-        var utf8SourceData = Data([0xEF, 0xBB, 0xBF])
-        utf8SourceData.append(try Data(contentsOf: fileURL))
-        let sourceData = utf8SourceData
+        let sourceData = try AuthoredHTMLParserInput.normalizedData(fileURL: fileURL)
         try process.run()
         DispatchQueue.global(qos: .utility).async {
             input.fileHandleForWriting.write(sourceData)

@@ -255,7 +255,8 @@ final class CodeLibraryViewModel: ObservableObject {
         lifetimeGrantLookupClient: LifetimeGrantLookupClient = LocalLifetimeGrantLookupClient(),
         accountBackendClient: AccountBackendClient = PermitextBackendFactory.makeClient(),
         syncBackend: UserContentSyncBackend? = nil,
-        loadsInitialContent: Bool = true
+        loadsInitialContent: Bool = true,
+        loadsPersistedAccount: Bool = true
     ) {
         self.locator = locator
         self.formattingEngine = formattingEngine
@@ -272,7 +273,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.accountBackendClient = accountBackendClient
         self.currentPlan = entitlementService.currentPlan
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
-        let loadedSignedInAccount = Self.loadSignedInAccount()
+        let loadedSignedInAccount = loadsPersistedAccount ? Self.loadSignedInAccount() : nil
         self.signedInAccount = loadedSignedInAccount
         self.userContentSyncCheckpoint = syncEngine.checkpoint(account: loadedSignedInAccount)
         self.readerTheme = readerThemeStore.load()

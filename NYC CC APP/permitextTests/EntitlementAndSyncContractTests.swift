@@ -3959,6 +3959,54 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             NativeReaderLinkResolver.reference(for: zoningURL),
             NativeReaderReference(kind: .section, codePrefix: nil, token: "11-122")
         )
+
+        let title28ChapterURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_T28C001"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: title28ChapterURL),
+            NativeReaderReference(kind: .chapter, codePrefix: "T28", token: "1")
+        )
+
+        let title28ArticleURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_28-103"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: title28ArticleURL),
+            NativeReaderReference(kind: .article, codePrefix: "T28", token: "28-103")
+        )
+
+        let title24AlphaChapterURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_T24C005A"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: title24AlphaChapterURL),
+            NativeReaderReference(kind: .chapter, codePrefix: "T24", token: "5-A")
+        )
+
+        let title24SectionURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_24-526"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: title24SectionURL),
+            NativeReaderReference(kind: .section, codePrefix: "T24", token: "24-526")
+        )
+
+        let title25ChapterURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_T25C003"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: title25ChapterURL),
+            NativeReaderReference(kind: .chapter, codePrefix: "T25", token: "3")
+        )
+
+        let title26SectionURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_26-101"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: title26SectionURL),
+            NativeReaderReference(kind: .section, codePrefix: "T26", token: "26-101")
+        )
+
+        let housingSectionURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_27-2077"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: housingSectionURL),
+            NativeReaderReference(kind: .section, codePrefix: "T27", token: "27-2077")
+        )
+
+        let localLawURL = try XCTUnwrap(NativeReaderLinkResolver.fragmentURL("JD_L.L.2023/077"))
+        XCTAssertEqual(
+            NativeReaderLinkResolver.reference(for: localLawURL),
+            NativeReaderReference(kind: .section, codePrefix: "LL", token: "L.L. 2023/077")
+        )
         XCTAssertEqual(
             NativeReaderSectionNavigator.sectionNumber(from: "SECTION BC 101 General", anchorID: nil),
             "101"
@@ -3967,6 +4015,169 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             NativeReaderSectionNavigator.sectionNumber(from: "EBC 101 General", anchorID: nil),
             "101"
         )
+    }
+
+    func testNativeReaderCodeSectionResolverUsesExactCollectionsAndFailsClosed() {
+        let codeSections = [
+            CodeSectionCategory(id: 1, codeID: 1, name: "BUILDING CODE"),
+            CodeSectionCategory(id: 2, codeID: 1, name: "GENERAL ADMINISTRATIVE PROVISIONS"),
+            CodeSectionCategory(id: 3, codeID: 1, name: "ADMINISTRATIVE CODE TITLE 24"),
+            CodeSectionCategory(id: 4, codeID: 1, name: "ADMINISTRATIVE CODE TITLE 28"),
+            CodeSectionCategory(id: 5, codeID: 1, name: "HOUSING MAINTENANCE CODE"),
+            CodeSectionCategory(id: 6, codeID: 1, name: "CONSTRUCTION-RELATED LOCAL LAWS"),
+            CodeSectionCategory(id: 7, codeID: 1, name: "1968 BUILDING CODE"),
+            CodeSectionCategory(id: 8, codeID: 1, name: "ADMINISTRATIVE CODE TITLE 25"),
+            CodeSectionCategory(id: 9, codeID: 1, name: "ADMINISTRATIVE CODE TITLE 26")
+        ]
+
+        XCTAssertEqual(NativeReaderCodeSectionResolver.codeSectionID(for: "BC", in: codeSections), 1)
+        XCTAssertEqual(NativeReaderCodeSectionResolver.codeSectionID(for: "AC", in: codeSections), 2)
+        XCTAssertEqual(NativeReaderCodeSectionResolver.codeSectionID(for: "T24", in: codeSections), 3)
+        XCTAssertEqual(NativeReaderCodeSectionResolver.codeSectionID(for: "T25", in: codeSections), 8)
+        XCTAssertEqual(NativeReaderCodeSectionResolver.codeSectionID(for: "T26", in: codeSections), 9)
+        XCTAssertEqual(NativeReaderCodeSectionResolver.codeSectionID(for: "T28", in: codeSections), 4)
+        XCTAssertEqual(
+            NativeReaderCodeSectionResolver.codeSectionID(
+                for: "T28",
+                in: Array(codeSections.prefix(2))
+            ),
+            2
+        )
+        XCTAssertEqual(NativeReaderCodeSectionResolver.codeSectionID(for: "T27", in: codeSections), 5)
+        XCTAssertEqual(NativeReaderCodeSectionResolver.codeSectionID(for: "LL", in: codeSections), 6)
+
+        let unavailableFireReference = NativeReaderReference(
+            kind: .section,
+            codePrefix: "FC",
+            token: "105"
+        )
+        XCTAssertNil(
+            NativeReaderCodeSectionResolver.targetCodeSectionID(
+                for: unavailableFireReference,
+                sourceCodeSectionID: 1,
+                codeSections: codeSections
+            )
+        )
+
+        let sameCodeReference = NativeReaderReference(
+            kind: .section,
+            codePrefix: nil,
+            token: "101.1"
+        )
+        XCTAssertEqual(
+            NativeReaderCodeSectionResolver.targetCodeSectionID(
+                for: sameCodeReference,
+                sourceCodeSectionID: 1,
+                codeSections: codeSections
+            ),
+            1
+        )
+    }
+
+    func testFuelGasTitle28LinkRendersAndResolvesAgainstBundled2022Content() async throws {
+        let sourcePath = "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 1.html"
+        let documentStore = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let resolvedRoute = await documentStore.debugValidatedRoute(
+            forRelativeSourcePath: sourcePath
+        )
+        let route = try XCTUnwrap(resolvedRoute)
+        let document = try await documentStore.loadDocument(for: route)
+        let target = try XCTUnwrap(
+            document.blocks
+                .flatMap(\.runs)
+                .first(where: { $0.linkTarget?.contains("JD_T28C001") == true })?
+                .linkTarget
+        )
+        let url = try XCTUnwrap(NativeReaderLinkResolver.linkURL(for: target))
+        let reference = try XCTUnwrap(NativeReaderLinkResolver.reference(for: url))
+
+        let version = try XCTUnwrap(
+            BundleDatabaseLocator().availableCodeVersions().first {
+                UserContentSyncCodeVersion.server($0.codeVersion) ==
+                    UserContentSyncCodeVersion.canonicalNYC2022
+            }
+        )
+        let authoredStore = try AuthoredCodeStore(
+            jsonURL: version.fileURL,
+            codeID: version.authoredCodeID,
+            jurisdictionID: version.jurisdictionID
+        )
+        let fuelGasCodeSectionID = try XCTUnwrap(
+            authoredStore.codeSections().first { $0.name == "FUEL GAS CODE" }?.id
+        )
+        let destination = NativeReaderReferenceDestinationResolver.destination(
+            for: reference,
+            sourceCodeSectionID: fuelGasCodeSectionID,
+            codeSections: authoredStore.codeSections(),
+            chapters: { authoredStore.chapters(codeSectionID: $0) },
+            sections: { authoredStore.sections(chapterID: $0.id) },
+            sectionSummary: {
+                try? authoredStore.sectionSummary(sectionNumber: $0, codeSectionID: $1)
+            }
+        )
+
+        XCTAssertEqual(reference, NativeReaderReference(kind: .chapter, codePrefix: "T28", token: "1"))
+        XCTAssertEqual(destination?.chapterNumber, "1")
+        XCTAssertEqual(destination?.sectionNumber, "28-101.1")
+        XCTAssertEqual(destination?.id, 8_779)
+    }
+
+    func testBuildingCodeTitle28ArticleLinksRenderAndResolveAgainstBundled2022Content() async throws {
+        let sourcePath = "2022-construction-codes/code-sections/building-code/chapters/1.html"
+        let documentStore = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let resolvedRoute = await documentStore.debugValidatedRoute(
+            forRelativeSourcePath: sourcePath
+        )
+        let route = try XCTUnwrap(resolvedRoute)
+        let document = try await documentStore.loadDocument(for: route)
+
+        let version = try XCTUnwrap(
+            BundleDatabaseLocator().availableCodeVersions().first {
+                UserContentSyncCodeVersion.server($0.codeVersion) ==
+                    UserContentSyncCodeVersion.canonicalNYC2022
+            }
+        )
+        let authoredStore = try AuthoredCodeStore(
+            jsonURL: version.fileURL,
+            codeID: version.authoredCodeID,
+            jurisdictionID: version.jurisdictionID
+        )
+        let buildingCodeSectionID = try XCTUnwrap(
+            authoredStore.codeSections().first { $0.name == "BUILDING CODE" }?.id
+        )
+        let cases: [(fragment: String, linkedText: String, destinationNumber: String, destinationID: Int64)] = [
+            ("JD_28-103", "Article 103 of Chapter 1 of Title 28", "28-103.1", 8_812),
+            ("JD_28-105", "Article 105 of Chapter 1 of Title 28", "28-105.1", 8_979)
+        ]
+
+        for item in cases {
+            let linkedRun = try XCTUnwrap(
+                document.blocks
+                    .flatMap(\.runs)
+                    .first(where: { $0.linkTarget?.contains(item.fragment) == true })
+            )
+            let target = try XCTUnwrap(linkedRun.linkTarget)
+            let url = try XCTUnwrap(NativeReaderLinkResolver.linkURL(for: target))
+            let reference = try XCTUnwrap(NativeReaderLinkResolver.reference(for: url))
+            let destination = NativeReaderReferenceDestinationResolver.destination(
+                for: reference,
+                sourceCodeSectionID: buildingCodeSectionID,
+                codeSections: authoredStore.codeSections(),
+                chapters: { authoredStore.chapters(codeSectionID: $0) },
+                sections: { authoredStore.sections(chapterID: $0.id) },
+                sectionSummary: {
+                    try? authoredStore.sectionSummary(sectionNumber: $0, codeSectionID: $1)
+                }
+            )
+
+            XCTAssertEqual(
+                reference,
+                NativeReaderReference(kind: .article, codePrefix: "T28", token: item.fragment.replacingOccurrences(of: "JD_", with: ""))
+            )
+            XCTAssertEqual(linkedRun.text, item.linkedText)
+            XCTAssertEqual(destination?.sectionNumber, item.destinationNumber)
+            XCTAssertEqual(destination?.id, item.destinationID)
+        }
     }
 
     func testPhaseSixSectionNavigatorTracksNearestPublishedHeading() async throws {

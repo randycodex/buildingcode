@@ -529,7 +529,7 @@
 
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/1.html",
-      "sourceSHA256" : "505be29790433a13dbb0c867c8371637dbc69c30f9a11d55f3c1dd62be485029",
+      "sourceSHA256" : "5223ad09efa16a5f4efa42417919f840367d24e74e8aefe7f0e08f6829817fb8",
       "state" : "native"
     },
     {
@@ -4028,7 +4028,7 @@
       "state" : "fullHTMLFallback"
     }
   ],
-  "corpusSHA256" : "0709f1f425bd47b29fe89543cb604065c511802869ea6c08c6181273b5c49d88",
+  "corpusSHA256" : "57166ea4cf999e2c223e2da07a826dfc312ea342a662cc797a22b51fac0d7cda",
   "parserSchemaVersion" : "native-reader-document-v2",
   "schemaVersion" : 3
 }

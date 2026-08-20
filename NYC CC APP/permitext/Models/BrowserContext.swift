@@ -12,6 +12,7 @@ enum AppTab: Hashable {
 struct ContinuityStore {
     static let shared = ContinuityStore()
 
+    private let defaults: UserDefaults
     private let contextDefaultsKey = "continuityContext"
     private let selectedVersionDefaultsKey = "selectedCodeVersionFileName"
     private let selectedJurisdictionDefaultsKey = "selectedJurisdictionKey"
@@ -20,16 +21,20 @@ struct ContinuityStore {
     private let comparisonModeDefaultsKey = "comparisonModeEnabled"
     private let recentlyViewedSectionsDefaultsKey = "recentlyViewedSections"
 
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
     func load() -> ContinuityContext {
-        if let data = UserDefaults.standard.data(forKey: contextDefaultsKey),
+        if let data = defaults.data(forKey: contextDefaultsKey),
            var decoded = try? JSONDecoder().decode(ContinuityContext.self, from: data) {
             decoded.comparisonModeEnabled = true
             return decoded
         }
 
         return ContinuityContext(
-            selectedJurisdictionKey: UserDefaults.standard.string(forKey: selectedJurisdictionDefaultsKey) ?? "",
-            selectedVersionFileName: UserDefaults.standard.string(forKey: selectedVersionDefaultsKey) ?? "",
+            selectedJurisdictionKey: defaults.string(forKey: selectedJurisdictionDefaultsKey) ?? "",
+            selectedVersionFileName: defaults.string(forKey: selectedVersionDefaultsKey) ?? "",
             selectedCodeSectionID: legacyInt64(forKey: selectedCodeSectionDefaultsKey),
             lastOpenedChapterID: legacyInt64(forKey: lastOpenedChapterIDDefaultsKey),
             activeProjectID: nil,
@@ -40,7 +45,7 @@ struct ContinuityStore {
 
     func save(_ context: ContinuityContext) {
         guard let data = try? JSONEncoder().encode(context) else { return }
-        UserDefaults.standard.set(data, forKey: contextDefaultsKey)
+        defaults.set(data, forKey: contextDefaultsKey)
         persistLegacyMirror(context)
     }
 
@@ -68,48 +73,48 @@ struct ContinuityStore {
 
     private func persistLegacyMirror(_ context: ContinuityContext) {
         if context.selectedJurisdictionKey.isEmpty {
-            UserDefaults.standard.removeObject(forKey: selectedJurisdictionDefaultsKey)
+            defaults.removeObject(forKey: selectedJurisdictionDefaultsKey)
         } else {
-            UserDefaults.standard.set(context.selectedJurisdictionKey, forKey: selectedJurisdictionDefaultsKey)
+            defaults.set(context.selectedJurisdictionKey, forKey: selectedJurisdictionDefaultsKey)
         }
 
         if context.selectedVersionFileName.isEmpty {
-            UserDefaults.standard.removeObject(forKey: selectedVersionDefaultsKey)
+            defaults.removeObject(forKey: selectedVersionDefaultsKey)
         } else {
-            UserDefaults.standard.set(context.selectedVersionFileName, forKey: selectedVersionDefaultsKey)
+            defaults.set(context.selectedVersionFileName, forKey: selectedVersionDefaultsKey)
         }
 
         if let selectedCodeSectionID = context.selectedCodeSectionID {
-            UserDefaults.standard.set(selectedCodeSectionID, forKey: selectedCodeSectionDefaultsKey)
+            defaults.set(selectedCodeSectionID, forKey: selectedCodeSectionDefaultsKey)
         } else {
-            UserDefaults.standard.removeObject(forKey: selectedCodeSectionDefaultsKey)
+            defaults.removeObject(forKey: selectedCodeSectionDefaultsKey)
         }
 
         if let lastOpenedChapterID = context.lastOpenedChapterID {
-            UserDefaults.standard.set(lastOpenedChapterID, forKey: lastOpenedChapterIDDefaultsKey)
+            defaults.set(lastOpenedChapterID, forKey: lastOpenedChapterIDDefaultsKey)
         } else {
-            UserDefaults.standard.removeObject(forKey: lastOpenedChapterIDDefaultsKey)
+            defaults.removeObject(forKey: lastOpenedChapterIDDefaultsKey)
         }
 
-        UserDefaults.standard.set(context.comparisonModeEnabled, forKey: comparisonModeDefaultsKey)
+        defaults.set(context.comparisonModeEnabled, forKey: comparisonModeDefaultsKey)
 
         if let data = try? JSONEncoder().encode(context.recentlyViewedSections) {
-            UserDefaults.standard.set(data, forKey: recentlyViewedSectionsDefaultsKey)
+            defaults.set(data, forKey: recentlyViewedSectionsDefaultsKey)
         }
     }
 
     private func legacyInt64(forKey key: String) -> Int64? {
-        if let number = UserDefaults.standard.object(forKey: key) as? NSNumber {
+        if let number = defaults.object(forKey: key) as? NSNumber {
             return number.int64Value
         }
-        if let value = UserDefaults.standard.object(forKey: key) as? Int64 {
+        if let value = defaults.object(forKey: key) as? Int64 {
             return value
         }
         return nil
     }
 
     private func loadLegacyRecentlyViewedSections() -> [RecentlyViewedEntry] {
-        guard let data = UserDefaults.standard.data(forKey: recentlyViewedSectionsDefaultsKey),
+        guard let data = defaults.data(forKey: recentlyViewedSectionsDefaultsKey),
               let decoded = try? JSONDecoder().decode([RecentlyViewedEntry].self, from: data)
         else {
             return []

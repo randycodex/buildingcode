@@ -4,21 +4,39 @@ import os.signpost
 
 @main
 struct PermitextApp: App {
+    @StateObject private var library: CodeLibraryViewModel
+    @Environment(\.scenePhase) private var scenePhase
+
 #if DEBUG
+    private let physicalStressConfiguration: NativeReaderPhysicalStressConfiguration?
+
     init() {
-        if UserDefaults.standard.string(forKey: PermitextBackendConfiguration.apiBaseURLDefaultsKey) == nil {
-            PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")
+        if let preparedStressHarness = NativeReaderPhysicalStressConfiguration.prepareIfRequested() {
+            physicalStressConfiguration = preparedStressHarness.configuration
+            _library = StateObject(wrappedValue: preparedStressHarness.library)
+        } else {
+            physicalStressConfiguration = nil
+            if UserDefaults.standard.string(forKey: PermitextBackendConfiguration.apiBaseURLDefaultsKey) == nil {
+                PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")
+            }
+            _library = StateObject(wrappedValue: CodeLibraryViewModel())
         }
         Self.configureTabBarAppearance()
     }
 #else
     init() {
+        _library = StateObject(wrappedValue: CodeLibraryViewModel())
         Self.configureTabBarAppearance()
     }
 #endif
 
-    @StateObject private var library = CodeLibraryViewModel()
-    @Environment(\.scenePhase) private var scenePhase
+    private var runsNormalLifecycle: Bool {
+#if DEBUG
+        physicalStressConfiguration == nil
+#else
+        true
+#endif
+    }
 
     private static func configureTabBarAppearance() {
         let appearance = UITabBarAppearance()
@@ -47,7 +65,9 @@ struct PermitextApp: App {
         WindowGroup {
             Group {
 #if DEBUG
-                if let snapshotConfiguration = NativeReaderPhase9SnapshotConfiguration.active {
+                if let physicalStressConfiguration {
+                    NativeReaderPhysicalStressHarness(configuration: physicalStressConfiguration)
+                } else if let snapshotConfiguration = NativeReaderPhase9SnapshotConfiguration.active {
                     NativeReaderPhase9SnapshotHarness(configuration: snapshotConfiguration)
                 } else if library.isInitialContentLoaded {
                     PermitextRootNavigation()
@@ -106,6 +126,7 @@ struct PermitextApp: App {
                 }
             }
             .onChange(of: library.isInitialContentLoaded) { _, isLoaded in
+                guard runsNormalLifecycle else { return }
                 guard isLoaded else { return }
                 Task { @MainActor in
                     // Let the library screen render first, then pay WebKit's
@@ -130,6 +151,7 @@ struct PermitextApp: App {
                 }
             }
             .onChange(of: library.signedInAccount?.appUserID) { _, userID in
+                guard runsNormalLifecycle else { return }
                 if userID != nil, scenePhase == .active {
                     library.startForegroundAutomaticSync()
                 } else {
@@ -137,6 +159,7 @@ struct PermitextApp: App {
                 }
             }
             .onChange(of: scenePhase) { _, phase in
+                guard runsNormalLifecycle else { return }
                 switch phase {
                 case .active:
                     library.startForegroundAutomaticSync()
@@ -165,9 +188,11 @@ struct PermitextApp: App {
                 os_log(.info, log: AppSignpost.memory, "memoryWarningHandled")
             }
             .onOpenURL { url in
+                guard runsNormalLifecycle else { return }
                 library.handleOpenURL(url)
             }
             .onAppear {
+                guard runsNormalLifecycle else { return }
                 library.startStoreKitTransactionObservation()
                 Task {
                     await library.refreshStoreKitEntitlements()
@@ -191,6 +216,217 @@ struct PermitextApp: App {
         }
     }
 }
+
+#if DEBUG
+private struct NativeReaderPhysicalStressConfiguration {
+    enum Target {
+        case bookmarkStress
+        case crossCodeLink
+    }
+
+    struct PreparedHarness {
+        let configuration: NativeReaderPhysicalStressConfiguration
+        let library: CodeLibraryViewModel
+    }
+
+    static let launchArgument = "--native-reader-physical-stress"
+    static let crossCodeLinkLaunchArgument = "--native-reader-cross-code-link-test"
+    private static let defaultsSuiteName = "com.randycodex.permitext.native-reader-physical-stress"
+    private static let temporaryDirectoryName = "permitext-native-reader-physical-stress"
+
+    let defaults: UserDefaults
+    let target: Target
+
+    @MainActor
+    static func prepareIfRequested() -> PreparedHarness? {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard arguments.contains(launchArgument) || arguments.contains(crossCodeLinkLaunchArgument) else {
+            return nil
+        }
+
+        let target: Target = arguments.contains(crossCodeLinkLaunchArgument)
+            ? .crossCodeLink
+            : .bookmarkStress
+
+        guard let defaults = UserDefaults(suiteName: defaultsSuiteName) else {
+            fatalError("Unable to create the isolated physical-stress defaults suite.")
+        }
+        defaults.removePersistentDomain(forName: defaultsSuiteName)
+
+        let fileManager = FileManager.default
+        let testDirectory = fileManager.temporaryDirectory
+            .appendingPathComponent(temporaryDirectoryName, isDirectory: true)
+        do {
+            if fileManager.fileExists(atPath: testDirectory.path) {
+                try fileManager.removeItem(at: testDirectory)
+            }
+            try fileManager.createDirectory(
+                at: testDirectory,
+                withIntermediateDirectories: true
+            )
+            let repository = try UserDataStore(
+                databaseURL: testDirectory.appendingPathComponent("user_data.sqlite")
+            )
+            let library = CodeLibraryViewModel(
+                userContentRepository: repository,
+                continuityStore: ContinuityStore(defaults: defaults),
+                readerThemeStore: ReaderThemeStore(defaults: defaults),
+                syncBackend: NoOpUserContentSyncBackend(),
+                loadsPersistedAccount: false
+            )
+            return PreparedHarness(
+                configuration: Self(defaults: defaults, target: target),
+                library: library
+            )
+        } catch {
+            // Failing closed is important here: falling back to the ordinary
+            // repository would let a stress test mutate the user's real data.
+            fatalError("Unable to prepare isolated physical-stress storage: \(error.localizedDescription)")
+        }
+    }
+
+}
+
+private struct NativeReaderPhysicalStressHarness: View {
+    let configuration: NativeReaderPhysicalStressConfiguration
+
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var chapter: CodeChapter?
+    @State private var initialSection: CodeSectionSummary?
+    @State private var failureMessage: String?
+
+    var body: some View {
+        TabView(selection: $library.selectedTab) {
+            readerTab
+                .environment(\.isBrowserTabActive, library.selectedTab == .browse)
+                .tabItem {
+                    Image(systemName: "text.line.first.and.arrowtriangle.forward")
+                }
+                .accessibilityLabel("First reader")
+                .tag(AppTab.browse)
+
+            BookmarksView(filterDefaults: configuration.defaults)
+                .tabItem {
+                    Image(systemName: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
+                }
+                .accessibilityLabel("Projects")
+                .tag(AppTab.bookmarks)
+        }
+        .task {
+            await prepareReaderTarget()
+        }
+    }
+
+    @ViewBuilder
+    private var readerTab: some View {
+        if let chapter, let initialSection {
+            NavigationStack {
+                ChapterHTMLReaderView(
+                    chapter: chapter,
+                    initialSection: initialSection
+                )
+            }
+        } else if let failureMessage {
+            ContentUnavailableView(
+                "Physical stress harness failed",
+                systemImage: "exclamationmark.triangle.fill",
+                description: Text(failureMessage)
+            )
+            .accessibilityIdentifier("physical-stress-failure")
+        } else {
+            ProgressView("Preparing isolated native Reader…")
+                .accessibilityIdentifier("physical-stress-loading")
+        }
+    }
+
+    @MainActor
+    private func prepareReaderTarget() async {
+        failureMessage = nil
+        chapter = nil
+        initialSection = nil
+        library.selectedTab = .browse
+
+        guard await waitForInitialContent() else {
+            failureMessage = "The bundled code library did not finish loading."
+            return
+        }
+
+        guard let constructionVersion = library.availableVersions.first(where: {
+            $0.authoredHTMLBundlePath?.hasSuffix("2022-construction-codes") == true
+        }) else {
+            failureMessage = "The 2022 Construction Codes bundle is unavailable."
+            return
+        }
+
+        if library.selectedVersionFileName != constructionVersion.fileName {
+            library.updateSelectedVersion(fileName: constructionVersion.fileName)
+            guard await waitForInitialContent(
+                selectedVersionFileName: constructionVersion.fileName
+            ) else {
+                failureMessage = "The 2022 Construction Codes bundle did not finish loading."
+                return
+            }
+        }
+
+        let codeSectionName: String
+        let initialSectionNumber: String?
+        switch configuration.target {
+        case .bookmarkStress:
+            codeSectionName = "BUILDING CODE"
+            initialSectionNumber = nil
+        case .crossCodeLink:
+            codeSectionName = "FUEL GAS CODE"
+            initialSectionNumber = "102.2.1"
+        }
+
+        guard let codeSection = library.codeSections.first(where: {
+            $0.name.caseInsensitiveCompare(codeSectionName) == .orderedSame
+        }) else {
+            failureMessage = "The \(codeSectionName.localizedCapitalized) section is unavailable."
+            return
+        }
+        library.updateSelectedCodeSection(id: codeSection.id)
+
+        guard let chapterOne = library.chapters(for: codeSection.id).first(where: {
+            $0.chapterNumber == "1"
+        }) else {
+            failureMessage = "\(codeSectionName.localizedCapitalized) Chapter 1 is unavailable."
+            return
+        }
+        let selectedInitialSection: CodeSectionSummary?
+        if let initialSectionNumber {
+            selectedInitialSection = library.sections(for: chapterOne).first(where: {
+                $0.sectionNumber == initialSectionNumber
+            })
+        } else {
+            selectedInitialSection = await library.firstSectionAsync(for: chapterOne)
+        }
+        guard let selectedInitialSection else {
+            failureMessage = "\(codeSectionName.localizedCapitalized) Chapter 1 has no readable section."
+            return
+        }
+
+        chapter = chapterOne
+        initialSection = selectedInitialSection
+    }
+
+    @MainActor
+    private func waitForInitialContent(
+        selectedVersionFileName: String? = nil
+    ) async -> Bool {
+        for _ in 0..<300 {
+            if library.isInitialContentLoaded,
+               (selectedVersionFileName == nil ||
+                library.selectedVersionFileName == selectedVersionFileName) {
+                return true
+            }
+            try? await Task.sleep(for: .milliseconds(100))
+            guard !Task.isCancelled else { return false }
+        }
+        return false
+    }
+}
+#endif
 
 private struct PermitextRootNavigation: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass

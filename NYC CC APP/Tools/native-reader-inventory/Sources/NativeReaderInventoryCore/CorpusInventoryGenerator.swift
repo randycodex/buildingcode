@@ -1,6 +1,67 @@
 import CryptoKit
 import Foundation
 
+enum AuthoredHTMLParserInputError: LocalizedError {
+    case unbalancedLinkElements(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .unbalancedLinkElements(let path):
+            "Authored JSX link elements are unbalanced: \(path)"
+        }
+    }
+}
+
+enum AuthoredHTMLParserInput {
+    static func normalizedData(fileURL: URL) throws -> Data {
+        let sourceData = try Data(contentsOf: fileURL)
+        var source = String(decoding: sourceData, as: UTF8.self)
+
+        // The authored corpus uses JSX-style <Link to="..."> elements in both
+        // uppercase and lowercase forms. libxml2's HTML parser otherwise treats
+        // them as the void HTML <link> element, separating the visible label from
+        // its target before we build text runs. Requiring a `to` attribute avoids
+        // rewriting ordinary HTML stylesheet <link> elements.
+        guard hasBalancedLinkElements(in: source) else {
+            throw AuthoredHTMLParserInputError.unbalancedLinkElements(fileURL.path)
+        }
+        source = source.replacingOccurrences(
+            of: #"<link(?=[\s>])(?=[^>]*\bto\s*=)"#,
+            with: "<a",
+            options: [.regularExpression, .caseInsensitive]
+        )
+        source = source.replacingOccurrences(
+            of: #"</link\s*>"#,
+            with: "</a>",
+            options: [.regularExpression, .caseInsensitive]
+        )
+
+        var normalizedData = Data([0xEF, 0xBB, 0xBF])
+        normalizedData.append(Data(source.utf8))
+        return normalizedData
+    }
+
+    private static func hasBalancedLinkElements(in value: String) -> Bool {
+        guard let expression = try? NSRegularExpression(
+            pattern: #"(?i)<link(?=[\s>])(?=[^>]*\bto\s*=)[^>]*>|</link\s*>"#
+        ) else { return false }
+        let range = NSRange(location: 0, length: value.utf16.count)
+        var depth = 0
+        for match in expression.matches(in: value, range: range) {
+            guard let tokenRange = Range(match.range, in: value) else { return false }
+            let token = value[tokenRange]
+            if token.hasPrefix("</") {
+                guard depth == 1 else { return false }
+                depth = 0
+            } else {
+                guard depth == 0 else { return false }
+                depth = 1
+            }
+        }
+        return depth == 0
+    }
+}
+
 public enum CorpusInventoryError: LocalizedError {
     case sourceRootMissing(String)
     case noChapterFiles(String)
@@ -21,7 +82,7 @@ public enum CorpusInventoryError: LocalizedError {
 public struct CorpusInventoryGenerator {
     public static let schemaVersion = 3
     public static let parserSchemaVersion = "native-reader-document-v2"
-    public static let parserEngine = "libxml2 HTML recovery DOM (xmllint --html --xmlout) + Foundation XMLDocument"
+    public static let parserEngine = "Case-insensitive authored JSX Link-to-anchor normalization + libxml2 HTML recovery DOM (xmllint --html --xmlout) + Foundation XMLDocument"
 
     private let fileManager: FileManager
 
@@ -295,9 +356,7 @@ public struct CorpusInventoryGenerator {
         process.standardInput = input
         process.standardOutput = output
         process.standardError = FileHandle.nullDevice
-        var utf8SourceData = Data([0xEF, 0xBB, 0xBF])
-        utf8SourceData.append(try Data(contentsOf: fileURL))
-        let sourceData = utf8SourceData
+        let sourceData = try AuthoredHTMLParserInput.normalizedData(fileURL: fileURL)
         try process.run()
         DispatchQueue.global(qos: .utility).async {
             input.fileHandleForWriting.write(sourceData)

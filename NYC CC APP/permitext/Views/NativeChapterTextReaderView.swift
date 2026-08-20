@@ -249,6 +249,7 @@ struct NativeChapterTextReaderView: View {
             .padding(.bottom, 28)
             .scrollTargetLayout()
         }
+        .accessibilityIdentifier("native-reader-ready")
     }
 
     @MainActor
@@ -778,47 +779,18 @@ struct NativeChapterTextReaderView: View {
     }
 
     private func resolvedReference(_ reference: NativeReaderReference) -> CodeSectionSummary? {
-        let targetCodeSectionID = reference.codePrefix
-            .flatMap(codeSectionID(for:))
-            ?? chapter.codeSectionID
-
-        switch reference.kind {
-        case .section:
-            for candidate in reference.sectionNumberCandidates {
-                if let section = library.sectionSummary(
-                    sectionNumber: candidate,
-                    codeSectionID: targetCodeSectionID
-                ) {
-                    return section
-                }
+        NativeReaderReferenceDestinationResolver.destination(
+            for: reference,
+            sourceCodeSectionID: chapter.codeSectionID,
+            codeSections: library.codeSections,
+            chapters: { library.chapters(for: $0) },
+            sections: { library.sections(for: $0) },
+            sectionSummary: {
+                library.sectionSummary(sectionNumber: $0, codeSectionID: $1)
             }
-            return nil
-        case .chapter, .appendix:
-            guard let targetCodeSectionID,
-                  let targetChapter = library.chapters(for: targetCodeSectionID).first(where: {
-                      $0.chapterNumber.caseInsensitiveCompare(reference.token) == .orderedSame
-                  }) else { return nil }
-            return library.sections(for: targetChapter).first
-        }
+        )
     }
 
-    private func codeSectionID(for prefix: String) -> Int64? {
-        let normalizedPrefix = prefix.uppercased()
-        return library.codeSections.first { codeSection in
-            let name = codeSection.name.lowercased()
-            switch normalizedPrefix {
-            case "BC": return name.contains("building") && !name.contains("existing")
-            case "EBC": return name.contains("existing building")
-            case "PC": return name.contains("plumbing")
-            case "MC": return name.contains("mechanical")
-            case "FGC": return name.contains("fuel gas")
-            case "AC": return name.contains("administrative")
-            case "FC": return name.contains("fire code")
-            case "ZR": return name.contains("zoning")
-            default: return false
-            }
-        }?.id
-    }
 }
 
 @MainActor
@@ -1293,6 +1265,7 @@ private struct NativeReaderSearchSheet: View {
 
 enum NativeReaderReferenceKind: String, Hashable {
     case section
+    case article
     case chapter
     case appendix
 }
@@ -1349,6 +1322,29 @@ enum NativeReaderLinkResolver {
             fragment.removeFirst(3)
         }
 
+        for title in ["24", "25", "26", "27", "28"] {
+            if let token = firstCapture(
+                in: fragment,
+                pattern: "(?i)^T\(title)C([A-Z0-9-]+)$"
+            ) {
+                return NativeReaderReference(
+                    kind: .chapter,
+                    codePrefix: "T\(title)",
+                    token: normalizedChapterToken(token)
+                )
+            }
+        }
+        if let localLaw = firstCapture(
+            in: fragment,
+            pattern: #"(?i)^L\.L\.\s*(\d{4}/\d{1,3})$"#
+        ) {
+            return NativeReaderReference(
+                kind: .section,
+                codePrefix: "LL",
+                token: "L.L. \(localLaw)"
+            )
+        }
+
         var codePrefix: String?
         for prefix in ["FGC", "EBC", "BC", "PC", "MC", "AC", "FC", "ZR"] {
             if fragment.uppercased().hasPrefix(prefix) {
@@ -1357,10 +1353,6 @@ enum NativeReaderLinkResolver {
                 break
             }
         }
-        if codePrefix == nil, fragment.hasPrefix("28-") {
-            codePrefix = "AC"
-        }
-
         if let token = firstCapture(in: fragment, pattern: #"(?i)^(?:CH(?:APTER)?\.?)\s*([A-Z0-9-]+)"#) {
             return NativeReaderReference(kind: .chapter, codePrefix: codePrefix, token: token.uppercased())
         }
@@ -1373,6 +1365,22 @@ enum NativeReaderLinkResolver {
             with: "",
             options: .regularExpression
         )
+        if let title = firstCapture(in: stripped, pattern: #"^(2[4-8])-"#),
+           firstCapture(
+               in: stripped,
+               pattern: #"^([0-9]+(?:[.\-][0-9A-Za-z]+)*(?:\([A-Za-z0-9]+\))?)"#
+           ) != nil {
+            let normalizedToken = stripped.uppercased()
+            let kind: NativeReaderReferenceKind = title == "28"
+                && firstCapture(in: normalizedToken, pattern: #"^(28-\d{3})$"#) != nil
+                ? .article
+                : .section
+            return NativeReaderReference(
+                kind: kind,
+                codePrefix: "T\(title)",
+                token: normalizedToken
+            )
+        }
         guard let token = firstCapture(
             in: stripped,
             pattern: #"^([A-Z]?\d+(?:[.\-]\d+)*(?:\([A-Za-z0-9]+\))?)"#
@@ -1384,6 +1392,24 @@ enum NativeReaderLinkResolver {
         )
     }
 
+    private static func normalizedChapterToken(_ value: String) -> String {
+        let uppercase = value.uppercased()
+        if let suffixStart = uppercase.firstIndex(where: { $0.isLetter }) {
+            let numberPart = uppercase[..<suffixStart]
+            let suffixPart = uppercase[suffixStart...]
+            if !numberPart.isEmpty,
+               numberPart.allSatisfy({ $0.isNumber }),
+               suffixPart.allSatisfy({ $0.isLetter }) {
+                let normalizedNumber = numberPart.drop(while: { $0 == "0" })
+                let number = normalizedNumber.isEmpty ? "0" : String(normalizedNumber)
+                return "\(number)-\(suffixPart)"
+            }
+        }
+
+        let normalized = uppercase.drop(while: { $0 == "0" })
+        return normalized.isEmpty ? "0" : String(normalized)
+    }
+
     private static func firstCapture(in value: String, pattern: String) -> String? {
         guard let expression = try? NSRegularExpression(pattern: pattern),
               let match = expression.firstMatch(
@@ -1392,6 +1418,96 @@ enum NativeReaderLinkResolver {
               ),
               let range = Range(match.range(at: 1), in: value) else { return nil }
         return String(value[range])
+    }
+}
+
+enum NativeReaderCodeSectionResolver {
+    static func targetCodeSectionID(
+        for reference: NativeReaderReference,
+        sourceCodeSectionID: Int64?,
+        codeSections: [CodeSectionCategory]
+    ) -> Int64? {
+        guard let prefix = reference.codePrefix else { return sourceCodeSectionID }
+        return codeSectionID(for: prefix, in: codeSections)
+    }
+
+    static func codeSectionID(
+        for prefix: String,
+        in codeSections: [CodeSectionCategory]
+    ) -> Int64? {
+        let normalizedPrefix = prefix.uppercased()
+        let match: (String) -> Int64? = { fragment in
+            codeSections.first { $0.name.uppercased().contains(fragment) }?.id
+        }
+        switch normalizedPrefix {
+        case "BC":
+            return codeSections.first {
+                let name = $0.name.uppercased()
+                return name.contains("BUILDING CODE")
+                    && !name.contains("EXISTING")
+                    && !name.contains("1968")
+            }?.id
+        case "EBC": return match("EXISTING BUILDING")
+        case "PC": return match("PLUMBING")
+        case "MC": return match("MECHANICAL")
+        case "FGC": return match("FUEL GAS")
+        case "AC": return match("GENERAL ADMINISTRATIVE")
+        case "FC": return match("FIRE CODE")
+        case "ZR": return match("ZONING")
+        case "T24": return match("TITLE 24")
+        case "T25": return match("TITLE 25")
+        case "T26": return match("TITLE 26")
+        case "T27": return match("HOUSING MAINTENANCE")
+        case "T28": return match("TITLE 28") ?? match("GENERAL ADMINISTRATIVE")
+        case "LL": return match("CONSTRUCTION-RELATED LOCAL LAWS")
+        default: return nil
+        }
+    }
+}
+
+enum NativeReaderReferenceDestinationResolver {
+    static func destination(
+        for reference: NativeReaderReference,
+        sourceCodeSectionID: Int64?,
+        codeSections: [CodeSectionCategory],
+        chapters: (Int64) -> [CodeChapter],
+        sections: (CodeChapter) -> [CodeSectionSummary],
+        sectionSummary: (String, Int64) -> CodeSectionSummary?
+    ) -> CodeSectionSummary? {
+        guard let targetCodeSectionID = NativeReaderCodeSectionResolver.targetCodeSectionID(
+            for: reference,
+            sourceCodeSectionID: sourceCodeSectionID,
+            codeSections: codeSections
+        ) else { return nil }
+
+        switch reference.kind {
+        case .section:
+            for candidate in reference.sectionNumberCandidates {
+                if let destination = sectionSummary(candidate, targetCodeSectionID) {
+                    return destination
+                }
+            }
+            return nil
+        case .article:
+            if let destination = sectionSummary(reference.token, targetCodeSectionID) {
+                return destination
+            }
+            let provisionPrefix = "\(reference.token)."
+            for chapter in chapters(targetCodeSectionID) {
+                if let destination = sections(chapter).first(where: {
+                    $0.sectionNumber.caseInsensitiveCompare(reference.token) == .orderedSame
+                        || $0.sectionNumber.uppercased().hasPrefix(provisionPrefix.uppercased())
+                }) {
+                    return destination
+                }
+            }
+            return nil
+        case .chapter, .appendix:
+            guard let targetChapter = chapters(targetCodeSectionID).first(where: {
+                $0.chapterNumber.caseInsensitiveCompare(reference.token) == .orderedSame
+            }) else { return nil }
+            return sections(targetChapter).first
+        }
     }
 }
 

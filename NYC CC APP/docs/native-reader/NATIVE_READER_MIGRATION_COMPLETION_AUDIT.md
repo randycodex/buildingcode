@@ -20,6 +20,12 @@ This audit separates five evidence layers that must not be treated as interchang
 
 No TestFlight upload, App Store Connect change, App Store submission, production deployment, or merge to `main` is claimed.
 
+## Build 24 checkpoint — 2026-08-20
+
+Build 24 improves native Reader link interaction and authored-link parsing, but it is not a complete link-navigation sign-off. The shared text tap conflict was removed, JSX-style authored links are normalized with fail-closed structural validation, and Title 28 article references resolve to their first provision when no article-level section exists. Simulator interaction opened the actual Article 103 and Article 105 links to `28-103.1` and `28-105.1`; the user subsequently reported that other links still do not open on the physical phone. That unresolved physical-device result remains an open migration defect and this checkpoint must not be described as universal link support.
+
+Checkpoint verification includes 104 passing iOS unit/contract tests, 14 passing native-inventory package tests, a deterministic check of all 463 generated documents, and a clean signed Release 1.0 build 24 installed on the physical iPhone. Any later web Production deployment from this branch is a separate server/web baseline and does not validate or ship the native iOS migration.
+
 ## Phase reconciliation
 
 | Phase | Status | Reconciled result |

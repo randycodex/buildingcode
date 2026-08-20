@@ -227,6 +227,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
         textView.selectionChangeHandler = { hasSelection in
             context.coordinator.onSelectionChange?(hasSelection)
         }
+        textView.isAuxiliaryTapHandlingEnabled = onOpenImage != nil || onContentTap != nil
         return textView
     }
 
@@ -245,6 +246,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
         uiView.selectionChangeHandler = { hasSelection in
             context.coordinator.onSelectionChange?(hasSelection)
         }
+        uiView.isAuxiliaryTapHandlingEnabled = onOpenImage != nil || onContentTap != nil
 
         let contentSizeCategory = uiView.traitCollection.preferredContentSizeCategory
         if context.coordinator.requiresTextUpdate(
@@ -511,11 +513,19 @@ private final class RichTextView: UITextView {
     var attachmentTapHandler: ((UIImage) -> Void)?
     var contentTapHandler: (() -> Void)?
     var selectionChangeHandler: ((Bool) -> Void)?
+    var isAuxiliaryTapHandlingEnabled: Bool {
+        get { auxiliaryTapRecognizer.isEnabled }
+        set { auxiliaryTapRecognizer.isEnabled = newValue }
+    }
     private var selectionObserver: NSObjectProtocol?
+    private lazy var auxiliaryTapRecognizer = UITapGestureRecognizer(
+        target: self,
+        action: #selector(handleTap(_:))
+    )
 
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
-        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(_:))))
+        addGestureRecognizer(auxiliaryTapRecognizer)
         selectionObserver = NotificationCenter.default.addObserver(
             forName: .nycccClearRichTextSelection,
             object: nil,
@@ -529,7 +539,7 @@ private final class RichTextView: UITextView {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(_:))))
+        addGestureRecognizer(auxiliaryTapRecognizer)
         selectionObserver = NotificationCenter.default.addObserver(
             forName: .nycccClearRichTextSelection,
             object: nil,

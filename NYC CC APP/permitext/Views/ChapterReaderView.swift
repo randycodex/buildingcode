@@ -710,6 +710,7 @@ struct ReaderCurrentSectionBookmarkButton: View {
         }
         .buttonStyle(.plain)
         .disabled(sectionID == nil)
+        .accessibilityIdentifier("reader-current-section-bookmark")
         .accessibilityLabel(displayedIsBookmarked ? "Remove current section bookmark" : "Save current section")
         .accessibilityValue(displayedIsBookmarked ? "Saved" : "Not saved")
         .onAppear { synchronizeState() }

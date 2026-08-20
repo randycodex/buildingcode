@@ -18,16 +18,24 @@ struct BookmarksView: View {
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
+    private let filterDefaults: UserDefaults
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let projectTilePageSize = CodeScreenMetrics.tileGridPageSize
 
-    init() {
+    init(filterDefaults: UserDefaults = .standard) {
+        self.filterDefaults = filterDefaults
         _savedFilterCodeSectionIDs = State(
-            initialValue: FilterIDsStorage.load(key: Self.filterCodeSectionIDsDefaultsKey)
+            initialValue: FilterIDsStorage.load(
+                key: Self.filterCodeSectionIDsDefaultsKey,
+                defaults: filterDefaults
+            )
         )
         _savedFilterFolderIDs = State(
-            initialValue: FilterIDsStorage.load(key: Self.filterFolderIDsDefaultsKey)
+            initialValue: FilterIDsStorage.load(
+                key: Self.filterFolderIDsDefaultsKey,
+                defaults: filterDefaults
+            )
         )
     }
 
@@ -220,6 +228,7 @@ struct BookmarksView: View {
                 .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
                 .padding(.bottom, tabBarClearance)
             }
+            .accessibilityIdentifier("projects-root")
             .overlay(alignment: .top) {
                 CodeTopContentFade(title: "Projects", progress: collapseProgress)
             }
@@ -234,11 +243,19 @@ struct BookmarksView: View {
                 rebuildBookmarkCaches()
             }
             .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
-                FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
+                FilterIDsStorage.persist(
+                    newValue,
+                    key: Self.filterCodeSectionIDsDefaultsKey,
+                    defaults: filterDefaults
+                )
                 rebuildBookmarkCaches()
             }
             .onChange(of: savedFilterFolderIDs) { _, newValue in
-                FilterIDsStorage.persist(newValue, key: Self.filterFolderIDsDefaultsKey)
+                FilterIDsStorage.persist(
+                    newValue,
+                    key: Self.filterFolderIDsDefaultsKey,
+                    defaults: filterDefaults
+                )
                 rebuildBookmarkCaches()
             }
             .onChange(of: savedSortMode) { _, _ in
@@ -367,6 +384,7 @@ private var savedBookmarkList: some View {
                         bookmarkRow(bookmark)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("projects-bookmark-\(bookmark.id)")
 
                     CodeHairline()
                 }

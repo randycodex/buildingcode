@@ -235,6 +235,109 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         )
     }
 
+    func testJSXLinkPreservesVisibleTextAndTargetInRenderedRun() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("sample-package/chapters/1.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        let target = "{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-237170', hash: '#JD_T28C001' }}"
+        try """
+        <html><body><p>Refer to <Link class="Jump" to="\(target)">Chapter 1 of Title 28</Link> of the Administrative Code.</p></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(
+            fileURL: chapterURL,
+            sourceRoot: root
+        )
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+
+        XCTAssertEqual(inventory.links.first?.target, target)
+        XCTAssertEqual(document.links.first?.text, "Chapter 1 of Title 28")
+        XCTAssertTrue(document.validation.linkTargetsMatch)
+        XCTAssertTrue(document.blocks.flatMap(\.runs).contains {
+            $0.text == "Chapter 1 of Title 28" && $0.linkTarget == target
+        })
+    }
+
+    func testLowercaseJSXLinkPreservesVisibleTextAndTargetInRenderedRun() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("sample-package/chapters/1.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        let target = "{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-207476', hash: '#JD_28-103' }}"
+        try """
+        <html><head><link rel="stylesheet" href="reader.css"></head><body><p>Refer to <link class="Jump" to="\(target)">Article 103 of Chapter 1 of Title 28</link>.</p></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(
+            fileURL: chapterURL,
+            sourceRoot: root
+        )
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+
+        XCTAssertEqual(inventory.links.map(\.target), [target])
+        XCTAssertEqual(document.links.first?.text, "Article 103 of Chapter 1 of Title 28")
+        XCTAssertTrue(document.validation.linkTargetsMatch)
+        XCTAssertTrue(document.blocks.flatMap(\.runs).contains {
+            $0.text == "Article 103 of Chapter 1 of Title 28" && $0.linkTarget == target
+        })
+    }
+
+    func testUnbalancedJSXLinkFailsClosedInsteadOfOverlinkingParagraph() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("sample-package/chapters/1.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try """
+        <html><body><p>Refer to <link class="Jump" to="#JD_28-103">Article 103 of Chapter 1 of Title 28 and unrelated trailing text.</p></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        XCTAssertThrowsError(try AuthoredHTMLParserInput.normalizedData(fileURL: chapterURL)) { error in
+            XCTAssertTrue(error is AuthoredHTMLParserInputError)
+        }
+    }
+
+    func testEqualCountMisorderedOrNestedJSXLinksFailClosed() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("sample-package/chapters/1.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        let malformedSources = [
+            """
+            <html><body><p></link>Refer to <link to="#JD_28-103">Article 103 and unrelated trailing text.</p></body></html>
+            """,
+            """
+            <html><body><p><link to="#JD_28-103">Article 103 <link to="#JD_28-105">Article 105</link></link>.</p></body></html>
+            """
+        ]
+
+        for (index, source) in malformedSources.enumerated() {
+            try source.write(to: chapterURL, atomically: true, encoding: .utf8)
+            XCTAssertThrowsError(
+                try AuthoredHTMLParserInput.normalizedData(fileURL: chapterURL),
+                "Malformed equal-count link case \(index) should fail closed"
+            ) { error in
+                XCTAssertTrue(error is AuthoredHTMLParserInputError)
+            }
+        }
+    }
+
     func testExactTableMatrixSignatureCoversCoordinatesSpansHeadersAndText() throws {
         let root = try makeTemporaryDirectory()
         let chapterURL = root.appendingPathComponent("package/chapters/table.html")
