@@ -4,7 +4,7 @@ Date: 2026-08-19
 
 ## Status
 
-The local rollout implementation, deterministic corpus gates, simulator suite, Release build, and focused physical-device tests pass after crash, text-presentation, and scroll-restoration remediations. Build 18 is installed on the physical phone and the user accepted it for publication of this checkpoint. Restoring a saved chapter position now keeps the Reader preparation state visible until the saved block is ready, avoiding the visible top-of-chapter flash; a completely direct first frame with no intermediate preparation state is intentionally deferred for follow-up. The Phase 10 exit gate still requires TestFlight evidence, and no TestFlight/App Store action has been authorized or performed.
+The local rollout implementation, deterministic corpus gates, simulator suite, Release build, and focused physical-device tests pass after crash, text-presentation, and scroll-restoration remediations. Build 18 was installed on the physical phone and the user accepted it for publication of this checkpoint. Restoring a saved chapter position now keeps the Reader preparation state visible until the saved block is ready, avoiding the visible top-of-chapter flash; a completely direct first frame with no intermediate preparation state is intentionally deferred for follow-up. The formal Phase 10 exit gate calls for TestFlight evidence. On 2026-08-19, the user explicitly chose to defer TestFlight and proceed with the local Phase 11 cutover; no TestFlight/App Store action was performed.
 
 ## Feature-flag design
 
@@ -23,7 +23,7 @@ Build defaults are intentionally different:
 - Debug: `isolated-table-fallback`, so every validated native tier opens natively by default for internal testing.
 - Release: `off`, so the ordinary Release build continues to use the authoritative HTML reader and does not expose the rollout diagnostic control.
 
-The Release-capable routing code remains compiled behind the runtime flag. A future separately authorized internal TestFlight archive can override the build setting without changing routing code, while the normal Release default stays off.
+The Release-capable routing code remains compiled behind the runtime flag. At this Phase 10 checkpoint the normal Release default stayed off; the separately documented Phase 11 cutover later enabled the validated tier in Release. A future authorized internal TestFlight archive can still override the build setting without changing routing code.
 
 ## Deterministic rollout tiers
 
@@ -182,6 +182,6 @@ Release verification:
 
 ## Remaining Phase 10 gate
 
-The local, simulator, signed-build, and direct physical-device checkpoint is accepted for branch publication. Completing the formal Phase 10 exit gate still requires explicit authorization to create/upload an internal TestFlight build and collect TestFlight evidence for native content, navigation, fallback, bookmarks, and Projects stability. Phase 11 Release-default cutover remains gated on that evidence and the migration acceptance criteria.
+The local, simulator, signed-build, and direct physical-device checkpoint is accepted for branch publication. The plan's formal TestFlight evidence remains deferred rather than satisfied. The user explicitly authorized proceeding without that evidence for now, and the local Phase 11 Release-default cutover is recorded separately. A future TestFlight run still requires separate authorization and must collect evidence for native content, navigation, fallback, bookmarks, and Projects stability.
 
 No TestFlight upload, App Store Connect change, App Store submission, merge, or production release was performed.

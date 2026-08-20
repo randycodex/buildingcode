@@ -3289,7 +3289,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertNil(invalidRoute)
     }
 
-    func testPhaseTenBuildFlagsKeepNormalReleaseOffAndRetainHTMLDiagnostics() throws {
+    func testPhaseElevenBuildFlagsMakeValidatedNativeDefaultAndRetainHTMLFallback() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -3317,13 +3317,14 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             info[NativeReaderRolloutPolicy.infoPlistKey] as? String,
             "$(NATIVE_READER_ROLLOUT_STAGE)"
         )
-        XCTAssertTrue(
-            projectSource.contains(
-                "NATIVE_READER_ROLLOUT_STAGE = \"isolated-table-fallback\";"
-            )
+        XCTAssertEqual(
+            projectSource.components(
+                separatedBy: "NATIVE_READER_ROLLOUT_STAGE = \"isolated-table-fallback\";"
+            ).count - 1,
+            2
         )
-        XCTAssertTrue(projectSource.contains("NATIVE_READER_ROLLOUT_STAGE = off;"))
-        XCTAssertTrue(readerSource.contains("Native (Rollout Default)"))
+        XCTAssertFalse(projectSource.contains("NATIVE_READER_ROLLOUT_STAGE = off;"))
+        XCTAssertTrue(readerSource.contains("Native (Default)"))
         XCTAssertTrue(readerSource.contains("HTML (Diagnostic)"))
         XCTAssertTrue(
             readerSource.contains(

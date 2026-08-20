@@ -533,7 +533,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;
 				INFOPLIST_OUTPUT_FORMAT = xml;
@@ -561,7 +561,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;
 				INFOPLIST_OUTPUT_FORMAT = xml;
@@ -571,7 +571,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				NATIVE_READER_ROLLOUT_STAGE = off;
+				NATIVE_READER_ROLLOUT_STAGE = "isolated-table-fallback";
 				PRODUCT_BUNDLE_IDENTIFIER = com.randycodex.permitext;
 				PRODUCT_NAME = permitext;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

@@ -70,7 +70,7 @@ private enum ChapterReaderPresentation: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .html: "HTML (Diagnostic)"
-        case .native: "Native (Rollout Default)"
+        case .native: "Native (Default)"
         }
     }
 }
