@@ -1849,6 +1849,12 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(htmlSource.contains("action: 'toggleBookmark'"))
         XCTAssertFalse(chapterSource.contains("ParagraphBookmarkSwipeModifier"))
         XCTAssertTrue(chapterSource.contains("struct ReaderCurrentSectionBookmarkButton"))
+        XCTAssertTrue(chapterSource.contains("let desiredBookmarkState = !displayedIsBookmarked"))
+        XCTAssertTrue(chapterSource.contains("if displayedIsBookmarked == desiredBookmarkState"))
+        XCTAssertTrue(chapterSource.contains("displayedIsBookmarked ? \"Saved\" : \"Removed\""))
+        XCTAssertTrue(chapterSource.contains("Task.sleep(for: .milliseconds(1_200))"))
+        XCTAssertTrue(chapterSource.contains(".overlay(alignment: .topTrailing)"))
+        XCTAssertTrue(chapterSource.contains(".lineLimit(1)\n                    .fixedSize()"))
         XCTAssertTrue(nativeSource.contains("ReaderCurrentSectionBookmarkButton"))
         XCTAssertTrue(htmlReaderSource.contains("ReaderCurrentSectionBookmarkButton"))
         XCTAssertEqual(projectsSource.components(separatedBy: "library.refreshBookmarks()").count - 1, 1)
@@ -3326,6 +3332,21 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertFalse(projectSource.contains("NATIVE_READER_ROLLOUT_STAGE = off;"))
         XCTAssertTrue(readerSource.contains("Native (Default)"))
         XCTAssertTrue(readerSource.contains("HTML (Diagnostic)"))
+        XCTAssertTrue(
+            readerSource.contains(
+                "#if DEBUG\n                if NativeReaderRolloutPolicy.activeStage != .disabled {\n                    readerDiagnosticSelector\n                }\n#endif"
+            )
+        )
+        XCTAssertTrue(
+            readerSource.contains(
+                "readerPresentation = .html\n#if DEBUG\n                            nativeReaderFallbackMessage = message\n#endif"
+            )
+        )
+        XCTAssertTrue(
+            readerSource.contains(
+                "#if DEBUG\n        .alert(\n            \"Native reader used HTML fallback\""
+            )
+        )
         XCTAssertTrue(
             readerSource.contains(
                 "NativeReaderRolloutPolicy.activeStage != .disabled"

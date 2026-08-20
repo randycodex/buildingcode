@@ -325,7 +325,9 @@ struct ChapterHTMLReaderView: View {
                         rememberedAnchorID: rememberedAnchorID,
                         onNativeFallbackToHTML: { message in
                             readerPresentation = .html
+#if DEBUG
                             nativeReaderFallbackMessage = message
+#endif
                         },
                         onNativeOpenReference: { section in
                             inlineReferenceDestination = section
@@ -376,9 +378,11 @@ struct ChapterHTMLReaderView: View {
             }
 
             ToolbarItemGroup(placement: .topBarTrailing) {
+#if DEBUG
                 if NativeReaderRolloutPolicy.activeStage != .disabled {
                     readerDiagnosticSelector
                 }
+#endif
                 if !usesNativeRolloutReader {
                     chapterSearchToolbarButton
                 }
@@ -488,6 +492,7 @@ struct ChapterHTMLReaderView: View {
         .onDisappear {
             chapterSearchQuery = ""
         }
+#if DEBUG
         .alert(
             "Native reader used HTML fallback",
             isPresented: Binding(
@@ -501,6 +506,7 @@ struct ChapterHTMLReaderView: View {
         } message: {
             Text(nativeReaderFallbackMessage ?? "The native reader could not validate this chapter.")
         }
+#endif
     }
 
     private var readerDiagnosticSelector: some View {

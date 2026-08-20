@@ -1,8 +1,10 @@
 # Permitext Native iOS Reader Migration Plan
 
-Status: Approved direction; implementation has not started.
+Status: Local implementation through Phase 11 exists on `codex/native-ios-reader-migration`; strict acceptance and release validation remain incomplete.
 
-Last updated: 2026-08-18
+Last updated: 2026-08-19
+
+Implementation and acceptance evidence is reconciled in [`NYC CC APP/docs/native-reader/NATIVE_READER_MIGRATION_COMPLETION_AUDIT.md`](NYC%20CC%20APP/docs/native-reader/NATIVE_READER_MIGRATION_COMPLETION_AUDIT.md). That audit distinguishes implemented code, automated checks, simulator evidence, physical-device evidence, and deferred release gates.
 
 ## 1. Objective
 

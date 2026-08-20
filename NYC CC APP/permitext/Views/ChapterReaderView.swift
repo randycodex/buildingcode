@@ -687,13 +687,19 @@ struct ReaderCurrentSectionBookmarkButton: View {
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var displayedIsBookmarked = false
+    @State private var bookmarkConfirmation: String?
+    @State private var bookmarkConfirmationTask: Task<Void, Never>?
 
     var body: some View {
         Button {
             guard let sectionID else { return }
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            displayedIsBookmarked.toggle()
+            let desiredBookmarkState = !displayedIsBookmarked
+            displayedIsBookmarked = desiredBookmarkState
             displayedIsBookmarked = library.toggleBookmark(sectionID: sectionID)
+            if displayedIsBookmarked == desiredBookmarkState {
+                showBookmarkConfirmation(displayedIsBookmarked ? "Saved" : "Removed")
+            }
         } label: {
             Image(systemName: displayedIsBookmarked ? "bookmark.fill" : "bookmark")
                 .font(.body.weight(.semibold))
@@ -709,10 +715,46 @@ struct ReaderCurrentSectionBookmarkButton: View {
         .onAppear { synchronizeState() }
         .onChange(of: sectionID) { _, _ in synchronizeState() }
         .onChange(of: library.bookmarkRevision) { _, _ in synchronizeState() }
+        .overlay(alignment: .topTrailing) {
+            if let bookmarkConfirmation {
+                Text(bookmarkConfirmation)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.primary)
+                    .lineLimit(1)
+                    .fixedSize()
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.regularMaterial, in: Capsule())
+                    .offset(y: -34)
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+        }
+        .onDisappear {
+            bookmarkConfirmationTask?.cancel()
+            bookmarkConfirmationTask = nil
+            bookmarkConfirmation = nil
+        }
     }
 
     private func synchronizeState() {
         displayedIsBookmarked = sectionID.map { library.isBookmarked(sectionID: $0) } ?? false
+    }
+
+    private func showBookmarkConfirmation(_ message: String) {
+        bookmarkConfirmationTask?.cancel()
+        withAnimation(.easeOut(duration: 0.15)) {
+            bookmarkConfirmation = message
+        }
+        bookmarkConfirmationTask = Task {
+            try? await Task.sleep(for: .milliseconds(1_200))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeIn(duration: 0.15)) {
+                bookmarkConfirmation = nil
+            }
+            bookmarkConfirmationTask = nil
+        }
     }
 }
 
