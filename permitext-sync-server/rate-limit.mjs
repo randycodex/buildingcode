@@ -16,6 +16,7 @@ export const rateLimitPolicies = new Map([
   ["billing/web/portal", { limit: 20, windowMs: 10 * 60 * 1000 }],
   ["billing/stripe/restore", { limit: 20, windowMs: 10 * 60 * 1000 }],
   ["billing/apple/transactions/verify", { limit: 30, windowMs: 10 * 60 * 1000 }],
+  ["client-errors/report", { limit: 30, windowMs: 5 * 60 * 1000 }],
   ["research/interpret", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/get", { limit: 120, windowMs: 60 * 60 * 1000 }],

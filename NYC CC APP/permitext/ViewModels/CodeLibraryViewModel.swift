@@ -1,5 +1,6 @@
 import Foundation
 import AuthenticationServices
+import ClerkKit
 import CryptoKit
 import Network
 import os.signpost
@@ -2813,13 +2814,44 @@ final class CodeLibraryViewModel: ObservableObject {
                         email: credential.email,
                         identityToken: identityToken,
                         authorizationCode: authorizationCode
-                    )
+                    ),
+                    linkFrom: nil
                 )
                 await completeBackendSignIn(backendRecord)
             } catch {
                 statusMessage = error.localizedDescription
             }
         case .failure(let error):
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func handleClerkHostedSignIn(clerk: Clerk) async {
+        guard !isAccountBusy else { return }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            _ = try await clerk.auth.startHostedAuth(mode: .signIn)
+            guard let userID = clerk.user?.id else {
+                throw PermitextBackendHTTPError.invalidResponse
+            }
+            guard let sessionToken = try await clerk.auth.getToken() else {
+                throw PermitextBackendHTTPError.invalidResponse
+            }
+            let sourceAccount = signedInAccount
+            let backendRecord = try await accountBackendClient.signIn(
+                credential: AccountSignInCredential(
+                    provider: .clerk,
+                    providerUserID: userID,
+                    displayName: nil,
+                    signedInAt: Date(),
+                    sessionToken: sessionToken
+                ),
+                linkFrom: sourceAccount
+            )
+            await completeBackendSignIn(backendRecord)
+        } catch {
             statusMessage = error.localizedDescription
         }
     }

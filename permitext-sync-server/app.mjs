@@ -11,6 +11,12 @@ import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
+import { ClerkCredentialError, clerkConfigurationStatus, verifyClerkCredential } from "./clerk-auth.mjs";
+import {
+  releaseIdentity,
+  sanitizedClientErrorReport,
+  sanitizedServerErrorReport
+} from "./operational-readiness.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
 import {
   withFileStoreLock,
@@ -135,7 +141,11 @@ import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
 import { recordSurvivesBulkClear } from "./public/sync-state.js";
 import {
+  beginResearchSpendReservation,
+  endResearchSpendReservation,
   estimatedResearchCost,
+  researchSpendGuardrails,
+  reserveResearchProviderSpend,
   reserveResearchEvaluationSpend,
   researchModelConfiguration
 } from "./research-config.mjs";
@@ -387,6 +397,7 @@ const emptyStore = () => ({
   users: {},
   entitlements: {},
   appleTransactionOwners: {},
+  appleNotificationStates: {},
   sessions: {},
   passkeyCredentials: {},
   mutationsByUserID: {},
@@ -1557,7 +1568,7 @@ function createFileStoreAdapter() {
         .sort((left, right) => right.estimatedCostUSD - left.estimatedCostUSD);
     },
     async reserveResearchUsage(userID, reservation) {
-      return withResearchUsageLock(userID, async () => {
+      return withResearchUsageLock("__global_research_spend__", async () => {
         const store = await this.read();
         const retentionCutoff = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString();
         const retainedEntries = (store.researchUsageByUserID?.[userID] || [])
@@ -1568,6 +1579,18 @@ function createFileStoreAdapter() {
             entry.createdAt >= reservation.since && activeResearchUsageEntry(entry)
           );
         if (Number.isSafeInteger(reservation.limit) && entries.length >= reservation.limit) return false;
+        const activeEntries = Object.entries(store.researchUsageByUserID || {})
+          .flatMap(([entryUserID, usageEntries]) => (usageEntries || [])
+            .filter(activeResearchUsageEntry)
+            .map((entry) => ({ ...entry, entryUserID })));
+        const spendSince = (since, matchingUserID = null) => activeEntries
+          .filter((entry) => entry.createdAt >= since && (!matchingUserID || entry.entryUserID === matchingUserID))
+          .reduce((total, entry) => total + Number(entry.estimatedCostUSD || 0), 0);
+        if (
+          spendSince(reservation.daySince, userID) + reservation.maximumRequestUSD > reservation.userDailyCapUSD ||
+          spendSince(reservation.daySince) + reservation.maximumRequestUSD > reservation.dailyCapUSD ||
+          spendSince(reservation.monthSince) + reservation.maximumRequestUSD > reservation.monthlyCapUSD
+        ) return false;
         store.researchUsageByUserID ||= {};
         store.researchUsageByUserID[userID] = [
           ...retainedEntries,
@@ -1579,6 +1602,8 @@ function createFileStoreAdapter() {
             cachedInputTokens: 0,
             outputTokens: 0,
             totalTokens: 0,
+            estimatedCostUSD: reservation.maximumRequestUSD,
+            pricingVersion: reservation.pricingVersion,
             createdAt: reservation.createdAt
           }
         ];
@@ -1795,6 +1820,15 @@ async function createPostgresStoreAdapter() {
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_apple_transaction_owners_user_idx
       ON permitext_apple_transaction_owners (user_id)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_apple_notification_states (
+        original_transaction_id TEXT PRIMARY KEY,
+        signed_date BIGINT NOT NULL,
+        notification_uuid TEXT NOT NULL,
+        notification_type TEXT NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
     `;
     await sql`
       INSERT INTO permitext_apple_transaction_owners (
@@ -2923,6 +2957,16 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return accountRepository.claimAppleEntitlement(userID, originalTransactionID, entitlement);
     },
+    async appleTransactionOwner(originalTransactionID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.appleTransactionOwner(originalTransactionID);
+    },
+    async applyAppleNotification(notification) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.applyAppleNotification(notification);
+    },
     async deleteEntitlement(userID, expected) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -3964,10 +4008,11 @@ async function createPostgresStoreAdapter() {
             sql`
               INSERT INTO permitext_research_usage (
                 id, user_id, model, mode, input_tokens, cached_input_tokens,
-                output_tokens, total_tokens, created_at
+                output_tokens, total_tokens, estimated_cost_usd, pricing_version, created_at
               )
               SELECT
                 ${reservation.id}, ${userID}, 'pending', 'reservation', 0, 0, 0, 0,
+                ${reservation.maximumRequestUSD}, ${reservation.pricingVersion},
                 ${reservation.createdAt}::timestamptz
               WHERE (
                 ${reservation.limit}::integer IS NULL
@@ -3982,6 +4027,25 @@ async function createPostgresStoreAdapter() {
                     )
                 ) < ${reservation.limit}
               )
+              AND (
+                SELECT COALESCE(sum(estimated_cost_usd), 0)
+                FROM permitext_research_usage
+                WHERE user_id = ${userID}
+                  AND created_at >= ${reservation.daySince}::timestamptz
+                  AND (mode <> 'reservation' OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes')
+              ) + ${reservation.maximumRequestUSD} <= ${reservation.userDailyCapUSD}
+              AND (
+                SELECT COALESCE(sum(estimated_cost_usd), 0)
+                FROM permitext_research_usage
+                WHERE created_at >= ${reservation.daySince}::timestamptz
+                  AND (mode <> 'reservation' OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes')
+              ) + ${reservation.maximumRequestUSD} <= ${reservation.dailyCapUSD}
+              AND (
+                SELECT COALESCE(sum(estimated_cost_usd), 0)
+                FROM permitext_research_usage
+                WHERE created_at >= ${reservation.monthSince}::timestamptz
+                  AND (mode <> 'reservation' OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes')
+              ) + ${reservation.maximumRequestUSD} <= ${reservation.monthlyCapUSD}
               ON CONFLICT (id) DO NOTHING
               RETURNING id
             `
@@ -5080,9 +5144,10 @@ function researchProgressResponder(request, response, enabled) {
 }
 
 function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}) {
+  const clerkScriptSources = "https://*.clerk.accounts.dev https://clerk.permitext.com";
   const scriptPolicy = scriptNonce
-    ? `'self' 'nonce-${scriptNonce}' https://appleid.cdn-apple.com`
-    : "'self' https://appleid.cdn-apple.com";
+    ? `'self' 'nonce-${scriptNonce}' https://appleid.cdn-apple.com ${clerkScriptSources}`
+    : `'self' https://appleid.cdn-apple.com ${clerkScriptSources}`;
   response.writeHead(200, {
     ...securityHeaders(),
     "content-type": "text/html; charset=utf-8",
@@ -5092,7 +5157,7 @@ function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}
       `script-src ${scriptPolicy}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data:",
-      "connect-src 'self'",
+      "connect-src 'self' https://*.clerk.accounts.dev https://clerk.permitext.com",
       "object-src 'none'",
       "base-uri 'none'",
       "frame-ancestors 'none'",
@@ -6742,6 +6807,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
   let response;
   try {
     reserveResearchEvaluationSpend(requestBody);
+    reserveResearchProviderSpend(requestBody);
     response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -6982,6 +7048,7 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   let response;
   try {
     reserveResearchEvaluationSpend(requestBody);
+    reserveResearchProviderSpend(requestBody);
     response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -7456,6 +7523,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
       }
     };
     reserveResearchEvaluationSpend(requestBody);
+    reserveResearchProviderSpend(requestBody);
     response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -7644,6 +7712,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
   let response;
   try {
     reserveResearchEvaluationSpend(requestBody);
+    reserveResearchProviderSpend(requestBody);
     response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -14591,6 +14660,11 @@ function currentMonthStart() {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
 }
 
+function currentDayStart() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();
+}
+
 function monthlyResearchRequestLimit() {
   const configured = Number(process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT);
   return Number.isSafeInteger(configured) && configured >= 1 && configured <= 100_000 ? configured : 100;
@@ -15265,12 +15339,25 @@ async function handleResearchConversationMessage(request, response) {
     const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
     const requestLimit = monthlyResearchRequestLimit();
     if (!mockMode) {
+      const spendGuardrails = researchSpendGuardrails();
+      if (!spendGuardrails.ready) {
+        const error = new Error(`Research spend safeguards are not ready. ${spendGuardrails.problems.join(" ")}`.trim());
+        error.code = "RESEARCH_SPEND_CAP";
+        throw error;
+      }
       researchReservationID = randomUUID();
       researchReservationCreatedAt = new Date().toISOString();
       const reserved = await reserveResearchUsage(context.userID, {
         id: researchReservationID,
         since: currentMonthStart(),
         limit: requestLimit,
+        maximumRequestUSD: spendGuardrails.maximumRequestUSD,
+        userDailyCapUSD: spendGuardrails.userDailyCapUSD,
+        dailyCapUSD: spendGuardrails.dailyCapUSD,
+        monthlyCapUSD: spendGuardrails.monthlyCapUSD,
+        daySince: currentDayStart(),
+        monthSince: currentMonthStart(),
+        pricingVersion: spendGuardrails.pricingVersion,
         createdAt: researchReservationCreatedAt
       });
       if (!reserved) {
@@ -15281,6 +15368,7 @@ async function handleResearchConversationMessage(request, response) {
         });
         return;
       }
+      beginResearchSpendReservation({ id: researchReservationID });
     }
     const projectContextCapturedAt = new Date().toISOString();
     let decisionContextSnapshot = null;
@@ -15784,6 +15872,11 @@ async function handleResearchConversationMessage(request, response) {
       progressResponse.error(503, error.message, { code: "RESEARCH_EVAL_SPEND_CAP" });
       return;
     }
+    if (error.code === "RESEARCH_SPEND_CAP") {
+      progressResponse.failActive("failed");
+      progressResponse.error(503, error.message, { code: "RESEARCH_SPEND_CAP" });
+      return;
+    }
     if (error.code === "RESEARCH_REFUSAL") {
       progressResponse.failActive("failed");
       progressResponse.error(422, error.message, { code: "RESEARCH_REFUSAL" });
@@ -15827,6 +15920,8 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     throw error;
+  } finally {
+    endResearchSpendReservation();
   }
 }
 
@@ -17236,6 +17331,17 @@ function normalizedAccountEmail(value) {
 
 async function verifiedCredentialIdentity(credential, options = {}) {
   const provider = credential?.provider || "guest";
+  if (provider === "clerk") {
+    try {
+      const verified = await verifyClerkCredential(credential, options);
+      return { providerUserID: verified.providerUserID, email: "" };
+    } catch (error) {
+      if (error instanceof ClerkCredentialError) {
+        throw new ClientAuthError(error.statusCode, error.message);
+      }
+      throw error;
+    }
+  }
   if (provider !== "apple") {
     return { providerUserID: credential?.providerUserID || "local-guest", email: "" };
   }
@@ -17284,7 +17390,7 @@ function accountEmail(account) {
 
 function appleSubjectIDs(account) {
   return new Set([
-    account?.authProviderUserID,
+    account?.authProvider === "apple" ? account?.authProviderUserID : null,
     account?.appleUserID,
     ...(Array.isArray(account?.linkedAppleUserIDs) ? account.linkedAppleUserIDs : [])
   ].map((value) => String(value || "").trim()).filter(Boolean));
@@ -17653,6 +17759,21 @@ function entitlementBillingPackages(entitlement) {
   ];
 }
 
+export function activeCommercialPackage(entitlement, packageID) {
+  if (packageID === entitlementPackageIDs.pro && hasActiveProEntitlement(entitlement)) {
+    return {
+      packageID,
+      source: entitlement?.source || null,
+      provider: entitlement?.provider || {}
+    };
+  }
+  if (packageID === entitlementPackageIDs.research && hasActiveResearchEntitlement(entitlement)) {
+    const addOn = entitlement?.addOns?.[entitlementPackageIDs.research] || {};
+    return { packageID, source: addOn.source || null, provider: addOn.provider || {} };
+  }
+  return null;
+}
+
 export function accountDeletionBillingPlan(entitlement) {
   const packages = entitlementBillingPackages(entitlement);
   const stripeSubscriptions = packages
@@ -17806,6 +17927,13 @@ function stripeEventCreatedAt(event) {
   return Number.isFinite(timestamp) && timestamp > 0
     ? new Date(timestamp * 1000).toISOString()
     : null;
+}
+
+export function stripeEventIsCurrent(provider, event) {
+  const incoming = Date.parse(stripeEventCreatedAt(event) || "");
+  const existing = Date.parse(provider?.stripeEventCreatedAt || "");
+  if (!Number.isFinite(incoming)) return false;
+  return !Number.isFinite(existing) || incoming >= existing;
 }
 
 function stripeSearchValue(value) {
@@ -18028,10 +18156,10 @@ function ecdsaJoseToDER(signature) {
   return Buffer.concat([Buffer.from([0x30, body.length]), body]);
 }
 
-export function verifyAppleTransactionJWS(signedTransactionInfo) {
-  const parts = String(signedTransactionInfo || "").split(".");
+export function verifyAppleSignedPayload(signedPayload, label = "payload") {
+  const parts = String(signedPayload || "").split(".");
   if (parts.length !== 3) {
-    throw new ClientAuthError(422, "Invalid Apple transaction.");
+    throw new ClientAuthError(422, `Invalid Apple ${label}.`);
   }
 
   const [encodedHeader, encodedPayload, encodedSignature] = parts;
@@ -18041,10 +18169,10 @@ export function verifyAppleTransactionJWS(signedTransactionInfo) {
     header = parseJWTPart(encodedHeader);
     payload = parseJWTPart(encodedPayload);
   } catch {
-    throw new ClientAuthError(422, "Invalid Apple transaction.");
+    throw new ClientAuthError(422, `Invalid Apple ${label}.`);
   }
   if (header.alg !== "ES256" || !Array.isArray(header.x5c) || !header.x5c[0]) {
-    throw new ClientAuthError(422, "Unsupported Apple transaction.");
+    throw new ClientAuthError(422, `Unsupported Apple ${label}.`);
   }
 
   const publicKey = verifyAppleTransactionCertificateChain(header.x5c);
@@ -18055,8 +18183,14 @@ export function verifyAppleTransactionJWS(signedTransactionInfo) {
     ecdsaJoseToDER(decodeBase64URL(encodedSignature))
   );
   if (!signatureOK) {
-    throw new ClientAuthError(422, "Apple transaction signature is invalid.");
+    throw new ClientAuthError(422, `Apple ${label} signature is invalid.`);
   }
+
+  return payload;
+}
+
+export function verifyAppleTransactionJWS(signedTransactionInfo) {
+  const payload = verifyAppleSignedPayload(signedTransactionInfo, "transaction");
 
   const bundleID = process.env.APPLE_BUNDLE_ID;
   if (productionAppleTransactionsRequired() && !bundleID) {
@@ -18084,6 +18218,133 @@ function appleTransactionActive(payload) {
   }
   const expiresDate = Number(payload?.expiresDate || 0);
   return !Number.isFinite(expiresDate) || expiresDate === 0 || expiresDate > Date.now();
+}
+
+export function appleNotificationLifecycleAction({
+  notificationType,
+  subtype,
+  transaction,
+  renewalInfo = {},
+  now = Date.now()
+}) {
+  const type = String(notificationType || "").trim().toUpperCase();
+  const detail = String(subtype || "").trim().toUpperCase();
+  const packageID = applePackageIDForProductID(transaction?.productId);
+  if (!packageID) return { action: "ignore", reason: "unsupported-product" };
+
+  if (["REFUND", "REVOKE", "EXPIRED", "GRACE_PERIOD_EXPIRED"].includes(type)) {
+    return { action: "revoke", packageID, reason: type.toLowerCase() };
+  }
+
+  if (type === "DID_FAIL_TO_RENEW") {
+    const gracePeriodExpiresDate = Number(renewalInfo?.gracePeriodExpiresDate || 0);
+    if (detail === "GRACE_PERIOD" && gracePeriodExpiresDate > now) {
+      return {
+        action: "grant",
+        packageID,
+        expiresAt: new Date(gracePeriodExpiresDate).toISOString(),
+        reason: "billing-grace-period"
+      };
+    }
+    return appleTransactionActive(transaction)
+      ? {
+          action: "grant",
+          packageID,
+          expiresAt: appleTransactionExpiration(transaction),
+          reason: "billing-retry-before-expiration"
+        }
+      : { action: "revoke", packageID, reason: "billing-retry-without-access" };
+  }
+
+  const grantTypes = new Set([
+    "SUBSCRIBED",
+    "DID_RENEW",
+    "REFUND_REVERSED",
+    "OFFER_REDEEMED",
+    "RENEWAL_EXTENDED"
+  ]);
+  if (grantTypes.has(type) && appleTransactionActive(transaction)) {
+    return {
+      action: "grant",
+      packageID,
+      expiresAt: appleTransactionExpiration(transaction),
+      reason: type.toLowerCase()
+    };
+  }
+  return { action: "ignore", packageID, reason: "no-entitlement-change" };
+}
+
+async function appleTransactionOwnerContext(originalTransactionID) {
+  const store = await readStore();
+  const adapter = await storeAdapter();
+  const claimedUserID = typeof adapter.appleTransactionOwner === "function"
+    ? await adapter.appleTransactionOwner(originalTransactionID)
+    : store.appleTransactionOwners?.[originalTransactionID] || null;
+  const accountExists = claimedUserID ? await persistedAccountExists(claimedUserID) : false;
+  const userID = accountExists ? claimedUserID : null;
+  return {
+    store,
+    adapter,
+    userID,
+    claimedUserID,
+    ownerAccountDeleted: Boolean(claimedUserID && !accountExists),
+    entitlement: userID ? store.entitlements?.[userID] || null : null
+  };
+}
+
+async function applyPersistedAppleNotification({
+  context,
+  originalTransactionID,
+  signedDate,
+  notificationUUID,
+  notificationType,
+  nextEntitlement
+}) {
+  if (typeof context.adapter.applyAppleNotification === "function") {
+    return context.adapter.applyAppleNotification({
+      userID: context.userID,
+      originalTransactionID,
+      signedDate,
+      notificationUUID,
+      notificationType,
+      nextEntitlement
+    });
+  }
+  const result = applyAppleNotificationToStore(context.store, {
+    userID: context.userID,
+    originalTransactionID,
+    signedDate,
+    notificationUUID,
+    notificationType,
+    nextEntitlement
+  });
+  if (!result.applied) return result;
+  await writeStore(context.store);
+  return result;
+}
+
+export function applyAppleNotificationToStore(store, {
+  userID,
+  originalTransactionID,
+  signedDate,
+  notificationUUID,
+  notificationType,
+  nextEntitlement
+}) {
+  store.appleNotificationStates ||= {};
+  store.entitlements ||= {};
+  const previous = store.appleNotificationStates[originalTransactionID];
+  if (Number(previous?.signedDate || 0) >= signedDate) {
+    return { applied: false, entitlement: store.entitlements[userID] || null };
+  }
+  store.appleNotificationStates[originalTransactionID] = {
+    signedDate,
+    notificationUUID,
+    notificationType
+  };
+  if (nextEntitlement) store.entitlements[userID] = nextEntitlement;
+  else delete store.entitlements[userID];
+  return { applied: true, entitlement: nextEntitlement || null };
 }
 
 function mutationRecordID(mutation) {
@@ -18851,7 +19112,7 @@ async function handleSignIn(request, response) {
     sendError(response, 403, "Browser fallback sign-in is unavailable on this deployment.");
     return;
   }
-  if (credential.provider !== "apple" && credential.provider !== "web") {
+  if (credential.provider !== "apple" && credential.provider !== "web" && credential.provider !== "clerk") {
     sendError(response, 400, "Unsupported account provider.");
     return;
   }
@@ -20318,6 +20579,15 @@ async function handleWebCheckout(request, response) {
 
   const accountContext = await authenticatedUserContext(request, response, userID);
   if (!accountContext) return;
+  const activePackage = activeCommercialPackage(accountContext.entitlement, packageID);
+  if (activePackage) {
+    sendJSON(response, 409, {
+      error: `${packageID === entitlementPackageIDs.pro ? "Pro" : "Research"} is already active for this account. Manage the existing subscription instead of starting another one.`,
+      code: "PACKAGE_ALREADY_ACTIVE",
+      source: activePackage.source
+    });
+    return;
+  }
   if (
     packageID === entitlementPackageIDs.research &&
     !hasActiveProEntitlement(accountContext.entitlement)
@@ -20653,6 +20923,40 @@ async function handleStripeWebhook(request, response) {
     }
     break;
   }
+  case "invoice.payment_failed": {
+    console.warn(JSON.stringify({
+      event: "stripe_invoice_payment_failed",
+      stripeEventID: event.id || null,
+      subscriptionID: stripeSubscriptionIDFromObject(object),
+      invoiceID: object.id || null
+    }));
+    break;
+  }
+  case "charge.refunded": {
+    const amount = Number(object.amount || 0);
+    const amountRefunded = Number(object.amount_refunded || 0);
+    const invoiceID = stripeSubscriptionID(object.invoice);
+    if (invoiceID && amount > 0 && amountRefunded >= amount) {
+      const invoice = await stripeAPI(`/v1/invoices/${encodeURIComponent(invoiceID)}`);
+      const subscriptionID = stripeSubscriptionIDFromObject(invoice);
+      const owner = subscriptionID ? await persistedStripeEntitlementOwner(subscriptionID) : null;
+      const packageID = owner
+        ? entitlementPackageForStripeSubscription(owner.entitlement, subscriptionID)
+        : null;
+      const provider = packageID === entitlementPackageIDs.research
+        ? owner?.entitlement?.addOns?.research?.provider
+        : owner?.entitlement?.provider;
+      if (owner && packageID && stripeEventIsCurrent(provider, event)) {
+        changed = await deletePersistedEntitlement(owner.userID, {
+          packageID,
+          source: "webSubscription",
+          providerKey: "stripeSubscriptionID",
+          providerValue: subscriptionID
+        });
+      }
+    }
+    break;
+  }
   default:
     break;
   }
@@ -20698,6 +21002,10 @@ async function handleAppleTransactionVerify(request, response) {
     sendError(response, 422, "Apple transaction identifier is missing.");
     return;
   }
+  if (!packageID) {
+    sendError(response, 422, "This Apple product is not a configured Permitext package.");
+    return;
+  }
   const provider = {
     appleTransactionID: transactionID,
     appleOriginalTransactionID: originalTransactionID,
@@ -20735,6 +21043,17 @@ async function handleAppleTransactionVerify(request, response) {
     });
     return;
   }
+  const activePackage = activeCommercialPackage(accountContext.entitlement, packageID);
+  const sameApplePurchase = activePackage?.source === "appleSubscription" &&
+    activePackage.provider?.appleOriginalTransactionID === originalTransactionID;
+  if (activePackage && !sameApplePurchase) {
+    sendJSON(response, 409, {
+      error: `${packageID === entitlementPackageIDs.pro ? "Pro" : "Research"} is already active through another purchase. Manage that subscription instead of linking a duplicate.`,
+      code: "PACKAGE_ALREADY_ACTIVE",
+      source: activePackage.source
+    });
+    return;
+  }
   const entitlement = await persistAppleServerEntitlement(userID, originalTransactionID, {
     packageID,
     expiresAt: appleTransactionExpiration(payload),
@@ -20747,6 +21066,133 @@ async function handleAppleTransactionVerify(request, response) {
   sendJSON(response, 200, {
     entitlement,
     transaction: { active: true, productID: payload.productId, packageID }
+  });
+}
+
+async function handleAppleServerNotification(request, response) {
+  const body = await readJSON(request);
+  if (!body.signedPayload) {
+    sendError(response, 400, "Missing Apple notification signed payload.");
+    return;
+  }
+
+  let notification;
+  let transaction;
+  let renewalInfo = {};
+  try {
+    notification = verifyAppleSignedPayload(body.signedPayload, "server notification");
+    const data = notification?.data || {};
+    const configuredBundleID = process.env.APPLE_BUNDLE_ID;
+    if (productionAppleTransactionsRequired() && !configuredBundleID) {
+      throw new ClientAuthError(500, "APPLE_BUNDLE_ID is not configured.");
+    }
+    if (configuredBundleID && data.bundleId !== configuredBundleID) {
+      throw new ClientAuthError(422, "Apple notification bundle is invalid.");
+    }
+    validateAppleTransactionEnvironment(data);
+    if (!data.signedTransactionInfo) {
+      sendJSON(response, 200, { received: true, changed: false, reason: "no-transaction" });
+      return;
+    }
+    transaction = verifyAppleTransactionJWS(data.signedTransactionInfo);
+    if (String(transaction.environment || "").toLowerCase() !== String(data.environment || "").toLowerCase()) {
+      throw new ClientAuthError(422, "Apple notification transaction environment does not match.");
+    }
+    if (data.signedRenewalInfo) {
+      renewalInfo = verifyAppleSignedPayload(data.signedRenewalInfo, "renewal information");
+    }
+  } catch (error) {
+    if (error instanceof ClientAuthError) {
+      sendError(response, error.statusCode, error.message);
+      return;
+    }
+    throw error;
+  }
+
+  const transactionID = String(transaction.transactionId || "").trim();
+  const originalTransactionID = String(transaction.originalTransactionId || transactionID).trim();
+  const signedDate = Number(notification.signedDate || transaction.signedDate || 0);
+  const notificationUUID = String(notification.notificationUUID || "").trim();
+  const notificationType = String(notification.notificationType || "").trim().toUpperCase();
+  if (!originalTransactionID || !notificationUUID || !notificationType || !Number.isSafeInteger(signedDate) || signedDate <= 0) {
+    sendError(response, 422, "Apple notification identity is incomplete.");
+    return;
+  }
+
+  const decision = appleNotificationLifecycleAction({
+    notificationType,
+    subtype: notification.subtype,
+    transaction,
+    renewalInfo
+  });
+  if (decision.action === "ignore") {
+    sendJSON(response, 200, { received: true, changed: false, reason: decision.reason });
+    return;
+  }
+
+  const context = await appleTransactionOwnerContext(originalTransactionID);
+  if (!context.userID) {
+    if (context.ownerAccountDeleted) {
+      sendJSON(response, 200, { received: true, changed: false, reason: "owner-account-deleted" });
+      return;
+    }
+    sendError(response, 503, "Apple purchase ownership is not available yet; retry this notification.");
+    return;
+  }
+
+  const provider = {
+    appleTransactionID: transactionID,
+    appleOriginalTransactionID: originalTransactionID,
+    appleWebOrderLineItemID: transaction.webOrderLineItemId || null,
+    appleEnvironment: transaction.environment || null,
+    appleNotificationUUID: notificationUUID,
+    appleNotificationType: notificationType,
+    appleNotificationSignedDate: signedDate
+  };
+  let nextEntitlement;
+  if (decision.action === "grant") {
+    try {
+      nextEntitlement = entitlementForSource(
+        context.userID,
+        "appleSubscription",
+        {
+          packageID: decision.packageID,
+          expiresAt: decision.expiresAt,
+          provider
+        },
+        context.entitlement
+      );
+    } catch (error) {
+      sendError(response, 409, error.message || "Apple entitlement cannot be applied.");
+      return;
+    }
+  } else {
+    const removal = entitlementWithoutPackage(
+      context.entitlement,
+      decision.packageID,
+      {
+        source: "appleSubscription",
+        providerKey: "appleOriginalTransactionID",
+        providerValue: originalTransactionID
+      },
+      new Date(signedDate)
+    );
+    nextEntitlement = removal.changed ? removal.entitlement : context.entitlement;
+  }
+
+  const result = await applyPersistedAppleNotification({
+    context,
+    originalTransactionID,
+    signedDate,
+    notificationUUID,
+    notificationType,
+    nextEntitlement
+  });
+  sendJSON(response, 200, {
+    received: true,
+    changed: result.applied,
+    action: decision.action,
+    reason: decision.reason
   });
 }
 
@@ -20982,6 +21428,17 @@ function handleAppleWebConfig(request, response) {
     scope: "name email",
     identityTokenRequired: appleIdentityTokenRequired(),
     browserFallbackAllowed: browserFallbackSignInAllowed(request)
+  });
+}
+
+function handleClerkConfig(_request, response) {
+  const configuration = clerkConfigurationStatus();
+  sendJSON(response, 200, {
+    available: configuration.webReady,
+    publishableKey: configuration.webReady ? configuration.publishableKey : null,
+    frontendAPIURL: configuration.webReady ? configuration.frontendAPIURL : null,
+    accountPortalSignInURL: configuration.webReady ? configuration.accountPortalSignInURL : null,
+    migrationRequiredForLegacyAppleAccounts: true
   });
 }
 
@@ -23417,10 +23874,23 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
   let completedReservation = false;
   try {
     if (!mockMode) {
+      const spendGuardrails = researchSpendGuardrails();
+      if (!spendGuardrails.ready) {
+        const error = new Error(`Research spend safeguards are not ready. ${spendGuardrails.problems.join(" ")}`.trim());
+        error.code = "RESEARCH_SPEND_CAP";
+        throw error;
+      }
       reserved = await reserveResearchUsage(actorUserID, {
         id: reservationID,
         since: currentMonthStart(),
         limit: requestLimit,
+        maximumRequestUSD: spendGuardrails.maximumRequestUSD,
+        userDailyCapUSD: spendGuardrails.userDailyCapUSD,
+        dailyCapUSD: spendGuardrails.dailyCapUSD,
+        monthlyCapUSD: spendGuardrails.monthlyCapUSD,
+        daySince: currentDayStart(),
+        monthSince: currentMonthStart(),
+        pricingVersion: spendGuardrails.pricingVersion,
         createdAt: new Date().toISOString()
       });
       if (!reserved) {
@@ -23429,6 +23899,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
           status: 409
         });
       }
+      beginResearchSpendReservation({ id: reservationID });
     }
     const evidence = approvedEvidence.map(({ snapshot, entry }) =>
       codeQuestionResearchEvidence(snapshot, entry)
@@ -23535,6 +24006,8 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
   } catch (error) {
     if (reserved && !completedReservation) await releaseResearchUsageReservation(actorUserID, reservationID);
     throw error;
+  } finally {
+    endResearchSpendReservation();
   }
 }
 
@@ -23579,6 +24052,10 @@ async function handleCodeQuestionAnalysisCreate(request, response) {
     }
     if (error.code === "RESEARCH_NOT_CONFIGURED") {
       sendError(response, 503, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_SPEND_CAP") {
+      sendJSON(response, 503, { error: error.message, code: "RESEARCH_SPEND_CAP" });
       return;
     }
     throw error;
@@ -24762,8 +25239,21 @@ async function handleCodeQuestionMigrationRun(request, response) {
   }
 }
 
+async function handleClientErrorReport(request, response) {
+  const rawBody = await readBody(request, 8 * 1024);
+  const input = rawBody.length ? JSON.parse(rawBody.toString("utf8")) : {};
+  const report = sanitizedClientErrorReport(input);
+  console.error(JSON.stringify(report));
+  sendJSON(response, 202, {
+    accepted: true,
+    fingerprint: report.fingerprint,
+    releaseID: report.releaseID
+  });
+}
+
 const handlers = {
   "account/sign-in": handleSignIn,
+  "account/clerk/config": handleClerkConfig,
   "account/sign-out": handleSignOut,
   "account/delete": handleAccountDelete,
   "account/apple/start": handleAppleWebStart,
@@ -24776,6 +25266,8 @@ const handlers = {
   "billing/stripe/restore": handleStripeRestore,
   "billing/stripe/webhook": handleStripeWebhook,
   "billing/apple/transactions/verify": handleAppleTransactionVerify,
+  "billing/apple/notifications": handleAppleServerNotification,
+  "client-errors/report": handleClientErrorReport,
   "research/interpret": handleResearchInterpretation,
   "research/conversations/list": handleResearchConversationList,
   "research/conversations/get": handleResearchConversationGet,
@@ -24962,8 +25454,13 @@ async function handleRequestUnlocked(request, response) {
         ok: true,
         storage: await storageKind(),
         schema: await storageSchema(),
-        rateLimit: adapter.rateLimitMode
+        rateLimit: adapter.rateLimitMode,
+        release: releaseIdentity()
       });
+      return;
+    }
+    if (request.method === "GET" && path === "release") {
+      sendJSON(response, 200, { release: releaseIdentity() });
       return;
     }
     if (request.method === "GET" && path === "admin/storage/summary") {
@@ -24976,6 +25473,10 @@ async function handleRequestUnlocked(request, response) {
     }
     if (request.method === "GET" && path === "account/apple-web-config") {
       handleAppleWebConfig(request, response);
+      return;
+    }
+    if (request.method === "GET" && path === "account/clerk/config") {
+      handleClerkConfig(request, response);
       return;
     }
     if ((request.method === "GET" || request.method === "POST") && path === "account/apple/callback") {
@@ -25007,7 +25508,11 @@ async function handleRequestUnlocked(request, response) {
       sendError(response, 400, "Invalid JSON.");
       return;
     }
-    console.error(error);
+    console.error(JSON.stringify(sanitizedServerErrorReport(error, {
+      route: requestTelemetryRoute(normalizePath(request.url)),
+      method: request.method,
+      requestID: request.headers?.["x-vercel-id"]
+    })));
     sendError(response, 500, "Internal server error.");
   }
 }
@@ -25033,7 +25538,9 @@ function requestMutatesFileStore(request) {
     path === "billing/stripe/webhook" ||
     path === "billing/web/checkout" ||
     path === "billing/web/portal" ||
-    path === "billing/apple/transactions/verify"
+    path === "billing/apple/transactions/verify" ||
+    path === "billing/apple/notifications" ||
+    path === "client-errors/report"
   ) {
     return false;
   }
@@ -25053,6 +25560,10 @@ function requestTelemetryRoute(path) {
 }
 
 function observeVercelRequest(request, response) {
+  const release = releaseIdentity();
+  if (typeof response?.setHeader === "function" && !response.headersSent) {
+    response.setHeader("x-permitext-release", release.releaseID);
+  }
   if (!process.env.VERCEL || typeof response?.once !== "function") return;
   const startedAt = performance.now();
   const route = requestTelemetryRoute(normalizePath(request.url));
@@ -25065,7 +25576,10 @@ function observeVercelRequest(request, response) {
       route,
       method: String(request.method || "GET").toUpperCase(),
       statusCode,
-      durationMilliseconds
+      durationMilliseconds,
+      requestID: String(request.headers?.["x-vercel-id"] || "").slice(0, 120) || null,
+      releaseID: release.releaseID,
+      gitCommit: release.gitCommit
     }));
   });
 }
@@ -25083,7 +25597,11 @@ export async function handleRequest(request, response) {
       sendError(response, 503, "Local data storage is busy. Please retry.");
       return;
     }
-    console.error(error);
+    console.error(JSON.stringify(sanitizedServerErrorReport(error, {
+      route: requestTelemetryRoute(normalizePath(request.url)),
+      method: request.method,
+      requestID: request.headers?.["x-vercel-id"]
+    })));
     if (!response.headersSent) {
       sendError(response, 500, "Internal server error.");
     }

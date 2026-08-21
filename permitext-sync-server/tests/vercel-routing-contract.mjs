@@ -25,6 +25,8 @@ assert.equal(
 const dynamicRoutes = [
   "/.well-known/apple-app-site-association",
   "/health",
+  "/release",
+  "/client-errors/:path*",
   "/account/:path*",
   "/admin",
   "/admin/:path*",

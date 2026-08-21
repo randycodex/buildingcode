@@ -1,11 +1,15 @@
 import {
+  activeCommercialPackage,
   accountDeletionBillingPlan,
+  applyAppleNotificationToStore,
+  appleNotificationLifecycleAction,
   applePackageIDForProductID,
   cancelStripeSubscriptionsForAccount,
   claimAppleTransactionOwner,
   entitlementAfterPackageRemoval,
   sameOriginAbsoluteURL,
   stripeConfigurationStatus,
+  stripeEventIsCurrent,
   stripePackageIDFromObject,
   stripeSecretKeyMode,
   stripeSubscriptionExpiresAt,
@@ -35,6 +39,69 @@ function expectClientError(callback, statusCode, messageFragment) {
   }
   throw new Error(`Expected status ${statusCode}, but validation succeeded.`);
 }
+
+const appleSubscriptionTransaction = {
+  productId: "com.randycodex.permitext.pro.monthly",
+  expiresDate: Date.now() + 60_000
+};
+assert(
+  appleNotificationLifecycleAction({
+    notificationType: "DID_RENEW",
+    transaction: appleSubscriptionTransaction
+  }).action === "grant",
+  "An Apple renewal did not extend the Permitext entitlement."
+);
+const notificationStore = {
+  entitlements: { "clerk:user_contract": { plan: "pro", marker: "current" } },
+  appleNotificationStates: {}
+};
+assert(
+  applyAppleNotificationToStore(notificationStore, {
+    userID: "clerk:user_contract",
+    originalTransactionID: "original-contract",
+    signedDate: 200,
+    notificationUUID: "newer",
+    notificationType: "DID_RENEW",
+    nextEntitlement: { plan: "pro", marker: "newer" }
+  }).applied,
+  "The first Apple lifecycle notification was not applied."
+);
+assert(
+  !applyAppleNotificationToStore(notificationStore, {
+    userID: "clerk:user_contract",
+    originalTransactionID: "original-contract",
+    signedDate: 100,
+    notificationUUID: "older",
+    notificationType: "EXPIRED",
+    nextEntitlement: null
+  }).applied && notificationStore.entitlements["clerk:user_contract"].marker === "newer",
+  "A delayed older Apple notification corrupted the current entitlement."
+);
+assert(
+  appleNotificationLifecycleAction({
+    notificationType: "DID_FAIL_TO_RENEW",
+    subtype: "GRACE_PERIOD",
+    transaction: { ...appleSubscriptionTransaction, expiresDate: Date.now() - 60_000 },
+    renewalInfo: { gracePeriodExpiresDate: Date.now() + 120_000 }
+  }).reason === "billing-grace-period",
+  "Apple billing grace did not preserve access through the grace-period expiration."
+);
+for (const notificationType of ["REFUND", "REVOKE", "EXPIRED", "GRACE_PERIOD_EXPIRED"]) {
+  assert(
+    appleNotificationLifecycleAction({
+      notificationType,
+      transaction: appleSubscriptionTransaction
+    }).action === "revoke",
+    `Apple ${notificationType} did not revoke the affected entitlement.`
+  );
+}
+assert(
+  appleNotificationLifecycleAction({
+    notificationType: "DID_CHANGE_RENEWAL_STATUS",
+    transaction: appleSubscriptionTransaction
+  }).action === "ignore",
+  "Turning off Apple auto-renew incorrectly removed prepaid access."
+);
 
 assert(
   sameOriginAbsoluteURL(
@@ -121,6 +188,20 @@ assert(stripeSecretKeyMode("sk_test_contract") === "test", "Stripe test key was 
 assert(stripeSecretKeyMode("sk_live_contract") === "live", "Stripe live key was not detected.");
 assert(stripeSecretKeyMode("rk_live_contract") === "live", "Stripe restricted live key was not detected.");
 assert(stripeSecretKeyMode("unexpected_contract") === "unknown", "Unexpected Stripe key format was accepted.");
+assert(
+  stripeEventIsCurrent(
+    { stripeEventCreatedAt: "2026-08-21T12:00:00.000Z" },
+    { created: Date.parse("2026-08-21T12:01:00.000Z") / 1000 }
+  ),
+  "A newer Stripe lifecycle event was rejected."
+);
+assert(
+  !stripeEventIsCurrent(
+    { stripeEventCreatedAt: "2026-08-21T12:01:00.000Z" },
+    { created: Date.parse("2026-08-21T12:00:00.000Z") / 1000 }
+  ),
+  "A delayed older Stripe event was allowed to overwrite newer entitlement state."
+);
 
 assert(
   stripeConfigurationStatus({
@@ -219,6 +300,23 @@ assert(
     mixedDeletionPlan.stripeSubscriptions[0].subscriptionID === "sub_delete_pro" &&
     mixedDeletionPlan.appleSubscriptionPresent,
   "Mixed Stripe and Apple billing was not detected for account deletion."
+);
+assert(
+  activeCommercialPackage({ plan: "pro", source: "webSubscription", provider: {} }, "pro")?.source === "webSubscription",
+  "An active Stripe Pro package was not detected before a duplicate purchase."
+);
+assert(
+  activeCommercialPackage({
+    plan: "pro",
+    source: "appleSubscription",
+    provider: {},
+    addOns: { research: { source: "appleSubscription", provider: {} } }
+  }, "research")?.source === "appleSubscription",
+  "An active Apple Research package was not detected before a duplicate purchase."
+);
+assert(
+  activeCommercialPackage({ plan: "free" }, "pro") === null,
+  "A free account was incorrectly treated as already subscribed."
 );
 
 const stripeDeletionRequests = [];

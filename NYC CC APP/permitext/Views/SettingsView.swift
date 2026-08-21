@@ -1,4 +1,5 @@
 import AuthenticationServices
+import ClerkKit
 import SwiftUI
 import UIKit
 
@@ -11,6 +12,7 @@ struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openURL) private var openURL
+    @Environment(Clerk.self) private var clerk
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
     @State private var selectedProjectIDs = Set<Int64>()
@@ -23,7 +25,6 @@ struct SettingsView: View {
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
     private let webWorkspaceURL = URL(string: "https://permitext.com")!
     private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
-    private let privacyContactURL = URL(string: "mailto:permitext@gmail.com")!
     let initialSection: SettingsSection?
 
     init(initialSection: SettingsSection? = nil) {
@@ -42,6 +43,27 @@ struct SettingsView: View {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
         return "Permitext \(version) (Build \(build))"
+    }
+
+    private var clerkIsConfigured: Bool {
+        guard let key = Bundle.main.object(forInfoDictionaryKey: "PermitextClerkPublishableKey") as? String else {
+            return false
+        }
+        return !key.isEmpty && !key.contains("$(")
+    }
+
+    private var feedbackURL: URL {
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = "permitext@gmail.com"
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: "Permitext feedback — \(appVersionLabel)"),
+            URLQueryItem(
+                name: "body",
+                value: "What happened?\n\nWhat did you expect?\n\n\(appVersionLabel)"
+            )
+        ]
+        return components.url ?? URL(string: "mailto:permitext@gmail.com")!
     }
 
     private var collapseProgress: CGFloat {
@@ -70,12 +92,6 @@ struct SettingsView: View {
                         accountCard
                     }
                     .id(SettingsSection.account)
-
-                    if PermitextReleaseSurfaceVisibility.firmCollaboration {
-                        CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                            firmWorkspaceCard
-                        }
-                    }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         webWorkspaceCard
@@ -113,7 +129,7 @@ struct SettingsView: View {
                     HStack(spacing: 8) {
                         Link("Privacy Policy", destination: privacyPolicyURL)
                         Text("·")
-                        Link("Contact", destination: privacyContactURL)
+                        Link("Send feedback / Report a problem", destination: feedbackURL)
                     }
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(Color.appChrome)
@@ -156,11 +172,6 @@ struct SettingsView: View {
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
         .onChange(of: library.folders.map(\.id)) { _, folderIDs in
             selectedProjectIDs.formIntersection(folderIDs)
-        }
-        .task(id: library.signedInAccount?.appUserID) {
-            if PermitextReleaseSurfaceVisibility.firmCollaboration {
-                await library.refreshOrganizations()
-            }
         }
     }
 
@@ -291,7 +302,22 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            if library.signedInAccount == nil {
+            if library.signedInAccount == nil, clerkIsConfigured {
+                Button {
+                    Task { await library.handleClerkHostedSignIn(clerk: clerk) }
+                } label: {
+                    Label("Sign in with Apple, Google, or Microsoft", systemImage: "person.crop.circle.badge.checkmark")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .foregroundStyle(.white)
+                        .background(Color.appChrome, in: Capsule(style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(library.isAccountBusy)
+                .opacity(library.isAccountBusy ? 0.55 : 1)
+
+            } else if library.signedInAccount == nil {
                 SignInWithAppleButton(.signIn) { request in
                     request.requestedScopes = [.fullName]
                 } onCompletion: { result in
@@ -307,6 +333,24 @@ struct SettingsView: View {
 
             } else {
                 VStack(spacing: 10) {
+                    if clerkIsConfigured, library.signedInAccount?.authProvider != .clerk {
+                        Button {
+                            Task { await library.handleClerkHostedSignIn(clerk: clerk) }
+                        } label: {
+                            Label("Connect Apple, Google, or Microsoft", systemImage: "person.crop.circle.badge.plus")
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .foregroundStyle(Color.appChrome)
+                                .background(
+                                    Capsule(style: .continuous)
+                                        .fill(Color.appChrome.opacity(0.10))
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(library.isAccountBusy)
+                    }
+
                     if !library.userContentSyncConflicts.isEmpty {
                         syncConflictReviewCard
                     }
@@ -315,7 +359,7 @@ struct SettingsView: View {
                         if library.requiresSignOutConfirmation {
                             showsSignOutWarning = true
                         } else {
-                            library.signOut()
+                            signOut()
                         }
                     } label: {
                         Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
@@ -365,177 +409,6 @@ struct SettingsView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var firmWorkspaceCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                CodeEyebrow(text: "Firm & Collaboration", accent: settingsChromeColor)
-                Spacer(minLength: 0)
-                Text("Private beta")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(Color.appChrome)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 5)
-                    .background(
-                        Capsule(style: .continuous)
-                            .fill(Color.appChrome.opacity(0.12))
-                    )
-            }
-
-            Text("Open firm-owned Projects with your assigned Owner, Editor, Reviewer, or Viewer role. Project administration and member changes remain on the web.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            if library.pendingOrganizationInvitationToken != nil {
-                VStack(alignment: .leading, spacing: 10) {
-                    Label("Firm invitation ready", systemImage: "person.2.badge.plus")
-                        .font(.subheadline.weight(.semibold))
-
-                    Text(library.signedInAccount == nil
-                         ? "Sign in with Apple, then return here to accept the private invitation."
-                         : "Accept only if you recognize the firm or Project that shared this link.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    if library.signedInAccount != nil {
-                        Button {
-                            Task { await library.acceptPendingOrganizationInvitation() }
-                        } label: {
-                            Label(
-                                library.isOrganizationWorkspaceLoading ? "Accepting…" : "Accept Invitation",
-                                systemImage: "checkmark.circle.fill"
-                            )
-                            .font(.subheadline.weight(.semibold))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 11)
-                            .background(
-                                Capsule(style: .continuous)
-                                    .fill(Color.appChrome.opacity(0.12))
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(library.isOrganizationWorkspaceLoading)
-                    }
-                }
-                .padding(12)
-                .background(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color.appChrome.opacity(0.07))
-                )
-            }
-
-            if library.signedInAccount == nil {
-                Text("Sign in to see firm workspaces and Projects shared with you.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } else if library.isOrganizationWorkspaceLoading && library.organizations.isEmpty {
-                HStack(spacing: 10) {
-                    ProgressView()
-                    Text("Loading firm access…")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            } else if library.organizations.isEmpty {
-                Text("No firm workspaces yet. Create one or transfer a personal Project from Permitext Web.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
-                ForEach(library.organizations) { organization in
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack(alignment: .top, spacing: 10) {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(organization.name)
-                                    .font(.headline)
-                                Text(firmWorkspaceMetadata(organization))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer(minLength: 0)
-                            Text((organization.role ?? "member").capitalized)
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(.primary)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 5)
-                                .background(
-                                    Capsule(style: .continuous)
-                                        .fill(Color.primary.opacity(0.08))
-                                )
-                        }
-
-                        ForEach(organization.projects ?? []) { project in
-                            NavigationLink {
-                                OrganizationProjectHubView(
-                                    organization: organization,
-                                    project: project
-                                )
-                            } label: {
-                                HStack(spacing: 10) {
-                                    Circle()
-                                        .fill(
-                                            Color(
-                                                uiColor: PlatformColor(
-                                                    hex: project.colorHex ?? CodeFolder.defaultColorHex
-                                                ) ?? .systemBlue
-                                            )
-                                        )
-                                        .frame(width: 10, height: 10)
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(project.name)
-                                            .font(.subheadline.weight(.semibold))
-                                            .foregroundStyle(.primary)
-                                        Text(project.address.isEmpty
-                                             ? "\(project.role.capitalized) access"
-                                             : "\(project.role.capitalized) · \(project.address)")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                            .lineLimit(1)
-                                    }
-                                    Spacer(minLength: 0)
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption.weight(.bold))
-                                        .foregroundStyle(.tertiary)
-                                }
-                                .padding(11)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .fill(Color.primary.opacity(0.055))
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(Color.primary.opacity(0.04))
-                    )
-                }
-            }
-
-            Button {
-                openURL(webWorkspaceURL)
-            } label: {
-                Label("Manage Firms on Permitext Web", systemImage: "safari")
-                    .font(.footnote.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(
-                        Capsule(style: .continuous)
-                            .fill(Color.primary.opacity(0.08))
-                    )
-            }
-            .buttonStyle(.plain)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func firmWorkspaceMetadata(_ organization: PermitextOrganization) -> String {
-        let access = organization.accessScope == "project" ? "Project access" : "Firm access"
-        guard let seats = organization.seats else { return access }
-        return "\(access) · \(seats.used)/\(organization.billingIdentity.seatLimit) seats"
     }
 
     private var webWorkspaceCard: some View {
@@ -918,7 +791,11 @@ struct SettingsView: View {
 
             Button("Delete Account", role: .destructive) {
                 Task {
+                    let deletesClerkIdentity = library.signedInAccount?.authProvider == .clerk
                     if await library.deleteAccount() {
+                        if deletesClerkIdentity {
+                            _ = try? await clerk.user?.delete()
+                        }
                         showsAccountDeleteWarning = false
                     }
                 }
@@ -932,7 +809,7 @@ struct SettingsView: View {
     }
 
     private var accountDeletionMessage: String {
-        let dataDeletion = "This permanently deletes your Permitext account, synced saved work, Research history, private images and reports, and any firm workspace you own. This cannot be undone."
+        let dataDeletion = "This permanently deletes your Permitext account, synced saved work, Research history, private images and reports. This cannot be undone."
         if library.hasAppleManagedBillingForAccountDeletion &&
             library.hasWebManagedBillingForAccountDeletion {
             return "Permitext will cancel your Stripe subscription first. Apple billing cannot be canceled by Permitext, so manage your Apple subscription before deleting or Apple may continue charging you. \(dataDeletion)"
@@ -982,7 +859,7 @@ struct SettingsView: View {
 
             Button("Sign Out Anyway", role: .destructive) {
                 showsSignOutWarning = false
-                library.signOut()
+                signOut()
             }
             .buttonStyle(.borderedProminent)
             .tint(.red)
@@ -994,6 +871,12 @@ struct SettingsView: View {
         }
         .frame(width: 320, alignment: .leading)
         .padding(24)
+    }
+
+    private func signOut() {
+        library.signOut()
+        guard clerk.user != nil else { return }
+        Task { try? await clerk.auth.signOut() }
     }
 
     private var syncConflictReviewCard: some View {

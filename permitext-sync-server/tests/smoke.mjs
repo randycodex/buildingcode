@@ -281,6 +281,26 @@ async function main() {
   try {
     await waitForServer();
 
+    const release = await request("/release");
+    assert(release.response.ok, "Release identity endpoint failed.");
+    assert(release.json.release.releaseID === "local", "Local release identity was not explicit.");
+    assert(
+      release.response.headers.get("x-permitext-release") === "local",
+      "Responses did not expose the serving release identifier."
+    );
+    const clientError = await request("/client-errors/report", {
+      method: "POST",
+      body: {
+        kind: "error",
+        name: "SmokeError",
+        message: "Smoke report for smoke@example.com?token=private",
+        source: "/web/app.js?token=private",
+        route: "/"
+      }
+    });
+    assert(clientError.response.status === 202, "Client error report was not accepted.");
+    assert(clientError.json.releaseID === "local", "Client error report lost release identity.");
+
     const aasa = await request("/.well-known/apple-app-site-association");
     assert(aasa.response.ok, "AASA endpoint failed.");
     assert(
@@ -384,7 +404,6 @@ async function main() {
     const settingsSectionOrder = [
       '>Plan</h3>',
       '>Account</h3>',
-      '>Firm &amp; Collaboration</h3>',
       '>Offline Access</h3>',
       '>Data &amp; Storage</h3>'
     ].map((marker) => settingsTemplateSource.indexOf(marker));
@@ -673,12 +692,12 @@ async function main() {
       "Customer JavaScript exposed private evaluation material."
     );
     assert(
-      webRoot.text.includes("Firm &amp; Collaboration") &&
-        webRoot.text.includes('data-deferred-feature="firm-collaboration" hidden') &&
-        !webRoot.text.includes('class="settings-beta-badge"') &&
+      !webRoot.text.includes("Firm &amp; Collaboration") &&
+        !webRoot.text.includes('data-deferred-feature="firm-collaboration"') &&
         workspaceScript.text.includes("firmCollaboration: false") &&
-        workspaceScript.text.includes("firmCard.hidden = !releaseSurfaceVisibility.firmCollaboration") &&
-        workspaceScript.text.includes("if (releaseSurfaceVisibility.firmCollaboration) {") &&
+        workspaceScript.text.includes("if (!releaseSurfaceVisibility.firmCollaboration) return projects;") &&
+        workspaceScript.text.includes("if (!releaseSurfaceVisibility.firmCollaboration) return \"\";") &&
+        !workspaceScript.text.includes('"collaboration",\n  "organization-administration"') &&
         workspaceScript.text.includes('postResearch("/organizations/create"') &&
         workspaceScript.text.includes('postResearch("/organizations/members/invite"') &&
         workspaceScript.text.includes('postResearch("/organizations/projects/snapshot"') &&
@@ -699,7 +718,7 @@ async function main() {
         workspaceScript.text.includes('postResearch("/projects/collaboration/comments/save"') &&
         workspaceScript.text.includes("function appendProjectReportExports") &&
         workspaceScript.text.includes("if (identity.sharedOnly) row.classList.add(\"is-read-only\")"),
-      "Deferred Firm Collaboration should be hidden from Settings while its implementation and shared-record compatibility remain preserved."
+      "Firm and collaboration must be absent from public release surfaces while shared-record compatibility remains preserved."
     );
     const workspaceSourceMap = await request("/web/app.js.map");
     assert(

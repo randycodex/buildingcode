@@ -216,8 +216,11 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         self.bearerTokenProvider = bearerTokenProvider
     }
 
-    func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord {
-        try await transport.signIn(BackendSignInRequest(credential: credential))
+    func signIn(credential: AccountSignInCredential, linkFrom: SignedInAccount? = nil) async throws -> BackendAccountRecord {
+        try await transport.signIn(BackendSignInRequest(
+            credential: credential,
+            linkFrom: linkFrom.map { authContext(for: $0) }
+        ))
     }
 
     func signOut(account: SignedInAccount) async throws {

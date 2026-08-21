@@ -1,0 +1,130 @@
+# Permitext Beta 1 billing and identity runbook
+
+This runbook is an evidence checklist. Passing unit tests does not authorize public billing; the provider-created records and production entitlement changes below must also be captured.
+
+## Release architecture
+
+- Permitext Web sells Pro through Stripe Checkout and manages it through Stripe Billing Portal.
+- Permitext iOS sells Pro through StoreKit. It does not present a Stripe purchase path for digital access.
+- Both providers update the same Permitext entitlement record.
+- Clerk is the canonical sign-in provider for Apple, Google, and Microsoft identities.
+- An existing Permitext Apple account must be authenticated before it is linked into a Clerk identity. Never merge accounts from an email match alone.
+
+## Required production configuration
+
+Public production must use durable PostgreSQL storage and private Vercel Blob storage. The readiness check rejects the local JSON store and a deployment without private asset storage.
+
+Run the non-mutating configuration check:
+
+```bash
+cd permitext-sync-server
+node --env-file=.env.production.local scripts/verify-beta1-readiness.mjs
+```
+
+After the configuration check passes, the live Stripe inspection is also read-only:
+
+```bash
+node --env-file=.env.production.local scripts/verify-beta1-readiness.mjs --live-stripe
+```
+
+The live check confirms that the Pro Price is active, live, and recurring; that the exact production webhook URL is enabled; and that it receives every event the entitlement lifecycle requires.
+
+Configure App Store Server Notifications V2 in App Store Connect with:
+
+```text
+https://<production-domain>/billing/apple/notifications
+```
+
+Configure Stripe with:
+
+```text
+https://<production-domain>/billing/stripe/webhook
+```
+
+Configure Clerk with live keys, `CLERK_AUTHORIZED_PARTIES`, and these hosted web-flow values:
+
+```text
+CLERK_FRONTEND_API_URL=https://clerk.permitext.com
+CLERK_ACCOUNT_PORTAL_URL=https://accounts.permitext.com/sign-in
+```
+
+The corresponding Clerk DNS records, Account Portal redirects, and Apple, Google, and Microsoft social connections must be active in the Clerk production instance. Permitext loads ClerkJS directly from the configured Frontend API, redirects to the hosted Account Portal, verifies the returned Clerk session token on the backend, and only then creates or links the Permitext account.
+
+For iOS, set the target build setting `CLERK_PUBLISHABLE_KEY` to the production publishable key, enable Clerk Native API, register `com.randycodex.permitext` as the Native Application, and confirm `webcredentials:clerk.permitext.com` resolves through the signed associated-domain configuration. Until that build setting exists, iOS deliberately retains the current native Sign in with Apple fallback instead of showing a nonfunctional multi-provider button.
+
+## United States release boundary
+
+- In App Store Connect, make Beta 1 available only in the United States territory.
+- State the United States-only service boundary in the customer-facing Terms and purchase copy.
+- Review Stripe tax, business-address, and customer-location settings for US sales before enabling the live Price.
+- Confirm marketing and support do not invite customers in other countries during Beta 1. If the public web app must technically block non-US access rather than state a commercial restriction, add and test a separate geolocation enforcement layer before launch.
+
+## Identity migration evidence
+
+For an existing Apple account with saved work and Pro access:
+
+1. Record the Permitext user ID, entitlement source, and representative saved Project IDs before migration.
+2. Authenticate the existing Permitext session.
+3. Sign in to Clerk with Apple and submit the Clerk session token using the authenticated linking path.
+4. Confirm one resulting Permitext account, the same Projects and saved records, and the same entitlement.
+5. Sign out and sign in through Google, then Microsoft, after linking those verified identities in Clerk.
+6. Confirm every provider returns the same Clerk user and Permitext account.
+7. Attempt an unverified or mismatched link and confirm that Permitext rejects it without changing either account.
+
+## Stripe lifecycle evidence
+
+Use a dedicated production test account and a low-priced live test product approved for this exercise. Real charges and refunds require explicit approval immediately before execution.
+
+Capture the Stripe event ID, Permitext user ID, subscription ID, entitlement before/after, and timestamp for:
+
+1. New Checkout purchase grants Pro only after a signed provider event.
+2. A duplicate Checkout or subscription event is idempotent.
+3. Renewal extends the entitlement expiration.
+4. Cancellation preserves access through the paid period.
+5. `unpaid`, `canceled`, `paused`, or terminal expiration removes access.
+6. A failed invoice does not invent a paid renewal and produces an operational warning.
+7. A full refund removes the affected package; a partial refund does not automatically revoke it.
+8. A delayed event older than the stored provider event does not overwrite newer entitlement state.
+9. Restore succeeds only for the Permitext account that owns the Stripe subscription.
+
+## Apple lifecycle evidence
+
+Perform Sandbox and TestFlight exercises first, then one controlled production purchase only after approval. Capture the Apple notification UUID, original transaction ID, product ID, environment, signed date, Permitext user ID, and entitlement before/after.
+
+1. Purchase and restore bind the original transaction ID to exactly one Permitext account.
+2. `DID_RENEW` extends access.
+3. Turning off auto-renew does not remove prepaid access.
+4. `DID_FAIL_TO_RENEW` with `GRACE_PERIOD` keeps access only through `gracePeriodExpiresDate`.
+5. `GRACE_PERIOD_EXPIRED`, `EXPIRED`, `REFUND`, and `REVOKE` remove the affected package.
+6. `REFUND_REVERSED` restores an active transaction.
+7. Duplicate notifications are idempotent and older delayed notifications cannot overwrite newer state.
+8. Sandbox and Xcode transactions cannot grant production Pro.
+9. An unowned notification receives a retryable error until the signed client transaction establishes ownership.
+10. An account with active Stripe Pro cannot start a second Apple Pro purchase, and an account with active Apple Pro cannot start Stripe Checkout.
+
+## Research cost safeguards
+
+Production Research fails closed unless all of these are configured:
+
+- `PERMITEXT_RESEARCH_MAX_REQUEST_USD`
+- `PERMITEXT_RESEARCH_USER_DAILY_CAP_USD`
+- `PERMITEXT_RESEARCH_DAILY_CAP_USD`
+- `PERMITEXT_RESEARCH_MONTHLY_CAP_USD`
+- Versioned input, cached-input, and output token prices
+
+`PERMITEXT_RESEARCH_KILL_SWITCH=1` immediately prevents new paid Research requests. Each accepted turn atomically reserves its maximum exposure before a provider call, and every provider request consumes that reservation using its declared output-token ceiling.
+
+## Release evidence record
+
+For every exercise, record:
+
+- Release identifier and Git commit
+- Deployment URL
+- Provider environment and provider event identifiers
+- Test Permitext account
+- Expected and observed entitlement transition
+- Cross-platform verification result
+- Database evidence with secrets and personal data redacted
+- Operator, timestamp, and rollback or cleanup performed
+
+Public billing remains blocked if any required lifecycle has no production evidence, any configuration check fails, or the account-linking migration loses or duplicates data.

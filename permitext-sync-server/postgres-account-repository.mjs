@@ -15,9 +15,9 @@ function withoutSessionToken(account) {
   return stored;
 }
 
-function appleSubjectIDs(account) {
+export function appleSubjectIDs(account) {
   return new Set([
-    account?.authProviderUserID,
+    account?.authProvider === "apple" ? account?.authProviderUserID : null,
     account?.appleUserID,
     ...(Array.isArray(account?.linkedAppleUserIDs) ? account.linkedAppleUserIDs : [])
   ].map((value) => String(value || "").trim()).filter(Boolean));
@@ -237,8 +237,10 @@ export function createPostgresAccountRepository(sql, options = {}) {
                     COALESCE(target.account->'linkedAppleUserIDs', '[]'::jsonb)
                   ) AS subject
                   UNION SELECT NULLIF(source.auth_provider_user_id, '')
+                    WHERE source.auth_provider = 'apple'
                   UNION SELECT NULLIF(source.apple_user_id, '')
                   UNION SELECT NULLIF(target.auth_provider_user_id, '')
+                    WHERE target.auth_provider = 'apple'
                   UNION SELECT NULLIF(target.apple_user_id, '')
                 ) AS identities
                 WHERE identities.subject IS NOT NULL
@@ -868,6 +870,90 @@ export function createPostgresAccountRepository(sql, options = {}) {
     return safeJSON(entitlementRows[0].entitlement, entitlement);
   }
 
+  async function appleTransactionOwner(originalTransactionID) {
+    const rows = await sql`
+      SELECT user_id
+      FROM permitext_apple_transaction_owners
+      WHERE original_transaction_id = ${originalTransactionID}
+      LIMIT 1
+    `;
+    return rows[0]?.user_id || null;
+  }
+
+  async function applyAppleNotification({
+    userID,
+    originalTransactionID,
+    signedDate,
+    notificationUUID,
+    notificationType,
+    nextEntitlement
+  }) {
+    const stateSQL = sql`
+      INSERT INTO permitext_apple_notification_states (
+        original_transaction_id, signed_date, notification_uuid, notification_type, updated_at
+      )
+      VALUES (
+        ${originalTransactionID}, ${signedDate}, ${notificationUUID}, ${notificationType}, now()
+      )
+      ON CONFLICT (original_transaction_id) DO UPDATE SET
+        signed_date = EXCLUDED.signed_date,
+        notification_uuid = EXCLUDED.notification_uuid,
+        notification_type = EXCLUDED.notification_type,
+        updated_at = now()
+      WHERE permitext_apple_notification_states.signed_date < EXCLUDED.signed_date
+      RETURNING original_transaction_id
+    `;
+    if (nextEntitlement) {
+      const [stateRows, entitlementRows] = await sql.transaction([
+        stateSQL,
+        sql`
+          INSERT INTO permitext_entitlements (
+            user_id, plan, source, granted_user_id, entitlement, expires_at, updated_at
+          )
+          SELECT
+            ${userID}, ${nextEntitlement.plan || "free"}, ${nextEntitlement.source || "unknown"},
+            ${nextEntitlement.grantedUserID || null}, ${JSON.stringify(nextEntitlement)}::jsonb,
+            ${nextEntitlement.expiresAt || null}::timestamptz, now()
+          WHERE EXISTS (
+            SELECT 1 FROM permitext_apple_notification_states
+            WHERE original_transaction_id = ${originalTransactionID}
+              AND signed_date = ${signedDate}
+              AND notification_uuid = ${notificationUUID}
+          )
+          ON CONFLICT (user_id) DO UPDATE SET
+            plan = EXCLUDED.plan,
+            source = EXCLUDED.source,
+            granted_user_id = EXCLUDED.granted_user_id,
+            entitlement = EXCLUDED.entitlement,
+            expires_at = EXCLUDED.expires_at,
+            updated_at = now()
+          RETURNING entitlement
+        `
+      ]);
+      return {
+        applied: stateRows.length > 0,
+        entitlement: stateRows.length && entitlementRows[0]?.entitlement
+          ? safeJSON(entitlementRows[0].entitlement, nextEntitlement)
+          : null
+      };
+    }
+    const [stateRows, deletionRows] = await sql.transaction([
+      stateSQL,
+      sql`
+        DELETE FROM permitext_entitlements
+        WHERE user_id = ${userID}
+          AND EXISTS (
+            SELECT 1 FROM permitext_apple_notification_states
+            WHERE original_transaction_id = ${originalTransactionID}
+              AND signed_date = ${signedDate}
+              AND notification_uuid = ${notificationUUID}
+          )
+        RETURNING user_id
+      `
+    ]);
+    return { applied: stateRows.length > 0, entitlement: null, removed: deletionRows.length > 0 };
+  }
+
   async function deleteEntitlement(userID, expected = {}) {
     let rows;
     if (expected.source && expected.providerKey && expected.providerValue) {
@@ -962,6 +1048,8 @@ export function createPostgresAccountRepository(sql, options = {}) {
   }
 
   return {
+    applyAppleNotification,
+    appleTransactionOwner,
     authenticate,
     claimAppleEntitlement,
     contextForUser,

@@ -1,6 +1,7 @@
 import SwiftUI
 import UIKit
 import os.signpost
+import ClerkKit
 
 @main
 struct PermitextApp: App {
@@ -13,6 +14,7 @@ struct PermitextApp: App {
     private let phase3ResearchConfiguration: Phase3EntitledResearchConfiguration?
 
     init() {
+        Self.configureClerkIfAvailable()
         offersFirstUseExperience = PermitextFirstUseGate.evaluateBeforeLibraryStartup()
         if let preparedResearchHarness = Phase3EntitledResearchConfiguration.prepareIfRequested() {
             phase3ResearchConfiguration = preparedResearchHarness.configuration
@@ -34,6 +36,7 @@ struct PermitextApp: App {
     }
 #else
     init() {
+        Self.configureClerkIfAvailable()
         offersFirstUseExperience = PermitextFirstUseGate.evaluateBeforeLibraryStartup()
         _library = StateObject(wrappedValue: CodeLibraryViewModel())
         Self.configureTabBarAppearance()
@@ -71,6 +74,15 @@ struct PermitextApp: App {
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
 
+    private static func configureClerkIfAvailable() {
+        guard
+            let publishableKey = Bundle.main.object(forInfoDictionaryKey: "PermitextClerkPublishableKey") as? String,
+            !publishableKey.isEmpty,
+            !publishableKey.contains("$(")
+        else { return }
+        Clerk.configure(publishableKey: publishableKey)
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {
@@ -101,6 +113,7 @@ struct PermitextApp: App {
 #endif
             }
             .environmentObject(library)
+            .environment(Clerk.shared)
             .tint(Color.appChrome)
             .alert(
                 "Upgrade to Pro",

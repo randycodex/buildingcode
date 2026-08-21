@@ -210,6 +210,7 @@ import {
 } from "./code-question-legacy.js?v=20260806-code-question-legacy-v1";
 
 const permitextSyncSchemaVersion = 2;
+let releaseIdentityPromise = null;
 const releaseSurfaceVisibility = Object.freeze({
   // Preserved for data, report, and restoration compatibility. See
   // docs/PERMITEXT_DEFERRED_FEATURES.md before changing this release boundary.
@@ -228,8 +229,6 @@ const permitextClientCapabilities = Object.freeze([
   "offline-access",
   "research",
   "evidence-discovery",
-  "collaboration",
-  "organization-administration",
   "code-question-workspace"
 ]);
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
@@ -462,6 +461,8 @@ const sectionSummaryCache = new Map();
 const annotationPushTimers = new Map();
 let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
+let clerkWebConfigPromise = null;
+let clerkScriptPromise = null;
 let workboardModulePromise = null;
 let workboardStylesPromise = null;
 const workboardMounts = new Map();
@@ -4439,6 +4440,61 @@ async function api(path) {
   return response.json();
 }
 
+function loadReleaseIdentity() {
+  releaseIdentityPromise ||= fetch("/release", {
+    cache: "no-store",
+    headers: { accept: "application/json" }
+  }).then(async (response) => {
+    if (!response.ok) throw new Error(`Release request failed: ${response.status}`);
+    return (await response.json()).release || null;
+  }).catch(() => null);
+  return releaseIdentityPromise;
+}
+
+function feedbackURL(releaseID = "unknown") {
+  const parameters = new URLSearchParams({
+    subject: `Permitext feedback — release ${releaseID}`,
+    body: [
+      "What happened?",
+      "",
+      "What did you expect?",
+      "",
+      `Permitext release: ${releaseID}`
+    ].join("\n")
+  });
+  return `mailto:permitext@gmail.com?${parameters.toString()}`;
+}
+
+function wireOperationalSupport(panel) {
+  const feedbackLink = panel.querySelector(".settings-feedback-link");
+  const releaseLabel = panel.querySelector(".settings-release-id");
+  if (!feedbackLink || !releaseLabel) return;
+  void loadReleaseIdentity().then((release) => {
+    const releaseID = release?.releaseID || "unknown";
+    feedbackLink.href = feedbackURL(releaseID);
+    releaseLabel.textContent = `Release: ${releaseID}`;
+    if (release?.gitCommit) releaseLabel.title = `Git commit ${release.gitCommit}`;
+  });
+}
+
+function reportClientError(kind, error, details = {}) {
+  const payload = {
+    kind,
+    name: error?.name || details.name || "Error",
+    message: error?.message || String(error || details.message || "Client error"),
+    source: details.source || null,
+    route: window.location.pathname,
+    line: details.line || null,
+    column: details.column || null
+  };
+  void fetch("/client-errors/report", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+    keepalive: true
+  }).catch(() => {});
+}
+
 async function fetchChapterList(codePrefix = "BC") {
   const cacheKey = codePrefix || "BC";
   return cacheRetryablePromise(
@@ -7270,6 +7326,91 @@ async function appleWebSignInConfig() {
   return appleWebConfigPromise;
 }
 
+async function clerkWebSignInConfig() {
+  if (!clerkWebConfigPromise) {
+    clerkWebConfigPromise = api("/account/clerk/config").catch((error) => {
+      clerkWebConfigPromise = null;
+      throw error;
+    });
+  }
+  return clerkWebConfigPromise;
+}
+
+function loadClerkScript(config) {
+  if (window.Clerk) return Promise.resolve(window.Clerk);
+  if (clerkScriptPromise) return clerkScriptPromise;
+  clerkScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = `${config.frontendAPIURL}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`;
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.dataset.clerkPublishableKey = config.publishableKey;
+    script.onload = async () => {
+      try {
+        if (!window.Clerk) throw new Error("ClerkJS did not initialize.");
+        await window.Clerk.load();
+        resolve(window.Clerk);
+      } catch (error) {
+        clerkScriptPromise = null;
+        reject(error);
+      }
+    };
+    script.onerror = () => {
+      clerkScriptPromise = null;
+      reject(new Error("Could not load secure sign-in."));
+    };
+    document.head.append(script);
+  });
+  return clerkScriptPromise;
+}
+
+async function completeClerkPermitextSignIn(config) {
+  const clerk = await loadClerkScript(config);
+  if (!clerk.isSignedIn || !clerk.session || !clerk.user?.id) return null;
+  const sessionToken = await clerk.session.getToken();
+  if (!sessionToken) throw new Error("Secure sign-in did not return a session token.");
+  const existingAccount = activeAccount();
+  const targetUserID = `clerk:${clerk.user.id}`;
+  const linkFrom = existingAccount && existingAccount.userID !== targetUserID
+    ? { accountUserID: existingAccount.userID, sessionToken: existingAccount.sessionToken }
+    : undefined;
+  const displayName = clerk.user.fullName || clerk.user.firstName || "Permitext account";
+  const payload = await postJSON("/account/sign-in", {
+    credential: {
+      provider: "clerk",
+      providerUserID: clerk.user.id,
+      sessionToken,
+      displayName,
+      signedInAt: new Date().toISOString()
+    },
+    linkFrom
+  }, { token: existingAccount?.sessionToken });
+  return storeSignedInAccount(payload, displayName);
+}
+
+async function signInWithClerkWeb(config) {
+  const existingSession = await completeClerkPermitextSignIn(config);
+  if (existingSession) return existingSession;
+  const returnURL = new URL(window.location.href);
+  returnURL.searchParams.set("clerk_return", "1");
+  const authorizationURL = new URL(config.accountPortalSignInURL);
+  authorizationURL.searchParams.set("redirect_url", returnURL.toString());
+  window.location.assign(authorizationURL.toString());
+  return new Promise(() => {});
+}
+
+async function resumeClerkSignInReturn() {
+  const currentURL = new URL(window.location.href);
+  if (currentURL.searchParams.get("clerk_return") !== "1") return null;
+  const config = await clerkWebSignInConfig();
+  if (!config.available) throw new Error("Secure sign-in is not configured.");
+  const account = await completeClerkPermitextSignIn(config);
+  if (!account) throw new Error("Secure sign-in did not create an active session.");
+  currentURL.searchParams.delete("clerk_return");
+  window.history.replaceState({}, "", `${currentURL.pathname}${currentURL.search}${currentURL.hash}`);
+  return account;
+}
+
 function loadAppleIDScript() {
   if (window.AppleID?.auth) return Promise.resolve();
   if (appleIDScriptPromise) return appleIDScriptPromise;
@@ -7385,6 +7526,10 @@ async function signInWithBrowserFallback() {
 }
 
 async function signInCurrentBrowser() {
+  const clerkConfig = await clerkWebSignInConfig().catch(() => null);
+  if (clerkConfig?.available) {
+    return signInWithClerkWeb(clerkConfig);
+  }
   const config = await appleWebSignInConfig();
   if (config.available) {
     return signInWithAppleWeb(config);
@@ -15262,6 +15407,10 @@ function researchOpenContextIsCurrent(context, options = {}) {
 }
 
 async function loadOrganizationWorkspace(options = {}) {
+  if (!releaseSurfaceVisibility.firmCollaboration) {
+    organizationWorkspace = { organizations: [] };
+    return organizationWorkspace;
+  }
   const account = activeAccount();
   if (!account) {
     organizationWorkspace = { organizations: [] };
@@ -15307,6 +15456,7 @@ function sharedProjectsFromOrganizations(workspace = organizationWorkspace) {
 }
 
 function mergeProjectsWithOrganizationAccess(projects = [], workspace = organizationWorkspace) {
+  if (!releaseSurfaceVisibility.firmCollaboration) return projects;
   const sharedProjects = sharedProjectsFromOrganizations(workspace);
   const sharedByID = new Map(sharedProjects.map((project) => [String(project.id), project]));
   const localIDs = new Set();
@@ -27847,6 +27997,7 @@ async function performSettingsClearAction(action) {
 }
 
 function organizationInvitationTokenFromURL() {
+  if (!releaseSurfaceVisibility.firmCollaboration) return "";
   return new URLSearchParams(window.location.search).get("organizationInvite") || "";
 }
 
@@ -28708,7 +28859,6 @@ function renderSettings() {
   const syncConflictsCard = panel.querySelector(".settings-sync-conflicts-card");
   const syncConflictsSummary = panel.querySelector(".settings-sync-conflicts-summary");
   const syncConflictsList = panel.querySelector(".settings-sync-conflicts-list");
-  const firmCard = panel.querySelector(".settings-firm-card");
   const checkoutButton = panel.querySelector(".account-checkout");
   const researchCheckoutButton = panel.querySelector(".account-research-checkout");
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
@@ -28723,8 +28873,7 @@ function renderSettings() {
   const projectDelete = panel.querySelector(".settings-project-delete");
   const projectClearAll = panel.querySelector(".settings-project-clear-all");
   const status = panel.querySelector(".settings-status-message");
-  firmCard.hidden = !releaseSurfaceVisibility.firmCollaboration;
-
+  wireOperationalSupport(panel);
   const setStatus = (message, isError = false) => {
     status.textContent = message || "";
     status.classList.toggle("has-error", isError);
@@ -28900,10 +29049,6 @@ function renderSettings() {
     }
   });
   updateProjectSelection();
-  if (releaseSurfaceVisibility.firmCollaboration) {
-    void renderFirmWorkspaceSettings(panel, settingsProjects, setStatus);
-  }
-
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");
     const account = activeAccount();
@@ -29009,6 +29154,7 @@ function renderSettings() {
       });
   }
   appleWebSignInConfig().then((config) => {
+    if (panel.dataset.clerkReady === "true") return;
     const account = activeAccount();
     if (account && state.account?.authProvider === "web") {
       signInButton.hidden = !config.available;
@@ -29023,6 +29169,17 @@ function renderSettings() {
   }).catch(() => {
     if (!activeAccount()) accountCopy.textContent = "Could not check sign-in configuration.";
   });
+  clerkWebSignInConfig().then((config) => {
+    if (!config.available) return;
+    panel.dataset.clerkReady = "true";
+    const account = activeAccount();
+    signInButton.hidden = Boolean(account && state.account?.authProvider === "clerk");
+    signInButton.disabled = false;
+    signInButton.textContent = account
+      ? "Link Apple, Google, or Microsoft"
+      : "Sign in with Apple, Google, or Microsoft";
+    if (!account) accountCopy.textContent = "Sign in with Apple, Google, or Microsoft to sync saved work across devices.";
+  }).catch(() => {});
 
   signInButton.addEventListener("click", async () => {
     signInButton.disabled = true;
@@ -29068,6 +29225,9 @@ function renderSettings() {
     } catch {
       // Clear the local session even if the network is unavailable.
     } finally {
+      if (window.Clerk?.isSignedIn) {
+        await window.Clerk.signOut().catch(() => {});
+      }
       await disableOfflineFeature().catch(() => {});
       if (account) persistCodeQuestionAccountState(account.userID);
       stopForegroundSyncLoop();
@@ -29106,7 +29266,7 @@ function renderSettings() {
           : "No recurring Permitext subscription is linked to this account.";
     const confirmed = await confirmWebWarning(
       "Delete Permitext account?",
-      `${billingMessage} This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports, and any firm workspace you own. This cannot be undone.`,
+      `${billingMessage} This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports. This cannot be undone.`,
       { confirmLabel: "Delete Account" }
     );
     if (!confirmed) return;
@@ -29122,6 +29282,16 @@ function renderSettings() {
         },
         { token: account.sessionToken }
       );
+
+      if (account.authProvider === "clerk") {
+        try {
+          const config = await clerkWebSignInConfig();
+          const clerk = config.available ? await loadClerkScript(config) : null;
+          await clerk?.user?.delete();
+        } catch (error) {
+          reportClientError("error", error, { source: "account-deletion" });
+        }
+      }
 
       const localProjectIDs = new Set([
         ...(currentContentSummary().projects || []).map((project) => workboardProjectID(projectIdentity(project))),
@@ -33921,6 +34091,7 @@ async function start() {
     ]);
     chapters = chapterPayload.chapters || [];
     codeTrustProfiles = libraryPayload.codeTrustProfiles || [];
+    await resumeClerkSignInReturn();
   }
   updateConnectionStatus();
   document.addEventListener("click", (event) => {
@@ -34185,7 +34356,22 @@ function renderWorkspaceLoadError(error) {
   title.focus({ preventScroll: true });
 }
 
+window.addEventListener("error", (event) => {
+  reportClientError("error", event.error, {
+    name: event.error?.name || "ErrorEvent",
+    message: event.message,
+    source: event.filename,
+    line: event.lineno,
+    column: event.colno
+  });
+});
+window.addEventListener("unhandledrejection", (event) => {
+  const reason = event.reason instanceof Error ? event.reason : new Error(String(event.reason || "Unhandled rejection"));
+  reportClientError("unhandledrejection", reason);
+});
+
 start().catch((error) => {
   console.error(error);
+  reportClientError("startup", error);
   renderWorkspaceLoadError(error);
 });

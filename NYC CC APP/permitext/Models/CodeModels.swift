@@ -1357,6 +1357,7 @@ struct BackendAuthContext: Codable, Hashable, Sendable {
 
 struct BackendSignInRequest: Codable, Hashable, Sendable {
     let credential: AccountSignInCredential
+    let linkFrom: BackendAuthContext?
 }
 
 struct BackendSignOutRequest: Codable, Hashable, Sendable {
@@ -4439,6 +4440,7 @@ struct AppEntitlement: Codable, Hashable, Sendable {
 
 enum AccountAuthProvider: String, Codable, Hashable, Sendable {
     case apple
+    case clerk
     case passkey
     case guest
 }
@@ -4457,6 +4459,7 @@ struct AccountSignInCredential: Codable, Hashable, Sendable {
     let email: String?
     let identityToken: String?
     let authorizationCode: String?
+    let sessionToken: String?
 
     init(
         provider: AccountAuthProvider,
@@ -4465,7 +4468,8 @@ struct AccountSignInCredential: Codable, Hashable, Sendable {
         signedInAt: Date,
         email: String? = nil,
         identityToken: String? = nil,
-        authorizationCode: String? = nil
+        authorizationCode: String? = nil,
+        sessionToken: String? = nil
     ) {
         self.provider = provider
         self.providerUserID = providerUserID
@@ -4474,6 +4478,7 @@ struct AccountSignInCredential: Codable, Hashable, Sendable {
         self.email = email
         self.identityToken = identityToken
         self.authorizationCode = authorizationCode
+        self.sessionToken = sessionToken
     }
 }
 
@@ -4548,7 +4553,7 @@ struct BackendAccountRecord: Codable, Hashable, Sendable {
 protocol AccountBackendClient {
     var name: String { get }
     func health() async throws -> BackendHealthStatus
-    func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord
+    func signIn(credential: AccountSignInCredential, linkFrom: SignedInAccount?) async throws -> BackendAccountRecord
     func signOut(account: SignedInAccount) async throws
     func deleteAccount(account: SignedInAccount) async throws
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState

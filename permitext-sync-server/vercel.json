@@ -8,7 +8,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://appleid.cdn-apple.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://appleid.apple.com"
+          "value": "default-src 'self'; script-src 'self' https://appleid.cdn-apple.com https://*.clerk.accounts.dev https://clerk.permitext.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.clerk.accounts.dev https://clerk.permitext.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://appleid.apple.com"
         },
         {
           "key": "Cross-Origin-Opener-Policy",
@@ -37,7 +37,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://appleid.cdn-apple.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://appleid.apple.com"
+          "value": "default-src 'self'; script-src 'self' https://appleid.cdn-apple.com https://*.clerk.accounts.dev https://clerk.permitext.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.clerk.accounts.dev https://clerk.permitext.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://appleid.apple.com"
         },
         {
           "key": "Cross-Origin-Opener-Policy",
@@ -115,6 +115,14 @@
     },
     {
       "source": "/health",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/release",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/client-errors/:path*",
       "destination": "/api/index"
     },
     {

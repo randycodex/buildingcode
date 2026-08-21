@@ -84,7 +84,7 @@
   <body>
     <main>
       <h1>Privacy Policy</h1>
-      <p class="effective-date">Effective August 11, 2026</p>
+      <p class="effective-date">Effective August 21, 2026</p>
 
       <p>
         Permitext is operated by Higinio Jimenez Manzano. This policy explains what information
@@ -95,13 +95,14 @@
       <h2>Information Permitext processes</h2>
       <ul>
         <li>
-          <strong>Account information:</strong> your Sign in with Apple identifier and, when Apple
-          provides them, your name and email address, including a private relay address. Permitext
-          may also store a display name or public username you choose.
+          <strong>Account information:</strong> identifiers used to sign in through Apple, Google,
+          or Microsoft using Clerk, and any name or email address those services provide. Existing
+          iOS builds may also use direct Sign in with Apple, including an Apple private relay
+          address. Permitext may store a display name or public username you choose.
         </li>
         <li>
           <strong>Workspace content:</strong> saved code sections, notes, tags, projects, project
-          names and addresses, comments, firm membership and invitations, legacy Workboards, images,
+          names and addresses, comments, legacy Workboards, images,
           Notebook content, report drafts and exports, and related activity records.
         </li>
         <li>
@@ -120,16 +121,17 @@
         </li>
         <li>
           <strong>Security and operational information:</strong> hashed session credentials, request
-          timestamps, and limited request metadata used to authenticate requests, prevent abuse, and
-          operate the service. Infrastructure providers may process IP addresses and technical logs
-          under their own retention practices.
+          timestamps, release identifiers, and limited, redacted error and request metadata used to
+          authenticate requests, prevent abuse, troubleshoot failures, and operate the service.
+          Infrastructure providers may process IP addresses and technical logs under their own
+          retention practices.
         </li>
       </ul>
 
       <h2>How information is used</h2>
       <p>
         Permitext uses this information to authenticate your account, synchronize your work, provide
-        saved research and collaboration features, verify paid access, generate requested Research
+        saved research features, verify paid access, generate requested Research
         responses, protect accounts and infrastructure, troubleshoot failures, and respond to support
         requests. Permitext does not sell personal information, show third-party advertising, or use
         your activity for cross-app advertising tracking.
@@ -138,8 +140,9 @@
       <h2>Service providers</h2>
       <p>
         Permitext uses service providers only as needed to deliver the application. These currently
-        include Apple for authentication and in-app purchases; Stripe for web subscriptions; Vercel
-        for application hosting and private file storage; and Neon for hosted PostgreSQL storage.
+        include Clerk for account authentication; Apple, Google, and Microsoft as sign-in providers;
+        Apple for in-app purchases; Stripe for web subscriptions; Vercel for application hosting and
+        private file storage; and Neon for hosted PostgreSQL storage.
         When paid Research generation is enabled, Permitext also uses OpenAI for user-requested
         Research responses. Those requests send the question and the evidence selected for that
         request to OpenAI, and Permitext requests that generated API responses not be stored through
@@ -174,9 +177,11 @@
         or legal obligations.
       </p>
       <p>
-        Deleting Permitext does not automatically cancel an Apple or Stripe subscription. Cancel the
-        subscription through the App Store subscription settings or the Stripe billing portal, as
-        applicable.
+        Permitext attempts to cancel an active Stripe subscription before deleting the account and
+        stops deletion if Stripe cancellation cannot be confirmed. Permitext cannot cancel an Apple
+        subscription; manage that subscription in App Store settings before deleting the account.
+        When a Clerk-authenticated account is deleted from the web or iOS app, the client also asks
+        Clerk to delete its Permitext sign-in identity.
       </p>
 
       <h2>Your choices</h2>

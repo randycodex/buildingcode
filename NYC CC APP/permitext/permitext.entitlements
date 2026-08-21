@@ -12,6 +12,7 @@
 		<string>webcredentials:permitext.com</string>
 		<string>applinks:permitext-sync.vercel.app</string>
 		<string>webcredentials:permitext-sync.vercel.app</string>
+		<string>webcredentials:clerk.permitext.com</string>
 	</array>
 </dict>
 </plist>

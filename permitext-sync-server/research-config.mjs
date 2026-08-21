@@ -1,3 +1,5 @@
+import { AsyncLocalStorage } from "node:async_hooks";
+
 export const supportedResearchPromptVersions = [
   "20260817-adaptive-answer-v10",
   "20260730-readable-grounded-answer-v9",
@@ -13,6 +15,7 @@ let evaluationSpendReservation = {
   reservedUSD: 0,
   requestCount: 0
 };
+const productionSpendContext = new AsyncLocalStorage();
 
 export function researchModelConfiguration(environment = process.env) {
   return {
@@ -36,6 +39,110 @@ function researchPricing(environment = process.env) {
     outputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS),
     pricingVersion: String(environment.PERMITEXT_RESEARCH_PRICING_VERSION || "").trim()
   };
+}
+
+export function researchSpendGuardrails(environment = process.env) {
+  const enabled = environment.PERMITEXT_RESEARCH_KILL_SWITCH !== "1";
+  const maximumRequestUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_MAX_REQUEST_USD);
+  const userDailyCapUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_USER_DAILY_CAP_USD);
+  const dailyCapUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_DAILY_CAP_USD);
+  const monthlyCapUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_MONTHLY_CAP_USD);
+  const hosted = environment.VERCEL === "1" || Boolean(environment.VERCEL_ENV);
+  const problems = [];
+  if (!enabled) problems.push("The Research kill switch is active.");
+  if (!maximumRequestUSD) problems.push("PERMITEXT_RESEARCH_MAX_REQUEST_USD must be a positive amount.");
+  if (!userDailyCapUSD) problems.push("PERMITEXT_RESEARCH_USER_DAILY_CAP_USD must be a positive amount.");
+  if (!dailyCapUSD) problems.push("PERMITEXT_RESEARCH_DAILY_CAP_USD must be a positive amount.");
+  if (!monthlyCapUSD) problems.push("PERMITEXT_RESEARCH_MONTHLY_CAP_USD must be a positive amount.");
+  if (maximumRequestUSD && userDailyCapUSD && maximumRequestUSD > userDailyCapUSD) {
+    problems.push("The per-request maximum cannot exceed the per-user daily cap.");
+  }
+  if (userDailyCapUSD && dailyCapUSD && userDailyCapUSD > dailyCapUSD) {
+    problems.push("The per-user daily cap cannot exceed the system daily cap.");
+  }
+  if (dailyCapUSD && monthlyCapUSD && dailyCapUSD > monthlyCapUSD) {
+    problems.push("The system daily cap cannot exceed the monthly cap.");
+  }
+  const pricing = researchPricing(environment);
+  if (
+    pricing.inputRate === null ||
+    pricing.cachedInputRate === null ||
+    pricing.outputRate === null ||
+    !pricing.pricingVersion
+  ) {
+    problems.push("Versioned input, cached-input, and output pricing must be configured for Research spend enforcement.");
+  }
+  return {
+    ready: enabled && problems.length === 0,
+    enabled,
+    hosted,
+    problems,
+    maximumRequestUSD,
+    userDailyCapUSD,
+    dailyCapUSD,
+    monthlyCapUSD,
+    pricingVersion: pricing.pricingVersion || null
+  };
+}
+
+function maximumProviderRequestCost(requestBody, environment = process.env) {
+  const pricing = researchPricing(environment);
+  const maxOutputTokens = nonnegativeNumber(requestBody?.max_output_tokens);
+  if (pricing.inputRate === null || pricing.outputRate === null || !pricing.pricingVersion || !maxOutputTokens) {
+    const error = new Error("Research model requests require versioned pricing and a positive max_output_tokens ceiling.");
+    error.code = "RESEARCH_SPEND_CAP";
+    throw error;
+  }
+  const maximumInputTokens = Buffer.byteLength(JSON.stringify(requestBody), "utf8");
+  return Math.ceil(
+    ((maximumInputTokens * pricing.inputRate + maxOutputTokens * pricing.outputRate) / 1_000_000) * 1_000_000
+  ) / 1_000_000;
+}
+
+export function beginResearchSpendReservation(reservation, environment = process.env) {
+  const guardrails = researchSpendGuardrails(environment);
+  if (!guardrails.ready) {
+    const error = new Error(`Research spend safeguards are not ready. ${guardrails.problems.join(" ")}`.trim());
+    error.code = "RESEARCH_SPEND_CAP";
+    throw error;
+  }
+  productionSpendContext.enterWith({
+    id: reservation.id,
+    maximumRequestUSD: guardrails.maximumRequestUSD,
+    reservedUSD: 0,
+    providerRequestCount: 0
+  });
+  return guardrails;
+}
+
+export function reserveResearchProviderSpend(requestBody, environment = process.env) {
+  const context = productionSpendContext.getStore();
+  const hosted = environment.VERCEL === "1" || Boolean(environment.VERCEL_ENV);
+  if (!context) {
+    if (!hosted) return { active: false, reservedUSD: 0, providerRequestCount: 0 };
+    const error = new Error("A production Research model request was attempted without an atomic spend reservation.");
+    error.code = "RESEARCH_SPEND_CAP";
+    throw error;
+  }
+  const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
+  const nextReservedUSD = Number((context.reservedUSD + maximumRequestUSD).toFixed(6));
+  if (nextReservedUSD > context.maximumRequestUSD) {
+    const error = new Error(
+      `This Research turn could exceed its $${context.maximumRequestUSD.toFixed(2)} maximum ` +
+      `($${context.reservedUSD.toFixed(6)} already reserved; $${maximumRequestUSD.toFixed(6)} next request).`
+    );
+    error.code = "RESEARCH_SPEND_CAP";
+    throw error;
+  }
+  context.reservedUSD = nextReservedUSD;
+  context.providerRequestCount += 1;
+  return { active: true, ...context };
+}
+
+export function endResearchSpendReservation() {
+  const context = productionSpendContext.getStore();
+  productionSpendContext.enterWith(null);
+  return context ? { ...context } : null;
 }
 
 export function validatePaidResearchEvaluationEnvironment(environment = process.env) {
