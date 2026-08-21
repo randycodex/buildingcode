@@ -1,8 +1,8 @@
 # Permitext UX/UI Alignment Plan
 
-**Updated:** 2026-08-20
+**Updated:** 2026-08-21
 
-**Status:** Active roadmap; typography and Phase 1 are implemented, and Phase 2 is implemented on `codex/ux-ui-accessibility-phase2`
+**Status:** All six alignment phases are implemented locally on `codex/ux-ui-alignment-phases4-6`; publication, deployment, and App Store release remain separate work.
 
 **Surfaces:** Permitext web workspace and native iPhone app
 
@@ -65,7 +65,7 @@ Use precise user-facing names:
 | AI-assisted enacted-code investigation | **Research** | The accessibility label remains Research even when the visible control is a sparkle icon. |
 | Sparkle icon in instructional copy | **sparkle icon** | Replace `Astroid`; do not rename the feature itself Sparkle. |
 
-The proposed iPhone **Saved** naming should be confirmed before implementation. If Project access is present, expose **Saved** and **Projects** as distinct sections rather than making one word represent both objects.
+The iPhone destination is **Saved**. When Project access is present, Saved and Projects remain distinct sections rather than making one word represent both objects.
 
 ## Design-system principles
 
@@ -229,6 +229,8 @@ Implementation should proceed one phase at a time. Each phase receives an isolat
 
 **Goal:** Make moving between platforms feel like continuing the same work rather than learning a second object model.
 
+**Implementation status (2026-08-21): Complete.** Saved and Project meaning is distinct, Research recovery preserves Reader evidence, modeled trust fields and governing citations are available on both platforms, active Project context is visible and correctable, and Report names the artifact while Export names the output action. Entitled iPhone fixture coverage reached the real Reader selection, Research answer, evidence roles, and trust headings; later refresh/Project/citation automation remains separately tracked where SwiftUI container identifiers masked descendant controls.
+
 #### Saved and Projects
 
 - Keep web **Projects** as the job-context destination.
@@ -272,6 +274,8 @@ Implementation should proceed one phase at a time. Each phase receives an isolat
 
 **Goal:** Ensure a Reader or bookmark action has the same meaning regardless of where it starts.
 
+**Implementation status (2026-08-21): Complete on `codex/ux-ui-alignment-phases4-6` at `0abb0f696`.** The iPhone Readers own independent transient navigation/loading state while sharing saved data through one account-sync owner. Web and iPhone now save immediately, offer optional Add to Project follow-up, and use explicit replacement choice when occupied web Readers would otherwise be overwritten. Focused web contracts, native unit tests, Release build, and rendered Reader/save checks passed.
+
 #### Independent iPhone Reader state
 
 - Remove destructive coupling between the two Reader destinations' loading, search, bookmark, and version state.
@@ -305,6 +309,8 @@ Implementation should proceed one phase at a time. Each phase receives an isolat
 
 **Goal:** Communicate Permitext's purpose before exposing organizational complexity.
 
+**Implementation status (2026-08-21): Complete on `codex/ux-ui-alignment-phases4-6` at `ff90a981a`.** A genuinely new web workspace and iPhone installation receive the approved single-screen value introduction; returning users and recognized external intents bypass it. Both surfaces include a static, clearly labeled cited Research example and contextual trust language. Web Reader selections survive account/entitlement interruption with bounded session storage, client single-flight, and idempotent server replay. Focused web/server contracts, native gate tests, Release build, and rendered first-use routes passed; the final iPhone automated citation tap remains an explicitly recorded UI-automation evidence gap.
+
 - Keep the iPhone's Reader-first entry and the web's workspace model, but give each a clear first useful action.
 - Introduce the core loop with minimal copy rather than a multi-screen tutorial.
 - Preserve the user's interrupted section, question, or save through account creation.
@@ -313,11 +319,13 @@ Implementation should proceed one phase at a time. Each phase receives an isolat
 
 **Acceptance:** A first-time user can identify what Permitext does, open enacted code, search, and understand how saving and Research relate without encountering internal governance vocabulary.
 
-Specific onboarding copy and account/Pro boundaries require a separate product-copy approval before implementation.
+Approved copy is **NYC code research you can verify.** with actions **Explore the Codes**, **See How Research Works**, and **Sign In**. Guest reading, Search, and local Saved work remain available before account creation; sync/private Research and paid capabilities retain their existing gates.
 
 ### Phase 6 — Prevent regression
 
 **Goal:** Turn the design system into an operating discipline.
+
+**Implementation status (2026-08-21): Complete locally on `codex/ux-ui-alignment-phases4-6`.** The shared UX command now runs all six phase contracts, light-theme secondary text meets the normal-text contrast floor, remaining Save/Report language is normalized, cache agreement has one test owner, and `npm run audit:ux-ui` reviews changed lines for high-confidence vocabulary/token/accessibility regressions. The operating contract lives in `docs/PERMITEXT_UX_UI_GOVERNANCE.md`.
 
 - Add automated checks for duplicate chapter options, target sizes where practical, semantic labels, focus contracts, and theme contrast.
 - Maintain a cross-platform terminology contract.

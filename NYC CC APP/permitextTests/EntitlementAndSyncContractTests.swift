@@ -1436,6 +1436,40 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testImmediateSaveRemainsUnassignedUntilProjectFollowUp() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-immediate-save-follow-up-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let codeVersion = UserContentSyncCodeVersion.localNYC2022
+        let projectID = try store.createFolder(
+            name: "Acceptance Project",
+            address: "",
+            description: "",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .project,
+            codeVersion: codeVersion
+        )
+        let sectionID: Int64 = 1_011
+
+        try store.toggleBookmark(sectionID: sectionID, codeVersion: codeVersion)
+
+        XCTAssertTrue(try store.isBookmarked(sectionID: sectionID, codeVersion: codeVersion))
+        XCTAssertEqual(try store.bookmarkCount(codeVersion: codeVersion), 1)
+        XCTAssertNil(try store.folderMembership(codeVersion: codeVersion)[sectionID])
+
+        try store.saveSection(sectionID, toFolderIDs: [projectID], codeVersion: codeVersion)
+
+        XCTAssertTrue(try store.isBookmarked(sectionID: sectionID, codeVersion: codeVersion))
+        XCTAssertEqual(try store.bookmarkCount(codeVersion: codeVersion), 1)
+        XCTAssertEqual(try store.folderMembership(codeVersion: codeVersion)[sectionID], [projectID])
+    }
+
     func testReplacingFolderMembershipPreservesBookmarkAndRejectsFinalUnlink() throws {
         let databaseURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-folder-replace-\(UUID().uuidString).sqlite")
@@ -2067,7 +2101,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(chapterSource.contains("struct ReaderCurrentSectionBookmarkButton"))
         XCTAssertTrue(chapterSource.contains("let desiredBookmarkState = !displayedIsBookmarked"))
         XCTAssertTrue(chapterSource.contains("if displayedIsBookmarked == desiredBookmarkState"))
-        XCTAssertTrue(chapterSource.contains("displayedIsBookmarked ? \"Saved\" : \"Removed\""))
+        XCTAssertTrue(chapterSource.contains("displayedIsBookmarked ? \"Saved\" : \"Removed from Saved\""))
         XCTAssertTrue(chapterSource.contains("Task.sleep(for: .milliseconds(1_200))"))
         XCTAssertTrue(chapterSource.contains(".overlay(alignment: .topTrailing)"))
         XCTAssertTrue(chapterSource.contains(".lineLimit(1)\n                    .fixedSize()"))

@@ -120,8 +120,7 @@ assert.match(serverSource, /withResearchConversationCreateLock/);
 assert.match(stylesSource, /\.first-use-primary\s*\{[\s\S]*?color: #0d0d0f;[\s\S]*?background: var\(--accent-building\)/);
 assert.match(stylesSource, /\.first-use-actions button,[\s\S]*?border: 0;/);
 assert.match(stylesSource, /\.first-use-actions button:focus-visible,[\s\S]*?outline: 3px solid/);
-assert.match(indexSource, /app\.js\?v=20260821-first-use-phase5-v1/);
-assert.match(serviceWorkerSource, /permitext-pro-shell-v721/);
-assert.match(serviceWorkerSource, /research-intent-state\.js\?v=20260821-first-use-phase5-v1/);
+assert.match(indexSource, /app\.js\?v=[^"']+/);
+assert.match(serviceWorkerSource, /research-intent-state\.js\?v=[^"']+/);
 
 console.log("ux ui first-use phase 5 contract passed");

@@ -706,7 +706,7 @@ struct ReaderCurrentSectionBookmarkButton: View {
             displayedIsBookmarked = desiredBookmarkState
             displayedIsBookmarked = library.toggleBookmark(sectionID: sectionID)
             if displayedIsBookmarked == desiredBookmarkState {
-                showBookmarkConfirmation(displayedIsBookmarked ? "Saved" : "Removed")
+                showBookmarkConfirmation(displayedIsBookmarked ? "Saved" : "Removed from Saved")
                 if displayedIsBookmarked {
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                     showsSavedFollowUp = true
@@ -729,13 +729,13 @@ struct ReaderCurrentSectionBookmarkButton: View {
         .buttonStyle(.plain)
         .disabled(sectionID == nil)
         .accessibilityIdentifier("reader-current-section-bookmark")
-        .accessibilityLabel(displayedIsBookmarked ? "Remove current section bookmark" : "Save current section")
+        .accessibilityLabel(displayedIsBookmarked ? "Remove from Saved" : "Save passage")
         .accessibilityValue(displayedIsBookmarked ? "Saved" : "Not saved")
         .onAppear { synchronizeState() }
         .onChange(of: sectionID) { _, _ in synchronizeState() }
         .onChange(of: library.bookmarkRevision) { _, _ in synchronizeState() }
         .alert(
-            "Section saved",
+            "Saved",
             isPresented: $showsSavedFollowUp
         ) {
             Button("Add to Project") {

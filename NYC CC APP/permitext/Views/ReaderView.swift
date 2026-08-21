@@ -128,7 +128,7 @@ struct ReaderView: View {
                 } label: {
                     Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                 }
-                .accessibilityLabel(isBookmarked ? "Remove bookmark" : "Save bookmark")
+                .accessibilityLabel(isBookmarked ? "Remove from Saved" : "Save passage")
             }
         }
         .fullScreenCover(

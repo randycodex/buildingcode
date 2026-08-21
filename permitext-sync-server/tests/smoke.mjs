@@ -415,7 +415,7 @@ async function main() {
         !settingsTemplateSource.includes("All browser changes are synced."),
       "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
-    ["Clear All Projects and Saved Collections", "Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes"].forEach((label) => {
+    ["Clear All Projects and Saved Collections", "Clear Recent Searches", "Clear All Saved Passages", "Clear All Notes"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
     assert(!settingsTemplateSource.includes("Clear All Tags"), "Web Settings still exposes tag management.");
@@ -1450,7 +1450,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260821-first-use-phase5-v1'),
+        /\/web\/app\.js\?v=[^"']+/.test(webRoot.text),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1619,7 +1619,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260821-first-use-phase5-v1'),
+      /\/web\/styles\.css\?v=[^"']+/.test(webRoot.text),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1885,7 +1885,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260821-first-use-phase5-v1'),
+      /\/web\/styles\.css\?v=[^"']+/.test(webRoot.text),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

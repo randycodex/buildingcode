@@ -743,7 +743,7 @@ struct SettingsView: View {
             CodeHairline()
 
             settingsDangerButton(
-                title: "Clear All Bookmarks",
+                title: "Clear All Saved Passages",
                 systemImage: "bookmark.slash",
                 action: .clearBookmarks
             )
@@ -870,7 +870,7 @@ struct SettingsView: View {
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(.primary)
 
-            Text("This will permanently delete \(deletionDescription) from every synced device. Saved items will keep their bookmarks. This cannot be undone.")
+            Text("This will permanently delete \(deletionDescription) from every synced device. Saved passages will remain in Saved. This cannot be undone.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1229,7 +1229,7 @@ private enum ClearSettingsAction: Identifiable, Equatable {
         case .clearSearches:
             return "Clear Recent Searches"
         case .clearBookmarks:
-            return "Clear All Bookmarks"
+            return "Clear All Saved Passages"
         case .clearNotes:
             return "Clear All Notes"
         }
@@ -1240,7 +1240,7 @@ private enum ClearSettingsAction: Identifiable, Equatable {
         case .clearSearches:
             return "Clear recent searches?"
         case .clearBookmarks:
-            return "Clear all bookmarks?"
+            return "Clear all Saved passages?"
         case .clearNotes:
             return "Clear all notes?"
         }
@@ -1251,7 +1251,7 @@ private enum ClearSettingsAction: Identifiable, Equatable {
         case .clearSearches:
             return "This removes the recent-search list for this device."
         case .clearBookmarks:
-            return "This removes every bookmark and saved Project evidence item across all code versions. Projects and notes are not affected."
+            return "This removes every passage in Saved and every saved Project evidence item across all code versions. Projects and notes are not affected."
         case .clearNotes:
             return "This removes every note saved for the current code version."
         }

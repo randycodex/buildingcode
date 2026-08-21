@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260821-first-use-phase5-v1";
+} from "./offline-storage.js?v=20260821-ux-governance-phase6-v1";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -84,7 +84,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260821-first-use-phase5-v1";
+} from "./research-intent-state.js?v=20260821-ux-governance-phase6-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -14339,8 +14339,8 @@ async function renderSectionDetail(searchID, detail) {
     svg: circleXIconSVG()
   });
   const saveButton = appendDetailIconButton(chrome, {
-    title: saved ? "Remove bookmark" : "Save bookmark",
-    label: saved ? "Remove bookmark" : "Save bookmark",
+    title: saved ? "Remove from Saved" : "Save passage",
+    label: saved ? "Remove from Saved" : "Save passage",
     className: `section-detail-icon section-detail-save${saved ? " is-saved" : ""}`,
     svg: bookmarkIconSVG(saved)
   });
@@ -23886,8 +23886,8 @@ function appendProjectReportExports(content, identity, foundation) {
   heading.className = "project-studio-section-heading";
   const title = document.createElement("p");
   title.className = "section-label";
-  title.textContent = "Report exports";
-  heading.append(title, projectSectionCount(reports.length, "Report exports"));
+  title.textContent = "Reports";
+  heading.append(title, projectSectionCount(reports.length, "Reports"));
   section.append(heading);
   reports.slice(0, 8).forEach((artifact) => {
     const row = document.createElement("article");
@@ -29347,7 +29347,7 @@ function renderSettings() {
 
   const clearActionCopy = {
     searches: ["Clear recent searches", "This will remove recent search history and Recently Viewed sections from this browser. Pinned searches will remain. Are you sure?"],
-    bookmarks: ["Clear all bookmarks", "This will remove every bookmark saved for the current code version. Are you sure?"],
+    bookmarks: ["Clear all Saved passages", "This will remove every passage in Saved for the current code version. Are you sure?"],
     notes: ["Clear all notes", "This will remove every note saved for the current code version. Are you sure?"]
   };
   panel.querySelectorAll("[data-clear-action]").forEach((button) => {
