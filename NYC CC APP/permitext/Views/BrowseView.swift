@@ -301,17 +301,15 @@ struct BrowseView: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(selectedVersionName)
-                    .font(.system(size: 18, weight: .medium, design: .default))
+                Label(
+                    "Source jurisdiction · \(selectedJurisdictionName) · Edition · \(selectedVersionName)",
+                    systemImage: "text.book.closed"
+                )
+                    .font(.system(size: 15, weight: .medium, design: .default))
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
-
-                Text(selectedJurisdictionName)
-                    .font(.system(size: 15, weight: .regular, design: .default))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
+                    .accessibilityIdentifier("reader-source-edition")
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

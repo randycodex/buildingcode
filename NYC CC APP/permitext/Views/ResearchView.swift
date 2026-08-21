@@ -308,6 +308,11 @@ struct ResearchView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+            Text("AI-assisted—not an official interpretation.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .accessibilityIdentifier("research-access-trust-boundary")
             Button(buttonTitle) {
                 recoverySettingsSection = section
                 showingSettings = true
@@ -515,6 +520,10 @@ struct ResearchView: View {
 
     private var researchComposer: some View {
         VStack(alignment: .leading, spacing: 8) {
+            Text("AI-assisted—not an official interpretation.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .accessibilityIdentifier("research-composer-trust-boundary")
             if let composerBlockMessage {
                 Text(composerBlockMessage)
                     .font(.caption)

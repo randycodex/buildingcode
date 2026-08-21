@@ -323,6 +323,83 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(webView.contains("user-scalable=no"))
     }
 
+    func testPhase5FirstUseGateOffersOnlyGenuinelyNewInstallations() {
+        let freshDefaults = isolatedEntitlementDefaults()
+        XCTAssertTrue(
+            PermitextFirstUseGate.evaluateBeforeLibraryStartup(
+                defaults: freshDefaults,
+                arguments: ["permitext-tests"]
+            )
+        )
+        XCTAssertEqual(
+            freshDefaults.integer(forKey: PermitextFirstUseGate.completionVersionKey),
+            0
+        )
+
+        let returningDefaults = isolatedEntitlementDefaults()
+        returningDefaults.set(Data([0x01]), forKey: "continuityContext")
+        XCTAssertFalse(
+            PermitextFirstUseGate.evaluateBeforeLibraryStartup(
+                defaults: returningDefaults,
+                arguments: ["permitext-tests"]
+            )
+        )
+        XCTAssertEqual(
+            returningDefaults.integer(forKey: PermitextFirstUseGate.completionVersionKey),
+            PermitextFirstUseGate.currentVersion
+        )
+
+        let completedDefaults = isolatedEntitlementDefaults()
+        PermitextFirstUseGate.complete(defaults: completedDefaults)
+        XCTAssertFalse(
+            PermitextFirstUseGate.evaluateBeforeLibraryStartup(
+                defaults: completedDefaults,
+                arguments: ["permitext-tests"]
+            )
+        )
+    }
+
+    func testPhase5FirstUsePresentationBypassesInterruptedIntent() {
+        let eligible: (AppTab, Int64?, String?, Int) -> Bool = { tab, sectionID, invitation, selectionCount in
+            PermitextFirstUseGate.canPresent(
+                wasOffered: true,
+                completedVersion: 0,
+                selectedTab: tab,
+                pendingDeepLinkedSectionID: sectionID,
+                pendingInvitationToken: invitation,
+                pendingResearchSelectionCount: selectionCount
+            )
+        }
+
+        XCTAssertTrue(eligible(.browse, nil, nil, 0))
+        XCTAssertFalse(eligible(.search, 101, nil, 0))
+        XCTAssertFalse(eligible(.research, nil, "invite-token", 0))
+        XCTAssertFalse(eligible(.research, nil, nil, 1))
+
+        // The route can consume its pending section before the sheet finishes
+        // dismissing. Completion depends on the captured dismissal cause, not
+        // on re-reading transient route state at onDismiss time.
+        XCTAssertFalse(
+            PermitextFirstUseGate.shouldPersistCompletionAfterDismissal(
+                dismissedForExternalIntent: true
+            )
+        )
+    }
+
+    func testPhase5FirstUseFixtureOverridesPersistedCompletion() {
+        XCTAssertTrue(
+            PermitextFirstUseGate.canPresent(
+                wasOffered: true,
+                isDebugPresentationForced: true,
+                completedVersion: PermitextFirstUseGate.currentVersion,
+                selectedTab: .browse,
+                pendingDeepLinkedSectionID: nil,
+                pendingInvitationToken: nil,
+                pendingResearchSelectionCount: 0
+            )
+        )
+    }
+
     private func isolatedEntitlementDefaults() -> UserDefaults {
         let suiteName = "permitext-tests-\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

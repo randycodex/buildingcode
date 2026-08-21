@@ -101,7 +101,7 @@ assert.match(webClient, /: "Governing"/);
 assert.equal((webClient.match(/projectOwnership\.textContent = `Project: \$\{identity\.name\}`/g) || []).length, 2);
 assert.match(webStyles, /\.project-ownership-label/);
 assert.doesNotMatch(webClient, /Project Report Manifest as PDF/);
-assert.match(webIndex, /ux-reader-save-phase4-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v720/);
+assert.match(webIndex, /first-use-phase5-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v721/);
 
 console.log("UX/UI meaning Phase 3 contract passed.");

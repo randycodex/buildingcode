@@ -610,6 +610,7 @@ function canonicalJSONString(value) {
 }
 
 const researchUsageLocks = new Map();
+const researchConversationCreateLocks = new Map();
 const organizationMutationLocks = new Map();
 const researchUsageReservationTTLMilliseconds = 15 * 60 * 1000;
 
@@ -635,6 +636,25 @@ async function withResearchUsageLock(userID, operation) {
     release();
     if (researchUsageLocks.get(userID) === tail) {
       researchUsageLocks.delete(userID);
+    }
+  }
+}
+
+async function withResearchConversationCreateLock(key, operation) {
+  const previous = researchConversationCreateLocks.get(key) || Promise.resolve();
+  let release;
+  const gate = new Promise((resolve) => {
+    release = resolve;
+  });
+  const tail = previous.then(() => gate);
+  researchConversationCreateLocks.set(key, tail);
+  await previous;
+  try {
+    return await operation();
+  } finally {
+    release();
+    if (researchConversationCreateLocks.get(key) === tail) {
+      researchConversationCreateLocks.delete(key);
     }
   }
 }
@@ -8589,8 +8609,13 @@ export function researchAnswerRecordForClient(answer) {
 }
 
 async function researchConversationForClient(conversation, options = {}) {
+  const {
+    creationRequestID: _creationRequestID,
+    creationRequestFingerprint: _creationRequestFingerprint,
+    ...clientStoredConversation
+  } = conversation;
   let clientConversation = {
-    ...conversation,
+    ...clientStoredConversation,
     title: researchConversationDisplayTitle(conversation),
     messages: (conversation.messages || []).map(researchMessageForClient)
   };
@@ -14237,84 +14262,176 @@ async function handleResearchConversationReuseEvidence(request, response) {
   });
 }
 
+function normalizedResearchConversationCreateRequestID(value) {
+  const requestID = String(value || "").trim();
+  if (!requestID) return "";
+  if (requestID.length > 100 || !/^[a-zA-Z0-9._:@/-]+$/.test(requestID)) {
+    const error = new Error("Research creation request ID is invalid.");
+    error.code = "INVALID_RESEARCH_CREATE_REQUEST_ID";
+    throw error;
+  }
+  return requestID;
+}
+
+function researchConversationCreateFingerprint({ projectID, selections, originSurface }) {
+  const payload = {
+    projectID: String(projectID || "").trim() || null,
+    originSurface: normalizedResearchText(originSurface, 40),
+    selections: selections.map((selection) => ({
+      sectionID: String(selection.sectionID || "").trim(),
+      selectedText: readableResearchSelectionText(
+        selection.selectedText,
+        maximumResearchSelectionCharacters
+      ),
+      richSourceIDs: requestedRichSourceIDs(selection.richSourceIDs).slice().sort(),
+      visualSourceIDs: requestedVisualSourceIDs(
+        selection.visualSourceIDs,
+        selection.visualReviewConfirmed
+      ).slice().sort(),
+      visualReviewConfirmed: selection.visualReviewConfirmed === true,
+      savedItemID: String(selection.savedItemID || "").trim()
+    }))
+  };
+  return createHash("sha256").update(canonicalJSONString(payload)).digest("hex");
+}
+
+function deterministicResearchConversationID(userID, requestID) {
+  const hex = createHash("sha256")
+    .update(`${String(userID || "")}\u0000${String(requestID || "")}`)
+    .digest("hex");
+  return [
+    hex.slice(0, 8),
+    hex.slice(8, 12),
+    `5${hex.slice(13, 16)}`,
+    `8${hex.slice(17, 20)}`,
+    hex.slice(20, 32)
+  ].join("-");
+}
+
 async function handleResearchConversationCreate(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   try {
-    if ((await listStoredResearchConversations(context.userID)).length >= 200) {
-      sendError(response, 409, "Delete an older research conversation before starting another.");
-      return;
-    }
+    const requestID = normalizedResearchConversationCreateRequestID(context.body.requestID);
     const projectID = String(context.body.projectID || "").trim() || null;
-    const project = projectID ? await requireResearchProject(context, response, projectID) : null;
-    if (projectID && !project) return;
     const hasSelectionPayload = context.body.selections !== undefined ||
       String(context.body.sectionID || "").trim() ||
       String(context.body.selectedText || "").trim();
     const selections = hasSelectionPayload ? requestedResearchSelections(context.body) : [];
-    await validateResearchSavedSelections(context.userID, selections);
-    const resolved = selections.length
-      ? await researchSourcesForSelections(selections)
-      : { sources: [], addedSelections: [] };
-    if (resolved.addedSelections.length > 24) {
-      sendError(response, 409, "This conversation would exceed the maximum of 24 selected passages.");
-      return;
-    }
-    assertResearchConversationVisualLimits(resolved.sources);
-    const sources = resolved.sources;
-    const now = new Date().toISOString();
-    const projectInformation = projectID ? researchProjectInformation(projectID, project) : null;
-    const conversation = {
-      id: randomUUID(),
-      title: defaultResearchConversationTitle(now),
-      titleSource: "default",
-      createdAt: now,
-      updatedAt: now,
-      codeVersion: defaultSyncCodeVersion,
-      codeBasis: researchCodeBasis(projectID, projectInformation, now),
-      evidenceSetVersion: 1,
-      primaryProjectID: projectID,
-      projectContext: projectID ? {
-        projectID,
-        facts: [],
-        source: "user-provided",
-        updatedAt: now
-      } : null,
-      projectContextReviewRequired: false,
-      origin: selections.length
-        ? researchOriginForSelections(selections, context.body.originSurface)
-        : { kind: "chat" },
-      sourceStatus: "current",
-      sources,
-      messages: []
-    };
-    refreshGeneratedResearchConversationTitle(conversation);
-    await saveStoredResearchConversation(context.userID, conversation);
-    if (projectID) {
-      await setResearchConversationProjectLink(
-        context.userID,
-        conversation.id,
-        projectID,
-        now
+    const requestFingerprint = requestID
+      ? researchConversationCreateFingerprint({
+          projectID,
+          selections,
+          originSurface: context.body.originSurface
+        })
+      : "";
+    const lockKey = requestID ? `${context.userID}:${requestID}` : randomUUID();
+    await withResearchConversationCreateLock(lockKey, async () => {
+      const storedConversations = await listStoredResearchConversations(context.userID);
+      if (requestID) {
+        const deterministicID = deterministicResearchConversationID(context.userID, requestID);
+        const existing = storedConversations.find((conversation) =>
+          conversation.id === deterministicID || conversation.creationRequestID === requestID
+        );
+        if (existing) {
+          if (
+            existing.creationRequestID !== requestID ||
+            existing.creationRequestFingerprint !== requestFingerprint
+          ) {
+            sendJSON(response, 409, {
+              error: "This Research creation request ID was already used for different content.",
+              code: "RESEARCH_CREATE_REQUEST_CONFLICT"
+            });
+            return;
+          }
+          sendJSON(response, 200, {
+            conversation: await researchConversationForClient(existing, { userID: context.userID }),
+            replayed: true
+          });
+          return;
+        }
+      }
+      if (storedConversations.length >= 200) {
+        sendError(response, 409, "Delete an older research conversation before starting another.");
+        return;
+      }
+      const project = projectID ? await requireResearchProject(context, response, projectID) : null;
+      if (projectID && !project) return;
+      await validateResearchSavedSelections(context.userID, selections);
+      const resolved = selections.length
+        ? await researchSourcesForSelections(selections)
+        : { sources: [], addedSelections: [] };
+      if (resolved.addedSelections.length > 24) {
+        sendError(response, 409, "This conversation would exceed the maximum of 24 selected passages.");
+        return;
+      }
+      assertResearchConversationVisualLimits(resolved.sources);
+      const sources = resolved.sources;
+      const now = new Date().toISOString();
+      const projectInformation = projectID ? researchProjectInformation(projectID, project) : null;
+      const conversation = {
+        id: requestID
+          ? deterministicResearchConversationID(context.userID, requestID)
+          : randomUUID(),
+        title: defaultResearchConversationTitle(now),
+        titleSource: "default",
+        createdAt: now,
+        updatedAt: now,
+        codeVersion: defaultSyncCodeVersion,
+        codeBasis: researchCodeBasis(projectID, projectInformation, now),
+        evidenceSetVersion: 1,
+        primaryProjectID: projectID,
+        projectContext: projectID ? {
+          projectID,
+          facts: [],
+          source: "user-provided",
+          updatedAt: now
+        } : null,
+        projectContextReviewRequired: false,
+        origin: selections.length
+          ? researchOriginForSelections(selections, context.body.originSurface)
+          : { kind: "chat" },
+        sourceStatus: "current",
+        sources,
+        messages: [],
+        ...(requestID ? {
+          creationRequestID: requestID,
+          creationRequestFingerprint: requestFingerprint
+        } : {})
+      };
+      refreshGeneratedResearchConversationTitle(conversation);
+      await saveStoredResearchConversation(context.userID, conversation);
+      if (projectID) {
+        await setResearchConversationProjectLink(
+          context.userID,
+          conversation.id,
+          projectID,
+          now
+        );
+        await recordResearchProjectLinkActivity(
+          context.userID,
+          projectID,
+          conversation.id,
+          "item.linked",
+          now
+        );
+      }
+      const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+        projectID
+          ? [{ projectID, domains: ["activity", "foundation", "research"] }]
+          : []
       );
-      await recordResearchProjectLinkActivity(
-        context.userID,
-        projectID,
-        conversation.id,
-        "item.linked",
-        now
-      );
-    }
-    const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
-      projectID
-        ? [{ projectID, domains: ["activity", "foundation", "research"] }]
-        : []
-    );
-    sendJSON(response, 201, {
-      conversation: await researchConversationForClient(conversation, { userID: context.userID }),
-      artifactRevisions
+      sendJSON(response, 201, {
+        conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+        replayed: false,
+        artifactRevisions
+      });
     });
   } catch (error) {
+    if (error.code === "INVALID_RESEARCH_CREATE_REQUEST_ID") {
+      sendJSON(response, 400, { error: error.message, code: error.code });
+      return;
+    }
     if ([
       "INVALID_RESEARCH_SELECTION",
       "INVALID_RESEARCH_SECTION",

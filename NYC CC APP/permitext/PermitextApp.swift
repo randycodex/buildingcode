@@ -6,12 +6,14 @@ import os.signpost
 struct PermitextApp: App {
     @StateObject private var library: CodeLibraryViewModel
     @Environment(\.scenePhase) private var scenePhase
+    private let offersFirstUseExperience: Bool
 
 #if DEBUG
     private let physicalStressConfiguration: NativeReaderPhysicalStressConfiguration?
     private let phase3ResearchConfiguration: Phase3EntitledResearchConfiguration?
 
     init() {
+        offersFirstUseExperience = PermitextFirstUseGate.evaluateBeforeLibraryStartup()
         if let preparedResearchHarness = Phase3EntitledResearchConfiguration.prepareIfRequested() {
             phase3ResearchConfiguration = preparedResearchHarness.configuration
             physicalStressConfiguration = nil
@@ -32,6 +34,7 @@ struct PermitextApp: App {
     }
 #else
     init() {
+        offersFirstUseExperience = PermitextFirstUseGate.evaluateBeforeLibraryStartup()
         _library = StateObject(wrappedValue: CodeLibraryViewModel())
         Self.configureTabBarAppearance()
     }
@@ -79,7 +82,7 @@ struct PermitextApp: App {
                 } else if let snapshotConfiguration = NativeReaderPhase9SnapshotConfiguration.active {
                     NativeReaderPhase9SnapshotHarness(configuration: snapshotConfiguration)
                 } else if library.isInitialContentLoaded {
-                    PermitextRootNavigation()
+                    PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
                 } else {
                     AppLaunchLoadingView(
                         progress: library.initialLoadProgress,
@@ -88,7 +91,7 @@ struct PermitextApp: App {
                 }
 #else
                 if library.isInitialContentLoaded {
-                    PermitextRootNavigation()
+                    PermitextRootNavigation(offersFirstUseExperience: offersFirstUseExperience)
                 } else {
                     AppLaunchLoadingView(
                         progress: library.initialLoadProgress,
@@ -676,14 +679,94 @@ private struct NativeReaderPhysicalStressHarness: View {
 }
 #endif
 
+enum PermitextFirstUseGate {
+    static let currentVersion = 1
+    static let completionVersionKey = "permitext.firstUseExperience.completedVersion"
+    static let debugLaunchArgument = "--phase5-first-use-fixture"
+
+    static func isDebugPresentationForced(
+        arguments: [String] = ProcessInfo.processInfo.arguments
+    ) -> Bool {
+#if DEBUG
+        arguments.contains(debugLaunchArgument)
+#else
+        false
+#endif
+    }
+
+    /// This runs before `CodeLibraryViewModel` writes a default continuity
+    /// payload, which lets an upgraded installation bypass first-use UI while
+    /// a genuinely new installation receives it.
+    static func evaluateBeforeLibraryStartup(
+        defaults: UserDefaults = .standard,
+        arguments: [String] = ProcessInfo.processInfo.arguments
+    ) -> Bool {
+#if DEBUG
+        if isDebugPresentationForced(arguments: arguments) {
+            return true
+        }
+#endif
+        guard defaults.integer(forKey: completionVersionKey) < currentVersion else {
+            return false
+        }
+        if legacyUsageKeys.contains(where: { defaults.object(forKey: $0) != nil }) {
+            complete(defaults: defaults)
+            return false
+        }
+        return true
+    }
+
+    static func canPresent(
+        wasOffered: Bool,
+        isDebugPresentationForced: Bool = false,
+        completedVersion: Int,
+        selectedTab: AppTab,
+        pendingDeepLinkedSectionID: Int64?,
+        pendingInvitationToken: String?,
+        pendingResearchSelectionCount: Int
+    ) -> Bool {
+        wasOffered &&
+            (isDebugPresentationForced || completedVersion < currentVersion) &&
+            selectedTab == .browse &&
+            pendingDeepLinkedSectionID == nil &&
+            pendingInvitationToken == nil &&
+            pendingResearchSelectionCount == 0
+    }
+
+    static func complete(defaults: UserDefaults = .standard) {
+        defaults.set(currentVersion, forKey: completionVersionKey)
+    }
+
+    static func shouldPersistCompletionAfterDismissal(
+        dismissedForExternalIntent: Bool
+    ) -> Bool {
+        !dismissedForExternalIntent
+    }
+
+    private static let legacyUsageKeys = [
+        "continuityContext",
+        "selectedCodeVersionFileName",
+        "selectedJurisdictionKey",
+        "selectedCodeSectionID",
+        "lastOpenedChapterID",
+        "recentSearches",
+        "recentlyViewedSections",
+        "readerTheme",
+        "permitext.account.signedIn",
+        "browseLeftCodeSectionID",
+        "browseRightCodeSectionID"
+    ]
+}
+
 private struct PermitextRootNavigation: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @EnvironmentObject private var library: CodeLibraryViewModel
+    let offersFirstUseExperience: Bool
 
     var body: some View {
         switch layoutMode {
         case .compactTabs, .regularPreparedTabs:
-            PermitextTabNavigation()
+            PermitextTabNavigation(offersFirstUseExperience: offersFirstUseExperience)
         }
     }
 
@@ -699,6 +782,13 @@ private enum PermitextRootLayoutMode {
 
 private struct PermitextTabNavigation: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @AppStorage(PermitextFirstUseGate.completionVersionKey)
+    private var completedFirstUseVersion = 0
+    @State private var presentsFirstUseExperience = false
+    @State private var presentsAccountSettings = false
+    @State private var pendingFirstUseDestination: FirstUseDestination?
+    @State private var dismissedForExternalIntent = false
+    let offersFirstUseExperience: Bool
 
     var body: some View {
         TabView(selection: $library.selectedTab) {
@@ -738,10 +828,317 @@ private struct PermitextTabNavigation: View {
                 .accessibilityLabel("Research")
                 .tag(AppTab.research)
         }
+        .task {
+            await presentFirstUseExperienceIfEligible()
+        }
+        .onChange(of: library.pendingDeepLinkedSectionID) { _, sectionID in
+            if sectionID != nil { bypassFirstUseForExternalIntent() }
+        }
+        .onChange(of: library.pendingOrganizationInvitationToken) { _, token in
+            if token != nil { bypassFirstUseForExternalIntent() }
+        }
+        .onChange(of: library.pendingResearchSelections) { _, selections in
+            if !selections.isEmpty { bypassFirstUseForExternalIntent() }
+        }
+        .sheet(isPresented: $presentsFirstUseExperience, onDismiss: finishFirstUseDismissal) {
+            PermitextFirstUseSheet { destination in
+                completeFirstUse(destination: destination)
+            }
+            .environmentObject(library)
+        }
+        .sheet(isPresented: $presentsAccountSettings) {
+            SettingsView(initialSection: .account)
+                .environmentObject(library)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .permitextSavedWorkDidChange)) { notification in
             guard (notification.object as? CodeLibraryViewModel) !== library else { return }
             library.reconcileExternalSavedWorkChange(scheduleAccountSync: true)
         }
+    }
+
+    @MainActor
+    private func presentFirstUseExperienceIfEligible() async {
+        await Task.yield()
+        guard PermitextFirstUseGate.canPresent(
+            wasOffered: offersFirstUseExperience,
+            isDebugPresentationForced: PermitextFirstUseGate.isDebugPresentationForced(),
+            completedVersion: completedFirstUseVersion,
+            selectedTab: library.selectedTab,
+            pendingDeepLinkedSectionID: library.pendingDeepLinkedSectionID,
+            pendingInvitationToken: library.pendingOrganizationInvitationToken,
+            pendingResearchSelectionCount: library.pendingResearchSelections.count
+        ) else { return }
+        presentsFirstUseExperience = true
+    }
+
+    private func completeFirstUse(destination: FirstUseDestination) {
+        dismissedForExternalIntent = false
+        completedFirstUseVersion = PermitextFirstUseGate.currentVersion
+        pendingFirstUseDestination = destination
+        presentsFirstUseExperience = false
+    }
+
+    private func finishFirstUseDismissal() {
+        if !PermitextFirstUseGate.shouldPersistCompletionAfterDismissal(
+            dismissedForExternalIntent: dismissedForExternalIntent
+        ) {
+            dismissedForExternalIntent = false
+            pendingFirstUseDestination = nil
+            return
+        } else {
+            completedFirstUseVersion = PermitextFirstUseGate.currentVersion
+        }
+        guard let destination = pendingFirstUseDestination else { return }
+        pendingFirstUseDestination = nil
+        Task { @MainActor in
+            await Task.yield()
+            switch destination {
+            case .reader:
+                library.selectedTab = .browse
+            case .account:
+                presentsAccountSettings = true
+            case .citation(let sectionID, let codeVersion):
+                library.openResearchCitation(sectionID: sectionID, codeVersion: codeVersion)
+            }
+        }
+    }
+
+    private func bypassFirstUseForExternalIntent() {
+        guard presentsFirstUseExperience else { return }
+        dismissedForExternalIntent = true
+        pendingFirstUseDestination = nil
+        presentsFirstUseExperience = false
+    }
+}
+
+private enum FirstUseDestination {
+    case reader
+    case account
+    case citation(sectionID: Int64, codeVersion: String?)
+}
+
+private struct PermitextFirstUseSheet: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var showsResearchExample = false
+    let onContinue: (FirstUseDestination) -> Void
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Image(systemName: "text.book.closed.fill")
+                        .font(.system(size: 34, weight: .semibold))
+                        .foregroundStyle(Color.appChrome)
+                        .accessibilityHidden(true)
+
+                    Text("NYC code research you can verify.")
+                        .font(.system(.largeTitle, design: .default, weight: .bold))
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text("Read enacted code, save the sections that matter, and ask cited Research questions.")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if showsResearchExample {
+                    researchExample
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                } else {
+                    VStack(alignment: .leading, spacing: 12) {
+                        firstUseBenefit(
+                            title: "Start with the source",
+                            detail: "Choose a code and open any chapter without an account.",
+                            symbol: "text.book.closed"
+                        )
+                        firstUseBenefit(
+                            title: "Keep useful sections",
+                            detail: "Saved work stays on this iPhone until you choose to sign in and sync.",
+                            symbol: "bookmark"
+                        )
+                    }
+                }
+
+                VStack(spacing: 10) {
+                    Button {
+                        onContinue(.reader)
+                    } label: {
+                        Text("Explore the Codes")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                            .foregroundStyle(.white)
+                            .background(Color.appChrome, in: RoundedRectangle(cornerRadius: 14))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("phase5-first-use-explore")
+
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showsResearchExample = true
+                        }
+                    } label: {
+                        Text("See How Research Works")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                            .foregroundStyle(.primary)
+                            .background(Color.secondary.opacity(0.13), in: RoundedRectangle(cornerRadius: 14))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("phase5-first-use-research-example")
+
+                    Button("Sign In") {
+                        onContinue(.account)
+                    }
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .accessibilityIdentifier("phase5-first-use-sign-in")
+                }
+            }
+            .padding(.horizontal, 22)
+            .padding(.top, dynamicTypeSize.isAccessibilitySize ? 22 : 30)
+            .padding(.bottom, 28)
+        }
+        .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+        .accessibilityIdentifier("phase5-first-use-sheet")
+    }
+
+    @ViewBuilder
+    private var researchExample: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Label("Static cited example", systemImage: "sparkles")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.appChrome)
+                Spacer()
+                Text("Offline")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+
+            Text("AI-assisted—not an official interpretation.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .accessibilityIdentifier("phase5-first-use-research-trust")
+
+            Text("Question")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.secondary)
+            Text(exampleQuestion)
+                .font(.subheadline.weight(.semibold))
+
+            if let example = installedResearchExample {
+                Text("Example answer")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.secondary)
+                Text(example.answerExcerpt)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 5 : 4)
+
+                Button {
+                    onContinue(
+                        .citation(
+                            sectionID: example.section.id,
+                            codeVersion: example.codeVersion
+                        )
+                    )
+                } label: {
+                    Label(example.citationLabel, systemImage: "arrow.up.right.square")
+                        .font(.caption.weight(.semibold))
+                        .frame(minHeight: 44)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.appChrome)
+                .accessibilityLabel("Open \(example.citationLabel) in Reader")
+                .accessibilityIdentifier("phase5-first-use-example-citation")
+            } else {
+                Text("The installed source is still preparing. Explore the codes to continue.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+        }
+        .padding(16)
+        .background(Color.secondary.opacity(0.09), in: RoundedRectangle(cornerRadius: 18))
+        .accessibilityIdentifier("phase5-first-use-static-example")
+    }
+
+    private var exampleQuestion: String {
+        guard let installedResearchExample else {
+            return "What does this enacted section establish?"
+        }
+        return "What does \(installedResearchExample.citationLabel) establish?"
+    }
+
+    private var installedResearchExample: FirstUseResearchExample? {
+        let codeSection = library.codeSections.first(where: {
+            $0.name.localizedCaseInsensitiveContains("building")
+        }) ?? library.codeSections.first
+        guard let codeSection,
+              let chapter = library.chapters(for: codeSection.id).first(where: {
+                  $0.chapterNumber == "1"
+              }) ?? library.chapters(for: codeSection.id).first,
+              let section = library.sections(for: chapter).first(where: {
+                  $0.sectionNumber == "101.1"
+              }) ?? library.sections(for: chapter).first,
+              let detail = library.loadSectionDetail(sectionID: section.id)
+        else { return nil }
+
+        return FirstUseResearchExample(
+            section: section,
+            officialText: detail.officialText,
+            codePrefix: codePrefix(for: codeSection.name),
+            codeVersion: library.selectedVersion?.codeVersion
+        )
+    }
+
+    private func codePrefix(for codeSectionName: String) -> String {
+        let normalized = codeSectionName.lowercased()
+        if normalized.contains("building") { return "BC" }
+        if normalized.contains("fuel gas") { return "FGC" }
+        if normalized.contains("mechanical") { return "MC" }
+        if normalized.contains("plumbing") { return "PC" }
+        return "Code"
+    }
+
+    private func firstUseBenefit(title: String, detail: String, symbol: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(Color.appChrome)
+                .frame(width: 26, height: 26)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Text(detail)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct FirstUseResearchExample {
+    let section: CodeSectionSummary
+    let officialText: String
+    let codePrefix: String
+    let codeVersion: String?
+
+    var citationLabel: String {
+        "\(codePrefix) § \(section.sectionNumber) · \(section.displayTitle)"
+    }
+
+    var answerExcerpt: String {
+        let normalized = officialText
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard normalized.count > 220 else { return normalized }
+        let end = normalized.index(normalized.startIndex, offsetBy: 220)
+        return String(normalized[..<end]).trimmingCharacters(in: .whitespacesAndNewlines) + "…"
     }
 }
 

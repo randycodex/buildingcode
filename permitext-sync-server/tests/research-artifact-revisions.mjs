@@ -148,13 +148,48 @@ async function main() {
 
     const unassigned = await request("/research/conversations/create", {
       token: account.token,
-      body: authenticated(account)
+      body: authenticated(account, { requestID: "phase5-resume-create-1" })
     });
     assert.equal(unassigned.response.status, 201);
+    assert.equal(unassigned.json.replayed, false);
+    assert.equal("creationRequestID" in unassigned.json.conversation, false);
+    assert.equal("creationRequestFingerprint" in unassigned.json.conversation, false);
     assert.deepEqual(simplifiedRevisions(unassigned.json.artifactRevisions), {
       account: { revision: 1, changedDomains: ["research"] },
       projects: []
     });
+
+    const replayedUnassigned = await request("/research/conversations/create", {
+      token: account.token,
+      body: authenticated(account, { requestID: "phase5-resume-create-1" })
+    });
+    assert.equal(replayedUnassigned.response.status, 200);
+    assert.equal(replayedUnassigned.json.replayed, true);
+    assert.equal(replayedUnassigned.json.conversation.id, unassigned.json.conversation.id);
+    const afterReplayList = await request("/research/conversations/list", {
+      token: account.token,
+      body: authenticated(account)
+    });
+    assert.equal(afterReplayList.response.status, 200);
+    assert.equal(
+      afterReplayList.json.conversations.filter((conversation) =>
+        conversation.id === unassigned.json.conversation.id
+      ).length,
+      1,
+      "Replaying a Research create request must leave exactly one conversation."
+    );
+    assert.equal((await checkpoint(account)).account.revision, 1, "A replay must not bump Research revisions.");
+
+    const conflictingReplay = await request("/research/conversations/create", {
+      token: account.token,
+      body: authenticated(account, {
+        requestID: "phase5-resume-create-1",
+        projectID: projectIDs[0]
+      })
+    });
+    assert.equal(conflictingReplay.response.status, 409);
+    assert.equal(conflictingReplay.json.code, "RESEARCH_CREATE_REQUEST_CONFLICT");
+    assert.equal((await checkpoint(account)).account.revision, 1, "A conflicting replay must not change Research.");
 
     const failedRename = await request("/research/conversations/rename", {
       token: account.token,
@@ -286,6 +321,35 @@ async function main() {
       legacyCheckpointAfterResearch.json.latestEventID,
       legacySyncBeforeResearch.json.latestEventID,
       "Research artifact revisions must not overload the legacy sync event cursor."
+    );
+
+    const concurrentCreates = await Promise.all([0, 1].map(() => request(
+      "/research/conversations/create",
+      {
+        token: account.token,
+        body: authenticated(account, { requestID: "phase5-concurrent-create-1" })
+      }
+    )));
+    assert.deepEqual(
+      concurrentCreates.map((result) => result.response.status).sort(),
+      [200, 201],
+      "Concurrent retries must serialize into one creation and one replay."
+    );
+    assert.equal(
+      new Set(concurrentCreates.map((result) => result.json.conversation.id)).size,
+      1,
+      "Concurrent retries must return the same deterministic conversation."
+    );
+    const afterConcurrentList = await request("/research/conversations/list", {
+      token: account.token,
+      body: authenticated(account)
+    });
+    const concurrentConversationID = concurrentCreates[0].json.conversation.id;
+    assert.equal(
+      afterConcurrentList.json.conversations.filter((conversation) =>
+        conversation.id === concurrentConversationID
+      ).length,
+      1
     );
   } finally {
     server.kill();

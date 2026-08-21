@@ -1067,6 +1067,147 @@ textarea:focus-visible {
   font-size: calc(var(--chrome-font-size) * 0.94);
 }
 
+.workspace-first-use {
+  align-items: start;
+  padding: clamp(2.5rem, 8vh, 6.5rem) clamp(1.5rem, 6vw, 6rem);
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.first-use-content {
+  width: min(100%, 55rem);
+}
+
+.first-use-eyebrow {
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.8);
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.first-use-content h1 {
+  max-width: 48rem;
+  margin: var(--space-3) 0 0;
+  color: var(--text-primary);
+  font-size: clamp(2.35rem, 5vw, 4.9rem);
+  font-weight: 760;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.workspace-empty-state .first-use-supporting {
+  max-width: 42rem;
+  margin-top: var(--space-4);
+  color: var(--text-secondary);
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  line-height: 1.55;
+}
+
+.first-use-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.first-use-actions button,
+.first-use-citation {
+  min-height: 44px;
+  padding: 0.72rem 1rem;
+  border: 0;
+  border-radius: var(--radius-control);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.first-use-primary {
+  color: #0d0d0f;
+  background: var(--accent-building);
+}
+
+.first-use-secondary {
+  color: var(--text-primary);
+  background: var(--surface-raised);
+}
+
+.first-use-tertiary {
+  color: var(--text-secondary);
+  background: transparent;
+}
+
+.first-use-actions button:hover,
+.first-use-citation:hover {
+  filter: brightness(0.96);
+}
+
+.first-use-actions button:focus-visible,
+.first-use-citation:focus-visible {
+  outline: 3px solid var(--accent-building);
+  outline-offset: 3px;
+}
+
+.first-use-research-example {
+  max-width: 46rem;
+  margin-top: var(--space-5);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: var(--radius-card);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-panel);
+}
+
+.first-use-research-example[hidden] {
+  display: none;
+}
+
+.workspace-empty-state .first-use-example-label {
+  color: var(--accent-building);
+  font-size: calc(var(--chrome-font-size) * 0.76);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.first-use-research-example h2 {
+  margin: var(--space-2) 0 var(--space-3);
+  color: var(--text-primary);
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  line-height: 1.25;
+}
+
+.workspace-empty-state .first-use-research-example > p:not(.first-use-example-label) {
+  max-width: 42rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.first-use-citation {
+  margin-top: var(--space-3);
+  color: var(--accent-building);
+  background: var(--accent-soft);
+}
+
+.workspace-empty-state .first-use-trust {
+  margin-top: var(--space-4);
+  font-size: calc(var(--chrome-font-size) * 0.78);
+}
+
+@media (max-width: 860px) {
+  .workspace-first-use {
+    padding: 2.25rem 1.25rem;
+  }
+
+  .first-use-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .first-use-actions button {
+    width: 100%;
+  }
+}
+
 .workspace-switch-placeholder {
   align-content: start;
   color: var(--text-secondary);

@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260821-ux-reader-save-phase4-v1";
+} from "./offline-storage.js?v=20260821-first-use-phase5-v1";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -80,6 +80,11 @@ import {
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
 } from "./workspace-state.js?v=20260811-research-columns-v3";
+import {
+  clearPendingResearchIntent,
+  readPendingResearchIntent,
+  writePendingResearchIntent
+} from "./research-intent-state.js?v=20260821-first-use-phase5-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -233,6 +238,7 @@ const tabWorkspaceKey = "permitext:webWorkspaceTab:v1";
 const workspaceRegistryKey = "permitext:webWorkspaces:v2";
 const workspaceStateKeyPrefix = "permitext:webWorkspace:v2:";
 const activeWorkspaceSessionKey = "permitext:webWorkspaceActive:v2";
+const firstUseWelcomeSeenKey = "permitext:webFirstUseWelcome:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
@@ -494,6 +500,9 @@ const codeDecisionResearchNoticesByQuestion = new Map();
 let activeWebWarningClose = null;
 const webWarningPositionCleanups = new WeakMap();
 let activeWorkspaceIssueAction = null;
+let pendingResearchIntentResumePromise = null;
+let pendingResearchIntentInFlightID = "";
+let firstUseWelcomeActive = false;
 
 applyReaderSettings();
 
@@ -18891,12 +18900,100 @@ function normalizedPassageAnchorText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
 }
 
+function pendingResearchPassages(selection) {
+  return (selection?.passages || [selection]).map(({ sectionID, selectedText, savedItemID }) => ({
+    sectionID,
+    selectedText,
+    savedItemID
+  }));
+}
+
+function preservePendingResearchSelection(selection, kind, conversationID = "") {
+  return writePendingResearchIntent(sessionStorage, {
+    kind,
+    workspaceID: activeWorkspaceID,
+    projectID: selection?.projectID || "",
+    conversationID,
+    originPaneID: selection?.originPaneID || "",
+    originSurface: selection?.originSurface || "reader",
+    passages: pendingResearchPassages(selection)
+  });
+}
+
+function pendingResearchWorkspaceIDs() {
+  return new Set((workspaceRegistry?.workspaces || []).map((workspace) => workspace.id));
+}
+
+async function resumePendingResearchIntent() {
+  const intent = readPendingResearchIntent(sessionStorage, {
+    allowedWorkspaceIDs: pendingResearchWorkspaceIDs()
+  });
+  if (!intent || !activeAccount() || !hasCapability("research")) return false;
+  if (pendingResearchIntentResumePromise) return pendingResearchIntentResumePromise;
+  if (pendingResearchIntentInFlightID === intent.intentID) return false;
+  pendingResearchIntentInFlightID = intent.intentID;
+  pendingResearchIntentResumePromise = (async () => {
+    if (intent.workspaceID !== activeWorkspaceID) {
+      await switchWorkspace(intent.workspaceID, { focus: false });
+    }
+    const values = {
+      selections: intent.passages,
+      projectID: intent.projectID,
+      originSurface: intent.originSurface
+    };
+    let conversation;
+    if (intent.kind === "append-selection") {
+      const payload = await postResearch("/research/conversations/evidence", {
+        conversationID: intent.conversationID,
+        selections: intent.passages
+      });
+      conversation = payload.conversation;
+    } else {
+      const payload = await postResearch("/research/conversations/create", {
+        ...values,
+        requestID: intent.intentID
+      });
+      conversation = payload.conversation;
+    }
+    const conversationID = String(conversation?.id || intent.conversationID || "").trim();
+    if (!conversationID) throw new Error("The preserved Research action did not return a conversation.");
+    activeResearchConversation = conversation;
+    researchConversationPaneOpened = true;
+    state.researchConversationID = conversationID;
+    window.getSelection?.().removeAllRanges();
+    await refreshResearchConversationList();
+    await openResearchConversation(conversationID, {
+      conversation,
+      refreshList: true,
+      anchorPaneID: intent.originPaneID
+    });
+    clearPendingResearchIntent(sessionStorage, intent.intentID);
+    presentWorkspaceIssue("Your Research action resumed after access was confirmed.");
+    return true;
+  })().catch((error) => {
+    presentWorkspaceIssue(
+      error?.message || "The preserved Research action is still waiting. Open Research to try again.",
+      {
+        actionLabel: "Try again",
+        onAction: () => void resumePendingResearchIntent()
+      }
+    );
+    return false;
+  }).finally(() => {
+    pendingResearchIntentInFlightID = "";
+    pendingResearchIntentResumePromise = null;
+  });
+  return pendingResearchIntentResumePromise;
+}
+
 async function startNewResearchFromSelection(selection) {
   if (!activeAccount()) {
+    preservePendingResearchSelection(selection, "create-selection");
     await focusUtility("settings");
     return null;
   }
   if (!hasCapability("research")) {
+    preservePendingResearchSelection(selection, "create-selection");
     await presentPlanLimitNotice(
       "Research Add-On required",
       isProAccount()
@@ -18929,6 +19026,21 @@ async function startNewResearchFromSelection(selection) {
 async function addResearchSelectionToCurrent(selection) {
   const conversationID = String(state.researchConversationID || "").trim();
   if (!conversationID) return startNewResearchFromSelection(selection);
+  if (!activeAccount()) {
+    preservePendingResearchSelection(selection, "append-selection", conversationID);
+    await focusUtility("settings");
+    return null;
+  }
+  if (!hasCapability("research")) {
+    preservePendingResearchSelection(selection, "append-selection", conversationID);
+    await presentPlanLimitNotice(
+      "Research Add-On required",
+      isProAccount()
+        ? "Add Research to continue this cited conversation."
+        : "Upgrade to Pro first, then add Research to continue this cited conversation."
+    );
+    return null;
+  }
   const passages = selection.passages || [selection];
   const payload = await postResearch("/research/conversations/evidence", {
     conversationID,
@@ -28920,6 +29032,7 @@ function renderSettings() {
       organizationWorkspace = null;
       organizationLoadPromise = null;
       await renderWorkspace();
+      await resumePendingResearchIntent();
       startForegroundSyncLoop({ immediate: true });
     } catch (error) {
       setStatus(error.message || "Could not sign in.", true);
@@ -29713,6 +29826,172 @@ function ensureWorkspacePanelAccessibleName(panel) {
   panel.setAttribute("aria-label", paneLabel || "Workspace panel");
 }
 
+function entryHasExternalIntent() {
+  if (sectionRouteIDFromLocation() || detachedWorkboardRoute) return true;
+  if (String(window.location.hash || "").startsWith("#cq/")) return true;
+  const params = new URLSearchParams(window.location.search);
+  return [
+    "checkout",
+    "session_id",
+    "package",
+    "appleSignIn",
+    "organizationInvite",
+    "detachedWorkboard",
+    "enableCodeQuestionWorkspace"
+  ].some((key) => params.has(key));
+}
+
+function workspaceHasPriorUse() {
+  const summary = currentContentSummary();
+  const activeWorkspace = activeWorkspaceRecord();
+  return Boolean(
+    activeAccount() ||
+    (workspaceRegistry?.workspaces || []).length > 1 ||
+    (activeWorkspace?.name && activeWorkspace.name !== "Main") ||
+    (state.localProjects || []).length ||
+    (state.localSavedItems || []).length ||
+    (state.localAnnotations || []).length ||
+    (state.recentSearches || []).length ||
+    (state.recentlyViewedSections || []).length ||
+    Object.keys(state.recentChaptersByCode || {}).length ||
+    (summary.projects || []).length ||
+    (summary.savedItems || []).length
+  );
+}
+
+function shouldShowFirstUseWelcome() {
+  if (firstUseWelcomeActive) return true;
+  if (detachedProjectWindow || entryHasExternalIntent() || workspaceHasPriorUse()) return false;
+  try {
+    if (localStorage.getItem(firstUseWelcomeSeenKey)) return false;
+  } catch {
+    // The welcome remains session-only when browser storage is unavailable.
+  }
+  firstUseWelcomeActive = true;
+  return true;
+}
+
+function completeFirstUseWelcome() {
+  firstUseWelcomeActive = false;
+  try {
+    localStorage.setItem(firstUseWelcomeSeenKey, new Date().toISOString());
+  } catch {
+    // No persisted dismissal is available in this browser session.
+  }
+}
+
+function renderFirstUseWelcome() {
+  const welcome = document.createElement("section");
+  welcome.className = "workspace-empty-state workspace-first-use";
+  const headingID = `first-use-heading-${crypto.randomUUID()}`;
+  welcome.setAttribute("aria-labelledby", headingID);
+
+  const content = document.createElement("div");
+  content.className = "first-use-content";
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "first-use-eyebrow";
+  eyebrow.textContent = "permitext";
+  const heading = document.createElement("h1");
+  heading.id = headingID;
+  heading.textContent = "NYC code research you can verify.";
+  const supporting = document.createElement("p");
+  supporting.className = "first-use-supporting";
+  supporting.textContent = "Read enacted code, save the sections that matter, and ask cited Research questions.";
+
+  const actions = document.createElement("div");
+  actions.className = "first-use-actions";
+  const exploreButton = document.createElement("button");
+  exploreButton.type = "button";
+  exploreButton.className = "first-use-primary";
+  exploreButton.textContent = "Explore the Codes";
+  const exampleButton = document.createElement("button");
+  exampleButton.type = "button";
+  exampleButton.className = "first-use-secondary";
+  exampleButton.textContent = "See How Research Works";
+  const exampleID = `first-use-example-${crypto.randomUUID()}`;
+  exampleButton.setAttribute("aria-controls", exampleID);
+  exampleButton.setAttribute("aria-expanded", "false");
+  const signInButton = document.createElement("button");
+  signInButton.type = "button";
+  signInButton.className = "first-use-tertiary";
+  signInButton.textContent = "Sign In";
+  actions.append(exploreButton, exampleButton, signInButton);
+
+  const example = document.createElement("article");
+  example.id = exampleID;
+  example.className = "first-use-research-example";
+  example.hidden = true;
+  const exampleLabel = document.createElement("p");
+  exampleLabel.className = "first-use-example-label";
+  exampleLabel.textContent = "Illustrative Research example";
+  const question = document.createElement("h2");
+  question.tabIndex = -1;
+  question.textContent = "What does the Building Code mean by a story?";
+  const answer = document.createElement("p");
+  answer.textContent = "BC 202 defines a story as the part of a building between the upper surface of a floor and the upper surface of the floor or roof above. Basement and mezzanine provisions can affect how a level is classified.";
+  const citation = document.createElement("button");
+  citation.type = "button";
+  citation.className = "first-use-citation";
+  citation.textContent = "BC 202 — Definitions";
+  citation.setAttribute("aria-label", "Open enacted source BC 202 Definitions in Reader");
+  const trust = document.createElement("p");
+  trust.className = "first-use-trust";
+  trust.textContent = "Static example — no question is submitted. Research is AI-assisted, not an official interpretation. Verify decisions against the enacted source.";
+  example.append(exampleLabel, question, answer, citation, trust);
+
+  exploreButton.addEventListener("click", async () => {
+    exploreButton.disabled = true;
+    completeFirstUseWelcome();
+    const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
+    state.readers.push(reader);
+    saveWorkspaceState();
+    await transitionWorkspace("utility");
+    scrollPaneIntoView(paneIDForReader(reader));
+  });
+  exampleButton.addEventListener("click", () => {
+    const expanded = exampleButton.getAttribute("aria-expanded") === "true";
+    if (!expanded) completeFirstUseWelcome();
+    exampleButton.setAttribute("aria-expanded", String(!expanded));
+    exampleButton.textContent = expanded ? "See How Research Works" : "Hide Research Example";
+    example.hidden = expanded;
+    if (!expanded) question.focus({ preventScroll: true });
+  });
+  example.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    example.hidden = true;
+    exampleButton.setAttribute("aria-expanded", "false");
+    exampleButton.textContent = "See How Research Works";
+    exampleButton.focus({ preventScroll: true });
+  });
+  signInButton.addEventListener("click", async () => {
+    signInButton.disabled = true;
+    completeFirstUseWelcome();
+    await focusUtility("settings");
+  });
+  citation.addEventListener("click", async () => {
+    citation.disabled = true;
+    completeFirstUseWelcome();
+    try {
+      await openSourceInReader({
+        sectionID: 113,
+        id: 113,
+        codePrefix: "BC",
+        chapterID: 2,
+        chapterNumber: "2",
+        sectionNumber: "202",
+        title: "SECTION 202: Definitions"
+      }, "", { sourceSurface: "welcome" });
+    } finally {
+      citation.disabled = false;
+    }
+  });
+
+  content.append(eyebrow, heading, supporting, actions, example);
+  welcome.append(content);
+  return welcome;
+}
+
 function appendPaneSequence(panes) {
   closeActiveCustomSelect();
   const orderedPanes = orderPanes(panes);
@@ -29748,15 +30027,21 @@ function appendPaneSequence(panes) {
     nodes.push(edgeResizer);
   }
   if (!orderedPanes.length && !detachedProjectWindow) {
-    const emptyState = track.querySelector(":scope > .workspace-empty-state") || document.createElement("section");
-    emptyState.className = "workspace-empty-state";
-    emptyState.setAttribute("aria-label", "Empty workspace");
-    if (!emptyState.firstElementChild) {
-      const message = document.createElement("p");
-      message.textContent = "Open a Reader, Search, Saved, or a Project to begin.";
-      emptyState.append(message);
+    if (shouldShowFirstUseWelcome()) {
+      nodes.push(renderFirstUseWelcome());
+    } else {
+      const emptyState = track.querySelector(
+        ":scope > .workspace-empty-state:not(.workspace-first-use)"
+      ) || document.createElement("section");
+      emptyState.className = "workspace-empty-state";
+      emptyState.setAttribute("aria-label", "Empty workspace");
+      if (!emptyState.firstElementChild) {
+        const message = document.createElement("p");
+        message.textContent = "Open a Reader, Search, Saved, or a Project to begin.";
+        emptyState.append(message);
+      }
+      nodes.push(emptyState);
     }
-    nodes.push(emptyState);
   }
   const desiredNodes = new Set(nodes);
   Array.from(track.children).forEach((node) => {
@@ -33691,7 +33976,7 @@ async function start() {
       } else {
         stopForegroundSyncLoop();
       }
-      void renderWorkspace();
+      void renderWorkspace().then(() => resumePendingResearchIntent());
       return;
     }
     if (
@@ -33874,7 +34159,8 @@ async function start() {
   void flushPendingSyncAndRender().catch(() => {});
   void flushCodeQuestionOutbox().catch(() => {});
   startForegroundSyncLoop();
-  refreshEntitlementAfterCheckoutReturn();
+  await refreshEntitlementAfterCheckoutReturn();
+  await resumePendingResearchIntent();
 }
 
 function renderWorkspaceLoadError(error) {
