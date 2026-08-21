@@ -415,7 +415,7 @@ async function main() {
         !settingsTemplateSource.includes("All browser changes are synced."),
       "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
-    ["Clear All Projects", "Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes"].forEach((label) => {
+    ["Clear All Projects and Saved Collections", "Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
     assert(!settingsTemplateSource.includes("Clear All Tags"), "Web Settings still exposes tag management.");
@@ -1267,7 +1267,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("const searchResultPageSize = 25;") &&
         workspaceScript.text.includes("function appendSearchLoadMore") &&
-        workspaceScript.text.includes("&limit=${searchResultPageSize}&offset=0") &&
+        workspaceScript.text.includes("&match=exact&limit=${searchResultPageSize}&offset=0") &&
         workspaceScript.text.includes("offset=${encodeURIComponent(String(options.nextOffset))}"),
       "Search no longer opens with 25 results and supports explicit pagination."
     );
@@ -1447,7 +1447,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260820-two-font-system-v1'),
+        webRoot.text.includes('/web/app.js?v=20260820-ux-alignment-phase1-v2'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1616,7 +1616,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-two-font-system-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260820-ux-alignment-phase1-v2'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1882,7 +1882,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-two-font-system-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260820-ux-alignment-phase1-v2'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2090,7 +2090,8 @@ async function main() {
     assert(
       workspaceScript.text.includes("function enforceReaderPlanLimit") &&
         workspaceScript.text.includes("if (isProAccount() || state.readers.length <= 2) return false") &&
-        workspaceScript.text.includes("addReaderButton.hidden = !isProAccount() && state.readers.length >= 2") &&
+        workspaceScript.text.includes("addReaderButton.disabled = limitReached") &&
+        workspaceScript.text.includes('limitReached ? "Two Reader limit reached" : "New Reader"') &&
         workspaceScript.text.includes("collapseReadersButton.disabled = !hasColumns") &&
         workspaceScript.text.includes("const canAddReader = isProAccount() || state.readers.length < 2") &&
         workspaceScript.text.includes("isProAccount() || state.readers.length < 2") &&
@@ -2588,8 +2589,8 @@ async function main() {
       "Saved menu grids should auto-fit only as many aligned columns as their items and available width support."
     );
     assert(
-      workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),
-      "Search result count should remain white and centered below the code filter list."
+      workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: var\(--text-primary\);[\s\S]*?text-align: center;/),
+      "Search result count should use accessible semantic text color and remain centered below the code filter list."
     );
     assert(
       workspaceScript.text.includes("function codeBlockHasVisibleContent(block)") &&

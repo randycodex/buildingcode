@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260820-two-font-system-v1";
+} from "./offline-storage.js?v=20260820-ux-alignment-phase1-v2";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -5770,7 +5770,14 @@ function isProAccount() {
 }
 
 function updateReaderPlanControls() {
-  addReaderButton.hidden = !isProAccount() && state.readers.length >= 2;
+  const limitReached = !isProAccount() && state.readers.length >= 2;
+  addReaderButton.hidden = false;
+  addReaderButton.disabled = limitReached;
+  addReaderButton.title = limitReached ? "Two Reader limit reached" : "New Reader";
+  addReaderButton.setAttribute(
+    "aria-label",
+    limitReached ? "New Reader. Two Reader limit reached." : "New Reader"
+  );
   collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
 }
@@ -9731,6 +9738,15 @@ function folderTypeLabel(folder) {
   return folderType(folder) === "reference" ? "Saved collection" : "Project";
 }
 
+function folderRecordCountLabel(folders = []) {
+  const projectCount = folders.filter((folder) => folderIsProject(folder)).length;
+  const collectionCount = folders.length - projectCount;
+  return [
+    projectCount ? `${projectCount} ${projectCount === 1 ? "Project" : "Projects"}` : "",
+    collectionCount ? `${collectionCount} saved ${collectionCount === 1 ? "collection" : "collections"}` : ""
+  ].filter(Boolean).join(" and ") || "0 records";
+}
+
 function folderIsProject(folder) {
   return folderType(folder) === "project";
 }
@@ -13476,7 +13492,7 @@ async function renderSearchResults(panel, instance) {
   renderSearchPlaceholder(results, { title: "Searching", body: "Checking section titles and code text." });
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
   const payload = await api(
-    `/code/search?q=${encodeURIComponent(query)}${codeQuery}&limit=${searchResultPageSize}&offset=0`
+    `/code/search?q=${encodeURIComponent(query)}${codeQuery}&match=exact&limit=${searchResultPageSize}&offset=0&candidateOffset=0`
   );
   if (
     searchInstance.query.trim() !== query ||
@@ -13520,6 +13536,7 @@ async function renderSearchResults(panel, instance) {
     query,
     selectedPrefixes,
     nextOffset: Number(payload.nextOffset) || (payload.results || []).length,
+    candidateOffset: Number(payload.nextCandidateOffset) || 0,
     totalResults,
     hasMore: Boolean(payload.hasMore),
     searchInstance,
@@ -13604,8 +13621,9 @@ function appendSearchLoadMore(results, options) {
       : "";
     try {
       const payload = await api(
-        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}` +
-        `&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}`
+        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}&match=exact` +
+        `&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}` +
+        `&candidateOffset=${encodeURIComponent(String(options.candidateOffset))}`
       );
       if (
         options.searchInstance.query.trim() !== options.query ||
@@ -13625,6 +13643,7 @@ function appendSearchLoadMore(results, options) {
       appendSearchLoadMore(results, {
         ...options,
         nextOffset: Number(payload.nextOffset) || (options.nextOffset + (payload.results || []).length),
+        candidateOffset: Number(payload.nextCandidateOffset) || options.candidateOffset,
         totalResults,
         hasMore: Boolean(payload.hasMore)
       });
@@ -18872,11 +18891,11 @@ async function renderArchive() {
   const sourceProjects = ["connected", "offline"].includes(data.status) ? data.summary.projects : [];
   const projects = archivedProjectRecords(sourceProjects);
   if (data.status === "error") {
-    appendProjectEmptyCard(content, "Sync error", data.error || "Could not load archived projects.");
+    appendProjectEmptyCard(content, "Sync error", data.error || "Could not load archived Projects and saved collections.");
     return panel;
   }
   if (projects.length === 0) {
-    appendProjectEmptyCard(content, "No archived Projects", "Archived Projects will appear here.");
+    appendProjectEmptyCard(content, "Archive is empty", "Archived Projects and saved collections will appear here.");
   } else {
     const selectionController = createProjectBulkSelectionController(panel, projects, "archive");
     renderProjectRows(content, projects, currentContentSummary().projectSections || [], { mode: "archive", selectionController });
@@ -21919,9 +21938,10 @@ async function deleteArchivedProjects(projects, options = {}) {
   const eligibleProjects = projects.filter((project) => projectRecordID(project));
   if (!eligibleProjects.length) return false;
   const count = eligibleProjects.length;
+  const recordLabel = folderRecordCountLabel(eligibleProjects);
   const confirmed = await confirmWebWarning(
-    `Delete ${count === 1 ? "record" : "records"}`,
-    `This will permanently delete ${count} selected ${count === 1 ? "Project or saved collection" : "Projects or saved collections"}. This cannot be undone.`,
+    `Delete ${recordLabel}`,
+    `This will permanently delete ${recordLabel}. This cannot be undone.`,
     { confirmLabel: "Delete" }
   );
   if (!confirmed) return false;
@@ -21936,8 +21956,8 @@ async function deleteArchivedProjects(projects, options = {}) {
     } catch (error) {
       const progress = deletedCount > 0 ? ` Deleted ${deletedCount} of ${count}.` : "";
       await showWebNotice(
-        "Could not delete projects",
-        `${error.message || "The selected projects could not be deleted."}${progress}`
+        "Could not delete selected records",
+        `${error.message || `The selected ${recordLabel} could not be deleted.`}${progress}`
       );
       break;
     }
@@ -24298,7 +24318,8 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     const primaryActionButton = document.createElement("button");
     primaryActionButton.className = `project-card-action ${mode === "archive" ? "is-restore" : "is-edit"}`;
     primaryActionButton.type = "button";
-    primaryActionButton.title = mode === "archive" ? "Restore project" : "Edit project";
+    const recordType = folderTypeLabel(project).toLowerCase();
+    primaryActionButton.title = mode === "archive" ? `Restore ${recordType}` : `Edit ${recordType}`;
     primaryActionButton.setAttribute("aria-label", `${primaryActionButton.title}: ${project.name || project.title || "project"}`);
     primaryActionButton.innerHTML = mode === "archive" ? archiveRestoreIconSVG() : pencilIconSVG();
     primaryActionButton.addEventListener("click", (event) => {
@@ -24314,7 +24335,7 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     const lifecycleButton = document.createElement("button");
     lifecycleButton.className = `project-card-action ${mode === "archive" ? "is-delete" : "is-archive"}`;
     lifecycleButton.type = "button";
-    lifecycleButton.title = mode === "archive" ? "Delete project" : "Archive project";
+    lifecycleButton.title = mode === "archive" ? `Delete ${recordType}` : `Archive ${recordType}`;
     lifecycleButton.setAttribute("aria-label", `${lifecycleButton.title}: ${project.name || project.title || "project"}`);
     lifecycleButton.innerHTML = mode === "archive" ? trashIconSVG() : archiveIconSVG();
     lifecycleButton.addEventListener("click", (event) => {
@@ -25345,7 +25366,7 @@ function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems
 }
 
 function unassignedSavedEvidenceKeys(savedItems, projectSections, projects = []) {
-  const projectRecords = (projects || []).filter(folderIsProject);
+  const projectRecords = activeFolderRecords(projects || []);
   const linkedSectionIDs = new Set((projectSections || [])
     .filter((item) => projectRecords.some((project) => projectSectionBelongsToProject(item, project)))
     .map((item) => savedEvidenceKey(item)));
@@ -26111,7 +26132,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
     if (savedInstance.projectsMenuOpen) return "";
     if (savedInstance.projectsArchiveMode) return "Archived Projects";
     const selectedProject = projects.find((project) =>
-      folderIsProject(project) &&
       projectRecordID(project) === String(savedInstance.selectedFolderID || "")
     );
     return selectedProject?.name || selectedProject?.title || "Projects";
@@ -26201,7 +26221,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
     const visibleRecords = showingArchived
       ? archivedProjectRecords(projects)
       : activeFolderRecords(projects);
-    const visibleProjects = visibleRecords.filter(folderIsProject);
+    const visibleFolders = visibleRecords;
     clear(list);
     list.classList.toggle("is-showing-archive", showingArchived);
 
@@ -26213,11 +26233,11 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
     };
     const reorderProject = async (sourceID, targetID, placeAfter) => {
       if (showingArchived) return;
-      const sourceIndex = visibleProjects.findIndex((project) => projectRecordID(project) === sourceID);
-      const targetIndex = visibleProjects.findIndex((project) => projectRecordID(project) === targetID);
+      const sourceIndex = visibleFolders.findIndex((project) => projectRecordID(project) === sourceID);
+      const targetIndex = visibleFolders.findIndex((project) => projectRecordID(project) === targetID);
       if (sourceIndex === -1 || targetIndex === -1 || sourceIndex === targetIndex) return;
-      if (folderType(visibleProjects[sourceIndex]) !== folderType(visibleProjects[targetIndex])) return;
-      const reordered = [...visibleProjects];
+      if (folderType(visibleFolders[sourceIndex]) !== folderType(visibleFolders[targetIndex])) return;
+      const reordered = [...visibleFolders];
       const [movedProject] = reordered.splice(sourceIndex, 1);
       let insertionIndex = targetIndex - (sourceIndex < targetIndex ? 1 : 0);
       if (placeAfter) insertionIndex += 1;
@@ -26225,7 +26245,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
       await persistProjectOrder(reordered, paneID);
     };
 
-    visibleProjects.forEach((project) => {
+    visibleFolders.forEach((project) => {
       const tile = document.createElement("article");
       tile.className = "saved-project-tile";
       tile.classList.add(`is-${folderType(project)}`);
@@ -26317,11 +26337,11 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
           (event.key === "ArrowUp" || event.key === "ArrowDown")
         ) {
           event.preventDefault();
-          const currentIndex = visibleProjects.findIndex(
+          const currentIndex = visibleFolders.findIndex(
             (candidate) => projectRecordID(candidate) === projectRecordID(project)
           );
           const nextIndex = currentIndex + (event.key === "ArrowUp" ? -1 : 1);
-          const target = visibleProjects[nextIndex];
+          const target = visibleFolders[nextIndex];
           if (target && folderType(target) === folderType(project)) {
             void reorderProject(
               projectRecordID(project),
@@ -26353,7 +26373,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections,
       tile.addEventListener("dragover", (event) => {
         const sourceID = draggedProjectID || event.dataTransfer.getData("text/plain");
         if (!sourceID || sourceID === tile.dataset.projectId || tile.dataset.draggable !== "true") return;
-        const sourceProject = visibleProjects.find((candidate) => projectRecordID(candidate) === sourceID);
+        const sourceProject = visibleFolders.find((candidate) => projectRecordID(candidate) === sourceID);
         if (!sourceProject || folderType(sourceProject) !== folderType(project)) return;
         event.preventDefault();
         event.dataTransfer.dropEffect = "move";
@@ -28316,12 +28336,17 @@ function renderSettings() {
     row.style.setProperty("--project-color", projectColor(project));
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
-    checkbox.setAttribute("aria-label", `Select ${project.name || project.title || "project"}`);
+    checkbox.setAttribute(
+      "aria-label",
+      `Select ${folderTypeLabel(project)} ${project.name || project.title || "record"}`
+    );
     const copy = document.createElement("span");
     copy.className = "settings-project-copy";
     const name = document.createElement("strong");
     name.textContent = readableProjectName(project);
-    copy.append(name);
+    const typeLabel = document.createElement("span");
+    typeLabel.textContent = folderTypeLabel(project);
+    copy.append(name, typeLabel);
     row.append(checkbox, copy);
     if (projectIsArchived(project)) {
       const archivedLabel = document.createElement("span");
@@ -28346,9 +28371,10 @@ function renderSettings() {
     const selectedProjects = settingsProjects.filter((project) => selectedProjectIDs.has(projectRecordID(project)));
     const count = selectedProjects.length;
     if (!count) return;
+    const recordLabel = folderRecordCountLabel(selectedProjects);
     const confirmed = await confirmWebWarning(
-      count === 1 ? "Delete project" : "Delete projects",
-      `This will permanently delete ${count} ${count === 1 ? "project" : "projects"} from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
+      `Delete ${recordLabel}`,
+      `This will permanently delete ${recordLabel} from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
       { confirmLabel: "Delete" }
     );
     if (!confirmed) return;
@@ -28357,20 +28383,21 @@ function renderSettings() {
       for (const project of selectedProjects) {
         await deleteArchivedProjectData(project);
       }
-      setStatus(`${count} ${count === 1 ? "project" : "projects"} deleted.`);
+      setStatus(`${recordLabel} deleted.`);
       await renderWorkspace();
     } catch (error) {
-      setStatus(error.message || "Could not delete the selected projects.", true);
+      setStatus(error.message || `Could not delete ${recordLabel}.`, true);
       projectDelete.disabled = false;
     }
   });
   projectClearAll.addEventListener("click", async () => {
     const count = settingsProjects.length;
     if (!count) return;
+    const recordLabel = folderRecordCountLabel(settingsProjects);
     const confirmed = await confirmWebWarning(
-      "Clear all Projects?",
-      `This will permanently delete all ${count} ${count === 1 ? "Project" : "Projects"}, including archived Projects, from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
-      { confirmLabel: "Clear All Projects" }
+      "Clear all Projects and saved collections?",
+      `This will permanently delete ${recordLabel}, including archived records, from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
+      { confirmLabel: "Delete All" }
     );
     if (!confirmed) return;
     projectClearAll.disabled = true;
@@ -28378,10 +28405,10 @@ function renderSettings() {
       for (const project of settingsProjects) {
         await deleteArchivedProjectData(project);
       }
-      setStatus(`${count} ${count === 1 ? "Project" : "Projects"} deleted.`);
+      setStatus(`${recordLabel} deleted.`);
       await renderWorkspace();
     } catch (error) {
-      setStatus(error.message || "Could not clear all Projects.", true);
+      setStatus(error.message || `Could not delete ${recordLabel}.`, true);
       projectClearAll.disabled = false;
     }
   });
@@ -33032,11 +33059,11 @@ function workspaceCommandDefinitions() {
     { label: "Open Search", hint: "Find sections across all codes", run: () => openNewSearchColumn() },
     { label: "Open Research", hint: "Ask a cited building-code question", run: () => focusUtility("analysis", ".research-question-input") },
     ...(isProAccount() || state.readers.length < 2
-      ? [{ label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
+      ? [{ label: "New Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
       : []),
     { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
     { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
-    { label: "Reset Column Widths", hint: "Restore each open column to its original width", run: () => resetVisibleColumnWidths() },
+    { label: "Reset Layout", hint: "Restore default panel widths", run: () => resetVisibleColumnWidths() },
     ...(defaultActivePaneIDs().length
       ? [{ label: "Close All", hint: "Close every column in the current workspace", run: () => closeAllColumns() }]
       : [])
@@ -33442,26 +33469,29 @@ async function start() {
   refreshEntitlementAfterCheckoutReturn();
 }
 
+function renderWorkspaceLoadError(error) {
+  clear(track);
+  const panel = document.createElement("article");
+  panel.className = "workspace-panel workspace-load-error";
+  panel.setAttribute("role", "alert");
+  const title = document.createElement("h1");
+  title.tabIndex = -1;
+  title.textContent = detachedWorkboardRoute ? "Workboard unavailable" : "Workspace unavailable";
+  const message = document.createElement("p");
+  message.textContent = detachedWorkboardRoute
+    ? String(error?.message || "The Workboard could not be loaded.")
+    : `Permitext could not load this workspace. ${String(error?.message || "Please try again.")}`;
+  const retry = document.createElement("button");
+  retry.type = "button";
+  retry.className = "toolbar-button";
+  retry.textContent = "Try again";
+  retry.addEventListener("click", () => window.location.reload());
+  panel.append(title, message, retry);
+  track.append(panel);
+  title.focus({ preventScroll: true });
+}
+
 start().catch((error) => {
   console.error(error);
-  clear(track);
-  if (detachedWorkboardRoute) {
-    const panel = document.createElement("article");
-    panel.className = "workspace-panel detached-workboard-error";
-    const title = document.createElement("h1");
-    title.textContent = "Workboard unavailable";
-    const message = document.createElement("p");
-    message.textContent = error.message;
-    panel.append(title, message);
-    track.append(panel);
-    return;
-  }
-  const panel = renderTemplate(settingsTemplate);
-  panel.querySelector(".panel-title").textContent = "Load error";
-  const list = panel.querySelector(".settings-list");
-  clear(list);
-  const item = document.createElement("div");
-  item.append(textNode("Could not load the web workspace."), textNode(error.message));
-  list.append(item);
-  track.append(panel);
+  renderWorkspaceLoadError(error);
 });

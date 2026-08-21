@@ -2,7 +2,7 @@
 
 **Updated:** 2026-08-20
 
-**Status:** Active roadmap; the typography contract is implemented on the current development branch
+**Status:** Active roadmap; typography and Phase 1 are implemented on `codex/ux-ui-alignment`
 
 **Surfaces:** Permitext web workspace and native iPhone app
 
@@ -108,6 +108,8 @@ Implementation should proceed one phase at a time. Each phase receives an isolat
 ### Phase 1 — Repair trust-breaking behavior and misleading controls
 
 **Goal:** Remove behavior that looks broken, loses discoverability, or can mislead users about available data.
+
+**Implementation status (2026-08-20): Complete on `codex/ux-ui-alignment`.** The web now has recoverable startup failure, authoritative exact Search pagination, visible saved collections with type-accurate deletion language, one complete Appendix K navigation entry, explicit New Reader limit behavior, Reset layout wording, and semantic Search-status contrast. The Xcode configuration and compiled app metadata now identify Permitext as iPhone-only. Verification includes rendered browser checks, the full server contract suite, an iPhone simulator build, `UIDeviceFamily = [1]` inspection, and a focused XCTest. This status records local implementation evidence only; it does not imply GitHub publication, Production deployment, or App Store submission.
 
 #### Web startup recovery
 

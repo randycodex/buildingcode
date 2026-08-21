@@ -1177,7 +1177,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   display: none;
 }
 
-body.is-detached-workboard-window .detached-workboard-error {
+.workspace-load-error {
   display: grid;
   place-content: center;
   gap: 8px;
@@ -1187,9 +1187,19 @@ body.is-detached-workboard-window .detached-workboard-error {
   text-align: center;
 }
 
-body.is-detached-workboard-window .detached-workboard-error h1,
-body.is-detached-workboard-window .detached-workboard-error p {
+.workspace-load-error h1,
+.workspace-load-error p {
   margin: 0;
+}
+
+.workspace-load-error p {
+  max-width: 52ch;
+  color: var(--text-secondary);
+}
+
+.workspace-load-error .toolbar-button {
+  justify-self: center;
+  margin-top: var(--space-2);
 }
 
 .workspace-panel.is-dragging {
@@ -1768,6 +1778,11 @@ body.is-detached-workboard-window .detached-workboard-error p {
   justify-content: center;
 }
 
+.topbar-actions > #add-reader {
+  width: 104px;
+  flex-basis: 104px;
+}
+
 .topbar .toolbar-button > svg,
 .topbar .mobile-more-button > svg {
   display: none;
@@ -1780,7 +1795,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 .topbar .toolbar-button:disabled,
 .workspace-add-button:disabled,
 .workspace-actions-button:disabled {
-  cursor: default;
+  cursor: not-allowed;
   opacity: 0.38;
 }
 
@@ -4359,7 +4374,7 @@ select option:checked {
   margin: var(--space-2) 0 0;
   padding: 0;
   background: transparent;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: calc(var(--chrome-font-size) * 0.86);
   font-weight: 600;
   text-align: center;

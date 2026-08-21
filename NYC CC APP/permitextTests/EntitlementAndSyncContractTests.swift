@@ -175,6 +175,30 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(projectSource.contains("SourceSerif4Variable-Italic.ttf in Resources"))
     }
 
+    func testDistributionMetadataIsIPhoneOnly() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let projectSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("NYC CC APP.xcodeproj/project.pbxproj"),
+            encoding: .utf8
+        )
+
+        XCTAssertFalse(projectSource.contains("TARGETED_DEVICE_FAMILY = \"1,2\";"))
+        XCTAssertEqual(
+            projectSource.components(separatedBy: "TARGETED_DEVICE_FAMILY = 1;").count - 1,
+            8
+        )
+        XCTAssertEqual(
+            projectSource.components(separatedBy: "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;").count - 1,
+            2
+        )
+        XCTAssertEqual(
+            projectSource.components(separatedBy: "SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;").count - 1,
+            2
+        )
+    }
+
     func testPreparedChapterHTMLInjectsOneMobileViewportBeforeLoading() throws {
         let directoryURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-reader-viewport-\(UUID().uuidString)", isDirectory: true)

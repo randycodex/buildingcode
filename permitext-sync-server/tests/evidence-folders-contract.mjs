@@ -629,8 +629,8 @@ assert.match(indexSource, /class="saved-evidence-search"[\s\S]*?class="saved-evi
 assert.match(indexSource, /class="saved-projects-section[^>]*aria-label="Projects"/);
 assert.match(indexSource, /class="code-filter-menu-toggle saved-projects-menu-toggle"[^>]*aria-label="Expand Projects"/);
 assert.doesNotMatch(appSource, /heading\.textContent = showingArchived \? "Archived saved collections" : "Saved collections"/);
-assert.match(appSource, /const visibleProjects = visibleRecords\.filter\(folderIsProject\)/);
-assert.match(appSource, /folderType\(visibleProjects\[sourceIndex\]\) !== folderType\(visibleProjects\[targetIndex\]\)/);
+assert.match(appSource, /const visibleFolders = visibleRecords;/);
+assert.match(appSource, /folderType\(visibleFolders\[sourceIndex\]\) !== folderType\(visibleFolders\[targetIndex\]\)/);
 assert.match(stylesSource, /\.saved-collections-section \{[\s\S]*?border-top: 1px solid var\(--border\);/);
 assert.doesNotMatch(indexSource, /class="code-filter-menu saved-code-filter-menu"/);
 assert.match(appSource, /control\.setAttribute\("aria-expanded", String\(nextExpanded\)\)/);
@@ -795,6 +795,9 @@ assert.match(
   /if \(projectIsArchived\(project\)\) \{[\s\S]*?archivedLabel\.className = "settings-project-archive-label";[\s\S]*?archivedLabel\.textContent = "Archived";/,
   "Settings must mark only archived folders when active and archived folders share a name."
 );
+assert.match(appSource, /typeLabel\.textContent = folderTypeLabel\(project\)/, "Settings must identify each record as a Project or saved collection.");
+assert.match(appSource, /folderRecordCountLabel\(selectedProjects\)/, "Selected-record deletion must name the exact Project and saved-collection mix.");
+assert.match(indexSource, /Clear All Projects and Saved Collections/, "Settings must not describe mixed folder deletion as Projects only.");
 assert.match(
   appSource,
   /function projectOverviewRefreshPaneIDs\([\s\S]*?state\.utilities\.settings \? "utility:settings" : ""/,
