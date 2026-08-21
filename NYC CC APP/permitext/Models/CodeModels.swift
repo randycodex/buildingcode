@@ -2354,6 +2354,8 @@ protocol PermitextBackendTransport {
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse
     func researchConversationList(_ request: ResearchConversationListRequest) async throws -> ResearchConversationListResponse
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse
+    func researchConversationRefresh(_ request: ResearchConversationRefreshRequest) async throws -> ResearchConversationResponse
+    func researchProjectContextReview(_ request: ResearchProjectContextReviewRequest) async throws -> ResearchConversationResponse
     func researchSelectionReview(_ request: ResearchSelectionReviewRequest) async throws -> ResearchSelectionReviewResponse
     func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse
     func researchConversationAddEvidence(_ request: ResearchConversationEvidenceRequest) async throws -> ResearchConversationEvidenceResponse
@@ -2604,6 +2606,14 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse {
         try await post("research/conversations/get", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchConversationRefresh(_ request: ResearchConversationRefreshRequest) async throws -> ResearchConversationResponse {
+        try await post("research/conversations/refresh", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchProjectContextReview(_ request: ResearchProjectContextReviewRequest) async throws -> ResearchConversationResponse {
+        try await post("research/conversations/project-context", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func researchSelectionReview(_ request: ResearchSelectionReviewRequest) async throws -> ResearchSelectionReviewResponse {
@@ -2953,6 +2963,14 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse {
         throw URLError(.fileDoesNotExist)
+    }
+
+    func researchConversationRefresh(_ request: ResearchConversationRefreshRequest) async throws -> ResearchConversationResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func researchProjectContextReview(_ request: ResearchProjectContextReviewRequest) async throws -> ResearchConversationResponse {
+        throw URLError(.unsupportedURL)
     }
 
     func researchSelectionReview(_ request: ResearchSelectionReviewRequest) async throws -> ResearchSelectionReviewResponse {
@@ -4304,6 +4322,13 @@ protocol AccountBackendClient {
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot
     func researchConversations(account: SignedInAccount) async throws -> [ResearchConversationSummary]
     func researchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation
+    func refreshResearchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation
+    func reviewResearchProjectContext(
+        account: SignedInAccount,
+        conversationID: String,
+        projectID: String,
+        facts: [String]
+    ) async throws -> ResearchConversation
     func reviewResearchSelection(
         account: SignedInAccount,
         selection: ResearchSelectionRequest

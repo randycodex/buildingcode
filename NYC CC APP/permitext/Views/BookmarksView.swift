@@ -8,6 +8,7 @@ struct BookmarksView: View {
     @State private var folderEditorTarget: FolderEditorTarget?
     @State private var savedSortMode: BookmarkSortMode = .codeOrder
     @State private var projectPageIndex: Int = 0
+    @State private var referencePageIndex: Int = 0
     @State private var scrollOffset: CGFloat = 0
     @State private var cachedFilteredBookmarks: [BookmarkedSection] = []
     @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
@@ -198,7 +199,7 @@ struct BookmarksView: View {
     }
 
     private var hasSavedHeaderContentBelowTitle: Bool {
-        showsProjectsSection || showsSavedInlineFilters
+        showsProjectsSection || !referenceFolders.isEmpty || showsSavedInlineFilters
     }
 
     private var showsProjectsSection: Bool {
@@ -230,7 +231,7 @@ struct BookmarksView: View {
             }
             .accessibilityIdentifier("projects-root")
             .overlay(alignment: .top) {
-                CodeTopContentFade(title: "Projects", progress: collapseProgress)
+                CodeTopContentFade(title: "Saved", progress: collapseProgress)
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
@@ -342,7 +343,7 @@ struct BookmarksView: View {
 
 private var savedScreenHeader: some View {
     VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-        CodeScreenTitleRow(title: "Projects", collapseProgress: collapseProgress) {
+        CodeScreenTitleRow(title: "Saved", collapseProgress: collapseProgress) {
             HStack(spacing: 6) {
                 sortButton
                 exportButton
@@ -355,10 +356,19 @@ private var savedScreenHeader: some View {
                 projectTilesSection
             }
 
-            if !library.bookmarks.isEmpty && showsSavedInlineFilters {
-                savedInlineFilters
+            if !referenceFolders.isEmpty {
+                referenceTilesSection
                     .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+            }
+
+            if !library.bookmarks.isEmpty {
+                CodeScreenSectionEyebrow(text: "Saved sections", accent: accentColor)
+                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+
+                if showsSavedInlineFilters {
+                    savedInlineFilters
                     .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                }
             }
         }
     }
@@ -515,9 +525,23 @@ private var filteredSavedEmptyState: some View {
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
+    private var projectFolders: [CodeFolder] {
+        library.folders.filter { $0.folderType == .project }
+    }
+
+    private var referenceFolders: [CodeFolder] {
+        library.folders.filter { $0.folderType == .reference }
+    }
+
     private var projectPages: [[CodeFolder]] {
-        stride(from: 0, to: library.folders.count, by: projectTilePageSize).map { start in
-            Array(library.folders[start..<min(start + projectTilePageSize, library.folders.count)])
+        stride(from: 0, to: projectFolders.count, by: projectTilePageSize).map { start in
+            Array(projectFolders[start..<min(start + projectTilePageSize, projectFolders.count)])
+        }
+    }
+
+    private var referencePages: [[CodeFolder]] {
+        stride(from: 0, to: referenceFolders.count, by: projectTilePageSize).map { start in
+            Array(referenceFolders[start..<min(start + projectTilePageSize, referenceFolders.count)])
         }
     }
 
@@ -569,6 +593,44 @@ private var filteredSavedEmptyState: some View {
                 if projectPages.count > 1 {
                     projectPageDots
                 }
+            }
+        }
+    }
+
+    private var referenceTilesSection: some View {
+        VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
+            CodeScreenSectionEyebrow(text: "References", accent: accentColor)
+
+            GeometryReader { proxy in
+                let pageWidth = proxy.size.width
+                TabView(selection: $referencePageIndex) {
+                    ForEach(Array(referencePages.enumerated()), id: \.offset) { index, page in
+                        projectPageGrid(page, pageWidth: pageWidth)
+                            .frame(
+                                width: pageWidth,
+                                height: projectGridViewportHeight,
+                                alignment: .topLeading
+                            )
+                            .tag(index)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
+                .clipped()
+            }
+            .frame(height: projectGridViewportHeight)
+
+            if referencePages.count > 1 {
+                HStack(spacing: 6) {
+                    ForEach(referencePages.indices, id: \.self) { index in
+                        Circle()
+                            .fill(index == referencePageIndex ? Color.appChrome : Color.secondary.opacity(0.35))
+                            .frame(width: 6, height: 6)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 4)
+                .accessibilityHidden(true)
             }
         }
     }
@@ -635,7 +697,7 @@ private var filteredSavedEmptyState: some View {
                     Button {
                         folderEditorTarget = .edit(folder)
                     } label: {
-                        Label("Edit project", systemImage: "pencil")
+                        Label("Edit \(folder.folderType == .project ? "project" : "reference")", systemImage: "pencil")
                     }
                 }
             } else {
@@ -1107,6 +1169,10 @@ struct ProjectView: View {
         library.folder(id: folderID)
     }
 
+    private var isProjectFolder: Bool {
+        folder?.folderType == .project
+    }
+
     private var projectBookmarks: [BookmarkedSection] {
         BookmarkSorter.sorted(
             library.bookmarks(inFolder: folderID),
@@ -1170,10 +1236,12 @@ struct ProjectView: View {
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                 projectHeader
 
-                projectHub
+                if isProjectFolder {
+                    projectHub
 
-                CodeHairline()
-                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                    CodeHairline()
+                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                }
 
                 if !projectBookmarks.isEmpty {
                     savedEvidenceHeader
@@ -1263,7 +1331,9 @@ struct ProjectView: View {
             // Project rows optimistically. Avoid re-reading and rebuilding the
             // full Saved library simply because this destination appeared;
             // pull-to-refresh remains the explicit reconciliation path.
-            library.noteProjectOpened(folderID)
+            if isProjectFolder {
+                library.noteProjectOpened(folderID)
+            }
         }
         .onDisappear {
             isProjectHubVisible = false
@@ -1289,7 +1359,9 @@ struct ProjectView: View {
         }
         .onChange(of: folder?.id) { _, newFolderID in
             if let newFolderID {
-                library.noteProjectOpened(newFolderID)
+                if isProjectFolder {
+                    library.noteProjectOpened(newFolderID)
+                }
             } else {
                 dismiss()
             }
@@ -1543,7 +1615,7 @@ struct ProjectView: View {
     @ViewBuilder
     private var projectReportSummary: some View {
         let reports = projectHubSnapshot?.reports ?? []
-        projectHubSection(title: "Exports", systemImage: "doc.richtext") {
+        projectHubSection(title: "Reports", systemImage: "doc.richtext") {
             if reports.isEmpty {
                 projectHubEmpty("No immutable Project Reports have been generated yet.")
             } else {
@@ -1579,7 +1651,7 @@ struct ProjectView: View {
                             buildProjectReportPDF(report)
                         } label: {
                             Label(
-                                isProjectReportBuilding ? "Building & saving PDF…" : "Create & Save iOS PDF",
+                                isProjectReportBuilding ? "Exporting & saving PDF…" : "Export & Save iOS PDF",
                                 systemImage: "square.and.arrow.up"
                             )
                             .font(.footnote.weight(.semibold))
@@ -1697,6 +1769,11 @@ struct ProjectView: View {
 
     @MainActor
     private func loadProjectHub() async {
+        guard isProjectFolder else {
+            projectHubSnapshot = nil
+            projectHubError = nil
+            return
+        }
         guard !isProjectHubLoading else { return }
         lastProjectHubLoadAt = Date()
         isProjectHubLoading = true
@@ -1726,7 +1803,7 @@ struct ProjectView: View {
                 Circle()
                     .fill(accentColor)
                     .frame(width: 12, height: 12)
-                Text(folder?.name ?? "Project")
+                Text(folder?.name ?? (isProjectFolder ? "Project" : "Reference"))
                     .font(.largeTitle.weight(.bold))
                     .foregroundStyle(.primary)
                     .lineLimit(2)
@@ -1742,7 +1819,7 @@ struct ProjectView: View {
                         .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Edit project")
+                .accessibilityLabel("Edit \(isProjectFolder ? "project" : "reference")")
             }
 
             if let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines),

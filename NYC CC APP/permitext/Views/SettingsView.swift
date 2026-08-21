@@ -2,6 +2,11 @@ import AuthenticationServices
 import SwiftUI
 import UIKit
 
+enum SettingsSection: Hashable {
+    case plan
+    case account
+}
+
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
@@ -12,12 +17,18 @@ struct SettingsView: View {
     @State private var showsProjectDeleteWarning = false
     @State private var showsAccountDeleteWarning = false
     @State private var showsSignOutWarning = false
+    @State private var didScrollToInitialSection = false
     @State private var pendingSyncConflictResolution: PendingSyncConflictResolution?
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
     private let webWorkspaceURL = URL(string: "https://permitext.com")!
     private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
     private let privacyContactURL = URL(string: "mailto:permitext@gmail.com")!
+    let initialSection: SettingsSection?
+
+    init(initialSection: SettingsSection? = nil) {
+        self.initialSection = initialSection
+    }
 
     private var readerPreviewAccent: Color {
         Color(uiColor: library.accentColor())
@@ -39,6 +50,7 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
+            ScrollViewReader { scrollProxy in
             ScrollView {
                 GeometryReader { proxy in
                     Color.clear
@@ -52,10 +64,12 @@ struct SettingsView: View {
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         planCard
                     }
+                    .id(SettingsSection.plan)
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         accountCard
                     }
+                    .id(SettingsSection.account)
 
                     if PermitextReleaseSurfaceVisibility.firmCollaboration {
                         CodeSurface(accent: settingsChromeColor, showsBorder: false) {
@@ -130,6 +144,13 @@ struct SettingsView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .tint(Color.appChrome)
+            .task(id: initialSection) {
+                guard let initialSection, !didScrollToInitialSection else { return }
+                didScrollToInitialSection = true
+                await Task.yield()
+                scrollProxy.scrollTo(initialSection, anchor: .top)
+            }
+            }
         }
         .coordinateSpace(name: "settingsScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
@@ -741,7 +762,7 @@ struct SettingsView: View {
     private var projectManagementCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                CodeEyebrow(text: "Projects", accent: settingsChromeColor)
+                CodeEyebrow(text: "Projects and References", accent: settingsChromeColor)
 
                 Spacer(minLength: 0)
 
@@ -760,7 +781,7 @@ struct SettingsView: View {
             }
 
             if library.folders.isEmpty {
-                Text("No projects yet.")
+                Text("No projects or references yet.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
@@ -822,7 +843,7 @@ struct SettingsView: View {
                         .lineLimit(1)
 
                     let count = library.bookmarkCount(inFolder: folder.id)
-                    Text(count == 1 ? "1 saved item" : "\(count) saved items")
+                    Text("\(folder.folderType == .project ? "Project" : "Reference") · \(count == 1 ? "1 saved item" : "\(count) saved items")")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -833,22 +854,28 @@ struct SettingsView: View {
             .padding(.vertical, 9)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(folder.name), \(isSelected ? "selected" : "not selected")")
+        .accessibilityLabel("\(folder.folderType == .project ? "Project" : "Reference") \(folder.name), \(isSelected ? "selected" : "not selected")")
     }
 
     private var projectDeletePopover: some View {
-        let count = selectedProjectIDs.count
+        let selectedFolders = library.folders.filter { selectedProjectIDs.contains($0.id) }
+        let projectCount = selectedFolders.filter { $0.folderType == .project }.count
+        let referenceCount = selectedFolders.filter { $0.folderType == .reference }.count
+        let deletionDescription = folderDeletionDescription(
+            projectCount: projectCount,
+            referenceCount: referenceCount
+        )
         return VStack(alignment: .leading, spacing: 18) {
-            Text(count == 1 ? "Delete project?" : "Delete projects?")
+            Text("Delete selected items?")
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(.primary)
 
-            Text("This will permanently delete \(count) \(count == 1 ? "project" : "projects") from every synced device. Saved items will keep their bookmarks. This cannot be undone.")
+            Text("This will permanently delete \(deletionDescription) from every synced device. Saved items will keep their bookmarks. This cannot be undone.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Button(count == 1 ? "Delete Project" : "Delete Projects", role: .destructive) {
+            Button("Delete Selected", role: .destructive) {
                 let deletedIDs = library.deleteFolders(ids: selectedProjectIDs)
                 selectedProjectIDs.subtract(deletedIDs)
                 showsProjectDeleteWarning = false
@@ -858,6 +885,14 @@ struct SettingsView: View {
         }
         .frame(width: 300, alignment: .leading)
         .padding(24)
+    }
+
+    private func folderDeletionDescription(projectCount: Int, referenceCount: Int) -> String {
+        let parts = [
+            projectCount > 0 ? "\(projectCount) \(projectCount == 1 ? "Project" : "Projects")" : nil,
+            referenceCount > 0 ? "\(referenceCount) \(referenceCount == 1 ? "Reference" : "References")" : nil
+        ].compactMap { $0 }
+        return parts.isEmpty ? "the selected items" : parts.joined(separator: " and ")
     }
 
     private var accountDeletePopover: some View {

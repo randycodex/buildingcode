@@ -1540,6 +1540,25 @@ final class CodeLibraryViewModel: ObservableObject {
         selectedTab = .search
     }
 
+    func openResearchCitation(sectionID: Int64, codeVersion: String?) {
+        if let codeVersion {
+            let canonicalVersion = UserContentSyncCodeVersion.server(codeVersion)
+            if let version = availableVersions.first(where: {
+                UserContentSyncCodeVersion.server($0.codeVersion) == canonicalVersion
+            }) {
+                if version.fileName != selectedVersionFileName {
+                    updateSelectedVersion(fileName: version.fileName)
+                }
+            } else {
+                selectVersionForDeepLinkedSection(sectionID)
+            }
+        } else {
+            selectVersionForDeepLinkedSection(sectionID)
+        }
+        pendingDeepLinkedSectionID = sectionID
+        selectedTab = .search
+    }
+
     private func selectVersionForDeepLinkedSection(_ sectionID: Int64) {
         guard let version = Self.codeVersion(containingDeepLinkedSectionID: sectionID, in: availableVersions),
               version.fileName != selectedVersionFileName else {
@@ -2135,7 +2154,10 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func backendProjectID(for folderID: Int64) -> String? {
-        guard let folder = folder(id: folderID), let signedInAccount else { return nil }
+        guard let folder = folder(id: folderID),
+              folder.folderType == .project,
+              let signedInAccount
+        else { return nil }
         return UserContentProjectIdentity.stable(
             folder.clientID,
             userID: signedInAccount.appUserID
@@ -2149,7 +2171,8 @@ final class CodeLibraryViewModel: ObservableObject {
     func folder(forBackendProjectID projectID: String?) -> CodeFolder? {
         guard let projectID, let signedInAccount else { return nil }
         return folders.first { folder in
-            (UserContentProjectIdentity.stable(folder.clientID, userID: signedInAccount.appUserID) ?? folder.clientID) == projectID
+            guard folder.folderType == .project else { return false }
+            return (UserContentProjectIdentity.stable(folder.clientID, userID: signedInAccount.appUserID) ?? folder.clientID) == projectID
         }
     }
 
@@ -2175,6 +2198,28 @@ final class CodeLibraryViewModel: ObservableObject {
         return try await accountBackendClient.researchConversation(
             account: signedInAccount,
             conversationID: id
+        )
+    }
+
+    func refreshResearchConversation(id: String) async throws -> ResearchConversation {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.refreshResearchConversation(
+            account: signedInAccount,
+            conversationID: id
+        )
+    }
+
+    func reviewResearchProjectContext(
+        conversationID: String,
+        projectID: String,
+        facts: [String]
+    ) async throws -> ResearchConversation {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.reviewResearchProjectContext(
+            account: signedInAccount,
+            conversationID: conversationID,
+            projectID: projectID,
+            facts: facts
         )
     }
 

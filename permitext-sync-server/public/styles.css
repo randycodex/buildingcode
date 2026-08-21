@@ -12490,6 +12490,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   text-transform: uppercase;
 }
 
+.project-ownership-label {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.76);
+  line-height: 1.25;
+}
+
 .notebook-card-rail h3,
 .notebook-welcome h3 {
   margin: 0;

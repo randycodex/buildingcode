@@ -373,6 +373,31 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         ).conversation
     }
 
+    func refreshResearchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation {
+        try await transport.researchConversationRefresh(
+            ResearchConversationRefreshRequest(
+                auth: authContext(for: account),
+                conversationID: conversationID
+            )
+        ).conversation
+    }
+
+    func reviewResearchProjectContext(
+        account: SignedInAccount,
+        conversationID: String,
+        projectID: String,
+        facts: [String]
+    ) async throws -> ResearchConversation {
+        try await transport.researchProjectContextReview(
+            ResearchProjectContextReviewRequest(
+                auth: authContext(for: account),
+                conversationID: conversationID,
+                projectID: projectID,
+                facts: facts
+            )
+        ).conversation
+    }
+
     func reviewResearchSelection(
         account: SignedInAccount,
         selection: ResearchSelectionRequest

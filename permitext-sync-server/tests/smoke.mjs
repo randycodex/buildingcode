@@ -640,7 +640,9 @@ async function main() {
         workspaceScript.text.includes('group.label = groupLabel;') &&
         workspaceScript.text.includes("codeOptions.forEach((code) => {") &&
         !workspaceScript.text.includes("codeOptions.filter((code) => code.prefix !== zoningCodePrefix)") &&
-        workspaceScript.text.includes("const staticSelect = select.disabled;") &&
+        workspaceScript.text.includes("const syncDisabledState = () => {") &&
+        workspaceScript.text.includes("const disabled = select.disabled;") &&
+        workspaceScript.text.includes('disabledObserver.observe(select, { attributes: true, attributeFilter: ["disabled"] });') &&
         !workspaceScript.text.includes("const addZoningReaderButton") &&
         !workspaceScript.text.includes('label: "Open ZR Reader"') &&
         workspaceScript.text.includes('item.classList.toggle("is-indented", indented)') &&
@@ -982,14 +984,14 @@ async function main() {
         iosLibraryViewModelSource.includes("func projectReportPDF(manifestID: String)") &&
         iosLibraryViewModelSource.includes("saveProjectReportPDF") &&
         iosLibraryViewModelSource.includes("projectBookmarksByFolderID") &&
-        iosLibraryViewModelSource.includes("accountWideProjectBookmarks(") &&
+        iosLibraryViewModelSource.includes("func bookmarks(inFolder folderID: Int64)") &&
         iosLibraryViewModelSource.includes("repository.evidenceReferences(inFolder: folder.id)") &&
         iosUserDataStoreSource.includes("func evidenceReferences(inFolder folderID: Int64)") &&
         iosBookmarksSource.includes('CodeEyebrow(text: "Project Hub"') &&
         iosBookmarksSource.includes('Label("Notebook", systemImage: "note.text")') &&
         iosBookmarksSource.includes("projectNotebookDestination(projectID: projectID, cardID: card.id)") &&
         iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
-        iosBookmarksSource.includes('projectHubSection(title: "Exports"') &&
+        iosBookmarksSource.includes('projectHubSection(title: "Reports"') &&
         iosExportBuilderSource.includes("struct ProjectReportExportBuilder: Sendable") &&
         iosCodeModelsSource.includes("struct PermitextFirmControls: Codable") &&
         iosCodeModelsSource.includes("struct ProjectReportPresentation: Codable") &&
@@ -998,7 +1000,7 @@ async function main() {
         iosOrganizationProjectHubSource.includes('projectSection(title: "Firm context"') &&
         !iosOrganizationProjectHubSource.includes("assignedFirmTags") &&
         iosExportBuilderSource.includes("manifest.contentHash") &&
-        iosBookmarksSource.includes("Create & Save iOS PDF") &&
+        iosBookmarksSource.includes("Export & Save iOS PDF") &&
         !iosBookmarksSource.includes("Flattened Project Workboard preview") &&
         !iosOrganizationProjectHubSource.includes("Workboard preview"),
       "iOS Project Hub must show account-wide Project evidence without exposing the web-only Workboard."
@@ -1447,7 +1449,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260820-ux-alignment-phase2-v1'),
+        webRoot.text.includes('/web/app.js?v=20260820-ux-meaning-phase3-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1616,7 +1618,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-ux-alignment-phase2-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260820-ux-meaning-phase3-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1882,7 +1884,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-ux-alignment-phase2-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260820-ux-meaning-phase3-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2165,7 +2167,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
         workspaceScript.text.includes('track.querySelectorAll(".section-detail-panel")') &&
-        workspaceScript.text.match(/overlay\.remove\(\);\s+await transitionWorkspace\("utility", \{\s+refreshPaneIDs: projectOverviewRefreshPaneIDs\(/) &&
+        workspaceScript.text.match(/closeSheet\(\{ restoreFocus: false \}\);\s+await transitionWorkspace\("utility", \{\s+refreshPaneIDs: projectOverviewRefreshPaneIDs\(/) &&
         workspaceScript.text.match(/refreshPaneIDs: projectOverviewRefreshPaneIDs\([\s\S]*?\);\s+refreshOpenAnnotationProjectEditors\(\);/),
       "Creating or editing a Project should refresh Project pills in open section details."
     );

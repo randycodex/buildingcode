@@ -13313,7 +13313,7 @@ async function handleReportManifestGet(request, response) {
   if (!context) return;
   const result = await accessibleReportManifest(context.userID, context.body.manifestID);
   if (!result) {
-    sendError(response, 404, "Report Manifest not found.");
+    sendError(response, 404, "Report not found.");
     return;
   }
   const { access, artifact } = result;
@@ -13351,7 +13351,7 @@ async function handleReportFileUpload(request, response) {
   const storageOwnerUserID = access.storageOwnerUserID;
   const manifestArtifact = await reportManifestArtifact(storageOwnerUserID, manifestID);
   if (!manifestArtifact || manifestArtifact.payload.project?.id !== projectID) {
-    sendError(response, 404, "Report Manifest not found.");
+    sendError(response, 404, "Report not found.");
     return;
   }
   if (!privateProjectAssetStorageConfigured()) {

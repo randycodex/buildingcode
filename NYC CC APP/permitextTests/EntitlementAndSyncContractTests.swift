@@ -3016,6 +3016,123 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(decoded.replayed, true)
     }
 
+    func testResearchAnswerRetainsTrustAndCitationBindings() throws {
+        let data = Data(
+            """
+            {
+              "answerText": "The cited provision governs.",
+              "conclusion": "The cited provision governs.",
+              "explanation": "The condition applies when the stated facts are true.",
+              "supportedPoints": [{
+                "heading": "The limit applies",
+                "explanation": "The selected passage states the controlling limit.",
+                "sectionID": "101",
+                "sourceIDs": ["passage-101"],
+                "evidenceRole": "governing"
+              }],
+              "assumptions": ["The occupancy is Group B."],
+              "missingFacts": ["Confirm the actual occupant load."],
+              "evidenceLimitations": ["Only the cited enacted provisions were reviewed."],
+              "followUpQuestions": ["What is the occupant load?"],
+              "additionalEvidenceNeeded": ["Add the applicable table."],
+              "citations": [{
+                "sourceID": "legacy-source-binding",
+                "sectionID": "101",
+                "sourceIDs": ["passage-101"],
+                "codePrefix": "BC",
+                "sectionNumber": "101.2",
+                "title": "Scope",
+                "evidenceRole": "governing",
+                "relevance": "Controls the scope question.",
+                "codeVersion": "2022 Construction Codes",
+                "codeEdition": "2022",
+                "corpusID": "nyc-construction",
+                "corpusLabel": "NYC Construction Codes",
+                "applicabilityStatus": "current"
+              }]
+            }
+            """.utf8
+        )
+
+        let answer = try JSONDecoder().decode(ResearchAnswer.self, from: data)
+        let point = try XCTUnwrap(answer.supportedPoints.first)
+        let citation = try XCTUnwrap(answer.citations.first)
+
+        XCTAssertEqual(point.explanation, "The selected passage states the controlling limit.")
+        XCTAssertEqual(point.sectionID, "101")
+        XCTAssertEqual(point.sourceIDs, ["passage-101"])
+        XCTAssertEqual(citation.sectionID, "101")
+        XCTAssertEqual(citation.sourceIDs, ["passage-101"])
+        XCTAssertEqual(citation.relevance, "Controls the scope question.")
+        XCTAssertEqual(citation.codeVersion, "2022 Construction Codes")
+        XCTAssertEqual(citation.corpusLabel, "NYC Construction Codes")
+        XCTAssertTrue(citation.id.contains("101"))
+        XCTAssertTrue(citation.id.contains("passage-101"))
+        XCTAssertNotEqual(citation.id, "legacy-source-binding")
+    }
+
+    func testLegacyResearchCitationStillDecodesWithoutSourceBindings() throws {
+        let data = Data(
+            """
+            {
+              "codePrefix": "BC",
+              "sectionNumber": "101.2",
+              "title": "Scope"
+            }
+            """.utf8
+        )
+
+        let citation = try JSONDecoder().decode(ResearchCitation.self, from: data)
+
+        XCTAssertNil(citation.sectionID)
+        XCTAssertNil(citation.sourceIDs)
+        XCTAssertEqual(citation.id, "BC:101.2:Scope")
+    }
+
+    func testResearchProjectContextRetainsFactsForReview() throws {
+        let data = Data(
+            """
+            {
+              "id": "conversation-1",
+              "title": "Exit width review",
+              "createdAt": "2026-08-20T12:00:00.000Z",
+              "updatedAt": "2026-08-20T12:05:00.000Z",
+              "primaryProjectID": "project-1",
+              "projectContext": {
+                "projectID": "project-1",
+                "facts": ["Occupancy is Group B", "Building is six stories"],
+                "source": "user-provided",
+                "updatedAt": "2026-08-20T12:04:00.000Z"
+              },
+              "projectContextReviewRequired": true,
+              "sourceStatus": "current",
+              "sources": [],
+              "messages": []
+            }
+            """.utf8
+        )
+
+        let conversation = try JSONDecoder().decode(ResearchConversation.self, from: data)
+
+        XCTAssertEqual(conversation.projectContext?.projectID, "project-1")
+        XCTAssertEqual(
+            conversation.projectContext?.facts,
+            ["Occupancy is Group B", "Building is six stories"]
+        )
+        XCTAssertTrue(conversation.projectContextReviewRequired)
+    }
+
+    @MainActor
+    func testResearchCitationNavigationSelectsVersionSectionAndSearch() {
+        let model = CodeLibraryViewModel.preview()
+
+        model.openResearchCitation(sectionID: 101, codeVersion: "2022 Construction Codes")
+
+        XCTAssertEqual(model.selectedVersion?.codeVersion, "2022 Construction Codes")
+        XCTAssertEqual(model.pendingDeepLinkedSectionID, 101)
+        XCTAssertEqual(model.selectedTab, .search)
+    }
+
     func testNativeNotebookSimpleDocumentRoundTripsWithoutLosingReferencesOrImages() throws {
         let document = NotebookDocument(document: [
             NotebookBlock.textBlock(type: "heading", text: "Finding", level: 2),
@@ -3906,7 +4023,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             accentColor: .systemBlue
         )
         let plainFont = try XCTUnwrap(plainText.attribute(.font, at: 0, effectiveRange: nil) as? UIFont)
-        XCTAssertEqual(plainFont.familyName, UIFont.systemFont(ofSize: 12).familyName)
+        XCTAssertEqual(plainFont.familyName, ReaderTheme.default.bodyFont.familyName)
     }
 
     func testNativeHeadingPresentationRecoversPublishedHierarchy() {

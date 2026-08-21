@@ -11,6 +11,18 @@ struct ResearchConversationGetRequest: Codable, Hashable, Sendable {
     let conversationID: String
 }
 
+struct ResearchConversationRefreshRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let conversationID: String
+}
+
+struct ResearchProjectContextReviewRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let conversationID: String
+    let projectID: String
+    let facts: [String]
+}
+
 struct ResearchSelectionRequest: Codable, Hashable, Sendable {
     let sectionID: String
     let selectedText: String
@@ -140,6 +152,7 @@ struct ResearchConversation: Codable, Hashable, Identifiable, Sendable {
     let createdAt: String
     var updatedAt: String
     var primaryProjectID: String? = nil
+    var projectContext: ResearchProjectContext? = nil
     var projectContextReviewRequired: Bool = false
     var sourceStatus: String = "current"
     var sources: [ResearchSource] = []
@@ -160,6 +173,13 @@ struct ResearchConversation: Codable, Hashable, Identifiable, Sendable {
             sourceStatus: sourceStatus
         )
     }
+}
+
+struct ResearchProjectContext: Codable, Hashable, Sendable {
+    var projectID: String? = nil
+    var facts: [String]? = nil
+    var source: String? = nil
+    var updatedAt: String? = nil
 }
 
 struct ResearchSource: Codable, Hashable, Identifiable, Sendable {
@@ -183,6 +203,7 @@ struct ResearchMessage: Codable, Hashable, Identifiable, Sendable {
 }
 
 struct ResearchAnswer: Codable, Hashable, Sendable {
+    var answerText: String? = nil
     var conclusion: String = ""
     var explanation: String = ""
     var supportedPoints: [ResearchSupportedPoint] = []
@@ -197,18 +218,34 @@ struct ResearchAnswer: Codable, Hashable, Sendable {
 
 struct ResearchSupportedPoint: Codable, Hashable, Sendable {
     var heading: String = ""
+    var explanation: String? = nil
+    var sectionID: String? = nil
+    var sourceIDs: [String]? = nil
     var evidenceRole: String? = nil
 }
 
 struct ResearchCitation: Codable, Hashable, Identifiable, Sendable {
     var sourceID: String? = nil
+    var sectionID: String? = nil
+    var sourceIDs: [String]? = nil
     var codePrefix: String? = nil
     var sectionNumber: String? = nil
     var title: String? = nil
     var evidenceRole: String? = nil
+    var relevance: String? = nil
+    var codeVersion: String? = nil
+    var codeEdition: String? = nil
+    var corpusID: String? = nil
+    var corpusLabel: String? = nil
+    var applicabilityStatus: String? = nil
 
     var id: String {
-        sourceID ?? [codePrefix, sectionNumber, title].compactMap { $0 }.joined(separator: ":")
+        let boundIdentity = [sectionID, sourceIDs?.sorted().joined(separator: ",")]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .joined(separator: ":")
+        if !boundIdentity.isEmpty { return boundIdentity }
+        return sourceID ?? [codePrefix, sectionNumber, title].compactMap { $0 }.joined(separator: ":")
     }
 }
 

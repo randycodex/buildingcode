@@ -309,7 +309,7 @@ private struct NativeReaderPhysicalStressHarness: View {
                 .tabItem {
                     Image(systemName: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
                 }
-                .accessibilityLabel("Projects")
+                .accessibilityLabel("Saved")
                 .tag(AppTab.bookmarks)
         }
         .task {
@@ -458,7 +458,7 @@ private struct PermitextTabNavigation: View {
                 .tabItem {
                     Image(systemName: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
                 }
-                .accessibilityLabel("Projects")
+                .accessibilityLabel("Saved")
                 .tag(AppTab.bookmarks)
 
             BrowseView(browserContext: .primary)

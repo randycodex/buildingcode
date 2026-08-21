@@ -222,7 +222,7 @@ struct OrganizationProjectHubView: View {
                 value: "\(reviewThreads.filter { ["open", "waiting"].contains($0.payload.status ?? "") }.count)",
                 label: "Active coordination"
             )
-            metric(value: "\(reportFiles.count)", label: "Report exports")
+            metric(value: "\(reportFiles.count)", label: "Reports")
         }
     }
 
@@ -479,7 +479,7 @@ struct OrganizationProjectHubView: View {
 
     @ViewBuilder
     private var reportSection: some View {
-        projectSection(title: "Report exports", systemImage: "doc.richtext") {
+        projectSection(title: "Reports", systemImage: "doc.richtext") {
             if reportFiles.isEmpty {
                 emptyText("No generated Project Report PDFs are available yet.")
             } else {

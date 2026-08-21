@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260820-ux-alignment-phase2-v1";
+} from "./offline-storage.js?v=20260820-ux-meaning-phase3-v1";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -14871,6 +14871,9 @@ function renderResearchInterpretation(container, result, options = {}) {
   evidenceReviewedBody.className = "research-evidence-reviewed-body";
 
   if (result.citations?.length) {
+    const answerSources = options.message && options.conversation
+      ? researchSourcesForAnswer(options.conversation, options.message)
+      : [];
     const citationRow = document.createElement("nav");
     citationRow.className = "research-answer-citation-chips";
     citationRow.setAttribute("aria-label", "Sources cited in this answer");
@@ -14882,12 +14885,24 @@ function renderResearchInterpretation(container, result, options = {}) {
           ? "Context"
           : citation.evidenceRole === "supporting"
             ? "Supporting"
-            : "",
+            : "Governing",
         citation.codePrefix,
         citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
       ].filter(Boolean).join(" ");
       citationButton.title = [citation.corpusLabel, citation.codeEdition].filter(Boolean).join(" · ");
       citationButton.addEventListener("click", () => {
+        const sourceIDs = new Set((citation.sourceIDs || []).map(String));
+        const exactSource = answerSources.find((source) =>
+          sourceIDs.has(String(source.id || "")) ||
+          sourceIDs.has(String(source.sourceID || "")) ||
+          String(source.sectionID || "") === String(citation.sectionID || "")
+        );
+        if (exactSource) {
+          void openSourceInReader(exactSource, options.anchorPaneID || "", {
+            projectID: options.conversation?.primaryProjectID || ""
+          });
+          return;
+        }
         const sourceDetails = container.querySelector(".research-answer-source-text");
         if (!sourceDetails) return;
         if (sourceDetails.setResearchExpanded) sourceDetails.setResearchExpanded(true);
@@ -14970,7 +14985,7 @@ function renderResearchInterpretation(container, result, options = {}) {
           ? "Context —"
           : citation.evidenceRole === "supporting"
             ? "Supporting —"
-            : "",
+            : "Governing —",
         citation.codePrefix,
         citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
       ].filter(Boolean).join(" ");
@@ -16768,7 +16783,20 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
 function renderNewResearchComposer(container, researchEnabled) {
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
-  const initialProjectID = preferredResearchProjectID();
+  let initialProjectID = preferredResearchProjectID();
+  const projectField = document.createElement("label");
+  projectField.className = "research-start-project";
+  const projectLabel = document.createElement("span");
+  projectLabel.textContent = "Project context";
+  const projectSelect = createResearchProjectSelect({
+    value: initialProjectID,
+    unassignedLabel: "Unassigned — no Project context",
+    ariaLabel: "Project context for new Research"
+  });
+  projectSelect.addEventListener("change", () => {
+    initialProjectID = projectSelect.value;
+  });
+  projectField.append(projectLabel, projectSelect);
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
@@ -16854,7 +16882,7 @@ function renderNewResearchComposer(container, researchEnabled) {
     }
   });
   composerBox.append(input, sendButton);
-  form.append(composerBox, status);
+  form.append(projectField, composerBox, status);
   container.append(form);
 }
 
@@ -18581,7 +18609,12 @@ async function renderResearchConversation(conversationID, options = {}) {
     const bubble = document.createElement("article");
     bubble.className = "research-message is-assistant";
     const savedProgress = researchProgressFromSavedMessage(message);
-    renderResearchInterpretation(bubble, message.answer, { message, conversationID });
+    renderResearchInterpretation(bubble, message.answer, {
+      message,
+      conversationID,
+      conversation,
+      anchorPaneID: paneID
+    });
     if (savedProgress) bubble.prepend(renderResearchProgressCard(savedProgress, { completed: true }));
     const answerSources = renderResearchAnswerSources(conversation, message, paneID);
     if (answerSources) {
@@ -19404,7 +19437,10 @@ async function renderProjectNotebook(project) {
   heading.className = "notebook-heading";
   const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Notebook";
-  heading.append(headingTitle);
+  const projectOwnership = document.createElement("p");
+  projectOwnership.className = "project-ownership-label";
+  projectOwnership.textContent = `Project: ${identity.name}`;
+  heading.append(headingTitle, projectOwnership);
   const dragHandle = createProjectToolDragHandle(identity);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close notebook-close";
@@ -20702,7 +20738,7 @@ function printReportManifestAsPDF(manifest) {
   if (!hasCapability("professional-exports")) {
     void presentPlanLimitNotice(
       "Professional reports require Pro",
-      "Upgrade to Pro to render a Project Report Manifest as PDF."
+      "Upgrade to Pro to export a Project Report as PDF."
     );
     return;
   }
@@ -20921,7 +20957,10 @@ async function renderProjectReportDraft(project) {
   heading.className = "report-heading";
   const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Report";
-  heading.append(headingTitle);
+  const projectOwnership = document.createElement("p");
+  projectOwnership.className = "project-ownership-label";
+  projectOwnership.textContent = `Project: ${identity.name}`;
+  heading.append(headingTitle, projectOwnership);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close report-draft-close";
   closeButton.type = "button";

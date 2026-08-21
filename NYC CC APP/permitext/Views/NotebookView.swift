@@ -58,53 +58,62 @@ struct ProjectNotebookView: View {
     }
 
     var body: some View {
-        Group {
-            if isLoading && cards.isEmpty {
-                ProgressView("Loading Notebook…")
-            } else if cards.isEmpty {
-                ContentUnavailableView(
-                    "No Notes yet",
-                    systemImage: "note.text",
-                    description: Text(access.readOnly ? "This Project’s Notebook is read-only." : "Create a Note for analysis, evidence, and Research.")
-                )
-            } else {
-                List {
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-                    ForEach(cards) { card in
-                        Button {
-                            editorRoute = NativeNotebookEditorRoute(cardID: card.id)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 7) {
-                                Text(card.title)
-                                    .font(.body.weight(.semibold))
-                                    .foregroundStyle(.primary)
-                                if !card.plainText.isEmpty {
-                                    Text(card.plainText)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(3)
-                                }
-                                HStack(spacing: 8) {
-                                    if card.referenceCount > 0 {
-                                        Label("\(card.referenceCount) linked", systemImage: "link")
-                                    }
-                                    Spacer()
-                                    Text(notebookDate(card.updatedAt))
-                                }
-                                .font(.caption)
+        VStack(spacing: 0) {
+            Label("Project: \(projectName)", systemImage: "folder")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+
+            Group {
+                if isLoading && cards.isEmpty {
+                    ProgressView("Loading Notebook…")
+                } else if cards.isEmpty {
+                    ContentUnavailableView(
+                        "No Notes yet",
+                        systemImage: "note.text",
+                        description: Text(access.readOnly ? "This Project’s Notebook is read-only." : "Create a Note for analysis, evidence, and Research.")
+                    )
+                } else {
+                    List {
+                        if let errorMessage {
+                            Text(errorMessage)
+                                .font(.footnote)
                                 .foregroundStyle(.secondary)
-                            }
-                            .padding(.vertical, 6)
                         }
-                        .buttonStyle(.plain)
+                        ForEach(cards) { card in
+                            Button {
+                                editorRoute = NativeNotebookEditorRoute(cardID: card.id)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 7) {
+                                    Text(card.title)
+                                        .font(.body.weight(.semibold))
+                                        .foregroundStyle(.primary)
+                                    if !card.plainText.isEmpty {
+                                        Text(card.plainText)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(3)
+                                    }
+                                    HStack(spacing: 8) {
+                                        if card.referenceCount > 0 {
+                                            Label("\(card.referenceCount) linked", systemImage: "link")
+                                        }
+                                        Spacer()
+                                        Text(notebookDate(card.updatedAt))
+                                    }
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                }
+                                .padding(.vertical, 6)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
+                    .listStyle(.plain)
+                    .refreshable { await loadCards(forceNetwork: true) }
                 }
-                .listStyle(.plain)
-                .refreshable { await loadCards(forceNetwork: true) }
             }
         }
         .navigationTitle("Notebook")

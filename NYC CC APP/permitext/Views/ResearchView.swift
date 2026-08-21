@@ -169,6 +169,10 @@ struct ResearchView: View {
     @State private var showingAssignmentConfirmation = false
     @State private var pendingDeletion: PendingResearchDeletion?
     @State private var deletingConversationID: String?
+    @State private var showingSettings = false
+    @State private var recoverySettingsSection: SettingsSection = .account
+    @State private var isRefreshingSources = false
+    @State private var isConfirmingProjectContext = false
     @State private var isVisible = false
     private let cache = ProjectHubOfflineCache()
 
@@ -179,16 +183,22 @@ struct ResearchView: View {
 
                 Group {
                     if library.signedInAccount == nil {
-                        ContentUnavailableView(
-                            "Sign in to use Research",
-                            image: "Astroid",
-                            description: Text("Research conversations synchronize with Permitext on the web.")
+                        researchAccessRecovery(
+                            title: "Sign in to use Research",
+                            description: pendingSelectionRecoveryDescription(
+                                fallback: "Research conversations synchronize with Permitext on the web."
+                            ),
+                            buttonTitle: "Open Account",
+                            section: .account
                         )
                     } else if !library.hasResearchAccess {
-                        ContentUnavailableView(
-                            "Research requires the Research Add-On",
-                            image: "Astroid",
-                            description: Text("Manage your plan from Settings.")
+                        researchAccessRecovery(
+                            title: "Research requires the Research Add-On",
+                            description: pendingSelectionRecoveryDescription(
+                                fallback: "Manage your plan from Settings."
+                            ),
+                            buttonTitle: "View Plans",
+                            section: .plan
                         )
                     } else if let conversation {
                         conversationView(conversation)
@@ -214,6 +224,10 @@ struct ResearchView: View {
                         Task { await confirmVisualReview(pending, sourceIDs: sourceIDs) }
                     }
                 )
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView(initialSection: recoverySettingsSection)
+                    .environmentObject(library)
             }
             .alert("Rename Research", isPresented: $showingRename) {
                 TextField("Research title", text: $draftTitle)
@@ -250,7 +264,7 @@ struct ResearchView: View {
             } message: { pending in
                 Text("\u{201c}\(pending.title)\u{201d} will be permanently deleted from Permitext. This cannot be undone.")
             }
-            .task(id: library.signedInAccount?.appUserID) {
+            .task(id: "\(library.signedInAccount?.appUserID ?? "signed-out"):\(library.hasResearchAccess)") {
                 await loadHistory()
                 await openActiveConversationIfNeeded()
                 await consumePendingSelectionIfNeeded()
@@ -269,6 +283,40 @@ struct ResearchView: View {
             .onAppear { isVisible = true }
             .onDisappear { isVisible = false }
         }
+    }
+
+    private func researchAccessRecovery(
+        title: String,
+        description: String,
+        buttonTitle: String,
+        section: SettingsSection
+    ) -> some View {
+        VStack(spacing: 14) {
+            Image("Astroid")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 44, height: 44)
+                .accessibilityHidden(true)
+            Text(title)
+                .font(.title3.weight(.semibold))
+                .multilineTextAlignment(.center)
+            Text(description)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            Button(buttonTitle) {
+                recoverySettingsSection = section
+                showingSettings = true
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func pendingSelectionRecoveryDescription(fallback: String) -> String {
+        guard !library.pendingResearchSelections.isEmpty else { return fallback }
+        return "Your selected Reader passage is kept. \(fallback)"
     }
 
     private var researchScreenHeader: some View {
@@ -374,13 +422,13 @@ struct ResearchView: View {
             HStack(spacing: 10) {
                 Menu {
                     Button("Unassigned") { requestAssignment(nil) }
-                    ForEach(library.folders) { folder in
+                    ForEach(library.folders.filter { $0.folderType == .project }) { folder in
                         if let projectID = library.backendProjectID(for: folder.id) {
                             Button(folder.name) { requestAssignment(projectID) }
                         }
                     }
                 } label: {
-                    Label(projectName(for: conversation.primaryProjectID), systemImage: "folder")
+                    Label("Project context: \(projectName(for: conversation.primaryProjectID))", systemImage: "folder")
                         .font(.caption.weight(.semibold))
                         .padding(.horizontal, 11)
                         .padding(.vertical, 7)
@@ -411,11 +459,17 @@ struct ResearchView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         if let errorMessage { statusMessage(errorMessage) }
+                        if conversation.sourceStatus == "changed" {
+                            changedSourceWarning(conversation)
+                        }
+                        if conversation.projectContextReviewRequired {
+                            projectContextWarning(conversation)
+                        }
                         if !conversation.sources.isEmpty {
                             evidenceSummary(conversation.sources)
                         }
                         ForEach(conversation.messages) { message in
-                            messageView(message)
+                            messageView(message, sources: conversation.sources)
                                 .id(message.id)
                         }
                         if let pendingQuestionAttempt {
@@ -454,32 +508,158 @@ struct ResearchView: View {
     }
 
     private var researchComposer: some View {
-        HStack(alignment: .bottom, spacing: 10) {
-            TextField("Ask Terra…", text: $question, axis: .vertical)
-                .textFieldStyle(.plain)
-                .lineLimit(1...6)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 11)
-                .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
-                .disabled(isSending)
-            Button {
-                Task { await sendQuestion() }
-            } label: {
-                if isSending {
-                    ProgressView()
-                        .frame(width: 38, height: 38)
-                } else {
-                    Image(systemName: "arrow.up")
-                        .font(.body.weight(.bold))
-                        .frame(width: 38, height: 38)
-                        .foregroundStyle(.white)
-                        .background(Color.appChrome, in: Circle())
-                }
+        VStack(alignment: .leading, spacing: 8) {
+            if let composerBlockMessage {
+                Text(composerBlockMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .disabled(question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 || isSending)
-            .accessibilityLabel("Send Research question")
+            HStack(alignment: .bottom, spacing: 10) {
+                TextField("Ask Terra…", text: $question, axis: .vertical)
+                    .textFieldStyle(.plain)
+                    .lineLimit(1...6)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 11)
+                    .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+                    .disabled(isSending || researchSendIsBlocked)
+                Button {
+                    Task { await sendQuestion() }
+                } label: {
+                    if isSending {
+                        ProgressView()
+                            .frame(width: 38, height: 38)
+                    } else {
+                        Image(systemName: "arrow.up")
+                            .font(.body.weight(.bold))
+                            .frame(width: 38, height: 38)
+                            .foregroundStyle(.white)
+                            .background(Color.appChrome, in: Circle())
+                    }
+                }
+                .disabled(
+                    question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
+                    isSending ||
+                    researchSendIsBlocked
+                )
+                .accessibilityLabel("Send Research question")
+            }
         }
         .padding(12)
+    }
+
+    private var researchSendIsBlocked: Bool {
+        conversation?.sourceStatus == "changed" ||
+            conversation?.projectContextReviewRequired == true
+    }
+
+    private var composerBlockMessage: String? {
+        if conversation?.sourceStatus == "changed" {
+            return "Refresh the changed enacted sources before asking another question."
+        }
+        if conversation?.projectContextReviewRequired == true {
+            return "Review the active Project above before asking another question."
+        }
+        return nil
+    }
+
+    private func changedSourceWarning(_ conversation: ResearchConversation) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Enacted source changed", systemImage: "exclamationmark.triangle.fill")
+                .font(.subheadline.weight(.semibold))
+            Text("Refresh the source metadata before continuing. If the selected words changed or disappeared, start a new selection from the current Reader.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Button(isRefreshingSources ? "Refreshing…" : "Refresh Sources", systemImage: "arrow.clockwise") {
+                Task { await refreshChangedSources(conversation) }
+            }
+            .disabled(isRefreshingSources)
+        }
+        .padding(12)
+        .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func projectContextWarning(_ conversation: ResearchConversation) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label("Project review required", systemImage: "folder.badge.questionmark")
+                .font(.subheadline.weight(.semibold))
+            Text("Choose a different Project above, choose Unassigned, or confirm that the current Project and its facts are correct. Existing answers and citations will not change.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            if conversation.primaryProjectID != nil {
+                Button(isConfirmingProjectContext ? "Confirming…" : "Confirm Current Project") {
+                    Task { await confirmCurrentProjectContext(conversation) }
+                }
+                .disabled(isConfirmingProjectContext)
+            }
+        }
+        .padding(12)
+        .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func confirmCurrentProjectContext(_ current: ResearchConversation) async {
+        guard !isConfirmingProjectContext,
+              let projectID = current.primaryProjectID
+        else { return }
+        isConfirmingProjectContext = true
+        defer { isConfirmingProjectContext = false }
+        do {
+            let updated = try await library.reviewResearchProjectContext(
+                conversationID: current.id,
+                projectID: projectID,
+                facts: current.projectContext?.facts ?? []
+            )
+            guard conversation?.id == current.id else { return }
+            conversation = updated
+            cacheConversation(updated)
+            await loadHistory(forceNetwork: true)
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func refreshChangedSources(_ current: ResearchConversation) async {
+        guard !isRefreshingSources else { return }
+        isRefreshingSources = true
+        defer { isRefreshingSources = false }
+        do {
+            let updated = try await library.refreshResearchConversation(id: current.id)
+            guard conversation?.id == current.id else { return }
+            conversation = updated
+            cacheConversation(updated)
+            await loadHistory(forceNetwork: true)
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func openCitation(_ citation: ResearchCitation, sources: [ResearchSource]) {
+        let citedSourceIDs = Set(([citation.sourceID].compactMap { $0 }) + (citation.sourceIDs ?? []))
+        let matchedSource = sources.first { source in
+            citedSourceIDs.contains(source.id) || source.sectionID == citation.sectionID
+        }
+        let resolvedSectionID = [citation.sectionID, matchedSource?.sectionID]
+            .compactMap { $0 }
+            .compactMap(Int64.init)
+            .first
+        if let resolvedSectionID {
+            library.openResearchCitation(
+                sectionID: resolvedSectionID,
+                codeVersion: citation.codeVersion
+            )
+            return
+        }
+        let sectionNumber = citation.sectionNumber ?? matchedSource?.sectionNumber
+        if let sectionNumber,
+           let summary = library.sectionSummary(sectionNumber: sectionNumber) {
+            library.openResearchCitation(
+                sectionID: summary.id,
+                codeVersion: citation.codeVersion
+            )
+            return
+        }
+        errorMessage = "The cited provision is not available in the installed code library."
     }
 
     private func evidenceSummary(_ sources: [ResearchSource]) -> some View {
@@ -509,7 +689,7 @@ struct ResearchView: View {
     }
 
     @ViewBuilder
-    private func messageView(_ message: ResearchMessage) -> some View {
+    private func messageView(_ message: ResearchMessage, sources: [ResearchSource]) -> some View {
         if message.role == "user", let question = message.question {
             Text(question)
                 .padding(.horizontal, 14)
@@ -518,7 +698,9 @@ struct ResearchView: View {
                 .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: 16))
                 .frame(maxWidth: .infinity, alignment: .trailing)
         } else if let answer = message.answer {
-            ResearchAnswerView(answer: answer)
+            ResearchAnswerView(answer: answer) { citation in
+                openCitation(citation, sources: sources)
+            }
         }
     }
 
@@ -660,7 +842,11 @@ struct ResearchView: View {
     }
 
     private func consumePendingSelectionIfNeeded() async {
-        guard !isConsumingPendingSelection, pendingVisualReview == nil else { return }
+        guard library.signedInAccount != nil,
+              library.hasResearchAccess,
+              !isConsumingPendingSelection,
+              pendingVisualReview == nil
+        else { return }
         isConsumingPendingSelection = true
         defer { isConsumingPendingSelection = false }
 
@@ -774,7 +960,7 @@ struct ResearchView: View {
     }
 
     private func sendQuestion(_ attempt: ResearchQuestionAttempt) async {
-        guard let id = conversation?.id, !isSending else { return }
+        guard let id = conversation?.id, !isSending, !researchSendIsBlocked else { return }
         let messageIDsBeforeRequest = Set(conversation?.messages.map(\.id) ?? [])
         isSending = true
         pendingQuestionAttempt = attempt
@@ -1056,6 +1242,7 @@ private struct ResearchVisualReviewSheet: View {
 
 private struct ResearchAnswerView: View {
     let answer: ResearchAnswer
+    let onOpenCitation: (ResearchCitation) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -1071,29 +1258,56 @@ private struct ResearchAnswerView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(answer.citations) { citation in
-                            Text([
-                                citation.codePrefix,
-                                citation.sectionNumber.map { "§ \($0)" }
-                            ].compactMap { $0 }.joined(separator: " "))
-                                .font(.caption.weight(.semibold))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Color.appChrome.opacity(0.14), in: Capsule())
+                            Button {
+                                onOpenCitation(citation)
+                            } label: {
+                                Text(citationLabel(citation))
+                                    .font(.caption.weight(.semibold))
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.appChrome.opacity(0.14), in: Capsule())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Open \(citationAccessibilityLabel(citation)) in Reader")
                         }
                     }
                 }
             }
-            if !answer.supportedPoints.isEmpty || !answer.missingFacts.isEmpty || !answer.evidenceLimitations.isEmpty {
+            if hasEvidenceDetails {
                 DisclosureGroup("Evidence reviewed") {
-                    VStack(alignment: .leading, spacing: 9) {
-                        ForEach(answer.supportedPoints, id: \.heading) { point in
-                            Label(point.heading, systemImage: "checkmark.circle")
-                        }
-                        ForEach(answer.missingFacts, id: \.self) { fact in
-                            Label(fact, systemImage: "questionmark.circle")
-                        }
-                        ForEach(answer.evidenceLimitations, id: \.self) { limit in
-                            Label(limit, systemImage: "exclamationmark.triangle")
+                    VStack(alignment: .leading, spacing: 14) {
+                        answerSection("What the cited evidence establishes", items: answer.supportedPoints.map { point in
+                            [evidenceRoleLabel(point.evidenceRole), point.heading, point.explanation]
+                                .compactMap { $0 }
+                                .filter { !$0.isEmpty }
+                                .joined(separator: " — ")
+                        })
+                        answerSection("Assumptions used", items: answer.assumptions)
+                        answerSection("Project facts to verify", items: answer.missingFacts)
+                        answerSection("Limits of this answer", items: answer.evidenceLimitations)
+                        answerSection("Questions that would materially advance this answer", items: answer.followUpQuestions)
+                        answerSection("Related evidence to add", items: answer.additionalEvidenceNeeded)
+                        if !answer.citations.isEmpty {
+                            VStack(alignment: .leading, spacing: 7) {
+                                Text("Cited sources")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(.primary)
+                                ForEach(answer.citations) { citation in
+                                    Button {
+                                        onOpenCitation(citation)
+                                    } label: {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(citationAccessibilityLabel(citation))
+                                            if let relevance = citation.relevance, !relevance.isEmpty {
+                                                Text(relevance)
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
                         }
                     }
                     .font(.caption)
@@ -1108,6 +1322,56 @@ private struct ResearchAnswerView: View {
         }
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var hasEvidenceDetails: Bool {
+        !answer.supportedPoints.isEmpty ||
+            !answer.assumptions.isEmpty ||
+            !answer.missingFacts.isEmpty ||
+            !answer.evidenceLimitations.isEmpty ||
+            !answer.followUpQuestions.isEmpty ||
+            !answer.additionalEvidenceNeeded.isEmpty ||
+            !answer.citations.isEmpty
+    }
+
+    @ViewBuilder
+    private func answerSection(_ title: String, items: [String]) -> some View {
+        if !items.isEmpty {
+            VStack(alignment: .leading, spacing: 5) {
+                Text(title)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.primary)
+                ForEach(items, id: \.self) { item in
+                    Text("• \(item)")
+                }
+            }
+        }
+    }
+
+    private func citationLabel(_ citation: ResearchCitation) -> String {
+        [
+            evidenceRoleLabel(citation.evidenceRole),
+            citation.codePrefix,
+            citation.sectionNumber.map { "§ \($0)" } ?? citation.title
+        ]
+        .compactMap { $0 }
+        .filter { !$0.isEmpty }
+        .joined(separator: " ")
+    }
+
+    private func citationAccessibilityLabel(_ citation: ResearchCitation) -> String {
+        [citationLabel(citation), citation.title, citation.corpusLabel, citation.codeEdition]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .joined(separator: ", ")
+    }
+
+    private func evidenceRoleLabel(_ role: String?) -> String {
+        switch role?.lowercased() {
+        case "contextual": return "Context"
+        case "supporting": return "Supporting"
+        default: return "Governing"
+        }
     }
 }
 
