@@ -83,7 +83,7 @@ enum ChapterHTMLWebProcessWarmup {
 }
 
 private enum HTMLAssetPathResolver {
-    private static let readerViewportContent = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    private static let readerViewportContent = "width=device-width, initial-scale=1.0"
 
     static func resolveSharedAssetPaths(in html: String, readAccessURL: URL) -> String {
         let assetRoot = readAccessURL
@@ -295,8 +295,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         webView.backgroundColor = pageBackgroundColor
         webView.scrollView.backgroundColor = pageBackgroundColor
         webView.scrollView.minimumZoomScale = 1
-        webView.scrollView.maximumZoomScale = 1
-        webView.scrollView.bouncesZoom = false
+        webView.scrollView.maximumZoomScale = 5
+        webView.scrollView.bouncesZoom = true
         webView.scrollView.alwaysBounceHorizontal = false
         webView.scrollView.showsHorizontalScrollIndicator = false
         webView.scrollView.isDirectionalLockEnabled = true
@@ -653,7 +653,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 viewport.name = 'viewport';
                 document.head.appendChild(viewport);
               }
-              viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+              viewport.content = 'width=device-width, initial-scale=1.0';
 
               var existing = document.getElementById('nyccc-reader-style');
               if (!existing) {
@@ -1366,15 +1366,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            if abs(scrollView.contentOffset.x) > 0.5 {
+            if scrollView.zoomScale <= scrollView.minimumZoomScale + 0.01,
+               abs(scrollView.contentOffset.x) > 0.5 {
                 scrollView.contentOffset.x = 0
             }
             reportScrollProgress(from: scrollView)
             scheduleVisibleAnchorReport()
-        }
-
-        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-            nil
         }
 
         private func reportScrollProgress(from scrollView: UIScrollView) {
@@ -1543,10 +1540,10 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let borderColor = isDark ? "#6f6f76" : "#c6c6cc"
             let softBorderColor = isDark ? "#4b4b50" : "#d8d8de"
             let guideLineColor = isDark ? "rgba(255,255,255,0.18)" : "rgba(60,60,67,0.18)"
-            let bodyFontSize = max(theme.fontSize * 1.16, 12)
-            let sectionHeadingSize = max(theme.fontSize * 1.08, 13)
-            let subsectionHeadingSize = max(theme.fontSize * 1.0, 12)
-            let tableFontSize = max(theme.fontSize * 0.78, 9)
+            let bodyFontSize = max(theme.fontSize, ReaderTheme.minimumFontSize)
+            let sectionHeadingSize = max(bodyFontSize * 1.18, bodyFontSize + 2)
+            let subsectionHeadingSize = max(bodyFontSize * 1.08, bodyFontSize + 1)
+            let tableFontSize = max(bodyFontSize * 0.82, 14)
             let lineHeight = max(1.35, min(1.64, 1.28 + theme.lineSpacing / 28))
             let paragraphSpacing = max(theme.paragraphSpacing / 20, 0.42)
             let fontFamily = #""Source Serif 4 Variable", "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif"#

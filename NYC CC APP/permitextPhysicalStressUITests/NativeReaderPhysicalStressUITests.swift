@@ -90,6 +90,33 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
     }
 
+    func testReaderRestoresInteractiveEdgeSwipeBack() {
+        let app = XCUIApplication()
+        app.launch()
+
+        let chapter = app.buttons
+            .matching(NSPredicate(format: "label BEGINSWITH[c] %@", "Chapter "))
+            .firstMatch
+        XCTAssertTrue(chapter.waitForExistence(timeout: 20), "No chapter card was available to open.")
+        chapter.tap()
+
+        XCTAssertTrue(
+            app.buttons["Jump within chapter"].waitForExistence(timeout: 30),
+            "The chapter Reader did not open."
+        )
+
+        let screen = app.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0))
+        screen.withOffset(CGVector(dx: 2, dy: app.frame.height * 0.52)).press(
+            forDuration: 0.08,
+            thenDragTo: screen.withOffset(CGVector(dx: app.frame.width * 0.82, dy: app.frame.height * 0.52))
+        )
+
+        XCTAssertTrue(
+            chapter.waitForExistence(timeout: 10),
+            "The standard left-edge swipe did not return from the Reader to the chapter grid."
+        )
+    }
+
     private func runCycles(_ iterations: Int, in app: XCUIApplication) {
         for iteration in 1...iterations {
             let bookmark = element(in: app, identifier: bookmarkIdentifier)

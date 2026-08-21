@@ -516,6 +516,6 @@ assert.match(stylesSource, /@media \(max-width: 760px\) \{[\s\S]*?grid-template-
 assert.match(stylesSource, /\.topbar #fit-columns,[\s\S]*?\.topbar #collapse-readers,[\s\S]*?display: none !important;/, "Desktop column-layout controls remain visible in the mobile dock.");
 assert.match(clientSource, /function openMobileMoreSheet\(\)[\s\S]*?workspace\.name[\s\S]*?"Create workspace"[\s\S]*?"Rename workspace"[\s\S]*?"Settings"/, "The mobile More sheet does not contain workspace switching and management controls.");
 assert.match(clientSource, /const preservedTargetOffset = preservedTarget[\s\S]*?menu\.scrollTop \+= nextTargetOffset - preservedTargetOffset;[\s\S]*?focusTarget\?\.focus\(\{ preventScroll: true \}\)/, "Expanding a Reader chapter does not preserve its viewport position.");
-assert.match(clientSource, /if \(readerCodeMenu\) \{[\s\S]*?event\.key !== "Escape" \|\| menu\.hidden[\s\S]*?closeMenu\(\);[\s\S]*?trigger\.focus\(\{ preventScroll: true \}\)/, "Escape does not close the Reader code menu and restore trigger focus.");
+assert.match(clientSource, /if \(!readerChapterMenu\) \{[\s\S]*?event\.key === "Escape"[\s\S]*?closeMenu\(\);[\s\S]*?trigger\.focus\(\{ preventScroll: true \}\)/, "Escape does not close an enhanced select and restore trigger focus.");
 
 console.log("permitext research list summary contract passed");

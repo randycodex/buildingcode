@@ -8,6 +8,7 @@ enum CodeFilterChipMetrics {
     static let verticalPadding: CGFloat = 7
     static let compactHorizontalPadding: CGFloat = 12
     static let minHeight: CGFloat = 32
+    static let minimumHitHeight: CGFloat = 44
     static let font = Font.subheadline.weight(.semibold)
 }
 
@@ -68,10 +69,18 @@ struct CodeSectionMultiFilterChips: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            Text(title)
-                .font(CodeFilterChipMetrics.font)
-                .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
-                .frame(width: minWidth)
+            HStack(spacing: 6) {
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .font(.caption.weight(.bold))
+                        .accessibilityHidden(true)
+                }
+                Text(title)
+                    .lineLimit(1)
+            }
+            .font(CodeFilterChipMetrics.font)
+            .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
+            .frame(width: minWidth)
                 .padding(.horizontal, CodeFilterChipMetrics.horizontalPadding)
                 .padding(.vertical, CodeFilterChipMetrics.verticalPadding)
                 .frame(minHeight: CodeFilterChipMetrics.minHeight)
@@ -79,8 +88,13 @@ struct CodeSectionMultiFilterChips: View {
                     Capsule(style: .continuous)
                         .fill(isSelected ? accent : accent.opacity(0.12))
                 )
+                .frame(minHeight: CodeFilterChipMetrics.minimumHitHeight)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityValue(isSelected ? "Selected" : "Not selected")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

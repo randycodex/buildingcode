@@ -320,7 +320,7 @@ struct ResearchView: View {
                 ContentUnavailableView(
                     "No Research yet",
                     image: "Astroid",
-                    description: Text("Start here or select enacted text in a Reader and tap the Astroid.")
+                    description: Text("Tap the sparkle icon to start Research.")
                 )
                 .padding(.top, 70)
                 .listRowBackground(Color.clear)

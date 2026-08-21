@@ -770,32 +770,6 @@ struct BrowseView: View {
     }
 }
 
-extension View {
-    func disablesInteractivePopGesture() -> some View {
-        background(InteractivePopGestureDisabler())
-    }
-}
-
-private struct InteractivePopGestureDisabler: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIViewController {
-        let controller = UIViewController()
-        DispatchQueue.main.async {
-            controller.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-        }
-        return controller
-    }
-
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
-        DispatchQueue.main.async {
-            uiViewController.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-        }
-    }
-
-    static func dismantleUIViewController(_ uiViewController: UIViewController, coordinator: ()) {
-        uiViewController.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
-    }
-}
-
 private struct BrowseChapterGroup: Identifiable {
     let id: String
     let title: String
@@ -1092,7 +1066,7 @@ private enum ChapterTilePalette {
         switch self {
         case .monochrome: return Self.dynamicColor(light: 0xFFFFFF, dark: 0xE0E0E4)
         case .administrative: return Self.dynamicColor(light: 0x7C3AED, dark: 0xC4A1FF)
-        case .building: return Self.dynamicColor(light: 0xC96410, dark: 0xFFB067)
+        case .building: return Self.dynamicColor(light: 0xB7570E, dark: 0xFFB067)
         case .plumbing: return Self.dynamicColor(light: 0x0891B2, dark: 0x67E8F9)
         case .fuelGas: return Self.dynamicColor(light: 0xC62828, dark: 0xFF7B7B)
         case .electrical: return Self.dynamicColor(light: 0x352215, dark: 0xD8C0A4)
@@ -1107,24 +1081,24 @@ private enum ChapterTilePalette {
 
     var chapterTitleColor: Color {
         switch self {
-        case .monochrome: return Self.dynamicColor(light: 0xCCCCCC, dark: 0xF5F5F7)
+        case .monochrome: return Self.dynamicColor(light: 0xFFFFFF, dark: 0xF5F5F7)
         case .administrative: return Self.dynamicColor(light: 0x341A5A, dark: 0xF1E8FF)
         case .building: return Self.dynamicColor(light: 0x5C2E0A, dark: 0xFFE9D6)
         case .plumbing: return Self.dynamicColor(light: 0x123B46, dark: 0xE6FAFF)
         case .fuelGas: return Self.dynamicColor(light: 0x5A1515, dark: 0xFFE3E3)
-        case .electrical: return Self.dynamicColor(light: 0xA2743F, dark: 0xD2A16A)
+        case .electrical: return Self.dynamicColor(light: 0x352215, dark: 0xD2A16A)
         case .mechanical: return Self.dynamicColor(light: 0x163524, dark: 0xE7F7EC)
-        case .energy: return Self.dynamicColor(light: 0x7E9B3A, dark: 0xB9D06D)
-        case .fire: return Self.dynamicColor(light: 0xA65A53, dark: 0xD58F86)
-        case .existingBuilding: return Self.dynamicColor(light: 0x7E7865, dark: 0xBCB69E)
-        case .residential: return Self.dynamicColor(light: 0x9B7547, dark: 0xD0A577)
+        case .energy: return Self.dynamicColor(light: 0x263016, dark: 0xB9D06D)
+        case .fire: return Self.dynamicColor(light: 0x301816, dark: 0xD58F86)
+        case .existingBuilding: return Self.dynamicColor(light: 0x2B2A22, dark: 0xBCB69E)
+        case .residential: return Self.dynamicColor(light: 0x332217, dark: 0xD0A577)
         case .zoning: return Self.dynamicColor(light: 0x17433F, dark: 0xE0F6F3)
         }
     }
 
     var appendixNumberColor: Color {
         switch self {
-        case .monochrome: return Self.dynamicColor(light: 0x707078, dark: 0xD8D8DD)
+        case .monochrome: return Self.dynamicColor(light: 0x3B3B40, dark: 0xD8D8DD)
         case .administrative: return Self.dynamicColor(light: 0x69548E, dark: 0xD3C3F1)
         case .building: return Self.dynamicColor(light: 0x1E6BA8, dark: 0x8FCBFF)
         case .plumbing: return Self.dynamicColor(light: 0xC96A10, dark: 0xFFB067)
@@ -1146,12 +1120,12 @@ private enum ChapterTilePalette {
         case .building: return Self.dynamicColor(light: 0x123A5A, dark: 0xE5F4FF)
         case .plumbing: return Self.dynamicColor(light: 0x5A3408, dark: 0xFFF0DC)
         case .fuelGas: return Self.dynamicColor(light: 0x0F3F46, dark: 0xDFFBFF)
-        case .electrical: return Self.dynamicColor(light: 0x5C6F9F, dark: 0x90A8D6)
+        case .electrical: return Self.dynamicColor(light: 0x1C2536, dark: 0x90A8D6)
         case .mechanical: return Self.dynamicColor(light: 0x5A183F, dark: 0xFFE5F2)
-        case .energy: return Self.dynamicColor(light: 0x7468A8, dark: 0xA297D2)
-        case .fire: return Self.dynamicColor(light: 0x618E4D, dark: 0x96C17E)
-        case .existingBuilding: return Self.dynamicColor(light: 0x73639A, dark: 0xA695CB)
-        case .residential: return Self.dynamicColor(light: 0x567F99, dark: 0x89AEC8)
+        case .energy: return Self.dynamicColor(light: 0x26243A, dark: 0xA297D2)
+        case .fire: return Self.dynamicColor(light: 0x1F2F1A, dark: 0x96C17E)
+        case .existingBuilding: return Self.dynamicColor(light: 0x2A2435, dark: 0xA695CB)
+        case .residential: return Self.dynamicColor(light: 0x1E2B37, dark: 0x89AEC8)
         case .zoning: return Self.dynamicColor(light: 0x173F4A, dark: 0xE3F6FA)
         }
     }
@@ -1190,6 +1164,8 @@ private struct ChapterTile: View {
     let chapter: CodeChapter
     let palette: ChapterTilePalette
     let kind: ChapterTileKind
+    @ScaledMetric(relativeTo: .title2) private var chapterNumberSize: CGFloat = 28
+    @ScaledMetric(relativeTo: .subheadline) private var chapterTitleSize: CGFloat = 14
 
     var body: some View {
         ZStack {
@@ -1200,7 +1176,7 @@ private struct ChapterTile: View {
                 HStack(alignment: .top) {
                     Spacer()
                     Text("\(chapter.chapterNumber)")
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.system(size: chapterNumberSize, weight: .bold))
                         .foregroundStyle(tileNumberColor)
                         .lineLimit(1)
                 }
@@ -1208,7 +1184,7 @@ private struct ChapterTile: View {
                 Spacer(minLength: 0)
 
                 Text(chapter.title)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: chapterTitleSize, weight: .medium))
                     .foregroundStyle(tileTitleColor)
                     .lineLimit(nil)
                     .multilineTextAlignment(.leading)

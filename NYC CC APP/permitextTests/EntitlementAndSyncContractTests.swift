@@ -148,6 +148,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(ReaderTheme.default.fontChoice, .sourceSerif4)
         XCTAssertEqual(ReaderTheme.default.bodyFont.fontName, "SourceSerif4Variable-Roman")
         XCTAssertEqual(ReaderTheme.default.italicFont.fontName, "SourceSerif4Variable-Italic")
+        XCTAssertEqual(ReaderTheme.minimumFontSize, 17)
+        XCTAssertEqual(ReaderTheme.default.fontSize, 17)
+        var undersizedTheme = ReaderTheme.default
+        undersizedTheme.fontSize = 10
+        XCTAssertEqual(undersizedTheme.normalized.fontSize, 17)
 
         let legacyChoices: [ReaderFontChoice] = [
             .sfPro, .sfCompact, .sfMono, .newYork,
@@ -220,6 +225,8 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
         XCTAssertEqual(preparedMissing.components(separatedBy: "name=\"viewport\"").count - 1, 1)
         XCTAssertTrue(preparedMissing.contains("width=device-width, initial-scale=1.0"))
+        XCTAssertFalse(preparedMissing.contains("maximum-scale=1.0"))
+        XCTAssertFalse(preparedMissing.contains("user-scalable=no"))
 
         let existingViewportURL = directoryURL.appendingPathComponent("existing.html")
         try "<html><head><meta name='viewport' content='width=device-width'></head><body>Chapter</body></html>".write(
@@ -238,6 +245,36 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             preparedExisting.lowercased().components(separatedBy: "name='viewport'").count - 1,
             1
         )
+        XCTAssertFalse(preparedExisting.contains("user-scalable=no"))
+    }
+
+    func testPhase2ReaderNavigationAndFilterAccessibilitySourceContract() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = { (relativePath: String) throws -> String in
+            try String(
+                contentsOf: projectRoot.appendingPathComponent(relativePath),
+                encoding: .utf8
+            )
+        }
+        let browse = try source("permitext/Views/BrowseView.swift")
+        let htmlReader = try source("permitext/Views/ChapterHTMLReaderView.swift")
+        let nativeReader = try source("permitext/Views/ChapterReaderView.swift")
+        let filters = try source("permitext/Views/CodeSectionMultiFilterChips.swift")
+        let research = try source("permitext/Views/ResearchView.swift")
+        let webView = try source("permitext/Views/ChapterHTMLWebView.swift")
+
+        let navigationSources = [browse, htmlReader, nativeReader].joined(separator: "\n")
+        XCTAssertFalse(navigationSources.contains("disablesInteractivePopGesture"))
+        XCTAssertFalse(navigationSources.contains("InteractivePopGestureDisabler"))
+        XCTAssertTrue(filters.contains("minimumHitHeight: CGFloat = 44"))
+        XCTAssertTrue(filters.contains("Image(systemName: \"checkmark\")"))
+        XCTAssertTrue(filters.contains(".accessibilityAddTraits(isSelected ? .isSelected : [])"))
+        XCTAssertTrue(research.contains("Tap the sparkle icon to start Research."))
+        XCTAssertFalse(research.localizedCaseInsensitiveContains("tap the Astroid"))
+        XCTAssertTrue(webView.contains("maximumZoomScale = 5"))
+        XCTAssertFalse(webView.contains("user-scalable=no"))
     }
 
     private func isolatedEntitlementDefaults() -> UserDefaults {

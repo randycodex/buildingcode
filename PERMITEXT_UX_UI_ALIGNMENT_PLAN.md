@@ -2,7 +2,7 @@
 
 **Updated:** 2026-08-20
 
-**Status:** Active roadmap; typography and Phase 1 are implemented on `codex/ux-ui-alignment`
+**Status:** Active roadmap; typography and Phase 1 are implemented, and Phase 2 is implemented on `codex/ux-ui-accessibility-phase2`
 
 **Surfaces:** Permitext web workspace and native iPhone app
 
@@ -174,6 +174,8 @@ Implementation should proceed one phase at a time. Each phase receives an isolat
 ### Phase 2 — Restore interaction and accessibility fundamentals
 
 **Goal:** Make every important workflow operable and understandable with touch, keyboard, VoiceOver, and increased text size.
+
+**Implementation status (2026-08-20): Complete on `codex/ux-ui-accessibility-phase2`.** Web panels now expose headings, enhanced selectors use coherent listbox/option keyboard semantics, modal-like surfaces contain and restore focus, visible focus treatment is restored, and compact header/passage actions retain minimum target sizes. The iPhone app restores the standard navigation edge-swipe, gives filter chips a checkmark and programmatic selected state within a 44-point hit area, corrects chapter-card contrast, uses a 17-point Source Serif 4 Reader baseline, permits HTML pinch enlargement, and calls the Research control the sparkle icon in instructional copy. Verification includes rendered desktop keyboard/focus checks, rendered iPhone accessibility-state and typography checks, the full server contract suite, focused XCTest, a fresh iPhone Simulator build, and an XCUITest that opens a chapter and successfully returns with a synthesized left-edge swipe. This status records local implementation evidence only; it does not imply GitHub publication, Production deployment, or App Store submission.
 
 #### Web semantics and focus
 

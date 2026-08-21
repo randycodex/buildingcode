@@ -1105,9 +1105,9 @@ textarea:focus-visible {
   --pane-resized-min-width: var(--pane-min-width);
   --pane-default-min-width: 0px;
   --panel-padding: clamp(16px, 1.8vw, 24px);
-  --panel-title-row-height: calc(var(--chrome-font-size) * var(--code-title-scale) * 1.2);
+  --panel-title-row-height: max(calc(var(--chrome-font-size) * var(--code-title-scale) * 1.2), 28px);
   --panel-title-control-size: var(--panel-title-row-height);
-  --panel-title-icon-size: calc(var(--panel-title-row-height) - 2px);
+  --panel-title-icon-size: 18px;
   --panel-control-row-top: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-2));
   container-type: inline-size;
   display: grid;
@@ -1584,19 +1584,20 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 }
 
 .panel-title {
-  display: none !important;
-  max-width: 100%;
-  margin: 0;
-  font-size: clamp(1.65rem, 2.1vw, 2.35rem);
-  line-height: 1.02;
-  letter-spacing: -0.045em;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
 }
 
 .reader-panel .panel-title {
-  display: none !important;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  position: absolute !important;
 }
 
 .panel-actions {
@@ -1842,6 +1843,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   display: grid;
   width: var(--panel-title-control-size);
   height: var(--panel-title-control-size);
+  flex: 0 0 var(--panel-title-control-size);
   place-items: center;
   padding: 0;
   border-color: transparent;
@@ -1889,6 +1891,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   display: grid;
   width: var(--panel-title-control-size);
   height: var(--panel-title-control-size);
+  flex: 0 0 var(--panel-title-control-size);
   place-items: center;
   padding: 0;
   border-color: transparent;
@@ -3116,8 +3119,8 @@ select option:checked {
   align-self: end;
   justify-content: flex-end;
   gap: var(--space-1);
-  min-width: 0;
-  width: 60px;
+  min-width: 68px;
+  width: 68px;
   min-height: 30px;
   margin-bottom: var(--space-4);
   padding-left: var(--space-1);
@@ -3139,7 +3142,7 @@ select option:checked {
 .inline-bookmark-toggle,
 .inline-research-toggle {
   display: inline-flex;
-  min-width: 0;
+  min-width: 28px;
   width: 28px;
   min-height: 28px;
   height: 28px;
@@ -3157,6 +3160,7 @@ select option:checked {
   box-shadow: none;
 }
 
+.inline-bookmark-toggle,
 .inline-research-toggle {
   flex: 0 0 28px;
 }
@@ -3994,13 +3998,37 @@ select option:checked {
 
 .search-clear-button {
   display: grid;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   place-items: center;
   padding: 0;
   border: 0;
   background: transparent;
   color: var(--text-tertiary);
+}
+
+/* Phase 2 keyboard affordances remain transient and do not add persistent control borders. */
+body button:focus-visible,
+body [role="button"]:focus-visible,
+body [role="option"]:focus-visible,
+body [role="treeitem"]:focus-visible,
+body .pane-divider:focus-visible,
+body input:focus-visible,
+body textarea:focus-visible,
+body select:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--code-accent, var(--text-primary)) 72%, transparent) !important;
+  outline-offset: 2px !important;
+}
+
+body .search-input:focus-visible,
+body .reader-internal-search-input:focus-visible {
+  outline: 0 !important;
+}
+
+.search-box:has(.search-input:focus-visible),
+.reader-internal-search:has(.reader-internal-search-input:focus-visible) {
+  outline: 2px solid color-mix(in srgb, var(--code-accent, var(--text-primary)) 72%, transparent) !important;
+  outline-offset: 2px !important;
 }
 
 .search-clear-button svg {
@@ -12454,7 +12482,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin-right: auto;
 }
 
-.notebook-heading strong {
+.notebook-heading h2 {
+  margin: 0;
   color: var(--text-primary);
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -13732,7 +13761,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin-right: auto;
 }
 
-.report-heading strong {
+.report-heading h2 {
+  margin: 0;
   color: var(--text-primary);
   font-size: 12px;
   letter-spacing: 0.08em;

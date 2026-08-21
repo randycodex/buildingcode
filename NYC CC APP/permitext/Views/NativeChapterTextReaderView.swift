@@ -2518,7 +2518,7 @@ enum NativeReaderAttributedTextBuilder {
         theme: ReaderTheme,
         role: NativeReaderTypographyRole
     ) -> UIFont {
-        let bodySize = max(CGFloat(theme.fontSize) * 1.16, 12)
+        let bodySize = max(CGFloat(theme.fontSize), CGFloat(ReaderTheme.minimumFontSize))
         let roleSize: CGFloat
         let textStyle: UIFont.TextStyle
         var wantsBold = styles.contains(.bold)

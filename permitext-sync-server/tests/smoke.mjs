@@ -557,7 +557,7 @@ async function main() {
         workspaceStyles.text.match(/\.topbar-brand\s*\{[^}]*position:\s*absolute;[^}]*left:\s*50%;[^}]*top:\s*50%;[^}]*transform:\s*translate\(-50%, -50%\);/) &&
         workspaceStyles.text.match(/\.topbar-actions > \.toolbar-button\s*\{[^}]*width:\s*88px;[^}]*flex:\s*0 0 88px;[^}]*justify-content:\s*center;/) &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button\s*\{[^}]*font-size:\s*14px !important;/) &&
-        workspaceStyles.text.match(/\.topbar \.toolbar-button:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
+        workspaceStyles.text.match(/body button:focus-visible,[\s\S]*?outline:\s*2px solid[^;]+!important;/) &&
         workspaceStyles.text.includes(".workspace-empty-state {") &&
         workspaceStyles.text.includes(".pane-edge-resizer {") &&
         workspaceStyles.text.includes(".workspace-switch-placeholder {") &&
@@ -1447,7 +1447,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260820-ux-alignment-phase1-v2'),
+        webRoot.text.includes('/web/app.js?v=20260820-ux-alignment-phase2-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1616,7 +1616,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-ux-alignment-phase1-v2'),
+      webRoot.text.includes('/web/styles.css?v=20260820-ux-alignment-phase2-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1882,7 +1882,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-ux-alignment-phase1-v2'),
+      webRoot.text.includes('/web/styles.css?v=20260820-ux-alignment-phase2-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2635,9 +2635,9 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".topbar .toolbar-button {\n  display: inline-flex;") &&
         workspaceStyles.text.includes("border-radius: var(--radius-pill);\n  background: color-mix(in srgb, var(--text-primary) 10%, transparent);") &&
-        workspaceStyles.text.match(/\.topbar \.toolbar-button:focus-visible \{[\s\S]*?outline: 0;[\s\S]*?background: color-mix\(in srgb, var\(--text-primary\) 16%, transparent\);[\s\S]*?text-decoration: none;/) &&
+        workspaceStyles.text.match(/body button:focus-visible,[\s\S]*?outline:\s*2px solid[^;]+!important;/) &&
         workspaceStyles.text.includes('.topbar .toolbar-button[aria-pressed="true"],\n.topbar #add-reader.has-open-reader {'),
-      "Top toolbar controls should preserve their pill shape, ring-free focus state, and active state."
+      "Top toolbar controls should preserve their pill shape, visible keyboard focus, and active state."
     );
     assert(
       workspaceStyles.text.match(/\.settings-destructive-secondary\.account-delete,[\s\S]*?\.settings-destructive-secondary\.settings-firm-delete \{[\s\S]*?background: color-mix\(in srgb, var\(--destructive\) 10%, transparent\);[\s\S]*?color: var\(--destructive\);/) &&
@@ -2755,8 +2755,9 @@ async function main() {
       "Search results still include styling for the retired Reader action buttons."
     );
     assert(
-      workspaceStyles.text.match(/input:focus,[\s\S]*?input:focus-visible,[\s\S]*?textarea:focus,[\s\S]*?textarea:focus-visible \{[\s\S]*?outline: 0;[\s\S]*?outline-offset: 0;/),
-      "Text fields can still render the browser's rectangular focus outline."
+      workspaceStyles.text.match(/body input:focus-visible,[\s\S]*?body textarea:focus-visible,[\s\S]*?outline:\s*2px solid[^;]+!important;/) &&
+        workspaceStyles.text.match(/\.search-box:has\(\.search-input:focus-visible\),[\s\S]*?outline:\s*2px solid[^;]+!important;/),
+      "Text fields no longer expose the intentional keyboard focus treatment."
     );
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),

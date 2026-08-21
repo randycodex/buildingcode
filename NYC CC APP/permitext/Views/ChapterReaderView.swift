@@ -155,7 +155,6 @@ struct ChapterReaderView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
-        .disablesInteractivePopGesture()
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 2) {

@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260820-ux-alignment-phase1-v2";
+} from "./offline-storage.js?v=20260820-ux-alignment-phase2-v1";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -1404,9 +1404,12 @@ function openMobileMoreSheet() {
     if (event.target === backdrop) closeMobileMoreSheet();
   });
   sheet.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-    event.preventDefault();
-    closeMobileMoreSheet();
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeMobileMoreSheet();
+      return;
+    }
+    trapWebModalFocus(sheet, event);
   });
   document.body.append(backdrop);
   mobileMoreSheet = backdrop;
@@ -2078,6 +2081,13 @@ function renderProjectWorkboard(project) {
   const remoteRevision = isGeneric ? "" : syncedWorkboardForProject(projectID)?.updatedAt || "";
   const syncEnabled = !isGeneric && Boolean(activeAccount());
   const projectName = isGeneric ? "Permitext" : identity.name || identity.title || "Project";
+  let heading = mounted.panel.querySelector(":scope > .panel-title");
+  if (!heading) {
+    heading = document.createElement("h2");
+    heading.className = "panel-title";
+    mounted.panel.prepend(heading);
+  }
+  heading.textContent = `${projectName} Workboard`;
   const renderKey = JSON.stringify([projectID, projectName, syncEnabled, remoteRevision, detachedProjectWindow]);
   scheduleProjectWorkboardMount(mounted, {
     projectID,
@@ -4495,6 +4505,62 @@ function clear(element) {
   }
 }
 
+function webFocusableElements(container = document) {
+  return Array.from(container.querySelectorAll([
+    "a[href]",
+    "button:not([disabled])",
+    "summary",
+    "input:not([disabled]):not([type='hidden'])",
+    "select:not([disabled])",
+    "textarea:not([disabled])",
+    "[tabindex]:not([tabindex='-1'])",
+    "[contenteditable='true']"
+  ].join(","))).filter((element) =>
+    !element.hidden &&
+    element.getAttribute("aria-hidden") !== "true" &&
+    element.getClientRects().length > 0
+  );
+}
+
+function trapWebModalFocus(dialog, event) {
+  if (event.key !== "Tab") return false;
+  const focusable = webFocusableElements(dialog);
+  if (!focusable.length) {
+    event.preventDefault();
+    dialog.focus?.({ preventScroll: true });
+    return true;
+  }
+  const first = focusable[0];
+  const last = focusable.at(-1);
+  if (event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) {
+    event.preventDefault();
+    last.focus({ preventScroll: true });
+    return true;
+  }
+  if (!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+    event.preventDefault();
+    first.focus({ preventScroll: true });
+    return true;
+  }
+  return false;
+}
+
+function focusAdjacentDocumentControl(origin, backwards = false) {
+  const focusable = webFocusableElements(document).filter((element) =>
+    !element.closest(".custom-select-menu[hidden]") &&
+    !element.closest(".web-warning-backdrop") &&
+    !element.closest(".command-palette-backdrop")
+  );
+  const originIndex = focusable.indexOf(origin);
+  if (originIndex === -1) {
+    origin.focus?.({ preventScroll: true });
+    return;
+  }
+  const offset = backwards ? -1 : 1;
+  const target = focusable[originIndex + offset];
+  (target || origin).focus?.({ preventScroll: true });
+}
+
 function resolveWebWarningContainer(container, previousFocus = document.activeElement) {
   const explicitContainer = container instanceof HTMLElement ? container : null;
   return explicitContainer?.closest(".workspace-panel") ||
@@ -4609,14 +4675,7 @@ function openWebWarning({
         if (cancellable) close(false);
         return;
       }
-      if (event.key !== "Tab") return;
-      const focusable = cancelButton ? [cancelButton, confirmButton] : [confirmButton];
-      const activeIndex = focusable.indexOf(document.activeElement);
-      const nextIndex = event.shiftKey
-        ? (activeIndex <= 0 ? focusable.length - 1 : activeIndex - 1)
-        : (activeIndex + 1) % focusable.length;
-      event.preventDefault();
-      focusable[nextIndex].focus();
+      trapWebModalFocus(dialog, event);
     });
     dialog.focus({ preventScroll: true });
   });
@@ -4715,7 +4774,9 @@ function openWebTextPrompt({
       if (event.key === "Escape") {
         event.preventDefault();
         close(null);
+        return;
       }
+      trapWebModalFocus(dialog, event);
     });
     queueMicrotask(() => input.focus());
   });
@@ -4834,14 +4895,7 @@ function openStripeRestoreDialog(onSubmit) {
         if (!restoreButton.disabled) close(false);
         return;
       }
-      if (event.key !== "Tab") return;
-      const focusable = [input, cancelButton, restoreButton].filter((element) => !element.disabled);
-      const activeIndex = focusable.indexOf(document.activeElement);
-      const nextIndex = event.shiftKey
-        ? (activeIndex <= 0 ? focusable.length - 1 : activeIndex - 1)
-        : (activeIndex + 1) % focusable.length;
-      event.preventDefault();
-      focusable[nextIndex].focus();
+      trapWebModalFocus(dialog, event);
     });
     input.focus({ preventScroll: true });
   });
@@ -5453,6 +5507,9 @@ function enhanceSelect(select) {
   if (!select || select.dataset.customized === "true") return;
   select.dataset.customized = "true";
   select.classList.add("native-select-hidden");
+  select.dataset.previousTabIndex = select.getAttribute("tabindex") || "";
+  select.tabIndex = -1;
+  select.setAttribute("aria-hidden", "true");
 
   const custom = document.createElement("div");
   custom.className = "custom-select";
@@ -5461,6 +5518,7 @@ function enhanceSelect(select) {
   trigger.type = "button";
   const menu = document.createElement("div");
   menu.className = "custom-select-menu";
+  menu.id = `custom-select-menu-${crypto.randomUUID()}`;
   const readerCodeMenu = select.classList.contains("code-select");
   const readerChapterMenu = select.classList.contains("chapter-select");
   const reportDraftMenu = select.classList.contains("report-draft-select");
@@ -5480,12 +5538,23 @@ function enhanceSelect(select) {
   menu.hidden = true;
   select._customSelectMenu = menu;
   select._customSelectTrigger = trigger;
-  const staticSelect = select.disabled;
-  trigger.classList.toggle("is-static", staticSelect);
-  if (staticSelect) {
-    trigger.setAttribute("aria-disabled", "true");
-    trigger.tabIndex = -1;
-  }
+  const fieldLabel = String(select.getAttribute("aria-label") ||
+    select.labels?.[0]?.querySelector(":scope > .sr-only")?.textContent ||
+    Array.from(select.labels?.[0]?.childNodes || [])
+      .filter((node) => node.nodeType === Node.TEXT_NODE)
+      .map((node) => node.textContent)
+      .join(" ") ||
+    "Select option").replace(/\s+/g, " ").trim();
+
+  const syncDisabledState = () => {
+    const disabled = select.disabled;
+    trigger.disabled = disabled;
+    trigger.classList.toggle("is-static", disabled);
+    trigger.setAttribute("aria-disabled", String(disabled));
+  };
+  const disabledObserver = new MutationObserver(syncDisabledState);
+  disabledObserver.observe(select, { attributes: true, attributeFilter: ["disabled"] });
+  select._customSelectObserver = disabledObserver;
 
   const syncTrigger = () => {
     const selectedLabel = select.options[select.selectedIndex]?.textContent || "";
@@ -5494,7 +5563,10 @@ function enhanceSelect(select) {
       trigger.classList.add("is-icon-only");
       trigger.setAttribute("aria-label", select.dataset.customTriggerLabel || selectedLabel);
       trigger.title = select.dataset.customTriggerLabel || selectedLabel;
+    } else {
+      trigger.setAttribute("aria-label", `${fieldLabel}: ${selectedLabel}`);
     }
+    syncDisabledState();
   };
   select._syncCustomSelect = syncTrigger;
 
@@ -5519,12 +5591,17 @@ function enhanceSelect(select) {
       item.type = "button";
       item.textContent = option.textContent;
       item.dataset.value = option.value;
+      item.id = `custom-select-option-${crypto.randomUUID()}`;
+      item.setAttribute("role", "option");
       item.setAttribute("aria-selected", String(option.selected));
+      item.tabIndex = option.selected ? 0 : -1;
+      item.disabled = option.disabled;
       item.addEventListener("click", () => {
         select.value = option.value;
         select.dispatchEvent(new Event("change", { bubbles: true }));
         syncTrigger();
         closeMenu();
+        trigger.focus({ preventScroll: true });
       });
       menu.append(item);
     };
@@ -5589,11 +5666,17 @@ function enhanceSelect(select) {
     menu.style.setProperty("--select-menu-max-height", `${availableBelow}px`);
   };
 
-  trigger.setAttribute("aria-haspopup", "listbox");
+  if (!readerChapterMenu) {
+    menu.setAttribute("role", "listbox");
+    menu.setAttribute("aria-label", `${fieldLabel} options`);
+  }
+  trigger.setAttribute("aria-haspopup", readerChapterMenu ? "tree" : "listbox");
+  trigger.setAttribute("aria-controls", menu.id);
   trigger.setAttribute("aria-expanded", "false");
   trigger.addEventListener("click", async (event) => {
     event.stopPropagation();
-    if (staticSelect) return;
+    syncDisabledState();
+    if (select.disabled) return;
     const willOpen = menu.hidden;
     closeActiveCustomSelect();
     if (willOpen) {
@@ -5605,6 +5688,11 @@ function enhanceSelect(select) {
         await renderReaderChapterNavigationMenu(menu, select);
       } else {
         renderOptions();
+        requestAnimationFrame(() => {
+          const target = menu.querySelector('[role="option"][aria-selected="true"]:not(:disabled)') ||
+            menu.querySelector('[role="option"]:not(:disabled)');
+          target?.focus({ preventScroll: true });
+        });
       }
       positionMenu();
       requestAnimationFrame(positionMenu);
@@ -5613,16 +5701,55 @@ function enhanceSelect(select) {
     trigger.setAttribute("aria-expanded", "false");
   });
 
-  if (readerCodeMenu) {
-    const closeCodeMenuOnEscape = (event) => {
-      if (event.key !== "Escape" || menu.hidden) return;
+  if (!readerChapterMenu) {
+    const menuOptions = () => Array.from(menu.querySelectorAll('[role="option"]:not(:disabled)'));
+    const moveMenuFocus = (event, boundary = "") => {
+      const options = menuOptions();
+      if (!options.length) return;
+      const currentIndex = options.indexOf(document.activeElement);
+      let nextIndex = currentIndex;
+      if (boundary === "first") nextIndex = 0;
+      else if (boundary === "last") nextIndex = options.length - 1;
+      else if (event.key === "ArrowDown") nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % options.length;
+      else nextIndex = currentIndex < 0 ? options.length - 1 : (currentIndex - 1 + options.length) % options.length;
       event.preventDefault();
-      event.stopPropagation();
-      closeMenu();
-      trigger.focus({ preventScroll: true });
+      options.forEach((option, index) => { option.tabIndex = index === nextIndex ? 0 : -1; });
+      options[nextIndex].focus({ preventScroll: true });
     };
-    trigger.addEventListener("keydown", closeCodeMenuOnEscape);
-    menu.addEventListener("keydown", closeCodeMenuOnEscape);
+    trigger.addEventListener("keydown", (event) => {
+      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      if (menu.hidden) trigger.click();
+      requestAnimationFrame(() => moveMenuFocus(
+        event,
+        event.key === "Home" ? "first" : event.key === "End" ? "last" : ""
+      ));
+    });
+    menu.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        closeMenu();
+        trigger.focus({ preventScroll: true });
+        return;
+      }
+      if (event.key === "Tab") {
+        event.preventDefault();
+        closeMenu();
+        focusAdjacentDocumentControl(trigger, event.shiftKey);
+        return;
+      }
+      if (["Enter", " "].includes(event.key) && document.activeElement?.matches?.('[role="option"]')) {
+        event.preventDefault();
+        document.activeElement.click();
+        return;
+      }
+      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+      moveMenuFocus(
+        event,
+        event.key === "Home" ? "first" : event.key === "End" ? "last" : ""
+      );
+    });
   }
 
   select.addEventListener("change", () => {
@@ -5644,12 +5771,21 @@ function enhanceReaderSelects() {
 function resetEnhancedSelects(scope) {
   scope.querySelectorAll("select.native-select-hidden").forEach((select) => {
     select._customSelectMenu?.remove();
+    select._customSelectObserver?.disconnect();
     delete select._customSelectMenu;
+    delete select._customSelectObserver;
     delete select._syncCustomSelect;
     if (select.nextElementSibling?.classList.contains("custom-select")) {
       select.nextElementSibling.remove();
     }
     select.classList.remove("native-select-hidden");
+    select.removeAttribute("aria-hidden");
+    if (select.dataset.previousTabIndex) {
+      select.setAttribute("tabindex", select.dataset.previousTabIndex);
+    } else {
+      select.removeAttribute("tabindex");
+    }
+    delete select.dataset.previousTabIndex;
     delete select.dataset.customized;
   });
 }
@@ -14067,6 +14203,14 @@ async function renderSectionDetail(searchID, detail) {
   const saved = isSectionSaved(sectionTarget);
   const noteBody = noteValueForTarget(sectionTarget);
   const bodyText = sectionPlainText(section);
+  const accessibleHeading = document.createElement("h2");
+  accessibleHeading.className = "panel-title";
+  accessibleHeading.textContent = sectionDisplayTitle(
+    section?.sectionNumber || detail.sectionNumber,
+    sectionTitleWithoutNumber(section) || detail.title,
+    "Section detail"
+  );
+  panel.append(accessibleHeading);
 
   const chrome = document.createElement("header");
   chrome.className = "section-detail-chrome";
@@ -19258,7 +19402,7 @@ async function renderProjectNotebook(project) {
   header.className = "notebook-header";
   const heading = document.createElement("div");
   heading.className = "notebook-heading";
-  const headingTitle = document.createElement("strong");
+  const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Notebook";
   heading.append(headingTitle);
   const dragHandle = createProjectToolDragHandle(identity);
@@ -20775,7 +20919,7 @@ async function renderProjectReportDraft(project) {
   header.className = "report-draft-header";
   const heading = document.createElement("div");
   heading.className = "report-heading";
-  const headingTitle = document.createElement("strong");
+  const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Report";
   heading.append(headingTitle);
   const closeButton = document.createElement("button");
@@ -24118,6 +24262,7 @@ async function openProjectSavedSection(project, item) {
 
 function showProjectCreateSheet(panel, project = null, options = {}) {
   panel.querySelector(".project-sheet-overlay")?.remove();
+  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const isEditing = Boolean(project);
   const identity = isEditing ? projectIdentity(project) : null;
   let selectedFolderType = String(options.folderType || identity?.folderType || "project") === "reference"
@@ -24125,6 +24270,8 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     : "project";
   const overlay = document.createElement("section");
   overlay.className = "project-sheet-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
   overlay.setAttribute("aria-label", isEditing ? `Edit ${folderTypeLabel(project)}` : "New Project or saved collection");
 
   const sheet = document.createElement("form");
@@ -24184,6 +24331,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   nameInput.type = "text";
   nameInput.className = "project-name-input";
   nameInput.placeholder = "Project Name";
+  nameInput.setAttribute("aria-label", "Name");
   nameInput.autocomplete = "off";
   if (identity) nameInput.value = identity.name;
   nameLabel.append(nameInput);
@@ -24194,12 +24342,14 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   addressInput.type = "text";
   addressInput.className = "project-address-input";
   addressInput.placeholder = "Project Address";
+  addressInput.setAttribute("aria-label", "Project address");
   addressInput.autocomplete = "street-address";
   if (identity) addressInput.value = identity.address;
   addressLabel.append(addressInput);
 
   const colorGroup = document.createElement("fieldset");
   colorGroup.className = "project-sheet-colors";
+  colorGroup.setAttribute("aria-label", "Project color");
   const colorRail = document.createElement("div");
   colorRail.className = "project-color-rail";
   let selectedColor = identity?.color && projectColorOptions.includes(identity.color) ? identity.color : projectColorOptions[0];
@@ -24225,6 +24375,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   const descriptionInput = document.createElement("textarea");
   descriptionInput.className = "project-description-input";
   descriptionInput.placeholder = "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
+  descriptionInput.setAttribute("aria-label", "Description");
   descriptionInput.autocomplete = "off";
   descriptionInput.rows = 3;
   if (identity) descriptionInput.value = identity.description;
@@ -24233,7 +24384,27 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   nameInput.addEventListener("input", () => {
     saveButton.disabled = !nameInput.value.trim();
   });
-  cancelButton.addEventListener("click", () => overlay.remove());
+  const restoreSheetFocus = () => {
+    if (previousFocus?.isConnected) {
+      previousFocus.focus({ preventScroll: true });
+      return;
+    }
+    panel.querySelector(".projects-add-button, .saved-project-tile-edit, .project-card-action.is-edit")
+      ?.focus({ preventScroll: true });
+  };
+  const closeSheet = ({ restoreFocus = true } = {}) => {
+    overlay.remove();
+    if (restoreFocus) restoreSheetFocus();
+  };
+  cancelButton.addEventListener("click", () => closeSheet());
+  overlay.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeSheet();
+      return;
+    }
+    trapWebModalFocus(sheet, event);
+  });
   sheet.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!nameInput.value.trim()) return;
@@ -24256,13 +24427,14 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         }
         await options.onCreated?.(createdProject);
       }
-      overlay.remove();
+      closeSheet({ restoreFocus: false });
       await transitionWorkspace("utility", {
         refreshPaneIDs: projectOverviewRefreshPaneIDs(
           isEditing ? paneIDForProjectDetail(identity) : ""
         )
       });
       refreshOpenAnnotationProjectEditors();
+      restoreSheetFocus();
     } catch (error) {
       saveButton.disabled = false;
       const content = panel.querySelector(".projects-content, .saved-project-list");
@@ -29319,9 +29491,29 @@ function notifyWorkspaceLayoutChange() {
   track.dispatchEvent(new Event("permitext:workspace-layout-change"));
 }
 
+function ensureWorkspacePanelAccessibleName(panel) {
+  if (!(panel instanceof HTMLElement)) return;
+  const heading = panel.querySelector(
+    ":scope > .panel-title, :scope > .panel-header .panel-title, :scope > header h2"
+  );
+  if (heading) {
+    heading.id ||= `workspace-panel-heading-${crypto.randomUUID()}`;
+    panel.setAttribute("aria-labelledby", heading.id);
+    panel.removeAttribute("aria-label");
+    return;
+  }
+  if (panel.hasAttribute("aria-label") || panel.hasAttribute("aria-labelledby")) return;
+  const paneLabel = String(panel.dataset.paneId || "Workspace panel")
+    .replace(/^utility:/, "")
+    .replace(/[\:_-]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  panel.setAttribute("aria-label", paneLabel || "Workspace panel");
+}
+
 function appendPaneSequence(panes) {
   closeActiveCustomSelect();
   const orderedPanes = orderPanes(panes);
+  orderedPanes.forEach(ensureWorkspacePanelAccessibleName);
   const previousScrollLeft = track.scrollLeft;
   const nodes = [];
   const dividerKey = (previousPaneID, nextPaneID) => `${previousPaneID}\u0000${nextPaneID}`;
@@ -33072,6 +33264,7 @@ function workspaceCommandDefinitions() {
 
 function openWorkspaceCommandPalette() {
   document.querySelector(".command-palette-backdrop")?.remove();
+  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const commands = workspaceCommandDefinitions();
   const backdrop = document.createElement("div");
   backdrop.className = "command-palette-backdrop";
@@ -33090,9 +33283,12 @@ function openWorkspaceCommandPalette() {
   let visibleCommands = commands;
   let selectedIndex = 0;
 
-  const closePalette = () => backdrop.remove();
+  const closePalette = ({ restoreFocus = true } = {}) => {
+    backdrop.remove();
+    if (restoreFocus && previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+  };
   const executeCommand = (command) => {
-    closePalette();
+    closePalette({ restoreFocus: false });
     void Promise.resolve(command.run());
   };
   const renderCommands = () => {
@@ -33121,6 +33317,7 @@ function openWorkspaceCommandPalette() {
   input.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       event.preventDefault();
+      event.stopPropagation();
       closePalette();
     } else if (event.key === "ArrowDown" && visibleCommands.length) {
       event.preventDefault();
@@ -33137,6 +33334,14 @@ function openWorkspaceCommandPalette() {
   });
   backdrop.addEventListener("mousedown", (event) => {
     if (event.target === backdrop) closePalette();
+  });
+  backdrop.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePalette();
+      return;
+    }
+    trapWebModalFocus(dialog, event);
   });
   dialog.append(input, list);
   backdrop.append(dialog);

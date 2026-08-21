@@ -354,7 +354,6 @@ struct ChapterHTMLReaderView: View {
             ReaderView(sectionID: section.id)
         }
         .toolbarBackground(.hidden, for: .navigationBar)
-        .disablesInteractivePopGesture()
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 2) {
