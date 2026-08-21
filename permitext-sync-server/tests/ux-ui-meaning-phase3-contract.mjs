@@ -90,12 +90,15 @@ assert.match(iosOrganizationHub, /projectSection\(title: "Reports"/);
 
 assert.match(webClient, /projectLabel\.textContent = "Project context"[\s\S]*?createResearchProjectSelect/);
 assert.match(webClient, /initialProjectID = projectSelect\.value[\s\S]*?projectID: initialProjectID/);
+assert.match(webClient, /function researchProjectChoices[\s\S]*?activeProjectRecords\(currentContentSummary\(\)\.projects \|\| \[\]\)/);
+assert.doesNotMatch(webClient, /folders\.filter\(\(folder\) => !folderIsProject\(folder\)\)\.forEach/);
 assert.match(webClient, /const exactSource = answerSources\.find[\s\S]*?openSourceInReader\(exactSource/);
+assert.match(webClient, /if \(citation\.sectionID \|\| citation\.sectionNumber\)[\s\S]*?openSourceInReader\(citation/);
 assert.match(webClient, /: "Governing"/);
 assert.equal((webClient.match(/projectOwnership\.textContent = `Project: \$\{identity\.name\}`/g) || []).length, 2);
 assert.match(webStyles, /\.project-ownership-label/);
 assert.doesNotMatch(webClient, /Project Report Manifest as PDF/);
-assert.match(webIndex, /ux-meaning-phase3-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v718/);
+assert.match(webIndex, /ux-meaning-phase3-v2/);
+assert.match(serviceWorker, /permitext-pro-shell-v719/);
 
 console.log("UX/UI meaning Phase 3 contract passed.");

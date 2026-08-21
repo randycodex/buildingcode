@@ -2,6 +2,12 @@ import Foundation
 import SQLite3
 
 final class BundleDatabaseLocator {
+    private let defaults: UserDefaults
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
     private struct AuthoredBundleIndex: Decodable {
         struct Jurisdiction: Decodable {
             let id: Int64
@@ -30,12 +36,12 @@ final class BundleDatabaseLocator {
     ]
 
     func availableCodeVersions() -> [BundledCodeVersion] {
-        if let cached = Self.loadCache() {
+        if let cached = loadCache() {
             return cached
         }
 
         let versions = scanAvailableCodeVersions()
-        Self.persistCache(versions: versions)
+        persistCache(versions: versions)
         return versions
     }
 
@@ -92,11 +98,11 @@ final class BundleDatabaseLocator {
         return "\(short)-\(build)"
     }
 
-    private static func loadCache() -> [BundledCodeVersion]? {
+    private func loadCache() -> [BundledCodeVersion]? {
         guard let resourceURL = Bundle.main.resourceURL else { return nil }
-        guard let data = UserDefaults.standard.data(forKey: cacheDefaultsKey) else { return nil }
+        guard let data = defaults.data(forKey: Self.cacheDefaultsKey) else { return nil }
         guard let scan = try? JSONDecoder().decode(CachedScan.self, from: data) else { return nil }
-        guard scan.appVersionKey == appVersionKey else { return nil }
+        guard scan.appVersionKey == Self.appVersionKey else { return nil }
 
         var versions: [BundledCodeVersion] = []
         versions.reserveCapacity(scan.entries.count)
@@ -120,7 +126,7 @@ final class BundleDatabaseLocator {
         return versions
     }
 
-    private static func persistCache(versions: [BundledCodeVersion]) {
+    private func persistCache(versions: [BundledCodeVersion]) {
         guard let resourceURL = Bundle.main.resourceURL else { return }
         let resourcePath = resourceURL.path
         let entries: [CachedScanEntry] = versions.map { version in
@@ -142,9 +148,9 @@ final class BundleDatabaseLocator {
                 authoredHTMLBundlePath: version.authoredHTMLBundlePath
             )
         }
-        let scan = CachedScan(appVersionKey: appVersionKey, entries: entries)
+        let scan = CachedScan(appVersionKey: Self.appVersionKey, entries: entries)
         if let data = try? JSONEncoder().encode(scan) {
-            UserDefaults.standard.set(data, forKey: cacheDefaultsKey)
+            defaults.set(data, forKey: Self.cacheDefaultsKey)
         }
     }
 

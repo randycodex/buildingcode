@@ -1449,7 +1449,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260820-ux-meaning-phase3-v1'),
+        webRoot.text.includes('/web/app.js?v=20260820-ux-meaning-phase3-v2'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1618,7 +1618,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-ux-meaning-phase3-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260820-ux-meaning-phase3-v2'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1884,7 +1884,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-ux-meaning-phase3-v1'),
+      webRoot.text.includes('/web/styles.css?v=20260820-ux-meaning-phase3-v2'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1907,9 +1907,9 @@ async function main() {
         workspaceScript.text.includes('projectToggle.className = "code-filter-menu-toggle research-conversation-project-toggle";') &&
         workspaceScript.text.includes('projectOptions.className = "research-conversation-project-options";') &&
         workspaceScript.text.includes('categoryLabel.className = "research-conversation-project-category";') &&
-        workspaceScript.text.includes('categoryLabel.textContent = choice.category === "reference" ? "Saved collections" : "Projects";') &&
-        workspaceScript.text.includes("folders.filter(folderIsProject).forEach") &&
-        workspaceScript.text.includes('category: "reference"') &&
+        workspaceScript.text.includes('categoryLabel.textContent = "Projects";') &&
+        workspaceScript.text.includes("const projects = activeProjectRecords(currentContentSummary().projects || []);") &&
+        !workspaceScript.text.includes('category: "reference"') &&
         workspaceScript.text.includes('optionButton.className = "research-conversation-project-option";') &&
         workspaceScript.text.includes("wireCodeFilterMenu(projectOptions, projectMenuState, {") &&
         workspaceScript.text.includes("assignResearchConversationProject(conversation, targetProjectID, {") &&

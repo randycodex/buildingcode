@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260820-ux-meaning-phase3-v1";
+} from "./offline-storage.js?v=20260820-ux-meaning-phase3-v2";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -14903,6 +14903,12 @@ function renderResearchInterpretation(container, result, options = {}) {
           });
           return;
         }
+        if (citation.sectionID || citation.sectionNumber) {
+          void openSourceInReader(citation, options.anchorPaneID || "", {
+            projectID: options.conversation?.primaryProjectID || ""
+          });
+          return;
+        }
         const sourceDetails = container.querySelector(".research-answer-source-text");
         if (!sourceDetails) return;
         if (sourceDetails.setResearchExpanded) sourceDetails.setResearchExpanded(true);
@@ -15591,29 +15597,22 @@ function researchProjectChoices({
   if (includeUnassigned) {
     choices.push({ value: "", label: unassignedLabel, category: "unassigned" });
   }
-  const folders = activeFolderRecords(currentContentSummary().projects || []);
-  folders.filter(folderIsProject).forEach((project) => {
+  const projects = activeProjectRecords(currentContentSummary().projects || []);
+  projects.forEach((project) => {
     choices.push({
       value: researchProjectID(project),
       label: readableProjectName(project),
       category: "project"
     });
   });
-  folders.filter((folder) => !folderIsProject(folder)).forEach((folder) => {
-    choices.push({
-      value: researchProjectID(folder),
-      label: readableProjectName(folder),
-      category: "reference"
-    });
-  });
   if (value && !choices.some((choice) => choice.value === value)) {
     const historicalProject = visibleProjectRecords(currentContentSummary().projects || [])
-      .find((project) => researchProjectID(project) === value);
+      .find((project) => folderIsProject(project) && researchProjectID(project) === value);
     if (historicalProject) {
       choices.push({
         value,
         label: `${readableProjectName(historicalProject)} (Archived)`,
-        category: folderIsProject(historicalProject) ? "project" : "reference"
+        category: "project"
       });
     }
   }
@@ -17248,7 +17247,7 @@ async function renderResearch(paneID = "utility:analysis") {
         if (choice.category !== "unassigned" && choice.category !== previousProjectChoiceCategory) {
           const categoryLabel = document.createElement("p");
           categoryLabel.className = "research-conversation-project-category";
-          categoryLabel.textContent = choice.category === "reference" ? "Saved collections" : "Projects";
+          categoryLabel.textContent = "Projects";
           projectOptions.append(categoryLabel);
         }
         previousProjectChoiceCategory = choice.category;

@@ -171,6 +171,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let syncEngine: UserContentSyncEngine
     private let continuityStore: ContinuityStore
     private let readerThemeStore: ReaderThemeStore
+    private let preferencesDefaults: UserDefaults
     private let entitlementService: EntitlementService
     private let lifetimeGrantLookupClient: LifetimeGrantLookupClient
     private let accountBackendClient: AccountBackendClient
@@ -251,12 +252,14 @@ final class CodeLibraryViewModel: ObservableObject {
         userContentRepository: UserContentRepository? = nil,
         continuityStore: ContinuityStore = .shared,
         readerThemeStore: ReaderThemeStore = ReaderThemeStore(),
+        preferencesDefaults: UserDefaults = .standard,
         entitlementService: EntitlementService = LocalEntitlementService(),
         lifetimeGrantLookupClient: LifetimeGrantLookupClient = LocalLifetimeGrantLookupClient(),
         accountBackendClient: AccountBackendClient = PermitextBackendFactory.makeClient(),
         syncBackend: UserContentSyncBackend? = nil,
         loadsInitialContent: Bool = true,
-        loadsPersistedAccount: Bool = true
+        loadsPersistedAccount: Bool = true,
+        initialSignedInAccount: SignedInAccount? = nil
     ) {
         self.locator = locator
         self.formattingEngine = formattingEngine
@@ -268,17 +271,19 @@ final class CodeLibraryViewModel: ObservableObject {
         )
         self.continuityStore = continuityStore
         self.readerThemeStore = readerThemeStore
+        self.preferencesDefaults = preferencesDefaults
         self.entitlementService = entitlementService
         self.lifetimeGrantLookupClient = lifetimeGrantLookupClient
         self.accountBackendClient = accountBackendClient
         self.currentPlan = entitlementService.currentPlan
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
-        let loadedSignedInAccount = loadsPersistedAccount ? Self.loadSignedInAccount() : nil
+        let loadedSignedInAccount = initialSignedInAccount
+            ?? (loadsPersistedAccount ? Self.loadSignedInAccount() : nil)
         self.signedInAccount = loadedSignedInAccount
         self.userContentSyncCheckpoint = syncEngine.checkpoint(account: loadedSignedInAccount)
         self.readerTheme = readerThemeStore.load()
-        self.recentSearches = Self.loadRecentSearches()
-        self.pinnedSearches = Self.loadPinnedSearches()
+        self.recentSearches = Self.loadRecentSearches(defaults: preferencesDefaults)
+        self.pinnedSearches = Self.loadPinnedSearches(defaults: preferencesDefaults)
         let continuityContext = continuityStore.load()
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
@@ -621,7 +626,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private func refreshContinuityStateFromStore() {
         let context = continuityStore.load()
         recentlyViewedSections = context.recentlyViewedSections
-        recentSearches = Self.loadRecentSearches()
+        recentSearches = Self.loadRecentSearches(defaults: preferencesDefaults)
     }
 
     #if DEBUG
@@ -1671,20 +1676,20 @@ final class CodeLibraryViewModel: ObservableObject {
         var updated = recentSearches.filter { $0.caseInsensitiveCompare(trimmed) != .orderedSame }
         updated.insert(trimmed, at: 0)
         recentSearches = Array(updated.prefix(10))
-        UserDefaults.standard.set(recentSearches, forKey: recentSearchesDefaultsKey)
+        preferencesDefaults.set(recentSearches, forKey: recentSearchesDefaultsKey)
         queueContinuityContextForSync()
     }
 
     func removeRecentSearch(_ query: String) {
         recentSearches.removeAll { $0.caseInsensitiveCompare(query) == .orderedSame }
-        UserDefaults.standard.set(recentSearches, forKey: recentSearchesDefaultsKey)
+        preferencesDefaults.set(recentSearches, forKey: recentSearchesDefaultsKey)
         queueContinuityContextForSync()
     }
 
     func clearRecentSearches() {
         recentSearches = []
         recentlyViewedSections = []
-        UserDefaults.standard.removeObject(forKey: recentSearchesDefaultsKey)
+        preferencesDefaults.removeObject(forKey: recentSearchesDefaultsKey)
         persistRecentlyViewedSections()
         scheduleUserContentAutoSync()
     }
@@ -1714,17 +1719,17 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func persistPinnedSearches() {
-        UserDefaults.standard.set(pinnedSearches, forKey: pinnedSearchesDefaultsKey)
+        preferencesDefaults.set(pinnedSearches, forKey: pinnedSearchesDefaultsKey)
     }
 
-    private static func loadRecentSearches() -> [String] {
-        (UserDefaults.standard.array(forKey: "recentSearches") as? [String] ?? [])
+    private static func loadRecentSearches(defaults: UserDefaults) -> [String] {
+        (defaults.array(forKey: "recentSearches") as? [String] ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
     }
 
-    private static func loadPinnedSearches() -> [String] {
-        (UserDefaults.standard.array(forKey: "pinnedSearches") as? [String] ?? [])
+    private static func loadPinnedSearches(defaults: UserDefaults) -> [String] {
+        (defaults.array(forKey: "pinnedSearches") as? [String] ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
     }
@@ -3061,9 +3066,9 @@ final class CodeLibraryViewModel: ObservableObject {
         // bulk-clear tombstone repairs. Older event cursors could otherwise
         // remain ahead of those repaired records and preserve stale local data.
         let key = "permitext.sync.full-state-reconciliation.v7.\(account.appUserID)"
-        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        guard !preferencesDefaults.bool(forKey: key) else { return }
         syncEngine.resetCheckpoint(account: account)
-        UserDefaults.standard.set(true, forKey: key)
+        preferencesDefaults.set(true, forKey: key)
     }
 
     private func refreshPendingUserContentSyncCount() {
@@ -3302,8 +3307,8 @@ final class CodeLibraryViewModel: ObservableObject {
         recentSearches = []
         pinnedSearches = []
         recentlyViewedSections = []
-        UserDefaults.standard.removeObject(forKey: recentSearchesDefaultsKey)
-        UserDefaults.standard.removeObject(forKey: pinnedSearchesDefaultsKey)
+        preferencesDefaults.removeObject(forKey: recentSearchesDefaultsKey)
+        preferencesDefaults.removeObject(forKey: pinnedSearchesDefaultsKey)
         persistRecentlyViewedSections()
         refreshBookmarks()
         refreshPendingUserContentSyncCount()

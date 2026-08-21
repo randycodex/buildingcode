@@ -2847,6 +2847,15 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     private var accountsByUserID: [String: SignedInAccount] = [:]
     private var userContentByUserID: [String: [ServerUserContentMutation]] = [:]
 
+    #if DEBUG
+    private let phase3ResearchFixtureEnabled: Bool
+    private var phase3ResearchConversations: [String: ResearchConversation] = [:]
+
+    init(phase3ResearchFixtureEnabled: Bool = false) {
+        self.phase3ResearchFixtureEnabled = phase3ResearchFixtureEnabled
+    }
+    #endif
+
     func health() async throws -> BackendHealthStatus {
         BackendHealthStatus(ok: true, storage: "memory")
     }
@@ -2958,18 +2967,59 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     }
 
     func researchConversationList(_ request: ResearchConversationListRequest) async throws -> ResearchConversationListResponse {
-        ResearchConversationListResponse(conversations: [])
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            return ResearchConversationListResponse(
+                conversations: phase3ResearchConversations.values
+                    .map(\.summary)
+                    .sorted { $0.updatedAt > $1.updatedAt }
+            )
+        }
+        #endif
+        return ResearchConversationListResponse(conversations: [])
     }
 
     func researchConversationGet(_ request: ResearchConversationGetRequest) async throws -> ResearchConversationResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled,
+           let conversation = phase3ResearchConversations[request.conversationID] {
+            return ResearchConversationResponse(conversation: conversation)
+        }
+        #endif
         throw URLError(.fileDoesNotExist)
     }
 
     func researchConversationRefresh(_ request: ResearchConversationRefreshRequest) async throws -> ResearchConversationResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            conversation.sourceStatus = "current"
+            conversation.projectContextReviewRequired = true
+            conversation.updatedAt = phase3ResearchTimestamp(adding: 180)
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchConversationResponse(conversation: conversation)
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
     func researchProjectContextReview(_ request: ResearchProjectContextReviewRequest) async throws -> ResearchConversationResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            conversation.primaryProjectID = request.projectID
+            conversation.projectContext = ResearchProjectContext(
+                projectID: request.projectID,
+                facts: request.facts,
+                source: "user-provided",
+                updatedAt: phase3ResearchTimestamp(adding: 240)
+            )
+            conversation.projectContextReviewRequired = false
+            conversation.updatedAt = phase3ResearchTimestamp(adding: 240)
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchConversationResponse(conversation: conversation)
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
@@ -2986,26 +3036,189 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     }
 
     func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            let selections = request.selections ?? []
+            let sources = selections.enumerated().map { index, selection in
+                phase3ResearchSource(selection, index: index)
+            }
+            let title = selections.first?.selectedText
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .prefix(80)
+            let conversation = ResearchConversation(
+                id: "phase3-research-conversation",
+                title: title.map(String.init) ?? "Phase 3 Research",
+                createdAt: phase3ResearchTimestamp(),
+                updatedAt: phase3ResearchTimestamp(),
+                primaryProjectID: request.projectID,
+                projectContext: ResearchProjectContext(
+                    projectID: request.projectID,
+                    facts: [
+                        "Occupancy is Group B.",
+                        "The building remains occupied during the proposed work."
+                    ],
+                    source: "user-provided",
+                    updatedAt: phase3ResearchTimestamp()
+                ),
+                projectContextReviewRequired: false,
+                sourceStatus: "current",
+                sources: sources,
+                messages: []
+            )
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchConversationResponse(conversation: conversation)
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
     func researchConversationAddEvidence(_ request: ResearchConversationEvidenceRequest) async throws -> ResearchConversationEvidenceResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            let existingIDs = Set(conversation.sources.map(\.id))
+            let additions = request.selections.enumerated().map { index, selection in
+                phase3ResearchSource(selection, index: conversation.sources.count + index)
+            }.filter { !existingIDs.contains($0.id) }
+            conversation.sources.append(contentsOf: additions)
+            conversation.updatedAt = phase3ResearchTimestamp(adding: 60)
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchConversationEvidenceResponse(
+                conversation: conversation,
+                replayed: additions.isEmpty,
+                addedSelectionCount: additions.count
+            )
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            let source = conversation.sources.first
+            let sectionID = source?.sectionID ?? "1"
+            let sourceID = source?.id ?? "phase3-source-1"
+            let question = ResearchMessage(
+                id: "phase3-question-\(request.requestID)",
+                role: "user",
+                question: request.question,
+                requestID: request.requestID,
+                createdAt: phase3ResearchTimestamp(adding: 90)
+            )
+            let answer = ResearchAnswer(
+                answerText: "The selected enacted provision controls the code title under the stated Project facts.",
+                conclusion: "The selected enacted provision controls, subject to the stated Project facts.",
+                explanation: "The answer is limited to the enacted passage selected in Reader and does not replace an official determination.",
+                supportedPoints: [
+                    ResearchSupportedPoint(
+                        heading: "The selected provision is controlling enacted text",
+                        explanation: "The exact Reader passage establishes the cited rule.",
+                        sectionID: sectionID,
+                        sourceIDs: [sourceID],
+                        evidenceRole: "governing"
+                    ),
+                    ResearchSupportedPoint(
+                        heading: "The Project facts frame the application",
+                        explanation: "The reported occupancy and work conditions remain user-provided facts.",
+                        sectionID: sectionID,
+                        sourceIDs: [sourceID],
+                        evidenceRole: "supporting"
+                    ),
+                    ResearchSupportedPoint(
+                        heading: "Related context is not controlling",
+                        explanation: "Context helps explain the result but does not replace the enacted provision.",
+                        sectionID: sectionID,
+                        sourceIDs: [sourceID],
+                        evidenceRole: "contextual"
+                    )
+                ],
+                assumptions: ["The selected passage is current for the Project's code edition."],
+                missingFacts: ["Confirm the final occupancy classification."],
+                evidenceLimitations: ["Only the selected enacted provision was reviewed."],
+                followUpQuestions: ["Will the building remain occupied throughout the work?"],
+                additionalEvidenceNeeded: ["Add any applicable exception or referenced table."],
+                citations: [
+                    ResearchCitation(
+                        sourceID: sourceID,
+                        sectionID: sectionID,
+                        sourceIDs: [sourceID],
+                        codePrefix: "BC",
+                        sectionNumber: source?.sectionNumber ?? "101.1",
+                        title: source?.title ?? "Title",
+                        evidenceRole: "governing",
+                        relevance: "Controls the title and scope of the selected enacted provision.",
+                        codeVersion: "2022 Construction Codes",
+                        codeEdition: "2022",
+                        corpusID: "nyc-construction-codes",
+                        corpusLabel: "NYC Construction Codes",
+                        applicabilityStatus: "current"
+                    )
+                ],
+                disclaimer: "AI-generated research assistance, not an official code determination."
+            )
+            let response = ResearchMessage(
+                id: "phase3-answer-\(request.requestID)",
+                role: "assistant",
+                answer: answer,
+                requestID: request.requestID,
+                createdAt: phase3ResearchTimestamp(adding: 120)
+            )
+            conversation.messages.append(contentsOf: [question, response])
+            conversation.sourceStatus = "changed"
+            conversation.updatedAt = phase3ResearchTimestamp(adding: 120)
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchConversationMessageResponse(
+                conversation: conversation,
+                replayed: false,
+                requestID: request.requestID
+            )
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
     func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            conversation.title = request.title
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchConversationResponse(conversation: conversation)
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
     func researchConversationAssignProject(_ request: ResearchConversationAssignProjectRequest) async throws -> ResearchConversationResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            conversation.primaryProjectID = request.projectID
+            conversation.projectContext = ResearchProjectContext(
+                projectID: request.projectID,
+                facts: request.projectID == nil ? [] : ["Project assignment was explicitly reviewed."],
+                source: "user-provided",
+                updatedAt: phase3ResearchTimestamp(adding: 300)
+            )
+            conversation.projectContextReviewRequired = false
+            conversation.updatedAt = phase3ResearchTimestamp(adding: 300)
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchConversationResponse(conversation: conversation)
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
     func researchConversationDelete(_ request: ResearchConversationDeleteRequest) async throws -> ResearchConversationDeleteResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            return ResearchConversationDeleteResponse(
+                deleted: phase3ResearchConversations.removeValue(forKey: request.conversationID) != nil
+            )
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
@@ -3115,6 +3328,37 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             entitlementFingerprint: entitlementFingerprint
         )
     }
+
+    #if DEBUG
+    private func phase3ResearchConversation(id: String) throws -> ResearchConversation {
+        guard let conversation = phase3ResearchConversations[id] else {
+            throw URLError(.fileDoesNotExist)
+        }
+        return conversation
+    }
+
+    private func phase3ResearchSource(
+        _ selection: ResearchSelectionRequest,
+        index: Int
+    ) -> ResearchSource {
+        ResearchSource(
+            id: "phase3-source-\(selection.sectionID)-\(index)",
+            kind: "selection",
+            relationship: "governing",
+            sectionID: selection.sectionID,
+            sectionNumber: "101.1",
+            title: "Title",
+            codePrefix: "BC",
+            selectedText: selection.selectedText
+        )
+    }
+
+    private func phase3ResearchTimestamp(adding seconds: TimeInterval = 0) -> String {
+        ISO8601DateFormatter().string(
+            from: Date(timeIntervalSince1970: 1_787_220_000 + seconds)
+        )
+    }
+    #endif
 }
 
 enum UserContentMergeAction: String, Codable, Hashable, Sendable {

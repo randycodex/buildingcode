@@ -268,6 +268,10 @@ const newResearchComposerSource = clientSource.slice(newResearchComposerStart, n
 assert.ok(newResearchComposerStart >= 0 && newResearchComposerEnd > newResearchComposerStart, "New Research composer source was not found.");
 assert.match(newResearchComposerSource, /let initialProjectID = preferredResearchProjectID\(\)[\s\S]*?projectID: initialProjectID/, "New Research does not inherit the active Project context.");
 assert.match(newResearchComposerSource, /projectLabel\.textContent = "Project context"[\s\S]*?createResearchProjectSelect\([\s\S]*?initialProjectID = projectSelect\.value/, "New Research does not expose a correctable Project context before the first send.");
+const researchProjectChoicesSource = functionSource(clientSource, "researchProjectChoices");
+assert.match(researchProjectChoicesSource, /activeProjectRecords\(currentContentSummary\(\)\.projects \|\| \[\]\)/, "Research Project controls must include only true Projects.");
+assert.doesNotMatch(researchProjectChoicesSource, /category: "reference"/, "Saved collections must not appear as Research Project context.");
+assert.match(clientSource, /if \(citation\.sectionID \|\| citation\.sectionNumber\)[\s\S]*?openSourceInReader\(citation/, "A citation with canonical section identity must open Reader even before exact saved sources are hydrated.");
 assert.doesNotMatch(newResearchComposerSource, /section\.append\(renderResearchProgressCard\(progress\)\)/, "The new Research composer still targets a removed progress container.");
 assert.doesNotMatch(newResearchComposerSource, /What would you like to research\?|createElement\("h3"\)/, "The new Research composer should begin directly with the chat box.");
 assert.match(clientSource, /monthFormatter\.format\(created\)[\s\S]*?`year-\$\{created\.getFullYear\(\)\}`/, "Older Research history is not grouped by calendar month and year.");

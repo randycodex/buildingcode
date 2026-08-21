@@ -174,7 +174,11 @@ struct ResearchView: View {
     @State private var isRefreshingSources = false
     @State private var isConfirmingProjectContext = false
     @State private var isVisible = false
-    private let cache = ProjectHubOfflineCache()
+    private let cache: ProjectHubOfflineCache
+
+    init(cacheDirectoryURL: URL? = nil) {
+        cache = ProjectHubOfflineCache(directoryURL: cacheDirectoryURL)
+    }
 
     var body: some View {
         NavigationStack {
@@ -309,6 +313,7 @@ struct ResearchView: View {
                 showingSettings = true
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityIdentifier("research-recovery-action")
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -434,6 +439,7 @@ struct ResearchView: View {
                         .padding(.vertical, 7)
                         .background(.thinMaterial, in: Capsule())
                 }
+                .accessibilityIdentifier("research-project-context-menu")
                 Spacer()
                 Menu {
                     Button("Rename", systemImage: "pencil") {
@@ -522,6 +528,7 @@ struct ResearchView: View {
                     .padding(.vertical, 11)
                     .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
                     .disabled(isSending || researchSendIsBlocked)
+                    .accessibilityIdentifier("research-composer")
                 Button {
                     Task { await sendQuestion() }
                 } label: {
@@ -573,6 +580,7 @@ struct ResearchView: View {
                 Task { await refreshChangedSources(conversation) }
             }
             .disabled(isRefreshingSources)
+            .accessibilityIdentifier("research-refresh-sources")
         }
         .padding(12)
         .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 14))
@@ -590,6 +598,7 @@ struct ResearchView: View {
                     Task { await confirmCurrentProjectContext(conversation) }
                 }
                 .disabled(isConfirmingProjectContext)
+                .accessibilityIdentifier("research-confirm-project")
             }
         }
         .padding(12)
@@ -686,6 +695,7 @@ struct ResearchView: View {
         }
         .padding(12)
         .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
+        .accessibilityIdentifier("research-selected-evidence")
     }
 
     @ViewBuilder
@@ -1269,6 +1279,7 @@ private struct ResearchAnswerView: View {
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel("Open \(citationAccessibilityLabel(citation)) in Reader")
+                            .accessibilityIdentifier(citationAccessibilityIdentifier(citation))
                         }
                     }
                 }
@@ -1276,12 +1287,7 @@ private struct ResearchAnswerView: View {
             if hasEvidenceDetails {
                 DisclosureGroup("Evidence reviewed") {
                     VStack(alignment: .leading, spacing: 14) {
-                        answerSection("What the cited evidence establishes", items: answer.supportedPoints.map { point in
-                            [evidenceRoleLabel(point.evidenceRole), point.heading, point.explanation]
-                                .compactMap { $0 }
-                                .filter { !$0.isEmpty }
-                                .joined(separator: " — ")
-                        })
+                        supportedPointsSection(answer.supportedPoints)
                         answerSection("Assumptions used", items: answer.assumptions)
                         answerSection("Project facts to verify", items: answer.missingFacts)
                         answerSection("Limits of this answer", items: answer.evidenceLimitations)
@@ -1322,6 +1328,14 @@ private struct ResearchAnswerView: View {
         }
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .topLeading) {
+            Color.clear
+                .frame(width: 1, height: 1)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Research answer ready")
+                .accessibilityIdentifier("research-answer")
+                .allowsHitTesting(false)
+        }
     }
 
     private var hasEvidenceDetails: Bool {
@@ -1332,6 +1346,26 @@ private struct ResearchAnswerView: View {
             !answer.followUpQuestions.isEmpty ||
             !answer.additionalEvidenceNeeded.isEmpty ||
             !answer.citations.isEmpty
+    }
+
+    @ViewBuilder
+    private func supportedPointsSection(_ points: [ResearchSupportedPoint]) -> some View {
+        if !points.isEmpty {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("What the cited evidence establishes")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.primary)
+                ForEach(points, id: \.self) { point in
+                    Text(
+                        "\u{2022} " + [evidenceRoleLabel(point.evidenceRole), point.heading, point.explanation]
+                            .compactMap { $0 }
+                            .filter { !$0.isEmpty }
+                            .joined(separator: " \u{2014} ")
+                    )
+                    .accessibilityIdentifier(supportedPointAccessibilityIdentifier(point.evidenceRole))
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -1366,11 +1400,27 @@ private struct ResearchAnswerView: View {
             .joined(separator: ", ")
     }
 
+    private func citationAccessibilityIdentifier(_ citation: ResearchCitation) -> String {
+        let identity = citation.sectionID ?? citation.sourceID ?? citation.id
+        let safeIdentity = identity.map { character in
+            character.isLetter || character.isNumber ? character : "-"
+        }
+        return "research-citation-\(String(safeIdentity))"
+    }
+
     private func evidenceRoleLabel(_ role: String?) -> String {
         switch role?.lowercased() {
         case "contextual": return "Context"
         case "supporting": return "Supporting"
         default: return "Governing"
+        }
+    }
+
+    private func supportedPointAccessibilityIdentifier(_ role: String?) -> String {
+        switch role?.lowercased() {
+        case "contextual": return "research-supported-point-contextual"
+        case "supporting": return "research-supported-point-supporting"
+        default: return "research-supported-point-governing"
         }
     }
 }

@@ -195,9 +195,9 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260820-ux-meaning-phase3-v1"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260820-ux-meaning-phase3-v2"));
 assert(shellPrecacheURLs.includes("/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3"));
-assert(shellPrecacheURLs.includes("/web/styles.css?v=20260820-ux-meaning-phase3-v1"));
+assert(shellPrecacheURLs.includes("/web/styles.css?v=20260820-ux-meaning-phase3-v2"));
 assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260813-research-reader-spacing-v120"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260811-research-columns-v3"));

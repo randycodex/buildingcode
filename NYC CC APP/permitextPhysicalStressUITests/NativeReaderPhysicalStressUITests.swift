@@ -117,6 +117,141 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
     }
 
+    func testPhase3EntitledReaderResearchJourney() {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--phase3-entitled-research-fixture",
+            "--native-reader-rollout-stage",
+            "isolated-table-fallback"
+        ]
+        app.launch()
+
+        XCTAssertTrue(
+            element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45),
+            phase3LaunchFailureDescription(in: app)
+        )
+
+        // Section 101.1 is the fixture's initial jump target. Native Reader's
+        // attributed UITextViews intentionally expose selectable runs rather
+        // than duplicating the complete text as one accessibility value; the
+        // first substantive paragraph at that deterministic viewport is 101.1.
+        let enactedPassage = app.textViews.element(boundBy: 3)
+        XCTAssertTrue(
+            enactedPassage.waitForExistence(timeout: 15) && enactedPassage.isHittable,
+            "Building Code 101.1 enacted text was not exposed as selectable Reader text.\n\(app.debugDescription)"
+        )
+        enactedPassage.press(forDuration: 1.1)
+
+        let selectAll = app.menuItems["Select All"]
+        if selectAll.waitForExistence(timeout: 2) {
+            selectAll.tap()
+        }
+        var researchSelectionAction = app.menuItems["Research"]
+        if !researchSelectionAction.exists {
+            let nextMenuPage = app.buttons["Forward"]
+            if nextMenuPage.waitForExistence(timeout: 2) {
+                nextMenuPage.tap()
+                researchSelectionAction = app.buttons["Research"]
+            }
+        }
+        XCTAssertTrue(
+            researchSelectionAction.waitForExistence(timeout: 5),
+            "The native Reader selection menu did not expose Research.\n\(app.debugDescription)"
+        )
+        researchSelectionAction.tap()
+
+        let composer = element(in: app, identifier: "research-composer")
+        XCTAssertTrue(
+            composer.waitForExistence(timeout: 15),
+            "The selected Reader passage did not create and open Research.\n\(app.debugDescription)"
+        )
+        XCTAssertTrue(
+            element(in: app, identifier: "research-selected-evidence").waitForExistence(timeout: 10),
+            "Research did not preserve the selected enacted passage."
+        )
+
+        let projectContext = element(in: app, identifier: "research-project-context-menu")
+        XCTAssertTrue(projectContext.waitForExistence(timeout: 5), "Active Project context is not visible.")
+        XCTAssertTrue(
+            projectContext.label.localizedCaseInsensitiveContains("Acceptance Project"),
+            "Research did not begin in the active Acceptance Project; label was \(projectContext.label)."
+        )
+
+        composer.tap()
+        composer.typeText("What does this enacted provision establish?")
+        let send = app.buttons["Send Research question"]
+        XCTAssertTrue(send.isEnabled, "The deterministic Research question was not sendable.")
+        send.tap()
+
+        XCTAssertTrue(
+            element(in: app, identifier: "research-answer").waitForExistence(timeout: 15),
+            "The zero-network Research transport did not return its deterministic answer.\n\(app.debugDescription)"
+        )
+        XCTAssertTrue(
+            app.staticTexts["Enacted source changed"].waitForExistence(timeout: 10),
+            "The answer did not expose its changed-source recovery state."
+        )
+
+        let evidenceReviewed = app.buttons["Evidence reviewed"]
+        reveal(evidenceReviewed, in: app)
+        XCTAssertTrue(evidenceReviewed.exists && evidenceReviewed.isHittable, "Evidence reviewed details are absent.")
+        evidenceReviewed.tap()
+        assertResearchTrustDetails(in: app)
+
+        let refresh = element(in: app, identifier: "research-refresh-sources")
+        reveal(refresh, in: app, swipingDown: true)
+        XCTAssertTrue(refresh.isHittable, "Refresh Sources could not be reached.")
+        refresh.tap()
+        let projectWarning = app.staticTexts["Project review required"]
+        XCTAssertTrue(
+            projectWarning.waitForExistence(timeout: 10),
+            "Refreshing changed sources did not require Project review."
+        )
+        let confirmProject = element(in: app, identifier: "research-confirm-project")
+        reveal(confirmProject, in: app, swipingDown: true)
+        XCTAssertTrue(confirmProject.isHittable, "Confirm Current Project could not be reached.")
+        confirmProject.tap()
+        XCTAssertTrue(
+            waitForNonexistence(projectWarning),
+            "Confirming the current Project did not clear the review requirement."
+        )
+
+        reveal(projectContext, in: app, swipingDown: true)
+        XCTAssertTrue(projectContext.isHittable, "The Project context menu could not be reached for correction.")
+        projectContext.tap()
+        let correctionProject = app.buttons["Correction Project"]
+        XCTAssertTrue(correctionProject.waitForExistence(timeout: 5), "The second true Project is not available.")
+        correctionProject.tap()
+        let moveConversation = app.buttons["Move Conversation"]
+        XCTAssertTrue(moveConversation.waitForExistence(timeout: 5), "Project correction lacks confirmation.")
+        moveConversation.tap()
+        XCTAssertTrue(
+            waitForLabelContaining("Correction Project", on: projectContext),
+            "Research did not display the corrected active Project."
+        )
+
+        let citation = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH %@", "research-citation-"))
+            .firstMatch
+        reveal(citation, in: app)
+        XCTAssertTrue(citation.isHittable, "The answer citation could not be reached.")
+        citation.tap()
+
+        XCTAssertTrue(
+            element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 30),
+            "Opening the Research citation did not return to the installed native Reader.\n\(app.debugDescription)"
+        )
+        XCTAssertTrue(
+            app.buttons["Jump within chapter"].waitForExistence(timeout: 10),
+            "The citation destination is not an interactive chapter Reader."
+        )
+
+        let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .original)
+        attachment.name = "Phase 3 entitled Reader to Research citation journey"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     private func runCycles(_ iterations: Int, in app: XCUIApplication) {
         for iteration in 1...iterations {
             let bookmark = element(in: app, identifier: bookmarkIdentifier)
@@ -281,6 +416,65 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
     }
 
+    private func waitForLabelContaining(
+        _ expectedSubstring: String,
+        on element: XCUIElement,
+        timeout: TimeInterval = 10
+    ) -> Bool {
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label CONTAINS[c] %@", expectedSubstring),
+            object: element
+        )
+        return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
+    private func reveal(
+        _ element: XCUIElement,
+        in app: XCUIApplication,
+        swipingDown: Bool = false
+    ) {
+        for _ in 0..<12 where !element.isHittable {
+            if swipingDown {
+                app.swipeDown()
+            } else {
+                app.swipeUp()
+            }
+        }
+    }
+
+    private func assertResearchTrustDetails(in app: XCUIApplication) {
+        let expectedHeadings = [
+            "What the cited evidence establishes",
+            "Assumptions used",
+            "Project facts to verify",
+            "Limits of this answer",
+            "Questions that would materially advance this answer",
+            "Related evidence to add",
+            "Cited sources"
+        ]
+        let supportedPointsHeading = app.staticTexts[expectedHeadings[0]]
+        reveal(supportedPointsHeading, in: app)
+        XCTAssertTrue(
+            supportedPointsHeading.exists,
+            "Research answer is missing the \(expectedHeadings[0]) field."
+        )
+        let expectedRoles = [
+            ("Governing", "research-supported-point-governing"),
+            ("Supporting", "research-supported-point-supporting"),
+            ("Context", "research-supported-point-contextual")
+        ]
+        for (role, identifier) in expectedRoles {
+            let roleText = element(in: app, identifier: identifier)
+            reveal(roleText, in: app)
+            XCTAssertTrue(roleText.exists, "Research answer is missing the \(role) evidence role.")
+        }
+        for heading in expectedHeadings.dropFirst() {
+            let text = app.staticTexts[heading]
+            reveal(text, in: app)
+            XCTAssertTrue(text.exists, "Research answer is missing the \(heading) field.")
+        }
+    }
+
     private func waitForNonexistence(
         _ element: XCUIElement,
         timeout: TimeInterval = 10
@@ -298,5 +492,13 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             return "Physical stress harness failed: \(failure.label)"
         }
         return "Native Reader did not become ready within 45 seconds."
+    }
+
+    private func phase3LaunchFailureDescription(in app: XCUIApplication) -> String {
+        let failure = element(in: app, identifier: "phase3-research-fixture-failure")
+        if failure.exists {
+            return "Phase 3 Research fixture failed: \(failure.label)"
+        }
+        return "Phase 3 entitled Research fixture did not become ready within 45 seconds."
     }
 }

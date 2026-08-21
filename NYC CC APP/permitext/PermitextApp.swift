@@ -9,12 +9,19 @@ struct PermitextApp: App {
 
 #if DEBUG
     private let physicalStressConfiguration: NativeReaderPhysicalStressConfiguration?
+    private let phase3ResearchConfiguration: Phase3EntitledResearchConfiguration?
 
     init() {
-        if let preparedStressHarness = NativeReaderPhysicalStressConfiguration.prepareIfRequested() {
+        if let preparedResearchHarness = Phase3EntitledResearchConfiguration.prepareIfRequested() {
+            phase3ResearchConfiguration = preparedResearchHarness.configuration
+            physicalStressConfiguration = nil
+            _library = StateObject(wrappedValue: preparedResearchHarness.library)
+        } else if let preparedStressHarness = NativeReaderPhysicalStressConfiguration.prepareIfRequested() {
+            phase3ResearchConfiguration = nil
             physicalStressConfiguration = preparedStressHarness.configuration
             _library = StateObject(wrappedValue: preparedStressHarness.library)
         } else {
+            phase3ResearchConfiguration = nil
             physicalStressConfiguration = nil
             if UserDefaults.standard.string(forKey: PermitextBackendConfiguration.apiBaseURLDefaultsKey) == nil {
                 PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")
@@ -32,7 +39,7 @@ struct PermitextApp: App {
 
     private var runsNormalLifecycle: Bool {
 #if DEBUG
-        physicalStressConfiguration == nil
+        physicalStressConfiguration == nil && phase3ResearchConfiguration == nil
 #else
         true
 #endif
@@ -65,7 +72,9 @@ struct PermitextApp: App {
         WindowGroup {
             Group {
 #if DEBUG
-                if let physicalStressConfiguration {
+                if let phase3ResearchConfiguration {
+                    Phase3EntitledResearchHarness(configuration: phase3ResearchConfiguration)
+                } else if let physicalStressConfiguration {
                     NativeReaderPhysicalStressHarness(configuration: physicalStressConfiguration)
                 } else if let snapshotConfiguration = NativeReaderPhase9SnapshotConfiguration.active {
                     NativeReaderPhase9SnapshotHarness(configuration: snapshotConfiguration)
@@ -218,6 +227,242 @@ struct PermitextApp: App {
 }
 
 #if DEBUG
+private struct Phase3EntitledResearchConfiguration {
+    struct PreparedHarness {
+        let configuration: Phase3EntitledResearchConfiguration
+        let library: CodeLibraryViewModel
+    }
+
+    static let launchArgument = "--phase3-entitled-research-fixture"
+    private static let defaultsSuiteName = "com.randycodex.permitext.phase3-entitled-research"
+    private static let temporaryDirectoryName = "permitext-phase3-entitled-research"
+
+    let defaults: UserDefaults
+    let cacheDirectoryURL: URL
+
+    @MainActor
+    static func prepareIfRequested() -> PreparedHarness? {
+        guard ProcessInfo.processInfo.arguments.contains(launchArgument) else { return nil }
+        guard let defaults = UserDefaults(suiteName: defaultsSuiteName) else {
+            fatalError("Unable to create the isolated Phase 3 Research defaults suite.")
+        }
+        defaults.removePersistentDomain(forName: defaultsSuiteName)
+        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+
+        let fileManager = FileManager.default
+        let testDirectory = fileManager.temporaryDirectory
+            .appendingPathComponent(temporaryDirectoryName, isDirectory: true)
+        do {
+            if fileManager.fileExists(atPath: testDirectory.path) {
+                try fileManager.removeItem(at: testDirectory)
+            }
+            try fileManager.createDirectory(
+                at: testDirectory,
+                withIntermediateDirectories: true
+            )
+            let repository = try UserDataStore(
+                databaseURL: testDirectory.appendingPathComponent("user_data.sqlite")
+            )
+            let transport = LocalPermitextBackendTransport(
+                phase3ResearchFixtureEnabled: true
+            )
+            let account = SignedInAccount(
+                appUserID: "guest:phase3-entitled-research",
+                authProvider: .guest,
+                authProviderUserID: "phase3-entitled-research",
+                appleUserID: "",
+                displayName: "Phase 3 Fixture",
+                signedInAt: Date(timeIntervalSince1970: 1_787_220_000),
+                migrationState: .localDataAttached,
+                backendSessionToken: nil
+            )
+            let library = CodeLibraryViewModel(
+                locator: BundleDatabaseLocator(defaults: defaults),
+                userContentRepository: repository,
+                continuityStore: ContinuityStore(defaults: defaults),
+                readerThemeStore: ReaderThemeStore(defaults: defaults),
+                preferencesDefaults: defaults,
+                entitlementService: LocalEntitlementService(defaults: defaults),
+                lifetimeGrantLookupClient: LocalLifetimeGrantLookupClient(defaults: defaults),
+                accountBackendClient: PermitextBackendClient(transport: transport),
+                syncBackend: NoOpUserContentSyncBackend(),
+                loadsPersistedAccount: false,
+                initialSignedInAccount: account
+            )
+            return PreparedHarness(
+                configuration: Self(
+                    defaults: defaults,
+                    cacheDirectoryURL: testDirectory.appendingPathComponent(
+                        "research-cache",
+                        isDirectory: true
+                    )
+                ),
+                library: library
+            )
+        } catch {
+            // Never fall through to ordinary app storage or networking if the
+            // acceptance fixture cannot establish its isolated container.
+            fatalError("Unable to prepare isolated Phase 3 Research storage: \(error.localizedDescription)")
+        }
+    }
+}
+
+private struct Phase3EntitledResearchHarness: View {
+    let configuration: Phase3EntitledResearchConfiguration
+
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var chapter: CodeChapter?
+    @State private var initialSection: CodeSectionSummary?
+    @State private var failureMessage: String?
+    @State private var isReady = false
+
+    var body: some View {
+        TabView(selection: $library.selectedTab) {
+            BookmarksView(filterDefaults: configuration.defaults)
+                .tabItem { Image(systemName: library.selectedTab == .bookmarks ? "folder.fill" : "folder") }
+                .accessibilityLabel("Saved")
+                .tag(AppTab.bookmarks)
+
+            readerTab
+                .environment(\.isBrowserTabActive, library.selectedTab == .browse)
+                .tabItem { Image(systemName: "text.line.first.and.arrowtriangle.forward") }
+                .accessibilityLabel("First reader")
+                .tag(AppTab.browse)
+
+            ContentUnavailableView(
+                "Second Reader",
+                systemImage: "text.line.last.and.arrowtriangle.forward",
+                description: Text("The acceptance journey uses the first Reader.")
+            )
+            .tabItem { Image(systemName: "text.line.last.and.arrowtriangle.forward") }
+            .accessibilityLabel("Second reader")
+            .tag(AppTab.browseSecondary)
+
+            SearchView()
+                .tabItem { Image(systemName: "magnifyingglass") }
+                .accessibilityLabel("Search")
+                .tag(AppTab.search)
+
+            ResearchView(cacheDirectoryURL: configuration.cacheDirectoryURL)
+                .tabItem { Image(systemName: "sparkle") }
+                .accessibilityLabel("Research")
+                .tag(AppTab.research)
+        }
+        .overlay(alignment: .topTrailing) {
+            if isReady {
+                Color.clear
+                    .frame(width: 1, height: 1)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Phase 3 entitled Research fixture ready")
+                    .accessibilityIdentifier("phase3-research-fixture-ready")
+                    .allowsHitTesting(false)
+            }
+        }
+        .task { await prepareReaderAndProjects() }
+    }
+
+    @ViewBuilder
+    private var readerTab: some View {
+        if let chapter, let initialSection {
+            NavigationStack {
+                ChapterHTMLReaderView(
+                    chapter: chapter,
+                    initialSection: initialSection
+                )
+            }
+        } else if let failureMessage {
+            ContentUnavailableView(
+                "Phase 3 fixture failed",
+                systemImage: "exclamationmark.triangle.fill",
+                description: Text(failureMessage)
+            )
+            .accessibilityIdentifier("phase3-research-fixture-failure")
+        } else {
+            ProgressView("Preparing entitled Research fixture…")
+                .accessibilityIdentifier("phase3-research-fixture-loading")
+        }
+    }
+
+    @MainActor
+    private func prepareReaderAndProjects() async {
+        isReady = false
+        failureMessage = nil
+        library.selectedTab = .browse
+
+        guard await waitForInitialContent() else {
+            failureMessage = "The bundled code library did not finish loading."
+            return
+        }
+        guard let constructionVersion = library.availableVersions.first(where: {
+            $0.authoredHTMLBundlePath?.hasSuffix("2022-construction-codes") == true
+        }) else {
+            failureMessage = "The 2022 Construction Codes bundle is unavailable."
+            return
+        }
+        if library.selectedVersionFileName != constructionVersion.fileName {
+            library.updateSelectedVersion(fileName: constructionVersion.fileName)
+            guard await waitForInitialContent(selectedVersionFileName: constructionVersion.fileName) else {
+                failureMessage = "The Construction Codes bundle did not finish loading."
+                return
+            }
+        }
+        guard let buildingCode = library.codeSections.first(where: {
+            $0.name.caseInsensitiveCompare("BUILDING CODE") == .orderedSame
+        }) else {
+            failureMessage = "The Building Code is unavailable."
+            return
+        }
+        library.updateSelectedCodeSection(id: buildingCode.id)
+        guard let chapterOne = library.chapters(for: buildingCode.id).first(where: {
+            $0.chapterNumber == "1"
+        }),
+        let section1011 = library.sections(for: chapterOne).first(where: {
+            $0.sectionNumber == "101.1"
+        }) else {
+            failureMessage = "Building Code Section 101.1 is unavailable."
+            return
+        }
+
+        guard let acceptanceProject = library.createFolder(
+            name: "Acceptance Project",
+            address: "1 Centre Street",
+            description: "Phase 3 entitled Research acceptance",
+            colorHex: CodeFolder.presetColorHexes[0],
+            folderType: .project
+        ),
+        library.createFolder(
+            name: "Correction Project",
+            address: "2 Centre Street",
+            description: "Alternate Project context",
+            colorHex: CodeFolder.presetColorHexes[1],
+            folderType: .project
+        ) != nil else {
+            failureMessage = "The isolated Projects could not be created."
+            return
+        }
+        library.noteProjectOpened(acceptanceProject.id)
+        chapter = chapterOne
+        initialSection = section1011
+        isReady = true
+    }
+
+    @MainActor
+    private func waitForInitialContent(
+        selectedVersionFileName: String? = nil
+    ) async -> Bool {
+        for _ in 0..<300 {
+            if library.isInitialContentLoaded,
+               (selectedVersionFileName == nil ||
+                library.selectedVersionFileName == selectedVersionFileName) {
+                return true
+            }
+            try? await Task.sleep(for: .milliseconds(100))
+            guard !Task.isCancelled else { return false }
+        }
+        return false
+    }
+}
+
 private struct NativeReaderPhysicalStressConfiguration {
     enum Target {
         case bookmarkStress
