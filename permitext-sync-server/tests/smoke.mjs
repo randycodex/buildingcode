@@ -1325,7 +1325,8 @@ async function main() {
         !workspaceScript.text.includes('function openSearchResultInNewReader') &&
         !workspaceScript.text.includes('newReaderButton') &&
         !workspaceScript.text.includes('New reader') &&
-        workspaceScript.text.includes('void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance));') &&
+        workspaceScript.text.includes('void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {') &&
+        workspaceScript.text.includes('sourceSurface: "search"') &&
         workspaceScript.text.includes("function updateSearchDock") &&
         workspaceScript.text.includes("summary.hidden = !query;") &&
         workspaceScript.text.includes('`Searching in ${scope}`') &&
@@ -1342,7 +1343,7 @@ async function main() {
         workspaceScript.text.includes('label.textContent = "Recently Viewed"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
         workspaceScript.text.includes("async function openRecentlyViewedInReader(searchInstance, entry)") &&
-        workspaceScript.text.includes("await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance))") &&
+        workspaceScript.text.includes("await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance), {") &&
         workspaceScript.text.includes('console.warn("Could not open recently viewed section.", error)') &&
         workspaceScript.text.includes('presentWorkspaceIssue(error?.message || "This section could not be loaded. Try opening it again.")') &&
         workspaceScript.text.includes("for (let attempt = 0; attempt < 3 && !section; attempt += 1)") &&
@@ -1449,7 +1450,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260820-ux-meaning-phase3-v2'),
+        webRoot.text.includes('/web/app.js?v=20260821-ux-reader-save-phase4-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1618,7 +1619,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-ux-meaning-phase3-v2'),
+      webRoot.text.includes('/web/styles.css?v=20260821-ux-reader-save-phase4-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1817,7 +1818,7 @@ async function main() {
     assert(
       !workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
         workspaceScript.text.includes("async function openRecentlyViewedInReader(searchInstance, entry)") &&
-        workspaceScript.text.includes("await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance))"),
+        workspaceScript.text.includes("await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance), {"),
       "Recently Viewed should open an exact-passage Reader."
     );
     const readerHeaderStyleSource =
@@ -1884,7 +1885,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260820-ux-meaning-phase3-v2'),
+      webRoot.text.includes('/web/styles.css?v=20260821-ux-reader-save-phase4-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2357,13 +2358,13 @@ async function main() {
       "Saved rows no longer match the iOS code, chapter, and code-order structure."
     );
     assert(
-      workspaceScript.text.includes("async function saveReaderPassage(panel, section, reader, target)") &&
+      workspaceScript.text.includes("async function saveReaderPassage(panel, section, reader, target, options = {})") &&
         workspaceScript.text.includes("await persistSectionBookmark(payload, true, { refreshSavedPanes: false })") &&
-        workspaceScript.text.includes("project = activeProjectForReaderSave()") &&
-        workspaceScript.text.includes("await persistSectionInProject(project, payload)") &&
-        workspaceScript.text.includes("showReaderSaveConfirmation(panel, section, reader, target, project)") &&
+        !workspaceScript.text.includes("function activeProjectForReaderSave()") &&
+        workspaceScript.text.includes("showReaderSaveConfirmation(panel, payload, options)") &&
+        workspaceScript.text.includes('projectButton.textContent = "Add to Project"') &&
         !workspaceScript.text.includes('addNote.textContent = "Link to Note"'),
-      "Reader passage saving is no longer immediate and Project-aware."
+      "Reader passage saving is no longer immediate with Project assignment as a follow-up."
     );
     assert(
         !workspaceScript.text.includes('wrapper.classList.toggle("is-actions-active")') &&
@@ -2371,7 +2372,7 @@ async function main() {
         !workspaceScript.text.includes("wrapper.tabIndex = 0") &&
         !workspaceScript.text.includes('className = "inline-comment-toggle"') &&
         !workspaceScript.text.includes('button.setAttribute("aria-label", "Link passage to Note")') &&
-        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", saved ? "Saved passage" : "Save passage")') &&
+        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", saved ? "Remove from Saved" : "Save passage")') &&
         workspaceScript.text.includes('const removingSavedPassage = bookmarkButton.classList.contains("is-saved")') &&
         workspaceScript.text.includes("await persistSectionBookmark(payload, false);") &&
         !workspaceScript.text.includes('if (bookmarkButton.disabled || bookmarkButton.classList.contains("is-saved")) return;') &&
@@ -2392,7 +2393,7 @@ async function main() {
         workspaceScript.text.includes('sectionWrapper.dataset.codeVersion = syncCodeVersion') &&
         workspaceScript.text.includes('wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion)') &&
         workspaceScript.text.includes('wrapper.classList.toggle("has-saved-section", showBookmark)') &&
-        workspaceScript.text.includes('button.setAttribute("aria-label", showBookmark ? "Saved passage" : "Save passage")') &&
+        workspaceScript.text.includes('button.setAttribute("aria-label", showBookmark ? "Remove from Saved" : "Save passage")') &&
         !workspaceScript.text.includes('const bookmarkWrapper = wrappers.find') &&
         workspaceScript.text.includes('marker.hidden = !showSectionMarker') &&
         workspaceStyles.text.includes(".reader-section-saved-marker") &&

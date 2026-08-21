@@ -22,7 +22,6 @@ struct FolderMembershipRow: View {
                         Text(folder.name)
                             .font(.caption.weight(.semibold))
                         Button {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
                             onRemove(folder)
                         } label: {
                             Image(systemName: "xmark")
@@ -253,7 +252,6 @@ struct FolderPickerSheet: View {
                                     onRequireProjectAccess()
                                     return
                                 }
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                 if selectedFolderIDs.contains(folder.id) {
                                     selectedFolderIDs.remove(folder.id)
                                 } else {

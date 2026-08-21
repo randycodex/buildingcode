@@ -35,6 +35,24 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         runCycles(iterations, in: app)
     }
 
+    func testReaderBookmarkProjectCycle() {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--native-reader-physical-stress",
+            "--native-reader-rollout-stage",
+            "isolated-table-fallback"
+        ]
+        app.launch()
+
+        let nativeReader = element(in: app, identifier: "native-reader-ready")
+        XCTAssertTrue(
+            nativeReader.waitForExistence(timeout: 45),
+            launchFailureDescription(in: app)
+        )
+
+        runCycles(1, in: app)
+    }
+
     func testFuelGasChapterOneCrossCodeLinkOpensTitle28() {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -260,6 +278,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
             bookmark.tap()
             XCTAssertTrue(waitForValue("Saved", on: bookmark), "Cycle \(iteration): bookmark save did not complete.")
+            let saveDone = app.buttons["Done"]
+            if saveDone.waitForExistence(timeout: 2) {
+                saveDone.tap()
+            }
 
             let tabButtons = app.tabBars.buttons
             XCTAssertGreaterThanOrEqual(

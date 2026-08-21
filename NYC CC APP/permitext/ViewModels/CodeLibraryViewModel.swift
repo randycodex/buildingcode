@@ -6,6 +6,10 @@ import os.signpost
 import Security
 import SwiftUI
 
+extension Notification.Name {
+    static let permitextSavedWorkDidChange = Notification.Name("permitext.savedWorkDidChange")
+}
+
 enum PermitextReleaseSurfaceVisibility {
     static let firmCollaboration = false
     static let coordination = false
@@ -175,6 +179,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let entitlementService: EntitlementService
     private let lifetimeGrantLookupClient: LifetimeGrantLookupClient
     private let accountBackendClient: AccountBackendClient
+    private let ownsAccountSync: Bool
     private let projectHubOfflineCache = ProjectHubOfflineCache()
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
@@ -246,6 +251,10 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var bookmarkRevision: Int = 0
     @Published private(set) var userContentSyncCheckpoint: UserContentSyncCheckpoint?
 
+#if DEBUG
+    var ownsAccountSyncForTesting: Bool { ownsAccountSync }
+#endif
+
     init(
         locator: BundleDatabaseLocator = BundleDatabaseLocator(),
         formattingEngine: FormattingEngine = FormattingEngine(),
@@ -259,7 +268,8 @@ final class CodeLibraryViewModel: ObservableObject {
         syncBackend: UserContentSyncBackend? = nil,
         loadsInitialContent: Bool = true,
         loadsPersistedAccount: Bool = true,
-        initialSignedInAccount: SignedInAccount? = nil
+        initialSignedInAccount: SignedInAccount? = nil,
+        ownsAccountSync: Bool = true
     ) {
         self.locator = locator
         self.formattingEngine = formattingEngine
@@ -275,6 +285,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.entitlementService = entitlementService
         self.lifetimeGrantLookupClient = lifetimeGrantLookupClient
         self.accountBackendClient = accountBackendClient
+        self.ownsAccountSync = ownsAccountSync
         self.currentPlan = entitlementService.currentPlan
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
         let loadedSignedInAccount = initialSignedInAccount
@@ -308,7 +319,9 @@ final class CodeLibraryViewModel: ObservableObject {
                 }
             }
         }
-        networkMonitor.start(queue: networkMonitorQueue)
+        if ownsAccountSync {
+            networkMonitor.start(queue: networkMonitorQueue)
+        }
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
         initialLoadProgress = 0
@@ -1192,6 +1205,32 @@ final class CodeLibraryViewModel: ObservableObject {
         readerThemeStore.save(theme)
     }
 
+    /// Mirrors shared account/capability/theme state into a corpus-only Reader
+    /// session without giving that session ownership of StoreKit or sync work.
+    /// Transient Reader state remains independent.
+    func synchronizeIndependentReaderSession(from sharedLibrary: CodeLibraryViewModel) {
+        signedInAccount = sharedLibrary.signedInAccount
+        currentPlan = sharedLibrary.currentPlan
+        currentEntitlementSource = sharedLibrary.currentEntitlementSource
+        currentCapabilityContract = sharedLibrary.currentCapabilityContract
+        activeStoreKitPlan = sharedLibrary.activeStoreKitPlan
+        activeStoreKitResearch = sharedLibrary.activeStoreKitResearch
+        isStoreKitResearchActive = sharedLibrary.isStoreKitResearchActive
+        hasActiveBackendProEntitlement = sharedLibrary.hasActiveBackendProEntitlement
+        activeProjectID = sharedLibrary.activeProjectID
+        updateReaderTheme(sharedLibrary.readerTheme)
+    }
+
+    /// Reconciles a mutation written by another Reader session. The main app
+    /// model owns the single account-sync pipeline; corpus-only sessions only
+    /// refresh their local presentation.
+    func reconcileExternalSavedWorkChange(scheduleAccountSync: Bool) {
+        refreshBookmarks()
+        if scheduleAccountSync {
+            scheduleUserContentAutoSync()
+        }
+    }
+
     func resolveReferences(for detail: ReaderSectionDetail) -> [ResolvedCodeReference] {
         if let authoredCodeStore {
             return referenceResolver.resolveReferences(in: detail.officialText, database: authoredCodeStore)
@@ -1938,7 +1977,7 @@ final class CodeLibraryViewModel: ObservableObject {
     ) -> CodeFolder? {
         guard let selectedVersion, let userContentRepository else { return nil }
         do {
-            if folderType == .project {
+            if folderType == .project, currentPlan != .pro {
                 let folderCount = try folderCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateProject(currentCount: folderCount)) else {
                     return nil
@@ -1954,6 +1993,7 @@ final class CodeLibraryViewModel: ObservableObject {
             )
             refreshFolders()
             scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
             return folders.first { $0.id == id }
         } catch {
             statusMessage = error.localizedDescription
@@ -1975,6 +2015,7 @@ final class CodeLibraryViewModel: ObservableObject {
             )
             refreshFolders()
             scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -1986,6 +2027,7 @@ final class CodeLibraryViewModel: ObservableObject {
             try userContentRepository.deleteFolder(id: id, codeVersion: folder.codeVersion)
             refreshFolders()
             scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -2008,6 +2050,7 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshFolders()
         if !deletedIDs.isEmpty {
             scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
         }
         if let firstError {
             statusMessage = firstError.localizedDescription
@@ -2042,7 +2085,7 @@ final class CodeLibraryViewModel: ObservableObject {
             requireProjectAccess()
             return false
         }
-        if !isBookmarked(sectionID: sectionID) {
+        if !isBookmarked(sectionID: sectionID), currentPlan != .pro {
             do {
                 let bookmarkCount = try bookmarkCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateSavedSection(currentCount: bookmarkCount)) else {
@@ -2074,6 +2117,7 @@ final class CodeLibraryViewModel: ObservableObject {
             )
             scheduleProjectPresentationRefresh()
             scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
             return true
         } catch {
             bookmarkedSectionIDs = previousBookmarkedSectionIDs
@@ -2876,6 +2920,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func scheduleUserContentAutoSync() {
+        guard ownsAccountSync else { return }
         guard signedInAccount != nil else { return }
         // Keep sign-out safety current even when the device is offline and
         // the delayed automatic sync cannot run.
@@ -2910,6 +2955,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func startForegroundAutomaticSync() {
+        guard ownsAccountSync else { return }
         guard isInitialContentLoaded, signedInAccount != nil else {
             stopForegroundAutomaticSync()
             return
@@ -3670,7 +3716,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func toggleBookmark(sectionID: Int64) -> Bool {
         guard let selectedVersion, let userContentRepository else { return false }
         let wasBookmarked = bookmarkedSectionIDs.contains(sectionID)
-        if !wasBookmarked {
+        if !wasBookmarked, currentPlan != .pro {
             do {
                 let bookmarkCount = try bookmarkCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateSavedSection(currentCount: bookmarkCount)) else {
@@ -3716,6 +3762,7 @@ final class CodeLibraryViewModel: ObservableObject {
             try userContentRepository.toggleBookmark(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
             scheduleProjectPresentationRefresh()
             scheduleUserContentAutoSync()
+            NotificationCenter.default.post(name: .permitextSavedWorkDidChange, object: self)
             return newState
         } catch {
             bookmarkedSectionIDs = previousBookmarkedSectionIDs

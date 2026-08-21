@@ -606,19 +606,11 @@ struct SearchView: View {
 
     private func jumpBackInBookmarkButton(for entry: RecentlyViewedEntry) -> some View {
         let tileAccent = Color(uiColor: library.accentColor(for: entry.codeSectionID))
-        let isBookmarked = library.isBookmarked(sectionID: entry.sectionID)
-        return Button {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            library.toggleBookmark(sectionID: entry.sectionID)
-        } label: {
-            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(isBookmarked ? tileAccent : Color.secondary.opacity(0.7))
-                .frame(width: 28, height: 28)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(isBookmarked ? "Remove bookmark" : "Bookmark section")
+        return ReaderCurrentSectionBookmarkButton(
+            sectionID: entry.sectionID,
+            accentColor: tileAccent,
+            style: .compact
+        )
     }
 
     private func recentlyViewedTile(_ entry: RecentlyViewedEntry) -> some View {
@@ -730,7 +722,6 @@ struct SearchView: View {
                 .buttonStyle(.plain)
 
                 Button {
-                    searchPinHaptic()
                     if isPinned {
                         library.unpinSearch(searchQuery)
                     } else {
@@ -774,10 +765,6 @@ struct SearchView: View {
             query: searchQuery,
             restrictToSelectedCodeSection: library.isZoningResolutionSelected
         )
-    }
-
-    private func searchPinHaptic() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
     private func searchResultLink(_ result: CodeSearchResult) -> some View {

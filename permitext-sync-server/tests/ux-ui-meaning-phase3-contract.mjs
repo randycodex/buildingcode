@@ -35,7 +35,10 @@ const [
 // Canonical product meanings:
 // Saved = preserved code; Project = job context; Report = professional artifact;
 // Export = an action or produced file.
-assert.equal((iosApp.match(/\.accessibilityLabel\("Saved"\)/g) || []).length, 2);
+assert(
+  (iosApp.match(/\.accessibilityLabel\("Saved"\)/g) || []).length >= 2,
+  "Every production and acceptance tab shell must retain Saved as the top-level label."
+);
 assert.doesNotMatch(iosApp, /\.accessibilityLabel\("Projects"\)/);
 assert.match(iosSaved, /CodeTopContentFade\(title: "Saved"/);
 assert.match(iosSaved, /CodeScreenTitleRow\(title: "Saved"/);
@@ -98,7 +101,7 @@ assert.match(webClient, /: "Governing"/);
 assert.equal((webClient.match(/projectOwnership\.textContent = `Project: \$\{identity\.name\}`/g) || []).length, 2);
 assert.match(webStyles, /\.project-ownership-label/);
 assert.doesNotMatch(webClient, /Project Report Manifest as PDF/);
-assert.match(webIndex, /ux-meaning-phase3-v2/);
-assert.match(serviceWorker, /permitext-pro-shell-v719/);
+assert.match(webIndex, /ux-reader-save-phase4-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v720/);
 
 console.log("UX/UI meaning Phase 3 contract passed.");

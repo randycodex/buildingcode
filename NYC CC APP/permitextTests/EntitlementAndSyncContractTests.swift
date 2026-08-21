@@ -143,6 +143,52 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
 }
 
 final class EntitlementAndSyncContractTests: XCTestCase {
+    @MainActor
+    func testIndependentReaderSessionSeparatesTransientStateAndDoesNotOwnAccountSync() {
+        let mainDefaults = isolatedEntitlementDefaults()
+        let readerDefaults = isolatedEntitlementDefaults()
+        mainDefaults.set(AppPlan.pro.rawValue, forKey: LocalEntitlementService.planDefaultsKey)
+
+        let main = CodeLibraryViewModel(
+            continuityStore: ContinuityStore(defaults: mainDefaults),
+            readerThemeStore: ReaderThemeStore(defaults: mainDefaults),
+            preferencesDefaults: mainDefaults,
+            entitlementService: LocalEntitlementService(defaults: mainDefaults),
+            loadsInitialContent: false,
+            loadsPersistedAccount: false,
+            ownsAccountSync: true
+        )
+        let secondReader = CodeLibraryViewModel(
+            continuityStore: ContinuityStore(defaults: readerDefaults),
+            readerThemeStore: ReaderThemeStore(defaults: readerDefaults),
+            preferencesDefaults: readerDefaults,
+            entitlementService: LocalEntitlementService(defaults: readerDefaults),
+            loadsInitialContent: false,
+            loadsPersistedAccount: false,
+            ownsAccountSync: false
+        )
+
+        main.selectedVersionFileName = "primary-version"
+        main.selectedCodeSectionID = 101
+        secondReader.selectedVersionFileName = "secondary-version"
+        secondReader.selectedCodeSectionID = 202
+
+        XCTAssertNotEqual(main.selectedVersionFileName, secondReader.selectedVersionFileName)
+        XCTAssertNotEqual(main.selectedCodeSectionID, secondReader.selectedCodeSectionID)
+        XCTAssertTrue(main.ownsAccountSyncForTesting)
+        XCTAssertFalse(secondReader.ownsAccountSyncForTesting)
+
+        var updatedTheme = ReaderTheme.default
+        updatedTheme.fontSize = ReaderTheme.default.fontSize + 2
+        main.updateReaderTheme(updatedTheme)
+        secondReader.synchronizeIndependentReaderSession(from: main)
+
+        XCTAssertEqual(secondReader.currentPlan, .pro)
+        XCTAssertEqual(secondReader.readerTheme, updatedTheme.normalized)
+        XCTAssertEqual(main.selectedVersionFileName, "primary-version")
+        XCTAssertEqual(secondReader.selectedVersionFileName, "secondary-version")
+    }
+
     func testTwoTypefaceContractUsesSourceSerifForReaderAndMigratesLegacyChoices() throws {
         XCTAssertEqual(ReaderFontChoice.allCases, [.sourceSerif4])
         XCTAssertEqual(ReaderTheme.default.fontChoice, .sourceSerif4)

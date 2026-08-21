@@ -27,6 +27,7 @@ struct ReaderView: View {
     @State private var pendingFolderIDs: Set<Int64> = []
     @State private var pendingFinalFolderRemoval: CodeFolder?
     @State private var folderEditorTarget: ReaderFolderEditorTarget?
+    @State private var showsSavedFollowUp = false
 
     /// Same shape as BookmarksView.FolderEditorTarget but scoped to this view
     /// so the two states don't share an `Identifiable` collision.
@@ -122,7 +123,7 @@ struct ReaderView: View {
                     if isBookmarked {
                         removeBookmarkAndFolderLinks()
                     } else {
-                        openFolderPicker()
+                        saveBookmarkImmediately()
                     }
                 } label: {
                     Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
@@ -163,9 +164,17 @@ struct ReaderView: View {
                 canUseProjects: library.hasProjectAccess,
                 onSave: { folderIDs in
                     if isBookmarked {
-                        _ = library.replaceFolderMembership(sectionID: sectionID, folderIDs: folderIDs)
+                        if library.replaceFolderMembership(sectionID: sectionID, folderIDs: folderIDs) {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        }
                     } else {
-                        isBookmarked = library.saveSection(sectionID: sectionID, toFolderIDs: folderIDs)
+                        // Compatibility fallback for a stale presentation: the
+                        // bookmark itself is still created immediately.
+                        isBookmarked = library.toggleBookmark(sectionID: sectionID)
+                        if isBookmarked,
+                           library.replaceFolderMembership(sectionID: sectionID, folderIDs: folderIDs) {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        }
                     }
                 },
                 onCreateNew: { folderType in
@@ -235,6 +244,19 @@ struct ReaderView: View {
             }
         } message: {
             Text("Every saved section needs a folder. Removing this final destination will delete the saved record. You can choose another folder instead.")
+        }
+        .alert(
+            "Section saved",
+            isPresented: $showsSavedFollowUp
+        ) {
+            Button("Add to Project") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    openFolderPicker()
+                }
+            }
+            Button("Done", role: .cancel) { }
+        } message: {
+            Text("The section is saved now. Project assignment is optional and can be added next.")
         }
     }
 
@@ -379,6 +401,14 @@ struct ReaderView: View {
     private func openFolderPicker() {
         pendingFolderIDs = Set(library.folderMembership[sectionID] ?? [])
         isFolderPickerOpen = true
+    }
+
+    private func saveBookmarkImmediately() {
+        guard !isBookmarked else { return }
+        isBookmarked = library.toggleBookmark(sectionID: sectionID)
+        guard isBookmarked else { return }
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        showsSavedFollowUp = true
     }
 
     private func removeBookmarkAndFolderLinks() {

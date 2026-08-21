@@ -129,7 +129,10 @@ struct PermitextApp: App {
                 case .browse:
                     library.syncSelectedCodeSection(from: .primary)
                 case .browseSecondary:
-                    library.syncSelectedCodeSection(from: .secondary)
+                    // Reader 2 owns an independent library model. Switching
+                    // tabs must not retarget Reader 1's corpus or cancel its
+                    // active content load.
+                    break
                 default:
                     break
                 }
@@ -148,7 +151,7 @@ struct PermitextApp: App {
                 case .browse:
                     library.syncSelectedCodeSection(from: .primary)
                 case .browseSecondary:
-                    library.syncSelectedCodeSection(from: .secondary)
+                    break
                 default:
                     break
                 }
@@ -211,7 +214,7 @@ struct PermitextApp: App {
                 case .browse:
                     library.syncSelectedCodeSection(from: .primary)
                 case .browseSecondary:
-                    library.syncSelectedCodeSection(from: .secondary)
+                    break
                 default:
                     break
                 }
@@ -714,8 +717,7 @@ private struct PermitextTabNavigation: View {
                 .accessibilityLabel("First reader")
                 .tag(AppTab.browse)
 
-            BrowseView(browserContext: .secondary)
-                .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
+            IndependentReaderHost(browserContext: .secondary)
                 .tabItem {
                     Image(systemName: "text.line.last.and.arrowtriangle.forward")
                 }
@@ -735,6 +737,115 @@ private struct PermitextTabNavigation: View {
                 }
                 .accessibilityLabel("Research")
                 .tag(AppTab.research)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .permitextSavedWorkDidChange)) { notification in
+            guard (notification.object as? CodeLibraryViewModel) !== library else { return }
+            library.reconcileExternalSavedWorkChange(scheduleAccountSync: true)
+        }
+    }
+}
+
+/// Gives the second permanent Reader its own content loader, search work,
+/// selected version, and navigation model. Saved work still uses the shared
+/// on-device repository and is reconciled through `permitextSavedWorkDidChange`.
+/// The model is created lazily so users who never open Reader 2 do not pay for
+/// a second corpus load at launch.
+private struct IndependentReaderHost: View {
+    let browserContext: BrowserContextID
+
+    @EnvironmentObject private var sharedLibrary: CodeLibraryViewModel
+    @State private var readerLibrary: CodeLibraryViewModel?
+
+    var body: some View {
+        Group {
+            if let readerLibrary {
+                IndependentReaderContent(
+                    browserContext: browserContext,
+                    readerLibrary: readerLibrary,
+                    sharedLibrary: sharedLibrary
+                )
+            } else {
+                AppLaunchLoadingView(
+                    progress: 0,
+                    message: "Preparing second Reader..."
+                )
+                .task {
+                    let model = makeReaderLibrary()
+                    model.synchronizeIndependentReaderSession(from: sharedLibrary)
+                    readerLibrary = model
+                }
+            }
+        }
+    }
+
+    @MainActor
+    private func makeReaderLibrary() -> CodeLibraryViewModel {
+        let continuityDefaults = UserDefaults(
+            suiteName: "com.permitext.reader.\(browserContext.rawValue).continuity"
+        ) ?? .standard
+        return CodeLibraryViewModel(
+            continuityStore: ContinuityStore(defaults: continuityDefaults),
+            readerThemeStore: ReaderThemeStore(defaults: .standard),
+            preferencesDefaults: .standard,
+            entitlementService: LocalEntitlementService(defaults: .standard),
+            loadsPersistedAccount: false,
+            ownsAccountSync: false
+        )
+    }
+}
+
+private struct IndependentReaderContent: View {
+    let browserContext: BrowserContextID
+    @ObservedObject var readerLibrary: CodeLibraryViewModel
+    @ObservedObject var sharedLibrary: CodeLibraryViewModel
+
+    var body: some View {
+        Group {
+            if readerLibrary.isInitialContentLoaded {
+                BrowseView(browserContext: browserContext)
+                    .environment(\.isBrowserTabActive, sharedLibrary.selectedTab == .browseSecondary)
+            } else {
+                AppLaunchLoadingView(
+                    progress: readerLibrary.initialLoadProgress,
+                    message: readerLibrary.statusMessage ?? "Preparing second Reader..."
+                )
+            }
+        }
+        .environmentObject(readerLibrary)
+        .onReceive(NotificationCenter.default.publisher(for: .permitextSavedWorkDidChange)) { notification in
+            guard (notification.object as? CodeLibraryViewModel) !== readerLibrary else { return }
+            readerLibrary.reconcileExternalSavedWorkChange(scheduleAccountSync: false)
+        }
+        .onChange(of: sharedLibrary.currentPlan) { _, _ in
+            readerLibrary.synchronizeIndependentReaderSession(from: sharedLibrary)
+        }
+        .onChange(of: sharedLibrary.currentCapabilityContract) { _, _ in
+            readerLibrary.synchronizeIndependentReaderSession(from: sharedLibrary)
+        }
+        .onChange(of: sharedLibrary.readerTheme) { _, _ in
+            readerLibrary.synchronizeIndependentReaderSession(from: sharedLibrary)
+        }
+        .onChange(of: sharedLibrary.signedInAccount?.appUserID) { _, _ in
+            readerLibrary.synchronizeIndependentReaderSession(from: sharedLibrary)
+        }
+        .onChange(of: sharedLibrary.activeProjectID) { _, _ in
+            readerLibrary.synchronizeIndependentReaderSession(from: sharedLibrary)
+        }
+        .onChange(of: readerLibrary.pendingResearchSelections) { _, selections in
+            guard !selections.isEmpty else { return }
+            for selection in selections {
+                sharedLibrary.sendToResearch(selection)
+            }
+            readerLibrary.acknowledgePendingResearchSelections(selections)
+        }
+        .onChange(of: readerLibrary.selectedTab) { _, selectedTab in
+            switch selectedTab {
+            case .browse, .browseSecondary:
+                break
+            case .search, .bookmarks, .research:
+                sharedLibrary.selectedTab = selectedTab
+                readerLibrary.selectedTab = .browseSecondary
+            }
         }
     }
 }

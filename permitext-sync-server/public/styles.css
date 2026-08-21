@@ -3227,6 +3227,23 @@ select option:checked {
   font-weight: 650;
 }
 
+.section-save-project-sheet {
+  position: absolute;
+  inset: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3)) var(--space-3) var(--space-3);
+  z-index: 21;
+  min-width: 0;
+  padding: var(--space-4);
+  overflow: auto;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-panel);
+}
+
+.section-save-project-sheet .reader-notes-project-picker {
+  margin: 0;
+}
+
 .reader-notes-project-picker {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -4327,12 +4344,52 @@ body .reader-internal-search-input:focus-visible {
 
 .result-row {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  align-items: start;
   gap: var(--space-2);
   width: 100%;
   padding: var(--space-4) var(--panel-padding);
   border-bottom: 1px solid var(--border);
   background: transparent;
   color: inherit;
+}
+
+.search-result-save {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.search-result-save:hover,
+.search-result-save:focus-visible,
+.search-result-save.is-saved {
+  background: color-mix(in srgb, var(--code-accent) 12%, transparent);
+  color: var(--code-accent);
+}
+
+.search-result-save svg {
+  width: 18px;
+  height: 18px;
+}
+
+.search-result-save.is-saved svg {
+  fill: currentColor;
+}
+
+.search-result-save:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.search-result-save.has-error {
+  color: #c62828;
 }
 
 .result-row-main {

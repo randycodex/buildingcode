@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260820-ux-meaning-phase3-v2";
+} from "./offline-storage.js?v=20260821-ux-reader-save-phase4-v1";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -3456,17 +3456,23 @@ function updateLinkedReaderForSearch(searchID, detail, overrides = {}) {
   const linkedReaders = searchLinkedReadersBySearch();
   const readerID = linkedReaders[searchID];
   const reader = (state.readers || []).find((item) => item.id === readerID);
-  if (!reader) return null;
+  if (!reader || !readerMatchesSource(reader, detail)) return null;
   Object.assign(reader, readerFieldsForSectionDetail(detail, overrides));
   placeLinkedReaderAfterSectionDetail(searchID, reader.id);
   return reader;
 }
 
-function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {}) {
+async function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {}) {
   const existing = updateLinkedReaderForSearch(searchID, detail, overrides);
   if (existing) return existing;
   if (!isProAccount() && state.readers.length >= 2) {
-    const reader = state.readers[1];
+    const reader = searchReaderReplacementCandidate(paneIDForSectionDetail(searchID));
+    const confirmed = await confirmSearchReaderReplacement(
+      reader,
+      detail,
+      paneIDForSectionDetail(searchID)
+    );
+    if (!confirmed) return null;
     Object.assign(reader, readerFieldsForSectionDetail(detail, overrides));
     searchLinkedReadersBySearch()[searchID] = reader.id;
     placeLinkedReaderAfterSectionDetail(searchID, reader.id);
@@ -11945,13 +11951,6 @@ function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) 
   return wrapper;
 }
 
-function activeProjectForReaderSave() {
-  const active = openProjectDetails()[0];
-  if (!active) return null;
-  return activeProjectRecords(currentContentSummary().projects || [])
-    .find((project) => projectDetailMatches(project, active)) || active;
-}
-
 function readerPassagePayload(section, reader, target) {
   return {
     codeVersion: target.codeVersion,
@@ -11966,38 +11965,70 @@ function readerPassagePayload(section, reader, target) {
   };
 }
 
-function showReaderSaveConfirmation(panel, section, reader, target, project = null) {
+function closeSectionSaveProjectSheet(panel, focusTarget = null) {
+  panel?.querySelector(".section-save-project-sheet")?.remove();
+  if (focusTarget?.isConnected) focusTarget.focus({ preventScroll: true });
+}
+
+function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null) {
+  if (!panel || !sectionPayload?.sectionID) return;
+  closeSectionSaveProjectSheet(panel);
+  const sheet = document.createElement("section");
+  sheet.className = "section-save-project-sheet";
+  sheet.setAttribute("role", "region");
+  sheet.setAttribute("aria-label", "Add saved evidence to a Project or saved collection");
+  sheet.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    closeSectionSaveProjectSheet(panel, focusTarget);
+  });
+  panel.append(sheet);
+  showReaderNotesProjectPicker(sheet, sectionPayload, {
+    onClose: () => closeSectionSaveProjectSheet(panel, focusTarget)
+  });
+}
+
+function showReaderSaveConfirmation(panel, sectionPayload, options = {}) {
+  if (!panel) return;
   panel.querySelector(".reader-save-confirmation")?.remove();
   const confirmation = document.createElement("div");
   confirmation.className = "reader-save-confirmation";
-  confirmation.setAttribute("role", "status");
   const message = document.createElement("span");
-  message.textContent = project
-    ? `Saved to ${project.name || project.title || "Project"}`
-    : "Saved";
-  confirmation.append(message);
+  message.setAttribute("role", "status");
+  message.setAttribute("aria-live", "polite");
+  message.textContent = "Saved";
+  const projectButton = document.createElement("button");
+  projectButton.type = "button";
+  projectButton.textContent = "Add to Project";
+  confirmation.append(message, projectButton);
   panel.append(confirmation);
-  window.setTimeout(() => confirmation.remove(), 4200);
+  const dismissTimer = window.setTimeout(() => confirmation.remove(), 5200);
+  projectButton.addEventListener("click", () => {
+    window.clearTimeout(dismissTimer);
+    confirmation.remove();
+    showSectionProjectAssignment(panel, sectionPayload, options.focusTarget || null);
+  });
 }
 
-async function saveReaderPassage(panel, section, reader, target) {
+function confirmSectionBookmarkRemoval(panel) {
+  return openWebWarning({
+    title: "Remove saved passage?",
+    message: "This removes the passage from Saved and from every Project or saved collection linked to it. The enacted source remains available in Reader.",
+    confirmLabel: "Remove from Saved",
+    container: panel
+  });
+}
+
+async function saveReaderPassage(panel, section, reader, target, options = {}) {
   const payload = readerPassagePayload(section, reader, target);
   const alreadySaved = isSectionSaved(payload);
-  let project = null;
   if (!alreadySaved) {
     const saved = await persistSectionBookmark(payload, true, { refreshSavedPanes: false });
     if (!saved) return false;
-    project = activeProjectForReaderSave();
-    if (project) {
-      const linked = await persistSectionInProject(project, payload);
-      if (!linked) project = null;
-    }
     await refreshOpenSavedPanes();
     syncReaderNoteBookmarkButtons(section.id, true, target.codeVersion);
-  } else {
-    project = activeProjectForReaderSave();
   }
-  showReaderSaveConfirmation(panel, section, reader, target, project);
+  showReaderSaveConfirmation(panel, payload, options);
   return true;
 }
 
@@ -12015,13 +12046,19 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   bookmarkButton.type = "button";
   bookmarkButton.className = "inline-bookmark-toggle";
   bookmarkButton.innerHTML = bookmarkIconSVG(saved);
-  bookmarkButton.setAttribute("aria-label", saved ? "Saved passage" : "Save passage");
-  bookmarkButton.title = saved ? "Saved passage" : "Save passage";
+  bookmarkButton.setAttribute("aria-label", saved ? "Remove from Saved" : "Save passage");
+  bookmarkButton.title = saved ? "Remove from Saved" : "Save passage";
   bookmarkButton.classList.toggle("is-saved", saved);
 
   bookmarkButton.addEventListener("click", async () => {
     if (bookmarkButton.disabled) return;
     const removingSavedPassage = bookmarkButton.classList.contains("is-saved");
+    if (removingSavedPassage) {
+      const confirmed = await confirmSectionBookmarkRemoval(
+        bookmarkButton.closest(".reader-panel")
+      );
+      if (!confirmed) return;
+    }
     bookmarkButton.disabled = true;
     try {
       if (removingSavedPassage) {
@@ -12031,12 +12068,14 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
         return;
       }
       const panel = bookmarkButton.closest(".reader-panel");
-      const savedPassage = await saveReaderPassage(panel, section, reader, target);
+      const savedPassage = await saveReaderPassage(panel, section, reader, target, {
+        focusTarget: bookmarkButton
+      });
       if (!savedPassage) return;
       bookmarkButton.classList.add("is-saved");
       bookmarkButton.innerHTML = bookmarkIconSVG(true);
-      bookmarkButton.setAttribute("aria-label", "Saved passage");
-      bookmarkButton.title = "Saved passage";
+      bookmarkButton.setAttribute("aria-label", "Remove from Saved");
+      bookmarkButton.title = "Remove from Saved";
     } finally {
       bookmarkButton.disabled = false;
     }
@@ -12105,7 +12144,7 @@ function removeReaderNotesProjectPicker(sheet) {
   sheet?.querySelector(".reader-notes-project-picker")?.remove();
 }
 
-function showReaderNotesProjectPicker(sheet, sectionPayload) {
+function showReaderNotesProjectPicker(sheet, sectionPayload, options = {}) {
   removeReaderNotesProjectPicker(sheet);
   if (sheet.getBoundingClientRect().height < 440) {
     sheet.style.setProperty("--reader-notes-height", "440px");
@@ -12276,7 +12315,10 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   cancelButton.type = "button";
   cancelButton.className = "reader-notes-project-cancel";
   cancelButton.textContent = "Cancel";
-  cancelButton.addEventListener("click", () => removeReaderNotesProjectPicker(sheet));
+  cancelButton.addEventListener("click", () => {
+    removeReaderNotesProjectPicker(sheet);
+    options.onClose?.({ saved: false, folders: [] });
+  });
   confirmButton.addEventListener("click", async () => {
     const selectedFolders = projects.filter((project) => selectedFolderIDs.has(projectRecordID(project)));
     if (!selectedFolders.length) return;
@@ -12298,7 +12340,10 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
         detail: { saved: true, folders: selectedFolders }
       }));
       refreshOpenAnnotationProjectEditors();
-      window.setTimeout(() => removeReaderNotesProjectPicker(sheet), 900);
+      window.setTimeout(() => {
+        removeReaderNotesProjectPicker(sheet);
+        options.onClose?.({ saved: true, folders: selectedFolders });
+      }, 900);
     } catch (error) {
       status.textContent = error.message || "The evidence could not be saved.";
       presentWorkspaceIssue(status.textContent);
@@ -12312,6 +12357,10 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   syncConfirmState();
 
   sheet.prepend(picker);
+  requestAnimationFrame(() => {
+    const firstOption = destinationList.querySelector('button[role="option"]');
+    (firstOption || cancelButton).focus({ preventScroll: true });
+  });
 }
 
 function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSyncCodeVersion) {
@@ -12332,9 +12381,9 @@ function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSy
     wrapper.classList.toggle("has-saved-section", showBookmark);
     if (!button) return;
     button.classList.toggle("is-saved", showBookmark);
-    button.setAttribute("aria-label", showBookmark ? "Saved passage" : "Save passage");
+    button.setAttribute("aria-label", showBookmark ? "Remove from Saved" : "Save passage");
     button.innerHTML = bookmarkIconSVG(showBookmark);
-    button.title = showBookmark ? "Saved passage" : "Save passage";
+    button.title = showBookmark ? "Remove from Saved" : "Save passage";
   });
   track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((section) => {
     if (section.dataset.codeVersion !== exactCodeVersion) return;
@@ -13247,7 +13296,9 @@ function updateVisibleSearchHistoryEntry(panel, entry) {
 async function openRecentlyViewedInReader(searchInstance, entry) {
   if (!searchInstance?.id || !entry) return;
   try {
-    await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance));
+    await openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(searchInstance), {
+      sourceSurface: "search"
+    });
   } catch (error) {
     console.warn("Could not open recently viewed section.", error);
     presentWorkspaceIssue(error?.message || "This section could not be loaded. Try opening it again.");
@@ -13612,6 +13663,24 @@ function updateSearchCodeFilterStates(filterRail, instance) {
   });
 }
 
+function syncImmediateBookmarkButton(button, saved) {
+  if (!button) return;
+  button.classList.toggle("is-saved", Boolean(saved));
+  button.setAttribute("aria-pressed", String(Boolean(saved)));
+  button.setAttribute("aria-label", saved ? "Remove from Saved" : "Save passage");
+  button.title = saved ? "Remove from Saved" : "Save passage";
+  button.innerHTML = bookmarkIconSVG(Boolean(saved));
+}
+
+function syncSearchResultBookmarkButtons(sectionPayload, saved) {
+  const sectionKey = savedEvidenceKey(sectionPayload);
+  track.querySelectorAll(".search-result-save[data-saved-evidence-key]").forEach((button) => {
+    if (button.dataset.savedEvidenceKey === sectionKey) {
+      syncImmediateBookmarkButton(button, saved);
+    }
+  });
+}
+
 async function renderSearchResults(panel, instance) {
   const searchInstance = normalizeSearchInstance(instance);
   const results = panel.querySelector(".search-results");
@@ -13728,10 +13797,51 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       mainButton.addEventListener("click", () => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
         recordRecentSearch(query);
-        void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance));
+        void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {
+          sourceSurface: "search"
+        });
       });
 
-      row.append(mainButton);
+      const saveButton = document.createElement("button");
+      saveButton.type = "button";
+      saveButton.className = "search-result-save";
+      saveButton.dataset.savedEvidenceKey = savedEvidenceKey(detail);
+      syncImmediateBookmarkButton(saveButton, isSectionSaved(detail));
+      saveButton.addEventListener("click", async () => {
+        if (saveButton.disabled) return;
+        const shouldRemove = saveButton.classList.contains("is-saved");
+        if (shouldRemove) {
+          const confirmed = await confirmSectionBookmarkRemoval(results.closest(".search-panel"));
+          if (!confirmed) return;
+        }
+        saveButton.disabled = true;
+        saveButton.classList.remove("has-error");
+        try {
+          const persisted = await persistSectionBookmark(detail, !shouldRemove, {
+            refreshSavedPanes: false
+          });
+          if (persisted === false) return;
+          await refreshOpenSavedPanes();
+          syncReaderNoteBookmarkButtons(detail.sectionID, !shouldRemove, detail.codeVersion);
+          syncSearchResultBookmarkButtons(detail, !shouldRemove);
+          if (!shouldRemove) {
+            showReaderSaveConfirmation(results.closest(".search-panel"), detail, {
+              focusTarget: saveButton
+            });
+          }
+          refreshVisibleSyncedDerivedState();
+        } catch (error) {
+          saveButton.classList.add("has-error");
+          await showWebNotice(
+            shouldRemove ? "Saved passage not removed" : "Passage not saved",
+            error.message || "This saved passage could not be updated."
+          );
+        } finally {
+          if (saveButton.isConnected) saveButton.disabled = false;
+        }
+      });
+
+      row.append(mainButton, saveButton);
       group.append(row);
     });
   });
@@ -14225,7 +14335,7 @@ async function renderSectionDetail(searchID, detail) {
     className: `section-detail-icon section-detail-save${saved ? " is-saved" : ""}`,
     svg: bookmarkIconSVG(saved)
   });
-  saveButton.setAttribute("aria-pressed", String(saved));
+  syncImmediateBookmarkButton(saveButton, saved);
   chrome.append(saveButton, backButton);
 
   const content = document.createElement("section");
@@ -14361,11 +14471,8 @@ async function renderSectionDetail(searchID, detail) {
   panel.__sectionPayload = sectionPayload;
   notes.addEventListener("permitext-folder-save", (event) => {
     const nextSaved = event.detail?.saved === true;
-    saveButton.classList.toggle("is-saved", nextSaved);
-    saveButton.setAttribute("aria-pressed", String(nextSaved));
-    saveButton.title = nextSaved ? "Organize saved evidence" : "Save evidence";
-    saveButton.setAttribute("aria-label", saveButton.title);
-    saveButton.innerHTML = bookmarkIconSVG(nextSaved);
+    syncImmediateBookmarkButton(saveButton, nextSaved);
+    syncSearchResultBookmarkButtons(sectionPayload, nextSaved);
   });
 
   backButton.addEventListener("click", () => {
@@ -14380,25 +14487,33 @@ async function renderSectionDetail(searchID, detail) {
   });
 
   saveButton.addEventListener("click", async () => {
+    const shouldRemove = saveButton.classList.contains("is-saved");
+    if (shouldRemove) {
+      const confirmed = await confirmSectionBookmarkRemoval(panel);
+      if (!confirmed) return;
+    }
     saveButton.disabled = true;
     saveButton.classList.remove("has-error");
-    const shouldRemove = saveButton.classList.contains("is-saved");
     try {
       if (!shouldRemove) {
-        showReaderNotesProjectPicker(notes, sectionPayload);
+        const persisted = await persistSectionBookmark(sectionPayload, true, {
+          refreshSavedPanes: false
+        });
+        if (persisted === false) return;
+        await refreshOpenSavedPanes();
+        syncImmediateBookmarkButton(saveButton, true);
+        syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
+        syncSearchResultBookmarkButtons(sectionPayload, true);
+        showReaderSaveConfirmation(panel, sectionPayload, { focusTarget: saveButton });
+        refreshVisibleSyncedDerivedState();
         return;
       }
-      const confirmed = await openWebWarning({
-        title: "Delete saved evidence?",
-        message: "This removes the section from every destination and deletes the canonical saved record. Notes remain available if you save the section again later.",
-        confirmLabel: "Delete saved evidence",
-        container: panel
-      });
-      if (!confirmed) return;
       const persisted = await persistSectionBookmark(sectionPayload, false);
       if (persisted === false) {
         return;
       }
+      syncImmediateBookmarkButton(saveButton, false);
+      syncSearchResultBookmarkButtons(sectionPayload, false);
       refreshVisibleSyncedDerivedState();
     } catch (error) {
       saveButton.classList.add("has-error");
@@ -14412,12 +14527,13 @@ async function renderSectionDetail(searchID, detail) {
   });
 
   heading.addEventListener("click", async () => {
-    const reader = openOrUpdateLinkedReaderForSearch(searchID, detail, {
+    const reader = await openOrUpdateLinkedReaderForSearch(searchID, detail, {
       chapterID: detail.chapterID || chapter?.id || "",
       sectionNumber: sectionPayload.sectionNumber,
       title: sectionPayload.title,
       shouldSmoothScrollToSection: false
     });
+    if (!reader) return;
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
     alignReaderSectionAfterLayout(reader);
@@ -27307,6 +27423,47 @@ function readerMatchesSource(reader, detail) {
   return sameCode && sameSection;
 }
 
+function readerIsClearlyAvailable(reader) {
+  return Boolean(reader) &&
+    !String(reader.sectionID || "").trim() &&
+    !String(reader.sectionNumber || "").trim() &&
+    (!String(reader.title || "").trim() || reader.title === "Reader");
+}
+
+function readerPositionLabel(reader) {
+  const index = (state.readers || []).findIndex((candidate) => candidate.id === reader?.id);
+  return index >= 0 ? `Reader ${index + 1}` : "Reader";
+}
+
+function readerSourceLabel(reader) {
+  return sectionDisplayTitle(reader?.sectionNumber, reader?.title, "current section");
+}
+
+function searchReaderReplacementCandidate(anchorPaneID = "") {
+  return (state.readers || []).find((reader) => reader.sourceAnchorPaneID === anchorPaneID) ||
+    state.readers[1] ||
+    state.readers[0] ||
+    null;
+}
+
+async function confirmSearchReaderReplacement(reader, detail, anchorPaneID = "") {
+  if (!reader) return false;
+  const readerLabel = readerPositionLabel(reader);
+  const currentSource = readerSourceLabel(reader);
+  const nextSource = sectionDisplayTitle(detail?.sectionNumber, detail?.title, "this Search result");
+  const container = anchorPaneID
+    ? track.querySelector(`[data-pane-id="${CSS.escape(anchorPaneID)}"]`)
+    : null;
+  return confirmWebWarning(
+    `Replace ${readerLabel}?`,
+    `Free includes two Readers and both are in use. Opening ${nextSource} will replace ${currentSource} in ${readerLabel}. The other Reader will stay unchanged.`,
+    {
+      confirmLabel: `Replace ${readerLabel}`,
+      container
+    }
+  );
+}
+
 function revealReaderSourceTarget(reader, item, evidenceAnchor = null) {
   const paneID = paneIDForReader(reader);
   [0, 90, 240].forEach((delay) => {
@@ -27349,13 +27506,21 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     sourceBlockID: normalizeAnnotationBlockID(detail.blockID)
   });
   let reader = (state.readers || []).find((candidate) => readerMatchesSource(candidate, detail));
-  if (!reader && anchorPaneID) {
+  if (!reader) {
+    reader = (state.readers || []).find(readerIsClearlyAvailable) || null;
+  }
+  if (!reader && anchorPaneID && options.sourceSurface !== "search") {
     reader = (state.readers || []).find((candidate) => candidate.sourceAnchorPaneID === anchorPaneID);
   }
   if (!reader) {
     if (isProAccount() || state.readers.length < 2) {
       reader = newReaderState(sourceFields);
       state.readers.push(reader);
+    } else if (options.sourceSurface === "search") {
+      const replacement = searchReaderReplacementCandidate(anchorPaneID);
+      const confirmed = await confirmSearchReaderReplacement(replacement, detail, anchorPaneID);
+      if (!confirmed) return null;
+      reader = replacement;
     } else {
       reader = state.readers.find((candidate) => paneIDForReader(candidate) !== anchorPaneID) || state.readers[0];
     }

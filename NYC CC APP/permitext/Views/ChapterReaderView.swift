@@ -680,32 +680,51 @@ struct ChapterReaderView: View {
     }
 }
 
+enum ReaderBookmarkButtonStyle {
+    case standard
+    case compact
+}
+
 struct ReaderCurrentSectionBookmarkButton: View {
     let sectionID: Int64?
     let accentColor: Color
+    var style: ReaderBookmarkButtonStyle = .standard
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var displayedIsBookmarked = false
     @State private var bookmarkConfirmation: String?
     @State private var bookmarkConfirmationTask: Task<Void, Never>?
+    @State private var showsSavedFollowUp = false
+    @State private var isFolderPickerOpen = false
+    @State private var pendingFolderIDs: Set<Int64> = []
+    @State private var folderCreationRequest: ReaderBookmarkFolderCreation?
 
     var body: some View {
         Button {
             guard let sectionID else { return }
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
             let desiredBookmarkState = !displayedIsBookmarked
             displayedIsBookmarked = desiredBookmarkState
             displayedIsBookmarked = library.toggleBookmark(sectionID: sectionID)
             if displayedIsBookmarked == desiredBookmarkState {
                 showBookmarkConfirmation(displayedIsBookmarked ? "Saved" : "Removed")
+                if displayedIsBookmarked {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    showsSavedFollowUp = true
+                }
             }
         } label: {
             Image(systemName: displayedIsBookmarked ? "bookmark.fill" : "bookmark")
                 .font(.body.weight(.semibold))
                 .foregroundStyle(displayedIsBookmarked ? accentColor : Color.secondary)
+                .frame(width: style == .standard ? 44 : 28, height: style == .standard ? 44 : 28)
+                .background(
+                    style == .standard
+                        ? Color(uiColor: .secondarySystemGroupedBackground)
+                        : Color.clear
+                )
+                .clipShape(RoundedRectangle(cornerRadius: style == .standard ? 12 : 6, style: .continuous))
                 .frame(width: 44, height: 44)
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(sectionID == nil)
@@ -715,6 +734,64 @@ struct ReaderCurrentSectionBookmarkButton: View {
         .onAppear { synchronizeState() }
         .onChange(of: sectionID) { _, _ in synchronizeState() }
         .onChange(of: library.bookmarkRevision) { _, _ in synchronizeState() }
+        .alert(
+            "Section saved",
+            isPresented: $showsSavedFollowUp
+        ) {
+            Button("Add to Project") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    openFolderPicker()
+                }
+            }
+            Button("Done", role: .cancel) { }
+        } message: {
+            Text("The section is saved now. Project assignment is optional and can be added next.")
+        }
+        .sheet(isPresented: $isFolderPickerOpen) {
+            if let sectionID {
+                FolderPickerSheet(
+                    folders: library.folders,
+                    memberFolderIDs: Set(library.folderMembership[sectionID] ?? []),
+                    selectedFolderIDs: $pendingFolderIDs,
+                    canUseProjects: library.hasProjectAccess,
+                    onSave: { folderIDs in
+                        if library.replaceFolderMembership(sectionID: sectionID, folderIDs: folderIDs) {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        }
+                    },
+                    onCreateNew: { folderType in
+                        isFolderPickerOpen = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            folderCreationRequest = ReaderBookmarkFolderCreation(folderType: folderType)
+                        }
+                    },
+                    onRequireProjectAccess: {
+                        library.requireProjectAccess()
+                    }
+                )
+            }
+        }
+        .sheet(item: $folderCreationRequest) { request in
+            FolderEditorSheet(
+                existing: nil,
+                defaultFolderType: request.folderType,
+                onSave: { name, address, description, colorHex, folderType in
+                    if let folder = library.createFolder(
+                        name: name,
+                        address: address,
+                        description: description,
+                        colorHex: colorHex,
+                        folderType: folderType
+                    ) {
+                        pendingFolderIDs.insert(folder.id)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            isFolderPickerOpen = true
+                        }
+                    }
+                },
+                onDelete: { }
+            )
+        }
         .overlay(alignment: .topTrailing) {
             if let bookmarkConfirmation {
                 Text(bookmarkConfirmation)
@@ -742,6 +819,12 @@ struct ReaderCurrentSectionBookmarkButton: View {
         displayedIsBookmarked = sectionID.map { library.isBookmarked(sectionID: $0) } ?? false
     }
 
+    private func openFolderPicker() {
+        guard let sectionID else { return }
+        pendingFolderIDs = Set(library.folderMembership[sectionID] ?? [])
+        isFolderPickerOpen = true
+    }
+
     private func showBookmarkConfirmation(_ message: String) {
         bookmarkConfirmationTask?.cancel()
         withAnimation(.easeOut(duration: 0.15)) {
@@ -756,6 +839,11 @@ struct ReaderCurrentSectionBookmarkButton: View {
             bookmarkConfirmationTask = nil
         }
     }
+}
+
+private struct ReaderBookmarkFolderCreation: Identifiable {
+    let id = UUID()
+    let folderType: CodeFolderType
 }
 
 struct ChapterNoteSheet: View {
@@ -955,7 +1043,6 @@ private struct ChapterNoteProjectPickerSheet: View {
                     } else {
                         ForEach(projects) { project in
                             Button {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                 onToggle(project)
                             } label: {
                                 HStack(spacing: 12) {
