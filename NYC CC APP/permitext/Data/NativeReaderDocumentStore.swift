@@ -46,12 +46,26 @@ struct NativeReaderRuntimeTextRun: Decodable, Equatable, Sendable {
     let linkTarget: String?
 }
 
+enum NativeReaderRuntimeListSegmentKind: String, Decodable, Sendable {
+    case text
+    case table
+}
+
+struct NativeReaderRuntimeListSegment: Decodable, Equatable, Identifiable, Sendable {
+    let id: String
+    let kind: NativeReaderRuntimeListSegmentKind
+    let plainText: String
+    let runs: [NativeReaderRuntimeTextRun]
+    let table: NativeReaderRuntimeTable?
+}
+
 struct NativeReaderRuntimeListItem: Decodable, Equatable, Identifiable, Sendable {
     let id: String
     let depth: Int
     let ordinal: Int?
     let plainText: String
     let runs: [NativeReaderRuntimeTextRun]
+    let segments: [NativeReaderRuntimeListSegment]
     let children: [NativeReaderRuntimeListItem]
 }
 
@@ -309,7 +323,7 @@ struct NativeReaderRuntimeDocument: Decodable, Equatable, Sendable {
     }
 
     var rolloutTier: NativeReaderRolloutTier {
-        let tables = blocks.compactMap(\.table)
+        let tables = allTables
         if tables.contains(where: { $0.renderingClassification == .isolatedHTML }) {
             return .isolatedTableFallback
         }
@@ -347,12 +361,21 @@ struct NativeReaderRuntimeDocument: Decodable, Equatable, Sendable {
         case .nativeWithTableFallback:
             return !eligibility.reasons.isEmpty
                 && eligibility.reasons.allSatisfy { $0.hasPrefix("isolatedHTMLTableCount: ") }
-                && blocks.contains {
-                    $0.table?.renderingClassification == .isolatedHTML
-                }
+                && allTables.contains { $0.renderingClassification == .isolatedHTML }
         case .fullHTMLFallback, .invalidContent:
             return false
         }
+    }
+
+
+    var allTables: [NativeReaderRuntimeTable] {
+        blocks.compactMap(\.table) + blocks.flatMap { block in
+            block.listItems.flatMap(Self.embeddedTables)
+        }
+    }
+
+    private static func embeddedTables(in item: NativeReaderRuntimeListItem) -> [NativeReaderRuntimeTable] {
+        item.segments.compactMap(\.table) + item.children.flatMap(embeddedTables)
     }
 }
 
@@ -903,7 +926,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         in document: NativeReaderRuntimeDocument,
         for route: NativeReaderDocumentRoute
     ) throws {
-        let tables = document.blocks.compactMap(\.table)
+        let tables = document.allTables
         guard Set(tables.map(\.id)).count == tables.count else {
             throw NativeReaderDocumentStoreError.tableValidationFailed(
                 "duplicate table IDs in \(route.relativeSourcePath)"
@@ -966,9 +989,7 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
                     )
                 }
             case .isolatedHTML:
-                guard table.rowCount <= 250,
-                      table.cells.count <= 2_500,
-                      !table.classificationReasons.isEmpty,
+                guard !table.classificationReasons.isEmpty,
                       let sourceHTML = table.sourceHTML,
                       sourceHTML.range(of: "<table", options: .caseInsensitive) != nil else {
                     throw NativeReaderDocumentStoreError.tableValidationFailed(
@@ -990,8 +1011,15 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
         for media: NativeReaderRuntimeMedia,
         route: NativeReaderDocumentRoute
     ) -> URL? {
-        guard media.assetExists,
-              let relativePath = media.resolvedAssetPath,
+        guard media.assetExists else {
+            return nil
+        }
+        if let source = media.source,
+           source.lowercased().hasPrefix("data:image/"),
+           let embeddedURL = URL(string: source) {
+            return embeddedURL
+        }
+        guard let relativePath = media.resolvedAssetPath,
               let corpusRootURL = route.corpusRootURL
         else {
             return nil
@@ -1010,6 +1038,18 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
 
         for item in media {
             try Task.checkCancellation()
+            // Some authoritative source packages reference media that was not
+            // delivered with the corpus. That known source defect is rendered
+            // as an explicit native placeholder; it must not force otherwise
+            // complete legal text back to the chapter-wide HTML reader.
+            if !item.assetExists {
+                guard item.assetSHA256 == nil else {
+                    throw NativeReaderDocumentStoreError.mediaValidationFailed(
+                        "unexpected integrity hash for unavailable media \(item.id) in \(route.relativeSourcePath)"
+                    )
+                }
+                continue
+            }
             guard let assetURL = resolvedMediaURL(for: item, route: route) else {
                 throw NativeReaderDocumentStoreError.mediaValidationFailed(
                     "unresolved asset \(item.id) in \(route.relativeSourcePath)"
@@ -1020,10 +1060,15 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
                     "unreadable asset \(assetURL.lastPathComponent)"
                 )
             }
-            guard let expectedHash = item.assetSHA256,
-                  sha256(data) == expectedHash else {
+            if let expectedHash = item.assetSHA256 {
+                guard sha256(data) == expectedHash else {
+                    throw NativeReaderDocumentStoreError.mediaValidationFailed(
+                        "integrity mismatch for \(assetURL.lastPathComponent)"
+                    )
+                }
+            } else if assetURL.scheme?.lowercased() != "data" {
                 throw NativeReaderDocumentStoreError.mediaValidationFailed(
-                    "integrity mismatch for \(assetURL.lastPathComponent)"
+                    "missing integrity hash for \(assetURL.lastPathComponent)"
                 )
             }
             guard let imageSource = CGImageSourceCreateWithData(data as CFData, nil),

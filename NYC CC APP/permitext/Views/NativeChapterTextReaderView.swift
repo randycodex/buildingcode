@@ -1625,6 +1625,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
                     ordered: block.kind == .orderedList,
                     theme: theme,
                     accentColor: accentColor,
+                    baseURL: route.sourceURL.deletingLastPathComponent(),
                     onOpenLink: onOpenLink,
                     searchQuery: searchQuery,
                     onResearchSelection: onResearchSelection
@@ -1902,7 +1903,9 @@ private struct NativeReaderMediaBlockView: View {
                 } else {
                     missingMedia(media)
                         .task(id: media.id) {
-                            onMediaFailure("The native Reader could not resolve \(media.id).")
+                            if media.assetExists {
+                                onMediaFailure("The native Reader could not resolve \(media.id).")
+                            }
                         }
                 }
             }
@@ -2006,6 +2009,7 @@ private struct NativeReaderListBlockView: View {
     let ordered: Bool
     let theme: ReaderTheme
     let accentColor: UIColor
+    let baseURL: URL?
     let onOpenLink: (URL) -> Void
     let searchQuery: String
     let onResearchSelection: (String) -> Void
@@ -2017,34 +2021,81 @@ private struct NativeReaderListBlockView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
             ForEach(rows) { row in
-                let cacheID = NativeReaderAttributedTextCacheKey.list(
-                    routeID: cachePrefix,
-                    rowID: row.id
-                )
-                HStack(alignment: .top, spacing: 8) {
-                    Text(marker(for: row))
-                        .font(theme.swiftUIFont(emphasized: true))
-                        .foregroundStyle(Color(uiColor: accentColor))
-                        .frame(minWidth: 18, alignment: .trailing)
-                    NativeReaderPreparedAttributedTextView(
-                        cacheID: cacheID,
-                        runs: row.runs,
-                        fallbackText: row.plainText,
-                        theme: theme,
-                        role: .body,
-                        accentColor: accentColor,
-                        highlightRanges: NativeReaderSearchIndex.ranges(
-                            of: searchQuery,
-                            in: row.plainText
-                        ),
-                        onOpenLink: onOpenLink,
-                        onResearchSelection: onResearchSelection
-                    )
+                VStack(alignment: .leading, spacing: 8) {
+                    if row.segments.isEmpty {
+                        textRow(
+                            marker: marker(for: row),
+                            cacheID: NativeReaderAttributedTextCacheKey.list(
+                                routeID: cachePrefix,
+                                rowID: row.id
+                            ),
+                            runs: row.runs,
+                            plainText: row.plainText
+                        )
+                    } else {
+                        ForEach(Array(row.segments.enumerated()), id: \.element.id) { index, segment in
+                            switch segment.kind {
+                            case .text:
+                                textRow(
+                                    marker: index == 0 ? marker(for: row) : "",
+                                    cacheID: NativeReaderAttributedTextCacheKey.list(
+                                        routeID: cachePrefix,
+                                        rowID: segment.id
+                                    ),
+                                    runs: segment.runs,
+                                    plainText: segment.plainText
+                                )
+                            case .table:
+                                if let table = segment.table {
+                                    HStack(alignment: .top, spacing: 8) {
+                                        Text(index == 0 ? marker(for: row) : "")
+                                            .font(theme.swiftUIFont(emphasized: true))
+                                            .foregroundStyle(Color(uiColor: accentColor))
+                                            .frame(minWidth: 18, alignment: .trailing)
+                                        NativeReaderTableBlockView(
+                                            table: table,
+                                            baseURL: baseURL,
+                                            searchQuery: searchQuery,
+                                            activeMatchIndex: nil
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 .padding(.leading, CGFloat(max(row.depth, 0)) * 18)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func textRow(
+        marker: String,
+        cacheID: String,
+        runs: [NativeReaderRuntimeTextRun],
+        plainText: String
+    ) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(marker)
+                .font(theme.swiftUIFont(emphasized: true))
+                .foregroundStyle(Color(uiColor: accentColor))
+                .frame(minWidth: 18, alignment: .trailing)
+            NativeReaderPreparedAttributedTextView(
+                cacheID: cacheID,
+                runs: runs,
+                fallbackText: plainText,
+                theme: theme,
+                role: .body,
+                accentColor: accentColor,
+                highlightRanges: NativeReaderSearchIndex.ranges(
+                    of: searchQuery,
+                    in: plainText
+                ),
+                onOpenLink: onOpenLink,
+                onResearchSelection: onResearchSelection
+            )
+        }
     }
 
     private func marker(for row: NativeReaderListRow) -> String {
@@ -2061,6 +2112,7 @@ private struct NativeReaderListRow: Identifiable {
     let ordinal: Int?
     let plainText: String
     let runs: [NativeReaderRuntimeTextRun]
+    let segments: [NativeReaderRuntimeListSegment]
 
     static func flatten(_ item: NativeReaderRuntimeListItem) -> [NativeReaderListRow] {
         [
@@ -2069,7 +2121,8 @@ private struct NativeReaderListRow: Identifiable {
                 depth: item.depth,
                 ordinal: item.ordinal,
                 plainText: item.plainText,
-                runs: item.runs
+                runs: item.runs,
+                segments: item.segments
             )
         ] + item.children.flatMap(flatten)
     }

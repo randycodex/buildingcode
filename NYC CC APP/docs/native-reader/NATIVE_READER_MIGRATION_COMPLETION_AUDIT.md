@@ -1,5 +1,7 @@
 # Native Reader Migration Completion Audit
 
+> Current coverage note (2026-08-21): the historical Phase 11 counts below have been superseded by the universal native-corpus checkpoint. All 463 indexed chapters now open through the native Reader, with complex tables isolated inside native chapters rather than forcing whole-chapter HTML fallback. See `UNIVERSAL_NATIVE_READER_COVERAGE.md` for current counts, safeguards, and verification boundaries. The physical-device and TestFlight acceptance gaps recorded here remain open.
+
 Date: 2026-08-19
 
 Branch: `codex/native-ios-reader-migration`

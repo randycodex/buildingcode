@@ -53,12 +53,40 @@ public struct NativeReaderTextRun: Codable, Equatable, Sendable {
     }
 }
 
+public enum NativeReaderListSegmentKind: String, Codable, Sendable {
+    case text
+    case table
+}
+
+public struct NativeReaderListSegment: Codable, Equatable, Sendable {
+    public let id: String
+    public let kind: NativeReaderListSegmentKind
+    public let plainText: String
+    public let runs: [NativeReaderTextRun]
+    public let table: NativeReaderTable?
+
+    public init(
+        id: String,
+        kind: NativeReaderListSegmentKind,
+        plainText: String,
+        runs: [NativeReaderTextRun],
+        table: NativeReaderTable?
+    ) {
+        self.id = id
+        self.kind = kind
+        self.plainText = plainText
+        self.runs = runs
+        self.table = table
+    }
+}
+
 public struct NativeReaderListItem: Codable, Equatable, Sendable {
     public let id: String
     public let depth: Int
     public let ordinal: Int?
     public let plainText: String
     public let runs: [NativeReaderTextRun]
+    public let segments: [NativeReaderListSegment]
     public let children: [NativeReaderListItem]
 
     public init(
@@ -67,6 +95,7 @@ public struct NativeReaderListItem: Codable, Equatable, Sendable {
         ordinal: Int?,
         plainText: String,
         runs: [NativeReaderTextRun],
+        segments: [NativeReaderListSegment] = [],
         children: [NativeReaderListItem]
     ) {
         self.id = id
@@ -74,6 +103,7 @@ public struct NativeReaderListItem: Codable, Equatable, Sendable {
         self.ordinal = ordinal
         self.plainText = plainText
         self.runs = runs
+        self.segments = segments
         self.children = children
     }
 }
@@ -411,7 +441,9 @@ public enum NativeReaderRolloutTier: String, Codable, CaseIterable, Sendable {
     case isolatedTableFallback
 
     public init(blocks: [NativeReaderBlock]) {
-        let tables = blocks.compactMap(\.table)
+        let tables = blocks.compactMap(\.table) + blocks.flatMap { block in
+            block.listItems.flatMap(Self.embeddedTables)
+        }
         if tables.contains(where: { $0.renderingClassification == .isolatedHTML }) {
             self = .isolatedTableFallback
         } else if !tables.isEmpty {
@@ -421,6 +453,10 @@ public enum NativeReaderRolloutTier: String, Codable, CaseIterable, Sendable {
         } else {
             self = .textOnly
         }
+    }
+
+    private static func embeddedTables(in item: NativeReaderListItem) -> [NativeReaderTable] {
+        item.segments.compactMap(\.table) + item.children.flatMap(embeddedTables)
     }
 }
 

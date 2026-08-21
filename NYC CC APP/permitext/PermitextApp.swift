@@ -473,6 +473,7 @@ private struct NativeReaderPhysicalStressConfiguration {
     enum Target {
         case bookmarkStress
         case crossCodeLink
+        case plumbingChapter
     }
 
     struct PreparedHarness {
@@ -482,6 +483,7 @@ private struct NativeReaderPhysicalStressConfiguration {
 
     static let launchArgument = "--native-reader-physical-stress"
     static let crossCodeLinkLaunchArgument = "--native-reader-cross-code-link-test"
+    static let plumbingChapterLaunchArgument = "--native-reader-universal-plumbing-test"
     private static let defaultsSuiteName = "com.randycodex.permitext.native-reader-physical-stress"
     private static let temporaryDirectoryName = "permitext-native-reader-physical-stress"
 
@@ -491,13 +493,21 @@ private struct NativeReaderPhysicalStressConfiguration {
     @MainActor
     static func prepareIfRequested() -> PreparedHarness? {
         let arguments = ProcessInfo.processInfo.arguments
-        guard arguments.contains(launchArgument) || arguments.contains(crossCodeLinkLaunchArgument) else {
+        guard arguments.contains(launchArgument)
+                || arguments.contains(crossCodeLinkLaunchArgument)
+                || arguments.contains(plumbingChapterLaunchArgument)
+        else {
             return nil
         }
 
-        let target: Target = arguments.contains(crossCodeLinkLaunchArgument)
-            ? .crossCodeLink
-            : .bookmarkStress
+        let target: Target
+        if arguments.contains(plumbingChapterLaunchArgument) {
+            target = .plumbingChapter
+        } else if arguments.contains(crossCodeLinkLaunchArgument) {
+            target = .crossCodeLink
+        } else {
+            target = .bookmarkStress
+        }
 
         guard let defaults = UserDefaults(suiteName: defaultsSuiteName) else {
             fatalError("Unable to create the isolated physical-stress defaults suite.")
@@ -628,6 +638,9 @@ private struct NativeReaderPhysicalStressHarness: View {
         case .crossCodeLink:
             codeSectionName = "FUEL GAS CODE"
             initialSectionNumber = "102.2.1"
+        case .plumbingChapter:
+            codeSectionName = "PLUMBING CODE"
+            initialSectionNumber = nil
         }
 
         guard let codeSection = library.codeSections.first(where: {

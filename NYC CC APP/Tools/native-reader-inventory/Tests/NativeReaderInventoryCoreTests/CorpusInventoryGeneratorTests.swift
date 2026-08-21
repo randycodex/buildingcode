@@ -128,7 +128,7 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertEqual(NativeReaderRolloutTier(blocks: document.blocks), .isolatedTableFallback)
     }
 
-    func testOversizedIsolatedTableKeepsWholeChapterOnHTML() throws {
+    func testOversizedIsolatedTableKeepsChapterNativeWithContainedTableFallback() throws {
         let root = try makeTemporaryDirectory()
         let chapters = root.appendingPathComponent("sample-package/chapters", isDirectory: true)
         try FileManager.default.createDirectory(at: chapters, withIntermediateDirectories: true)
@@ -141,8 +141,8 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
 
         XCTAssertEqual(chapter.tables.first?.rowCount, 251)
         XCTAssertEqual(chapter.tables.first?.renderingClassification, .isolatedHTML)
-        XCTAssertEqual(chapter.eligibility.state, .fullHTMLFallback)
-        XCTAssertEqual(chapter.eligibility.reasons, ["oversizedIsolatedHTMLTableCount: 1"])
+        XCTAssertEqual(chapter.eligibility.state, .nativeWithTableFallback)
+        XCTAssertEqual(chapter.eligibility.reasons, ["isolatedHTMLTableCount: 1"])
     }
 
     func testGenerationDiscoversOnlyNonPreparedChapterHTMLAndIsDeterministic() throws {
@@ -173,7 +173,7 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         )
     }
 
-    func testDuplicateAnchorsAndMissingAssetsAreInvalidContent() throws {
+    func testDuplicateAnchorsAndMissingAssetsStayNativeWithExplicitAuditMetadata() throws {
         let root = try makeTemporaryDirectory()
         let chapterURL = root.appendingPathComponent("package/chapters/1.html")
         try FileManager.default.createDirectory(at: chapterURL.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -185,8 +185,77 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
 
         XCTAssertEqual(chapter.duplicateAnchorIDs, ["duplicate"])
         XCTAssertEqual(chapter.images.first?.assetExists, false)
-        XCTAssertEqual(chapter.eligibility.state, .invalidContent)
-        XCTAssertEqual(chapter.eligibility.reasons, ["duplicateAnchorIDs", "missingMediaAsset"])
+        XCTAssertEqual(chapter.eligibility.state, .native)
+        XCTAssertTrue(chapter.eligibility.reasons.isEmpty)
+        XCTAssertTrue(chapter.parserMessages.contains("Duplicate stable anchor IDs were found"))
+        XCTAssertTrue(chapter.parserMessages.contains("One or more referenced media assets could not be resolved"))
+    }
+
+    func testKnownLegacyPresentationMarkupAndInterCodeLinkRemainNative() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("sample-package/chapters/1.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try """
+        <html><body><center><p class="Small MsoNormal pseudo-li sec-link-inline" style="margin-bottom=10pt;counter-reset:item">
+        Refer to <InterCodeLink destinationId="JD_1403">1403</InterCodeLink> of the Charter.
+        </p></center></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+
+        XCTAssertTrue(inventory.unknownElementNames.isEmpty)
+        XCTAssertTrue(inventory.unknownClassNames.isEmpty)
+        XCTAssertTrue(inventory.unsupportedCSSProperties.isEmpty)
+        XCTAssertEqual(inventory.eligibility.state, .native)
+        XCTAssertEqual(document.links.map(\.target), ["#JD_1403"])
+        XCTAssertTrue(document.blocks.flatMap(\.runs).contains {
+            $0.text == "1403" && $0.linkTarget == "#JD_1403"
+        })
+        XCTAssertTrue(document.validation.passesStructuralValidation)
+        XCTAssertEqual(document.validation.unsupportedBlockCount, 0)
+    }
+
+    func testTableNestedInsideListItemIsEmittedOnceAsTableBlock() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("sample-package/chapters/nested-table.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try """
+        <html><body><ol><li>Applicable areas:
+          <table border="1"><tr><th>Area</th><th>Value</th></tr><tr><td>A</td><td>1</td></tr></table>
+        </li></ol></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+
+        let listBlock = try XCTUnwrap(document.blocks.first { $0.kind == .orderedList })
+        let embeddedTables = listBlock.listItems.flatMap { $0.segments.compactMap(\.table) }
+        XCTAssertEqual(document.blocks.compactMap(\.table).count, 0)
+        XCTAssertEqual(embeddedTables.count, 1)
+        XCTAssertEqual(document.blocks.filter { $0.kind == .orderedList }.count, 1)
+        XCTAssertEqual(
+            listBlock.listItems.first?.segments.map(\.plainText),
+            ["Applicable areas:", "AreaValueA1"]
+        )
+        XCTAssertTrue(document.validation.normalizedTextMatches)
+        XCTAssertTrue(document.validation.tableStructuresMatch)
+        XCTAssertEqual(document.validation.unsupportedBlockCount, 0)
+        XCTAssertEqual(NativeReaderRolloutTier(blocks: document.blocks), .isolatedTableFallback)
     }
 
     func testNativeDocumentPreservesTextAnchorsLinksListsAndTableMatrixDeterministically() throws {
@@ -362,6 +431,33 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertTrue(document.validation.tableStructuresMatch)
         XCTAssertEqual(sourceTable.footnotes, ["Note"])
         XCTAssertEqual(nativeTable.cells.map(\.column), [0, 1, 1, 0])
+    }
+
+    func testLogicalTableRowCountIncludesAuthoredRowspanBeyondLastRow() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("package/chapters/table.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try """
+        <html><body><table>
+          <tr><th rowspan="2">Heading</th><th>Value</th></tr>
+        </table></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+        let sourceTable = try XCTUnwrap(inventory.tables.first)
+        let nativeTable = try XCTUnwrap(document.blocks.compactMap(\.table).first)
+
+        XCTAssertEqual(sourceTable.rowCount, 2)
+        XCTAssertEqual(nativeTable.rowCount, 2)
+        XCTAssertTrue(document.validation.tableStructuresMatch)
     }
 
     func testUTF8AuthoredPunctuationSurvivesDOMRecovery() throws {

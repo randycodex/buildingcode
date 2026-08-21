@@ -40,6 +40,38 @@ public struct NativeReaderChapterDocumentGenerator {
             drafts: &drafts
         )
 
+        // Tables can be authored inside list items or other semantic text
+        // containers. Those containers become a single native block, so emit
+        // every otherwise-unrepresented table as its own ordered block. Text
+        // run construction excludes nested tables to avoid duplicating their
+        // content in both the surrounding block and the table block.
+        let structuralTableElements = contentElements.filter { normalizedName($0) == "table" }
+        var representedTableIDs = Set(
+            drafts.compactMap(\.table).map(\.id)
+                + drafts.flatMap { $0.listItems.flatMap(embeddedTables) }.map(\.id)
+        )
+        for tableElement in structuralTableElements {
+            let table = makeTable(
+                element: tableElement,
+                inventory: inventory,
+                sourceOrderByElement: sourceOrderByElement
+            )
+            guard !representedTableIDs.contains(table.id) else { continue }
+            let tableDraft = makeDraft(
+                element: tableElement,
+                forcedText: nil,
+                forcedKind: .table,
+                sectionID: sectionID(for: tableElement),
+                inventory: inventory,
+                sourceOrderByElement: sourceOrderByElement,
+                sourceRoot: sourceRoot,
+                sequence: drafts.count
+            )
+            let insertionIndex = drafts.firstIndex { $0.sourceOrder > tableDraft.sourceOrder } ?? drafts.endIndex
+            drafts.insert(tableDraft, at: insertionIndex)
+            representedTableIDs.insert(table.id)
+        }
+
         let structuralMediaPairs = contentElements
             .filter(isTopLevelMediaElement)
             .compactMap { element -> (element: XMLElement, media: NativeReaderMedia)? in
@@ -339,11 +371,18 @@ public struct NativeReaderChapterDocumentGenerator {
             element: name,
             sourceSHA256: inventory.sourceSHA256
         )
-        let plainText = normalizeText(forcedText ?? element.stringValue ?? "")
         let headingLevel = forcedKind == .heading ? Int(name.dropFirst()) : nil
         let runs = [.table, .image, .figure, .divider, .unsupportedHTML].contains(forcedKind)
             ? []
             : textRuns(in: element)
+        let plainText: String
+        if let forcedText {
+            plainText = normalizeText(forcedText)
+        } else if runs.isEmpty {
+            plainText = normalizeText(element.stringValue ?? "")
+        } else {
+            plainText = normalizeText(runs.map(\.text).joined())
+        }
         let listItems: [NativeReaderListItem]
         if forcedKind == .orderedList || forcedKind == .unorderedList {
             listItems = makeListItems(
@@ -351,7 +390,8 @@ public struct NativeReaderChapterDocumentGenerator {
                 depth: 1,
                 ordered: forcedKind == .orderedList,
                 inventory: inventory,
-                sourceOrderByElement: sourceOrderByElement
+                sourceOrderByElement: sourceOrderByElement,
+                sourceRoot: sourceRoot
             )
         } else {
             listItems = []
@@ -503,7 +543,8 @@ public struct NativeReaderChapterDocumentGenerator {
         depth: Int,
         ordered: Bool,
         inventory: ChapterInventory,
-        sourceOrderByElement: [ObjectIdentifier: Int]
+        sourceOrderByElement: [ObjectIdentifier: Int],
+        sourceRoot: URL
     ) -> [NativeReaderListItem] {
         let directItems = (list.children ?? []).compactMap { $0 as? XMLElement }.filter { normalizedName($0) == "li" }
         return directItems.enumerated().map { offset, item in
@@ -511,15 +552,22 @@ public struct NativeReaderChapterDocumentGenerator {
             let nestedLists = (item.children ?? []).compactMap { $0 as? XMLElement }.filter {
                 ["ol", "ul"].contains(normalizedName($0))
             }
-            let runs = textRuns(in: item, excludingNestedLists: true)
-            let directText = normalizeText(runs.map(\.text).joined())
+            let segments = makeListSegments(
+                in: item,
+                inventory: inventory,
+                sourceOrderByElement: sourceOrderByElement,
+                sourceRoot: sourceRoot
+            )
+            let runs = segments.filter { $0.kind == .text }.flatMap(\.runs)
+            let directText = normalizeText(segments.map(\.plainText).joined(separator: " "))
             let children = nestedLists.flatMap {
                 makeListItems(
                     in: $0,
                     depth: depth + 1,
                     ordered: normalizedName($0) == "ol",
                     inventory: inventory,
-                    sourceOrderByElement: sourceOrderByElement
+                    sourceOrderByElement: sourceOrderByElement,
+                    sourceRoot: sourceRoot
                 )
             }
             return NativeReaderListItem(
@@ -528,9 +576,78 @@ public struct NativeReaderChapterDocumentGenerator {
                 ordinal: ordered ? offset + 1 : nil,
                 plainText: directText,
                 runs: runs,
+                segments: segments,
                 children: children
             )
         }
+    }
+
+    private func makeListSegments(
+        in item: XMLElement,
+        inventory: ChapterInventory,
+        sourceOrderByElement: [ObjectIdentifier: Int],
+        sourceRoot: URL
+    ) -> [NativeReaderListSegment] {
+        let itemSourceOrder = sourceOrderByElement[ObjectIdentifier(item)] ?? 0
+        var segments: [NativeReaderListSegment] = []
+        var pendingRuns: [NativeReaderTextRun] = []
+
+        func flushText() {
+            let mergedRuns = mergeTextRuns(pendingRuns)
+            let text = normalizeText(mergedRuns.map(\.text).joined())
+            pendingRuns.removeAll(keepingCapacity: true)
+            guard !text.isEmpty else { return }
+            segments.append(
+                NativeReaderListSegment(
+                    id: stableID("\(inventory.relativePath)\u{0}list-segment\u{0}\(itemSourceOrder)\u{0}\(segments.count)\u{0}text"),
+                    kind: .text,
+                    plainText: text,
+                    runs: mergedRuns,
+                    table: nil
+                )
+            )
+        }
+
+        for child in item.children ?? [] {
+            if let element = child as? XMLElement {
+                let name = normalizedName(element)
+                if ["ol", "ul"].contains(name) {
+                    continue
+                }
+                if name == "table" {
+                    flushText()
+                    let table = makeTable(
+                        element: element,
+                        inventory: inventory,
+                        sourceOrderByElement: sourceOrderByElement
+                    )
+                    segments.append(
+                        NativeReaderListSegment(
+                            id: stableID("\(inventory.relativePath)\u{0}list-segment\u{0}\(itemSourceOrder)\u{0}\(segments.count)\u{0}\(table.id)"),
+                            kind: .table,
+                            plainText: normalizeText(element.stringValue ?? ""),
+                            runs: [],
+                            table: table
+                        )
+                    )
+                    continue
+                }
+            }
+            appendTextRuns(
+                from: child,
+                styles: [],
+                linkTarget: nil,
+                excludingNestedLists: true,
+                isRoot: false,
+                runs: &pendingRuns
+            )
+        }
+        flushText()
+        return segments
+    }
+
+    private func embeddedTables(in item: NativeReaderListItem) -> [NativeReaderTable] {
+        item.segments.compactMap(\.table) + item.children.flatMap(embeddedTables)
     }
 
     private func makeTable(
@@ -592,8 +709,12 @@ public struct NativeReaderChapterDocumentGenerator {
         let footnotes = inventoryTable?.footnotes ?? []
         let classification = inventoryTable?.renderingClassification ?? .isolatedHTML
         let reasons = inventoryTable?.classificationReasons ?? ["missingInventoryRecord"]
+        let logicalRowCount = max(
+            rows.count,
+            cells.map { $0.row + $0.rowSpan }.max() ?? 0
+        )
         let signature = tableSignature(
-            rowCount: rows.count,
+            rowCount: logicalRowCount,
             columnCount: columnCount,
             cells: cells,
             caption: caption,
@@ -601,7 +722,7 @@ public struct NativeReaderChapterDocumentGenerator {
         )
         return NativeReaderTable(
             id: stableID("\(inventory.relativePath)\u{0}table\u{0}\(sourceOrder)"),
-            rowCount: rows.count,
+            rowCount: logicalRowCount,
             columnCount: columnCount,
             cells: cells,
             caption: caption,
@@ -668,8 +789,8 @@ public struct NativeReaderChapterDocumentGenerator {
     ) -> [NativeReaderLink] {
         elements.compactMap { element in
             let name = normalizedName(element)
-            guard ["a", "link", "area"].contains(name),
-                  let target = nonEmpty(attribute("href", in: element)) ?? nonEmpty(attribute("to", in: element)) else {
+            guard ["a", "link", "area", "intercodelink"].contains(name),
+                  let target = resolvedLinkTarget(for: element) else {
                 return nil
             }
             return NativeReaderLink(
@@ -692,7 +813,7 @@ public struct NativeReaderChapterDocumentGenerator {
         structuralMedia: [NativeReaderMedia]
     ) -> NativeReaderDocumentValidation {
         let sourceText = normalizeText(body.stringValue ?? "")
-        let documentText = normalizeText(blocks.map(\.plainText).joined(separator: " "))
+        let documentText = normalizeText(blocks.flatMap(validationText).joined(separator: " "))
         // HTML element boundaries may carry semantic word separation even when the
         // source has no literal whitespace between closing and opening tags. Compare
         // the enacted character stream after whitespace normalization so block
@@ -752,6 +873,17 @@ public struct NativeReaderChapterDocumentGenerator {
         )
     }
 
+    private func validationText(for block: NativeReaderBlock) -> [String] {
+        guard block.kind == .orderedList || block.kind == .unorderedList else {
+            return [block.plainText]
+        }
+        return block.listItems.flatMap(validationText)
+    }
+
+    private func validationText(for item: NativeReaderListItem) -> [String] {
+        [item.plainText] + item.children.flatMap(validationText)
+    }
+
     private func finalEligibility(
         inventory: ChapterInventory,
         validation: NativeReaderDocumentValidation
@@ -801,6 +933,7 @@ public struct NativeReaderChapterDocumentGenerator {
         guard let element = node as? XMLElement else { return }
         let name = normalizedName(element)
         if excludingNestedLists && !isRoot && ["ol", "ul"].contains(name) { return }
+        if !isRoot && name == "table" { return }
         if name == "br" {
             runs.append(NativeReaderTextRun(text: "\n", styles: styles.sorted { $0.rawValue < $1.rawValue }, linkTarget: linkTarget))
             return
@@ -825,9 +958,7 @@ public struct NativeReaderChapterDocumentGenerator {
         if style.contains("text-decoration") && style.contains("line-through") { nextStyles.insert(.strikethrough) }
         if style.contains("vertical-align: super") || style.contains("vertical-align:super") { nextStyles.insert(.superscript) }
         if style.contains("vertical-align: sub") || style.contains("vertical-align:sub") { nextStyles.insert(.subscript) }
-        let nextTarget = nonEmpty(attribute("href", in: element))
-            ?? nonEmpty(attribute("to", in: element))
-            ?? linkTarget
+        let nextTarget = resolvedLinkTarget(for: element) ?? linkTarget
         for child in element.children ?? [] {
             appendTextRuns(
                 from: child,
@@ -853,6 +984,19 @@ public struct NativeReaderChapterDocumentGenerator {
             }
         }
         return result
+    }
+
+    private func resolvedLinkTarget(for element: XMLElement) -> String? {
+        if let target = nonEmpty(attribute("href", in: element))
+            ?? nonEmpty(attribute("to", in: element)) {
+            return target
+        }
+        guard normalizedName(element) == "intercodelink",
+              let destinationID = nonEmpty(attribute("destinationid", in: element))
+                ?? nonEmpty(attribute("destinationId", in: element)) else {
+            return nil
+        }
+        return destinationID.hasPrefix("#") ? destinationID : "#\(destinationID)"
     }
 
     private struct AuthoredBundle: Decodable {

@@ -617,8 +617,12 @@ public struct CorpusInventoryGenerator {
                 signatureColumnCount = max(signatureColumnCount, columnIndex)
             }
         }
+        let logicalRowCount = max(
+            rows.count,
+            signatureCells.map { $0.row + $0.rowSpan }.max() ?? 0
+        )
         let structureSHA256 = sha256(Data(tableSignature(
-            rowCount: rows.count,
+            rowCount: logicalRowCount,
             columnCount: signatureColumnCount,
             cells: signatureCells,
             caption: caption,
@@ -657,7 +661,7 @@ public struct CorpusInventoryGenerator {
         return TableInventory(
             sourceOrder: sourceOrderByElement[ObjectIdentifier(table)] ?? 0,
             anchorID: nonEmpty(attribute("id", in: table)),
-            rowCount: rows.count,
+            rowCount: logicalRowCount,
             logicalColumnCount: logicalColumnCount,
             cellCount: cells.count,
             headerCellCount: cells.filter { normalizedName($0) == "th" }.count,
@@ -715,9 +719,8 @@ public struct CorpusInventoryGenerator {
         var counts: [String: (element: String, target: String, count: Int)] = [:]
         for element in elements {
             let name = normalizedName(element)
-            guard ["a", "link", "area"].contains(name) else { continue }
-            let target = nonEmpty(attribute("href", in: element)) ?? nonEmpty(attribute("to", in: element))
-            guard let target else { continue }
+            guard ["a", "link", "area", "intercodelink"].contains(name),
+                  let target = resolvedLinkTarget(for: element) else { continue }
             let key = "\(name)\u{0}\(target)"
             let current = counts[key]
             counts[key] = (name, target, (current?.count ?? 0) + 1)
@@ -762,8 +765,11 @@ public struct CorpusInventoryGenerator {
     ) -> NativeReaderEligibility {
         var invalidReasons: [String] = []
         if normalizedText.isEmpty { invalidReasons.append("emptyNormalizedText") }
-        if !duplicateAnchorIDs.isEmpty { invalidReasons.append("duplicateAnchorIDs") }
-        if images.contains(where: { !$0.assetExists }) { invalidReasons.append("missingMediaAsset") }
+        // Duplicate authored IDs are recorded for audit, but `makeAnchors`
+        // already keeps the first occurrence, matching browser fragment
+        // navigation. Missing source media is likewise represented explicitly
+        // by a native "Image unavailable" block instead of disqualifying all
+        // otherwise valid legal text in the chapter.
         if !invalidReasons.isEmpty {
             return NativeReaderEligibility(state: .invalidContent, reasons: invalidReasons)
         }
@@ -774,17 +780,6 @@ public struct CorpusInventoryGenerator {
         if !unsupportedCSS.isEmpty { fallbackReasons.append("unsupportedCSS: \(unsupportedCSS.joined(separator: ","))") }
         if !fallbackReasons.isEmpty {
             return NativeReaderEligibility(state: .fullHTMLFallback, reasons: fallbackReasons)
-        }
-
-        let oversizedIsolatedTableCount = tables.filter {
-            $0.renderingClassification == .isolatedHTML
-                && ($0.rowCount > 250 || $0.cellCount > 2_500)
-        }.count
-        if oversizedIsolatedTableCount > 0 {
-            return NativeReaderEligibility(
-                state: .fullHTMLFallback,
-                reasons: ["oversizedIsolatedHTMLTableCount: \(oversizedIsolatedTableCount)"]
-            )
         }
 
         let isolatedHTMLTableCount = tables.filter { $0.renderingClassification == .isolatedHTML }.count
@@ -1061,6 +1056,19 @@ public struct CorpusInventoryGenerator {
         }
     }
 
+    private func resolvedLinkTarget(for element: XMLElement) -> String? {
+        if let target = nonEmpty(attribute("href", in: element))
+            ?? nonEmpty(attribute("to", in: element)) {
+            return target
+        }
+        guard normalizedName(element) == "intercodelink",
+              let destinationID = nonEmpty(attribute("destinationid", in: element))
+                ?? nonEmpty(attribute("destinationId", in: element)) else {
+            return nil
+        }
+        return destinationID.hasPrefix("#") ? destinationID : "#\(destinationID)"
+    }
+
     private func isRecognizedClassName(_ className: String) -> Bool {
         let normalized = className.lowercased()
         if Self.recognizedClassNames.contains(normalized) { return true }
@@ -1174,24 +1182,28 @@ public struct CorpusInventoryGenerator {
     private static let recognizedElementNames: Set<String> = [
         "html", "head", "meta", "title", "base", "link", "style", "body", "main", "article", "section",
         "header", "footer", "nav", "aside", "div", "span", "p", "br", "hr", "h1", "h2", "h3", "h4", "h5", "h6",
-        "a", "area", "strong", "b", "em", "i", "u", "s", "strike", "small", "mark", "sup", "sub", "abbr", "cite",
+        "a", "area", "strong", "b", "em", "i", "u", "s", "strike", "small", "font", "mark", "sup", "sub", "abbr", "cite",
         "q", "blockquote", "pre", "code", "kbd", "var", "dfn", "time", "wbr", "ol", "ul", "li", "dl", "dt", "dd",
         "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col", "img", "picture", "source",
         "figure", "figcaption", "svg", "g", "path", "rect", "circle", "ellipse", "line", "polyline", "polygon", "text", "defs",
-        "clippath", "use", "symbol", "codeoptions", "annotationdrawer", "scrolltable"
+        "clippath", "use", "symbol", "center", "intercodelink", "codeoptions", "annotationdrawer", "scrolltable"
     ]
 
     private static let recognizedClassNames: Set<String> = [
         "clearfix", "rbox", "toc-destination", "jump", "subarticle", "article", "section", "subsection", "subsubsection",
         "paragraph", "normal-level", "ednotesm", "ednote", "history", "indent", "centered", "center", "text-left", "text-right",
         "table", "xsl-table", "scrolltable", "caption", "figure", "image", "img", "code-figure", "footnote", "footnotes", "source-note", "editor-note",
-        "reserved"
+        "reserved", "small", "small-bold", "web", "chapter", "default", "tableparagraph",
+        "pseudo-li", "sec-link-inline", "center-align", "embedded-entity", "pb_after",
+        "msonormal", "msotablegrid", "msonospacing", "msobodytext", "datetime",
+        "appendix-c-table", "appendix-c-table-header", "appendix-c-row"
     ]
 
     private static let recognizedClassPrefixes = [
         "level-", "indent-", "normal-", "heading-", "table-", "xsl-", "cell-", "row-", "col-", "note-", "list-",
         "figure-", "image-", "align-", "text-", "nyc-", "zr-", "ac-", "bc-", "fc-", "mc-", "pc-", "fgc-",
-        "chapter-", "section-", "subsection-"
+        "chapter-", "section-", "subsection-", "view", "views-", "field", "node", "paragraph--",
+        "definition", "defined-term", "applicability-type--", "js-view-dom-id-"
     ]
 
     private static let supportedInlineCSSProperties: Set<String> = [
@@ -1202,6 +1214,13 @@ public struct CorpusInventoryGenerator {
         "padding-right", "padding-bottom", "padding-left", "border", "border-top", "border-right", "border-bottom", "border-left",
         "border-width", "border-style", "border-color", "border-collapse", "border-spacing", "table-layout", "list-style",
         "list-style-type", "list-style-position", "page-break-before", "page-break-after", "page-break-inside", "break-before",
-        "break-after", "break-inside", "float", "clear", "overflow", "overflow-x", "overflow-y", "object-fit", "aspect-ratio"
+        "break-after", "break-inside", "float", "clear", "overflow", "overflow-x", "overflow-y", "object-fit", "aspect-ratio",
+        "position", "top", "word-wrap", "text-wrap-mode", "counter-reset", "tab-stops", "text-autospace",
+        "border-top-width", "border-top-style", "border-top-color", "border-right-width", "border-right-style",
+        "border-right-color", "border-bottom-width", "border-bottom-style", "border-bottom-color",
+        "border-left-width", "border-left-style", "border-left-color", "margin-bottom=10pt",
+        "mso-ansi-language", "mso-ascii-theme-font", "mso-bidi-language", "mso-bidi-theme-font",
+        "mso-fareast-font-family", "mso-fareast-language", "mso-fareast-theme-font", "mso-hansi-theme-font",
+        "mso-themecolor"
     ]
 }

@@ -53,6 +53,30 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         runCycles(1, in: app)
     }
 
+    func testFormerHTMLOnlyPlumbingChapterOneOpensNatively() {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--native-reader-universal-plumbing-test",
+            "--native-reader-rollout-stage",
+            "isolated-table-fallback"
+        ]
+        app.launch()
+
+        XCTAssertTrue(
+            element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45),
+            launchFailureDescription(in: app)
+        )
+        XCTAssertTrue(
+            app.staticTexts["Plumbing Code"].waitForExistence(timeout: 10),
+            "The former HTML-only Plumbing Code chapter did not open in its native Reader."
+        )
+
+        let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .medium)
+        attachment.name = "Plumbing Code Chapter 1 native Reader"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     func testFuelGasChapterOneCrossCodeLinkOpensTitle28() {
         let app = XCUIApplication()
         app.launchArguments += [

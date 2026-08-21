@@ -3377,7 +3377,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let sourcePaths = await store.debugValidatedSourcePaths()
 
-        XCTAssertGreaterThan(sourcePaths.count, 200)
+        XCTAssertEqual(sourcePaths.count, 463)
         XCTAssertEqual(Set(sourcePaths.map { $0.split(separator: "/").first.map(String.init) }), [
             "2022-construction-codes",
             "2025-specialty-codes",
@@ -3423,19 +3423,28 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             }
 
             for media in document.blocks.flatMap(\.media) {
-                let assetURL = try XCTUnwrap(
-                    NativeReaderDocumentStore.resolvedMediaURL(for: media, route: route),
-                    "\(sourcePath): \(media.id)"
-                )
-                XCTAssertNotNil(
-                    UIImage(contentsOfFile: assetURL.path),
-                    "Bundled media must decode: \(sourcePath): \(assetURL.lastPathComponent)"
-                )
+                if media.assetExists {
+                    let assetURL = try XCTUnwrap(
+                        NativeReaderDocumentStore.resolvedMediaURL(for: media, route: route),
+                        "\(sourcePath): \(media.id)"
+                    )
+                    let assetData = try Data(contentsOf: assetURL, options: [.mappedIfSafe])
+                    XCTAssertNotNil(
+                        UIImage(data: assetData),
+                        "Bundled media must decode: \(sourcePath): \(assetURL.lastPathComponent)"
+                    )
+                } else {
+                    XCTAssertNil(media.assetSHA256, sourcePath)
+                    XCTAssertNil(
+                        NativeReaderDocumentStore.resolvedMediaURL(for: media, route: route),
+                        sourcePath
+                    )
+                }
             }
         }
     }
 
-    func testPhaseNineRepresentativeCodeCollectionsAndFallbackRouting() async throws {
+    func testUniversalNativeRoutingCoversEveryKnownCodeCollectionAndFormerFallback() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let representativePaths = [
             "2022-construction-codes/chapters/1.html",
@@ -3458,11 +3467,16 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             XCTAssertFalse(document.blocks.isEmpty, sourcePath)
         }
 
-        let unsupportedPath = "2026-zoning-resolution/chapters/APP-C-21242.html"
-        let unsupportedRoute = await store.debugValidatedRoute(
-            forRelativeSourcePath: unsupportedPath
+        let formerlyUnsupportedPath = "2026-zoning-resolution/chapters/APP-C-21242.html"
+        let formerlyUnsupportedRoute = await store.debugValidatedRoute(
+            forRelativeSourcePath: formerlyUnsupportedPath
         )
-        XCTAssertNil(unsupportedRoute)
+        let route = try XCTUnwrap(formerlyUnsupportedRoute)
+        let document = try await store.loadDocument(for: route)
+        XCTAssertTrue(document.isValidatedNativeContent)
+        XCTAssertTrue(document.blocks.contains {
+            $0.table?.renderingClassification == .isolatedHTML
+        })
     }
 
     func testPhaseNineVisualSnapshotManifestCoversRequiredTraitMatrix() throws {
@@ -3618,7 +3632,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         }
 
         XCTAssertEqual(observedTiers, [.textOnly, .media, .isolatedTableFallback])
-        XCTAssertEqual(rolloutCounts, [233, 239, 239, 242])
+        XCTAssertEqual(rolloutCounts, [287, 312, 312, 463])
         let allValidatedPaths = await store.debugValidatedSourcePaths()
         XCTAssertEqual(
             previousPaths,
@@ -3626,7 +3640,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         )
     }
 
-    func testPhaseTenRoutingHonorsEveryStageAndKeepsInvalidContentOnHTML() async throws {
+    func testPhaseTenRoutingHonorsEveryStageAndKeepsUnknownContentOnHTML() async throws {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let allPaths = await store.debugValidatedSourcePaths()
         var representativePathByTier: [NativeReaderRolloutTier: String] = [:]
@@ -3652,14 +3666,14 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             }
         }
 
-        let invalidSourceURL = corpusRootURL.appendingPathComponent(
-            "2026-zoning-resolution/chapters/APP-C-21242.html"
+        let unknownSourceURL = corpusRootURL.appendingPathComponent(
+            "unknown-package/chapters/not-indexed.html"
         )
-        let invalidRoute = await store.rolloutRoute(
-            for: invalidSourceURL,
+        let unknownRoute = await store.rolloutRoute(
+            for: unknownSourceURL,
             stage: .isolatedTableFallback
         )
-        XCTAssertNil(invalidRoute)
+        XCTAssertNil(unknownRoute)
     }
 
     func testPhaseElevenBuildFlagsMakeValidatedNativeDefaultAndRetainHTMLFallback() throws {
@@ -3921,10 +3935,16 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         XCTAssertTrue(table.sourceHTML?.localizedCaseInsensitiveContains("<table") == true)
         XCTAssertEqual(Set(table.cells.map(\.id)).count, table.cells.count)
 
-        let oversizedSource = corpusRootURL
-            .appendingPathComponent("2026-zoning-resolution/chapters/APP-C-21242.html")
-        let oversizedRoute = await store.debugRoute(for: oversizedSource)
-        XCTAssertNil(oversizedRoute)
+        let oversizedRoute = await store.debugValidatedRoute(
+            forRelativeSourcePath: "2026-zoning-resolution/chapters/APP-C-21242.html"
+        )
+        let loadedOversizedRoute = try XCTUnwrap(oversizedRoute)
+        let oversizedDocument = try await store.loadDocument(for: loadedOversizedRoute)
+        let oversizedTable = try XCTUnwrap(oversizedDocument.blocks.compactMap(\.table).first)
+        XCTAssertEqual(oversizedDocument.eligibility.state, .nativeWithTableFallback)
+        XCTAssertEqual(oversizedTable.rowCount, 6_840)
+        XCTAssertEqual(oversizedTable.cells.count, 23_093)
+        XCTAssertEqual(oversizedTable.renderingClassification, .isolatedHTML)
     }
 
     func testPhaseFourMediaPilotsResolveBundledAssetsAndAccessibilityText() async throws {

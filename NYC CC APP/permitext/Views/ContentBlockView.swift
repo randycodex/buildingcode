@@ -279,6 +279,7 @@ struct NativeReaderTableBlockView: View {
                     searchQuery: searchQuery,
                     activeMatchIndex: activeMatchIndex,
                     tableWidth: isolatedTableWidth,
+                    maximumViewportHeight: usesContainedVerticalViewport ? 520 : nil,
                     accessibilityLabel: table.caption ?? "Code table"
                 )
             }
@@ -287,6 +288,10 @@ struct NativeReaderTableBlockView: View {
 
     private var isolatedTableWidth: CGFloat {
         CGFloat(max(table.columnCount, 1)) * 132
+    }
+
+    private var usesContainedVerticalViewport: Bool {
+        table.rowCount > 250 || table.cells.count > 2_500
     }
 
     private var nativeSimpleTable: some View {
@@ -358,6 +363,7 @@ private struct NativeReaderPreparedTableHTMLView: View {
     let searchQuery: String
     let activeMatchIndex: Int?
     let tableWidth: CGFloat
+    let maximumViewportHeight: CGFloat?
     let accessibilityLabel: String
 
     @State private var html: String?
@@ -366,7 +372,12 @@ private struct NativeReaderPreparedTableHTMLView: View {
         ScrollView(.horizontal) {
             Group {
                 if let html {
-                    TableHTMLView(html: html, tableID: tableID, baseURL: baseURL)
+                    TableHTMLView(
+                        html: html,
+                        tableID: tableID,
+                        baseURL: baseURL,
+                        maximumHeight: maximumViewportHeight
+                    )
                 } else {
                     HStack(spacing: 8) {
                         ProgressView()
@@ -792,22 +803,36 @@ private struct TableHTMLView: View {
     let html: String
     let tableID: String
     let baseURL: URL?
+    let maximumHeight: CGFloat?
     @State private var height: CGFloat
     @State private var shouldLoad = false
     @State private var loadTask: Task<Void, Never>?
 
-    init(html: String, tableID: String, baseURL: URL? = nil) {
+    init(
+        html: String,
+        tableID: String,
+        baseURL: URL? = nil,
+        maximumHeight: CGFloat? = nil
+    ) {
         self.html = html
         self.tableID = tableID
         self.baseURL = baseURL
-        _height = State(initialValue: TableHTMLHeightCache.height(for: tableID) ?? 120)
+        self.maximumHeight = maximumHeight
+        let cachedHeight = TableHTMLHeightCache.height(for: tableID) ?? 120
+        _height = State(initialValue: maximumHeight.map { min(cachedHeight, $0) } ?? cachedHeight)
     }
 
     var body: some View {
         Group {
             if shouldLoad {
                 GeometryReader { proxy in
-                    TableWebView(html: html, tableID: tableID, baseURL: baseURL, height: $height)
+                    TableWebView(
+                        html: html,
+                        tableID: tableID,
+                        baseURL: baseURL,
+                        maximumHeight: maximumHeight,
+                        height: $height
+                    )
                         .id(tableID)
                         .frame(width: proxy.size.width, height: height)
                 }
@@ -859,6 +884,7 @@ private struct TableWebView: UIViewRepresentable {
     let html: String
     let tableID: String
     let baseURL: URL?
+    let maximumHeight: CGFloat?
     @Binding var height: CGFloat
 
     func makeUIView(context: Context) -> WKWebView {
@@ -885,7 +911,7 @@ private struct TableWebView: UIViewRepresentable {
         context.coordinator.heightChanged = { newHeight in
             let resolvedHeight = max(80, newHeight)
             TableHTMLHeightCache.setHeight(resolvedHeight, for: tableID)
-            height = resolvedHeight
+            height = maximumHeight.map { min(resolvedHeight, $0) } ?? resolvedHeight
         }
         guard context.coordinator.loadedHTML != html else { return }
         context.coordinator.loadedHTML = html
