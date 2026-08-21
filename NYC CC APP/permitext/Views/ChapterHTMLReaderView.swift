@@ -566,7 +566,7 @@ struct ChapterHTMLReaderView: View {
                 .foregroundStyle(.secondary)
             if let relativePath = library.selectedVersion?.authoredHTMLBundlePath {
                 Text(relativePath)
-                    .font(.footnote.monospaced())
+                    .font(.footnote)
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
             }

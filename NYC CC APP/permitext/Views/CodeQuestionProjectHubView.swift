@@ -397,7 +397,7 @@ private struct CodeQuestionProjectHubDetail: View {
     private func hashLine(_ label: String, _ value: String?) -> some View {
         if let value, !value.isEmpty {
             Text("\(label): \(value)")
-                .font(.caption2.monospaced())
+                .font(.caption2)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
                 .accessibilityLabel("\(label), \(value)")

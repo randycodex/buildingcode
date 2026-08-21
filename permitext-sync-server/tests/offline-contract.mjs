@@ -195,9 +195,9 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260817-research-conversation-titles-v361"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260820-two-font-system-v1"));
 assert(shellPrecacheURLs.includes("/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3"));
-assert(shellPrecacheURLs.includes("/web/styles.css?v=20260817-research-conversation-titles-v361"));
+assert(shellPrecacheURLs.includes("/web/styles.css?v=20260820-two-font-system-v1"));
 assert(shellPrecacheURLs.includes("/web/research-progress.js?v=20260813-research-reader-spacing-v120"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260811-research-columns-v3"));
@@ -211,8 +211,7 @@ assert(shellPrecacheURLs.includes("/web/code-question-define.js?v=20260803-code-
 assert(shellPrecacheURLs.includes("/web/code-question-evidence.js?v=20260807-code-question-phase5a-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-analysis.js?v=20260817-adaptive-research-answer-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-review.js?v=20260803-code-question-review-v1"));
-assert(shellPrecacheURLs.includes("/web/fonts/inter-latin-wght-normal.woff2"));
-assert(shellPrecacheURLs.includes("/web/fonts/inter-latin-wght-italic.woff2"));
+assert(!shellPrecacheURLs.some((url) => url.includes("/web/fonts/inter-")));
 assert(shellPrecacheURLs.includes("/web/fonts/source-serif-4-latin-wght-normal.woff2"));
 assert(shellPrecacheURLs.includes("/web/fonts/source-serif-4-latin-wght-italic.woff2"));
 

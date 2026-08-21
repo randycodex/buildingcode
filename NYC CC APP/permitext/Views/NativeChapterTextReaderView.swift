@@ -2555,12 +2555,7 @@ enum NativeReaderAttributedTextBuilder {
         let effectiveSize = (styles.contains(.small) || styles.contains(.superscript) || styles.contains(.subscript))
             ? roleSize * 0.84
             : roleSize
-        let baseFont: UIFont
-        if styles.contains(.code) {
-            baseFont = .monospacedSystemFont(ofSize: effectiveSize, weight: wantsBold ? .semibold : .regular)
-        } else {
-            baseFont = theme.bodyFont.withSize(effectiveSize)
-        }
+        let baseFont = theme.bodyFont.withSize(effectiveSize)
 
         var traits = baseFont.fontDescriptor.symbolicTraits
         if wantsBold { traits.insert(.traitBold) }

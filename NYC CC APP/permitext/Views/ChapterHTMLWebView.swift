@@ -1549,23 +1549,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let tableFontSize = max(theme.fontSize * 0.78, 9)
             let lineHeight = max(1.35, min(1.64, 1.28 + theme.lineSpacing / 28))
             let paragraphSpacing = max(theme.paragraphSpacing / 20, 0.42)
-            let fontFamily: String
-            switch theme.fontChoice {
-            case .sanFrancisco, .sfCompact:
-                fontFamily = #"-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif"#
-            case .sfPro:
-                fontFamily = #""SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif"#
-            case .sfMono:
-                fontFamily = #""SF Mono", ui-monospace, Menlo, Monaco, monospace"#
-            case .newYork:
-                fontFamily = #""New York", "NewYork", ui-serif, Georgia, "Times New Roman", serif"#
-            case .serif:
-                fontFamily = #"ui-serif, Georgia, "Times New Roman", serif"#
-            case .rounded:
-                fontFamily = #"-apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Helvetica Neue", Arial, sans-serif"#
-            case .monospaced:
-                fontFamily = #"ui-monospace, "SF Mono", Menlo, Monaco, monospace"#
-            }
+            let fontFamily = #""Source Serif 4 Variable", "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif"#
 
             return """
             html {
@@ -1590,6 +1574,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               background: \(backgroundColor) !important;
               color: \(textColor) !important;
               font-family: \(fontFamily) !important;
+              font-optical-sizing: auto;
               font-size: \(bodyFontSize)px !important;
               line-height: \(lineHeight) !important;
               overflow-wrap: break-word;

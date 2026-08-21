@@ -12,6 +12,7 @@ typealias PlatformColor = NSColor
 #endif
 
 enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
+    case sourceSerif4
     case sfPro
     case sfCompact
     case sfMono
@@ -22,13 +23,15 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
     case monospaced
 
     static var allCases: [ReaderFontChoice] {
-        [.sfPro, .rounded, .newYork, .sfMono]
+        [.sourceSerif4]
     }
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
+        case .sourceSerif4:
+            return "Source Serif 4"
         case .sfPro:
             return "System"
         case .sfCompact:
@@ -49,18 +52,7 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
     }
 
     var normalizedChoice: ReaderFontChoice {
-        switch self {
-        case .sfPro, .sfMono, .newYork, .rounded:
-            return self
-        case .sanFrancisco:
-            return .sfPro
-        case .sfCompact:
-            return .sfPro
-        case .serif:
-            return .newYork
-        case .monospaced:
-            return .sfMono
-        }
+        .sourceSerif4
     }
 }
 
@@ -75,7 +67,7 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     static let minimumLineSpacing: Double = 0
     static let maximumLineSpacing: Double = 12
 
-    var fontChoice: ReaderFontChoice = .sfPro
+    var fontChoice: ReaderFontChoice = .sourceSerif4
     var fontSize: Double = minimumFontSize
     var lineSpacing: Double = minimumLineSpacing
     var paragraphSpacing: Double = 9
@@ -294,114 +286,32 @@ enum CodeSectionThemeProfile: Sendable {
 
 private extension ReaderFontChoice {
     func bodyFont(size: Double) -> PlatformFont {
-        switch self {
-        case .sfPro:
-            #if canImport(UIKit)
-            // System font APIs are the supported way to request SF Pro. Hidden
-            // `.SFUIText-*` names can resolve to Times New Roman on newer iOS.
-            return .systemFont(ofSize: size)
-            #else
-            return .systemFont(ofSize: size)
-            #endif
-        case .sanFrancisco, .sfCompact:
-            #if canImport(UIKit)
-            return .systemFont(ofSize: size)
-            #else
-            return .systemFont(ofSize: size)
-            #endif
-        case .sfMono:
-            #if canImport(UIKit)
-            return UIFont(name: "SFMono-Regular", size: size)
-                ?? .monospacedSystemFont(ofSize: size, weight: .regular)
-            #else
-            return .monospacedSystemFont(ofSize: size, weight: .regular)
-            #endif
-        case .newYork:
-            #if canImport(UIKit)
-            return UIFont(name: "NewYorkMedium-Regular", size: size)
-                ?? UIFont(name: "NewYork-Regular", size: size)
-                ?? UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body), size: size)
-            #else
-            return NSFont(name: "New York", size: size) ?? .systemFont(ofSize: size)
-            #endif
-        case .serif:
-            #if canImport(UIKit)
-            return UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body), size: size)
-            #else
-            return NSFont(name: "Times New Roman", size: size) ?? .systemFont(ofSize: size)
-            #endif
-        case .rounded:
-            #if canImport(UIKit)
-            return UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body).withDesign(.rounded) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body), size: size)
-            #else
-            return .systemFont(ofSize: size, weight: .regular)
-            #endif
-        case .monospaced:
-            return .monospacedSystemFont(ofSize: size, weight: .regular)
-        }
+        sourceSerifFont(size: size, weight: .regular, italic: false)
     }
 
     func boldFont(size: Double) -> PlatformFont {
-        switch self {
-        case .sfPro:
-            #if canImport(UIKit)
-            return .systemFont(ofSize: size, weight: .semibold)
-            #else
-            return .boldSystemFont(ofSize: size)
-            #endif
-        case .sanFrancisco, .sfCompact:
-            #if canImport(UIKit)
-            return .systemFont(ofSize: size, weight: .semibold)
-            #else
-            return .boldSystemFont(ofSize: size)
-            #endif
-        case .sfMono:
-            #if canImport(UIKit)
-            return UIFont(name: "SFMono-Semibold", size: size)
-                ?? .monospacedSystemFont(ofSize: size, weight: .semibold)
-            #else
-            return .monospacedSystemFont(ofSize: size, weight: .semibold)
-            #endif
-        case .newYork:
-            #if canImport(UIKit)
-            return UIFont(name: "NewYorkMedium-Semibold", size: size)
-                ?? UIFont(name: "NewYork-Semibold", size: size)
-                ?? UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline), size: size)
-            #else
-            return NSFont(name: "New York Bold", size: size) ?? .boldSystemFont(ofSize: size)
-            #endif
-        case .serif:
-            #if canImport(UIKit)
-            let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline)
-            return UIFont(descriptor: descriptor, size: size)
-            #else
-            return NSFont(name: "Times New Roman Bold", size: size) ?? .boldSystemFont(ofSize: size)
-            #endif
-        case .rounded:
-            #if canImport(UIKit)
-            let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline).withDesign(.rounded) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline)
-            return UIFont(descriptor: descriptor, size: size)
-            #else
-            return .boldSystemFont(ofSize: size)
-            #endif
-        case .monospaced:
-            return .monospacedSystemFont(ofSize: size, weight: .semibold)
-        }
+        sourceSerifFont(size: size, weight: .semibold, italic: false)
     }
 
     func italicFont(size: Double) -> PlatformFont {
-        bodyFont(size: size).withItalicTrait()
+        sourceSerifFont(size: size, weight: .regular, italic: true)
     }
-}
 
-private extension PlatformFont {
-    func withItalicTrait() -> PlatformFont {
+    private func sourceSerifFont(size: Double, weight: PlatformFont.Weight, italic: Bool) -> PlatformFont {
         #if canImport(UIKit)
-        guard let descriptor = fontDescriptor.withSymbolicTraits(.traitItalic) else { return self }
-        return PlatformFont(descriptor: descriptor, size: pointSize)
+        let postScriptName = italic ? "SourceSerif4Variable-Italic" : "SourceSerif4Variable-Roman"
+        guard let registeredFont = UIFont(name: postScriptName, size: size) else {
+            let fallbackDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
+                .withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
+            return UIFont(descriptor: fallbackDescriptor, size: size)
+        }
+        let descriptor = registeredFont.fontDescriptor.addingAttributes([
+            .traits: [UIFontDescriptor.TraitKey.weight: weight]
+        ])
+        return UIFont(descriptor: descriptor, size: size)
         #else
-        let descriptor = fontDescriptor.withSymbolicTraits(.italic)
-        return PlatformFont(descriptor: descriptor, size: pointSize) ?? self
+        return NSFont(name: italic ? "Source Serif 4 Variable Italic" : "Source Serif 4 Variable", size: size)
+            ?? .systemFont(ofSize: size, weight: weight)
         #endif
     }
 }

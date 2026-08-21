@@ -72,7 +72,7 @@ struct SettingsView: View {
 
                         CodeHairline()
 
-                        fontPicker
+                        readerTypefaceRow
 
                         CodeHairline()
 
@@ -221,12 +221,12 @@ struct SettingsView: View {
 
             #if DEBUG
             Text(library.accountSyncDebugSummary)
-                .font(.caption2.monospaced())
+                .font(.caption2)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(storeKitDebugText)
-                .font(.caption2.monospaced())
+                .font(.caption2)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -662,18 +662,12 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var fontPicker: some View {
-        Picker("Font", selection: Binding(
-            get: { library.readerTheme.fontChoice },
-            set: { newValue in
-                var theme = library.readerTheme
-                theme.fontChoice = newValue
-                library.updateReaderTheme(theme)
-            }
-        )) {
-            ForEach(ReaderFontChoice.allCases) { choice in
-                Text(choice.displayName).tag(choice)
-            }
+    private var readerTypefaceRow: some View {
+        HStack {
+            Text("Reader Typeface")
+            Spacer()
+            Text(ReaderFontChoice.sourceSerif4.displayName)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -1029,7 +1023,7 @@ struct SettingsView: View {
                         .foregroundStyle(.primary)
 
                     Text("Record \(conflict.recordReference)")
-                        .font(.caption.monospaced())
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }

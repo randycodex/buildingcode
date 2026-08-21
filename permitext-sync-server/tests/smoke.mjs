@@ -488,7 +488,6 @@ async function main() {
 
     const workspaceScript = await request("/web/app.js");
     const workspaceStyles = await request("/web/styles.css");
-    const interFont = await requestBinary("/web/fonts/inter-latin-wght-normal.woff2?v=20260808-typography-v1");
     const sourceSerifFont = await requestBinary("/web/fonts/source-serif-4-latin-wght-normal.woff2?v=20260808-typography-v1");
     const workspaceStateScript = await request("/web/workspace-state.js");
     const workspaceStartupSource = workspaceScript.text.slice(
@@ -500,19 +499,17 @@ async function main() {
     );
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(
-      interFont.response.ok && sourceSerifFont.response.ok &&
-        interFont.body.length > 40_000 && sourceSerifFont.body.length > 40_000 &&
-        interFont.response.headers.get("content-type")?.includes("font/woff2") &&
+      sourceSerifFont.response.ok &&
+        sourceSerifFont.body.length > 40_000 &&
         sourceSerifFont.response.headers.get("content-type")?.includes("font/woff2") &&
-        interFont.response.headers.get("cache-control")?.includes("immutable") &&
         sourceSerifFont.response.headers.get("cache-control")?.includes("immutable"),
-      "Self-hosted Permitext typography assets were missing, empty, or not immutable."
+      "The self-hosted Permitext Reader typeface was missing, empty, or not immutable."
     );
     assert(
-      workspaceStyles.text.includes('font-family: "Inter Variable";') &&
-        workspaceStyles.text.includes('font-family: "Source Serif 4 Variable";') &&
-        workspaceStyles.text.includes('--ui-font-family: "Inter Variable"') &&
+      workspaceStyles.text.includes('font-family: "Source Serif 4 Variable";') &&
+        workspaceStyles.text.includes('--ui-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui') &&
         workspaceStyles.text.includes('--source-font-family: "Source Serif 4 Variable"') &&
+        !workspaceStyles.text.includes('Inter Variable') &&
         workspaceStyles.text.includes('--reader-font-size: 16.5px;') &&
         workspaceStyles.text.includes('--reader-line-height: 1.6;') &&
         workspaceStyles.text.includes('.chapter-section h3 {') &&
@@ -1450,7 +1447,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('`Based on ${enactedCount} enacted ${enactedCount === 1 ? "provision" : "provisions"}`') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260817-research-conversation-titles-v361'),
+        webRoot.text.includes('/web/app.js?v=20260820-two-font-system-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1619,7 +1616,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-conversation-titles-v361'),
+      webRoot.text.includes('/web/styles.css?v=20260820-two-font-system-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1885,7 +1882,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-      webRoot.text.includes('/web/styles.css?v=20260817-research-conversation-titles-v361'),
+      webRoot.text.includes('/web/styles.css?v=20260820-two-font-system-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

@@ -908,7 +908,7 @@ private var filteredSavedEmptyState: some View {
 
                 if bookmark.hasNote {
                     Text(bookmark.noteBody)
-                        .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
+                        .font(.body)
                         .foregroundStyle(bookmarkAccent.opacity(0.88))
                         .multilineTextAlignment(.leading)
                         .padding(.top, 4)
@@ -2042,7 +2042,7 @@ struct ProjectView: View {
 
                     if bookmark.hasNote {
                         Text(bookmark.noteBody)
-                            .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
+                            .font(.body)
                             .foregroundStyle(bookmarkAccent.opacity(0.88))
                             .multilineTextAlignment(.leading)
                             .padding(.top, 4)

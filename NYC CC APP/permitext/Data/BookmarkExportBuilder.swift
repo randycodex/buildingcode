@@ -506,7 +506,7 @@ struct ProjectReportExportBuilder: Sendable {
                 "\(manifest.generatorVersion) · SHA-256 \(manifest.contentHash)"
             ].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n"),
             to: result,
-            font: .monospacedSystemFont(ofSize: 7, weight: .regular),
+            font: .systemFont(ofSize: 7, weight: .regular),
             color: UIColor(white: 0.5, alpha: 1),
             spacingBefore: 8
         )

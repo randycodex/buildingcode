@@ -143,6 +143,38 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
 }
 
 final class EntitlementAndSyncContractTests: XCTestCase {
+    func testTwoTypefaceContractUsesSourceSerifForReaderAndMigratesLegacyChoices() throws {
+        XCTAssertEqual(ReaderFontChoice.allCases, [.sourceSerif4])
+        XCTAssertEqual(ReaderTheme.default.fontChoice, .sourceSerif4)
+        XCTAssertEqual(ReaderTheme.default.bodyFont.fontName, "SourceSerif4Variable-Roman")
+        XCTAssertEqual(ReaderTheme.default.italicFont.fontName, "SourceSerif4Variable-Italic")
+
+        let legacyChoices: [ReaderFontChoice] = [
+            .sfPro, .sfCompact, .sfMono, .newYork,
+            .sanFrancisco, .serif, .rounded, .monospaced
+        ]
+        XCTAssertTrue(legacyChoices.allSatisfy { $0.normalizedChoice == .sourceSerif4 })
+
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let infoData = try Data(contentsOf: projectRoot.appendingPathComponent("permitext/Info.plist"))
+        let info = try XCTUnwrap(
+            PropertyListSerialization.propertyList(from: infoData, format: nil) as? [String: Any]
+        )
+        XCTAssertEqual(
+            info["UIAppFonts"] as? [String],
+            ["SourceSerif4Variable-Roman.ttf", "SourceSerif4Variable-Italic.ttf"]
+        )
+
+        let projectSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("NYC CC APP.xcodeproj/project.pbxproj"),
+            encoding: .utf8
+        )
+        XCTAssertTrue(projectSource.contains("SourceSerif4Variable-Roman.ttf in Resources"))
+        XCTAssertTrue(projectSource.contains("SourceSerif4Variable-Italic.ttf in Resources"))
+    }
+
     func testPreparedChapterHTMLInjectsOneMobileViewportBeforeLoading() throws {
         let directoryURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-reader-viewport-\(UUID().uuidString)", isDirectory: true)

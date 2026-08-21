@@ -1,20 +1,4 @@
 @font-face {
-  font-family: "Inter Variable";
-  font-style: normal;
-  font-display: swap;
-  font-weight: 100 900;
-  src: url("/web/fonts/inter-latin-wght-normal.woff2") format("woff2-variations");
-}
-
-@font-face {
-  font-family: "Inter Variable";
-  font-style: italic;
-  font-display: swap;
-  font-weight: 100 900;
-  src: url("/web/fonts/inter-latin-wght-italic.woff2") format("woff2-variations");
-}
-
-@font-face {
   font-family: "Source Serif 4 Variable";
   font-style: normal;
   font-display: swap;
@@ -88,7 +72,7 @@
   --card-stack-gap: var(--space-4);
   --header-height: 55px;
   --divider-width: 1px;
-  --ui-font-family: "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ui-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", sans-serif;
   --source-font-family: "Source Serif 4 Variable", "Source Serif 4", Iowan Old Style, Georgia, serif;
   --chrome-font-family: var(--ui-font-family);
   --reader-font-family: var(--source-font-family);
@@ -2746,6 +2730,8 @@ select option:checked {
 
 .reader-content {
   padding-top: 0;
+  font-family: var(--reader-font-family);
+  font-optical-sizing: auto;
   font-size: var(--reader-font-size) !important;
 }
 
@@ -7363,7 +7349,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   grid-column: 1 / -1;
   justify-self: end;
   color: var(--text-secondary);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-family: var(--ui-font-family);
   font-size: 14px !important;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
@@ -15172,8 +15158,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 
 .code-question-analysis-hashes dd {
   margin: 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--ui-font-family);
   font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .code-question-analysis-evidence-list,
@@ -15529,12 +15516,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 
   .mobile-web-message h1 {
     margin: 22px 0 10px;
-    font: 650 1.65rem/1.18 Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    font: 650 1.65rem/1.18 var(--ui-font-family);
   }
 
   .mobile-web-message p {
     margin: 0;
     color: #a8a8af;
-    font: 450 1rem/1.5 Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    font: 450 1rem/1.5 var(--ui-font-family);
   }
 }

@@ -2,7 +2,7 @@
 
 **Updated:** 2026-08-20
 
-**Status:** Planning document only; implementation has not started
+**Status:** Active roadmap; the typography contract is implemented on the current development branch
 
 **Surfaces:** Permitext web workspace and native iPhone app
 
@@ -50,6 +50,7 @@ Do not reopen these items during the work described by this plan:
 5. **Notebook and Project Hub error-versus-empty states are deferred.** Revisit them in a later review rather than including them in the first implementation pass.
 6. **Preserve deferred capabilities.** Do not delete Workboard, governance, collaboration, migration, compatibility, or advanced professional systems without separate technical justification and approval.
 7. **No release action is implied.** Local verification, a Git commit, GitHub publication, Production deployment, and App Store submission are separate evidence layers and require their own authorization where applicable.
+8. **Use one typeface for interface chrome and one for enacted text.** Web interface chrome uses the operating-system UI stack, which resolves to SF Pro on Apple platforms without redistributing Apple font files. Native iPhone interface chrome uses SwiftUI system styles. Reader text uses bundled Source Serif 4 on both platforms. The Reader typeface is fixed; legacy saved font choices normalize to Source Serif 4.
 
 ## Current terminology decisions
 

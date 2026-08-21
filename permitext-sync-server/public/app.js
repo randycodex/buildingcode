@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260817-research-conversation-titles-v361";
+} from "./offline-storage.js?v=20260820-two-font-system-v1";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -20566,7 +20566,7 @@ function printReportManifestAsPDF(manifest) {
       article.published-code{background:#f5eee6}article.ai-assisted{background:#eef1f8}article.user-authored{background:#f4f1f8}
       blockquote{margin:10px 0 0;padding-left:14px;border-left:3px solid ${accent};color:#333}
       ul{margin:4px 0 10px;padding-left:20px}.disclaimers{margin-top:32px;padding-top:16px;border-top:1px solid #bbb;color:#555;font-size:8.5pt}
-      .hash{margin-top:14px;overflow-wrap:anywhere;font:7pt/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;color:#777}
+      .hash{margin-top:14px;overflow-wrap:anywhere;font:7pt/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,"Segoe UI",sans-serif;color:#777;font-variant-numeric:tabular-nums}
       @page{margin:.35in}
     `;
     documentRoot.head.append(style);

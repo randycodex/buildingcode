@@ -867,14 +867,14 @@ struct SearchView: View {
 
                 if showsSeparateTitle {
                     Text(highlightedTitle)
-                        .font(library.readerTheme.swiftUIFont(size: library.readerTheme.fontSize + 1, emphasized: true))
+                        .font(.body.weight(.semibold))
                         .foregroundStyle(resultAccent)
                         .multilineTextAlignment(.leading)
                 }
 
                 if !snippet.isEmpty {
                     Text(highlightedSnippet)
-                        .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
+                        .font(.body)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
                         .lineLimit(4)

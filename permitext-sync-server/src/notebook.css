@@ -1,6 +1,6 @@
 .permitext-notebook-editor {
-  --bn-font-family: var(--ui-font-family, "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  --mantine-font-family: var(--ui-font-family, "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  --mantine-font-family-headings: var(--ui-font-family, "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  font-family: var(--ui-font-family, "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  --bn-font-family: var(--ui-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", sans-serif);
+  --mantine-font-family: var(--ui-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", sans-serif);
+  --mantine-font-family-headings: var(--ui-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", sans-serif);
+  font-family: var(--ui-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI", sans-serif);
 }
