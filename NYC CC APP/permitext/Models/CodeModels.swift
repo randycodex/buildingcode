@@ -4932,6 +4932,7 @@ struct StoreKitSubscriptionSnapshot: Sendable {
 
 enum StoreKitSubscriptionServiceError: LocalizedError {
     case proProductUnavailable
+    case paymentsUnavailable
     case unverifiedTransaction
     case pendingApproval
     case unknownPurchaseResult
@@ -4940,6 +4941,8 @@ enum StoreKitSubscriptionServiceError: LocalizedError {
         switch self {
         case .proProductUnavailable:
             return "The Pro monthly subscription is not available yet. Check the App Store product setup."
+        case .paymentsUnavailable:
+            return "Apple purchases are disabled for this device or App Store account. Check Screen Time purchase restrictions and your App Store sign-in, then try again."
         case .unverifiedTransaction:
             return "The purchase could not be verified."
         case .pendingApproval:
@@ -4982,6 +4985,9 @@ actor StoreKitSubscriptionService {
     }
 
     func purchasePro() async throws -> StoreKitSubscriptionSnapshot {
+        guard AppStore.canMakePayments else {
+            throw StoreKitSubscriptionServiceError.paymentsUnavailable
+        }
         guard let product = await proProducts().first(where: { $0.id == proProductID }) else {
             throw StoreKitSubscriptionServiceError.proProductUnavailable
         }

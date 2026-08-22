@@ -1537,7 +1537,65 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 proProductDisplayPrice: nil,
                 isStoreKitBusy: true
             ),
-            "Loading Pro..."
+            "Starting Apple purchase..."
+        )
+    }
+
+    func testAccountUserDataProfilesNeverExposeSavedPassagesAcrossAccounts() throws {
+        let suiteName = "permitext-tests.account-profiles.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defaults.removePersistentDomain(forName: suiteName)
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let directoryURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-account-profiles-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: directoryURL) }
+
+        let profiles = try AccountUserDataProfileStore(
+            baseDirectory: directoryURL,
+            defaults: defaults
+        )
+        let codeVersion = UserContentSyncCodeVersion.localNYC2022
+
+        let initialGuestURL = try profiles.databaseURL(accountID: nil)
+        let initialGuestStore = try UserDataStore(databaseURL: initialGuestURL)
+        try initialGuestStore.toggleBookmark(sectionID: 101, codeVersion: codeVersion)
+
+        let accountAURL = try profiles.databaseURL(
+            accountID: "account-a",
+            claimCurrentGuestForNewAccount: true
+        )
+        XCTAssertEqual(accountAURL, initialGuestURL)
+        XCTAssertEqual(
+            try UserDataStore(databaseURL: accountAURL).bookmarkedSectionIDs(codeVersion: codeVersion),
+            [101]
+        )
+
+        let signedOutURL = try profiles.databaseURL(accountID: nil)
+        XCTAssertNotEqual(signedOutURL, accountAURL)
+        XCTAssertTrue(
+            try UserDataStore(databaseURL: signedOutURL).bookmarkedSectionIDs(codeVersion: codeVersion).isEmpty
+        )
+
+        let accountBURL = try profiles.databaseURL(
+            accountID: "account-b",
+            claimCurrentGuestForNewAccount: true
+        )
+        XCTAssertEqual(accountBURL, signedOutURL)
+        let accountBStore = try UserDataStore(databaseURL: accountBURL)
+        try accountBStore.toggleBookmark(sectionID: 202, codeVersion: codeVersion)
+
+        XCTAssertEqual(
+            try UserDataStore(
+                databaseURL: profiles.databaseURL(accountID: "account-a")
+            ).bookmarkedSectionIDs(codeVersion: codeVersion),
+            [101]
+        )
+        XCTAssertEqual(
+            try UserDataStore(
+                databaseURL: profiles.databaseURL(accountID: "account-b")
+            ).bookmarkedSectionIDs(codeVersion: codeVersion),
+            [202]
         )
     }
 

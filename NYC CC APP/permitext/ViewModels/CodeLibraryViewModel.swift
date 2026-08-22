@@ -25,11 +25,12 @@ func permitextUpgradeCallToActionTitle(
 ) -> String {
     if isStoreKitTestProActive { return "Pro (Test) Active" }
     if currentPlan == .pro { return "Pro Active" }
+    if isStoreKitBusy { return "Starting Apple purchase..." }
     if let displayPrice = proProductDisplayPrice?.trimmingCharacters(in: .whitespacesAndNewlines),
        !displayPrice.isEmpty {
         return "Upgrade to Pro - \(displayPrice)/month"
     }
-    return isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
+    return "Upgrade to Pro"
 }
 
 func permitextProfessionalWorkspaceRequirementMessage() -> String {
@@ -134,6 +135,8 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var storeKitDebugSummary: String = "not checked"
     @Published private(set) var storeKitTransactionEnvironment: String?
     @Published private(set) var isStoreKitBusy = false
+    @Published private(set) var isStoreKitRestoreInProgress = false
+    @Published private(set) var storeKitOperationMessage: String?
     /// sectionID → ordered list of folderIDs containing that section. Cached
     /// up front so the Reader and Saved screens don't make per-section DB
     /// round trips when rendering the Projects row.
@@ -181,8 +184,10 @@ final class CodeLibraryViewModel: ObservableObject {
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
     private let referenceResolver = CodeReferenceResolver()
-    private let userContentRepository: UserContentRepository?
-    private let syncEngine: UserContentSyncEngine
+    private var userContentRepository: UserContentRepository?
+    private var syncEngine: UserContentSyncEngine
+    private let userContentSyncBackend: UserContentSyncBackend
+    private let accountUserDataProfiles: AccountUserDataProfileStore?
     private let continuityStore: ContinuityStore
     private let readerThemeStore: ReaderThemeStore
     private let preferencesDefaults: UserDefaults
@@ -282,12 +287,33 @@ final class CodeLibraryViewModel: ObservableObject {
         initialSignedInAccount: SignedInAccount? = nil,
         ownsAccountSync: Bool = true
     ) {
+        let loadedSignedInAccount = initialSignedInAccount
+            ?? (loadsPersistedAccount ? Self.loadSignedInAccount() : nil)
+        let resolvedSyncBackend = syncBackend
+            ?? (accountBackendClient as? UserContentSyncBackend)
+            ?? NoOpUserContentSyncBackend()
+        let resolvedProfiles: AccountUserDataProfileStore?
+        let resolvedRepository: UserContentRepository?
+        if let userContentRepository {
+            resolvedProfiles = nil
+            resolvedRepository = userContentRepository
+        } else if let profiles = try? AccountUserDataProfileStore(defaults: preferencesDefaults),
+                  let databaseURL = try? profiles.databaseURL(accountID: loadedSignedInAccount?.appUserID) {
+            resolvedProfiles = profiles
+            resolvedRepository = try? UserDataStore(databaseURL: databaseURL)
+        } else {
+            resolvedProfiles = nil
+            resolvedRepository = try? UserDataStore()
+        }
+
         self.locator = locator
         self.formattingEngine = formattingEngine
-        self.userContentRepository = userContentRepository ?? (try? UserDataStore())
+        self.userContentRepository = resolvedRepository
+        self.userContentSyncBackend = resolvedSyncBackend
+        self.accountUserDataProfiles = resolvedProfiles
         self.syncEngine = UserContentSyncEngine(
-            repository: self.userContentRepository,
-            backend: syncBackend ?? (accountBackendClient as? UserContentSyncBackend) ?? NoOpUserContentSyncBackend(),
+            repository: resolvedRepository,
+            backend: resolvedSyncBackend,
             continuityStore: continuityStore
         )
         self.continuityStore = continuityStore
@@ -299,10 +325,15 @@ final class CodeLibraryViewModel: ObservableObject {
         self.ownsAccountSync = ownsAccountSync
         self.currentPlan = entitlementService.currentPlan
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
-        let loadedSignedInAccount = initialSignedInAccount
-            ?? (loadsPersistedAccount ? Self.loadSignedInAccount() : nil)
         self.signedInAccount = loadedSignedInAccount
         self.userContentSyncCheckpoint = syncEngine.checkpoint(account: loadedSignedInAccount)
+        if resolvedProfiles != nil, let loadedSignedInAccount {
+            // A profile may be new even when this account already has a saved
+            // server checkpoint from the legacy shared database. Start with a
+            // full pull so the isolated profile is never left falsely empty.
+            self.syncEngine.resetCheckpoint(account: loadedSignedInAccount)
+            self.userContentSyncCheckpoint = self.syncEngine.checkpoint(account: loadedSignedInAccount)
+        }
         self.readerTheme = readerThemeStore.load()
         self.recentSearches = Self.loadRecentSearches(defaults: preferencesDefaults)
         self.pinnedSearches = Self.loadPinnedSearches(defaults: preferencesDefaults)
@@ -2737,6 +2768,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func purchasePro(clerk: Clerk? = nil) async {
         guard await requireSignedInBillingAccount(clerk: clerk, then: .purchasePro) else { return }
         guard !isStoreKitBusy else { return }
+        storeKitOperationMessage = nil
         isStoreKitBusy = true
         defer { isStoreKitBusy = false }
 
@@ -2746,13 +2778,17 @@ final class CodeLibraryViewModel: ObservableObject {
             await syncAppleTransactionIfPossible(snapshot)
             if currentPlan != .pro {
                 statusMessage = "Purchase cancelled."
+                storeKitOperationMessage = "Apple did not complete the purchase. No charge was made. Tap Upgrade to try again."
             } else if isStoreKitTestProActive {
                 statusMessage = "Pro (Test) is active on this device. Account-wide Pro still requires a server grant or production purchase."
+                storeKitOperationMessage = "Apple confirmed Pro (Test) on this device."
             } else {
                 statusMessage = "Pro is active."
+                storeKitOperationMessage = "Apple confirmed your Pro subscription."
             }
         } catch {
             statusMessage = error.localizedDescription
+            storeKitOperationMessage = error.localizedDescription
             entitlementPrompt = EntitlementRequirement(
                 feature: .unlimitedSavedItems,
                 requiredPlan: .pro,
@@ -2764,18 +2800,26 @@ final class CodeLibraryViewModel: ObservableObject {
     func restorePurchases(clerk: Clerk? = nil) async {
         guard await requireSignedInBillingAccount(clerk: clerk, then: .restorePurchases) else { return }
         guard !isStoreKitBusy else { return }
+        storeKitOperationMessage = nil
         isStoreKitBusy = true
-        defer { isStoreKitBusy = false }
+        isStoreKitRestoreInProgress = true
+        defer {
+            isStoreKitBusy = false
+            isStoreKitRestoreInProgress = false
+        }
 
         let snapshot = await storeKitSubscriptionService.restorePurchases()
         applyStoreKitSnapshot(snapshot)
         await syncAppleTransactionIfPossible(snapshot)
         if currentPlan != .pro {
             statusMessage = "No active Pro subscription found."
+            storeKitOperationMessage = "Apple found no active Pro subscription for this App Store account."
         } else if isStoreKitTestProActive {
             statusMessage = "Pro (Test), including Research, was restored on this device. Test purchases cannot activate production web access."
+            storeKitOperationMessage = "Apple restored Pro (Test) on this device."
         } else {
             statusMessage = "Pro, including Research, was restored."
+            storeKitOperationMessage = "Apple restored your Pro subscription."
         }
     }
 
@@ -2924,6 +2968,11 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func completeBackendSignIn(_ backendRecord: BackendAccountRecord) async {
         let account = backendRecord.account
+        let shouldClaimGuestProfile = signedInAccount == nil
+        activateUserContentScope(
+            account: account,
+            claimCurrentGuestForNewAccount: shouldClaimGuestProfile
+        )
         signedInAccount = account
         accountAuthenticationMessage = nil
         Self.saveSignedInAccount(account)
@@ -3235,6 +3284,62 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshPendingUserContentSyncCount()
     }
 
+    /// Activates the database belonging to the current Permitext account.
+    /// Injected repositories used by tests and previews intentionally retain
+    /// their existing behavior.
+    private func activateUserContentScope(
+        account: SignedInAccount?,
+        claimCurrentGuestForNewAccount: Bool = false
+    ) {
+        guard let accountUserDataProfiles else { return }
+
+        userContentAutoSyncTask?.cancel()
+        userContentAutoSyncTask = nil
+        savedPresentationRefreshTask?.cancel()
+        savedPresentationRefreshTask = nil
+        cancelProjectPresentationRefresh()
+
+        do {
+            let databaseURL = try accountUserDataProfiles.databaseURL(
+                accountID: account?.appUserID,
+                claimCurrentGuestForNewAccount: claimCurrentGuestForNewAccount
+            )
+            let currentURL = (userContentRepository as? UserDataStore)?.databaseURL
+            if currentURL?.standardizedFileURL != databaseURL.standardizedFileURL {
+                let repository = try UserDataStore(databaseURL: databaseURL)
+                userContentRepository = repository
+                syncEngine = UserContentSyncEngine(
+                    repository: repository,
+                    backend: userContentSyncBackend,
+                    continuityStore: continuityStore
+                )
+            }
+        } catch {
+            // Fail closed: an account must never inherit the preceding profile
+            // merely because its own database could not be opened.
+            userContentRepository = nil
+            syncEngine = UserContentSyncEngine(
+                repository: nil,
+                backend: userContentSyncBackend,
+                continuityStore: continuityStore
+            )
+            statusMessage = "Saved work for this account could not be opened. No other account data was shown."
+        }
+
+        didRunStartupAccountSync = false
+        lastForegroundAccountSyncAt = nil
+        if let account {
+            // Checkpoints predate account-scoped local databases. A full pull
+            // makes the selected profile authoritative before incremental sync
+            // resumes.
+            syncEngine.resetCheckpoint(account: account)
+        }
+        userContentSyncCheckpoint = syncEngine.checkpoint(account: account)
+        userContentSyncConflicts = []
+        refreshBookmarks()
+        refreshPendingUserContentSyncCount()
+    }
+
     private func prepareCanonicalCodeVersionMigration(for account: SignedInAccount?) {
         guard let account else { return }
         // Reconcile once from the complete server state after the project and
@@ -3423,6 +3528,7 @@ final class CodeLibraryViewModel: ObservableObject {
         Self.clearSignedInAccount()
         currentCapabilityContract = nil
         applyBackendEntitlement(nil)
+        activateUserContentScope(account: nil)
         statusMessage = "Signed out."
         if let account {
             Task {
@@ -3472,6 +3578,7 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             statusMessage = "Your Permitext account was deleted, but some on-device saved data could not be cleared."
         }
+        accountUserDataProfiles?.removeAccountProfile(accountID: account.appUserID)
         signedInAccount = nil
         organizations = []
         userContentSyncConflicts = []
@@ -3479,6 +3586,7 @@ final class CodeLibraryViewModel: ObservableObject {
         currentCapabilityContract = nil
         Self.clearSignedInAccount()
         applyBackendEntitlement(nil)
+        activateUserContentScope(account: nil)
         recentSearches = []
         pinnedSearches = []
         recentlyViewedSections = []
@@ -3500,6 +3608,7 @@ final class CodeLibraryViewModel: ObservableObject {
         signedInAccount = nil
         organizations = []
         Self.clearSignedInAccount()
+        activateUserContentScope(account: nil)
         userContentSyncCheckpoint = nil
         userContentSyncConflicts = []
         refreshPendingUserContentSyncCount()

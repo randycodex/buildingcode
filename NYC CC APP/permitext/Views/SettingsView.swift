@@ -236,6 +236,14 @@ struct SettingsView: View {
                 .disabled(library.isStoreKitBusy)
                 .opacity(library.isStoreKitBusy ? 0.55 : 1)
 
+                if let operationMessage = library.storeKitOperationMessage {
+                    Text(operationMessage)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(library.currentPlan == .pro ? Color.green : Color.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("storekit-operation-message")
+                }
+
                 Text("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month. Code reading and search remain free.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -262,7 +270,7 @@ struct SettingsView: View {
             Button {
                 Task { await library.restorePurchases(clerk: clerk) }
             } label: {
-                Text(library.isStoreKitBusy ? "Checking purchases..." : "Restore Purchases")
+                Text(library.isStoreKitRestoreInProgress ? "Checking purchases..." : "Restore Purchases")
                     .font(.footnote.weight(.semibold))
                     .frame(maxWidth: .infinity)
             }
@@ -844,7 +852,7 @@ struct SettingsView: View {
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(.primary)
 
-            Text("\(detail) Your work remains on this iPhone, but it will not sync until you sign in again.")
+            Text("\(detail) Your work remains on this iPhone under this account and reappears when this same account signs in again. It will not be shown to another account.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

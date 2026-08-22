@@ -62,6 +62,104 @@ protocol UserContentRepository {
     func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws
 }
 
+/// Resolves an isolated on-device database for each Permitext account.
+///
+/// Account IDs are deliberately kept out of filesystem paths. A random profile
+/// identifier is persisted for each account instead, while signed-out work uses
+/// a separate guest profile. The legacy shared database is left untouched so a
+/// prior installation can be recovered without exposing its contents to the
+/// next account that signs in.
+final class AccountUserDataProfileStore {
+    private let baseDirectory: URL
+    private let defaults: UserDefaults
+    private let fileManager: FileManager
+    private let accountProfilesKey = "permitext.user-data.account-profiles.v1"
+    private let currentGuestProfileKey = "permitext.user-data.current-guest-profile.v1"
+
+    convenience init(defaults: UserDefaults = .standard) throws {
+        let fileManager = FileManager.default
+        let baseSupport = try fileManager.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        try self.init(
+            baseDirectory: baseSupport
+                .appendingPathComponent("permitext", isDirectory: true)
+                .appendingPathComponent("profiles", isDirectory: true),
+            defaults: defaults,
+            fileManager: fileManager
+        )
+    }
+
+    init(baseDirectory: URL, defaults: UserDefaults, fileManager: FileManager = .default) throws {
+        self.baseDirectory = baseDirectory.standardizedFileURL
+        self.defaults = defaults
+        self.fileManager = fileManager
+        try fileManager.createDirectory(
+            at: self.baseDirectory,
+            withIntermediateDirectories: true,
+            attributes: nil
+        )
+    }
+
+    func databaseURL(
+        accountID: String?,
+        claimCurrentGuestForNewAccount: Bool = false
+    ) throws -> URL {
+        let profileID: String
+        if let accountID, !accountID.isEmpty {
+            var profiles = accountProfiles()
+            if let existingProfileID = profiles[accountID] {
+                profileID = existingProfileID
+            } else if claimCurrentGuestForNewAccount {
+                profileID = currentGuestProfileID()
+                profiles[accountID] = profileID
+                defaults.set(profiles, forKey: accountProfilesKey)
+                defaults.set(makeProfileID(), forKey: currentGuestProfileKey)
+            } else {
+                profileID = makeProfileID()
+                profiles[accountID] = profileID
+                defaults.set(profiles, forKey: accountProfilesKey)
+            }
+        } else {
+            profileID = currentGuestProfileID()
+        }
+
+        let profileDirectory = baseDirectory.appendingPathComponent(profileID, isDirectory: true)
+        try fileManager.createDirectory(
+            at: profileDirectory,
+            withIntermediateDirectories: true,
+            attributes: nil
+        )
+        return profileDirectory.appendingPathComponent("user_data.sqlite")
+    }
+
+    func removeAccountProfile(accountID: String) {
+        var profiles = accountProfiles()
+        profiles.removeValue(forKey: accountID)
+        defaults.set(profiles, forKey: accountProfilesKey)
+    }
+
+    private func accountProfiles() -> [String: String] {
+        defaults.dictionary(forKey: accountProfilesKey) as? [String: String] ?? [:]
+    }
+
+    private func currentGuestProfileID() -> String {
+        if let existing = defaults.string(forKey: currentGuestProfileKey), !existing.isEmpty {
+            return existing
+        }
+        let profileID = makeProfileID()
+        defaults.set(profileID, forKey: currentGuestProfileKey)
+        return profileID
+    }
+
+    private func makeProfileID() -> String {
+        UUID().uuidString.lowercased()
+    }
+}
+
 final class UserDataStore: UserContentRepository {
     private struct BookmarkIdentity: Hashable {
         let codeVersion: String
