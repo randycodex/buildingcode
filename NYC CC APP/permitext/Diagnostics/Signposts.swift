@@ -31,6 +31,12 @@ struct UserContentSyncPushReport: Hashable, Sendable {
     let latestEventID: Int64?
     let entitlement: AppEntitlement?
     let capabilityContract: PermitextCapabilityContract?
+
+    /// Empty queues do not contact the backend, so their nil entitlement is not
+    /// an authoritative revocation of the account's previously verified plan.
+    var includesAuthoritativeAccountState: Bool {
+        attemptedCount > 0
+    }
 }
 
 struct UserContentSyncPullReport: Hashable, Sendable {
@@ -44,6 +50,12 @@ struct UserContentSyncPullReport: Hashable, Sendable {
     let mergePlan: UserContentMergePlan
     let entitlement: AppEntitlement?
     let capabilityContract: PermitextCapabilityContract?
+
+    /// Checkpoint-only results intentionally omit entitlement and capability
+    /// payloads. Only a completed pull may replace the locally verified state.
+    var includesAuthoritativeAccountState: Bool {
+        skippedReason == nil
+    }
 
     var appliedRemoteContinuity: Bool {
         mergePlan.decisions.contains {

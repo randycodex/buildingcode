@@ -1717,6 +1717,10 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         XCTAssertEqual(report.skippedReason, "No remote changes.")
         XCTAssertEqual(report.pulledCount, 0)
+        XCTAssertFalse(report.includesAuthoritativeAccountState)
+        let emptyPushReport = try await engine.processPendingWork(account: account)
+        XCTAssertEqual(emptyPushReport.attemptedCount, 0)
+        XCTAssertFalse(emptyPushReport.includesAuthoritativeAccountState)
         let pullCount = await recorder.recordedPullCount()
         let checkpointCount = await recorder.recordedCheckpointCount()
         XCTAssertEqual(pullCount, 0)
@@ -1761,6 +1765,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
 
         XCTAssertNil(report.skippedReason)
+        XCTAssertTrue(report.includesAuthoritativeAccountState)
         let pullCount = await recorder.recordedPullCount()
         let checkpointCount = await recorder.recordedCheckpointCount()
         XCTAssertEqual(pullCount, 1)
@@ -1806,7 +1811,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(contract.enables(.research))
     }
 
-    func testPackagedProNeedsResearchAddOnWhileLegacyAndLifetimeKeepAccess() {
+    func testPackagedProLegacyAndLifetimePlansIncludeResearch() {
         let packagedPro = AppEntitlement(
             plan: .pro,
             source: .webSubscription,
@@ -1814,7 +1819,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             packageID: "pro",
             provider: .init(permitextPackage: "pro")
         )
-        XCTAssertFalse(packagedPro.grantsResearch())
+        XCTAssertTrue(packagedPro.grantsResearch())
 
         let proWithResearch = AppEntitlement(
             plan: .pro,

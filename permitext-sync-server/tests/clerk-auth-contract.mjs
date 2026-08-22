@@ -6,6 +6,14 @@ import {
   verifyClerkCredential,
   verifyClerkSessionToken
 } from "../clerk-auth.mjs";
+
+function contractToken(payload) {
+  return [
+    Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url"),
+    Buffer.from(JSON.stringify(payload)).toString("base64url"),
+    "contract-signature"
+  ].join(".");
+}
 import { appleSubjectIDs } from "../postgres-account-repository.mjs";
 
 function assert(condition, message) {
@@ -62,7 +70,7 @@ assert(
 );
 
 let receivedOptions = null;
-const verified = await verifyClerkSessionToken("session-token", {
+const verified = await verifyClerkSessionToken(contractToken({ azp: "https://permitext.com" }), {
   environment: production,
   verifier: async (_token, options) => {
     receivedOptions = options;
@@ -76,6 +84,21 @@ assert(
 );
 assert(receivedOptions.secretKey === "sk_live_contract", "Clerk verification omitted its server credential.");
 
+let nativeOptions;
+const nativeVerified = await verifyClerkSessionToken(contractToken({ sub: "unsigned", sid: "unsigned" }), {
+  environment: production,
+  verifier: async (_token, options) => {
+    nativeOptions = options;
+    return { sub: "user_native_contract", sid: "sess_native_contract" };
+  }
+});
+assert(nativeVerified.providerUserID === "user_native_contract", "Native Clerk identity was lost.");
+assert(
+  !Object.hasOwn(nativeOptions, "authorizedParties"),
+  "Native Clerk tokens without a browser Origin were subjected to the web authorized-party check."
+);
+assert(nativeOptions.secretKey === "sk_live_contract", "Native Clerk verification omitted its server credential.");
+
 const [iosProject, iosApp, iosSettings, iosViewModel, iosInfo] = await Promise.all([
   readFile(new URL("../../NYC CC APP/NYC CC APP.xcodeproj/project.pbxproj", import.meta.url), "utf8"),
   readFile(new URL("../../NYC CC APP/permitext/PermitextApp.swift", import.meta.url), "utf8"),
@@ -83,7 +106,12 @@ const [iosProject, iosApp, iosSettings, iosViewModel, iosInfo] = await Promise.a
   readFile(new URL("../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift", import.meta.url), "utf8"),
   readFile(new URL("../../NYC CC APP/permitext/Info.plist", import.meta.url), "utf8")
 ]);
-assert(iosProject.includes("https://github.com/clerk/clerk-ios") && iosProject.includes("ClerkKit in Frameworks"), "iOS is not linked to ClerkKit.");
+assert(
+  iosProject.includes("https://github.com/clerk/clerk-ios") &&
+    iosProject.includes("ClerkKit in Frameworks") &&
+    iosProject.includes("ClerkKitUI in Frameworks"),
+  "iOS is not linked to ClerkKit and ClerkKitUI."
+);
 assert(
   iosApp.includes("Clerk.configure(publishableKey:") &&
     iosApp.includes("private let clerk: Clerk?") &&
@@ -98,13 +126,19 @@ assert(
   "iOS lost the Clerk social sign-in path, its Apple fallback, or identity deletion."
 );
 assert(
-  iosViewModel.includes("startHostedAuth(mode: .signIn)") &&
-    iosViewModel.includes("clerk.auth.getToken()") &&
+  iosApp.includes("import ClerkKitUI") &&
+    iosApp.includes("AuthView()") &&
+    iosApp.includes("await library.handleClerkAuthenticationFinished(clerk: clerk)") &&
+    iosSettings.includes("library.requestClerkAuthentication()") &&
+    iosViewModel.includes("try await session.getToken()") &&
+    iosViewModel.includes("reconcileClerkSessionIfNeeded(clerk: Clerk?)") &&
+    iosApp.includes("await library.reconcileClerkSessionIfNeeded(clerk: clerk)") &&
     iosViewModel.includes("linkFrom: sourceAccount"),
-  "iOS Clerk sign-in does not complete hosted auth and authenticated account linking."
+  "iOS Clerk sign-in does not complete native auth and authenticated account linking."
 );
 assert(
-  iosViewModel.includes("guard await requireSignedInBillingAccount(clerk: clerk) else { return }") &&
+  iosViewModel.includes("guard await requireSignedInBillingAccount(clerk: clerk, then: .purchasePro) else { return }") &&
+    iosViewModel.includes("guard await requireSignedInBillingAccount(clerk: clerk, then: .restorePurchases) else { return }") &&
     iosViewModel.includes("Sign in or create a Permitext account before purchasing or restoring Pro.") &&
     iosSettings.includes("purchasePro(clerk: clerk)") &&
     iosSettings.includes("restorePurchases(clerk: clerk)") &&

@@ -56,6 +56,7 @@
 		B10000000000000000000001 /* EntitlementAndSyncContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */; };
 		C10000000000000000000001 /* NativeReaderPhysicalStressUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000001 /* NativeReaderPhysicalStressUITests.swift */; };
 		D10000000000000000000001 /* ClerkKit in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000001 /* ClerkKit */; };
+		D10000000000000000000002 /* ClerkKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000002 /* ClerkKitUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -142,6 +143,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D10000000000000000000001 /* ClerkKit in Frameworks */,
+				D10000000000000000000002 /* ClerkKitUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +342,7 @@
 			name = permitext;
 			packageProductDependencies = (
 				D30000000000000000000001 /* ClerkKit */,
+				D30000000000000000000002 /* ClerkKitUI */,
 			);
 			productName = permitext;
 			productReference = A20000000000000000000000 /* permitext.app */;
@@ -624,7 +627,7 @@
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CLERK_PUBLISHABLE_KEY = pk_test_ZGFzaGluZy13YXJ0aG9nLTQwNjEuY2xlcmsuYWNjb3VudHMuZGV2JA;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;
 				INFOPLIST_OUTPUT_FORMAT = xml;
@@ -655,7 +658,7 @@
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;
 				INFOPLIST_OUTPUT_FORMAT = xml;
@@ -831,6 +834,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D20000000000000000000001 /* XCRemoteSwiftPackageReference "clerk-ios" */;
 			productName = ClerkKit;
+		};
+		D30000000000000000000002 /* ClerkKitUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D20000000000000000000001 /* XCRemoteSwiftPackageReference "clerk-ios" */;
+			productName = ClerkKitUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

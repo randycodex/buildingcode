@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 import os.signpost
 import ClerkKit
+import ClerkKitUI
 
 private struct PermitextClerkEnvironmentKey: EnvironmentKey {
     static let defaultValue: Clerk? = nil
@@ -185,6 +186,7 @@ struct PermitextApp: App {
                     break
                 }
                 Task {
+                    await library.reconcileClerkSessionIfNeeded(clerk: clerk)
                     await library.performStartupAccountSyncIfNeeded()
                     if scenePhase == .active {
                         library.startForegroundAutomaticSync()
@@ -205,6 +207,7 @@ struct PermitextApp: App {
                 case .active:
                     library.startForegroundAutomaticSync()
                     Task {
+                        await library.reconcileClerkSessionIfNeeded(clerk: clerk)
                         await library.performForegroundAccountSyncIfNeeded()
                     }
                 case .inactive, .background:
@@ -212,6 +215,22 @@ struct PermitextApp: App {
                     library.suspendReaderWarmups()
                 @unknown default:
                     break
+                }
+            }
+            .sheet(
+                isPresented: Binding(
+                    get: { library.isClerkAuthenticationPresented },
+                    set: { library.isClerkAuthenticationPresented = $0 }
+                ),
+                onDismiss: {
+                    Task {
+                        await library.handleClerkAuthenticationFinished(clerk: clerk)
+                    }
+                }
+            ) {
+                if let clerk {
+                    AuthView()
+                        .environment(clerk)
                 }
             }
             .onReceive(
@@ -248,6 +267,7 @@ struct PermitextApp: App {
                     break
                 }
                 Task {
+                    await library.reconcileClerkSessionIfNeeded(clerk: clerk)
                     await library.performStartupAccountSyncIfNeeded()
                     if scenePhase == .active {
                         library.startForegroundAutomaticSync()

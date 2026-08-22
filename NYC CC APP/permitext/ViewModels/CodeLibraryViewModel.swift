@@ -3,6 +3,7 @@ import AuthenticationServices
 import ClerkKit
 import CryptoKit
 import Network
+import os
 import os.signpost
 import Security
 import SwiftUI
@@ -62,6 +63,12 @@ enum NoteSaveResult: Equatable {
 
 @MainActor
 final class CodeLibraryViewModel: ObservableObject {
+    private enum PostClerkAuthenticationAction: Equatable {
+        case none
+        case purchasePro
+        case restorePurchases
+    }
+
     private struct AuthoredContentSnapshot: Sendable {
         let store: AuthoredCodeStore
         let codeSections: [CodeSectionCategory]
@@ -113,6 +120,8 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var entitlementPrompt: EntitlementRequirement?
     @Published private(set) var signedInAccount: SignedInAccount?
     @Published private(set) var isAccountBusy = false
+    @Published private(set) var accountAuthenticationMessage: String?
+    @Published var isClerkAuthenticationPresented = false
     @Published private(set) var organizations: [PermitextOrganization] = []
     @Published private(set) var isOrganizationWorkspaceLoading = false
     @Published private(set) var pendingOrganizationInvitationToken: String?
@@ -185,6 +194,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
     private let startupSignpostID = OSSignpostID(log: AppSignpost.startup)
+    private var postClerkAuthenticationAction: PostClerkAuthenticationAction = .none
     private var hasRecordedFirstUsableContent = false
     private let recentSearchesDefaultsKey = "recentSearches"
     private let pinnedSearchesDefaultsKey = "pinnedSearches"
@@ -2725,7 +2735,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func purchasePro(clerk: Clerk? = nil) async {
-        guard await requireSignedInBillingAccount(clerk: clerk) else { return }
+        guard await requireSignedInBillingAccount(clerk: clerk, then: .purchasePro) else { return }
         guard !isStoreKitBusy else { return }
         isStoreKitBusy = true
         defer { isStoreKitBusy = false }
@@ -2752,7 +2762,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func restorePurchases(clerk: Clerk? = nil) async {
-        guard await requireSignedInBillingAccount(clerk: clerk) else { return }
+        guard await requireSignedInBillingAccount(clerk: clerk, then: .restorePurchases) else { return }
         guard !isStoreKitBusy else { return }
         isStoreKitBusy = true
         defer { isStoreKitBusy = false }
@@ -2769,21 +2779,20 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    private func requireSignedInBillingAccount(clerk: Clerk?) async -> Bool {
+    private func requireSignedInBillingAccount(
+        clerk: Clerk?,
+        then action: PostClerkAuthenticationAction
+    ) async -> Bool {
         if signedInAccount != nil { return true }
         guard let clerk else {
             statusMessage = "Sign in or create a Permitext account before purchasing or restoring Pro."
             return false
         }
 
-        await handleClerkHostedSignIn(clerk: clerk)
-        guard signedInAccount != nil else {
-            if statusMessage?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true {
-                statusMessage = "Sign in must finish before purchasing or restoring Pro."
-            }
-            return false
-        }
-        return true
+        requestClerkAuthentication(then: action)
+        statusMessage = "Sign in or create a Permitext account to continue."
+        _ = clerk
+        return false
     }
 
     func handleAppleSignIn(result: Result<ASAuthorization, Error>) async {
@@ -2820,39 +2829,103 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func handleClerkHostedSignIn(clerk: Clerk) async {
+    func requestClerkAuthentication() {
+        requestClerkAuthentication(then: .none)
+    }
+
+    private func requestClerkAuthentication(then action: PostClerkAuthenticationAction) {
+        guard !isAccountBusy else { return }
+        postClerkAuthenticationAction = action
+        accountAuthenticationMessage = nil
+        isClerkAuthenticationPresented = true
+    }
+
+    func handleClerkAuthenticationFinished(clerk: Clerk?) async {
+        let pendingAction = postClerkAuthenticationAction
+        postClerkAuthenticationAction = .none
+
+        guard let clerk, let session = clerk.session else {
+            if pendingAction != .none {
+                statusMessage = "Sign in was not completed. No purchase was started."
+            }
+            return
+        }
+        guard !isAccountBusy else { return }
+
+        isAccountBusy = true
+        accountAuthenticationMessage = "Finishing Permitext sign-in..."
+        let sourceAccount = signedInAccount?.authProvider == .clerk ? nil : signedInAccount
+
+        do {
+            Self.accountAuthenticationLogger.info("Clerk native authentication returned an activated session.")
+            try await completeClerkBackendSignIn(session: session, linkFrom: sourceAccount)
+        } catch {
+            let message = Self.accountAuthenticationFailureMessage(for: error)
+            accountAuthenticationMessage = message
+            statusMessage = message
+            Self.accountAuthenticationLogger.error(
+                "Clerk native session reconciliation failed: \(String(describing: error), privacy: .public)"
+            )
+        }
+        isAccountBusy = false
+
+        guard signedInAccount != nil else { return }
+        switch pendingAction {
+        case .none:
+            break
+        case .purchasePro:
+            await purchasePro()
+        case .restorePurchases:
+            await restorePurchases()
+        }
+    }
+
+    func reconcileClerkSessionIfNeeded(clerk: Clerk?) async {
+        guard signedInAccount == nil, let clerk, let session = clerk.session else { return }
         guard !isAccountBusy else { return }
         isAccountBusy = true
+        accountAuthenticationMessage = "Finishing Permitext sign-in..."
         defer { isAccountBusy = false }
 
         do {
-            _ = try await clerk.auth.startHostedAuth(mode: .signIn)
-            guard let userID = clerk.user?.id else {
-                throw PermitextBackendHTTPError.invalidResponse
-            }
-            guard let sessionToken = try await clerk.auth.getToken() else {
-                throw PermitextBackendHTTPError.invalidResponse
-            }
-            let sourceAccount = signedInAccount
-            let backendRecord = try await accountBackendClient.signIn(
-                credential: AccountSignInCredential(
-                    provider: .clerk,
-                    providerUserID: userID,
-                    displayName: nil,
-                    signedInAt: Date(),
-                    sessionToken: sessionToken
-                ),
-                linkFrom: sourceAccount
-            )
-            await completeBackendSignIn(backendRecord)
+            try await completeClerkBackendSignIn(session: session, linkFrom: nil)
         } catch {
-            statusMessage = error.localizedDescription
+            let message = Self.accountAuthenticationFailureMessage(for: error)
+            accountAuthenticationMessage = message
+            statusMessage = message
+            Self.accountAuthenticationLogger.error(
+                "Clerk session reconciliation failed: \(String(describing: error), privacy: .public)"
+            )
         }
+    }
+
+    private func completeClerkBackendSignIn(
+        session: Session,
+        linkFrom sourceAccount: SignedInAccount?
+    ) async throws {
+        guard let userID = session.user?.id ?? session.publicUserData?.userId else {
+            throw PermitextBackendHTTPError.invalidResponse
+        }
+        guard let sessionToken = try await session.getToken() else {
+            throw PermitextBackendHTTPError.invalidResponse
+        }
+        let backendRecord = try await accountBackendClient.signIn(
+            credential: AccountSignInCredential(
+                provider: .clerk,
+                providerUserID: userID,
+                displayName: nil,
+                signedInAt: Date(),
+                sessionToken: sessionToken
+            ),
+            linkFrom: sourceAccount
+        )
+        await completeBackendSignIn(backendRecord)
     }
 
     private func completeBackendSignIn(_ backendRecord: BackendAccountRecord) async {
         let account = backendRecord.account
         signedInAccount = account
+        accountAuthenticationMessage = nil
         Self.saveSignedInAccount(account)
         prepareCanonicalCodeVersionMigration(for: account)
         refreshUserContentSyncCheckpoint()
@@ -2866,6 +2939,25 @@ final class CodeLibraryViewModel: ObservableObject {
         if PermitextReleaseSurfaceVisibility.firmCollaboration {
             await refreshOrganizations()
         }
+    }
+
+    private static let accountAuthenticationLogger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.randycodex.permitext",
+        category: "AccountAuthentication"
+    )
+
+    private static func accountAuthenticationFailureMessage(for error: Error) -> String {
+        if error is CancellationError {
+            return "Sign-in was cancelled. Select the button to try again."
+        }
+
+        let nsError = error as NSError
+        if nsError.domain == ASWebAuthenticationSessionError.errorDomain,
+           nsError.code == ASWebAuthenticationSessionError.canceledLogin.rawValue {
+            return "Sign-in was cancelled. Select the button to try again."
+        }
+
+        return "Sign-in could not finish: \(error.localizedDescription)"
     }
 
     func attachLocalDataIfNeeded() async {
@@ -2903,10 +2995,12 @@ final class CodeLibraryViewModel: ObservableObject {
             let startedAt = Date()
             let report = try await syncEngine.processPendingWork(account: signedInAccount)
             let elapsed = Date().timeIntervalSince(startedAt)
-            applyBackendEntitlement(
-                report.entitlement,
-                capabilityContract: report.capabilityContract
-            )
+            if report.includesAuthoritativeAccountState {
+                applyBackendEntitlement(
+                    report.entitlement,
+                    capabilityContract: report.capabilityContract
+                )
+            }
             refreshUserContentSyncCheckpoint()
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
@@ -3060,10 +3154,12 @@ final class CodeLibraryViewModel: ObservableObject {
                 applySafeChanges: true,
                 skipIfUnchanged: skipIfUnchanged
             )
-            applyBackendEntitlement(
-                report.entitlement,
-                capabilityContract: report.capabilityContract
-            )
+            if report.includesAuthoritativeAccountState {
+                applyBackendEntitlement(
+                    report.entitlement,
+                    capabilityContract: report.capabilityContract
+                )
+            }
             if report.appliedRemoteContinuity {
                 refreshContinuityStateFromStore()
             }
@@ -3098,7 +3194,14 @@ final class CodeLibraryViewModel: ObservableObject {
         guard !didRunStartupAccountSync else { return }
         didRunStartupAccountSync = true
         lastForegroundAccountSyncAt = Date()
-        await performAutomaticUserContentSync()
+        // A cold launch must refresh the authoritative account state even when
+        // the content checkpoint is unchanged. This repairs missing local
+        // entitlement data after reinstall, migration, or an interrupted sync.
+        await pullRemoteUserContentIfPossible(skipIfUnchanged: false)
+        let pushedCount = await syncPendingUserContentIfPossible()
+        if pushedCount > 0 {
+            await pullRemoteUserContentIfPossible(skipIfUnchanged: false)
+        }
     }
 
     func performForegroundAccountSyncIfNeeded() async {

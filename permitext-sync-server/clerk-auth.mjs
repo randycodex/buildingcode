@@ -53,6 +53,18 @@ function normalizedClerkURL(value, { originOnly = false } = {}) {
   }
 }
 
+function unverifiedAuthorizedParty(token) {
+  const payloadSegment = String(token || "").split(".")[1];
+  if (!payloadSegment) return null;
+  try {
+    const payload = JSON.parse(Buffer.from(payloadSegment, "base64url").toString("utf8"));
+    const authorizedParty = String(payload?.azp || "").trim();
+    return authorizedParty || null;
+  } catch {
+    return null;
+  }
+}
+
 export function clerkAuthorizedParties(environment = process.env) {
   const configured = String(environment.CLERK_AUTHORIZED_PARTIES || "")
     .split(",")
@@ -133,7 +145,17 @@ export async function verifyClerkSessionToken(
     throw new ClerkCredentialError(503, `Clerk sign-in is not configured. ${configuration.message}`.trim());
   }
 
-  const options = { authorizedParties: configuration.authorizedParties };
+  // Browser session tokens carry an `azp` claim derived from their Origin and
+  // must remain inside the configured web allowlist. Clerk's native SDK does
+  // not send a browser Origin, so its signed bearer tokens omit `azp`; passing
+  // `authorizedParties` for those tokens makes Clerk's verifier reject them
+  // before signature validation. Only the applicability of the Origin check is
+  // determined from the unverified payload. Identity still comes exclusively
+  // from Clerk's cryptographic verification below.
+  const options = {};
+  if (unverifiedAuthorizedParty(token)) {
+    options.authorizedParties = configuration.authorizedParties;
+  }
   const jwtKey = normalizedPEM(environment.CLERK_JWT_KEY);
   if (jwtKey) options.jwtKey = jwtKey;
   else options.secretKey = String(environment.CLERK_SECRET_KEY || "").trim();

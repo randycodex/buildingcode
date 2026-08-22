@@ -172,38 +172,66 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             CodeEyebrow(text: "Plan", accent: settingsChromeColor)
 
-            Text(planSummaryText)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Current plan")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
 
-            Text("Billing: \(library.planBillingLabel)")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
+                HStack(spacing: 10) {
+                    Label(currentPlanTitle, systemImage: "checkmark.circle.fill")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
 
-            VStack(alignment: .leading, spacing: 10) {
-                planFeatureRow("Free", details: "Read and search the code library anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.")
-                planFeatureRow("Pro · \(proMonthlyPriceLabel)/month", details: "No trial. Includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month. Cancel anytime; code reading and search remain free.")
+                    Spacer(minLength: 12)
+
+                    Text("Active")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.appChrome)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(Color.appChrome.opacity(0.14))
+                        )
+                }
+
+                Text(planSummaryText)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("Billing: \(library.planBillingLabel)")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .combine)
+
+            if library.currentPlan == .free {
+                Button {
+                    Task { await library.purchasePro(clerk: clerk) }
+                } label: {
+                    Label(upgradeButtonTitle, systemImage: "sparkles")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .foregroundStyle(upgradeButtonForegroundColor)
+                        .padding(.vertical, 12)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(upgradeButtonBackgroundColor)
+                        )
+                }
+                .buttonStyle(.plain)
+                .disabled(library.isStoreKitBusy)
+                .opacity(library.isStoreKitBusy ? 0.55 : 1)
+
+                Text("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month. Code reading and search remain free.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
-            Button {
-                Task { await library.purchasePro(clerk: clerk) }
-            } label: {
-                Label(upgradeButtonTitle, systemImage: "sparkles")
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .foregroundStyle(upgradeButtonForegroundColor)
-                    .padding(.vertical, 12)
-                    .background(
-                        Capsule(style: .continuous)
-                            .fill(upgradeButtonBackgroundColor)
-                    )
-            }
-            .buttonStyle(.plain)
-            .disabled(library.isStoreKitBusy || library.currentPlan == .pro)
-            .opacity(library.isStoreKitBusy ? 0.55 : 1)
-
-            if library.currentPlan == .pro {
+            if library.currentPlan == .pro,
+               library.hasAppleManagedBillingForAccountDeletion {
                 Button {
                     openURL(subscriptionManagementURL)
                 } label: {
@@ -276,9 +304,20 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            if library.signedInAccount == nil, let clerk {
+            if let message = library.accountAuthenticationMessage {
+                Label(
+                    message,
+                    systemImage: library.isAccountBusy ? "hourglass" : "exclamationmark.triangle.fill"
+                )
+                .font(.footnote.weight(.medium))
+                .foregroundStyle(library.isAccountBusy ? Color.secondary : Color.red)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityLabel(message)
+            }
+
+            if library.signedInAccount == nil, clerk != nil {
                 Button {
-                    Task { await library.handleClerkHostedSignIn(clerk: clerk) }
+                    library.requestClerkAuthentication()
                 } label: {
                     Label("Sign in or create an account", systemImage: "person.crop.circle.badge.checkmark")
                         .font(.subheadline.weight(.semibold))
@@ -307,9 +346,9 @@ struct SettingsView: View {
 
             } else {
                 VStack(spacing: 10) {
-                    if let clerk, library.signedInAccount?.authProvider != .clerk {
+                    if clerk != nil, library.signedInAccount?.authProvider != .clerk {
                         Button {
-                            Task { await library.handleClerkHostedSignIn(clerk: clerk) }
+                            library.requestClerkAuthentication()
                         } label: {
                             Label("Connect email, Apple, Google, or Microsoft", systemImage: "person.crop.circle.badge.plus")
                                 .font(.subheadline.weight(.semibold))
@@ -421,7 +460,14 @@ struct SettingsView: View {
             }
             return "Pro is active, including Research. Projects, Notebook, Report, professional exports, offline access, and selected-evidence Research are unlocked."
         }
-        return "Free includes reading, search, recents, 25 saved sections, 10 notes, continuity, and cross-device sync. Pro unlocks the professional workspace."
+        return "Reading and search are available anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync."
+    }
+
+    private var currentPlanTitle: String {
+        guard library.currentPlan == .pro else { return "Free" }
+        if library.isStoreKitTestProActive { return "Pro (Test)" }
+        if library.currentEntitlementSource == .lifetimeGrant { return "Lifetime Pro" }
+        return "Pro"
     }
 
     private var accountSummaryText: String {
@@ -432,14 +478,6 @@ struct SettingsView: View {
             return "Signed in as \(displayName). Saved sections, notes, and Projects can sync across your devices."
         }
         return "Signed in with \(account.authProvider.rawValue). Saved sections, notes, and Projects can sync across your devices."
-    }
-
-    private var proMonthlyPriceLabel: String {
-        guard let displayPrice = library.proProductDisplayPrice?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !displayPrice.isEmpty else {
-            return "$20.00"
-        }
-        return displayPrice
     }
 
     private var upgradeButtonTitle: String {
@@ -474,26 +512,6 @@ struct SettingsView: View {
         return "StoreKit: \(productsText)\nTransactions: \(library.storeKitDebugSummary)"
     }
     #endif
-
-    private func planFeatureRow(_ title: String, details: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: title == "Free" ? "checkmark.circle" : "checkmark.seal.fill")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(title == "Free" ? Color.secondary : Color.appChrome)
-                .frame(width: 20)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
-
-                Text(details)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-    }
 
     private var themePreviewCard: some View {
         VStack(alignment: .leading, spacing: 14) {
