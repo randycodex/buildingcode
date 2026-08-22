@@ -4,7 +4,7 @@ This runbook defines the minimum operating loop for a public Beta 1. It separate
 
 ## User-visible diagnostics and support
 
-- Named support and alert owner: Higinio Jimenez (`permitext@gmail.com`).
+- Named support and alert owner: Higinio Jimenez Manzano (`permitext@gmail.com`).
 - Web Settings exposes **Send feedback / Report a problem** and inserts the serving release ID into the email.
 - iOS Settings exposes the same path and inserts the app version and build.
 - Web Settings displays the release ID. `GET /release` and `GET /health` expose the full serving Git commit. A Production build now fails unless Vercel supplies `VERCEL_GIT_COMMIT_SHA` or `PERMITEXT_GIT_COMMIT` contains the exact intended SHA.
@@ -51,7 +51,7 @@ The alert destination and named on-call owner must be recorded before opening th
 
 ## Identity credential rotation
 
-- Owner: Higinio Jimenez (`permitext@gmail.com`).
+- Owner: Higinio Jimenez Manzano (`permitext@gmail.com`).
 - The active Microsoft OAuth client secret for **Permitext Clerk Production** expires on **February 17, 2027**.
 - Create operator reminders for 30, 14, and 7 days before expiration. Treat the 30-day reminder as the rotation deadline, not the expiration date.
 - Rotate by creating a replacement secret in the Permitext Microsoft Entra directory, updating Clerk production, and verifying a complete Microsoft sign-in before deleting or allowing the prior secret to expire.

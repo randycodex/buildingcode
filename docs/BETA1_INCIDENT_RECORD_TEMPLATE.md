@@ -6,7 +6,7 @@
 - Severity: **SEV-1 / SEV-2 / SEV-3**
 - Detection time (UTC):
 - Detected by:
-- Incident owner: Higinio Jimenez (`permitext@gmail.com`)
+- Incident owner: Higinio Jimenez Manzano (`permitext@gmail.com`)
 - Status: **Investigating / Contained / Monitoring / Resolved**
 - User-facing summary:
 

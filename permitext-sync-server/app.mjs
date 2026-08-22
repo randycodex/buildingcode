@@ -18364,6 +18364,44 @@ export async function cancelStripeSubscriptionsForAccount({
   };
 }
 
+export async function cancelStripeSubscriptionAfterFullRefund({
+  subscriptionID,
+  ownerUserID,
+  requestStripe = stripeAPI
+} = {}) {
+  const normalizedSubscriptionID = stripeSubscriptionID(subscriptionID);
+  const normalizedOwnerUserID = normalizedStripeAccountUserID(ownerUserID);
+  if (!normalizedSubscriptionID || !normalizedOwnerUserID) {
+    throw new Error("A Stripe subscription and Permitext owner are required for refund cancellation.");
+  }
+  const subscription = await requestStripe(
+    `/v1/subscriptions/${encodeURIComponent(normalizedSubscriptionID)}`
+  );
+  validateStripeRestoreOwnership({
+    subscription,
+    persistedOwnerUserID: normalizedOwnerUserID,
+    requestedUserID: normalizedOwnerUserID
+  });
+  if (["canceled", "incomplete_expired"].includes(subscription.status)) {
+    return { status: subscription.status, alreadyInactive: true };
+  }
+  const canceled = await requestStripe(
+    `/v1/subscriptions/${encodeURIComponent(normalizedSubscriptionID)}`,
+    {
+      method: "DELETE",
+      body: encodedFormBody({
+        cancellation_details: {
+          comment: "Permitext web charge fully refunded"
+        }
+      })
+    }
+  );
+  if (canceled.status !== "canceled") {
+    throw new Error("Stripe did not confirm subscription cancellation after the full refund.");
+  }
+  return { status: canceled.status, alreadyInactive: false };
+}
+
 async function activeStripeSubscriptionForUserID(userID, packageID = entitlementPackageIDs.pro) {
   if (!stripeConfigured(packageID) || !userID) {
     return null;
@@ -21382,6 +21420,10 @@ async function handleStripeWebhook(request, response) {
         ? owner?.entitlement?.addOns?.research?.provider
         : owner?.entitlement?.provider;
       if (owner && packageID && stripeEventIsCurrent(provider, event)) {
+        await cancelStripeSubscriptionAfterFullRefund({
+          subscriptionID,
+          ownerUserID: owner.userID
+        });
         changed = await deletePersistedEntitlement(owner.userID, {
           packageID,
           source: "webSubscription",

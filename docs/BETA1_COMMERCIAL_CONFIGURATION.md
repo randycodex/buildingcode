@@ -22,16 +22,17 @@ This record captures owner decisions for implementation and provider setup. It i
 
 ## Business and support
 
-- Owner/operator: Higinio Jimenez.
+- Owner/operator: Higinio Jimenez Manzano, acting as an individual rather than through an LLC or corporation.
 - Support, legal notice, and urgent alerts: `permitext@gmail.com`.
-- Urgent support responder: Higinio Jimenez.
-- Still required before public legal documents are published: exact contracting legal name, entity type, and business mailing address.
+- Urgent support responder: Higinio Jimenez Manzano.
+- The operator's residential address is retained as private information and must not be published in customer-facing pages.
+- Governing law: New York. Dispute procedure and venue remain pending legal review.
 
 ## Refund policy working draft
 
 - Cancel anytime; paid access continues through the current billing period.
-- Stripe initial charge: full refund within seven calendar days.
-- Stripe accidental renewal: full refund within 72 hours if no more than five Research turns were used after renewal.
+- Every Stripe web charge, including the initial charge and renewals: full refund when requested within 72 hours.
+- Search and Research usage do not change eligibility within the 72-hour window.
 - Duplicate, verified unauthorized, and Permitext billing-error charges: full refund.
 - No routine prorated refunds outside those cases, except where required by law or granted for a material service failure.
 - Refunds return to the original payment method. A verified full refund revokes the related Pro entitlement; a partial refund does not automatically revoke it.

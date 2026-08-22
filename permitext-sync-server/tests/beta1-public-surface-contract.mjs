@@ -48,7 +48,7 @@ assert.match(iosSettings, /Text\("Current plan"\)/);
 assert.match(iosSettings, /By upgrading, you agree to the \[Terms\]/);
 
 for (const [name, document] of [["Terms", terms], ["Refund policy", refunds]]) {
-  assert.match(document, /Beta 1 working draft/);
+  assert.match(document, /Beta 1[^.]*working draft/);
   assert.match(document, /permitext@gmail\.com/);
   assert.match(document, /United States|web subscription|Web subscription/i);
   assert.match(document, /\/privacy/);
@@ -57,8 +57,10 @@ for (const [name, document] of [["Terms", terms], ["Refund policy", refunds]]) {
 assert.match(terms, /\$20 per month/);
 assert.match(terms, /no free trial/i);
 assert.match(terms, /unofficial research and workspace tool/i);
-assert.match(refunds, /seven calendar\s+days/i);
-assert.match(refunds, /no more than five paid Research turns/i);
+assert.match(refunds, /within 72 hours of that\s+charge/i);
+assert.match(refunds, /initial charge and every renewal charge/i);
+assert.match(refunds, /Search and\s+Research usage do not change eligibility/i);
+assert.doesNotMatch(refunds, /seven calendar\s+days|five paid Research turns/i);
 assert.match(refunds, /reportaproblem\.apple\.com/);
 assert.match(support, /within two business days/i);
 assert.match(support, /within one business day/i);

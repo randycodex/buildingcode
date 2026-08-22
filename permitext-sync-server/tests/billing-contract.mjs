@@ -4,6 +4,7 @@ import {
   applyAppleNotificationToStore,
   appleNotificationLifecycleAction,
   applePackageIDForProductID,
+  cancelStripeSubscriptionAfterFullRefund,
   cancelStripeSubscriptionsForAccount,
   claimAppleTransactionOwner,
   entitlementAfterPackageRemoval,
@@ -373,6 +374,31 @@ try {
     "Stripe ownership conflict did not stop account deletion before cancellation."
   );
 }
+
+const refundCancellationRequests = [];
+const refundCancellation = await cancelStripeSubscriptionAfterFullRefund({
+  subscriptionID: "sub_refunded_owned",
+  ownerUserID: "apple:refund-owner",
+  requestStripe: async (path, options = {}) => {
+    refundCancellationRequests.push({ path, method: options.method || "GET", body: options.body || null });
+    if (options.method === "DELETE") {
+      return { id: "sub_refunded_owned", status: "canceled" };
+    }
+    return {
+      id: "sub_refunded_owned",
+      status: "active",
+      metadata: { accountUserID: "apple:refund-owner" }
+    };
+  }
+});
+assert(
+  refundCancellation.status === "canceled" &&
+    refundCancellationRequests.length === 2 &&
+    refundCancellationRequests[0].method === "GET" &&
+    refundCancellationRequests[1].method === "DELETE" &&
+    String(refundCancellationRequests[1].body || "").includes(encodeURIComponent("fully refunded")),
+  "A verified full Stripe refund did not cancel the owned subscription."
+);
 
 assert(
   applePackageIDForProductID("com.randycodex.permitext.pro.monthly") === "pro",
