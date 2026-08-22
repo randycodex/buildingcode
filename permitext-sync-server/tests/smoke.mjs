@@ -455,9 +455,11 @@ async function main() {
         settingsTemplateSource.includes("up to 100 cited Research turns each month") &&
         !settingsTemplateSource.includes("Research Add-On") &&
         !settingsTemplateSource.includes("account-research-checkout") &&
-        !iosSettingsSource.includes('planFeatureRow("Research Add-On"') &&
-        iosSettingsSource.includes('planFeatureRow("Pro · \\(proMonthlyPriceLabel)/month"') &&
-        iosSettingsSource.includes('return "$20.00"') &&
+        !iosSettingsSource.includes("planFeatureRow(") &&
+        iosSettingsSource.includes('Text("Current plan")') &&
+        iosSettingsSource.includes('Label(currentPlanTitle, systemImage: "checkmark.circle.fill")') &&
+        iosSettingsSource.includes('Text("Active")') &&
+        iosSettingsSource.includes('return "Lifetime Pro"') &&
         iosSettingsSource.includes("up to 100 selected-evidence Research turns each month") &&
         !settingsTemplateSource.includes('class="settings-billing-line"'),
       "Settings lost the single $20 Pro plan with included Research or restored a separate Research add-on."

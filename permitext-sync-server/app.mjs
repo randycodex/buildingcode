@@ -12,6 +12,17 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
 import { ClerkCredentialError, clerkConfigurationStatus, verifyClerkCredential } from "./clerk-auth.mjs";
+import {
+  LifetimeGrantAdminError,
+  lifetimeGrantChangeDecision,
+  lifetimeGrantEmailHash,
+  lookupClerkUserByExactEmail,
+  maskedLifetimeGrantEmail,
+  normalizedLifetimeGrantEmail,
+  revokeClerkLifetimeGrantInvitation,
+  sendClerkLifetimeGrantInvitation,
+  verifiedClerkUserIdentity
+} from "./lifetime-grant-admin.mjs";
 import { beta1ConfigurationReadiness } from "./beta1-readiness.mjs";
 import {
   releaseIdentity,
@@ -398,6 +409,8 @@ async function renderReportPDFOnDemand(...args) {
 const emptyStore = () => ({
   users: {},
   entitlements: {},
+  lifetimeGrantInvitationsByEmailHash: {},
+  lifetimeGrantAuditEvents: [],
   appleTransactionOwners: {},
   appleNotificationStates: {},
   sessions: {},
@@ -758,6 +771,41 @@ function createFileStoreAdapter() {
     async accountExists(userID) {
       const store = await this.read();
       return Boolean(store.users?.[userID]);
+    },
+    async lifetimeGrantInvitation(emailHash) {
+      const store = await this.read();
+      return store.lifetimeGrantInvitationsByEmailHash?.[emailHash] || null;
+    },
+    async saveLifetimeGrantInvitation(invitation) {
+      return withFileStoreLock(dataPath, async () => {
+        const store = await readUnlocked();
+        store.lifetimeGrantInvitationsByEmailHash ||= {};
+        store.lifetimeGrantInvitationsByEmailHash[invitation.emailHash] = invitation;
+        await writeUnlocked(store);
+        return invitation;
+      });
+    },
+    async listLifetimeGrantInvitations(limit = 100) {
+      const store = await this.read();
+      return Object.values(store.lifetimeGrantInvitationsByEmailHash || {})
+        .sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")))
+        .slice(0, Math.max(1, Math.min(Number(limit) || 100, 500)));
+    },
+    async appendLifetimeGrantAudit(event) {
+      return withFileStoreLock(dataPath, async () => {
+        const store = await readUnlocked();
+        store.lifetimeGrantAuditEvents ||= [];
+        store.lifetimeGrantAuditEvents.push(event);
+        store.lifetimeGrantAuditEvents = store.lifetimeGrantAuditEvents.slice(-500);
+        await writeUnlocked(store);
+        return event;
+      });
+    },
+    async listLifetimeGrantAudit(limit = 100) {
+      const store = await this.read();
+      return [...(store.lifetimeGrantAuditEvents || [])]
+        .sort((left, right) => String(right.createdAt || "").localeCompare(String(left.createdAt || "")))
+        .slice(0, Math.max(1, Math.min(Number(limit) || 100, 500)));
     },
     async deleteAccount(userID) {
       const store = await this.read();
@@ -1811,6 +1859,38 @@ async function createPostgresStoreAdapter() {
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_entitlements_source_granted_idx
       ON permitext_entitlements (source, granted_user_id)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_lifetime_grant_invitations (
+        email_hash TEXT PRIMARY KEY,
+        email_masked TEXT NOT NULL,
+        status TEXT NOT NULL,
+        target_user_id TEXT,
+        invited_by_user_id TEXT NOT NULL,
+        invitation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_lifetime_grant_invitations_status_idx
+      ON permitext_lifetime_grant_invitations (status, updated_at DESC)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_lifetime_grant_audit (
+        id TEXT PRIMARY KEY,
+        actor_user_id TEXT NOT NULL,
+        target_user_id TEXT,
+        target_email_hash TEXT NOT NULL,
+        target_email_masked TEXT NOT NULL,
+        action TEXT NOT NULL,
+        event JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_lifetime_grant_audit_created_idx
+      ON permitext_lifetime_grant_audit (created_at DESC)
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_apple_transaction_owners (
@@ -2949,6 +3029,77 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       const rows = await sql`SELECT id FROM permitext_users WHERE id = ${userID} LIMIT 1`;
       return rows.length > 0;
+    },
+    async lifetimeGrantInvitation(emailHash) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT invitation
+        FROM permitext_lifetime_grant_invitations
+        WHERE email_hash = ${emailHash}
+        LIMIT 1
+      `;
+      return rows.length ? safeJSON(rows[0].invitation, null) : null;
+    },
+    async saveLifetimeGrantInvitation(invitation) {
+      await ensureSchema();
+      await sql`
+        INSERT INTO permitext_lifetime_grant_invitations (
+          email_hash, email_masked, status, target_user_id,
+          invited_by_user_id, invitation, created_at, updated_at
+        )
+        VALUES (
+          ${invitation.emailHash}, ${invitation.emailMasked}, ${invitation.status},
+          ${invitation.targetUserID || null}, ${invitation.invitedByUserID},
+          ${JSON.stringify(invitation)}::jsonb,
+          ${invitation.createdAt}::timestamptz, ${invitation.updatedAt}::timestamptz
+        )
+        ON CONFLICT (email_hash) DO UPDATE SET
+          email_masked = EXCLUDED.email_masked,
+          status = EXCLUDED.status,
+          target_user_id = EXCLUDED.target_user_id,
+          invited_by_user_id = EXCLUDED.invited_by_user_id,
+          invitation = EXCLUDED.invitation,
+          updated_at = EXCLUDED.updated_at
+      `;
+      return invitation;
+    },
+    async listLifetimeGrantInvitations(limit = 100) {
+      await ensureSchema();
+      const safeLimit = Math.max(1, Math.min(Number(limit) || 100, 500));
+      const rows = await sql`
+        SELECT invitation
+        FROM permitext_lifetime_grant_invitations
+        ORDER BY updated_at DESC
+        LIMIT ${safeLimit}
+      `;
+      return rows.map((row) => safeJSON(row.invitation, {}));
+    },
+    async appendLifetimeGrantAudit(event) {
+      await ensureSchema();
+      await sql`
+        INSERT INTO permitext_lifetime_grant_audit (
+          id, actor_user_id, target_user_id, target_email_hash,
+          target_email_masked, action, event, created_at
+        )
+        VALUES (
+          ${event.id}, ${event.actorUserID}, ${event.targetUserID || null},
+          ${event.targetEmailHash}, ${event.targetEmailMasked}, ${event.action},
+          ${JSON.stringify(event)}::jsonb, ${event.createdAt}::timestamptz
+        )
+        ON CONFLICT (id) DO NOTHING
+      `;
+      return event;
+    },
+    async listLifetimeGrantAudit(limit = 100) {
+      await ensureSchema();
+      const safeLimit = Math.max(1, Math.min(Number(limit) || 100, 500));
+      const rows = await sql`
+        SELECT event
+        FROM permitext_lifetime_grant_audit
+        ORDER BY created_at DESC
+        LIMIT ${safeLimit}
+      `;
+      return rows.map((row) => safeJSON(row.event, {}));
     },
     async saveEntitlement(userID, entitlement) {
       await ensureSchema();
@@ -17352,7 +17503,19 @@ async function verifiedCredentialIdentity(credential, options = {}) {
   if (provider === "clerk") {
     try {
       const verified = await verifyClerkCredential(credential, options);
-      return { providerUserID: verified.providerUserID, email: "" };
+      let email = "";
+      let verifiedEmails = [];
+      try {
+        const identity = await verifiedClerkUserIdentity(verified.providerUserID);
+        email = identity.primaryEmail;
+        verifiedEmails = identity.emails;
+      } catch (error) {
+        // A temporary Clerk Backend API failure must not lock a valid signed token
+        // out of Permitext. Pending Lifetime Pro invitations remain pending until a
+        // later verified sign-in can resolve the account email.
+        if (!(error instanceof LifetimeGrantAdminError)) throw error;
+      }
+      return { providerUserID: verified.providerUserID, email, verifiedEmails };
     } catch (error) {
       if (error instanceof ClerkCredentialError) {
         throw new ClientAuthError(error.statusCode, error.message);
@@ -17394,7 +17557,10 @@ async function accountFromCredential(credential, options = {}) {
     authProvider: provider,
     authProviderUserID: providerUserID,
     appleUserID: provider === "apple" ? providerUserID : "",
-    email: provider === "apple" ? identity.email : "",
+    email: ["apple", "clerk"].includes(provider) ? identity.email : "",
+    verifiedEmails: provider === "clerk"
+      ? Array.from(new Set((identity.verifiedEmails || []).map(normalizedAccountEmail).filter(Boolean)))
+      : [],
     publicUsername: null,
     displayName: credential?.displayName ?? null,
     signedInAt: credential?.signedInAt || new Date().toISOString(),
@@ -17595,6 +17761,161 @@ async function deletePersistedEntitlement(userID, expected = {}) {
   );
   if (changed) await writeStore(store);
   return changed;
+}
+
+async function storedLifetimeGrantInvitation(emailHash) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.lifetimeGrantInvitation === "function") {
+    return adapter.lifetimeGrantInvitation(emailHash);
+  }
+  const store = await readStore();
+  return store.lifetimeGrantInvitationsByEmailHash?.[emailHash] || null;
+}
+
+async function saveStoredLifetimeGrantInvitation(invitation) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveLifetimeGrantInvitation === "function") {
+    return adapter.saveLifetimeGrantInvitation(invitation);
+  }
+  const store = await readStore();
+  store.lifetimeGrantInvitationsByEmailHash ||= {};
+  store.lifetimeGrantInvitationsByEmailHash[invitation.emailHash] = invitation;
+  await writeStore(store);
+  return invitation;
+}
+
+async function storedLifetimeGrantInvitations(limit = 100) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.listLifetimeGrantInvitations === "function") {
+    return adapter.listLifetimeGrantInvitations(limit);
+  }
+  const store = await readStore();
+  return Object.values(store.lifetimeGrantInvitationsByEmailHash || {}).slice(0, limit);
+}
+
+async function appendStoredLifetimeGrantAudit(event) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.appendLifetimeGrantAudit === "function") {
+    return adapter.appendLifetimeGrantAudit(event);
+  }
+  const store = await readStore();
+  store.lifetimeGrantAuditEvents ||= [];
+  store.lifetimeGrantAuditEvents.push(event);
+  await writeStore(store);
+  return event;
+}
+
+async function storedLifetimeGrantAudit(limit = 100) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.listLifetimeGrantAudit === "function") {
+    return adapter.listLifetimeGrantAudit(limit);
+  }
+  const store = await readStore();
+  return [...(store.lifetimeGrantAuditEvents || [])].slice(-limit).reverse();
+}
+
+function lifetimeGrantInvitationRecord({
+  email,
+  actorUserID,
+  existing = null,
+  status,
+  targetUserID = null,
+  clerkInvitation = null,
+  now = new Date()
+}) {
+  const timestamp = now instanceof Date ? now.toISOString() : new Date(now).toISOString();
+  const normalizedEmail = normalizedLifetimeGrantEmail(email);
+  return {
+    id: existing?.id || `lgi_${randomUUID()}`,
+    emailHash: lifetimeGrantEmailHash(normalizedEmail),
+    emailMasked: maskedLifetimeGrantEmail(normalizedEmail),
+    status,
+    targetUserID: targetUserID || existing?.targetUserID || null,
+    invitedByUserID: actorUserID || existing?.invitedByUserID,
+    clerkInvitationID: clerkInvitation?.id || existing?.clerkInvitationID || null,
+    invitationEmailSentAt: clerkInvitation?.sentAt || existing?.invitationEmailSentAt || null,
+    createdAt: existing?.createdAt || timestamp,
+    updatedAt: timestamp,
+    activatedAt: status === "active"
+      ? (existing?.status === "active" ? existing.activatedAt || timestamp : timestamp)
+      : null,
+    revokedAt: status === "revoked" ? timestamp : null
+  };
+}
+
+function lifetimeGrantAuditRecord({
+  action,
+  actorUserID,
+  email,
+  targetUserID = null,
+  previousEntitlement = null,
+  nextEntitlement = null,
+  invitationStatus = null,
+  performedBy = "owner-console",
+  now = new Date()
+}) {
+  return {
+    id: `lga_${randomUUID()}`,
+    action,
+    actorUserID,
+    performedBy,
+    targetUserID,
+    targetEmailHash: lifetimeGrantEmailHash(email),
+    targetEmailMasked: maskedLifetimeGrantEmail(email),
+    previousSource: previousEntitlement?.source || null,
+    nextSource: nextEntitlement?.source || null,
+    invitationStatus,
+    createdAt: now instanceof Date ? now.toISOString() : new Date(now).toISOString()
+  };
+}
+
+async function activatePendingLifetimeGrantForAccount(account) {
+  const userID = String(account?.appUserID || "").trim();
+  if (!userID || account?.authProvider !== "clerk") return null;
+  const verifiedEmails = Array.from(new Set([
+    account?.email,
+    ...(Array.isArray(account?.verifiedEmails) ? account.verifiedEmails : [])
+  ].map(normalizedLifetimeGrantEmail).filter(Boolean)));
+  let email = null;
+  let invitation = null;
+  for (const verifiedEmail of verifiedEmails) {
+    const candidate = await storedLifetimeGrantInvitation(lifetimeGrantEmailHash(verifiedEmail));
+    if (candidate?.status === "pending") {
+      email = verifiedEmail;
+      invitation = candidate;
+      break;
+    }
+  }
+  if (!invitation || invitation.status !== "pending") return null;
+
+  const store = await readStore();
+  const currentEntitlement = store.entitlements?.[userID] || null;
+  const decision = lifetimeGrantChangeDecision(currentEntitlement, "grant");
+  if (!decision.allowed && decision.outcome !== "already_granted") {
+    return null;
+  }
+  const entitlement = decision.allowed
+    ? await persistServerEntitlement(userID, "lifetimeGrant")
+    : currentEntitlement;
+  const activeInvitation = lifetimeGrantInvitationRecord({
+    email,
+    actorUserID: invitation.invitedByUserID,
+    existing: invitation,
+    status: "active",
+    targetUserID: userID
+  });
+  await saveStoredLifetimeGrantInvitation(activeInvitation);
+  await appendStoredLifetimeGrantAudit(lifetimeGrantAuditRecord({
+    action: "activated",
+    actorUserID: invitation.invitedByUserID,
+    email,
+    targetUserID: userID,
+    previousEntitlement: currentEntitlement,
+    nextEntitlement: entitlement,
+    invitationStatus: "active",
+    performedBy: "verified-clerk-sign-in"
+  }));
+  return { invitation: activeInvitation, entitlement };
 }
 
 export function entitlementAfterPackageRemoval(entitlement, packageID, expected, changed) {
@@ -19213,13 +19534,21 @@ async function handleSignIn(request, response) {
       sendError(response, 409, accountEntitlementConflictMessage);
       return;
     }
-    const finalContext = await adapter.authenticateUserSession(
+    let finalContext = await adapter.authenticateUserSession(
       targetUserID,
       directResult.account.backendSessionToken
     );
+    const signedInAccount = finalContext?.account || directResult.account;
+    const activation = await activatePendingLifetimeGrantForAccount(signedInAccount);
+    if (activation) {
+      finalContext = await adapter.authenticateUserSession(
+        targetUserID,
+        directResult.account.backendSessionToken
+      );
+    }
     sendJSON(response, 200, {
       account: {
-        ...(finalContext?.account || directResult.account),
+        ...(finalContext?.account || signedInAccount),
         backendSessionToken: directResult.account.backendSessionToken
       },
       entitlement: finalContext?.entitlement || directResult.entitlement || null,
@@ -19230,6 +19559,22 @@ async function handleSignIn(request, response) {
   if (!sourceUserID && typeof adapter.signInAccount === "function") {
     const directResult = await adapter.signInAccount(account);
     if (!directResult.requiresLegacyMerge) {
+      const activation = await activatePendingLifetimeGrantForAccount(directResult.account);
+      if (activation) {
+        const refreshed = await adapter.authenticateUserSession(
+          directResult.account.appUserID,
+          directResult.account.backendSessionToken
+        );
+        sendJSON(response, 200, {
+          account: {
+            ...(refreshed?.account || directResult.account),
+            backendSessionToken: directResult.account.backendSessionToken
+          },
+          entitlement: refreshed?.entitlement || activation.entitlement,
+          mergedAccount: directResult.mergedAccount || null
+        });
+        return;
+      }
       sendJSON(response, 200, directResult);
       return;
     }
@@ -19275,9 +19620,13 @@ async function handleSignIn(request, response) {
     }
   }
   await writeStore(store);
+  const activation = await activatePendingLifetimeGrantForAccount(
+    store.users[account.appUserID] || storedAccount
+  );
+  const finalStore = activation ? await readStore() : store;
   sendJSON(response, 200, {
-    account: store.users[account.appUserID] || storedAccount,
-    entitlement: store.entitlements[account.appUserID] ?? null,
+    account: finalStore.users[account.appUserID] || storedAccount,
+    entitlement: finalStore.entitlements[account.appUserID] ?? null,
     mergedAccount
   });
 }
@@ -21275,6 +21624,232 @@ async function handleAppleServerNotification(request, response) {
   });
 }
 
+async function optionalLifetimeGrantClerkTarget(email) {
+  try {
+    return await lookupClerkUserByExactEmail(email);
+  } catch (error) {
+    if (error instanceof LifetimeGrantAdminError && error.statusCode === 404) return null;
+    throw error;
+  }
+}
+
+async function lifetimeGrantConsoleState(email) {
+  const normalizedEmail = normalizedLifetimeGrantEmail(email);
+  if (!normalizedEmail) throw new LifetimeGrantAdminError(400, "Enter a valid email address.");
+  const emailHash = lifetimeGrantEmailHash(normalizedEmail);
+  const invitation = await storedLifetimeGrantInvitation(emailHash);
+  let target = null;
+  try {
+    target = await optionalLifetimeGrantClerkTarget(normalizedEmail);
+  } catch (error) {
+    // A stored invitation remains inspectable and revocable when Clerk's
+    // management API is temporarily unavailable.
+    if (!invitation || !(error instanceof LifetimeGrantAdminError)) throw error;
+  }
+  const targetUserID = target?.userID || invitation?.targetUserID || null;
+  const accountExists = targetUserID ? await persistedAccountExists(targetUserID) : false;
+  const store = accountExists ? await readStore() : null;
+  const entitlement = targetUserID ? store?.entitlements?.[targetUserID] || null : null;
+  return {
+    email: normalizedEmail,
+    clerkAccountExists: Boolean(target),
+    permitextAccountExists: accountExists,
+    target: target ? {
+      userID: target.userID,
+      displayName: target.displayName,
+      createdAt: target.createdAt,
+      lastSignInAt: target.lastSignInAt
+    } : targetUserID ? { userID: targetUserID } : null,
+    invitation: invitation ? {
+      id: invitation.id,
+      emailMasked: invitation.emailMasked,
+      status: invitation.status,
+      targetUserID: invitation.targetUserID,
+      createdAt: invitation.createdAt,
+      updatedAt: invitation.updatedAt,
+      activatedAt: invitation.activatedAt,
+      revokedAt: invitation.revokedAt,
+      invitationEmailSentAt: invitation.invitationEmailSentAt || null
+    } : null,
+    entitlement: entitlement ? {
+      plan: entitlement.plan || null,
+      source: entitlement.source || null,
+      expiresAt: entitlement.expiresAt || null,
+      updatedAt: entitlement.updatedAt || null,
+      active: hasActiveProEntitlement(entitlement)
+    } : null
+  };
+}
+
+function sendLifetimeGrantAdminError(response, error) {
+  if (error instanceof LifetimeGrantAdminError) {
+    sendError(response, error.statusCode, error.message);
+    return true;
+  }
+  return false;
+}
+
+async function handleInternalLifetimeGrantData(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  const [invitations, audit] = await Promise.all([
+    storedLifetimeGrantInvitations(100),
+    storedLifetimeGrantAudit(100)
+  ]);
+  sendJSON(response, 200, {
+    invitations: invitations.map((invitation) => ({
+      id: invitation.id,
+      emailMasked: invitation.emailMasked,
+      status: invitation.status,
+      targetUserID: invitation.targetUserID || null,
+      createdAt: invitation.createdAt,
+      updatedAt: invitation.updatedAt,
+      activatedAt: invitation.activatedAt || null,
+      revokedAt: invitation.revokedAt || null,
+      invitationEmailSentAt: invitation.invitationEmailSentAt || null
+    })),
+    audit: audit.map((event) => ({
+      id: event.id,
+      action: event.action,
+      actorUserID: event.actorUserID,
+      performedBy: event.performedBy,
+      targetUserID: event.targetUserID || null,
+      targetEmailMasked: event.targetEmailMasked,
+      previousSource: event.previousSource || null,
+      nextSource: event.nextSource || null,
+      invitationStatus: event.invitationStatus || null,
+      createdAt: event.createdAt
+    }))
+  });
+}
+
+async function handleInternalLifetimeGrantLookup(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  try {
+    sendJSON(response, 200, await lifetimeGrantConsoleState(context.body.email));
+  } catch (error) {
+    if (!sendLifetimeGrantAdminError(response, error)) throw error;
+  }
+}
+
+async function handleInternalLifetimeGrantInvite(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  const email = normalizedLifetimeGrantEmail(context.body.email);
+  const confirmationEmail = normalizedLifetimeGrantEmail(context.body.confirmationEmail);
+  if (!email || email !== confirmationEmail) {
+    sendError(response, 400, "Type the exact email address again to confirm the Lifetime Pro invitation.");
+    return;
+  }
+  try {
+    const target = await optionalLifetimeGrantClerkTarget(email);
+    const existingInvitation = await storedLifetimeGrantInvitation(lifetimeGrantEmailHash(email));
+    const targetUserID = target?.userID || existingInvitation?.targetUserID || null;
+    const accountExists = targetUserID ? await persistedAccountExists(targetUserID) : false;
+    const store = accountExists ? await readStore() : null;
+    const previousEntitlement = targetUserID ? store?.entitlements?.[targetUserID] || null : null;
+    const decision = lifetimeGrantChangeDecision(previousEntitlement, "grant");
+    if (!decision.allowed && decision.outcome === "paid_entitlement_present") {
+      throw new LifetimeGrantAdminError(409, decision.message);
+    }
+
+    let entitlement = previousEntitlement;
+    let status = "pending";
+    let action = existingInvitation?.status === "revoked" ? "reinvited" : "invited";
+    let clerkInvitation = null;
+    if (accountExists) {
+      if (decision.allowed) {
+        entitlement = await persistServerEntitlement(targetUserID, "lifetimeGrant");
+      }
+      status = "active";
+      action = decision.outcome === "already_granted" ? "confirmed_active" : "granted";
+    } else {
+      clerkInvitation = await sendClerkLifetimeGrantInvitation(email);
+    }
+    const invitation = lifetimeGrantInvitationRecord({
+      email,
+      actorUserID: context.userID,
+      existing: existingInvitation,
+      status,
+      targetUserID,
+      clerkInvitation
+    });
+    await saveStoredLifetimeGrantInvitation(invitation);
+    await appendStoredLifetimeGrantAudit(lifetimeGrantAuditRecord({
+      action,
+      actorUserID: context.userID,
+      email,
+      targetUserID,
+      previousEntitlement,
+      nextEntitlement: entitlement,
+      invitationStatus: status
+    }));
+    sendJSON(response, 200, {
+      message: status === "active"
+        ? "Lifetime Pro is active for this Permitext account."
+        : "Invitation email sent. Lifetime Pro will activate when this exact verified email first signs in to Permitext.",
+      state: await lifetimeGrantConsoleState(email)
+    });
+  } catch (error) {
+    if (!sendLifetimeGrantAdminError(response, error)) throw error;
+  }
+}
+
+async function handleInternalLifetimeGrantRevoke(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  const email = normalizedLifetimeGrantEmail(context.body.email);
+  const confirmationEmail = normalizedLifetimeGrantEmail(context.body.confirmationEmail);
+  if (!email || email !== confirmationEmail) {
+    sendError(response, 400, "Type the exact email address again to confirm revocation.");
+    return;
+  }
+  try {
+    const emailHash = lifetimeGrantEmailHash(email);
+    const existingInvitation = await storedLifetimeGrantInvitation(emailHash);
+    const target = existingInvitation ? null : await optionalLifetimeGrantClerkTarget(email);
+    const targetUserID = existingInvitation?.targetUserID || target?.userID || null;
+    if (!existingInvitation && !targetUserID) {
+      throw new LifetimeGrantAdminError(404, "No Lifetime Pro invitation or account uses that exact email.");
+    }
+    const accountExists = targetUserID ? await persistedAccountExists(targetUserID) : false;
+    const store = accountExists ? await readStore() : null;
+    const previousEntitlement = targetUserID ? store?.entitlements?.[targetUserID] || null : null;
+    if (previousEntitlement?.source === "lifetimeGrant") {
+      await deletePersistedEntitlement(targetUserID, { source: "lifetimeGrant" });
+    }
+    if (existingInvitation?.clerkInvitationID && existingInvitation.status === "pending") {
+      await revokeClerkLifetimeGrantInvitation(existingInvitation.clerkInvitationID);
+    }
+    const invitation = lifetimeGrantInvitationRecord({
+      email,
+      actorUserID: context.userID,
+      existing: existingInvitation,
+      status: "revoked",
+      targetUserID
+    });
+    await saveStoredLifetimeGrantInvitation(invitation);
+    await appendStoredLifetimeGrantAudit(lifetimeGrantAuditRecord({
+      action: "revoked",
+      actorUserID: context.userID,
+      email,
+      targetUserID,
+      previousEntitlement,
+      nextEntitlement: previousEntitlement?.source === "lifetimeGrant" ? null : previousEntitlement,
+      invitationStatus: "revoked"
+    }));
+    sendJSON(response, 200, {
+      message: previousEntitlement && previousEntitlement.source !== "lifetimeGrant"
+        ? "The Lifetime Pro invitation was revoked. Provider-managed Apple or Stripe access remains unchanged."
+        : "Lifetime Pro access and any pending invitation were revoked.",
+      state: await lifetimeGrantConsoleState(email)
+    });
+  } catch (error) {
+    if (!sendLifetimeGrantAdminError(response, error)) throw error;
+  }
+}
+
 async function handleLifetimeGrant(request, response) {
   if (!requireGrantAdmin(request, response)) {
     return;
@@ -21287,6 +21862,16 @@ async function handleLifetimeGrant(request, response) {
     return;
   }
 
+  const store = await readStore();
+  const decision = lifetimeGrantChangeDecision(store.entitlements?.[userID] || null, "grant");
+  if (!decision.allowed) {
+    if (decision.outcome === "already_granted") {
+      sendJSON(response, 200, { userID, entitlement: store.entitlements[userID], changed: false });
+      return;
+    }
+    sendError(response, 409, decision.message);
+    return;
+  }
   const entitlement = await persistServerEntitlement(userID, "lifetimeGrant");
   sendJSON(response, 200, { userID, entitlement });
 }
@@ -21303,7 +21888,17 @@ async function handleLifetimeGrantDelete(request, response) {
     return;
   }
 
-  await deletePersistedEntitlement(userID);
+  const store = await readStore();
+  const decision = lifetimeGrantChangeDecision(store.entitlements?.[userID] || null, "revoke");
+  if (!decision.allowed) {
+    if (decision.outcome === "not_granted") {
+      sendJSON(response, 200, { userID, entitlement: null, changed: false });
+      return;
+    }
+    sendError(response, 409, decision.message);
+    return;
+  }
+  await deletePersistedEntitlement(userID, { source: "lifetimeGrant" });
   sendJSON(response, 200, { userID, entitlement: null });
 }
 
@@ -25475,6 +26070,10 @@ const handlers = {
   "internal/evaluations/data": handleInternalEvaluationData,
   "internal/evaluations/review": handleInternalEvaluationReview,
   "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,
+  "internal/lifetime-grants/data": handleInternalLifetimeGrantData,
+  "internal/lifetime-grants/lookup": handleInternalLifetimeGrantLookup,
+  "internal/lifetime-grants/invite": handleInternalLifetimeGrantInvite,
+  "internal/lifetime-grants/revoke": handleInternalLifetimeGrantRevoke,
   // Legacy authenticated compatibility only. No current client exposes these writers.
   "workboards/assets/upload": handleWorkboardAssetUpload,
   "workboards/assets/read": handleWorkboardAssetRead,

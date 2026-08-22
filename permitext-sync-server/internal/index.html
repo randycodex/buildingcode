@@ -15,8 +15,8 @@
       <a href="/">Return to Permitext</a>
     </header>
     <main>
-      <aside class="notice">Evaluation answer keys and reviews are available here only after server-side owner authentication. Nothing on this page is part of the customer research interface.</aside>
-      <p id="status" class="status">Loading private evaluation data…</p>
+      <aside class="notice">Owner operations and evaluation records are available here only after server-side owner authentication. Nothing on this page is part of the customer interface.</aside>
+      <p id="status" class="status">Loading private console data…</p>
       <section id="summary" class="summary" hidden></section>
       <nav class="tabs" aria-label="Console sections" hidden>
         <button type="button" data-tab="cases" aria-pressed="true">Research cases</button>
@@ -25,6 +25,7 @@
         <button type="button" data-tab="runs" aria-pressed="false">Runs and comparison</button>
         <button type="button" data-tab="feedback" aria-pressed="false">Feedback candidates</button>
         <button type="button" data-tab="spend" aria-pressed="false">Research spend</button>
+        <button type="button" data-tab="lifetime-grants" aria-pressed="false">Lifetime grants</button>
       </nav>
       <section id="cases" class="tab-panel"></section>
       <section id="retrieval" class="tab-panel" hidden></section>
@@ -32,6 +33,7 @@
       <section id="runs" class="tab-panel" hidden></section>
       <section id="feedback" class="tab-panel" hidden></section>
       <section id="spend" class="tab-panel" hidden></section>
+      <section id="lifetime-grants" class="tab-panel" hidden></section>
     </main>
     <script src="/internal/app.js" type="module"></script>
   </body>

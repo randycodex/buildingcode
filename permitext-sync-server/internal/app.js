@@ -9,6 +9,9 @@ let selectedRetrievalCaseID = "";
 let selectedZoningCaseID = "";
 let selectedFeedbackStatus = "open";
 let selectedFeedbackCategory = "all";
+let lifetimeGrantData = { invitations: [], audit: [] };
+let lifetimeGrantLookup = null;
+let lifetimeGrantMessage = "";
 
 function account() {
   try {
@@ -738,6 +741,200 @@ function renderResearchSpend() {
   panels.spend.replaceChildren(section);
 }
 
+function formattedConsoleDate(value) {
+  const timestamp = Date.parse(value || "");
+  return Number.isFinite(timestamp) ? new Date(timestamp).toLocaleString() : "—";
+}
+
+async function lookupLifetimeGrant(email, resultStatus) {
+  resultStatus.textContent = "Checking the exact email in Clerk and Permitext…";
+  lifetimeGrantMessage = "";
+  try {
+    lifetimeGrantLookup = await internalRequest("/internal/lifetime-grants/lookup", { email });
+    renderLifetimeGrants();
+  } catch (error) {
+    lifetimeGrantLookup = null;
+    resultStatus.textContent = error.message;
+    resultStatus.classList.add("is-error");
+  }
+}
+
+async function changeLifetimeGrant(action, email, confirmationEmail, resultStatus) {
+  const actionLabel = action === "invite" ? "send this Lifetime Pro invitation" : "revoke Lifetime Pro";
+  if (!window.confirm(`Confirm that you want to ${actionLabel} for ${email}.`)) return;
+  resultStatus.textContent = action === "invite" ? "Sending invitation…" : "Revoking Lifetime Pro…";
+  try {
+    const payload = await internalRequest(`/internal/lifetime-grants/${action}`, {
+      email,
+      confirmationEmail
+    });
+    lifetimeGrantLookup = payload.state;
+    lifetimeGrantMessage = payload.message;
+    lifetimeGrantData = await internalRequest("/internal/lifetime-grants/data");
+    renderLifetimeGrants();
+  } catch (error) {
+    resultStatus.textContent = error.message;
+    resultStatus.classList.add("is-error");
+  }
+}
+
+function lifetimeGrantStateCopy(state) {
+  if (!state) return "Search an exact email to inspect or invite an account.";
+  if (state.entitlement?.source === "lifetimeGrant") return "Lifetime Pro is active.";
+  if (state.entitlement) {
+    return `Provider-managed Pro is present (${state.entitlement.source}). It cannot be overwritten here.`;
+  }
+  if (state.invitation?.status === "pending") {
+    return "Invitation pending. It will activate only after this exact verified email signs in.";
+  }
+  if (state.invitation?.status === "revoked") return "The previous Lifetime Pro invitation was revoked.";
+  if (state.permitextAccountExists) return "Permitext account found. Lifetime Pro can be activated now.";
+  if (state.clerkAccountExists) return "Clerk identity found, but it has not completed Permitext sign-in yet.";
+  return "No account exists yet. Permitext can email an invitation and hold Lifetime Pro pending.";
+}
+
+function renderLifetimeGrantResult(section) {
+  const state = lifetimeGrantLookup;
+  if (!state) return;
+  const card = element("article", { className: "card lifetime-result" });
+  card.append(
+    element("p", { className: "eyebrow", text: "EXACT EMAIL RESULT" }),
+    element("h3", { text: state.email }),
+    element("p", { className: "grant-state", text: lifetimeGrantStateCopy(state) })
+  );
+  const facts = element("dl", { className: "grant-facts" });
+  [
+    ["Clerk identity", state.clerkAccountExists ? "Found" : "Not created"],
+    ["Permitext account", state.permitextAccountExists ? "Signed in before" : "Not signed in yet"],
+    ["Invitation", state.invitation?.status || "None"],
+    ["Current access", state.entitlement ? `${state.entitlement.plan || "Pro"} · ${state.entitlement.source}` : "Free / no entitlement"],
+    ["Permitext user ID", state.target?.userID || "Assigned after sign-in"]
+  ].forEach(([label, value]) => {
+    facts.append(element("dt", { text: label }), element("dd", { text: value }));
+  });
+  card.append(facts);
+
+  const confirmLabel = element("label", { className: "confirmation-field" });
+  confirmLabel.append(element("span", { text: `Type ${state.email} to confirm a change` }));
+  const confirmation = element("input");
+  confirmation.type = "email";
+  confirmation.autocomplete = "off";
+  confirmation.spellcheck = false;
+  confirmLabel.append(confirmation);
+  card.append(confirmLabel);
+
+  const actions = element("div", { className: "actions grant-actions" });
+  const resultStatus = element("p", { className: "meta operation-status" });
+  const hasPaidEntitlement = Boolean(state.entitlement && state.entitlement.source !== "lifetimeGrant");
+  const hasRevocableLifetimeAccess = state.entitlement?.source === "lifetimeGrant" || state.invitation?.status === "pending";
+  const inviteButton = element("button", {
+    text: state.invitation?.status === "revoked" ? "Send a new Lifetime Pro invitation" : "Invite to Lifetime Pro"
+  });
+  inviteButton.type = "button";
+  inviteButton.disabled = hasPaidEntitlement || hasRevocableLifetimeAccess;
+  inviteButton.addEventListener("click", () =>
+    changeLifetimeGrant("invite", state.email, confirmation.value, resultStatus)
+  );
+  const revokeButton = element("button", { className: "reject", text: "Revoke Lifetime Pro" });
+  revokeButton.type = "button";
+  revokeButton.disabled = !hasRevocableLifetimeAccess;
+  revokeButton.addEventListener("click", () =>
+    changeLifetimeGrant("revoke", state.email, confirmation.value, resultStatus)
+  );
+  const updateActionState = () => {
+    const confirmed = confirmation.value.trim().toLowerCase() === state.email.toLowerCase();
+    inviteButton.disabled = !confirmed || hasPaidEntitlement || hasRevocableLifetimeAccess;
+    revokeButton.disabled = !confirmed || !hasRevocableLifetimeAccess;
+  };
+  confirmation.addEventListener("input", updateActionState);
+  updateActionState();
+  actions.append(inviteButton, revokeButton);
+  card.append(
+    actions,
+    element("p", {
+      className: "meta",
+      text: "Revoke removes only Permitext Lifetime Pro. Apple and Stripe subscriptions are never changed by this console."
+    }),
+    resultStatus
+  );
+  section.append(card);
+}
+
+function renderLifetimeGrantActivity(section) {
+  const wrapper = element("div", { className: "grant-activity-grid" });
+  const invitations = element("article", { className: "card" });
+  invitations.append(element("h3", { text: "Invitations and access" }));
+  if (!lifetimeGrantData.invitations?.length) {
+    invitations.append(element("p", { className: "meta", text: "No Lifetime Pro invitations yet." }));
+  }
+  (lifetimeGrantData.invitations || []).forEach((item) => {
+    const row = element("div", { className: "grant-activity-row" });
+    row.append(
+      element("strong", { text: item.emailMasked || "Masked email unavailable" }),
+      element("span", { className: `badge grant-${item.status}`, text: item.status }),
+      element("p", {
+        className: "meta",
+        text: `${item.targetUserID || "Awaiting first sign-in"} · updated ${formattedConsoleDate(item.updatedAt)}`
+      })
+    );
+    invitations.append(row);
+  });
+  const audit = element("article", { className: "card" });
+  audit.append(element("h3", { text: "Audit history" }));
+  if (!lifetimeGrantData.audit?.length) {
+    audit.append(element("p", { className: "meta", text: "No Lifetime Pro changes recorded yet." }));
+  }
+  (lifetimeGrantData.audit || []).forEach((item) => {
+    const row = element("div", { className: "grant-activity-row" });
+    row.append(
+      element("strong", { text: `${item.action.replaceAll("_", " ")} · ${item.targetEmailMasked}` }),
+      element("p", {
+        className: "meta",
+        text: `${formattedConsoleDate(item.createdAt)} · ${item.performedBy || "owner-console"} · ${item.actorUserID}`
+      })
+    );
+    audit.append(row);
+  });
+  wrapper.append(invitations, audit);
+  section.append(wrapper);
+}
+
+function renderLifetimeGrants() {
+  const section = element("section", { className: "lifetime-grants" });
+  section.append(
+    element("h2", { text: "Lifetime Pro invitations" }),
+    element("p", {
+      className: "meta",
+      text: "Enter one exact email. Existing Permitext accounts activate immediately; everyone else receives a Clerk invitation email and activates automatically after their first verified sign-in."
+    })
+  );
+  if (lifetimeGrantMessage) {
+    section.append(element("p", { className: "status is-success", text: lifetimeGrantMessage }));
+  }
+  const search = element("form", { className: "grant-search" });
+  const emailLabel = element("label");
+  emailLabel.append(element("span", { text: "User email address" }));
+  const email = element("input");
+  email.type = "email";
+  email.required = true;
+  email.autocomplete = "off";
+  email.placeholder = "person@example.com";
+  email.value = lifetimeGrantLookup?.email || "";
+  emailLabel.append(email);
+  const searchButton = element("button", { text: "Check exact email" });
+  searchButton.type = "submit";
+  const resultStatus = element("p", { className: "meta operation-status" });
+  search.addEventListener("submit", (event) => {
+    event.preventDefault();
+    lookupLifetimeGrant(email.value, resultStatus);
+  });
+  search.append(emailLabel, searchButton, resultStatus);
+  section.append(search);
+  renderLifetimeGrantResult(section);
+  renderLifetimeGrantActivity(section);
+  panels["lifetime-grants"].replaceChildren(section);
+}
+
 function renderAll() {
   renderSummary();
   renderCases();
@@ -746,13 +943,17 @@ function renderAll() {
   renderRuns();
   renderFeedback();
   renderResearchSpend();
+  renderLifetimeGrants();
   tabs.hidden = false;
   statusElement.hidden = true;
 }
 
 async function loadData() {
   try {
-    data = await internalRequest("/internal/evaluations/data");
+    [data, lifetimeGrantData] = await Promise.all([
+      internalRequest("/internal/evaluations/data"),
+      internalRequest("/internal/lifetime-grants/data")
+    ]);
     renderAll();
   } catch (error) {
     statusElement.hidden = false;
