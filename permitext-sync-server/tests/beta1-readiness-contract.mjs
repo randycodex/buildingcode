@@ -30,7 +30,7 @@ const completeEnvironment = {
   PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "5",
   PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "20",
   PERMITEXT_RESEARCH_DAILY_CAP_USD: "25",
-  PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "250",
+  PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "100",
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "1",
   PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: "0.1",
   PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "5",
@@ -48,6 +48,13 @@ assert(
 assert(
   !beta1ConfigurationReadiness({ ...completeEnvironment, BLOB_READ_WRITE_TOKEN: "" }).ready,
   "Beta 1 readiness accepted missing private asset storage."
+);
+assert(
+  !beta1ConfigurationReadiness({
+    ...completeEnvironment,
+    PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "100.01"
+  }).ready,
+  "Beta 1 readiness accepted a Research budget above the owner's $100 monthly maximum."
 );
 
 const liveStripe = await verifyLiveStripeReadiness(completeEnvironment, {

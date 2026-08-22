@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import {
+  operationalMonitoringReadiness,
+  productionReleaseReadiness,
   releaseIdentity,
   sanitizedClientErrorReport,
+  sanitizedRequestObservation,
   sanitizedServerErrorReport
 } from "../operational-readiness.mjs";
 
@@ -20,6 +23,28 @@ const explicit = releaseIdentity({
   VERCEL_GIT_COMMIT_SHA: "abcdef"
 });
 assert.equal(explicit.releaseID, "beta1-24");
+
+const explicitCommit = releaseIdentity({
+  PERMITEXT_GIT_COMMIT: "abcdef0123456789",
+  VERCEL_GIT_COMMIT_SHA: "wrong",
+  VERCEL_URL: "permitext.example.vercel.app"
+});
+assert.equal(explicitCommit.gitCommit, "abcdef0123456789");
+
+const releaseReady = productionReleaseReadiness({
+  VERCEL_ENV: "production",
+  VERCEL_GIT_COMMIT_SHA: "0123456789abcdef",
+  VERCEL_URL: "permitext.example.vercel.app"
+});
+assert.equal(releaseReady.ready, true);
+assert.equal(productionReleaseReadiness({ VERCEL_ENV: "production" }).ready, false);
+
+const monitoring = operationalMonitoringReadiness({
+  PERMITEXT_MONITORING_PROVIDER: "vercel-observability",
+  PERMITEXT_SLOW_REQUEST_MS: "3500"
+});
+assert.equal(monitoring.externalAlertsConfigured, true);
+assert.equal(monitoring.slowRequestThresholdMilliseconds, 3500);
 
 const report = sanitizedClientErrorReport({
   kind: "unhandledrejection",
@@ -54,5 +79,23 @@ assert.equal(serverReport.message.includes("admin@example.com"), false);
 assert.equal(serverReport.message.includes("private"), false);
 assert.equal(serverReport.method, "POST");
 assert.equal(serverReport.releaseID, "beta1-24");
+
+const requestObservation = sanitizedRequestObservation({
+  route: "research/interpret",
+  method: "post",
+  statusCode: 503,
+  durationMilliseconds: 2_450,
+  requestID: "iad1::request"
+}, {
+  VERCEL_ENV: "production",
+  VERCEL_GIT_COMMIT_SHA: "0123456789abcdef",
+  VERCEL_URL: "permitext.example.vercel.app"
+});
+assert.equal(requestObservation.event, "dynamic_route_observation");
+assert.equal(requestObservation.severity, "error");
+assert.equal(requestObservation.statusCode, 503);
+assert.equal(requestObservation.durationMilliseconds, 2450);
+assert.equal(requestObservation.gitCommit, "0123456789abcdef");
+assert.equal(requestObservation.deploymentHost, "permitext.example.vercel.app");
 
 console.log("operational readiness contract passed");

@@ -35,7 +35,7 @@ function positiveInteger(value) {
 
 export function releaseIdentity(environment = process.env) {
   const gitCommit = compactText(
-    environment.VERCEL_GIT_COMMIT_SHA || environment.GITHUB_SHA,
+    environment.PERMITEXT_GIT_COMMIT || environment.VERCEL_GIT_COMMIT_SHA || environment.GITHUB_SHA,
     64
   );
   const explicitReleaseID = compactText(environment.PERMITEXT_RELEASE_ID, 80);
@@ -50,6 +50,35 @@ export function releaseIdentity(environment = process.env) {
     environment: compactText(environment.VERCEL_ENV || environment.NODE_ENV, 40) || "local",
     deploymentHost,
     buildTimestamp: compactText(environment.PERMITEXT_BUILD_TIMESTAMP, 40) || null
+  };
+}
+
+export function productionReleaseReadiness(environment = process.env) {
+  const release = releaseIdentity(environment);
+  const errors = [];
+  if (!/^[a-f0-9]{7,64}$/i.test(release.gitCommit || "")) {
+    errors.push(
+      "A Git commit is required. Enable Vercel System Environment Variables or set PERMITEXT_GIT_COMMIT to the exact deployed SHA."
+    );
+  }
+  if (!release.deploymentHost) {
+    errors.push("A Vercel deployment host is required for production release diagnostics.");
+  }
+  return {
+    ready: errors.length === 0,
+    errors,
+    release
+  };
+}
+
+export function operationalMonitoringReadiness(environment = process.env) {
+  const monitoringProvider = compactText(environment.PERMITEXT_MONITORING_PROVIDER, 80) || null;
+  return {
+    structuredRuntimeLogs: true,
+    clientErrorReporting: true,
+    slowRequestThresholdMilliseconds: positiveInteger(environment.PERMITEXT_SLOW_REQUEST_MS) || 2_000,
+    externalAlertsConfigured: Boolean(monitoringProvider),
+    monitoringProvider
   };
 }
 
@@ -101,6 +130,33 @@ export function sanitizedServerErrorReport(error, context = {}, environment = pr
     fingerprint,
     releaseID: release.releaseID,
     gitCommit: release.gitCommit,
+    observedAt: new Date().toISOString()
+  };
+}
+
+export function sanitizedRequestObservation(input, environment = process.env) {
+  const release = releaseIdentity(environment);
+  const statusCode = Number.isInteger(Number(input?.statusCode))
+    ? Math.max(0, Math.min(999, Number(input.statusCode)))
+    : 0;
+  const durationMilliseconds = Math.max(0, Math.round(Number(input?.durationMilliseconds) || 0));
+  const severity = statusCode >= 500
+    ? "error"
+    : statusCode >= 400 || durationMilliseconds >= 2_000
+      ? "warning"
+      : "info";
+  return {
+    event: "dynamic_route_observation",
+    severity,
+    route: compactText(input?.route, 120) || "unknown",
+    method: compactText(input?.method, 12).toUpperCase() || "UNKNOWN",
+    statusCode,
+    durationMilliseconds,
+    requestID: compactText(input?.requestID, 120) || null,
+    releaseID: release.releaseID,
+    gitCommit: release.gitCommit,
+    deploymentHost: release.deploymentHost,
+    environment: release.environment,
     observedAt: new Date().toISOString()
   };
 }

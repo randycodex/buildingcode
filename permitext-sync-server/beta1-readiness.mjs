@@ -58,7 +58,14 @@ export function beta1ConfigurationReadiness(environment = process.env) {
     check("apple-production-only", environment.PERMITEXT_REQUIRE_PRODUCTION_APPLE_TRANSACTIONS === "1" || environment.VERCEL_ENV === "production", "Production must reject Sandbox and Xcode transactions."),
     check("apple-root-pins", Boolean(String(environment.APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS || "").trim()), "Pin the trusted Apple App Store root certificate fingerprints."),
     check("clerk", clerk.webReady, clerk.webReady ? "Clerk production identity and hosted web sign-in are configured." : clerk.webMessage),
-    check("research-cost-guardrails", research.ready, research.ready ? "Research per-turn, per-user daily/monthly, and system daily/monthly caps are configured." : research.problems.join(" "))
+    check("research-cost-guardrails", research.ready, research.ready ? "Research per-turn, per-user daily/monthly, and system daily/monthly caps are configured." : research.problems.join(" ")),
+    check(
+      "research-beta1-monthly-budget",
+      research.ready && Number(research.monthlyCapUSD) <= 100,
+      research.ready && Number(research.monthlyCapUSD) <= 100
+        ? `The Research system monthly cap is $${Number(research.monthlyCapUSD).toFixed(2)}, within the approved $100 maximum.`
+        : "PERMITEXT_RESEARCH_MONTHLY_CAP_USD must not exceed the approved $100 Beta 1 maximum."
+    )
   ];
   return {
     ready: checks.every((item) => item.ready),

@@ -16,6 +16,15 @@ for (const source of ["/web", "/web/", "/open/section/:path*"]) {
 for (const source of ["/privacy", "/privacy/"]) {
   assert.equal(rewrites.get(source), "/privacy.html", `${source} must resolve to the static privacy document.`);
 }
+for (const [document, fileName] of [
+  ["terms", "terms.html"],
+  ["refunds", "refunds.html"],
+  ["support", "support.html"]
+]) {
+  for (const source of [`/${document}`, `/${document}/`]) {
+    assert.equal(rewrites.get(source), `/${fileName}`, `${source} must resolve to its public document.`);
+  }
+}
 assert.equal(
   rewrites.get("/web/:path*"),
   "/:path*",

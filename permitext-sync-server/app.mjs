@@ -25,8 +25,11 @@ import {
 } from "./lifetime-grant-admin.mjs";
 import { beta1ConfigurationReadiness } from "./beta1-readiness.mjs";
 import {
+  operationalMonitoringReadiness,
+  productionReleaseReadiness,
   releaseIdentity,
   sanitizedClientErrorReport,
+  sanitizedRequestObservation,
   sanitizedServerErrorReport
 } from "./operational-readiness.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
@@ -16366,6 +16369,10 @@ async function handlePrivacyPolicy(_request, response) {
   sendHTML(response, await readFile(join(webPublicPath, "privacy.html"), "utf8"));
 }
 
+async function handlePublicDocument(documentName, response) {
+  sendHTML(response, await readFile(join(webPublicPath, `${documentName}.html`), "utf8"));
+}
+
 async function handleServiceWorker(response) {
   const filePath = join(webPublicPath, "service-worker.js");
   sendStatic(
@@ -26115,6 +26122,18 @@ async function handleRequestUnlocked(request, response) {
       await handlePrivacyPolicy(request, response);
       return;
     }
+    if (request.method === "GET" && (path === "terms" || path === "terms/")) {
+      await handlePublicDocument("terms", response);
+      return;
+    }
+    if (request.method === "GET" && (path === "refunds" || path === "refunds/")) {
+      await handlePublicDocument("refunds", response);
+      return;
+    }
+    if (request.method === "GET" && (path === "support" || path === "support/")) {
+      await handlePublicDocument("support", response);
+      return;
+    }
     if (request.method === "GET" && (path === "internal" || path === "internal/" || path.startsWith("internal/"))) {
       await handleInternalStatic(request, path, response);
       return;
@@ -26171,6 +26190,10 @@ async function handleRequestUnlocked(request, response) {
         rateLimit: adapter.rateLimitMode,
         commercialReadiness: {
           configured: beta1ConfigurationReadiness().ready
+        },
+        operations: {
+          releaseIdentityConfigured: productionReleaseReadiness().ready,
+          ...operationalMonitoringReadiness()
         },
         release: releaseIdentity()
       });
@@ -26287,17 +26310,18 @@ function observeVercelRequest(request, response) {
   response.once("finish", () => {
     const durationMilliseconds = Math.round(performance.now() - startedAt);
     const statusCode = Number(response.statusCode || 0);
-    if (durationMilliseconds < 250 && statusCode < 500) return;
-    console.info(JSON.stringify({
-      event: "dynamic_route_timing",
+    const monitoring = operationalMonitoringReadiness();
+    if (durationMilliseconds < monitoring.slowRequestThresholdMilliseconds && statusCode < 500) return;
+    const observation = sanitizedRequestObservation({
       route,
       method: String(request.method || "GET").toUpperCase(),
       statusCode,
       durationMilliseconds,
-      requestID: String(request.headers?.["x-vercel-id"] || "").slice(0, 120) || null,
-      releaseID: release.releaseID,
-      gitCommit: release.gitCommit
-    }));
+      requestID: request.headers?.["x-vercel-id"]
+    });
+    if (observation.severity === "error") console.error(JSON.stringify(observation));
+    else if (observation.severity === "warning") console.warn(JSON.stringify(observation));
+    else console.info(JSON.stringify(observation));
   });
 }
 

@@ -63,19 +63,19 @@ separate entry documents a concrete technical reason for deletion.
 | Restore | Set `releaseSurfaceVisibility.researchConversationEvidencePane` to `true`, then re-verify evidence scrolling, expand/collapse behavior, keyboard and pointer resizing, saved split ratios, and narrow-column layout. |
 | Delete only if | A replacement evidence inspection workflow is shipped and existing evidence records remain reviewable and exportable. |
 
-## Firm and collaboration workspace
+## Firm and collaboration compatibility
 
 | Field | Decision |
 | --- | --- |
-| Status | Hidden and frozen |
+| Status | Retired from the product; hidden and frozen for stored-data compatibility |
 | Deferred on | 2026-08-11 |
-| Product reason | Firm administration, invitations, shared-role navigation, and organization Project Hubs are outside the release-critical individual Project -> Ask -> Research -> Evidence -> Conclusion -> Save -> Export workflow. |
+| Product reason | The owner decided Permitext will not offer firm administration or collaboration. Dormant readers remain only so legacy records can be retained, exported, or deleted safely. |
 | Web release surface | Hide the Firm & Collaboration Settings card and do not load its organization administration UI during ordinary Settings rendering. |
 | iOS release surface | Hide the Firm & Collaboration Settings card, do not load organization lists for that card, and do not route firm invitation links into a hidden Settings workflow. |
 | Preserved web implementation | Keep organization creation, invitations, member and seat administration, Project transfer, firm controls, shared Project access, collaboration routes, and settings rendering behind `releaseSurfaceVisibility.firmCollaboration`. |
 | Preserved iOS implementation | Keep organization models, backend transport, invitation parsing and acceptance, `OrganizationProjectHubView`, offline snapshots, role-aware presentation, and tests behind `PermitextReleaseSurfaceVisibility.firmCollaboration`. |
 | Preserved data | Existing organizations, memberships, invitations, shared Projects, collaboration records, reports, and account-deletion coverage remain unchanged. |
-| Restore | Set both web and iOS Firm Collaboration release flags to `true`, then re-verify invitation links, organization loading, role-aware Project Hub access, offline snapshots, member administration, and web/iOS Settings presentation. |
+| Restore | No product restoration is planned. Any future access must be limited to an explicit legacy export, migration, or deletion tool and reviewed as a new product decision. |
 | Delete only if | A replacement collaboration model is shipped with explicit membership, shared-record, invitation, retention, and export migrations. |
 
 ## Coordination

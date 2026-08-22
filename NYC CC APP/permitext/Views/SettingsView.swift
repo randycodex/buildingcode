@@ -25,6 +25,9 @@ struct SettingsView: View {
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
     private let webWorkspaceURL = URL(string: "https://permitext.com")!
     private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
+    private let termsURL = URL(string: "https://permitext.com/terms")!
+    private let refundsURL = URL(string: "https://permitext.com/refunds")!
+    private let supportURL = URL(string: "https://permitext.com/support")!
     let initialSection: SettingsSection?
 
     init(initialSection: SettingsSection? = nil) {
@@ -119,10 +122,19 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 6)
 
-                    HStack(spacing: 8) {
-                        Link("Privacy Policy", destination: privacyPolicyURL)
-                        Text("·")
-                        Link("Send feedback / Report a problem", destination: feedbackURL)
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack(spacing: 8) {
+                            Link("Privacy", destination: privacyPolicyURL)
+                            Text("·")
+                            Link("Terms", destination: termsURL)
+                            Text("·")
+                            Link("Subscriptions & Refunds", destination: refundsURL)
+                        }
+                        HStack(spacing: 8) {
+                            Link("Support", destination: supportURL)
+                            Text("·")
+                            Link("Send feedback / Report a problem", destination: feedbackURL)
+                        }
                     }
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(Color.appChrome)
@@ -225,6 +237,11 @@ struct SettingsView: View {
                 .opacity(library.isStoreKitBusy ? 0.55 : 1)
 
                 Text("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month. Code reading and search remain free.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("By upgrading, you agree to the [Terms](https://permitext.com/terms) and [Subscription and Refund Policy](https://permitext.com/refunds).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

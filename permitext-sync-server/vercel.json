@@ -106,6 +106,30 @@
       "destination": "/privacy.html"
     },
     {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/terms/",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/refunds",
+      "destination": "/refunds.html"
+    },
+    {
+      "source": "/refunds/",
+      "destination": "/refunds.html"
+    },
+    {
+      "source": "/support",
+      "destination": "/support.html"
+    },
+    {
+      "source": "/support/",
+      "destination": "/support.html"
+    },
+    {
       "source": "/web/:path*",
       "destination": "/:path*"
     },

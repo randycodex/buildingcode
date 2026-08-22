@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260821-ux-governance-phase6-v1";
+} from "./offline-storage.js?v=20260822-beta1-public-readiness-v1";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -84,7 +84,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260821-ux-governance-phase6-v1";
+} from "./research-intent-state.js?v=20260822-beta1-public-readiness-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -29097,6 +29097,7 @@ function renderSettings() {
       const active = row.dataset.planOption === "free"
         ? !pro
         : pro;
+      row.hidden = !active;
       row.classList.toggle("is-active", active);
       row.setAttribute("aria-current", active ? "true" : "false");
       const indicator = row.querySelector(".settings-feature-icon");

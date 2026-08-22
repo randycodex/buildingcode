@@ -7,7 +7,7 @@ This runbook defines the minimum operating loop for a public Beta 1. It separate
 - Named support and alert owner: Higinio Jimenez (`permitext@gmail.com`).
 - Web Settings exposes **Send feedback / Report a problem** and inserts the serving release ID into the email.
 - iOS Settings exposes the same path and inserts the app version and build.
-- Web Settings displays the release ID. `GET /release` and `GET /health` expose the full serving Git commit when Vercel supplies `VERCEL_GIT_COMMIT_SHA`.
+- Web Settings displays the release ID. `GET /release` and `GET /health` expose the full serving Git commit. A Production build now fails unless Vercel supplies `VERCEL_GIT_COMMIT_SHA` or `PERMITEXT_GIT_COMMIT` contains the exact intended SHA.
 - Beta 1 support target: acknowledge account, billing, data-loss, and access reports within one business day; acknowledge other reports within two business days. This is an operating target, not a contractual service-level agreement.
 - Do not request passwords, session tokens, provider receipts, or full database records by email.
 
@@ -15,7 +15,7 @@ This runbook defines the minimum operating loop for a public Beta 1. It separate
 
 Permitext emits structured Vercel runtime events for:
 
-- dynamic routes taking at least 250 ms;
+- dynamic routes taking at least 2,000 ms by default (configurable with `PERMITEXT_SLOW_REQUEST_MS`);
 - every dynamic route returning a 5xx status;
 - browser errors, unhandled promise rejections, and startup failures sent to `POST /client-errors/report`;
 - billing lifecycle warnings and provider-event failures;
@@ -23,10 +23,12 @@ Permitext emits structured Vercel runtime events for:
 
 Client reports remove email addresses, bearer credentials, sensitive query values, and URL query strings before logging. They contain a stable fingerprint, release ID, route, source path, and line/column where available.
 
-Before public access, configure one of these production paths:
+`GET /health` reports whether release identity and an external monitoring provider are marked configured. Before public access, configure one of these production paths:
 
-1. Vercel runtime-log alerts and daily review; or
+1. Vercel Observability alerts and daily runtime-log review; or
 2. a Vercel Log Drain or error-monitoring integration with alert delivery.
+
+After the alert path has actually delivered a test notification, set `PERMITEXT_MONITORING_PROVIDER` to the configured provider name. The environment value is evidence of the completed dashboard step, not a substitute for it.
 
 Minimum alerts:
 
@@ -67,26 +69,29 @@ For each production release, record the branch, Git commit, Vercel deployment UR
 2. Run `npm run verify:beta1-readiness` with production configuration.
 3. Do not use a Vercel Preview as an isolated account or billing test while Preview shares the Production database. Use a truly isolated database/provider configuration or a controlled Production exercise.
 4. Verify `/health`, `/release`, sign-in, one read-only code path, and one authenticated sync read.
-5. Promote only the verified deployment.
-6. Confirm the production `/release` commit exactly matches the intended Git commit.
-7. Scan runtime errors and the client-error stream after promotion.
-8. If a regression affects account access, billing, data integrity, or Research boundaries, stop new Research with `PERMITEXT_RESEARCH_KILL_SWITCH=1` when relevant and roll production back to the last verified deployment.
-9. Re-run `/health`, `/release`, sign-in, and entitlement reads after rollback; record the incident and affected window.
+5. Confirm the deployment build log passed both commercial readiness and production release-identity readiness. A missing Git SHA must block promotion.
+6. Promote only the verified deployment.
+7. Confirm the production `/release` commit exactly matches the intended Git commit.
+8. Scan runtime errors and the client-error stream after promotion.
+9. If a regression affects account access, billing, data integrity, or Research boundaries, stop new Research with `PERMITEXT_RESEARCH_KILL_SWITCH=1` when relevant and use Vercel Instant Rollback to route traffic to the last verified immutable deployment.
+10. Re-run `/health`, `/release`, sign-in, and entitlement reads after rollback; record the incident and affected window. Do not delete the bad deployment while incident evidence or rollback access may still be needed.
 
 ## Backup and restore drill
 
 A provider saying that backups exist is not a successful restore drill. Before public Beta 1 and at least once per quarter:
 
-1. Record the source database snapshot/backup identifier and Blob storage inventory timestamp.
-2. Restore into an isolated non-production database and private asset namespace.
+1. Record the source Neon branch, point-in-time or snapshot identifier, history-retention window, and Blob storage inventory timestamp.
+2. Use Neon restore preview/multi-step restore to create an isolated branch first. Do not finalize a restore onto the active production branch during a drill.
 3. Point a non-production deployment at the isolated restore.
 4. Use the admin restore checklist and storage summary to compare account, entitlement, Project, saved-item, Research, Notebook, and Report counts.
 5. Verify one test account with representative synced records and one private asset from each used asset class.
 6. Confirm the exercise cannot write to production providers, webhooks, email, or billing.
 7. Record recovery-point age, elapsed recovery time, missing/corrupt records, operator, and cleanup.
-8. Delete the isolated restore only after evidence is retained and the exact targets are verified.
+8. Delete the isolated restore only after evidence is retained and the exact branch, compute, deployment, and private asset namespace are verified. Production restore or deletion requires separate explicit approval.
 
 The public beta remains blocked until the first restore drill succeeds or a documented product decision explicitly accepts the data-recovery risk.
+
+Use `docs/BETA1_RESTORE_DRILL_RECORD.md` to record the first exercise. Neon history retention and Vercel deployment retention must be checked in the live dashboards because plan limits can change.
 
 ## Incident record
 
