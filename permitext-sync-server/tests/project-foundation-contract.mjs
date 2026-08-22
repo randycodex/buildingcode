@@ -118,7 +118,7 @@ const packagedProCapabilities = capabilityContract({
   expiresAt: "2099-01-01T00:00:00.000Z",
   provider: { permitextPackage: "pro" }
 });
-assert.equal(packagedProCapabilities.capabilities.research.enabled, false);
+assert.equal(packagedProCapabilities.capabilities.research.enabled, true);
 assert.equal(packagedProCapabilities.packages.research.requiresPro, true);
 const researchCapabilities = capabilityContract({
   plan: "pro",

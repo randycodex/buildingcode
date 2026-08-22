@@ -3,6 +3,7 @@ import {
   requiredStripeWebhookEvents,
   verifyLiveStripeReadiness
 } from "../beta1-readiness.mjs";
+import { readFile } from "node:fs/promises";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -26,6 +27,7 @@ const completeEnvironment = {
   CLERK_ACCOUNT_PORTAL_URL: "https://accounts.permitext.com/sign-in",
   PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.50",
   PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "5",
+  PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "20",
   PERMITEXT_RESEARCH_DAILY_CAP_USD: "25",
   PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "250",
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "1",
@@ -68,5 +70,23 @@ const liveStripe = await verifyLiveStripeReadiness(completeEnvironment, {
   }
 });
 assert(liveStripe.ready, "Valid live Stripe price and webhook configuration was rejected.");
+
+const vercelConfiguration = JSON.parse(
+  await readFile(new URL("../vercel.json", import.meta.url), "utf8")
+);
+assert(
+  vercelConfiguration.buildCommand?.includes("scripts/verify-production-deploy.mjs"),
+  "Vercel Production can deploy without the commercial configuration and live Stripe gate."
+);
+const deployGate = await readFile(
+  new URL("../scripts/verify-production-deploy.mjs", import.meta.url),
+  "utf8"
+);
+assert(
+  deployGate.includes('process.env.VERCEL_ENV !== "production"') &&
+    deployGate.includes("beta1ConfigurationReadiness()") &&
+    deployGate.includes("verifyLiveStripeReadiness()"),
+  "The Production deploy gate no longer verifies configuration and live Stripe state."
+);
 
 console.log("permitext Beta 1 readiness contract passed");

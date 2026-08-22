@@ -9,8 +9,6 @@ export const entitlementPackageIDs = Object.freeze({
   research: "research"
 });
 
-const fullAccessSources = new Set(["lifetimeGrant", "debugOverride"]);
-
 function mutationEntry(mutation) {
   const [kind, record] = Object.entries(mutation || {})[0] || [];
   return { kind, record: record || {} };
@@ -53,19 +51,51 @@ export function activeEntitlementAddOn(entitlement, addOnID, now = Date.now()) {
 export function researchEntitlementMode(entitlement, now = Date.now()) {
   if (!hasActiveProEntitlement(entitlement, now)) return "unavailable";
   if (activeEntitlementAddOn(entitlement, entitlementPackageIDs.research, now)) return "add-on";
-  if (fullAccessSources.has(String(entitlement?.source || ""))) return "included";
-  if (entitlement?.legacyResearchIncluded === true) return "legacy-included";
-
-  const explicitPackage = String(
-    entitlement?.packageID ||
-    entitlement?.provider?.permitextPackage ||
-    ""
-  ).trim();
-  return explicitPackage ? "unavailable" : "legacy-included";
+  return "included";
 }
 
 export function hasActiveResearchEntitlement(entitlement, now = Date.now()) {
   return researchEntitlementMode(entitlement, now) !== "unavailable";
+}
+
+const entitlementOwnershipProviderKeys = Object.freeze([
+  "stripeSubscriptionID",
+  "appleOriginalTransactionID",
+  "originalTransactionID"
+]);
+
+function entitlementOwnershipIDs(entitlement) {
+  return new Set(
+    entitlementOwnershipProviderKeys
+      .map((key) => String(entitlement?.provider?.[key] || "").trim())
+      .filter(Boolean)
+  );
+}
+
+/**
+ * Separate paid entitlements must never be collapsed into the single entitlement
+ * row used by an account merge. A duplicate provider entitlement and two
+ * lifetime grants are safe equivalents; every other two-entitlement merge needs
+ * a support decision so neither a lifetime grant nor a paid subscription is lost.
+ */
+export function accountMergeHasEntitlementConflict(sourceEntitlement, targetEntitlement) {
+  if (!sourceEntitlement || !targetEntitlement) return false;
+  if (
+    sourceEntitlement.source === "lifetimeGrant" &&
+    targetEntitlement.source === "lifetimeGrant"
+  ) {
+    return false;
+  }
+
+  const sourceOwnershipIDs = entitlementOwnershipIDs(sourceEntitlement);
+  const targetOwnershipIDs = entitlementOwnershipIDs(targetEntitlement);
+  if (
+    sourceOwnershipIDs.size > 0 &&
+    Array.from(sourceOwnershipIDs).some((id) => targetOwnershipIDs.has(id))
+  ) {
+    return false;
+  }
+  return true;
 }
 
 function entitlementProviderMatches(provider, expected = {}) {

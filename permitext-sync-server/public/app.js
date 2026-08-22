@@ -6258,7 +6258,7 @@ async function startLinkedResearchForCodeDecision(questionID, options = {}) {
     throw error;
   }
   if (!hasCapability("research")) {
-    const error = new Error("Research requires an active Pro plan and the Research Add-On.");
+    const error = new Error("Research requires an active Pro plan.");
     error.code = "RESEARCH_ADDON_REQUIRED";
     throw error;
   }
@@ -17097,7 +17097,7 @@ function renderNewResearchComposer(container, researchEnabled) {
   bindResearchSendShortcut(input, form);
   if (!researchEnabled) {
     input.disabled = true;
-    input.placeholder = "Research Add-On required to start a new chat…";
+    input.placeholder = "Pro required to start a new Research chat…";
   }
   updateSendState();
   form.addEventListener("submit", async (event) => {
@@ -17312,11 +17312,9 @@ async function renderResearch(paneID = "utility:analysis") {
     const upgrade = document.createElement("article");
     upgrade.className = "analysis-card research-empty-state";
     const upgradeHeading = document.createElement("h3");
-    upgradeHeading.textContent = isProAccount()
-      ? "Research Add-On required"
-      : "Pro and Research required";
+    upgradeHeading.textContent = "Pro required for Research";
     const upgradeCopy = document.createElement("p");
-    upgradeCopy.textContent = "Your saved Research history remains readable. Add Research to start conversations, attach evidence, or generate new answers.";
+    upgradeCopy.textContent = "Your saved Research history remains readable. Upgrade to Pro to start conversations, attach evidence, or generate new answers.";
     const upgradeButton = document.createElement("button");
     upgradeButton.className = "ghost-button";
     upgradeButton.type = "button";
@@ -17340,7 +17338,7 @@ async function renderResearch(paneID = "utility:analysis") {
     decisionAction.textContent = linkedConversationID ? "Resume linked Research" : "Start Research for this decision";
     const canEditDecision = ["owner", "editor"].includes(codeQuestionDefineRole());
     decisionAction.disabled = !researchEnabled || (!linkedConversationID && (!canEditDecision || !codeQuestionIsOnline()));
-    if (!researchEnabled) decisionAction.title = "Research Add-On required";
+    if (!researchEnabled) decisionAction.title = "Pro required for Research";
     else if (!linkedConversationID && !canEditDecision) decisionAction.title = "An Owner or Editor must start linked Research";
     else if (!linkedConversationID && !codeQuestionIsOnline()) decisionAction.title = "Reconnect to start linked Research";
     const decisionStatus = document.createElement("p");
@@ -18362,7 +18360,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
   reuseButton.type = "button";
   reuseButton.textContent = "Start new Research";
   reuseButton.disabled = !hasCapability("research");
-  if (reuseButton.disabled) reuseButton.title = "Research Add-On required";
+  if (reuseButton.disabled) reuseButton.title = "Pro required for Research";
   reuseButton.disabled = !projectSelect.value;
   const reuseStatus = document.createElement("p");
   reuseStatus.className = "research-historical-status";
@@ -18846,7 +18844,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     refreshButton.type = "button";
     refreshButton.textContent = "Refresh sources";
     refreshButton.disabled = !hasCapability("research");
-    if (refreshButton.disabled) refreshButton.title = "Research Add-On required";
+    if (refreshButton.disabled) refreshButton.title = "Pro required for Research";
     refreshButton.addEventListener("click", async () => {
       refreshButton.disabled = true;
       try {
@@ -18943,7 +18941,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     (input.value.trim() || starterAnalysisQuestion).length < 3;
   if (!researchEnabled || researchRequestActive) {
     input.disabled = true;
-    if (!researchEnabled) input.placeholder = "Research Add-On required to continue this conversation…";
+    if (!researchEnabled) input.placeholder = "Pro required to continue this Research conversation…";
   }
   const status = document.createElement("p");
   status.className = "research-composer-status";
@@ -19145,10 +19143,8 @@ async function startNewResearchFromSelection(selection) {
   if (!hasCapability("research")) {
     preservePendingResearchSelection(selection, "create-selection");
     await presentPlanLimitNotice(
-      "Research Add-On required",
-      isProAccount()
-        ? "Add Research to start cited conversations grounded in enacted text."
-        : "Upgrade to Pro first, then add Research for cited enacted-code conversations."
+      "Pro required for Research",
+      "Upgrade to Pro for cited enacted-code conversations. Code reading and search remain free."
     );
     return null;
   }
@@ -19184,10 +19180,8 @@ async function addResearchSelectionToCurrent(selection) {
   if (!hasCapability("research")) {
     preservePendingResearchSelection(selection, "append-selection", conversationID);
     await presentPlanLimitNotice(
-      "Research Add-On required",
-      isProAccount()
-        ? "Add Research to continue this cited conversation."
-        : "Upgrade to Pro first, then add Research to continue this cited conversation."
+      "Pro required for Research",
+      "Upgrade to Pro to continue this cited conversation. Code reading and search remain free."
     );
     return null;
   }
@@ -22726,7 +22720,7 @@ function appendProjectResearchContextEditor(content, identity, initialConversati
   if (readOnly) {
     status.textContent = identity.sharedOnly
       ? "Read-only Project access."
-      : "Research Add-On required to change Project context.";
+      : "Pro required to change Research Project context.";
   }
   form.append(label);
   section.append(heading, copy, warning, form, status);
@@ -28860,7 +28854,6 @@ function renderSettings() {
   const syncConflictsSummary = panel.querySelector(".settings-sync-conflicts-summary");
   const syncConflictsList = panel.querySelector(".settings-sync-conflicts-list");
   const checkoutButton = panel.querySelector(".account-checkout");
-  const researchCheckoutButton = panel.querySelector(".account-research-checkout");
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
   const offlineCopy = panel.querySelector(".settings-offline-copy");
   const offlineStatus = panel.querySelector(".settings-offline-status");
@@ -29098,8 +29091,6 @@ function renderSettings() {
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
-    const research = hasCapability("research");
-    const researchAddOn = currentEntitlement()?.addOns?.research || null;
     const source = currentEntitlement()?.source;
     const canLinkApple = Boolean(account && state.account?.authProvider === "web");
     planRows.forEach((row) => {
@@ -29116,13 +29107,6 @@ function renderSettings() {
     checkoutButton.textContent = pro
       ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
       : "Upgrade to Pro";
-    researchCheckoutButton.hidden = research && !researchAddOn;
-    researchCheckoutButton.disabled = !account || !pro;
-    researchCheckoutButton.textContent = !pro
-      ? "Pro Required for Research"
-      : research
-        ? researchAddOn ? "Manage Research Add-On" : ""
-        : "Add Research";
     planSecondaryButton.hidden = !account || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
     accountCopy.hidden = Boolean(account);
@@ -29176,9 +29160,11 @@ function renderSettings() {
     signInButton.hidden = Boolean(account && state.account?.authProvider === "clerk");
     signInButton.disabled = false;
     signInButton.textContent = account
-      ? "Link Apple, Google, or Microsoft"
-      : "Sign in with Apple, Google, or Microsoft";
-    if (!account) accountCopy.textContent = "Sign in with Apple, Google, or Microsoft to sync saved work across devices.";
+      ? "Connect email, Apple, Google, or Microsoft"
+      : "Sign in or create an account";
+    if (!account) {
+      accountCopy.textContent = "Use passwordless email, Apple, Google, or Microsoft. New users create an account during sign-in, then saved work can sync across devices.";
+    }
   }).catch(() => {});
 
   signInButton.addEventListener("click", async () => {
@@ -29385,58 +29371,6 @@ function renderSettings() {
     } catch (error) {
       setStatus(error.message || "Could not open checkout.", true);
       checkoutButton.disabled = false;
-    }
-  });
-  researchCheckoutButton.addEventListener("click", async () => {
-    const account = activeAccount();
-    if (!account) return;
-    if (!isProAccount()) {
-      void presentPlanLimitNotice(
-        "Research requires Pro",
-        "Upgrade to Pro first, then add cited enacted-code Research."
-      );
-      return;
-    }
-    const researchAddOn = currentEntitlement()?.addOns?.research || null;
-    if (hasCapability("research")) {
-      if (!researchAddOn) return;
-      const source = researchAddOn.source;
-      if (source === "appleSubscription") {
-        window.location.href = "https://apps.apple.com/account/subscriptions";
-        return;
-      }
-      researchCheckoutButton.disabled = true;
-      setStatus("Opening Research subscription management...");
-      try {
-        const payload = await postJSON(
-          "/billing/web/portal",
-          { auth: { accountUserID: account.userID } },
-          { token: account.sessionToken }
-        );
-        if (!payload.url) throw new Error("Subscription management did not return a URL.");
-        window.location.href = payload.url;
-      } catch (error) {
-        setStatus(error.message || "Could not open subscription management.", true);
-        researchCheckoutButton.disabled = false;
-      }
-      return;
-    }
-    researchCheckoutButton.disabled = true;
-    setStatus("Opening Research checkout...");
-    try {
-      const payload = await postJSON(
-        "/billing/web/checkout",
-        {
-          auth: { accountUserID: account.userID },
-          packageID: "research"
-        },
-        { token: account.sessionToken }
-      );
-      if (!payload.url) throw new Error("Checkout did not return a URL.");
-      window.location.href = payload.url;
-    } catch (error) {
-      setStatus(error.message || "Could not open Research checkout.", true);
-      researchCheckoutButton.disabled = false;
     }
   });
   planSecondaryButton.addEventListener("click", async () => {

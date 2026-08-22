@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run verify:deploy-content && npm run build:clients",
+  "buildCommand": "npm run verify:deploy-content && node scripts/verify-production-deploy.mjs && npm run build:clients",
   "outputDirectory": "public",
   "headers": [
     {

@@ -2652,7 +2652,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func hasCapability(_ capability: PermitextCapabilityID) -> Bool {
-        if capability == .research, activeStoreKitPlan == .pro, activeStoreKitResearch {
+        if capability == .research, activeStoreKitPlan == .pro {
             return true
         }
         if activeStoreKitPlan == .pro,
@@ -2724,7 +2724,8 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func purchasePro() async {
+    func purchasePro(clerk: Clerk? = nil) async {
+        guard await requireSignedInBillingAccount(clerk: clerk) else { return }
         guard !isStoreKitBusy else { return }
         isStoreKitBusy = true
         defer { isStoreKitBusy = false }
@@ -2750,28 +2751,8 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func purchaseResearch() async {
-        guard !isStoreKitBusy else { return }
-        guard currentPlan == .pro else {
-            statusMessage = "Subscribe to Pro before adding Research."
-            return
-        }
-        isStoreKitBusy = true
-        defer { isStoreKitBusy = false }
-
-        do {
-            let snapshot = try await storeKitSubscriptionService.purchaseResearch()
-            applyStoreKitSnapshot(snapshot)
-            await syncAppleTransactionIfPossible(snapshot)
-            statusMessage = snapshot.researchActive
-                ? "Research is active."
-                : "Research purchase cancelled."
-        } catch {
-            statusMessage = error.localizedDescription
-        }
-    }
-
-    func restorePurchases() async {
+    func restorePurchases(clerk: Clerk? = nil) async {
+        guard await requireSignedInBillingAccount(clerk: clerk) else { return }
         guard !isStoreKitBusy else { return }
         isStoreKitBusy = true
         defer { isStoreKitBusy = false }
@@ -2782,14 +2763,27 @@ final class CodeLibraryViewModel: ObservableObject {
         if currentPlan != .pro {
             statusMessage = "No active Pro subscription found."
         } else if isStoreKitTestProActive {
-            statusMessage = snapshot.researchActive
-                ? "Pro and Research (Test) were restored on this device. Test purchases cannot activate production web access."
-                : "Pro (Test) was restored on this device. Account-wide Pro still requires a server grant or production purchase."
+            statusMessage = "Pro (Test), including Research, was restored on this device. Test purchases cannot activate production web access."
         } else {
-            statusMessage = snapshot.researchActive
-                ? "Pro and Research purchases restored."
-                : "Pro purchase restored."
+            statusMessage = "Pro, including Research, was restored."
         }
+    }
+
+    private func requireSignedInBillingAccount(clerk: Clerk?) async -> Bool {
+        if signedInAccount != nil { return true }
+        guard let clerk else {
+            statusMessage = "Sign in or create a Permitext account before purchasing or restoring Pro."
+            return false
+        }
+
+        await handleClerkHostedSignIn(clerk: clerk)
+        guard signedInAccount != nil else {
+            if statusMessage?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true {
+                statusMessage = "Sign in must finish before purchasing or restoring Pro."
+            }
+            return false
+        }
+        return true
     }
 
     func handleAppleSignIn(result: Result<ASAuthorization, Error>) async {
@@ -3479,8 +3473,8 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func applyStoreKitSnapshot(_ snapshot: StoreKitSubscriptionSnapshot) {
         activeStoreKitPlan = snapshot.plan
-        activeStoreKitResearch = snapshot.researchActive
-        isStoreKitResearchActive = snapshot.researchActive
+        activeStoreKitResearch = snapshot.plan == .pro || snapshot.researchActive
+        isStoreKitResearchActive = snapshot.plan == .pro || snapshot.researchActive
         let entitlement = entitlementService.currentEntitlement
         let resolvedEntitlement: AppEntitlement
         if entitlement.plan == .pro {

@@ -623,7 +623,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CLERK_PUBLISHABLE_KEY = "";
+				CLERK_PUBLISHABLE_KEY = pk_test_ZGFzaGluZy13YXJ0aG9nLTQwNjEuY2xlcmsuYWNjb3VudHMuZGV2JA;
 				CURRENT_PROJECT_VERSION = 24;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;
@@ -654,7 +654,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CLERK_PUBLISHABLE_KEY = "";
+				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
 				CURRENT_PROJECT_VERSION = 24;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;

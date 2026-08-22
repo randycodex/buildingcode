@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { accountMergeHasEntitlementConflict } from "./entitlement-contract.mjs";
 
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) return fallback;
@@ -199,6 +200,17 @@ export function createPostgresAccountRepository(sql, options = {}) {
       contextForUser(targetUserID)
     ]);
     if (!sourceContext || !targetContext) return null;
+    if (accountMergeHasEntitlementConflict(sourceContext.entitlement, targetContext.entitlement)) {
+      return {
+        sourceUserID,
+        targetUserID,
+        movedMutationCount: 0,
+        acceptedMutationIDs: [],
+        rejectedMutationIDs: [],
+        transferredEntitlement: false,
+        entitlementConflict: true
+      };
+    }
 
     const queries = [
       sql`
@@ -695,7 +707,16 @@ export function createPostgresAccountRepository(sql, options = {}) {
       });
     const preferredAlternative = alternatives[0] || null;
     if (exact && preferredAlternative) {
-      await mergeAccounts(exact.id, preferredAlternative.id);
+      const mergedAccount = await mergeAccounts(exact.id, preferredAlternative.id);
+      if (mergedAccount?.entitlementConflict) {
+        return {
+          account: null,
+          entitlement: null,
+          mergedAccount,
+          requiresLegacyMerge: true,
+          mergeConflictCode: "ACCOUNT_ENTITLEMENT_CONFLICT"
+        };
+      }
       return signIn(account);
     }
 

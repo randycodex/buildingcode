@@ -45,6 +45,7 @@ export function researchSpendGuardrails(environment = process.env) {
   const enabled = environment.PERMITEXT_RESEARCH_KILL_SWITCH !== "1";
   const maximumRequestUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_MAX_REQUEST_USD);
   const userDailyCapUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_USER_DAILY_CAP_USD);
+  const userMonthlyCapUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD);
   const dailyCapUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_DAILY_CAP_USD);
   const monthlyCapUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_MONTHLY_CAP_USD);
   const hosted = environment.VERCEL === "1" || Boolean(environment.VERCEL_ENV);
@@ -52,6 +53,7 @@ export function researchSpendGuardrails(environment = process.env) {
   if (!enabled) problems.push("The Research kill switch is active.");
   if (!maximumRequestUSD) problems.push("PERMITEXT_RESEARCH_MAX_REQUEST_USD must be a positive amount.");
   if (!userDailyCapUSD) problems.push("PERMITEXT_RESEARCH_USER_DAILY_CAP_USD must be a positive amount.");
+  if (!userMonthlyCapUSD) problems.push("PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD must be a positive amount.");
   if (!dailyCapUSD) problems.push("PERMITEXT_RESEARCH_DAILY_CAP_USD must be a positive amount.");
   if (!monthlyCapUSD) problems.push("PERMITEXT_RESEARCH_MONTHLY_CAP_USD must be a positive amount.");
   if (maximumRequestUSD && userDailyCapUSD && maximumRequestUSD > userDailyCapUSD) {
@@ -59,6 +61,12 @@ export function researchSpendGuardrails(environment = process.env) {
   }
   if (userDailyCapUSD && dailyCapUSD && userDailyCapUSD > dailyCapUSD) {
     problems.push("The per-user daily cap cannot exceed the system daily cap.");
+  }
+  if (userDailyCapUSD && userMonthlyCapUSD && userDailyCapUSD > userMonthlyCapUSD) {
+    problems.push("The per-user daily cap cannot exceed the per-user monthly cap.");
+  }
+  if (userMonthlyCapUSD && monthlyCapUSD && userMonthlyCapUSD > monthlyCapUSD) {
+    problems.push("The per-user monthly cap cannot exceed the system monthly cap.");
   }
   if (dailyCapUSD && monthlyCapUSD && dailyCapUSD > monthlyCapUSD) {
     problems.push("The system daily cap cannot exceed the monthly cap.");
@@ -79,6 +87,7 @@ export function researchSpendGuardrails(environment = process.env) {
     problems,
     maximumRequestUSD,
     userDailyCapUSD,
+    userMonthlyCapUSD,
     dailyCapUSD,
     monthlyCapUSD,
     pricingVersion: pricing.pricingVersion || null

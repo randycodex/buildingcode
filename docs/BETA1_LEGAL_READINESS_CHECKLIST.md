@@ -22,6 +22,28 @@ This is a product-specific working checklist, not legal approval or a substitute
 - The production vendor list and any provider-specific retention settings.
 - Whether customers may upload confidential, regulated, or personally identifying project material; if not, the product rules must say so.
 
+## Confirmed Beta 1 commercial decisions
+
+- Contracting owner supplied for the working draft: Higinio Jimenez. Confirm the exact legal name before publication because the current Privacy Policy uses a longer name.
+- Support, legal-notice, and urgent-alert email: `permitext@gmail.com`.
+- Higinio Jimenez owns urgent support responses.
+- Distribution and marketing: United States only.
+- Free access: code reading and code search remain available.
+- Pro: $20 per month, no trial, no annual plan, and 100 Research turns per billing month.
+- The business mailing address, entity type, governing-law choice, minimum age, and confidential-data policy remain open and must not be replaced with placeholders in public documents.
+
+## Recommended working refund policy
+
+- Customers may cancel at any time; cancellation stops renewal and Pro remains active through the already-paid period.
+- Stripe web purchases receive a full refund when requested within seven calendar days of the initial charge.
+- An accidental Stripe renewal receives a full refund when requested within 72 hours and no more than five Research turns have been used since renewal.
+- Duplicate charges, verified unauthorized charges, and Permitext billing errors receive a full refund.
+- Outside those cases, charges are non-refundable and are not prorated, except where law requires otherwise or Permitext grants a remedy for a material service failure.
+- Refunds return to the original payment method. A full Stripe refund ends the related Pro entitlement when the verified provider event is processed; a partial refund does not automatically revoke it.
+- Apple controls App Store purchase and refund decisions. Users request those refunds through Apple, and Permitext follows Apple's verified refund or revocation event.
+
+This is a product-policy recommendation for attorney review, not a published promise yet. It gives customers a short, clear remedy while limiting the risk that a customer consumes substantial Research cost and then seeks a full refund.
+
 ## Attorney review scope
 
 Ask counsel to review the documents together with the live signup, upgrade, checkout, cancellation, account-deletion, and Research-result screens. The review should confirm that the written promises match the software, the limitation and professional-use language fits a building-code research product, recurring-payment disclosures are presented before purchase, and US federal and applicable state requirements are addressed.

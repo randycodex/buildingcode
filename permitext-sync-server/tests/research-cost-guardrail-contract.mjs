@@ -13,6 +13,7 @@ const environment = {
   VERCEL_ENV: "production",
   PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.03",
   PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "1",
+  PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "5",
   PERMITEXT_RESEARCH_DAILY_CAP_USD: "10",
   PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "100",
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "10",
@@ -29,6 +30,10 @@ assert(
 assert(
   !researchSpendGuardrails({ ...environment, PERMITEXT_RESEARCH_DAILY_CAP_USD: "0.5" }).ready,
   "An invalid spend-cap hierarchy was accepted."
+);
+assert(
+  !researchSpendGuardrails({ ...environment, PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "0.5" }).ready,
+  "A per-user monthly cap below the per-user daily cap was accepted."
 );
 assert(
   !researchSpendGuardrails({ ...environment, PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: "" }).ready,

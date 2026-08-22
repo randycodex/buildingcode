@@ -84,9 +84,15 @@ const [iosProject, iosApp, iosSettings, iosViewModel, iosInfo] = await Promise.a
   readFile(new URL("../../NYC CC APP/permitext/Info.plist", import.meta.url), "utf8")
 ]);
 assert(iosProject.includes("https://github.com/clerk/clerk-ios") && iosProject.includes("ClerkKit in Frameworks"), "iOS is not linked to ClerkKit.");
-assert(iosApp.includes("Clerk.configure(publishableKey:") && iosApp.includes(".environment(Clerk.shared)"), "iOS does not configure and inject Clerk.");
 assert(
-  iosSettings.includes("Sign in with Apple, Google, or Microsoft") &&
+  iosApp.includes("Clerk.configure(publishableKey:") &&
+    iosApp.includes("private let clerk: Clerk?") &&
+    iosApp.includes(".environment(\\.permitextClerk, clerk)"),
+  "iOS does not safely configure and inject optional Clerk authentication."
+);
+assert(
+  iosSettings.includes("Sign in or create an account") &&
+    iosSettings.includes("passwordless email, Apple, Google, or Microsoft") &&
     iosSettings.includes("SignInWithAppleButton") &&
     iosSettings.includes("clerk.user?.delete()"),
   "iOS lost the Clerk social sign-in path, its Apple fallback, or identity deletion."
@@ -96,6 +102,14 @@ assert(
     iosViewModel.includes("clerk.auth.getToken()") &&
     iosViewModel.includes("linkFrom: sourceAccount"),
   "iOS Clerk sign-in does not complete hosted auth and authenticated account linking."
+);
+assert(
+  iosViewModel.includes("guard await requireSignedInBillingAccount(clerk: clerk) else { return }") &&
+    iosViewModel.includes("Sign in or create a Permitext account before purchasing or restoring Pro.") &&
+    iosSettings.includes("purchasePro(clerk: clerk)") &&
+    iosSettings.includes("restorePurchases(clerk: clerk)") &&
+    iosApp.includes("purchasePro(clerk: clerk)"),
+  "iOS can start StoreKit purchase or restore before establishing its Permitext account."
 );
 assert(iosInfo.includes("PermitextClerkPublishableKey"), "iOS does not expose its Clerk publishable-key build setting.");
 

@@ -25,6 +25,10 @@ async function main() {
       `Expected schema "${expectedSchema}", received "${json?.schema ?? "unknown"}".`
     );
   }
+  assert(
+    json?.commercialReadiness?.configured === true,
+    "Production health did not confirm complete commercial configuration."
+  );
 
   console.log(`permitext production health passed: ${baseURL} uses ${json.storage}${json.schema ? ` (${json.schema})` : ""}`);
 }

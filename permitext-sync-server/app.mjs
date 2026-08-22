@@ -12,6 +12,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
 import { ClerkCredentialError, clerkConfigurationStatus, verifyClerkCredential } from "./clerk-auth.mjs";
+import { beta1ConfigurationReadiness } from "./beta1-readiness.mjs";
 import {
   releaseIdentity,
   sanitizedClientErrorReport,
@@ -46,6 +47,7 @@ import {
   verifiedAdminRateLimitPrincipal
 } from "./rate-limit.mjs";
 import {
+  accountMergeHasEntitlementConflict,
   entitlementPackageIDs,
   entitlementWithPackage,
   entitlementWithoutPackage,
@@ -1588,6 +1590,7 @@ function createFileStoreAdapter() {
           .reduce((total, entry) => total + Number(entry.estimatedCostUSD || 0), 0);
         if (
           spendSince(reservation.daySince, userID) + reservation.maximumRequestUSD > reservation.userDailyCapUSD ||
+          spendSince(reservation.monthSince, userID) + reservation.maximumRequestUSD > reservation.userMonthlyCapUSD ||
           spendSince(reservation.daySince) + reservation.maximumRequestUSD > reservation.dailyCapUSD ||
           spendSince(reservation.monthSince) + reservation.maximumRequestUSD > reservation.monthlyCapUSD
         ) return false;
@@ -4034,6 +4037,13 @@ async function createPostgresStoreAdapter() {
                   AND created_at >= ${reservation.daySince}::timestamptz
                   AND (mode <> 'reservation' OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes')
               ) + ${reservation.maximumRequestUSD} <= ${reservation.userDailyCapUSD}
+              AND (
+                SELECT COALESCE(sum(estimated_cost_usd), 0)
+                FROM permitext_research_usage
+                WHERE user_id = ${userID}
+                  AND created_at >= ${reservation.monthSince}::timestamptz
+                  AND (mode <> 'reservation' OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes')
+              ) + ${reservation.maximumRequestUSD} <= ${reservation.userMonthlyCapUSD}
               AND (
                 SELECT COALESCE(sum(estimated_cost_usd), 0)
                 FROM permitext_research_usage
@@ -8738,7 +8748,7 @@ async function authenticatedResearchBody(request, response, options = {}) {
   const authContext = await authenticatedUserContext(request, response, userID);
   if (authContext && options.requireResearch && !hasActiveResearchEntitlement(authContext.entitlement)) {
     sendJSON(response, 402, {
-      error: "Research requires an active Pro plan and the Research Add-On.",
+      error: "Research requires an active Pro plan.",
       code: "RESEARCH_ADDON_REQUIRED"
     });
     return null;
@@ -15353,6 +15363,7 @@ async function handleResearchConversationMessage(request, response) {
         limit: requestLimit,
         maximumRequestUSD: spendGuardrails.maximumRequestUSD,
         userDailyCapUSD: spendGuardrails.userDailyCapUSD,
+        userMonthlyCapUSD: spendGuardrails.userMonthlyCapUSD,
         dailyCapUSD: spendGuardrails.dailyCapUSD,
         monthlyCapUSD: spendGuardrails.monthlyCapUSD,
         daySince: currentDayStart(),
@@ -17168,6 +17179,13 @@ export function compatibilityAccountMergeAllowed(adapter) {
   return adapter?.kind !== "postgres" || typeof adapter.mergeUserAccounts === "function";
 }
 
+const accountEntitlementConflictMessage =
+  "Both accounts already have separate Pro entitlements. Nothing was changed. Contact support so Permitext can preserve the lifetime grant and resolve the duplicate purchase safely.";
+
+function accountMergeHasConflict(mergedAccount) {
+  return mergedAccount?.entitlementConflict === true;
+}
+
 function appleWebSignInConfigured() {
   if (!process.env.APPLE_SERVICE_ID?.trim()) return false;
   try {
@@ -17436,6 +17454,16 @@ async function canonicalizeAppleAccountForSignIn(store, account) {
     ...Array.from(appleSubjectIDs(target)),
     ...Array.from(appleSubjectIDs(account))
   ]));
+  if (
+    store.users[account.appUserID] &&
+    account.appUserID !== target.appUserID &&
+    accountMergeHasEntitlementConflict(
+      store.entitlements?.[account.appUserID],
+      store.entitlements?.[target.appUserID]
+    )
+  ) {
+    return { ...account, accountMergeEntitlementConflict: true };
+  }
   store.users[target.appUserID] = {
     ...account,
     ...target,
@@ -18821,6 +18849,20 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
   if (!sourceAccount || !targetAccount) {
     return null;
   }
+  if (accountMergeHasEntitlementConflict(
+    store.entitlements[sourceUserID],
+    store.entitlements[targetUserID]
+  )) {
+    return {
+      sourceUserID,
+      targetUserID,
+      movedMutationCount: 0,
+      acceptedMutationIDs: [],
+      rejectedMutationIDs: [],
+      transferredEntitlement: false,
+      entitlementConflict: true
+    };
+  }
 
   const sourceMutations = await canonicalizeMutations(
     (store.mutationsByUserID[sourceUserID] || [])
@@ -19150,7 +19192,13 @@ async function handleSignIn(request, response) {
     }
     const directResult = await adapter.signInAccount(account);
     if (directResult.requiresLegacyMerge) {
-      sendError(response, 409, "This account requires identity repair before linking can continue.");
+      sendError(
+        response,
+        409,
+        directResult.mergeConflictCode === "ACCOUNT_ENTITLEMENT_CONFLICT"
+          ? accountEntitlementConflictMessage
+          : "This account requires identity repair before linking can continue."
+      );
       return;
     }
     const targetUserID = directResult.account.appUserID;
@@ -19159,6 +19207,10 @@ async function handleSignIn(request, response) {
       : await adapter.mergeUserAccounts(sourceUserID, targetUserID);
     if (sourceUserID !== targetUserID && !mergedAccount) {
       sendError(response, 404, "The source account could not be linked.");
+      return;
+    }
+    if (accountMergeHasConflict(mergedAccount)) {
+      sendError(response, 409, accountEntitlementConflictMessage);
       return;
     }
     const finalContext = await adapter.authenticateUserSession(
@@ -19181,6 +19233,10 @@ async function handleSignIn(request, response) {
       sendJSON(response, 200, directResult);
       return;
     }
+    if (directResult.mergeConflictCode === "ACCOUNT_ENTITLEMENT_CONFLICT") {
+      sendError(response, 409, accountEntitlementConflictMessage);
+      return;
+    }
     if (!compatibilityAccountMergeAllowed(adapter)) {
       sendError(response, 409, "This account requires a transactional identity repair before sign-in can continue.");
       return;
@@ -19189,6 +19245,10 @@ async function handleSignIn(request, response) {
 
   const store = await readStore();
   account = await canonicalizeAppleAccountForSignIn(store, account);
+  if (account.accountMergeEntitlementConflict) {
+    sendError(response, 409, accountEntitlementConflictMessage);
+    return;
+  }
   const sessionToken = randomUUID();
   store.sessions[account.appUserID] = sessionToken;
   const existing = store.users[account.appUserID];
@@ -19209,6 +19269,10 @@ async function handleSignIn(request, response) {
       return;
     }
     mergedAccount = await mergeAccountInto(store, sourceUserID, account.appUserID);
+    if (accountMergeHasConflict(mergedAccount)) {
+      sendError(response, 409, accountEntitlementConflictMessage);
+      return;
+    }
   }
   await writeStore(store);
   sendJSON(response, 200, {
@@ -19250,6 +19314,10 @@ async function handleBrowserAccountLink(request, response) {
     }
     const sourceUserID = `web:${browserCredentialID}`;
     const mergedAccount = await adapter.mergeUserAccounts(sourceUserID, targetUserID);
+    if (accountMergeHasConflict(mergedAccount)) {
+      sendError(response, 409, accountEntitlementConflictMessage);
+      return;
+    }
     let finalContext = await adapter.authenticateUserSession(targetUserID, context.sessionToken);
     if (!finalContext?.entitlement) {
       const subscription = await activeStripeSubscriptionForUserID(sourceUserID);
@@ -19293,6 +19361,10 @@ async function handleBrowserAccountLink(request, response) {
 
   const sourceUserID = `web:${browserCredentialID}`;
   const mergedAccount = await mergeAccountInto(store, sourceUserID, targetUserID);
+  if (accountMergeHasConflict(mergedAccount)) {
+    sendError(response, 409, accountEntitlementConflictMessage);
+    return;
+  }
   if (!store.entitlements[targetUserID]) {
     const subscription = await activeStripeSubscriptionForUserID(sourceUserID);
     if (subscription) {
@@ -20565,6 +20637,13 @@ async function handleWebCheckout(request, response) {
     sendError(response, 400, "Choose a supported Permitext package.");
     return;
   }
+  if (packageID !== entitlementPackageIDs.pro) {
+    sendJSON(response, 410, {
+      error: "Research is included with Permitext Pro and is no longer sold separately.",
+      code: "PACKAGE_RETIRED"
+    });
+    return;
+  }
   const stripeStatus = stripeConfigurationStatus({ packageID });
   if (!stripeStatus.ready) {
     sendError(response, 503, stripeStatus.message);
@@ -21622,8 +21701,12 @@ async function handleAppleWebCallback(request, response) {
       if (directResult.requiresLegacyMerge) {
         sendCallbackHTML(appleCallbackHTML({
           title: "permitext sign in",
-          message: "This account needs identity repair before sign-in can continue. Your existing account data was not changed.",
-          successPath: "/?appleSignIn=repairRequired",
+          message: directResult.mergeConflictCode === "ACCOUNT_ENTITLEMENT_CONFLICT"
+            ? accountEntitlementConflictMessage
+            : "This account needs identity repair before sign-in can continue. Your existing account data was not changed.",
+          successPath: directResult.mergeConflictCode === "ACCOUNT_ENTITLEMENT_CONFLICT"
+            ? "/?appleSignIn=entitlementConflict"
+            : "/?appleSignIn=repairRequired",
           scriptNonce
         }));
         return;
@@ -21634,6 +21717,15 @@ async function handleAppleWebCallback(request, response) {
         : await adapter.mergeUserAccounts(oauthState.linkFrom.accountUserID, targetUserID);
       if (oauthState.linkFrom.accountUserID !== targetUserID && !mergedAccount) {
         throw new Error("The source account could not be linked.");
+      }
+      if (accountMergeHasConflict(mergedAccount)) {
+        sendCallbackHTML(appleCallbackHTML({
+          title: "permitext sign in",
+          message: accountEntitlementConflictMessage,
+          successPath: "/?appleSignIn=entitlementConflict",
+          scriptNonce
+        }));
+        return;
       }
       const finalContext = await adapter.authenticateUserSession(
         targetUserID,
@@ -21689,6 +21781,15 @@ async function handleAppleWebCallback(request, response) {
 
     const store = await readStore();
     account = await canonicalizeAppleAccountForSignIn(store, account);
+    if (account.accountMergeEntitlementConflict) {
+      sendCallbackHTML(appleCallbackHTML({
+        title: "permitext sign in",
+        message: accountEntitlementConflictMessage,
+        successPath: "/?appleSignIn=entitlementConflict",
+        scriptNonce
+      }));
+      return;
+    }
     const sessionToken = randomUUID();
     store.sessions[account.appUserID] = sessionToken;
     const existing = store.users[account.appUserID];
@@ -21697,7 +21798,20 @@ async function handleAppleWebCallback(request, response) {
       : { ...account, backendSessionToken: sessionToken };
     store.users[account.appUserID] = storedAccount;
     if (oauthState.linkFrom?.accountUserID) {
-      await mergeAccountInto(store, oauthState.linkFrom.accountUserID, account.appUserID);
+      const mergedAccount = await mergeAccountInto(
+        store,
+        oauthState.linkFrom.accountUserID,
+        account.appUserID
+      );
+      if (accountMergeHasConflict(mergedAccount)) {
+        sendCallbackHTML(appleCallbackHTML({
+          title: "permitext sign in",
+          message: accountEntitlementConflictMessage,
+          successPath: "/?appleSignIn=entitlementConflict",
+          scriptNonce
+        }));
+        return;
+      }
     }
     await writeStore(store);
     const finalAccount = store.users[account.appUserID] || storedAccount;
@@ -22355,7 +22469,7 @@ async function handleCodeQuestionResearchStart(request, response) {
   if (!context) return;
   if (!hasActiveResearchEntitlement(context.authContext.entitlement)) {
     sendJSON(response, 402, {
-      error: "Research requires an active Pro plan and the Research Add-On.",
+      error: "Research requires an active Pro plan.",
       code: "RESEARCH_ADDON_REQUIRED"
     });
     return;
@@ -23886,6 +24000,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
         limit: requestLimit,
         maximumRequestUSD: spendGuardrails.maximumRequestUSD,
         userDailyCapUSD: spendGuardrails.userDailyCapUSD,
+        userMonthlyCapUSD: spendGuardrails.userMonthlyCapUSD,
         dailyCapUSD: spendGuardrails.dailyCapUSD,
         monthlyCapUSD: spendGuardrails.monthlyCapUSD,
         daySince: currentDayStart(),
@@ -24017,7 +24132,7 @@ async function handleCodeQuestionAnalysisCreate(request, response) {
   });
   if (!context) return;
   if (!hasActiveResearchEntitlement(context.authContext.entitlement) && !researchMockMode()) {
-    sendJSON(response, 403, { error: "Research Add-On required for bounded analysis.", code: "RESEARCH_REQUIRED" });
+    sendJSON(response, 403, { error: "Pro required for bounded Research analysis.", code: "RESEARCH_REQUIRED" });
     return;
   }
   try {
@@ -25455,6 +25570,9 @@ async function handleRequestUnlocked(request, response) {
         storage: await storageKind(),
         schema: await storageSchema(),
         rateLimit: adapter.rateLimitMode,
+        commercialReadiness: {
+          configured: beta1ConfigurationReadiness().ready
+        },
         release: releaseIdentity()
       });
       return;

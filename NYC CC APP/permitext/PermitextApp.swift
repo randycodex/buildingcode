@@ -3,18 +3,30 @@ import UIKit
 import os.signpost
 import ClerkKit
 
+private struct PermitextClerkEnvironmentKey: EnvironmentKey {
+    static let defaultValue: Clerk? = nil
+}
+
+extension EnvironmentValues {
+    var permitextClerk: Clerk? {
+        get { self[PermitextClerkEnvironmentKey.self] }
+        set { self[PermitextClerkEnvironmentKey.self] = newValue }
+    }
+}
+
 @main
 struct PermitextApp: App {
     @StateObject private var library: CodeLibraryViewModel
     @Environment(\.scenePhase) private var scenePhase
     private let offersFirstUseExperience: Bool
+    private let clerk: Clerk?
 
 #if DEBUG
     private let physicalStressConfiguration: NativeReaderPhysicalStressConfiguration?
     private let phase3ResearchConfiguration: Phase3EntitledResearchConfiguration?
 
     init() {
-        Self.configureClerkIfAvailable()
+        clerk = Self.configuredClerkIfAvailable()
         offersFirstUseExperience = PermitextFirstUseGate.evaluateBeforeLibraryStartup()
         if let preparedResearchHarness = Phase3EntitledResearchConfiguration.prepareIfRequested() {
             phase3ResearchConfiguration = preparedResearchHarness.configuration
@@ -36,7 +48,7 @@ struct PermitextApp: App {
     }
 #else
     init() {
-        Self.configureClerkIfAvailable()
+        clerk = Self.configuredClerkIfAvailable()
         offersFirstUseExperience = PermitextFirstUseGate.evaluateBeforeLibraryStartup()
         _library = StateObject(wrappedValue: CodeLibraryViewModel())
         Self.configureTabBarAppearance()
@@ -74,13 +86,14 @@ struct PermitextApp: App {
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
 
-    private static func configureClerkIfAvailable() {
+    private static func configuredClerkIfAvailable() -> Clerk? {
         guard
             let publishableKey = Bundle.main.object(forInfoDictionaryKey: "PermitextClerkPublishableKey") as? String,
             !publishableKey.isEmpty,
             !publishableKey.contains("$(")
-        else { return }
+        else { return nil }
         Clerk.configure(publishableKey: publishableKey)
+        return Clerk.shared
     }
 
     var body: some Scene {
@@ -113,7 +126,7 @@ struct PermitextApp: App {
 #endif
             }
             .environmentObject(library)
-            .environment(Clerk.shared)
+            .environment(\.permitextClerk, clerk)
             .tint(Color.appChrome)
             .alert(
                 "Upgrade to Pro",
@@ -127,7 +140,7 @@ struct PermitextApp: App {
                     Button(library.upgradeCallToActionTitle) {
                         library.dismissEntitlementPrompt()
                         Task {
-                            await library.purchasePro()
+                            await library.purchasePro(clerk: clerk)
                         }
                     }
                 }

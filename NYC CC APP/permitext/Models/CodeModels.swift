@@ -4413,13 +4413,7 @@ struct AppEntitlement: Codable, Hashable, Sendable {
     }
 
     func grantsResearch(at date: Date = Date()) -> Bool {
-        guard grantsPro(at: date) else { return false }
-        if addOns?["research"]?.isActive(at: date) == true { return true }
-        if source == .lifetimeGrant || source == .debugOverride { return true }
-        if legacyResearchIncluded == true { return true }
-        let explicitPackage = packageID ?? provider?.permitextPackage
-        guard let explicitPackage else { return true }
-        return explicitPackage.isEmpty
+        grantsPro(at: date)
     }
 
     static let free = AppEntitlement(plan: .free, source: .none, grantedUserID: nil)
@@ -4938,7 +4932,6 @@ struct StoreKitSubscriptionSnapshot: Sendable {
 
 enum StoreKitSubscriptionServiceError: LocalizedError {
     case proProductUnavailable
-    case researchProductUnavailable
     case unverifiedTransaction
     case pendingApproval
     case unknownPurchaseResult
@@ -4947,8 +4940,6 @@ enum StoreKitSubscriptionServiceError: LocalizedError {
         switch self {
         case .proProductUnavailable:
             return "The Pro monthly subscription is not available yet. Check the App Store product setup."
-        case .researchProductUnavailable:
-            return "The Research Add-On is not available yet. Check the App Store product setup."
         case .unverifiedTransaction:
             return "The purchase could not be verified."
         case .pendingApproval:
@@ -4993,29 +4984,6 @@ actor StoreKitSubscriptionService {
     func purchasePro() async throws -> StoreKitSubscriptionSnapshot {
         guard let product = await proProducts().first(where: { $0.id == proProductID }) else {
             throw StoreKitSubscriptionServiceError.proProductUnavailable
-        }
-
-        let result = try await product.purchase()
-        switch result {
-        case .success(let verification):
-            let transaction = try verifiedTransaction(from: verification)
-            await transaction.finish()
-            return await snapshot(
-                signedTransactionInfo: verification.jwsRepresentation,
-                transactionEnvironment: transaction.environment.rawValue
-            )
-        case .userCancelled:
-            return await snapshot()
-        case .pending:
-            throw StoreKitSubscriptionServiceError.pendingApproval
-        @unknown default:
-            throw StoreKitSubscriptionServiceError.unknownPurchaseResult
-        }
-    }
-
-    func purchaseResearch() async throws -> StoreKitSubscriptionSnapshot {
-        guard let product = await proProducts().first(where: { $0.id == researchProductID }) else {
-            throw StoreKitSubscriptionServiceError.researchProductUnavailable
         }
 
         let result = try await product.purchase()

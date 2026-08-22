@@ -197,9 +197,9 @@ struct ResearchView: View {
                         )
                     } else if !library.hasResearchAccess {
                         researchAccessRecovery(
-                            title: "Research requires the Research Add-On",
+                            title: "Research requires Pro",
                             description: pendingSelectionRecoveryDescription(
-                                fallback: "Manage your plan from Settings."
+                                fallback: "Upgrade to Pro from Settings. Code reading and search remain free."
                             ),
                             buttonTitle: "View Plans",
                             section: .plan

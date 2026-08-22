@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  accountMergeHasEntitlementConflict,
   activeEntitlementAddOn,
   entitlementPackageIDs,
   entitlementWithPackage,
@@ -14,6 +15,43 @@ import { postgresMutationRejectionReason } from "../postgres-sync-repository.mjs
 
 const userID = "entitlement-contract-user";
 const codeVersion = "nyc-2022";
+
+assert.equal(
+  accountMergeHasEntitlementConflict(
+    { plan: "pro", source: "lifetimeGrant" },
+    {
+      plan: "pro",
+      source: "webSubscription",
+      provider: { stripeSubscriptionID: "sub_distinct" }
+    }
+  ),
+  true,
+  "A lifetime grant must not be discarded when the target has a separate paid subscription."
+);
+assert.equal(
+  accountMergeHasEntitlementConflict(
+    {
+      plan: "pro",
+      source: "webSubscription",
+      provider: { stripeSubscriptionID: "sub_shared" }
+    },
+    {
+      plan: "pro",
+      source: "webSubscription",
+      provider: { stripeSubscriptionID: "sub_shared" }
+    }
+  ),
+  false,
+  "Duplicate records for the same provider subscription must remain mergeable."
+);
+assert.equal(
+  accountMergeHasEntitlementConflict(
+    { plan: "pro", source: "lifetimeGrant" },
+    { plan: "pro", source: "lifetimeGrant" }
+  ),
+  false,
+  "Two lifetime grant records are equivalent and must remain mergeable."
+);
 
 function mutation(kind, id, values = {}) {
   return {
@@ -144,8 +182,8 @@ const activePro = { plan: "pro", expiresAt: "2099-01-01T00:00:00.000Z" };
 assert.equal(hasActiveProEntitlement(activePro), true);
 assert.equal(
   researchEntitlementMode(activePro),
-  "legacy-included",
-  "Existing Pro records without package metadata must keep Research during migration."
+  "included",
+  "Every active Pro record must include Research."
 );
 assert.equal(hasActiveResearchEntitlement(activePro), true);
 decision = enforceFreePlanMutationBatch(savedAtLimit, [savedOverLimit, ...proOnlyMutations], activePro);
@@ -156,7 +194,7 @@ const packagedPro = {
   expiresAt: "2099-01-01T00:00:00.000Z",
   provider: { permitextPackage: entitlementPackageIDs.pro }
 };
-assert.equal(hasActiveResearchEntitlement(packagedPro), false, "New Pro packages must not imply Research.");
+assert.equal(hasActiveResearchEntitlement(packagedPro), true, "New Pro packages must include Research.");
 const proWithResearch = {
   ...packagedPro,
   addOns: {
@@ -180,8 +218,8 @@ assert.equal(
       }
     }
   }),
-  false,
-  "Expired Research add-ons must not remain active."
+  true,
+  "An expired legacy Research add-on must not remove Research included with Pro."
 );
 assert.equal(
   hasActiveResearchEntitlement({ plan: "pro", source: "lifetimeGrant" }),
@@ -199,7 +237,7 @@ const newPackagedPro = entitlementWithPackage(null, {
   now: packagedAt
 });
 assert.equal(newPackagedPro.provider.permitextPackage, entitlementPackageIDs.pro);
-assert.equal(hasActiveResearchEntitlement(newPackagedPro), false);
+assert.equal(hasActiveResearchEntitlement(newPackagedPro), true);
 const restoredLegacyPro = entitlementWithPackage(null, {
   userID,
   packageID: entitlementPackageIDs.pro,
@@ -305,7 +343,11 @@ const researchRevocation = entitlementWithoutPackage(
 );
 assert.equal(researchRevocation.changed, true);
 assert.equal(hasActiveProEntitlement(researchRevocation.entitlement), true);
-assert.equal(hasActiveResearchEntitlement(researchRevocation.entitlement), false);
+assert.equal(
+  hasActiveResearchEntitlement(researchRevocation.entitlement),
+  true,
+  "Removing a legacy add-on must not remove Research included with Pro."
+);
 const mismatchedRevocation = entitlementWithoutPackage(
   packagedWithResearch,
   entitlementPackageIDs.research,

@@ -7,8 +7,12 @@ This runbook is an evidence checklist. Passing unit tests does not authorize pub
 - Permitext Web sells Pro through Stripe Checkout and manages it through Stripe Billing Portal.
 - Permitext iOS sells Pro through StoreKit. It does not present a Stripe purchase path for digital access.
 - Both providers update the same Permitext entitlement record.
+- Beta 1 Pro is $20 per month, has no trial or annual plan, and includes 100 Research turns per billing month.
+- Code reading and code search remain available without a Pro subscription.
 - Clerk is the canonical sign-in provider for Apple, Google, and Microsoft identities.
+- Web Checkout, web restore, iOS StoreKit purchase, and iOS StoreKit restore all require an authenticated Permitext account before provider billing begins. On iOS, the purchase or restore action starts the production Clerk sign-in flow first when needed.
 - An existing Permitext Apple account must be authenticated before it is linked into a Clerk identity. Never merge accounts from an email match alone.
+- If both source and target accounts already have different Pro ownership records, stop the merge without modifying either account. Support must resolve the duplicate purchase while preserving any lifetime grant. Only equivalent lifetime grants or duplicate records for the same provider subscription may merge automatically.
 
 ## Required production configuration
 
@@ -29,11 +33,15 @@ node --env-file=.env.production.local scripts/verify-beta1-readiness.mjs --live-
 
 The live check confirms that the Pro Price is active, live, and recurring; that the exact production webhook URL is enabled; and that it receives every event the entitlement lifecycle requires.
 
+Vercel variables marked Sensitive are intentionally unavailable to local environment pulls. The Production build therefore runs `scripts/verify-production-deploy.mjs` with the deployed environment: it blocks publication unless the complete configuration check and the read-only live Stripe inspection both pass. Preview builds skip this Production-only gate.
+
 Configure App Store Server Notifications V2 in App Store Connect with:
 
 ```text
 https://<production-domain>/billing/apple/notifications
 ```
+
+Production also requires `APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS` with the current Apple PKI App Store trust roots. The variable was added to Vercel Production only on 2026-08-21. Reconfirm the roots against Apple's certificate-authority page during credential rotation; a deployment is required before a changed value reaches the serving app.
 
 Configure Stripe with:
 
@@ -70,6 +78,7 @@ For an existing Apple account with saved work and Pro access:
 5. Sign out and sign in through Google, then Microsoft, after linking those verified identities in Clerk.
 6. Confirm every provider returns the same Clerk user and Permitext account.
 7. Attempt an unverified or mismatched link and confirm that Permitext rejects it without changing either account.
+8. Attempt to link two test accounts with distinct Pro ownership records and confirm a 409/support-resolution result while both accounts, purchases, and entitlements remain unchanged.
 
 ## Stripe lifecycle evidence
 
@@ -108,9 +117,23 @@ Production Research fails closed unless all of these are configured:
 
 - `PERMITEXT_RESEARCH_MAX_REQUEST_USD`
 - `PERMITEXT_RESEARCH_USER_DAILY_CAP_USD`
+- `PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD`
 - `PERMITEXT_RESEARCH_DAILY_CAP_USD`
 - `PERMITEXT_RESEARCH_MONTHLY_CAP_USD`
 - Versioned input, cached-input, and output token prices
+
+The initial Beta 1 values are:
+
+```text
+PERMITEXT_RESEARCH_MAX_REQUEST_USD=0.50
+PERMITEXT_RESEARCH_USER_DAILY_CAP_USD=2
+PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD=5
+PERMITEXT_RESEARCH_DAILY_CAP_USD=10
+PERMITEXT_RESEARCH_MONTHLY_CAP_USD=100
+PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT=100
+```
+
+These are exposure ceilings, not spending targets. Review actual provider usage weekly and lower the request limit or disable Research before increasing the $100 system cap.
 
 `PERMITEXT_RESEARCH_KILL_SWITCH=1` immediately prevents new paid Research requests. Each accepted turn atomically reserves its maximum exposure before a provider call, and every provider request consumes that reservation using its declared output-token ceiling.
 

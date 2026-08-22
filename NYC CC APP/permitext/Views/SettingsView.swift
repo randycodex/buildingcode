@@ -12,7 +12,7 @@ struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openURL) private var openURL
-    @Environment(Clerk.self) private var clerk
+    @Environment(\.permitextClerk) private var clerk
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
     @State private var selectedProjectIDs = Set<Int64>()
@@ -43,13 +43,6 @@ struct SettingsView: View {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
         return "Permitext \(version) (Build \(build))"
-    }
-
-    private var clerkIsConfigured: Bool {
-        guard let key = Bundle.main.object(forInfoDictionaryKey: "PermitextClerkPublishableKey") as? String else {
-            return false
-        }
-        return !key.isEmpty && !key.contains("$(")
     }
 
     private var feedbackURL: URL {
@@ -189,12 +182,12 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
 
             VStack(alignment: .leading, spacing: 10) {
-                planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.")
-                planFeatureRow("Pro", details: "Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, and offline access. Optional Research add-on: unlimited selected-evidence Research, verified citations, immutable answer history, and conversation history.")
+                planFeatureRow("Free", details: "Read and search the code library anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.")
+                planFeatureRow("Pro · \(proMonthlyPriceLabel)/month", details: "No trial. Includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month. Cancel anytime; code reading and search remain free.")
             }
 
             Button {
-                Task { await library.purchasePro() }
+                Task { await library.purchasePro(clerk: clerk) }
             } label: {
                 Label(upgradeButtonTitle, systemImage: "sparkles")
                     .font(.subheadline.weight(.semibold))
@@ -210,25 +203,6 @@ struct SettingsView: View {
             .disabled(library.isStoreKitBusy || library.currentPlan == .pro)
             .opacity(library.isStoreKitBusy ? 0.55 : 1)
 
-            if !library.hasResearchAccess {
-                Button {
-                    Task { await library.purchaseResearch() }
-                } label: {
-                    Label(researchButtonTitle, systemImage: "text.magnifyingglass")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                        .foregroundStyle(.primary)
-                        .padding(.vertical, 12)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(Color(uiColor: .secondarySystemGroupedBackground))
-                        )
-                }
-                .buttonStyle(.plain)
-                .disabled(!canPurchaseResearch)
-                .opacity(canPurchaseResearch ? 1 : 0.55)
-            }
-
             if library.currentPlan == .pro {
                 Button {
                     openURL(subscriptionManagementURL)
@@ -241,7 +215,7 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
             }
             Button {
-                Task { await library.restorePurchases() }
+                Task { await library.restorePurchases(clerk: clerk) }
             } label: {
                 Text(library.isStoreKitBusy ? "Checking purchases..." : "Restore Purchases")
                     .font(.footnote.weight(.semibold))
@@ -302,11 +276,11 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            if library.signedInAccount == nil, clerkIsConfigured {
+            if library.signedInAccount == nil, let clerk {
                 Button {
                     Task { await library.handleClerkHostedSignIn(clerk: clerk) }
                 } label: {
-                    Label("Sign in with Apple, Google, or Microsoft", systemImage: "person.crop.circle.badge.checkmark")
+                    Label("Sign in or create an account", systemImage: "person.crop.circle.badge.checkmark")
                         .font(.subheadline.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -333,11 +307,11 @@ struct SettingsView: View {
 
             } else {
                 VStack(spacing: 10) {
-                    if clerkIsConfigured, library.signedInAccount?.authProvider != .clerk {
+                    if let clerk, library.signedInAccount?.authProvider != .clerk {
                         Button {
                             Task { await library.handleClerkHostedSignIn(clerk: clerk) }
                         } label: {
-                            Label("Connect Apple, Google, or Microsoft", systemImage: "person.crop.circle.badge.plus")
+                            Label("Connect email, Apple, Google, or Microsoft", systemImage: "person.crop.circle.badge.plus")
                                 .font(.subheadline.weight(.semibold))
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 12)
@@ -445,37 +419,27 @@ struct SettingsView: View {
             if library.currentEntitlementSource == .lifetimeGrant {
                 return "Lifetime Pro is active, including Research. This gifted account does not need an App Store subscription."
             }
-            if library.hasResearchAccess {
-                return "Pro and Research are active. Projects, Notebook, Report, professional exports, offline access, and selected-evidence Research are unlocked."
-            }
-            return "Pro is active. Projects, Notebook, Report, professional exports, and offline access are unlocked. Research is available separately."
+            return "Pro is active, including Research. Projects, Notebook, Report, professional exports, offline access, and selected-evidence Research are unlocked."
         }
         return "Free includes reading, search, recents, 25 saved sections, 10 notes, continuity, and cross-device sync. Pro unlocks the professional workspace."
     }
 
-    private var canPurchaseResearch: Bool {
-        library.currentPlan == .pro &&
-            !library.hasResearchAccess &&
-            library.researchProductDisplayPrice != nil &&
-            !library.isStoreKitBusy
-    }
-
-    private var researchButtonTitle: String {
-        guard library.currentPlan == .pro else { return "Pro Required for Research" }
-        if let price = library.researchProductDisplayPrice, !price.isEmpty {
-            return "Add Research - \(price)/month"
-        }
-        return library.isStoreKitBusy ? "Loading Research..." : "Research Purchase Not Configured"
-    }
-
     private var accountSummaryText: String {
         guard let account = library.signedInAccount else {
-            return "Sign in to sync saved sections, notes, and Projects across your devices."
+            return "Use passwordless email, Apple, Google, or Microsoft. New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices."
         }
         if let displayName = account.displayName, !displayName.isEmpty {
             return "Signed in as \(displayName). Saved sections, notes, and Projects can sync across your devices."
         }
         return "Signed in with \(account.authProvider.rawValue). Saved sections, notes, and Projects can sync across your devices."
+    }
+
+    private var proMonthlyPriceLabel: String {
+        guard let displayPrice = library.proProductDisplayPrice?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !displayPrice.isEmpty else {
+            return "$20.00"
+        }
+        return displayPrice
     }
 
     private var upgradeButtonTitle: String {
@@ -793,7 +757,7 @@ struct SettingsView: View {
                 Task {
                     let deletesClerkIdentity = library.signedInAccount?.authProvider == .clerk
                     if await library.deleteAccount() {
-                        if deletesClerkIdentity {
+                        if deletesClerkIdentity, let clerk {
                             _ = try? await clerk.user?.delete()
                         }
                         showsAccountDeleteWarning = false
@@ -875,7 +839,7 @@ struct SettingsView: View {
 
     private func signOut() {
         library.signOut()
-        guard clerk.user != nil else { return }
+        guard let clerk, clerk.user != nil else { return }
         Task { try? await clerk.auth.signOut() }
     }
 

@@ -447,15 +447,20 @@ async function main() {
       "Web Settings omitted project selection or bulk deletion controls."
     );
     assert(
-      settingsTemplateSource.includes('data-plan-option="free"') &&
+        settingsTemplateSource.includes('data-plan-option="free"') &&
         settingsTemplateSource.includes('data-plan-option="pro"') &&
         !settingsTemplateSource.includes('data-plan-option="research"') &&
         !settingsTemplateSource.includes("Upgrade option") &&
-        settingsTemplateSource.includes("Optional Research add-on:") &&
+        settingsTemplateSource.includes("Pro · $20/month") &&
+        settingsTemplateSource.includes("up to 100 cited Research turns each month") &&
+        !settingsTemplateSource.includes("Research Add-On") &&
+        !settingsTemplateSource.includes("account-research-checkout") &&
         !iosSettingsSource.includes('planFeatureRow("Research Add-On"') &&
-        iosSettingsSource.includes("Optional Research add-on:") &&
+        iosSettingsSource.includes('planFeatureRow("Pro · \\(proMonthlyPriceLabel)/month"') &&
+        iosSettingsSource.includes('return "$20.00"') &&
+        iosSettingsSource.includes("up to 100 selected-evidence Research turns each month") &&
         !settingsTemplateSource.includes('class="settings-billing-line"'),
-      "Settings lost the consolidated Pro and optional Research description or restored a separate Research row."
+      "Settings lost the single $20 Pro plan with included Research or restored a separate Research add-on."
     );
     assert(
       !settingsTemplateSource.includes('>Code Preferences</h3>') &&
@@ -645,7 +650,6 @@ async function main() {
     assert(
       workspaceScript.text.includes('row.classList.toggle("is-active", active)') &&
         workspaceScript.text.includes('checkoutButton.classList.toggle("is-pro-active", pro)') &&
-        workspaceScript.text.includes("researchCheckoutButton.hidden = research && !researchAddOn;") &&
         !workspaceScript.text.includes('"Research Included"') &&
         workspaceScript.text.includes('checkoutButton.textContent = pro') &&
         workspaceScript.text.includes('? "Pro Active" : "Manage Subscription"') &&
@@ -1877,10 +1881,10 @@ async function main() {
       "Saved Evidence should provide a revealable project search without tag filtering."
     );
     assert(
-      !webRoot.text.includes("account-plan-detail") &&
+        !webRoot.text.includes("account-plan-detail") &&
         !workspaceScript.text.includes("account-plan-detail") &&
-        webRoot.text.includes("Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
-        webRoot.text.includes("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, and web offline access.") &&
+        webRoot.text.includes("Read and search the code library anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
+        webRoot.text.includes("Includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, web offline access, and up to 100 cited Research turns each month.") &&
         !webRoot.text.includes("professional exports, tags"),
       "Plan details should live in the Free and Pro descriptions instead of a redundant summary."
     );
@@ -2718,7 +2722,7 @@ async function main() {
         workspaceStyles.text.includes("--pro-active-background: #00b9e8;") &&
         iosSettingsSource.includes("Color(red: 0, green: 185 / 255, blue: 232 / 255)") &&
         iosSettingsSource.includes(".opacity(library.isStoreKitBusy ? 0.55 : 1)") &&
-        iosSettingsSource.includes("if !library.hasResearchAccess {") &&
+        !iosSettingsSource.includes("hasResearchAccess") &&
         !iosSettingsSource.includes('return "Research Active"'),
       "Active Pro buttons no longer share the requested full-opacity cyan treatment on web and iOS."
     );
