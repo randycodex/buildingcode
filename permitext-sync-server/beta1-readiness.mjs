@@ -11,6 +11,12 @@ export const requiredStripeWebhookEvents = Object.freeze([
   "charge.refunded"
 ]);
 
+export const expectedStripeProPrice = Object.freeze({
+  currency: "usd",
+  interval: "month",
+  unitAmount: 2_000
+});
+
 function check(id, ready, detail) {
   return { id, ready: Boolean(ready), detail };
 }
@@ -102,6 +108,9 @@ export async function verifyLiveStripeReadiness(
       price.livemode === true &&
       price.active === true &&
       price.type === "recurring" &&
+      price.currency === expectedStripeProPrice.currency &&
+      price.unit_amount === expectedStripeProPrice.unitAmount &&
+      price.recurring?.interval === expectedStripeProPrice.interval &&
       endpoint?.status === "enabled" &&
       missingEvents.length === 0
     ),
@@ -110,7 +119,9 @@ export async function verifyLiveStripeReadiness(
       live: price.livemode === true,
       active: price.active === true,
       recurring: price.type === "recurring",
-      interval: price.recurring?.interval || null
+      interval: price.recurring?.interval || null,
+      currency: price.currency || null,
+      unitAmount: Number.isSafeInteger(price.unit_amount) ? price.unit_amount : null
     },
     webhook: {
       configured: Boolean(endpoint),

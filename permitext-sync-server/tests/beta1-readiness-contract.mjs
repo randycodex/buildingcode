@@ -1,5 +1,6 @@
 import {
   beta1ConfigurationReadiness,
+  expectedStripeProPrice,
   requiredStripeWebhookEvents,
   verifyLiveStripeReadiness
 } from "../beta1-readiness.mjs";
@@ -57,7 +58,9 @@ const liveStripe = await verifyLiveStripeReadiness(completeEnvironment, {
         livemode: true,
         active: true,
         type: "recurring",
-        recurring: { interval: "month" }
+        currency: expectedStripeProPrice.currency,
+        unit_amount: expectedStripeProPrice.unitAmount,
+        recurring: { interval: expectedStripeProPrice.interval }
       }), { status: 200 });
     }
     return new Response(JSON.stringify({
@@ -70,6 +73,34 @@ const liveStripe = await verifyLiveStripeReadiness(completeEnvironment, {
   }
 });
 assert(liveStripe.ready, "Valid live Stripe price and webhook configuration was rejected.");
+assert(
+  liveStripe.price.currency === "usd" && liveStripe.price.unitAmount === 2_000,
+  "Live Stripe readiness did not preserve the expected USD $20 price evidence."
+);
+
+const wrongAmountStripe = await verifyLiveStripeReadiness(completeEnvironment, {
+  fetchImplementation: async (url) => {
+    if (url.includes("/v1/prices/")) {
+      return new Response(JSON.stringify({
+        id: "price_contract",
+        livemode: true,
+        active: true,
+        type: "recurring",
+        currency: "usd",
+        unit_amount: 1_499,
+        recurring: { interval: "month" }
+      }), { status: 200 });
+    }
+    return new Response(JSON.stringify({
+      data: [{
+        url: "https://permitext.com/billing/stripe/webhook",
+        status: "enabled",
+        enabled_events: [...requiredStripeWebhookEvents]
+      }]
+    }), { status: 200 });
+  }
+});
+assert(!wrongAmountStripe.ready, "Live Stripe readiness accepted a non-$20 Pro price.");
 
 const vercelConfiguration = JSON.parse(
   await readFile(new URL("../vercel.json", import.meta.url), "utf8")
