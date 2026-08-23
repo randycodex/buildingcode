@@ -6,6 +6,7 @@ import Network
 import os
 import os.signpost
 import Security
+import StoreKit
 import SwiftUI
 
 extension Notification.Name {
@@ -197,6 +198,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let ownsAccountSync: Bool
     private let projectHubOfflineCache = ProjectHubOfflineCache()
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
+    private var pendingStoreKitPurchaseAction: PurchaseAction?
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
     private let startupSignpostID = OSSignpostID(log: AppSignpost.startup)
     private var postClerkAuthenticationAction: PostClerkAuthenticationAction = .none
@@ -2765,15 +2767,29 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func purchasePro(clerk: Clerk? = nil) async {
+    func purchasePro(
+        clerk: Clerk? = nil,
+        using purchaseAction: PurchaseAction? = nil
+    ) async {
+        if let purchaseAction {
+            pendingStoreKitPurchaseAction = purchaseAction
+        }
         guard await requireSignedInBillingAccount(clerk: clerk, then: .purchasePro) else { return }
         guard !isStoreKitBusy else { return }
+        guard let purchaseAction = purchaseAction ?? pendingStoreKitPurchaseAction else {
+            storeKitOperationMessage = "Apple could not open the purchase sheet. Close Settings, reopen it, and try again."
+            statusMessage = storeKitOperationMessage
+            return
+        }
+        pendingStoreKitPurchaseAction = nil
         storeKitOperationMessage = nil
         isStoreKitBusy = true
         defer { isStoreKitBusy = false }
 
         do {
-            let snapshot = try await storeKitSubscriptionService.purchasePro()
+            let product = try await storeKitSubscriptionService.proProductForPurchase()
+            let result = try await purchaseAction(product)
+            let snapshot = try await storeKitSubscriptionService.snapshot(after: result)
             applyStoreKitSnapshot(snapshot)
             await syncAppleTransactionIfPossible(snapshot)
             if currentPlan != .pro {
@@ -2891,6 +2907,9 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let clerk, let session = clerk.session else {
             if pendingAction != .none {
                 statusMessage = "Sign in was not completed. No purchase was started."
+            }
+            if pendingAction == .purchasePro {
+                pendingStoreKitPurchaseAction = nil
             }
             return
         }

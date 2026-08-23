@@ -3,6 +3,7 @@ import UIKit
 import os.signpost
 import ClerkKit
 import ClerkKitUI
+import StoreKit
 
 private struct PermitextClerkEnvironmentKey: EnvironmentKey {
     static let defaultValue: Clerk? = nil
@@ -18,6 +19,7 @@ extension EnvironmentValues {
 @main
 struct PermitextApp: App {
     @StateObject private var library: CodeLibraryViewModel
+    @Environment(\.purchase) private var purchaseAction
     @Environment(\.scenePhase) private var scenePhase
     private let offersFirstUseExperience: Bool
     private let clerk: Clerk?
@@ -141,7 +143,7 @@ struct PermitextApp: App {
                     Button(library.upgradeCallToActionTitle) {
                         library.dismissEntitlementPrompt()
                         Task {
-                            await library.purchasePro(clerk: clerk)
+                            await library.purchasePro(clerk: clerk, using: purchaseAction)
                         }
                     }
                 }

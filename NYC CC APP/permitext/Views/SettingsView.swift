@@ -1,5 +1,6 @@
 import AuthenticationServices
 import ClerkKit
+import StoreKit
 import SwiftUI
 import UIKit
 
@@ -12,6 +13,7 @@ struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openURL) private var openURL
+    @Environment(\.purchase) private var purchaseAction
     @Environment(\.permitextClerk) private var clerk
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
@@ -220,7 +222,7 @@ struct SettingsView: View {
 
             if library.currentPlan == .free {
                 Button {
-                    Task { await library.purchasePro(clerk: clerk) }
+                    Task { await library.purchasePro(clerk: clerk, using: purchaseAction) }
                 } label: {
                     Label(upgradeButtonTitle, systemImage: "sparkles")
                         .font(.subheadline.weight(.semibold))

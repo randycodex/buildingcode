@@ -4984,7 +4984,7 @@ actor StoreKitSubscriptionService {
         )
     }
 
-    func purchasePro() async throws -> StoreKitSubscriptionSnapshot {
+    func proProductForPurchase() async throws -> Product {
         guard AppStore.canMakePayments else {
             throw StoreKitSubscriptionServiceError.paymentsUnavailable
         }
@@ -4992,7 +4992,10 @@ actor StoreKitSubscriptionService {
             throw StoreKitSubscriptionServiceError.proProductUnavailable
         }
 
-        let result = try await product.purchase()
+        return product
+    }
+
+    func snapshot(after result: Product.PurchaseResult) async throws -> StoreKitSubscriptionSnapshot {
         switch result {
         case .success(let verification):
             let transaction = try verifiedTransaction(from: verification)

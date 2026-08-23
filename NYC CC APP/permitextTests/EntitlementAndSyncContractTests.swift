@@ -1541,6 +1541,30 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testStoreKitPurchaseUsesTheActiveSwiftUIScene() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
+        let appSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/PermitextApp.swift"),
+            encoding: .utf8
+        )
+        let storeKitSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Models/CodeModels.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(settingsSource.contains("@Environment(\\.purchase) private var purchaseAction"))
+        XCTAssertTrue(settingsSource.contains("using: purchaseAction"))
+        XCTAssertTrue(appSource.contains("@Environment(\\.purchase) private var purchaseAction"))
+        XCTAssertTrue(appSource.contains("using: purchaseAction"))
+        XCTAssertFalse(storeKitSource.contains("product.purchase()"))
+    }
+
     func testAccountUserDataProfilesNeverExposeSavedPassagesAcrossAccounts() throws {
         let suiteName = "permitext-tests.account-profiles.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
