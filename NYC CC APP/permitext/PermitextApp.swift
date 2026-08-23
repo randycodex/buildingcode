@@ -17,21 +17,94 @@ extension EnvironmentValues {
 }
 
 private struct PermitextClerkAuthenticationView: View {
+    private enum PreparationState {
+        case preparing
+        case ready
+        case failed(String)
+    }
+
     @Environment(Clerk.self) private var clerk
     @Environment(\.dismiss) private var dismiss
+    @State private var preparationState: PreparationState = .preparing
+    @State private var preparationAttempt = 0
+    @State private var staleSessionID: String?
 
     var body: some View {
-        AuthView()
+        Group {
+            switch preparationState {
+            case .ready:
+                AuthView()
+            case .preparing:
+                ProgressView("Preparing secure sign-in...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            case .failed(let message):
+                ContentUnavailableView {
+                    Label("Sign-in needs a reset", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(message)
+                } actions: {
+                    Button("Try Again") {
+                        preparationState = .preparing
+                        preparationAttempt += 1
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+        }
             .onChange(of: clerk.session?.id) { _, sessionID in
-                guard sessionID != nil else { return }
+                guard case .ready = preparationState, let sessionID else { return }
+                guard sessionID != staleSessionID else {
+                    preparationState = .preparing
+                    preparationAttempt += 1
+                    return
+                }
                 dismiss()
             }
-            .task {
-                guard clerk.session != nil else { return }
-                await Task.yield()
-                dismiss()
+            .task(id: preparationAttempt) {
+                await prepareForAuthentication()
             }
     }
+
+    private func prepareForAuthentication() async {
+        // Give Clerk's persisted client a moment to hydrate so an old session
+        // cannot arrive immediately after AuthView is mounted.
+        try? await Task.sleep(for: .milliseconds(250))
+        guard !Task.isCancelled else { return }
+        staleSessionID = clerk.session?.id
+
+        do {
+            if clerk.session != nil {
+                do {
+                    try await clerk.auth.signOut()
+                } catch {
+                    // Network sign-out can fail while the device is offline.
+                    // Clearing Clerk's durable local state is still required
+                    // before another account may authenticate.
+                    try await Clerk.clearAllKeychainItemsAndWait()
+                }
+            } else {
+                // Also remove a client/session record left by an older build.
+                try await Clerk.clearAllKeychainItemsAndWait()
+            }
+
+            try? await Task.sleep(for: .milliseconds(150))
+            if clerk.session != nil {
+                try await Clerk.clearAllKeychainItemsAndWait()
+            }
+            guard clerk.session == nil else {
+                throw PermitextAuthenticationPreparationError.staleSessionRemains
+            }
+            preparationState = .ready
+        } catch {
+            preparationState = .failed(
+                "Permitext could not safely clear the previous sign-in. Check your connection and try again."
+            )
+        }
+    }
+}
+
+private enum PermitextAuthenticationPreparationError: Error {
+    case staleSessionRemains
 }
 
 @main

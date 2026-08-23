@@ -962,6 +962,97 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testStoreKitAccountBindingPolicyRequiresAccountSpecificAuthorization() {
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .free,
+                transactionEnvironment: "sandbox",
+                hasSignedTransactionInfo: true,
+                signedInUserID: "user-a",
+                boundTestUserID: "user-a",
+                allowsNewTestBinding: true
+            ),
+            .inactive
+        )
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .pro,
+                transactionEnvironment: "sandbox",
+                hasSignedTransactionInfo: true,
+                signedInUserID: nil,
+                boundTestUserID: nil,
+                allowsNewTestBinding: true
+            ),
+            .signInRequired
+        )
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .pro,
+                transactionEnvironment: "sandbox",
+                hasSignedTransactionInfo: true,
+                signedInUserID: "user-a",
+                boundTestUserID: nil,
+                allowsNewTestBinding: true
+            ),
+            .bindLocalTest
+        )
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .pro,
+                transactionEnvironment: "xcode",
+                hasSignedTransactionInfo: true,
+                signedInUserID: "user-a",
+                boundTestUserID: nil,
+                allowsNewTestBinding: false
+            ),
+            .explicitRestoreRequired
+        )
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .pro,
+                transactionEnvironment: "sandbox",
+                hasSignedTransactionInfo: true,
+                signedInUserID: "user-a",
+                boundTestUserID: "user-a",
+                allowsNewTestBinding: false
+            ),
+            .authorizedLocalTest
+        )
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .pro,
+                transactionEnvironment: "sandbox",
+                hasSignedTransactionInfo: true,
+                signedInUserID: "user-b",
+                boundTestUserID: "user-a",
+                allowsNewTestBinding: true
+            ),
+            .ownedByAnotherAccount
+        )
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .pro,
+                transactionEnvironment: "production",
+                hasSignedTransactionInfo: true,
+                signedInUserID: "user-a",
+                boundTestUserID: nil,
+                allowsNewTestBinding: false
+            ),
+            .requiresBackendVerification
+        )
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .pro,
+                transactionEnvironment: nil,
+                hasSignedTransactionInfo: false,
+                signedInUserID: "user-a",
+                boundTestUserID: nil,
+                allowsNewTestBinding: false
+            ),
+            .missingTransactionEvidence
+        )
+    }
+
     func testSignedInAccountPersistenceRemovesLegacySessionToken() {
         let account = SignedInAccount(
             appUserID: "apple:persistence-test",
@@ -1549,7 +1640,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
-    func testStoreKitPurchaseUsesPurchaseActionFromPresentedSwiftUIView() throws {
+    func testStoreKitPurchaseUsesPurchaseActionWithSafeTransactionPreflight() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -1573,14 +1664,52 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(settingsSource.contains("@Environment(\\.purchase) private var purchase"))
         XCTAssertTrue(settingsSource.contains("await library.purchasePro(using: purchase)"))
         XCTAssertTrue(appSource.contains("ProSubscriptionStoreView()"))
-        XCTAssertTrue(viewModelSource.contains("let purchaseResult = try await purchaseAction(product)"))
+        XCTAssertTrue(viewModelSource.contains("storeKitSubscriptionService.prepareForPurchase()"))
+        XCTAssertTrue(viewModelSource.contains("let appAccountToken = storeKitAppAccountToken(for: purchasingAccount.appUserID)"))
+        XCTAssertTrue(viewModelSource.contains("let purchaseResult = try await purchaseAction("))
+        XCTAssertTrue(viewModelSource.contains("options: [.appAccountToken(appAccountToken)]"))
         XCTAssertTrue(viewModelSource.contains("for attempt in 1...2"))
         XCTAssertFalse(settingsSource.contains("SubscriptionStoreView(groupID:"))
         XCTAssertFalse(appSource.contains("@Environment(\\.purchase)"))
         XCTAssertFalse(storeKitSource.contains("product.purchase()"))
+
+        let preflightStart = try XCTUnwrap(storeKitSource.range(of: "func prepareForPurchase()"))
+        let purchaseStart = try XCTUnwrap(
+            storeKitSource.range(
+                of: "func snapshot(after result: Product.PurchaseResult)",
+                range: preflightStart.upperBound..<storeKitSource.endIndex
+            )
+        )
+        let preflightSource = String(storeKitSource[preflightStart.lowerBound..<purchaseStart.lowerBound])
+        XCTAssertTrue(preflightSource.contains("for await verification in Transaction.unfinished"))
+        XCTAssertTrue(preflightSource.contains("guard !isActiveOwnedTransaction(transaction) else { continue }"))
+        XCTAssertTrue(preflightSource.contains("await transaction.finish()"))
+
+        let restoreStart = try XCTUnwrap(storeKitSource.range(of: "func restorePurchases()"))
+        let updatesStart = try XCTUnwrap(
+            storeKitSource.range(
+                of: "func transactionUpdates()",
+                range: restoreStart.upperBound..<storeKitSource.endIndex
+            )
+        )
+        let restoreSource = String(storeKitSource[restoreStart.lowerBound..<updatesStart.lowerBound])
+        XCTAssertTrue(restoreSource.contains("try await AppStore.sync()"))
+        XCTAssertFalse(restoreSource.contains("try? await AppStore.sync()"))
+
+        let storeKitActorStart = try XCTUnwrap(storeKitSource.range(of: "actor StoreKitSubscriptionService"))
+        let storeKitActorEnd = try XCTUnwrap(
+            storeKitSource.range(
+                of: "enum BookmarkSortMode",
+                range: storeKitActorStart.upperBound..<storeKitSource.endIndex
+            )
+        )
+        let storeKitActorSource = String(
+            storeKitSource[storeKitActorStart.lowerBound..<storeKitActorEnd.lowerBound]
+        )
+        XCTAssertFalse(storeKitActorSource.contains("LocalEntitlementService.setVerifiedPlan"))
     }
 
-    func testClerkAuthenticationSheetDismissesWhenSessionActivates() throws {
+    func testClerkAuthenticationRequiresFreshSessionAndSignsOutLocallyFirst() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -1592,11 +1721,49 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
             encoding: .utf8
         )
+        let bookmarksSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/BookmarksView.swift"),
+            encoding: .utf8
+        )
+        let viewModelSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/ViewModels/CodeLibraryViewModel.swift"),
+            encoding: .utf8
+        )
 
         XCTAssertTrue(appSource.contains("PermitextClerkAuthenticationView()"))
         XCTAssertTrue(appSource.contains(".onChange(of: clerk.session?.id)"))
+        XCTAssertTrue(appSource.contains("Preparing secure sign-in..."))
+        XCTAssertTrue(appSource.contains("Clerk.clearAllKeychainItemsAndWait()"))
+        XCTAssertFalse(appSource.contains("try? await clerk.auth.signOut()"))
         XCTAssertTrue(settingsSource.contains("await library.signOut(clerk: clerk)"))
+        XCTAssertTrue(bookmarksSource.contains("@Environment(\\.permitextClerk) private var clerk"))
+        XCTAssertTrue(bookmarksSource.contains("await library.signOut(clerk: clerk)"))
+        XCTAssertFalse(viewModelSource.contains("while isAccountBusy"))
         XCTAssertFalse(settingsSource.contains("try? await clerk.auth.signOut()"))
+
+        let signOutStart = try XCTUnwrap(viewModelSource.range(of: "func signOut(clerk: Clerk?) async"))
+        let convenienceSignOutStart = try XCTUnwrap(
+            viewModelSource.range(
+                of: "func signOut()",
+                range: signOutStart.upperBound..<viewModelSource.endIndex
+            )
+        )
+        let signOutSource = String(viewModelSource[signOutStart.lowerBound..<convenienceSignOutStart.lowerBound])
+        let localSignOut = try XCTUnwrap(signOutSource.range(of: "completeLocalSignOut()"))
+        let providerSignOut = try XCTUnwrap(signOutSource.range(of: "clerk.auth.signOut()"))
+        XCTAssertLessThan(localSignOut.lowerBound, providerSignOut.lowerBound)
+        XCTAssertFalse(signOutSource.contains("try? await clerk.auth.signOut()"))
+
+        let reconcileStart = try XCTUnwrap(viewModelSource.range(of: "func reconcileClerkSessionIfNeeded"))
+        let completeSignInStart = try XCTUnwrap(
+            viewModelSource.range(
+                of: "private func completeClerkBackendSignIn",
+                range: reconcileStart.upperBound..<viewModelSource.endIndex
+            )
+        )
+        let reconcileSource = String(viewModelSource[reconcileStart.lowerBound..<completeSignInStart.lowerBound])
+        XCTAssertTrue(reconcileSource.contains("Clerk.clearAllKeychainItemsAndWait()"))
+        XCTAssertFalse(reconcileSource.contains("completeClerkBackendSignIn(session: session, linkFrom: nil)"))
     }
 
     func testAccountUserDataProfilesNeverExposeSavedPassagesAcrossAccounts() throws {
@@ -2001,15 +2168,15 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
-    func testStoreKitProIsUsedWhenBackendHasNoActiveProEntitlement() {
+    func testLegacyVerifiedStoreKitPlanAloneNeverGrantsPro() {
         let defaults = isolatedEntitlementDefaults()
         let service = LocalEntitlementService(defaults: defaults)
         LocalEntitlementService.setVerifiedPlan(.pro, defaults: defaults)
 
-        XCTAssertEqual(service.currentEntitlement, .appleSubscriptionPro)
+        XCTAssertEqual(service.currentEntitlement, .free)
 
         LocalEntitlementService.setEntitlement(.free, defaults: defaults)
-        XCTAssertEqual(service.currentEntitlement, .appleSubscriptionPro)
+        XCTAssertEqual(service.currentEntitlement, .free)
 
         LocalEntitlementService.setEntitlement(
             AppEntitlement(
@@ -2020,10 +2187,40 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             ),
             defaults: defaults
         )
-        XCTAssertEqual(service.currentEntitlement, .appleSubscriptionPro)
+        XCTAssertEqual(service.currentEntitlement, .free)
 
         LocalEntitlementService.setVerifiedPlan(.free, defaults: defaults)
         XCTAssertEqual(service.currentEntitlement, .free)
+    }
+
+    @MainActor
+    func testStartupClearsLifetimeGrantThatBelongsToAnotherAccount() {
+        let defaults = isolatedEntitlementDefaults()
+        LocalEntitlementService.setLifetimeGrant(userID: "user-a", defaults: defaults)
+        let accountB = SignedInAccount(
+            appUserID: "user-b",
+            authProvider: .clerk,
+            authProviderUserID: "clerk-b",
+            appleUserID: "clerk-b",
+            displayName: "Account B",
+            signedInAt: Date()
+        )
+
+        _ = CodeLibraryViewModel(
+            continuityStore: ContinuityStore(defaults: defaults),
+            readerThemeStore: ReaderThemeStore(defaults: defaults),
+            preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults),
+            loadsInitialContent: false,
+            loadsPersistedAccount: false,
+            initialSignedInAccount: accountB,
+            ownsAccountSync: false
+        )
+
+        XCTAssertEqual(LocalEntitlementService(defaults: defaults).currentEntitlement, .free)
+        XCTAssertNil(
+            defaults.string(forKey: LocalEntitlementService.lifetimeGrantUserIDDefaultsKey)
+        )
     }
 
     #if DEBUG

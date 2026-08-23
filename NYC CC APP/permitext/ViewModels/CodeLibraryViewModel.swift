@@ -202,6 +202,8 @@ final class CodeLibraryViewModel: ObservableObject {
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
     private let startupSignpostID = OSSignpostID(log: AppSignpost.startup)
     private var postClerkAuthenticationAction: PostClerkAuthenticationAction = .none
+    private var clerkAuthenticationAttemptID: UUID?
+    private var accountMutationGeneration: UInt64 = 0
     private var hasRecordedFirstUsableContent = false
     private let recentSearchesDefaultsKey = "recentSearches"
     private let pinnedSearchesDefaultsKey = "pinnedSearches"
@@ -261,7 +263,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var isNetworkAvailable = false
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
-    private var activeStoreKitPlan: AppPlan = .free
+    private var accountAuthorizedStoreKitPlan: AppPlan = .free
     private var activeStoreKitResearch = false
     private var hasActiveBackendProEntitlement = false
     private let foregroundAccountSyncInterval: TimeInterval = 30
@@ -291,6 +293,16 @@ final class CodeLibraryViewModel: ObservableObject {
     ) {
         let loadedSignedInAccount = initialSignedInAccount
             ?? (loadsPersistedAccount ? Self.loadSignedInAccount() : nil)
+        if let storedLifetimeUserID = preferencesDefaults.string(
+            forKey: LocalEntitlementService.lifetimeGrantUserIDDefaultsKey
+        ), loadedSignedInAccount == nil
+            || (storedLifetimeUserID != loadedSignedInAccount?.appUserID
+                && storedLifetimeUserID != loadedSignedInAccount?.appleUserID) {
+            // Migrate away device-global lifetime state left by older builds.
+            // A grant is re-applied only after the matching account is
+            // authenticated and the backend confirms it.
+            LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
+        }
         let resolvedSyncBackend = syncBackend
             ?? (accountBackendClient as? UserContentSyncBackend)
             ?? NoOpUserContentSyncBackend()
@@ -1257,7 +1269,7 @@ final class CodeLibraryViewModel: ObservableObject {
         currentPlan = sharedLibrary.currentPlan
         currentEntitlementSource = sharedLibrary.currentEntitlementSource
         currentCapabilityContract = sharedLibrary.currentCapabilityContract
-        activeStoreKitPlan = sharedLibrary.activeStoreKitPlan
+        accountAuthorizedStoreKitPlan = sharedLibrary.accountAuthorizedStoreKitPlan
         activeStoreKitResearch = sharedLibrary.activeStoreKitResearch
         isStoreKitResearchActive = sharedLibrary.isStoreKitResearchActive
         hasActiveBackendProEntitlement = sharedLibrary.hasActiveBackendProEntitlement
@@ -2665,7 +2677,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     var isStoreKitTestProActive: Bool {
-        guard activeStoreKitPlan == .pro, !hasActiveBackendProEntitlement else { return false }
+        guard accountAuthorizedStoreKitPlan == .pro, !hasActiveBackendProEntitlement else { return false }
         switch storeKitTransactionEnvironment?.lowercased() {
         case "xcode", "sandbox":
             return true
@@ -2695,10 +2707,10 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func hasCapability(_ capability: PermitextCapabilityID) -> Bool {
-        if capability == .research, activeStoreKitPlan == .pro {
+        if capability == .research, accountAuthorizedStoreKitPlan == .pro {
             return true
         }
-        if activeStoreKitPlan == .pro,
+        if accountAuthorizedStoreKitPlan == .pro,
            [.projects, .notebook, .professionalExports, .offlineAccess].contains(capability) {
             return true
         }
@@ -2740,19 +2752,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func refreshStoreKitEntitlements() async {
         let snapshot = await storeKitSubscriptionService.snapshot()
-        applyStoreKitSnapshot(snapshot)
-        if snapshot.plan == .pro && signedInAccount == nil {
-            switch snapshot.transactionEnvironment?.lowercased() {
-            case "xcode":
-                statusMessage = "Pro is active on this device. Xcode StoreKit purchases cannot sync to the web."
-            case "sandbox":
-                statusMessage = "Pro is active in Sandbox or TestFlight. Test purchases do not activate production web Pro."
-            default:
-                statusMessage = "Pro is active on this device. Sign in with Apple to use Pro on the web."
-            }
-            return
-        }
-        await syncAppleTransactionIfPossible(snapshot)
+        _ = await authorizeStoreKitSnapshot(snapshot, allowsNewTestBinding: false)
     }
 
     func startStoreKitTransactionObservation() {
@@ -2761,14 +2761,17 @@ final class CodeLibraryViewModel: ObservableObject {
         storeKitUpdatesTask = Task { [weak self] in
             let updates = await service.transactionUpdates()
             for await snapshot in updates {
-                self?.applyStoreKitSnapshot(snapshot)
-                await self?.syncAppleTransactionIfPossible(snapshot)
+                _ = await self?.authorizeStoreKitSnapshot(snapshot, allowsNewTestBinding: false)
             }
         }
     }
 
     func requestProSubscriptionStore(clerk: Clerk? = nil) async {
         guard await requireSignedInBillingAccount(clerk: clerk, then: .purchasePro) else { return }
+        guard currentPlan != .pro else {
+            statusMessage = "Pro is already active for this Permitext account."
+            return
+        }
         guard !isStoreKitBusy else { return }
         storeKitOperationMessage = nil
         isStoreKitBusy = true
@@ -2790,7 +2793,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func purchasePro(using purchaseAction: PurchaseAction) async {
-        guard signedInAccount != nil else {
+        guard let purchasingAccount = signedInAccount else {
             statusMessage = "Sign in or create a Permitext account before purchasing Pro."
             storeKitOperationMessage = statusMessage
             return
@@ -2800,7 +2803,29 @@ final class CodeLibraryViewModel: ObservableObject {
         defer { isStoreKitBusy = false }
 
         do {
+            storeKitOperationMessage = "Preparing the App Store purchase..."
+            let preflightSnapshot = await storeKitSubscriptionService.prepareForPurchase()
+            let preflightAuthorized = await authorizeStoreKitSnapshot(
+                preflightSnapshot,
+                allowsNewTestBinding: false
+            )
+            if currentPlan == .pro {
+                isProSubscriptionStorePresented = false
+                statusMessage = isStoreKitTestProActive
+                    ? "Pro (Test) is already active on this device."
+                    : "Pro is already active."
+                storeKitOperationMessage = statusMessage
+                return
+            }
+            if preflightSnapshot.plan == .pro, !preflightAuthorized {
+                // An active Apple transaction exists, but this account has not
+                // established ownership. Starting another purchase risks a
+                // duplicate charge; explicit Restore is the recovery path.
+                return
+            }
+
             var product = try await storeKitSubscriptionService.proProductForPurchase(refresh: true)
+            let appAccountToken = storeKitAppAccountToken(for: purchasingAccount.appUserID)
             for attempt in 1...2 {
                 storeKitOperationMessage = attempt == 1
                     ? "Waiting for Apple to open the purchase confirmation..."
@@ -2809,13 +2834,25 @@ final class CodeLibraryViewModel: ObservableObject {
                     "Starting native StoreKit purchase attempt \(attempt, privacy: .public) for product \(product.id, privacy: .public)."
                 )
 
-                let purchaseResult = try await purchaseAction(product)
+                guard signedInAccount?.appUserID == purchasingAccount.appUserID else {
+                    throw CancellationError()
+                }
+                let purchaseResult = try await purchaseAction(
+                    product,
+                    options: [.appAccountToken(appAccountToken)]
+                )
                 switch purchaseResult {
                 case .success:
                     let snapshot = try await storeKitSubscriptionService.snapshot(after: purchaseResult)
-                    applyStoreKitSnapshot(snapshot)
-                    await syncAppleTransactionIfPossible(snapshot)
-                    if currentPlan == .pro {
+                    guard signedInAccount?.appUserID == purchasingAccount.appUserID else {
+                        throw CancellationError()
+                    }
+                    let authorized = await authorizeStoreKitSnapshot(
+                        snapshot,
+                        allowsNewTestBinding: true
+                    )
+                    if authorized, currentPlan == .pro {
+                        await storeKitSubscriptionService.finishActiveProTransactions()
                         isProSubscriptionStorePresented = false
                         if isStoreKitTestProActive {
                             statusMessage = "Pro (Test) is active on this device."
@@ -2828,6 +2865,7 @@ final class CodeLibraryViewModel: ObservableObject {
                         return
                     }
 
+                    guard snapshot.plan != .pro else { return }
                     Self.storeKitPurchaseLogger.error(
                         "StoreKit returned an inactive transaction on attempt \(attempt, privacy: .public): \(snapshot.debugSummary, privacy: .public)"
                     )
@@ -2886,18 +2924,29 @@ final class CodeLibraryViewModel: ObservableObject {
             isStoreKitRestoreInProgress = false
         }
 
-        let snapshot = await storeKitSubscriptionService.restorePurchases()
-        applyStoreKitSnapshot(snapshot)
-        await syncAppleTransactionIfPossible(snapshot)
-        if currentPlan != .pro {
-            statusMessage = "No active Pro subscription found."
-            storeKitOperationMessage = "Apple found no active Pro subscription for this App Store account."
-        } else if isStoreKitTestProActive {
-            statusMessage = "Pro (Test), including Research, was restored on this device. Test purchases cannot activate production web access."
-            storeKitOperationMessage = "Apple restored Pro (Test) on this device."
-        } else {
-            statusMessage = "Pro, including Research, was restored."
-            storeKitOperationMessage = "Apple restored your Pro subscription."
+        do {
+            let snapshot = try await storeKitSubscriptionService.restorePurchases()
+            let authorized = await authorizeStoreKitSnapshot(
+                snapshot,
+                allowsNewTestBinding: true
+            )
+            if authorized, currentPlan == .pro {
+                await storeKitSubscriptionService.finishActiveProTransactions()
+                if isStoreKitTestProActive {
+                    statusMessage = "Pro (Test), including Research, was restored on this device. Test purchases cannot activate production web access."
+                    storeKitOperationMessage = "Apple restored Pro (Test) on this device."
+                } else {
+                    statusMessage = "Pro, including Research, was restored."
+                    storeKitOperationMessage = "Apple restored your Pro subscription."
+                }
+            } else if snapshot.plan != .pro {
+                statusMessage = "No active Pro subscription found."
+                storeKitOperationMessage = "Apple found no active Pro subscription for this App Store account."
+            }
+        } catch {
+            let message = "Apple could not restore purchases: \(error.localizedDescription)"
+            statusMessage = message
+            storeKitOperationMessage = message
         }
     }
 
@@ -2956,40 +3005,70 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func requestClerkAuthentication(then action: PostClerkAuthenticationAction) {
-        guard !isAccountBusy else { return }
+        guard !isAccountBusy, !isStoreKitBusy else {
+            statusMessage = "Finish the current account or App Store operation before changing accounts."
+            return
+        }
+        accountMutationGeneration &+= 1
+        clerkAuthenticationAttemptID = UUID()
         postClerkAuthenticationAction = action
         accountAuthenticationMessage = nil
         isClerkAuthenticationPresented = true
     }
 
     func handleClerkAuthenticationFinished(clerk: Clerk?) async {
-        let pendingAction = postClerkAuthenticationAction
-        postClerkAuthenticationAction = .none
-
+        guard let authenticationAttemptID = clerkAuthenticationAttemptID else { return }
         guard let clerk, let session = clerk.session else {
+            let pendingAction = postClerkAuthenticationAction
+            postClerkAuthenticationAction = .none
+            clerkAuthenticationAttemptID = nil
             if pendingAction != .none {
                 statusMessage = "Sign in was not completed. No purchase was started."
             }
             return
         }
-        guard !isAccountBusy else { return }
 
-        isAccountBusy = true
-        accountAuthenticationMessage = "Finishing Permitext sign-in..."
-        let sourceAccount = signedInAccount?.authProvider == .clerk ? nil : signedInAccount
-
-        do {
-            Self.accountAuthenticationLogger.info("Clerk native authentication returned an activated session.")
-            try await completeClerkBackendSignIn(session: session, linkFrom: sourceAccount)
-        } catch {
-            let message = Self.accountAuthenticationFailureMessage(for: error)
-            accountAuthenticationMessage = message
-            statusMessage = message
-            Self.accountAuthenticationLogger.error(
-                "Clerk native session reconciliation failed: \(String(describing: error), privacy: .public)"
-            )
+        // Account sync may be finishing as the OAuth sheet closes. Bound this
+        // wait so a stalled sync can never hang sign-in or start a purchase
+        // after the user has already retried.
+        for _ in 0..<40 where isAccountBusy {
+            guard !Task.isCancelled else { return }
+            try? await Task.sleep(for: .milliseconds(50))
         }
-        isAccountBusy = false
+        guard !isAccountBusy, authenticationAttemptID == clerkAuthenticationAttemptID else {
+            statusMessage = "Permitext is still finishing an account operation. Select sign in and try again."
+            postClerkAuthenticationAction = .none
+            clerkAuthenticationAttemptID = nil
+            return
+        }
+
+        let pendingAction = postClerkAuthenticationAction
+        postClerkAuthenticationAction = .none
+
+        if signedInAccount?.authProvider != .clerk {
+            isAccountBusy = true
+            accountAuthenticationMessage = "Finishing Permitext sign-in..."
+            let sourceAccount = signedInAccount
+            let expectedGeneration = accountMutationGeneration
+
+            do {
+                Self.accountAuthenticationLogger.info("Clerk native authentication returned an activated session.")
+                try await completeClerkBackendSignIn(
+                    session: session,
+                    linkFrom: sourceAccount,
+                    expectedAccountGeneration: expectedGeneration
+                )
+            } catch {
+                let message = Self.accountAuthenticationFailureMessage(for: error)
+                accountAuthenticationMessage = message
+                statusMessage = message
+                Self.accountAuthenticationLogger.error(
+                    "Clerk native session reconciliation failed: \(String(describing: error), privacy: .public)"
+                )
+            }
+            isAccountBusy = false
+        }
+        clerkAuthenticationAttemptID = nil
 
         guard signedInAccount != nil else { return }
         switch pendingAction {
@@ -3003,27 +3082,34 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func reconcileClerkSessionIfNeeded(clerk: Clerk?) async {
-        guard signedInAccount == nil, let clerk, let session = clerk.session else { return }
-        guard !isAccountBusy else { return }
-        isAccountBusy = true
-        accountAuthenticationMessage = "Finishing Permitext sign-in..."
-        defer { isAccountBusy = false }
+        guard signedInAccount == nil,
+              !isAccountBusy,
+              !isClerkAuthenticationPresented,
+              clerkAuthenticationAttemptID == nil,
+              let clerk,
+              clerk.session != nil
+        else { return }
 
+        // A locally signed-out Permitext account must stay signed out. Older
+        // builds could leave a hydrated Clerk session behind; never turn that
+        // stale provider session back into a Permitext account automatically.
         do {
-            try await completeClerkBackendSignIn(session: session, linkFrom: nil)
+            do {
+                try await clerk.auth.signOut()
+            } catch {
+                try await Clerk.clearAllKeychainItemsAndWait()
+            }
         } catch {
-            let message = Self.accountAuthenticationFailureMessage(for: error)
-            accountAuthenticationMessage = message
-            statusMessage = message
             Self.accountAuthenticationLogger.error(
-                "Clerk session reconciliation failed: \(String(describing: error), privacy: .public)"
+                "Stale Clerk session cleanup failed: \(String(describing: error), privacy: .public)"
             )
         }
     }
 
     private func completeClerkBackendSignIn(
         session: Session,
-        linkFrom sourceAccount: SignedInAccount?
+        linkFrom sourceAccount: SignedInAccount?,
+        expectedAccountGeneration: UInt64
     ) async throws {
         guard let userID = session.user?.id ?? session.publicUserData?.userId else {
             throw PermitextBackendHTTPError.invalidResponse
@@ -3041,12 +3127,16 @@ final class CodeLibraryViewModel: ObservableObject {
             ),
             linkFrom: sourceAccount
         )
+        guard expectedAccountGeneration == accountMutationGeneration else {
+            throw CancellationError()
+        }
         await completeBackendSignIn(backendRecord)
     }
 
     private func completeBackendSignIn(_ backendRecord: BackendAccountRecord) async {
         let account = backendRecord.account
         let shouldClaimGuestProfile = signedInAccount == nil
+        LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
         activateUserContentScope(
             account: account,
             claimCurrentGuestForNewAccount: shouldClaimGuestProfile
@@ -3588,10 +3678,13 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             let result = try await lifetimeGrantLookupClient.lookupLifetimeGrant(appleUserID: signedInAccount.appleUserID)
             if result.hasLifetimeGrant {
-                LocalEntitlementService.setLifetimeGrant(userID: result.grantedUserID ?? signedInAccount.appleUserID)
+                LocalEntitlementService.setLifetimeGrant(
+                    userID: result.grantedUserID ?? signedInAccount.appleUserID,
+                    defaults: preferencesDefaults
+                )
                 statusMessage = "Lifetime Pro grant applied."
             } else if result.authoritativelyDeniesGrant && currentEntitlementSource == .lifetimeGrant {
-                LocalEntitlementService.clearLifetimeGrant()
+                LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
                 statusMessage = "No lifetime Pro grant found for this account."
             } else if result.authoritativelyDeniesGrant && announcesMissingGrant {
                 statusMessage = "Signed in. No lifetime Pro grant found for this account."
@@ -3603,27 +3696,46 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func signOut(clerk: Clerk?) async {
-        guard !isAccountBusy else { return }
+        guard !isAccountBusy, !isStoreKitBusy else {
+            statusMessage = "Finish the current account or App Store operation before signing out."
+            return
+        }
+        accountMutationGeneration &+= 1
+        clerkAuthenticationAttemptID = nil
+        postClerkAuthenticationAction = .none
+        isClerkAuthenticationPresented = false
+        completeLocalSignOut()
+
         isAccountBusy = true
         defer { isAccountBusy = false }
 
-        if let clerk, clerk.session != nil {
+        if let clerk {
             do {
                 try await clerk.auth.signOut()
             } catch {
-                let message = "Sign-out could not finish: \(error.localizedDescription)"
-                accountAuthenticationMessage = message
-                statusMessage = message
-                Self.accountAuthenticationLogger.error(
-                    "Clerk sign-out failed: \(String(describing: error), privacy: .public)"
-                )
-                return
+                do {
+                    try await Clerk.clearAllKeychainItemsAndWait()
+                } catch {
+                    let message = "Signed out of Permitext. The previous provider session could not be cleared; reconnect and try again before signing into another account."
+                    accountAuthenticationMessage = message
+                    statusMessage = message
+                    Self.accountAuthenticationLogger.error(
+                        "Clerk sign-out and local cleanup failed: \(String(describing: error), privacy: .public)"
+                    )
+                }
             }
         }
-        completeLocalSignOut()
     }
 
     func signOut() {
+        guard !isStoreKitBusy else {
+            statusMessage = "Finish the current App Store operation before signing out."
+            return
+        }
+        accountMutationGeneration &+= 1
+        clerkAuthenticationAttemptID = nil
+        postClerkAuthenticationAction = .none
+        isClerkAuthenticationPresented = false
         completeLocalSignOut()
     }
 
@@ -3635,6 +3747,8 @@ final class CodeLibraryViewModel: ObservableObject {
         userContentSyncConflicts = []
         Self.clearSignedInAccount()
         currentCapabilityContract = nil
+        LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
+        clearAccountAuthorizedStoreKitState()
         applyBackendEntitlement(nil)
         activateUserContentScope(account: nil)
         statusMessage = "Signed out."
@@ -3687,12 +3801,17 @@ final class CodeLibraryViewModel: ObservableObject {
             statusMessage = "Your Permitext account was deleted, but some on-device saved data could not be cleared."
         }
         accountUserDataProfiles?.removeAccountProfile(accountID: account.appUserID)
+        if preferencesDefaults.string(forKey: AccountDefaults.storeKitTestOwnerUserIDKey) == account.appUserID {
+            preferencesDefaults.removeObject(forKey: AccountDefaults.storeKitTestOwnerUserIDKey)
+        }
         signedInAccount = nil
         organizations = []
         userContentSyncConflicts = []
         userContentSyncCheckpoint = nil
         currentCapabilityContract = nil
         Self.clearSignedInAccount()
+        LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
+        clearAccountAuthorizedStoreKitState()
         applyBackendEntitlement(nil)
         activateUserContentScope(account: nil)
         recentSearches = []
@@ -3716,6 +3835,10 @@ final class CodeLibraryViewModel: ObservableObject {
         signedInAccount = nil
         organizations = []
         Self.clearSignedInAccount()
+        currentCapabilityContract = nil
+        LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
+        clearAccountAuthorizedStoreKitState()
+        applyBackendEntitlement(nil)
         activateUserContentScope(account: nil)
         userContentSyncCheckpoint = nil
         userContentSyncConflicts = []
@@ -3730,7 +3853,7 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshUserContentSyncCheckpoint()
         refreshPendingUserContentSyncCount()
         let storeKitSnapshot = await storeKitSubscriptionService.snapshot()
-        applyStoreKitSnapshot(storeKitSnapshot)
+        _ = await authorizeStoreKitSnapshot(storeKitSnapshot, allowsNewTestBinding: false)
 
         let accountText = signedInAccount == nil ? "account missing" : "account ok"
         let planText = currentPlan == .pro ? "Pro active" : "Free active"
@@ -3791,15 +3914,20 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshCurrentEntitlement()
     }
 
-    private func applyStoreKitSnapshot(_ snapshot: StoreKitSubscriptionSnapshot) {
-        activeStoreKitPlan = snapshot.plan
-        activeStoreKitResearch = snapshot.plan == .pro || snapshot.researchActive
-        isStoreKitResearchActive = snapshot.plan == .pro || snapshot.researchActive
+    private func applyStoreKitSnapshot(
+        _ snapshot: StoreKitSubscriptionSnapshot,
+        authorizedForCurrentAccount: Bool
+    ) {
+        let authorizedPlan: AppPlan = authorizedForCurrentAccount ? snapshot.plan : .free
+        accountAuthorizedStoreKitPlan = authorizedPlan
+        activeStoreKitResearch = authorizedForCurrentAccount
+            && (snapshot.plan == .pro || snapshot.researchActive)
+        isStoreKitResearchActive = activeStoreKitResearch
         let entitlement = entitlementService.currentEntitlement
         let resolvedEntitlement: AppEntitlement
         if entitlement.plan == .pro {
             resolvedEntitlement = entitlement
-        } else if snapshot.plan == .pro {
+        } else if authorizedPlan == .pro {
             resolvedEntitlement = .appleSubscriptionPro
         } else {
             resolvedEntitlement = entitlement
@@ -3813,32 +3941,145 @@ final class CodeLibraryViewModel: ObservableObject {
         storeKitTransactionEnvironment = snapshot.transactionEnvironment
     }
 
-    private func syncAppleTransactionIfPossible(_ snapshot: StoreKitSubscriptionSnapshot) async {
-        guard let signedInAccount else { return }
-        let candidates: [(String, String?)] = [
-            (snapshot.signedTransactionInfo ?? "", snapshot.transactionEnvironment),
-            (snapshot.researchSignedTransactionInfo ?? "", snapshot.researchTransactionEnvironment)
-        ]
-        var synchronizedTransactions: Set<String> = []
-        for (signedTransactionInfo, environment) in candidates
-        where !signedTransactionInfo.isEmpty && synchronizedTransactions.insert(signedTransactionInfo).inserted {
-            if environment?.lowercased() == "xcode" {
-                statusMessage = "StoreKit test access is active on this device. Xcode purchases cannot sync to the web."
-                continue
+    private func clearAccountAuthorizedStoreKitState() {
+        accountAuthorizedStoreKitPlan = .free
+        activeStoreKitResearch = false
+        isStoreKitResearchActive = false
+    }
+
+    @discardableResult
+    private func authorizeStoreKitSnapshot(
+        _ snapshot: StoreKitSubscriptionSnapshot,
+        allowsNewTestBinding: Bool
+    ) async -> Bool {
+        let account = signedInAccount
+        let boundTestUserID = preferencesDefaults.string(
+            forKey: AccountDefaults.storeKitTestOwnerUserIDKey
+        )
+        let decision = StoreKitAccountBindingPolicy.decision(
+            snapshotPlan: snapshot.plan,
+            transactionEnvironment: snapshot.transactionEnvironment,
+            hasSignedTransactionInfo: !(snapshot.signedTransactionInfo ?? "").isEmpty,
+            signedInUserID: account?.appUserID,
+            boundTestUserID: boundTestUserID,
+            allowsNewTestBinding: allowsNewTestBinding
+        )
+
+        switch decision {
+        case .inactive:
+            applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
+            return false
+
+        case .signInRequired:
+            applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
+            statusMessage = "Sign in to the Permitext account that owns this Apple subscription, then select Restore Subscription."
+            return false
+
+        case .authorizedLocalTest:
+            applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: true)
+            await storeKitSubscriptionService.finishActiveProTransactions()
+            return true
+
+        case .bindLocalTest:
+            guard let account else { return false }
+            preferencesDefaults.set(
+                account.appUserID,
+                forKey: AccountDefaults.storeKitTestOwnerUserIDKey
+            )
+            applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: true)
+            await storeKitSubscriptionService.finishActiveProTransactions()
+            return true
+
+        case .explicitRestoreRequired:
+            applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
+            let message = "Apple found an active test subscription. Select Restore Subscription while signed into the Permitext account that should own it."
+            statusMessage = message
+            storeKitOperationMessage = message
+            return false
+
+        case .ownedByAnotherAccount:
+            applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
+            let message = "This Apple test subscription is linked to a different Permitext account. Sign into that account to restore Pro."
+            statusMessage = message
+            storeKitOperationMessage = message
+            return false
+
+        case .missingTransactionEvidence:
+            applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
+            let message = "Apple reported subscription status without a verifiable transaction. Select Restore Subscription and try again."
+            statusMessage = message
+            storeKitOperationMessage = message
+            return false
+
+        case .requiresBackendVerification:
+            guard let account,
+                  let signedTransactionInfo = snapshot.signedTransactionInfo,
+                  !signedTransactionInfo.isEmpty
+            else {
+                applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
+                return false
             }
             do {
                 let entitlement = try await accountBackendClient.verifyAppleTransaction(
-                    account: signedInAccount,
+                    account: account,
                     signedTransactionInfo: signedTransactionInfo
                 )
-                applyBackendEntitlement(entitlement)
-            } catch {
-                if handleBackendSessionFailureIfNeeded(error) {
-                    return
+                guard signedInAccount?.appUserID == account.appUserID else {
+                    throw CancellationError()
                 }
-                statusMessage = "App Store access is active on this device. Backend billing sync failed: \(error.localizedDescription)"
+                guard let entitlement, entitlement.grantsPro() else {
+                    applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
+                    let message = "Apple confirmed the transaction, but Pro is not active for this Permitext account."
+                    statusMessage = message
+                    storeKitOperationMessage = message
+                    return false
+                }
+                applyBackendEntitlement(entitlement)
+                applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: true)
+                await storeKitSubscriptionService.finishActiveProTransactions()
+                return true
+            } catch {
+                applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
+                if Self.isApplePurchaseOwnershipConflict(error) {
+                    await storeKitSubscriptionService.finishActiveProTransactions()
+                    let message = "This Apple subscription is already linked to another Permitext account. Sign into that account to use Pro."
+                    statusMessage = message
+                    storeKitOperationMessage = message
+                    return false
+                }
+                if handleBackendSessionFailureIfNeeded(error) {
+                    storeKitOperationMessage = "Permitext sign-in expired before the Apple transaction could be linked. Sign in and restore the subscription."
+                    return false
+                }
+                let message = "Apple confirmed the purchase, but Permitext could not link it yet: \(error.localizedDescription) Select Restore Subscription to retry."
+                statusMessage = message
+                storeKitOperationMessage = message
+                return false
             }
         }
+    }
+
+    private func storeKitAppAccountToken(for appUserID: String) -> UUID {
+        let accountDigest = SHA256.hash(data: Data(appUserID.utf8))
+            .map { String(format: "%02x", $0) }
+            .joined()
+        let key = AccountDefaults.storeKitAppAccountTokenPrefix + accountDigest
+        if let storedValue = preferencesDefaults.string(forKey: key),
+           let storedToken = UUID(uuidString: storedValue) {
+            return storedToken
+        }
+        let token = UUID()
+        preferencesDefaults.set(token.uuidString, forKey: key)
+        return token
+    }
+
+    private static func isApplePurchaseOwnershipConflict(_ error: Error) -> Bool {
+        guard let backendError = error as? PermitextBackendHTTPError,
+              backendError.statusCode == 409,
+              let serverMessage = backendError.serverMessage?.lowercased()
+        else { return false }
+        return serverMessage.contains("apple purchase")
+            && serverMessage.contains("another permitext account")
     }
 
     private static func isBackendAuthenticationFailure(_ error: Error) -> Bool {

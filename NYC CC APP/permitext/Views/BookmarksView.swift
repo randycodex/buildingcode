@@ -3,6 +3,7 @@ import UIKit
 
 struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.permitextClerk) private var clerk
     @State private var savedFilterCodeSectionIDs: Set<Int64>
     @State private var savedFilterFolderIDs: Set<Int64>
     @State private var folderEditorTarget: FolderEditorTarget?
@@ -151,7 +152,7 @@ struct BookmarksView: View {
                     if library.requiresSignOutConfirmation {
                         showingSignOutWarning = true
                     } else {
-                        library.signOut()
+                        signOut()
                     }
                 } label: {
                     Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
@@ -329,7 +330,7 @@ struct BookmarksView: View {
                     showingSettings = true
                 }
                 Button("Sign Out Anyway", role: .destructive) {
-                    library.signOut()
+                    signOut()
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
@@ -339,6 +340,12 @@ struct BookmarksView: View {
         }
         .coordinateSpace(name: "savedScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
+    }
+
+    private func signOut() {
+        Task {
+            await library.signOut(clerk: clerk)
+        }
     }
 
 private var savedScreenHeader: some View {

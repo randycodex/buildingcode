@@ -4656,6 +4656,8 @@ struct LifetimeGrantLookupResult: Codable, Hashable, Sendable {
 
 enum AccountDefaults {
     static let signedInAccountKey = "permitext.account.signedIn"
+    static let storeKitTestOwnerUserIDKey = "permitext.storeKit.test.ownerUserID"
+    static let storeKitAppAccountTokenPrefix = "permitext.storeKit.appAccountToken."
 }
 
 protocol LifetimeGrantLookupClient {
@@ -4795,9 +4797,6 @@ struct LocalEntitlementService: EntitlementService {
         }
         #else
         #endif
-        if defaults.string(forKey: Self.verifiedPlanDefaultsKey).flatMap(AppPlan.init(rawValue:)) == .pro {
-            return .appleSubscriptionPro
-        }
         return .free
     }
 
@@ -4924,6 +4923,45 @@ enum StoreKitTransactionPolicy {
     }
 }
 
+enum StoreKitAccountBindingDecision: Equatable {
+    case inactive
+    case signInRequired
+    case requiresBackendVerification
+    case authorizedLocalTest
+    case bindLocalTest
+    case explicitRestoreRequired
+    case ownedByAnotherAccount
+    case missingTransactionEvidence
+}
+
+enum StoreKitAccountBindingPolicy {
+    static func decision(
+        snapshotPlan: AppPlan,
+        transactionEnvironment: String?,
+        hasSignedTransactionInfo: Bool,
+        signedInUserID: String?,
+        boundTestUserID: String?,
+        allowsNewTestBinding: Bool
+    ) -> StoreKitAccountBindingDecision {
+        guard snapshotPlan == .pro else { return .inactive }
+        guard let signedInUserID, !signedInUserID.isEmpty else { return .signInRequired }
+
+        switch transactionEnvironment?.lowercased() {
+        case "xcode", "sandbox":
+            if let boundTestUserID, !boundTestUserID.isEmpty {
+                return boundTestUserID == signedInUserID
+                    ? .authorizedLocalTest
+                    : .ownedByAnotherAccount
+            }
+            return allowsNewTestBinding ? .bindLocalTest : .explicitRestoreRequired
+        default:
+            return hasSignedTransactionInfo
+                ? .requiresBackendVerification
+                : .missingTransactionEvidence
+        }
+    }
+}
+
 struct StoreKitSubscriptionSnapshot: Sendable {
     let plan: AppPlan
     let researchActive: Bool
@@ -5006,12 +5044,28 @@ actor StoreKitSubscriptionService {
         return product
     }
 
+    func prepareForPurchase() async -> StoreKitSubscriptionSnapshot {
+        // TestFlight sandbox renewals can leave multiple verified, expired
+        // transactions unfinished. Drain only inactive known transactions so
+        // StoreKit can open a new checkout. An active transaction is not
+        // finished until Permitext has durably authorized it for an account.
+        for await verification in Transaction.unfinished {
+            guard case .verified(let transaction) = verification else { continue }
+            guard StoreKitTransactionPolicy.isKnownProductID(transaction.productID) else { continue }
+            guard !isActiveOwnedTransaction(transaction) else { continue }
+            await transaction.finish()
+        }
+        return await snapshot()
+    }
+
     func snapshot(after result: Product.PurchaseResult) async throws -> StoreKitSubscriptionSnapshot {
         switch result {
         case .success(let verification):
             let transaction = try verifiedTransaction(from: verification)
             let verifiedPurchaseIsActive = isActiveProTransaction(transaction)
-            await transaction.finish()
+            if !verifiedPurchaseIsActive {
+                await transaction.finish()
+            }
 
             var purchaseSnapshot = await snapshot(
                 signedTransactionInfo: verification.jwsRepresentation,
@@ -5036,7 +5090,6 @@ actor StoreKitSubscriptionService {
                 return purchaseSnapshot
             }
 
-            LocalEntitlementService.setVerifiedPlan(resolvedPlan)
             return StoreKitSubscriptionSnapshot(
                 plan: resolvedPlan,
                 researchActive: resolvedPlan == .pro || purchaseSnapshot.researchActive,
@@ -5058,8 +5111,8 @@ actor StoreKitSubscriptionService {
         }
     }
 
-    func restorePurchases() async -> StoreKitSubscriptionSnapshot {
-        try? await AppStore.sync()
+    func restorePurchases() async throws -> StoreKitSubscriptionSnapshot {
+        try await AppStore.sync()
         for _ in 0..<8 {
             let currentSnapshot = await snapshot()
             if currentSnapshot.plan == .pro {
@@ -5076,10 +5129,9 @@ actor StoreKitSubscriptionService {
                 for await result in Transaction.updates {
                     guard case .verified(let transaction) = result else { continue }
                     guard StoreKitTransactionPolicy.isKnownProductID(transaction.productID) else { continue }
-                    if isActiveProTransaction(transaction) {
-                        LocalEntitlementService.setVerifiedPlan(.pro)
+                    if !isActiveOwnedTransaction(transaction) {
+                        await transaction.finish()
                     }
-                    await transaction.finish()
                     continuation.yield(
                         await snapshot(
                             signedTransactionInfo: result.jwsRepresentation,
@@ -5089,6 +5141,15 @@ actor StoreKitSubscriptionService {
                 }
             }
             continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+
+    func finishActiveProTransactions() async {
+        for await verification in Transaction.unfinished {
+            guard case .verified(let transaction) = verification,
+                  isActiveProTransaction(transaction)
+            else { continue }
+            await transaction.finish()
         }
     }
 
@@ -5110,20 +5171,13 @@ actor StoreKitSubscriptionService {
         for await verification in Transaction.currentEntitlements {
             guard case .verified(let transaction) = verification else { continue }
             guard isActiveProTransaction(transaction) else { continue }
-            LocalEntitlementService.setVerifiedPlan(.pro)
             return (.pro, verification.jwsRepresentation, transaction.environment.rawValue)
         }
         if let verification = await Transaction.latest(for: proProductID),
            case .verified(let transaction) = verification,
            isActiveProTransaction(transaction) {
-            LocalEntitlementService.setVerifiedPlan(.pro)
             return (.pro, verification.jwsRepresentation, transaction.environment.rawValue)
         }
-        if await subscriptionStatusIndicatesActivePro() {
-            LocalEntitlementService.setVerifiedPlan(.pro)
-            return (.pro, nil, nil)
-        }
-        LocalEntitlementService.setVerifiedPlan(.free)
         return (.free, nil, nil)
     }
 
@@ -5167,11 +5221,7 @@ actor StoreKitSubscriptionService {
            isActiveResearchTransaction(transaction) {
             return (true, verification.jwsRepresentation, transaction.environment.rawValue)
         }
-        return (await subscriptionStatusIndicatesActive(productID: researchProductID), nil, nil)
-    }
-
-    private func subscriptionStatusIndicatesActivePro() async -> Bool {
-        await subscriptionStatusIndicatesActive(productID: proProductID)
+        return (false, nil, nil)
     }
 
     private func subscriptionStatusIndicatesActive(productID: String) async -> Bool {
