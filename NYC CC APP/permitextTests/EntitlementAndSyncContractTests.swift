@@ -2055,6 +2055,30 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(signInButtonSource.contains(".foregroundStyle(.white)"))
     }
 
+    func testAccountDeletionRequiresExplicitDisclosureAndReportsCleanupStages() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(settingsSource.contains("This is permanent and cannot be undone."))
+        XCTAssertTrue(settingsSource.contains("Permitext will delete"))
+        XCTAssertTrue(settingsSource.contains("Permitext will not delete"))
+        XCTAssertTrue(settingsSource.contains("Type DELETE to confirm"))
+        XCTAssertTrue(settingsSource.contains("Manage Apple Subscription"))
+        XCTAssertTrue(settingsSource.contains("I understand that deleting Permitext does not cancel App Store billing."))
+        XCTAssertTrue(settingsSource.contains("Canceling Stripe billing"))
+        XCTAssertTrue(settingsSource.contains("Deleting Permitext data"))
+        XCTAssertTrue(settingsSource.contains("Clearing this device"))
+        XCTAssertTrue(settingsSource.contains("Removing Permitext sign-in identity"))
+        XCTAssertTrue(settingsSource.contains("Retry cleanup"))
+        XCTAssertTrue(settingsSource.contains("Contact Support"))
+        XCTAssertFalse(settingsSource.contains("try? await clerk.user?.delete()"))
+    }
+
     func testSettingsDoesNotExposeWebWorkspaceCard() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

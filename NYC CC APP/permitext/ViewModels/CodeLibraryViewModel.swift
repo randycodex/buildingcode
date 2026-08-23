@@ -147,6 +147,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var selectedJurisdictionKey: String = ""
     @Published var selectedCodeSectionID: Int64?
     @Published var statusMessage: String?
+    @Published private(set) var accountDeletionServerCode: String?
     @Published var readerTheme: ReaderTheme
     @Published private(set) var isInitialContentLoaded: Bool = false {
         didSet {
@@ -3811,26 +3812,24 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     @discardableResult
-    func deleteAccount() async -> Bool {
-        guard let account = signedInAccount else { return false }
-        guard !isAccountBusy else { return false }
+    func deleteAccount() async -> AccountDeletionExecutionResult? {
+        guard let account = signedInAccount else { return nil }
+        guard !isAccountBusy else { return nil }
         isAccountBusy = true
         defer { isAccountBusy = false }
+        accountDeletionServerCode = nil
 
+        let response: BackendAccountDeleteResponse
         do {
-            try await accountBackendClient.deleteAccount(account: account)
+            response = try await accountBackendClient.deleteAccount(account: account)
         } catch {
+            accountDeletionServerCode = (error as? PermitextBackendHTTPError)?.serverCode
             statusMessage = error.localizedDescription
-            return false
+            return nil
         }
 
         stopForegroundAutomaticSync()
-        do {
-            try userContentRepository?.deleteAllUserData()
-        } catch {
-            statusMessage = "Your Permitext account was deleted, but some on-device saved data could not be cleared."
-        }
-        accountUserDataProfiles?.removeAccountProfile(accountID: account.appUserID)
+        let deviceCleanupError = retryDeletedAccountDeviceCleanup(accountID: account.appUserID)
         if preferencesDefaults.string(forKey: AccountDefaults.storeKitTestOwnerUserIDKey) == account.appUserID {
             preferencesDefaults.removeObject(forKey: AccountDefaults.storeKitTestOwnerUserIDKey)
         }
@@ -3852,10 +3851,31 @@ final class CodeLibraryViewModel: ObservableObject {
         persistRecentlyViewedSections()
         refreshBookmarks()
         refreshPendingUserContentSyncCount()
-        if statusMessage?.contains("on-device") != true {
+        if deviceCleanupError == nil {
             statusMessage = "Your Permitext account and synced data were deleted."
         }
-        return true
+        return AccountDeletionExecutionResult(
+            response: response,
+            deviceCleanupError: deviceCleanupError
+        )
+    }
+
+    @discardableResult
+    func retryDeletedAccountDeviceCleanup(accountID: String) -> String? {
+        do {
+            if let accountUserDataProfiles {
+                let databaseURL = try accountUserDataProfiles.databaseURL(accountID: accountID)
+                try UserDataStore(databaseURL: databaseURL).deleteAllUserData()
+                accountUserDataProfiles.removeAccountProfile(accountID: accountID)
+            } else {
+                try userContentRepository?.deleteAllUserData()
+            }
+            return nil
+        } catch {
+            let message = "Some Permitext data stored on this device could not be cleared: \(error.localizedDescription)"
+            statusMessage = message
+            return message
+        }
     }
 
     @discardableResult

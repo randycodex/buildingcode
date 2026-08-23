@@ -9,6 +9,37 @@ enum SettingsSection: Hashable {
     case account
 }
 
+private enum AccountDeletionStageStatus: String {
+    case waiting = "Waiting"
+    case active = "In progress"
+    case complete = "Complete"
+    case failed = "Needs attention"
+    case skipped = "Not applicable"
+
+    var color: Color {
+        switch self {
+        case .active: Color.appChrome
+        case .complete: .green
+        case .failed: .red
+        case .waiting, .skipped: .secondary
+        }
+    }
+}
+
+private struct AccountDeletionStage: Identifiable {
+    let id: String
+    let title: String
+    var status: AccountDeletionStageStatus = .waiting
+    var detail = ""
+
+    static let initial = [
+        AccountDeletionStage(id: "billing", title: "Canceling Stripe billing"),
+        AccountDeletionStage(id: "data", title: "Deleting Permitext data"),
+        AccountDeletionStage(id: "device", title: "Clearing this device"),
+        AccountDeletionStage(id: "identity", title: "Removing Permitext sign-in identity")
+    ]
+}
+
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
@@ -19,6 +50,14 @@ struct SettingsView: View {
     @State private var selectedProjectIDs = Set<Int64>()
     @State private var showsProjectDeleteWarning = false
     @State private var showsAccountDeleteWarning = false
+    @State private var accountDeletionConfirmation = ""
+    @State private var accountDeletionAppleAcknowledged = false
+    @State private var accountDeletionStages = AccountDeletionStage.initial
+    @State private var accountDeletionHasStarted = false
+    @State private var accountDeletionResultMessage: String?
+    @State private var accountDeletionDeviceError: String?
+    @State private var accountDeletionIdentityError: String?
+    @State private var deletedAccountForCleanup: SignedInAccount?
     @State private var showsSignOutWarning = false
     @State private var didScrollToInitialSection = false
     @State private var pendingSyncConflictResolution: PendingSyncConflictResolution?
@@ -437,6 +476,7 @@ struct SettingsView: View {
                     }
 
                     Button(role: .destructive) {
+                        resetAccountDeletionFlow()
                         showsAccountDeleteWarning = true
                     } label: {
                         Label("Delete Account", systemImage: "person.crop.circle.badge.minus")
@@ -824,61 +864,318 @@ struct SettingsView: View {
     }
 
     private var accountDeletePopover: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Text("Delete Permitext account?")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(.primary)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                Text(accountDeletionHasStarted ? "Deleting Permitext account" : "Delete Permitext account?")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.primary)
 
-            Text(accountDeletionMessage)
-                .font(.body)
+                if accountDeletionHasStarted {
+                    accountDeletionProgress
+                } else {
+                    accountDeletionConfirmationView
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(24)
+        }
+        .frame(width: 360, height: 540, alignment: .leading)
+    }
+
+    private var accountDeletionBillingMessage: String {
+        if library.hasAppleManagedBillingForAccountDeletion &&
+            library.hasWebManagedBillingForAccountDeletion {
+            return "Your Stripe subscription will be canceled first. Deleting Permitext does not cancel your App Store subscription; Apple may continue billing you."
+        }
+        if library.hasAppleManagedBillingForAccountDeletion {
+            return "Deleting Permitext does not cancel your App Store subscription. Apple may continue billing you."
+        }
+        if library.hasWebManagedBillingForAccountDeletion {
+            return "Your Stripe subscription will be canceled first. If cancellation cannot be confirmed, nothing will be deleted."
+        }
+        if library.currentEntitlementSource == .lifetimeGrant {
+            return "Your Lifetime Pro grant will be permanently removed."
+        }
+        return "No recurring Permitext subscription is linked to this account."
+    }
+
+    @ViewBuilder
+    private var accountDeletionConfirmationView: some View {
+        Text("This is permanent and cannot be undone.")
+            .font(.body.weight(.semibold))
+            .foregroundStyle(.red)
+
+        accountDeletionDisclosure("Permitext will delete", items: [
+            "Your Permitext account and sign-in sessions",
+            "Saved passages and notes",
+            "Projects and their stored content",
+            "Research history and reports",
+            "Private images and synchronized data",
+            "Entitlements and organizations you own",
+            "Permitext data stored on this device"
+        ])
+
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Billing")
+                .font(.subheadline.weight(.semibold))
+            Text(accountDeletionBillingMessage)
+                .font(.footnote)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-
             if library.hasAppleManagedBillingForAccountDeletion {
                 Button {
                     openURL(subscriptionManagementURL)
                 } label: {
                     Label("Manage Apple Subscription", systemImage: "arrow.up.right.square")
-                        .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.appChrome)
+
+                Toggle(
+                    "I understand that deleting Permitext does not cancel App Store billing.",
+                    isOn: $accountDeletionAppleAcknowledged
+                )
+                .font(.footnote)
+                .fixedSize(horizontal: false, vertical: true)
             }
+        }
+        .padding(12)
+        .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+        accountDeletionDisclosure("Permitext will not delete", items: [
+            "Your Google/Gmail, Apple, or Microsoft account",
+            "Records retained by Apple, Stripe, or Clerk for billing or legal purposes",
+            "A minimal purchase-ownership record used to prevent fraud and restore qualifying purchases"
+        ])
+
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Type DELETE to confirm")
+                .font(.subheadline.weight(.semibold))
+            TextField("DELETE", text: $accountDeletionConfirmation)
+                .textInputAutocapitalization(.characters)
+                .autocorrectionDisabled()
+                .textFieldStyle(.roundedBorder)
+        }
+
+        HStack {
+            Button("Cancel") {
+                showsAccountDeleteWarning = false
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
 
             Button("Delete Account", role: .destructive) {
-                Task {
-                    let deletesClerkIdentity = library.signedInAccount?.authProvider == .clerk
-                    if await library.deleteAccount() {
-                        if deletesClerkIdentity, let clerk {
-                            _ = try? await clerk.user?.delete()
-                        }
-                        showsAccountDeleteWarning = false
-                    }
-                }
+                Task { await beginAccountDeletion() }
             }
             .buttonStyle(.borderedProminent)
             .tint(.red)
-            .disabled(library.isAccountBusy)
+            .disabled(
+                accountDeletionConfirmation.trimmingCharacters(in: .whitespacesAndNewlines) != "DELETE" ||
+                    (library.hasAppleManagedBillingForAccountDeletion && !accountDeletionAppleAcknowledged) ||
+                    library.isAccountBusy
+            )
         }
-        .frame(width: 320, alignment: .leading)
-        .padding(24)
     }
 
-    private var accountDeletionMessage: String {
-        let dataDeletion = "This permanently deletes your Permitext account, synced saved work, Research history, private images and reports. This cannot be undone."
-        if library.hasAppleManagedBillingForAccountDeletion &&
-            library.hasWebManagedBillingForAccountDeletion {
-            return "Permitext will cancel your Stripe subscription first. Apple billing cannot be canceled by Permitext, so manage your Apple subscription before deleting or Apple may continue charging you. \(dataDeletion)"
+    private func accountDeletionDisclosure(_ title: String, items: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+            ForEach(items, id: \.self) { item in
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text("•")
+                    Text(item)
+                }
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            }
         }
-        if library.hasAppleManagedBillingForAccountDeletion {
-            return "Apple billing cannot be canceled by Permitext. Manage your Apple subscription first, or Apple may continue charging you. \(dataDeletion)"
+    }
+
+    @ViewBuilder
+    private var accountDeletionProgress: some View {
+        Text("Keep this window open until every stage finishes.")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+
+        VStack(spacing: 10) {
+            ForEach(accountDeletionStages) { stage in
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(stage.title)
+                            .font(.subheadline.weight(.medium))
+                        Spacer()
+                        Text(stage.status.rawValue)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(stage.status.color)
+                    }
+                    if !stage.detail.isEmpty {
+                        Text(stage.detail)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(12)
+                .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
         }
-        if library.hasWebManagedBillingForAccountDeletion {
-            return "Permitext will cancel your Stripe subscription before deleting anything. If Stripe cannot confirm cancellation, your account and data will not be deleted. \(dataDeletion)"
+
+        if let accountDeletionResultMessage {
+            Text(accountDeletionResultMessage)
+                .font(.footnote)
+                .foregroundStyle(accountDeletionDeviceError == nil && accountDeletionIdentityError == nil ? Color.secondary : Color.red)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if accountDeletionDeviceError != nil || accountDeletionIdentityError != nil {
+                Button("Retry cleanup") {
+                    Task { await retryAccountDeletionCleanup() }
+                }
+                .buttonStyle(.bordered)
+                .disabled(library.isAccountBusy)
+            } else if library.signedInAccount != nil {
+                Button("Retry deletion") {
+                    Task { await beginAccountDeletion() }
+                }
+                .buttonStyle(.bordered)
+                .disabled(library.isAccountBusy)
+            }
+
+            Link("Contact Support", destination: URL(string: "mailto:permitext@gmail.com?subject=Account%20deletion%20cleanup")!)
+                .font(.subheadline.weight(.medium))
+
+            Button("Done") {
+                showsAccountDeleteWarning = false
+            }
+            .buttonStyle(.borderedProminent)
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        if library.currentEntitlementSource == .lifetimeGrant {
-            return "This account has a lifetime grant and no recurring Permitext subscription. Deleting it permanently removes the grant. \(dataDeletion)"
+    }
+
+    private func resetAccountDeletionFlow() {
+        accountDeletionConfirmation = ""
+        accountDeletionAppleAcknowledged = false
+        accountDeletionStages = AccountDeletionStage.initial
+        accountDeletionHasStarted = false
+        accountDeletionResultMessage = nil
+        accountDeletionDeviceError = nil
+        accountDeletionIdentityError = nil
+        deletedAccountForCleanup = nil
+    }
+
+    private func updateAccountDeletionStage(
+        _ id: String,
+        status: AccountDeletionStageStatus,
+        detail: String = ""
+    ) {
+        guard let index = accountDeletionStages.firstIndex(where: { $0.id == id }) else { return }
+        accountDeletionStages[index].status = status
+        accountDeletionStages[index].detail = detail
+    }
+
+    @MainActor
+    private func beginAccountDeletion() async {
+        guard let account = library.signedInAccount else { return }
+        deletedAccountForCleanup = account
+        accountDeletionHasStarted = true
+        accountDeletionResultMessage = nil
+        updateAccountDeletionStage("billing", status: .active)
+        updateAccountDeletionStage("data", status: .active)
+        updateAccountDeletionStage("device", status: .waiting)
+        updateAccountDeletionStage("identity", status: .waiting)
+
+        guard let result = await library.deleteAccount() else {
+            let billingCompletedBeforeFailure = library.accountDeletionServerCode.map {
+                ["PRIVATE_ASSET_DELETION_FAILED", "ACCOUNT_DATA_DELETION_FAILED"].contains($0)
+            } ?? false
+            updateAccountDeletionStage(
+                "billing",
+                status: billingCompletedBeforeFailure
+                    ? (library.hasWebManagedBillingForAccountDeletion ? .complete : .skipped)
+                    : .failed,
+                detail: billingCompletedBeforeFailure
+                    ? (library.hasWebManagedBillingForAccountDeletion ? "Stripe cancellation completed before data deletion failed." : "No Stripe subscription was linked.")
+                    : "Stripe cancellation was not confirmed or the deletion request did not finish."
+            )
+            updateAccountDeletionStage("data", status: .failed, detail: library.statusMessage ?? "Permitext data deletion was not confirmed.")
+            updateAccountDeletionStage("device", status: .skipped, detail: "Not started because server deletion did not finish.")
+            updateAccountDeletionStage("identity", status: .skipped, detail: "Not started because server deletion did not finish.")
+            accountDeletionResultMessage = library.statusMessage ?? "Permitext could not complete account deletion. Nothing on this device was cleared."
+            return
         }
-        return "No recurring Permitext subscription is linked to this account. \(dataDeletion)"
+
+        let stripe = result.response.billingCancellation?.stripe
+        updateAccountDeletionStage(
+            "billing",
+            status: stripe?.status == "canceled" ? .complete : .skipped,
+            detail: stripe?.status == "canceled" ? "Stripe confirmed cancellation." : "No Stripe subscription was linked."
+        )
+        updateAccountDeletionStage(
+            "data",
+            status: .complete,
+            detail: "Permitext data and \(result.response.deletedPrivateAssetCount) private images were deleted."
+        )
+        accountDeletionDeviceError = result.deviceCleanupError
+        updateAccountDeletionStage(
+            "device",
+            status: result.deviceCleanupError == nil ? .complete : .failed,
+            detail: result.deviceCleanupError ?? "Permitext data stored on this device was cleared."
+        )
+
+        await removeAccountDeletionIdentity(account: account)
+        finishAccountDeletionResult()
+    }
+
+    @MainActor
+    private func removeAccountDeletionIdentity(account: SignedInAccount) async {
+        guard account.authProvider == .clerk else {
+            accountDeletionIdentityError = nil
+            updateAccountDeletionStage("identity", status: .skipped, detail: "No separate Clerk identity needed removal.")
+            return
+        }
+        updateAccountDeletionStage("identity", status: .active)
+        do {
+            guard let clerk, let user = clerk.user else {
+                throw NSError(
+                    domain: "PermitextAccountDeletion",
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: "The signed-in Clerk identity is unavailable."]
+                )
+            }
+            try await user.delete()
+            accountDeletionIdentityError = nil
+            updateAccountDeletionStage("identity", status: .complete, detail: "The Permitext Clerk sign-in identity was removed.")
+        } catch {
+            accountDeletionIdentityError = error.localizedDescription
+            updateAccountDeletionStage("identity", status: .failed, detail: error.localizedDescription)
+        }
+    }
+
+    @MainActor
+    private func retryAccountDeletionCleanup() async {
+        guard let account = deletedAccountForCleanup else { return }
+        if accountDeletionDeviceError != nil {
+            updateAccountDeletionStage("device", status: .active)
+            accountDeletionDeviceError = library.retryDeletedAccountDeviceCleanup(accountID: account.appUserID)
+            updateAccountDeletionStage(
+                "device",
+                status: accountDeletionDeviceError == nil ? .complete : .failed,
+                detail: accountDeletionDeviceError ?? "Permitext data stored on this device was cleared."
+            )
+        }
+        if accountDeletionIdentityError != nil {
+            await removeAccountDeletionIdentity(account: account)
+        }
+        finishAccountDeletionResult()
+    }
+
+    private func finishAccountDeletionResult() {
+        if accountDeletionDeviceError == nil && accountDeletionIdentityError == nil {
+            accountDeletionResultMessage = "Your Permitext account, synchronized data, device data, and Permitext sign-in identity were handled as shown above."
+        } else {
+            accountDeletionResultMessage = "Permitext data was deleted, but the stages marked Needs attention remain. Retry cleanup or contact support."
+        }
     }
 
     private var signOutWarningPopover: some View {

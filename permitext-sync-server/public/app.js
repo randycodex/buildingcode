@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260823-reader-only-scrollbars-v2";
+} from "./offline-storage.js?v=20260823-account-deletion-v2";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -84,7 +84,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260823-reader-only-scrollbars-v2";
+} from "./research-intent-state.js?v=20260823-account-deletion-v2";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -4758,6 +4758,256 @@ function confirmWebWarning(title, message, options = {}) {
 
 function showWebNotice(title, message, options = {}) {
   return openWebWarning({ title, message, ...options, confirmLabel: options.confirmLabel || "OK", cancellable: false });
+}
+
+function accountDeletionBillingMessage({ appleManaged, stripeManaged, lifetimeGrant }) {
+  if (appleManaged && stripeManaged) {
+    return "Your Stripe subscription will be canceled first. Deleting Permitext does not cancel your App Store subscription; Apple may continue billing you.";
+  }
+  if (appleManaged) {
+    return "Deleting Permitext does not cancel your App Store subscription. Apple may continue billing you.";
+  }
+  if (stripeManaged) {
+    return "Your Stripe subscription will be canceled first. If cancellation cannot be confirmed, nothing will be deleted.";
+  }
+  if (lifetimeGrant) return "Your Lifetime Pro grant will be permanently removed.";
+  return "No recurring Permitext subscription is linked to this account.";
+}
+
+function accountDeletionList(title, items) {
+  const section = document.createElement("section");
+  section.className = "account-deletion-disclosure";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  const list = document.createElement("ul");
+  items.forEach((item) => {
+    const row = document.createElement("li");
+    row.textContent = item;
+    list.append(row);
+  });
+  section.append(heading, list);
+  return section;
+}
+
+function confirmAccountDeletion({ appleManaged, stripeManaged, lifetimeGrant }) {
+  activeWebWarningClose?.(false);
+  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const titleID = `account-deletion-title-${crypto.randomUUID()}`;
+  const descriptionID = `account-deletion-description-${crypto.randomUUID()}`;
+  const inputID = `account-deletion-input-${crypto.randomUUID()}`;
+  const backdrop = document.createElement("div");
+  backdrop.className = "web-warning-backdrop";
+  const dialog = document.createElement("form");
+  dialog.className = "web-warning-dialog account-deletion-dialog";
+  dialog.setAttribute("role", "alertdialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-labelledby", titleID);
+  dialog.setAttribute("aria-describedby", descriptionID);
+  const heading = document.createElement("h2");
+  heading.className = "web-warning-title";
+  heading.id = titleID;
+  heading.textContent = "Delete Permitext account?";
+  const warning = document.createElement("p");
+  warning.className = "account-deletion-permanent-warning";
+  warning.id = descriptionID;
+  warning.textContent = "This is permanent and cannot be undone.";
+  const deleteList = accountDeletionList("Permitext will delete", [
+    "Your Permitext account and sign-in sessions",
+    "Saved passages and notes",
+    "Projects and their stored content",
+    "Research history and reports",
+    "Private images and synchronized data",
+    "Entitlements and organizations you own",
+    "Permitext data stored on this device"
+  ]);
+  const billing = document.createElement("section");
+  billing.className = "account-deletion-disclosure account-deletion-billing";
+  const billingHeading = document.createElement("h3");
+  billingHeading.textContent = "Billing";
+  const billingCopy = document.createElement("p");
+  billingCopy.textContent = accountDeletionBillingMessage({ appleManaged, stripeManaged, lifetimeGrant });
+  billing.append(billingHeading, billingCopy);
+  let appleAcknowledgment = null;
+  if (appleManaged) {
+    const manageApple = document.createElement("a");
+    manageApple.className = "account-deletion-manage-link";
+    manageApple.href = "https://apps.apple.com/account/subscriptions";
+    manageApple.target = "_blank";
+    manageApple.rel = "noopener noreferrer";
+    manageApple.textContent = "Manage Apple Subscription";
+    billing.append(manageApple);
+    const acknowledgmentLabel = document.createElement("label");
+    acknowledgmentLabel.className = "account-deletion-acknowledgment";
+    appleAcknowledgment = document.createElement("input");
+    appleAcknowledgment.type = "checkbox";
+    const acknowledgmentCopy = document.createElement("span");
+    acknowledgmentCopy.textContent = "I understand that deleting Permitext does not cancel App Store billing.";
+    acknowledgmentLabel.append(appleAcknowledgment, acknowledgmentCopy);
+    billing.append(acknowledgmentLabel);
+  }
+  const preserveList = accountDeletionList("Permitext will not delete", [
+    "Your Google/Gmail, Apple, or Microsoft account",
+    "Records retained by Apple, Stripe, or Clerk for billing or legal purposes",
+    "A minimal purchase-ownership record used to prevent fraud and restore qualifying purchases"
+  ]);
+  const field = document.createElement("label");
+  field.className = "web-warning-field";
+  field.htmlFor = inputID;
+  field.textContent = "Type DELETE to confirm";
+  const input = document.createElement("input");
+  input.id = inputID;
+  input.type = "text";
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  const actions = document.createElement("div");
+  actions.className = "web-warning-actions";
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.className = "web-warning-button web-warning-cancel";
+  cancelButton.textContent = "Cancel";
+  const confirmButton = document.createElement("button");
+  confirmButton.type = "submit";
+  confirmButton.className = "web-warning-button web-warning-confirm";
+  confirmButton.textContent = "Delete Account";
+  confirmButton.disabled = true;
+  field.append(input);
+  actions.append(cancelButton, confirmButton);
+  dialog.append(heading, warning, deleteList, billing, preserveList, field, actions);
+  backdrop.append(dialog);
+  const warningContainer = mountWebWarningBackdrop(backdrop, null, previousFocus);
+  return new Promise((resolve) => {
+    let settled = false;
+    const close = (confirmed) => {
+      if (settled) return;
+      settled = true;
+      unmountWebWarningBackdrop(backdrop, warningContainer);
+      if (activeWebWarningClose === close) activeWebWarningClose = null;
+      previousFocus?.focus?.({ preventScroll: true });
+      resolve(confirmed);
+    };
+    activeWebWarningClose = close;
+    const updateConfirmation = () => {
+      confirmButton.disabled = input.value.trim() !== "DELETE" || (appleManaged && !appleAcknowledgment?.checked);
+    };
+    input.addEventListener("input", updateConfirmation);
+    appleAcknowledgment?.addEventListener("change", updateConfirmation);
+    cancelButton.addEventListener("click", () => close(false));
+    dialog.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (input.value.trim() === "DELETE") close(true);
+    });
+    backdrop.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        close(false);
+        return;
+      }
+      trapWebModalFocus(dialog, event);
+    });
+    input.focus({ preventScroll: true });
+  });
+}
+
+function openAccountDeletionProgress() {
+  activeWebWarningClose?.(false);
+  const titleID = `account-deletion-progress-title-${crypto.randomUUID()}`;
+  const backdrop = document.createElement("div");
+  backdrop.className = "web-warning-backdrop";
+  const dialog = document.createElement("section");
+  dialog.className = "web-warning-dialog account-deletion-dialog account-deletion-progress-dialog";
+  dialog.tabIndex = -1;
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-labelledby", titleID);
+  const heading = document.createElement("h2");
+  heading.className = "web-warning-title";
+  heading.id = titleID;
+  heading.textContent = "Deleting Permitext account";
+  const summary = document.createElement("p");
+  summary.className = "web-warning-message account-deletion-result-summary";
+  summary.textContent = "Keep this window open until every stage finishes.";
+  const stages = document.createElement("ol");
+  stages.className = "account-deletion-stages";
+  const stageRows = new Map();
+  [
+    ["billing", "Canceling Stripe billing"],
+    ["data", "Deleting Permitext data"],
+    ["device", "Clearing this device"],
+    ["identity", "Removing Permitext sign-in identity"]
+  ].forEach(([key, label]) => {
+    const row = document.createElement("li");
+    row.dataset.status = "pending";
+    const copy = document.createElement("span");
+    copy.textContent = label;
+    const state = document.createElement("strong");
+    state.textContent = "Waiting";
+    const detail = document.createElement("small");
+    row.append(copy, state, detail);
+    stages.append(row);
+    stageRows.set(key, { row, state, detail });
+  });
+  const actions = document.createElement("div");
+  actions.className = "web-warning-actions account-deletion-result-actions";
+  dialog.append(heading, summary, stages, actions);
+  backdrop.append(dialog);
+  const warningContainer = mountWebWarningBackdrop(backdrop, null, null);
+  const labels = {
+    pending: "Waiting",
+    active: "In progress",
+    complete: "Complete",
+    failed: "Needs attention",
+    skipped: "Not applicable"
+  };
+  const setStage = (key, status, detail = "") => {
+    const stage = stageRows.get(key);
+    if (!stage) return;
+    stage.row.dataset.status = status;
+    stage.state.textContent = labels[status] || status;
+    stage.detail.textContent = detail;
+  };
+  let closed = false;
+  const closeDialog = () => {
+    if (closed) return;
+    closed = true;
+    unmountWebWarningBackdrop(backdrop, warningContainer);
+    if (activeWebWarningClose === closeDialog) activeWebWarningClose = null;
+  };
+  const finish = ({ title, message, retryLabel = "", onRetry = null }) => {
+    heading.textContent = title;
+    summary.textContent = message;
+    actions.replaceChildren();
+    if (retryLabel && onRetry) {
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "web-warning-button web-warning-cancel";
+      retry.textContent = retryLabel;
+      retry.addEventListener("click", async () => {
+        retry.disabled = true;
+        try {
+          await onRetry();
+        } finally {
+          retry.disabled = false;
+        }
+      });
+      actions.append(retry);
+    }
+    const support = document.createElement("a");
+    support.className = "web-warning-button web-warning-cancel account-deletion-support";
+    support.href = "mailto:permitext@gmail.com?subject=Account%20deletion%20cleanup";
+    support.textContent = "Contact Support";
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "web-warning-button web-warning-confirm";
+    close.textContent = "Done";
+    close.addEventListener("click", closeDialog);
+    actions.append(support, close);
+    close.focus({ preventScroll: true });
+  };
+  activeWebWarningClose = closeDialog;
+  backdrop.addEventListener("keydown", (event) => trapWebModalFocus(dialog, event));
+  dialog.focus({ preventScroll: true });
+  return { setStage, finish, close: closeDialog };
 }
 
 /**
@@ -29242,26 +29492,126 @@ function renderSettings() {
       ...Object.values(entitlement?.addOns || {}).map((addOn) => addOn?.source)
     ].some((source) => source === "webSubscription");
     const lifetimeGrant = entitlement?.source === "lifetimeGrant";
-    const billingMessage = appleManaged && stripeManaged
-      ? "Permitext will cancel your Stripe subscription first. Apple billing cannot be canceled by Permitext, so manage your Apple subscription before deleting or Apple may continue charging you."
-      : appleManaged
-        ? "Apple billing cannot be canceled by Permitext. Manage your Apple subscription before deleting, or Apple may continue charging you."
-      : stripeManaged
-        ? "Permitext will cancel your Stripe subscription before deleting anything. If Stripe cannot confirm cancellation, your account and data will not be deleted."
-        : lifetimeGrant
-          ? "This account has a lifetime grant and no recurring Permitext subscription. Deleting it permanently removes the grant."
-          : "No recurring Permitext subscription is linked to this account.";
-    const confirmed = await confirmWebWarning(
-      "Delete Permitext account?",
-      `${billingMessage} This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports. This cannot be undone.`,
-      { confirmLabel: "Delete Account" }
-    );
+    const confirmed = await confirmAccountDeletion({ appleManaged, stripeManaged, lifetimeGrant });
     if (!confirmed) return;
 
     deleteAccountButton.disabled = true;
     setStatus("Deleting your account and synced data...");
+    const progress = openAccountDeletionProgress();
+    progress.setStage("billing", "active");
+    progress.setStage("data", "active");
+    const localProjectIDs = new Set([
+      ...(currentContentSummary().projects || []).map((project) => workboardProjectID(projectIdentity(project))),
+      ...(state.localProjects || []).map((project) => workboardProjectID(projectIdentity(project)))
+    ].filter(Boolean));
+
+    const clearThisBrowser = async () => {
+      const failures = [];
+      for (const projectID of localProjectIDs) {
+        try {
+          await deleteLocalWorkboard(projectID);
+        } catch (error) {
+          failures.push(`Workboard ${projectID}: ${error.message || "could not be removed"}`);
+        }
+      }
+      try {
+        await disableOfflineFeature();
+      } catch (error) {
+        failures.push(`Offline library: ${error.message || "could not be removed"}`);
+      }
+      try {
+        stopForegroundSyncLoop();
+        clearResearchAccountRuntime();
+        state.account = null;
+        state.localProjects = [];
+        state.localSavedItems = [];
+        state.localProjectSections = [];
+        state.localAnnotations = [];
+        state.localBulkClears = [];
+        state.syncOutbox = [];
+        state.syncConflicts = [];
+        state.archivedProjectIDs = [];
+        state.sectionNotes = {};
+        state.localSavedSectionIDs = [];
+        state.recentSearches = [];
+        state.recentSearchHistory = [];
+        state.pinnedSearches = [];
+        state.recentlyViewedSections = [];
+        state.continuityAppliedAt = null;
+        setOpenProjectDetails([]);
+        state.workboards = [];
+        state.notebooks = [];
+        state.reportDrafts = [];
+        syncedContent = null;
+        organizationWorkspace = null;
+        organizationLoadPromise = null;
+        unloadCodeQuestionAccountState();
+        removeCodeQuestionAccountState(localStorage, account.userID);
+        persistAccountSession(null);
+        Object.keys(localStorage)
+          .filter((key) =>
+            key.startsWith(`${baseWorkspaceKey}:detached:`) ||
+            key.startsWith(workspaceStateKeyPrefix)
+          )
+          .forEach((key) => localStorage.removeItem(key));
+        localStorage.removeItem(workspaceRegistryKey);
+        sessionStorage.removeItem(tabWorkspaceKey);
+        sessionStorage.removeItem(activeWorkspaceSessionKey);
+        workspaceRegistry = normalizeWorkspaceRegistry(null);
+        activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
+        applyStoredWorkspaceLayout(emptyWorkspaceLayout());
+        saveWorkspaceState();
+      } catch (error) {
+        failures.push(`Browser storage: ${error.message || "could not be cleared"}`);
+      }
+      return failures;
+    };
+
+    const removeClerkIdentity = async () => {
+      if (account.authProvider !== "clerk") return "notApplicable";
+      const config = await clerkWebSignInConfig();
+      if (!config.available) throw new Error("Secure sign-in is not configured in this browser.");
+      const clerk = await loadClerkScript(config);
+      if (!clerk?.user) throw new Error("The signed-in Clerk identity is unavailable.");
+      await clerk.user.delete();
+      return "deleted";
+    };
+
+    const showBackendFailure = (error) => {
+      const stages = error.payload?.stages || {};
+      const stripeStatus = stages.stripeBilling?.status;
+      if (stripeStatus === "canceled") {
+        progress.setStage("billing", "complete", "Stripe confirmed cancellation.");
+      } else if (stripeStatus === "notApplicable") {
+        progress.setStage("billing", "skipped", "No Stripe subscription was linked.");
+      } else {
+        progress.setStage("billing", "failed", "Stripe cancellation was not confirmed.");
+      }
+      const assetDeleted = stages.privateAssets?.status === "deleted";
+      progress.setStage(
+        "data",
+        "failed",
+        assetDeleted
+          ? "Private images were deleted, but deletion of the remaining Permitext data was not confirmed."
+          : error.payload?.error || error.message || "Permitext data deletion was not confirmed."
+      );
+      progress.setStage("device", "skipped", "Not started because server deletion did not finish.");
+      progress.setStage("identity", "skipped", "Not started because server deletion did not finish.");
+      progress.finish({
+        title: error.payload?.partial ? "Deletion incomplete" : "Deletion stopped",
+        message: error.payload?.error || error.message || "Permitext could not complete account deletion.",
+        retryLabel: "Retry deletion",
+        onRetry: () => {
+          progress.close();
+          deleteAccountButton.disabled = false;
+          deleteAccountButton.click();
+        }
+      });
+    };
+
+    let payload;
     try {
-      await postJSON(
+      payload = await postJSON(
         "/account/delete",
         {
           auth: { accountUserID: account.userID },
@@ -29269,71 +29619,97 @@ function renderSettings() {
         },
         { token: account.sessionToken }
       );
-
-      if (account.authProvider === "clerk") {
-        try {
-          const config = await clerkWebSignInConfig();
-          const clerk = config.available ? await loadClerkScript(config) : null;
-          await clerk?.user?.delete();
-        } catch (error) {
-          reportClientError("error", error, { source: "account-deletion" });
-        }
-      }
-
-      const localProjectIDs = new Set([
-        ...(currentContentSummary().projects || []).map((project) => workboardProjectID(projectIdentity(project))),
-        ...(state.localProjects || []).map((project) => workboardProjectID(projectIdentity(project)))
-      ].filter(Boolean));
-      for (const projectID of localProjectIDs) {
-        await deleteLocalWorkboard(projectID).catch(() => {});
-      }
-      await disableOfflineFeature().catch(() => {});
-      stopForegroundSyncLoop();
-      clearResearchAccountRuntime();
-      state.account = null;
-      state.localProjects = [];
-      state.localSavedItems = [];
-      state.localProjectSections = [];
-      state.localAnnotations = [];
-      state.localBulkClears = [];
-      state.syncOutbox = [];
-      state.syncConflicts = [];
-      state.archivedProjectIDs = [];
-      state.sectionNotes = {};
-      state.localSavedSectionIDs = [];
-      state.recentSearches = [];
-      state.recentSearchHistory = [];
-      state.pinnedSearches = [];
-      state.recentlyViewedSections = [];
-      state.continuityAppliedAt = null;
-      setOpenProjectDetails([]);
-      state.workboards = [];
-      state.notebooks = [];
-      state.reportDrafts = [];
-      syncedContent = null;
-      organizationWorkspace = null;
-      organizationLoadPromise = null;
-      unloadCodeQuestionAccountState();
-      removeCodeQuestionAccountState(localStorage, account.userID);
-      persistAccountSession(null);
-      Object.keys(localStorage)
-        .filter((key) =>
-          key.startsWith(`${baseWorkspaceKey}:detached:`) ||
-          key.startsWith(workspaceStateKeyPrefix)
-        )
-        .forEach((key) => localStorage.removeItem(key));
-      localStorage.removeItem(workspaceRegistryKey);
-      sessionStorage.removeItem(tabWorkspaceKey);
-      sessionStorage.removeItem(activeWorkspaceSessionKey);
-      workspaceRegistry = normalizeWorkspaceRegistry(null);
-      activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
-      applyStoredWorkspaceLayout(emptyWorkspaceLayout());
-      saveWorkspaceState();
-      await renderWorkspace();
     } catch (error) {
       setStatus(error.message || "Could not delete this account.", true);
       deleteAccountButton.disabled = false;
+      showBackendFailure(error);
+      return;
     }
+
+    const stripeResult = payload.billingCancellation?.stripe;
+      progress.setStage(
+        "billing",
+        stripeResult?.status === "canceled" ? "complete" : "skipped",
+        stripeResult?.status === "canceled"
+          ? `Stripe canceled ${stripeResult.subscriptionCount || 1} subscription${stripeResult.subscriptionCount === 1 ? "" : "s"}.`
+          : "No Stripe subscription was linked."
+      );
+      progress.setStage(
+        "data",
+        "complete",
+        `Permitext data and ${payload.deletedPrivateAssetCount || 0} private image${payload.deletedPrivateAssetCount === 1 ? "" : "s"} were deleted.`
+      );
+
+      progress.setStage("device", "active");
+      let deviceFailures = await clearThisBrowser();
+      progress.setStage(
+        "device",
+        deviceFailures.length ? "failed" : "complete",
+        deviceFailures.length ? deviceFailures.join(" ") : "Permitext data stored in this browser was cleared."
+      );
+
+      progress.setStage("identity", "active");
+      let identityError = null;
+      try {
+        const identityResult = await removeClerkIdentity();
+        progress.setStage(
+          "identity",
+          identityResult === "deleted" ? "complete" : "skipped",
+          identityResult === "deleted"
+            ? "The Permitext Clerk sign-in identity was removed."
+            : "No separate Clerk identity needed removal."
+        );
+      } catch (error) {
+        identityError = error;
+        reportClientError("error", error, { source: "account-deletion" });
+        progress.setStage("identity", "failed", error.message || "The Clerk sign-in identity was not removed.");
+      }
+
+      try {
+        await renderWorkspace();
+      } catch (error) {
+        deviceFailures.push(`Interface refresh: ${error.message || "could not be completed"}`);
+        progress.setStage("device", "failed", deviceFailures.join(" "));
+      }
+      const finishCleanup = () => {
+        const incomplete = deviceFailures.length > 0 || Boolean(identityError);
+        progress.finish({
+          title: incomplete ? "Permitext data deleted; cleanup incomplete" : "Permitext account deleted",
+          message: incomplete
+            ? "The stages marked Needs attention remain. Retry cleanup or contact support; the result above shows exactly what was completed."
+            : "Your Permitext account, synchronized data, browser data, and Permitext sign-in identity were handled as shown above.",
+          retryLabel: incomplete ? "Retry cleanup" : "",
+          onRetry: incomplete ? async () => {
+            if (deviceFailures.length) {
+              progress.setStage("device", "active");
+              deviceFailures = await clearThisBrowser();
+              try {
+                await renderWorkspace();
+              } catch (error) {
+                deviceFailures.push(`Interface refresh: ${error.message || "could not be completed"}`);
+              }
+              progress.setStage(
+                "device",
+                deviceFailures.length ? "failed" : "complete",
+                deviceFailures.length ? deviceFailures.join(" ") : "Permitext data stored in this browser was cleared."
+              );
+            }
+            if (identityError) {
+              progress.setStage("identity", "active");
+              try {
+                await removeClerkIdentity();
+                identityError = null;
+                progress.setStage("identity", "complete", "The Permitext Clerk sign-in identity was removed.");
+              } catch (error) {
+                identityError = error;
+                progress.setStage("identity", "failed", error.message || "The Clerk sign-in identity was not removed.");
+              }
+            }
+            finishCleanup();
+          } : null
+        });
+      };
+      finishCleanup();
   });
   checkoutButton.addEventListener("click", async () => {
     const account = activeAccount();

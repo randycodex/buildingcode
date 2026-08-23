@@ -19996,6 +19996,36 @@ async function deletePrivateProjectAssetPathnames(pathnames) {
   }
 }
 
+function accountDeletionBillingStage(billingCancellation) {
+  if (!billingCancellation) return { status: "notStarted" };
+  if (billingCancellation.canceledSubscriptions.length) {
+    return {
+      status: "canceled",
+      subscriptionCount: billingCancellation.canceledSubscriptions.length
+    };
+  }
+  return { status: "notApplicable", subscriptionCount: 0 };
+}
+
+function accountDeletionStages({
+  billingCancellation = null,
+  billingStatus = null,
+  permitextDataStatus = "notStarted",
+  privateAssetsStatus = "notStarted",
+  deletedPrivateAssetCount = 0
+} = {}) {
+  return {
+    stripeBilling: billingStatus
+      ? { status: billingStatus }
+      : accountDeletionBillingStage(billingCancellation),
+    permitextData: { status: permitextDataStatus },
+    privateAssets: {
+      status: privateAssetsStatus,
+      deletedCount: deletedPrivateAssetCount
+    }
+  };
+}
+
 async function handleAccountDelete(request, response) {
   const body = await readJSON(request);
   const userID = String(body.auth?.accountUserID || "").trim();
@@ -20020,21 +20050,62 @@ async function handleAccountDelete(request, response) {
     console.error("Account deletion stopped because Stripe cancellation failed.", error);
     sendJSON(response, 502, {
       error: "Permitext could not confirm that Stripe billing was canceled. Your account and data were not deleted. Try again or manage the subscription from Settings.",
-      code: "STRIPE_CANCELLATION_FAILED"
+      code: "STRIPE_CANCELLATION_FAILED",
+      partial: false,
+      stages: accountDeletionStages({ billingStatus: "failed" })
     });
     return;
   }
 
-  const pathnames = await privateProjectAssetPathnamesForAccount(userID);
-  await deletePrivateProjectAssetPathnames(pathnames);
+  let pathnames;
+  try {
+    pathnames = await privateProjectAssetPathnamesForAccount(userID);
+    await deletePrivateProjectAssetPathnames(pathnames);
+  } catch (error) {
+    console.error("Account deletion stopped because private asset cleanup failed.", error);
+    sendJSON(response, 500, {
+      error: "Permitext handled applicable billing, but could not delete private images. Your Permitext account and remaining data were not deleted. Retry cleanup or contact support.",
+      code: "PRIVATE_ASSET_DELETION_FAILED",
+      partial: billingCancellation.canceledSubscriptions.length > 0,
+      stages: accountDeletionStages({
+        billingCancellation,
+        privateAssetsStatus: "failed"
+      })
+    });
+    return;
+  }
+
   const adapter = await storeAdapter();
-  if (typeof adapter.deleteAccount !== "function" || !await adapter.deleteAccount(userID)) {
-    sendError(response, 404, "Account not found.");
+  let accountDeleted = false;
+  try {
+    accountDeleted = typeof adapter.deleteAccount === "function" && await adapter.deleteAccount(userID);
+  } catch (error) {
+    console.error("Account deletion failed after private asset cleanup.", error);
+  }
+  if (!accountDeleted) {
+    sendJSON(response, 500, {
+      error: "Permitext deleted private images but could not confirm deletion of the account and remaining data. Retry cleanup or contact support.",
+      code: "ACCOUNT_DATA_DELETION_FAILED",
+      partial: pathnames.length > 0 || billingCancellation.canceledSubscriptions.length > 0,
+      stages: accountDeletionStages({
+        billingCancellation,
+        permitextDataStatus: "failed",
+        privateAssetsStatus: "deleted",
+        deletedPrivateAssetCount: pathnames.length
+      })
+    });
     return;
   }
   sendJSON(response, 200, {
     deleted: true,
     deletedPrivateAssetCount: pathnames.length,
+    partial: false,
+    stages: accountDeletionStages({
+      billingCancellation,
+      permitextDataStatus: "deleted",
+      privateAssetsStatus: "deleted",
+      deletedPrivateAssetCount: pathnames.length
+    }),
     billingCancellation: {
       stripe: billingCancellation.canceledSubscriptions.length
         ? {

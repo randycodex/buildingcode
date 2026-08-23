@@ -1395,6 +1395,11 @@ struct BackendAccountDeleteResponse: Codable, Hashable, Sendable {
     let billingCancellation: BillingCancellation?
 }
 
+struct AccountDeletionExecutionResult: Sendable {
+    let response: BackendAccountDeleteResponse
+    let deviceCleanupError: String?
+}
+
 struct BackendAttachLocalDataRequest: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
@@ -4555,7 +4560,7 @@ protocol AccountBackendClient {
     func health() async throws -> BackendHealthStatus
     func signIn(credential: AccountSignInCredential, linkFrom: SignedInAccount?) async throws -> BackendAccountRecord
     func signOut(account: SignedInAccount) async throws
-    func deleteAccount(account: SignedInAccount) async throws
+    func deleteAccount(account: SignedInAccount) async throws -> BackendAccountDeleteResponse
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?

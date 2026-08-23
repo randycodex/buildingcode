@@ -8618,6 +8618,16 @@ async function main() {
       }
     });
     assert(accountDeletion.response.ok && accountDeletion.json.deleted === true, "Account deletion failed.");
+    assert(accountDeletion.json.partial === false, "Successful account deletion reported a partial result.");
+    assert(
+      ["canceled", "notApplicable"].includes(accountDeletion.json.stages?.stripeBilling?.status),
+      "Account deletion did not report the Stripe billing stage."
+    );
+    assert(
+      accountDeletion.json.stages?.permitextData?.status === "deleted" &&
+        accountDeletion.json.stages?.privateAssets?.status === "deleted",
+      "Account deletion did not report completed Permitext data stages."
+    );
     const pullAfterAccountDeletion = await request("/sync/pull", {
       method: "POST",
       token: deletionToken,

@@ -269,6 +269,138 @@ button {
   display: none;
 }
 
+.account-deletion-dialog {
+  max-height: calc(100vh - 44px);
+  overflow-y: auto;
+}
+
+.account-deletion-permanent-warning {
+  margin: var(--space-4) 0;
+  color: var(--destructive);
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.account-deletion-disclosure {
+  margin-top: var(--space-4);
+}
+
+.account-deletion-disclosure h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.account-deletion-disclosure p,
+.account-deletion-disclosure ul {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.48;
+}
+
+.account-deletion-disclosure ul {
+  display: grid;
+  gap: 4px;
+  padding-left: 20px;
+}
+
+.account-deletion-billing {
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--code-accent) 8%, var(--surface));
+}
+
+.account-deletion-manage-link {
+  display: inline-flex;
+  margin-top: var(--space-2);
+  color: var(--code-accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.account-deletion-acknowledgment {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.account-deletion-acknowledgment input {
+  margin-top: 2px;
+  accent-color: var(--code-accent);
+}
+
+.account-deletion-dialog .web-warning-confirm:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.account-deletion-stages {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-deletion-stages li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface-muted);
+  font-size: 14px;
+}
+
+.account-deletion-stages li strong {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.account-deletion-stages li small {
+  grid-column: 1 / -1;
+  color: var(--text-tertiary);
+  line-height: 1.35;
+}
+
+.account-deletion-stages li[data-status="active"] strong {
+  color: var(--code-accent);
+}
+
+.account-deletion-stages li[data-status="complete"] strong {
+  color: color-mix(in srgb, #34c759 82%, var(--text-primary));
+}
+
+.account-deletion-stages li[data-status="failed"] strong {
+  color: var(--destructive);
+}
+
+.account-deletion-result-actions {
+  flex-wrap: wrap;
+}
+
+.account-deletion-support {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.account-deletion-dialog .web-warning-cancel,
+.account-deletion-dialog .account-deletion-support {
+  border: 0;
+  background: var(--surface-muted);
+}
+
+.account-deletion-dialog .web-warning-confirm {
+  border: 0;
+}
+
 .web-warning-actions {
   display: flex;
   justify-content: flex-end;

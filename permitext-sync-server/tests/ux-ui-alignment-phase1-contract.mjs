@@ -49,6 +49,14 @@ assert.match(stylesSource, /\.workspace-panel:not\(\.reader-panel\),[\s\S]*?scro
 assert.doesNotMatch(stylesSource, /\.reader-content[^}]*scrollbar-width: none;/);
 assert.match(stylesSource, /\.reader-panel \.reader-content \{[\s\S]*?margin-right: calc\(0px - var\(--panel-padding\)\);[\s\S]*?padding-right: calc\(var\(--panel-padding\) \+ var\(--space-4\)\);/);
 assert.match(stylesSource, /\.reader-panel \.reader-content::\-webkit-scrollbar-track \{[\s\S]*?margin-top: calc\(var\(--reader-scrollbar-track-top\) - var\(--panel-padding\)\);/);
+assert.match(clientSource, /function confirmAccountDeletion\([\s\S]*?Type DELETE to confirm[\s\S]*?confirmButton\.disabled = true/);
+assert.match(clientSource, /I understand that deleting Permitext does not cancel App Store billing\./);
+assert.match(clientSource, /Permitext will delete[\s\S]*?Permitext will not delete/);
+assert.match(clientSource, /Canceling Stripe billing[\s\S]*?Deleting Permitext data[\s\S]*?Clearing this device[\s\S]*?Removing Permitext sign-in identity/);
+assert.match(clientSource, /Retry cleanup/);
+assert.match(clientSource, /Contact Support/);
+assert.doesNotMatch(clientSource, /clerk\?\.user\?\.delete\(\)/);
+assert.doesNotMatch(clientSource, /deleteLocalWorkboard\(projectID\)\.catch\(\(\) => \{\}\)/);
 assert.doesNotMatch(clientSource, /start\(\)\.catch\([\s\S]*?settingsTemplate[\s\S]*?\.settings-list/);
 assert.match(clientSource, /addReaderButton\.disabled = limitReached/);
 assert.match(clientSource, /Two Reader limit reached/);
