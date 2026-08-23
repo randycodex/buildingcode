@@ -370,6 +370,21 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(webView.contains("user-scalable=no"))
     }
 
+    func testReaderHeaderShowsEditionOnlyWithoutBookIcon() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let browseSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/BrowseView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(browseSource.contains("Text(selectedVersionName)"))
+        XCTAssertTrue(browseSource.contains(".accessibilityIdentifier(\"reader-source-edition\")"))
+        XCTAssertFalse(browseSource.contains("Source jurisdiction ·"))
+        XCTAssertFalse(browseSource.contains("systemImage: \"text.book.closed\""))
+    }
+
     func testPhase5FirstUseGateOffersOnlyGenuinelyNewInstallations() {
         let freshDefaults = isolatedEntitlementDefaults()
         XCTAssertTrue(

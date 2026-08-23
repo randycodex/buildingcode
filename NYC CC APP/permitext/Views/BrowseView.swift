@@ -301,10 +301,7 @@ struct BrowseView: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Label(
-                    "Source jurisdiction · \(selectedJurisdictionName) · Edition · \(selectedVersionName)",
-                    systemImage: "text.book.closed"
-                )
+                Text(selectedVersionName)
                     .font(.system(size: 15, weight: .medium, design: .default))
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
