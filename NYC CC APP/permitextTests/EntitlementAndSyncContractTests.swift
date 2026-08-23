@@ -229,11 +229,23 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(ReaderTheme.default.fontChoice, .sourceSerif4)
         XCTAssertEqual(ReaderTheme.default.bodyFont.fontName, "SourceSerif4Variable-Roman")
         XCTAssertEqual(ReaderTheme.default.italicFont.fontName, "SourceSerif4Variable-Italic")
-        XCTAssertEqual(ReaderTheme.minimumFontSize, 17)
+        XCTAssertEqual(ReaderTheme.minimumFontSize, 10)
+        XCTAssertEqual(ReaderTheme.maximumFontSize, 24)
         XCTAssertEqual(ReaderTheme.default.fontSize, 17)
+        XCTAssertEqual(
+            ReaderTheme.default.fontSize,
+            (ReaderTheme.minimumFontSize + ReaderTheme.maximumFontSize) / 2
+        )
+        XCTAssertEqual(ReaderTheme.minimumLineSpacing, -6)
+        XCTAssertEqual(ReaderTheme.maximumLineSpacing, 6)
+        XCTAssertEqual(ReaderTheme.default.lineSpacing, 0)
+        XCTAssertEqual(
+            ReaderTheme.default.lineSpacing,
+            (ReaderTheme.minimumLineSpacing + ReaderTheme.maximumLineSpacing) / 2
+        )
         var undersizedTheme = ReaderTheme.default
-        undersizedTheme.fontSize = 10
-        XCTAssertEqual(undersizedTheme.normalized.fontSize, 17)
+        undersizedTheme.fontSize = 8
+        XCTAssertEqual(undersizedTheme.normalized.fontSize, 10)
 
         let legacyChoices: [ReaderFontChoice] = [
             .sfPro, .sfCompact, .sfMono, .newYork,
@@ -2021,6 +2033,21 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(settingsSource.contains("webWorkspaceURL"))
         XCTAssertFalse(settingsSource.contains("Web Workspace"))
         XCTAssertFalse(settingsSource.contains("Open Permitext Web"))
+    }
+
+    func testSettingsReaderControlsOmitTypefaceAndMetricPills() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertFalse(settingsSource.contains("readerTypefaceRow"))
+        XCTAssertFalse(settingsSource.contains("Reader Typeface"))
+        XCTAssertFalse(settingsSource.contains("CodeStatPill(value: \"\\(Int(library.readerTheme.fontSize)) pt\""))
+        XCTAssertFalse(settingsSource.contains("CodeStatPill(value: \"\\(Int(library.readerTheme.lineSpacing))\""))
     }
 
     func testAccountUserDataProfilesNeverExposeSavedPassagesAcrossAccounts() throws {

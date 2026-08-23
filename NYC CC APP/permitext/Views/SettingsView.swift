@@ -94,10 +94,6 @@ struct SettingsView: View {
 
                         CodeHairline()
 
-                        readerTypefaceRow
-
-                        CodeHairline()
-
                         fontSizeSlider
 
                         CodeHairline()
@@ -585,21 +581,8 @@ struct SettingsView: View {
                 .foregroundStyle(.primary)
                 .lineSpacing(library.readerTheme.lineSpacing)
 
-            HStack(spacing: 8) {
-                CodeStatPill(value: "\(Int(library.readerTheme.fontSize)) pt", label: "type", accent: readerPreviewAccent)
-                CodeStatPill(value: "\(Int(library.readerTheme.lineSpacing))", label: "spacing", accent: readerPreviewAccent)
-            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var readerTypefaceRow: some View {
-        HStack {
-            Text("Reader Typeface")
-            Spacer()
-            Text(ReaderFontChoice.sourceSerif4.displayName)
-                .foregroundStyle(.secondary)
-        }
     }
 
     private var fontSizeSlider: some View {
