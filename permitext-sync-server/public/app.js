@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260823-account-deletion-v2";
+} from "./offline-storage.js?v=20260823-clerk-return-recovery-v3";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -84,7 +84,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260823-account-deletion-v2";
+} from "./research-intent-state.js?v=20260823-clerk-return-recovery-v3";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -463,6 +463,7 @@ let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
 let clerkWebConfigPromise = null;
 let clerkScriptPromise = null;
+let clerkSignInReturnNotice = null;
 let workboardModulePromise = null;
 let workboardStylesPromise = null;
 const workboardMounts = new Map();
@@ -7652,13 +7653,30 @@ async function signInWithClerkWeb(config) {
 async function resumeClerkSignInReturn() {
   const currentURL = new URL(window.location.href);
   if (currentURL.searchParams.get("clerk_return") !== "1") return null;
-  const config = await clerkWebSignInConfig();
-  if (!config.available) throw new Error("Secure sign-in is not configured.");
-  const account = await completeClerkPermitextSignIn(config);
-  if (!account) throw new Error("Secure sign-in did not create an active session.");
   currentURL.searchParams.delete("clerk_return");
   window.history.replaceState({}, "", `${currentURL.pathname}${currentURL.search}${currentURL.hash}`);
-  return account;
+  state.utilities.settings = true;
+  saveWorkspaceState();
+  try {
+    const config = await clerkWebSignInConfig();
+    if (!config.available) {
+      throw new Error("Secure sign-in is not configured for this local app.");
+    }
+    const account = await completeClerkPermitextSignIn(config);
+    if (!account) throw new Error("Secure sign-in did not create an active session.");
+    clerkSignInReturnNotice = {
+      message: "Signed in successfully.",
+      isError: false
+    };
+    return account;
+  } catch (error) {
+    clerkSignInReturnNotice = {
+      message: `Sign-in could not be completed. ${String(error?.message || "Please try again from Account.")}`,
+      isError: true
+    };
+    console.warn("Could not complete secure sign-in return.", error);
+    return null;
+  }
 }
 
 function loadAppleIDScript() {
@@ -29121,6 +29139,9 @@ function renderSettings() {
     status.textContent = message || "";
     status.classList.toggle("has-error", isError);
   };
+  if (clerkSignInReturnNotice) {
+    setStatus(clerkSignInReturnNotice.message, clerkSignInReturnNotice.isError);
+  }
 
   const renderSyncConflictReview = () => {
     const account = activeAccount();
@@ -29420,6 +29441,7 @@ function renderSettings() {
 
   signInButton.addEventListener("click", async () => {
     signInButton.disabled = true;
+    clerkSignInReturnNotice = null;
     setStatus("Signing in...");
     try {
       await signInCurrentBrowser();
