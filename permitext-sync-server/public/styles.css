@@ -11936,6 +11936,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   flex-direction: column;
   gap: calc(var(--space-2) + var(--space-3));
   min-height: 0;
+  margin-right: calc(0px - var(--panel-padding));
+  padding-right: var(--panel-padding);
   padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
 }
 
