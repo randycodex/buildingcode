@@ -24,7 +24,6 @@ struct SettingsView: View {
     @State private var pendingSyncConflictResolution: PendingSyncConflictResolution?
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
-    private let webWorkspaceURL = URL(string: "https://permitext.com")!
     private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
     private let termsURL = URL(string: "https://permitext.com/terms")!
     private let refundsURL = URL(string: "https://permitext.com/refunds")!
@@ -89,10 +88,6 @@ struct SettingsView: View {
                         accountCard
                     }
                     .id(SettingsSection.account)
-
-                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                        webWorkspaceCard
-                    }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         themePreviewCard
@@ -508,32 +503,6 @@ struct SettingsView: View {
     private func normalizedAccountIdentityValue(_ value: String?) -> String? {
         let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return trimmed.isEmpty ? nil : trimmed
-    }
-
-    private var webWorkspaceCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            CodeEyebrow(text: "Web Workspace", accent: settingsChromeColor)
-
-            Text("iPhone provides adapted, read-only Project Hub access to Code Questions, Research records, and issued reports. Governed edits and Research conversations remain on the web until secure mobile mutation recovery is enabled.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Button {
-                openURL(webWorkspaceURL)
-            } label: {
-                Label("Open Permitext Web", systemImage: "safari")
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(
-                        Capsule(style: .continuous)
-                            .fill(Color.primary.opacity(0.08))
-                    )
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint("Opens the Permitext web workspace in your browser")
-        }
     }
 
     private var planSummaryText: String {

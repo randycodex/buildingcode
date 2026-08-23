@@ -2008,6 +2008,21 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(signInButtonSource.contains(".foregroundStyle(.white)"))
     }
 
+    func testSettingsDoesNotExposeWebWorkspaceCard() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertFalse(settingsSource.contains("webWorkspaceCard"))
+        XCTAssertFalse(settingsSource.contains("webWorkspaceURL"))
+        XCTAssertFalse(settingsSource.contains("Web Workspace"))
+        XCTAssertFalse(settingsSource.contains("Open Permitext Web"))
+    }
+
     func testAccountUserDataProfilesNeverExposeSavedPassagesAcrossAccounts() throws {
         let suiteName = "permitext-tests.account-profiles.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
