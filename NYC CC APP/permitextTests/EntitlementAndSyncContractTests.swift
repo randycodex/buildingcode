@@ -1968,6 +1968,20 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(reconcileSource.contains("completeClerkBackendSignIn(session: session, linkFrom: nil)"))
     }
 
+    func testSavedAccountMenuAvoidsDuplicateSettingsAndSyncPrefix() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let bookmarksSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/BookmarksView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(bookmarksSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
+        XCTAssertFalse(bookmarksSource.contains("Label(\"Sync: \\(library.syncStatusTitle)\""))
+        XCTAssertFalse(bookmarksSource.contains("Label(\"Settings\", systemImage: \"gearshape\")"))
+    }
+
     func testAccountUserDataProfilesNeverExposeSavedPassagesAcrossAccounts() throws {
         let suiteName = "permitext-tests.account-profiles.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))

@@ -135,14 +135,8 @@ struct BookmarksView: View {
                 Button {
                     showingSettings = true
                 } label: {
-                    Label("Sync: \(library.syncStatusTitle)", systemImage: syncStatusSystemImage)
+                    Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)
                 }
-            }
-
-            Button {
-                showingSettings = true
-            } label: {
-                Label("Settings", systemImage: "gearshape")
             }
 
             if library.signedInAccount != nil {
@@ -166,7 +160,7 @@ struct BookmarksView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Account and settings")
+        .accessibilityLabel("Account and plan")
     }
 
     private var syncStatusSystemImage: String {
