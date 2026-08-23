@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260822-beta1-public-readiness-v1";
+} from "./offline-storage.js?v=20260823-reader-only-scrollbars-v2";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -84,7 +84,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260822-beta1-public-readiness-v1";
+} from "./research-intent-state.js?v=20260823-reader-only-scrollbars-v2";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

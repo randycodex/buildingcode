@@ -2878,8 +2878,42 @@ select option:checked {
   scrollbar-gutter: stable;
 }
 
+.workspace-panel:not(.reader-panel),
+.workspace-panel:not(.reader-panel) * {
+  scrollbar-gutter: auto;
+  scrollbar-width: none;
+}
+
+.workspace-panel:not(.reader-panel)::-webkit-scrollbar,
+.workspace-panel:not(.reader-panel) *::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 .reader-content {
   padding-right: var(--space-4);
+}
+
+.reader-panel .reader-content {
+  margin-right: calc(0px - var(--panel-padding));
+  padding-right: calc(var(--panel-padding) + var(--space-4));
+  scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.reader-panel .reader-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.reader-panel .reader-content::-webkit-scrollbar-track {
+  margin-top: calc(var(--reader-scrollbar-track-top) - var(--panel-padding));
+  background: transparent;
+}
+
+.reader-panel .reader-content::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-tertiary) 58%, transparent);
 }
 
 .settings-panel {
@@ -11936,8 +11970,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   flex-direction: column;
   gap: calc(var(--space-2) + var(--space-3));
   min-height: 0;
-  margin-right: calc(0px - var(--panel-padding));
-  padding-right: var(--panel-padding);
   padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
 }
 

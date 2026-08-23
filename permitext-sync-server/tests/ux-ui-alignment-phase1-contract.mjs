@@ -45,7 +45,10 @@ assert.match(clientSource, /&match=exact&limit=\$\{searchResultPageSize\}&offset
 assert.match(clientSource, /&match=exact` \+[\s\S]*?&candidateOffset=\$\{encodeURIComponent\(String\(options\.candidateOffset\)\)\}/);
 assert.match(clientSource, /function renderWorkspaceLoadError\(error\)[\s\S]*?role", "alert"[\s\S]*?Try again[\s\S]*?window\.location\.reload\(\)/);
 assert.match(stylesSource, /\.workspace-load-error \.toolbar-button \{[\s\S]*?border: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/);
-assert.match(stylesSource, /\.settings-scroll \{[\s\S]*?margin-right: calc\(0px - var\(--panel-padding\)\);[\s\S]*?padding-right: var\(--panel-padding\);/);
+assert.match(stylesSource, /\.workspace-panel:not\(\.reader-panel\),[\s\S]*?scrollbar-width: none;[\s\S]*?\.workspace-panel:not\(\.reader-panel\) \*::-webkit-scrollbar \{[\s\S]*?display: none;/);
+assert.doesNotMatch(stylesSource, /\.reader-content[^}]*scrollbar-width: none;/);
+assert.match(stylesSource, /\.reader-panel \.reader-content \{[\s\S]*?margin-right: calc\(0px - var\(--panel-padding\)\);[\s\S]*?padding-right: calc\(var\(--panel-padding\) \+ var\(--space-4\)\);/);
+assert.match(stylesSource, /\.reader-panel \.reader-content::\-webkit-scrollbar-track \{[\s\S]*?margin-top: calc\(var\(--reader-scrollbar-track-top\) - var\(--panel-padding\)\);/);
 assert.doesNotMatch(clientSource, /start\(\)\.catch\([\s\S]*?settingsTemplate[\s\S]*?\.settings-list/);
 assert.match(clientSource, /addReaderButton\.disabled = limitReached/);
 assert.match(clientSource, /Two Reader limit reached/);
