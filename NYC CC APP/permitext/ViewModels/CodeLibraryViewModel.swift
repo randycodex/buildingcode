@@ -2804,7 +2804,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         do {
             storeKitOperationMessage = "Preparing the App Store purchase..."
-            let preflightSnapshot = await storeKitSubscriptionService.prepareForPurchase()
+            let preflightSnapshot = try await storeKitSubscriptionService.prepareForPurchase()
             let preflightAuthorized = await authorizeStoreKitSnapshot(
                 preflightSnapshot,
                 allowsNewTestBinding: false
@@ -2888,7 +2888,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     guard isProSubscriptionStorePresented else { return }
                     try? await Task.sleep(nanoseconds: 500_000_000)
                     guard isProSubscriptionStorePresented else { return }
-                    let retryPreflightSnapshot = await storeKitSubscriptionService.prepareForPurchase()
+                    let retryPreflightSnapshot = try await storeKitSubscriptionService.prepareForPurchase()
                     _ = await authorizeStoreKitSnapshot(
                         retryPreflightSnapshot,
                         allowsNewTestBinding: false
@@ -3221,6 +3221,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 authProvider: signedInAccount.authProvider,
                 authProviderUserID: signedInAccount.authProviderUserID,
                 appleUserID: signedInAccount.appleUserID,
+                email: signedInAccount.email,
                 publicUsername: signedInAccount.publicUsername,
                 displayName: signedInAccount.displayName,
                 signedInAt: signedInAccount.signedInAt,
@@ -4144,6 +4145,7 @@ final class CodeLibraryViewModel: ObservableObject {
             authProvider: account.authProvider,
             authProviderUserID: account.authProviderUserID,
             appleUserID: account.appleUserID,
+            email: account.email,
             publicUsername: account.publicUsername,
             displayName: account.displayName,
             signedInAt: account.signedInAt,
@@ -5666,6 +5668,7 @@ enum SignedInAccountPersistence {
             authProvider: account.authProvider,
             authProviderUserID: account.authProviderUserID,
             appleUserID: account.appleUserID,
+            email: account.email,
             publicUsername: account.publicUsername,
             displayName: account.displayName,
             signedInAt: account.signedInAt,

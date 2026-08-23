@@ -370,9 +370,11 @@ struct SettingsView: View {
                 .disabled(library.isAccountBusy)
                 .opacity(library.isAccountBusy ? 0.55 : 1)
 
-            } else {
+            } else if let account = library.signedInAccount {
                 VStack(spacing: 10) {
-                    if clerk != nil, library.signedInAccount?.authProvider != .clerk {
+                    signedInAccountIdentityCard(account)
+
+                    if clerk != nil, account.authProvider != .clerk {
                         Button {
                             library.requestClerkAuthentication()
                         } label: {
@@ -448,6 +450,64 @@ struct SettingsView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func signedInAccountIdentityCard(_ account: SignedInAccount) -> some View {
+        accountIdentityRow(
+            label: "Signed in as",
+            value: signedInPrimaryEmail(for: account) ?? "Email unavailable",
+            systemImage: "envelope.fill"
+        )
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.primary.opacity(0.06))
+        )
+    }
+
+    private func accountIdentityRow(
+        label: String,
+        value: String,
+        systemImage: String
+    ) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: systemImage)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Color.appChrome)
+                .frame(width: 20, height: 20)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(label): \(value)")
+    }
+
+    private func signedInPrimaryEmail(for account: SignedInAccount) -> String? {
+        if let email = normalizedAccountIdentityValue(account.email) {
+            return email
+        }
+        guard account.authProvider == .clerk,
+              clerk?.user?.id == account.authProviderUserID
+        else {
+            return nil
+        }
+        return normalizedAccountIdentityValue(clerk?.user?.primaryEmailAddress?.emailAddress)
+    }
+
+    private func normalizedAccountIdentityValue(_ value: String?) -> String? {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
     }
 
     private var webWorkspaceCard: some View {

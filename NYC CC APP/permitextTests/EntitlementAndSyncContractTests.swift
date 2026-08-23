@@ -1037,7 +1037,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
-    func testStoreKitTransactionFinishBarrierWaitsForSharedCleanup() async {
+    func testStoreKitTransactionFinishBarrierCoalescesOnlyConcurrentCleanup() async {
         let barrier = StoreKitTransactionFinishBarrier()
         let probe = StoreKitFinishBarrierProbe()
         let transactionID: UInt64 = 42
@@ -1082,7 +1082,32 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             await probe.holdOperation()
         }
         probeSnapshot = await probe.snapshot()
-        XCTAssertEqual(probeSnapshot.operationStarts, 1)
+        XCTAssertEqual(probeSnapshot.operationStarts, 2)
+    }
+
+    func testStoreKitTransactionDrainPolicyUsesBoundedBackoff() {
+        XCTAssertEqual(StoreKitTransactionDrainPolicy.maximumPasses, 3)
+        XCTAssertGreaterThan(StoreKitTransactionDrainPolicy.initialSettlingDelayNanoseconds, 0)
+        XCTAssertEqual(
+            StoreKitTransactionDrainPolicy.settlingDelayNanoseconds(afterCompletedPass: 1),
+            StoreKitTransactionDrainPolicy.initialSettlingDelayNanoseconds
+        )
+        XCTAssertEqual(
+            StoreKitTransactionDrainPolicy.settlingDelayNanoseconds(afterCompletedPass: 2),
+            StoreKitTransactionDrainPolicy.initialSettlingDelayNanoseconds * 2
+        )
+        XCTAssertEqual(
+            StoreKitTransactionDrainPolicy.settlingDelayNanoseconds(afterCompletedPass: 3),
+            StoreKitTransactionDrainPolicy.initialSettlingDelayNanoseconds * 4
+        )
+        XCTAssertEqual(
+            StoreKitTransactionDrainPolicy.settlingDelayNanoseconds(afterCompletedPass: 4),
+            StoreKitTransactionDrainPolicy.initialSettlingDelayNanoseconds * 4
+        )
+        XCTAssertEqual(
+            StoreKitSubscriptionServiceError.inactiveTransactionQueueDidNotSettle.localizedDescription,
+            "The App Store is still clearing an expired subscription. No charge was made. Wait a moment, then select Subscribe again."
+        )
     }
 
     func testStoreKitAccountBindingPolicyRequiresAccountSpecificAuthorization() {
@@ -1182,6 +1207,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             authProvider: .apple,
             authProviderUserID: "persistence-test",
             appleUserID: "persistence-test",
+            email: "owner@example.com",
             publicUsername: "permitext-test",
             displayName: "Persistence Test",
             signedInAt: Date(timeIntervalSince1970: 100),
@@ -1192,6 +1218,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         XCTAssertNil(sanitized.backendSessionToken)
         XCTAssertEqual(sanitized.appUserID, account.appUserID)
+        XCTAssertEqual(sanitized.email, account.email)
         XCTAssertEqual(sanitized.migrationState, account.migrationState)
     }
 
@@ -1787,7 +1814,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(settingsSource.contains("@Environment(\\.purchase) private var purchase"))
         XCTAssertTrue(settingsSource.contains("await library.purchasePro(using: purchase)"))
         XCTAssertTrue(appSource.contains("ProSubscriptionStoreView()"))
-        XCTAssertTrue(viewModelSource.contains("storeKitSubscriptionService.prepareForPurchase()"))
+        XCTAssertTrue(viewModelSource.contains("try await storeKitSubscriptionService.prepareForPurchase()"))
         XCTAssertTrue(viewModelSource.contains("let appAccountToken = storeKitAppAccountToken(for: purchasingAccount.appUserID)"))
         XCTAssertTrue(viewModelSource.contains("let purchaseResult = try await purchaseAction("))
         XCTAssertTrue(viewModelSource.contains("options: [.appAccountToken(appAccountToken)]"))
@@ -1818,9 +1845,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             )
         )
         let preflightSource = String(storeKitSource[preflightStart.lowerBound..<purchaseStart.lowerBound])
-        XCTAssertTrue(preflightSource.contains("for await verification in Transaction.unfinished"))
-        XCTAssertTrue(preflightSource.contains("inactiveKnownTransaction(from: verification)"))
-        XCTAssertTrue(preflightSource.contains("finishTransactionOnce(transaction)"))
+        XCTAssertTrue(preflightSource.contains("drainInactiveUnfinishedTransactions()"))
 
         let updatesStartForSafety = try XCTUnwrap(storeKitSource.range(of: "func transactionUpdates()"))
         let activeFinishStart = try XCTUnwrap(
@@ -1847,8 +1872,18 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(cleanupSource.contains("case .unverified(let unverifiedTransaction, _)"))
         XCTAssertTrue(cleanupSource.contains("shouldFinishInactiveTransaction"))
         XCTAssertTrue(cleanupSource.contains("finishBarrier.finishOnce(transactionID: transaction.id)"))
+        XCTAssertTrue(cleanupSource.contains("for pass in 1...StoreKitTransactionDrainPolicy.maximumPasses"))
+        XCTAssertTrue(cleanupSource.contains("let inactiveTransactions = await inactiveUnfinishedTransactions()"))
+        XCTAssertTrue(cleanupSource.contains("guard !inactiveTransactions.isEmpty else { return true }"))
+        XCTAssertTrue(cleanupSource.contains("try await Task.sleep"))
+        XCTAssertTrue(cleanupSource.contains("afterCompletedPass: pass"))
+        XCTAssertTrue(cleanupSource.contains("return await inactiveUnfinishedTransactions().isEmpty"))
+        XCTAssertTrue(cleanupSource.contains("private func inactiveUnfinishedTransactions()"))
+        XCTAssertTrue(cleanupSource.contains("for await verification in Transaction.unfinished"))
+        XCTAssertFalse(storeKitSource.contains("completedTransactionIDs"))
+        XCTAssertTrue(preflightSource.contains("inactiveTransactionQueueDidNotSettle"))
 
-        XCTAssertTrue(viewModelSource.contains("let retryPreflightSnapshot = await storeKitSubscriptionService.prepareForPurchase()"))
+        XCTAssertTrue(viewModelSource.contains("let retryPreflightSnapshot = try await storeKitSubscriptionService.prepareForPurchase()"))
         XCTAssertTrue(settingsSource.contains("subscribeButtonBackgroundColor"))
         XCTAssertTrue(settingsSource.contains("colorScheme == .dark ? Color.white.opacity(0.96) : Color.appChrome"))
 

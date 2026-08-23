@@ -2872,6 +2872,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             authProvider: credential.provider,
             authProviderUserID: credential.providerUserID,
             appleUserID: credential.provider == .apple ? credential.providerUserID : "",
+            email: credential.email,
             publicUsername: nil,
             displayName: credential.displayName,
             signedInAt: credential.signedInAt,
@@ -4481,6 +4482,7 @@ struct SignedInAccount: Codable, Hashable, Sendable {
     let authProvider: AccountAuthProvider
     let authProviderUserID: String
     let appleUserID: String
+    let email: String?
     let publicUsername: String?
     let displayName: String?
     let signedInAt: Date
@@ -4492,6 +4494,7 @@ struct SignedInAccount: Codable, Hashable, Sendable {
         authProvider: AccountAuthProvider = .apple,
         authProviderUserID: String? = nil,
         appleUserID: String,
+        email: String? = nil,
         publicUsername: String? = nil,
         displayName: String?,
         signedInAt: Date,
@@ -4502,6 +4505,7 @@ struct SignedInAccount: Codable, Hashable, Sendable {
         self.authProvider = authProvider
         self.authProviderUserID = authProviderUserID ?? appleUserID
         self.appleUserID = appleUserID
+        self.email = email
         self.publicUsername = publicUsername
         self.displayName = displayName
         self.signedInAt = signedInAt
@@ -4514,6 +4518,7 @@ struct SignedInAccount: Codable, Hashable, Sendable {
         case authProvider
         case authProviderUserID
         case appleUserID
+        case email
         case publicUsername
         case displayName
         case signedInAt
@@ -4531,6 +4536,7 @@ struct SignedInAccount: Codable, Hashable, Sendable {
         self.authProviderUserID = authProviderUserID
         self.appleUserID = appleUserID
         self.appUserID = try container.decodeIfPresent(String.self, forKey: .appUserID) ?? "\(authProvider.rawValue):\(authProviderUserID)"
+        self.email = try container.decodeIfPresent(String.self, forKey: .email)
         self.publicUsername = try container.decodeIfPresent(String.self, forKey: .publicUsername)
         self.displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
         self.signedInAt = try container.decode(Date.self, forKey: .signedInAt)
@@ -4935,17 +4941,25 @@ enum StoreKitTransactionPolicy {
     }
 }
 
+enum StoreKitTransactionDrainPolicy {
+    static let maximumPasses = 3
+    static let initialSettlingDelayNanoseconds: UInt64 = 200_000_000
+
+    static func settlingDelayNanoseconds(afterCompletedPass pass: Int) -> UInt64 {
+        let boundedPass = max(1, min(pass, maximumPasses))
+        return initialSettlingDelayNanoseconds << UInt64(boundedPass - 1)
+    }
+}
+
 actor StoreKitTransactionFinishBarrier {
     private var inFlightTasks: [UInt64: Task<Void, Never>] = [:]
-    private var completedTransactionIDs: Set<UInt64> = []
 
     func finishOnce(
         transactionID: UInt64,
         operation: @escaping @Sendable () async -> Void
     ) async {
-        if completedTransactionIDs.contains(transactionID) {
-            return
-        }
+        // Coalesce only overlapping calls. StoreKit can keep yielding a transaction
+        // briefly after finish(), so a later cleanup pass must be allowed to retry it.
         if let inFlightTask = inFlightTasks[transactionID] {
             await inFlightTask.value
             return
@@ -4957,7 +4971,6 @@ actor StoreKitTransactionFinishBarrier {
         inFlightTasks[transactionID] = task
         await task.value
         inFlightTasks[transactionID] = nil
-        completedTransactionIDs.insert(transactionID)
     }
 }
 
@@ -5016,6 +5029,7 @@ struct StoreKitSubscriptionSnapshot: Sendable {
 enum StoreKitSubscriptionServiceError: LocalizedError {
     case proProductUnavailable
     case paymentsUnavailable
+    case inactiveTransactionQueueDidNotSettle
     case unverifiedTransaction
     case pendingApproval
     case unknownPurchaseResult
@@ -5026,6 +5040,8 @@ enum StoreKitSubscriptionServiceError: LocalizedError {
             return "The Pro monthly subscription is not available yet. Check the App Store product setup."
         case .paymentsUnavailable:
             return "Apple purchases are disabled for this device or App Store account. Check Screen Time purchase restrictions and your App Store sign-in, then try again."
+        case .inactiveTransactionQueueDidNotSettle:
+            return "The App Store is still clearing an expired subscription. No charge was made. Wait a moment, then select Subscribe again."
         case .unverifiedTransaction:
             return "The purchase could not be verified."
         case .pendingApproval:
@@ -5083,14 +5099,13 @@ actor StoreKitSubscriptionService {
         return product
     }
 
-    func prepareForPurchase() async -> StoreKitSubscriptionSnapshot {
+    func prepareForPurchase() async throws -> StoreKitSubscriptionSnapshot {
         // TestFlight sandbox renewals can leave multiple expired transactions
         // unfinished, including transactions whose JWS no longer verifies.
         // An unverified payload is used only to remove a known, demonstrably
         // inactive transaction from Apple's queue; it can never grant access.
-        for await verification in Transaction.unfinished {
-            guard let transaction = inactiveKnownTransaction(from: verification) else { continue }
-            await finishTransactionOnce(transaction)
+        guard try await drainInactiveUnfinishedTransactions() else {
+            throw StoreKitSubscriptionServiceError.inactiveTransactionQueueDidNotSettle
         }
         return await snapshot()
     }
@@ -5244,6 +5259,35 @@ actor StoreKitSubscriptionService {
         await finishBarrier.finishOnce(transactionID: transaction.id) {
             await transaction.finish()
         }
+    }
+
+    private func drainInactiveUnfinishedTransactions() async throws -> Bool {
+        for pass in 1...StoreKitTransactionDrainPolicy.maximumPasses {
+            let inactiveTransactions = await inactiveUnfinishedTransactions()
+            guard !inactiveTransactions.isEmpty else { return true }
+
+            for transaction in inactiveTransactions {
+                await finishTransactionOnce(transaction)
+            }
+            try await Task.sleep(
+                nanoseconds: StoreKitTransactionDrainPolicy.settlingDelayNanoseconds(
+                    afterCompletedPass: pass
+                )
+            )
+        }
+
+        // Do not start another purchase until a separate pass proves StoreKit's
+        // unfinished queue no longer contains a known inactive transaction.
+        return await inactiveUnfinishedTransactions().isEmpty
+    }
+
+    private func inactiveUnfinishedTransactions() async -> [Transaction] {
+        var transactions: [Transaction] = []
+        for await verification in Transaction.unfinished {
+            guard let transaction = inactiveKnownTransaction(from: verification) else { continue }
+            transactions.append(transaction)
+        }
+        return transactions
     }
 
     private func proProducts() async -> [Product] {
