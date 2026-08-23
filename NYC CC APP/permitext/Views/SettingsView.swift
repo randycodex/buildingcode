@@ -349,8 +349,8 @@ struct SettingsView: View {
                         .font(.subheadline.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .foregroundStyle(.white)
-                        .background(Color.appChrome, in: Capsule(style: .continuous))
+                        .foregroundStyle(upgradeButtonForegroundColor)
+                        .background(upgradeButtonBackgroundColor, in: Capsule(style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .disabled(library.isAccountBusy)

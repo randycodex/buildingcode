@@ -1982,6 +1982,32 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(bookmarksSource.contains("Label(\"Settings\", systemImage: \"gearshape\")"))
     }
 
+    func testSettingsSignInButtonMatchesUpgradeButtonStyle() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
+        let signInLabelStart = try XCTUnwrap(
+            settingsSource.range(of: "Label(\"Sign in or create an account\"")
+        )
+        let signInButtonEnd = try XCTUnwrap(
+            settingsSource.range(
+                of: ".disabled(library.isAccountBusy)",
+                range: signInLabelStart.upperBound..<settingsSource.endIndex
+            )
+        )
+        let signInButtonSource = String(
+            settingsSource[signInLabelStart.lowerBound..<signInButtonEnd.upperBound]
+        )
+
+        XCTAssertTrue(signInButtonSource.contains(".foregroundStyle(upgradeButtonForegroundColor)"))
+        XCTAssertTrue(signInButtonSource.contains(".background(upgradeButtonBackgroundColor, in: Capsule(style: .continuous))"))
+        XCTAssertFalse(signInButtonSource.contains(".foregroundStyle(.white)"))
+    }
+
     func testAccountUserDataProfilesNeverExposeSavedPassagesAcrossAccounts() throws {
         let suiteName = "permitext-tests.account-profiles.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
