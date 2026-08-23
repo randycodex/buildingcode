@@ -882,9 +882,9 @@ struct SettingsView: View {
     }
 
     private func signOut() {
-        library.signOut()
-        guard let clerk, clerk.user != nil else { return }
-        Task { try? await clerk.auth.signOut() }
+        Task {
+            await library.signOut(clerk: clerk)
+        }
     }
 
     private var syncConflictReviewCard: some View {
@@ -1102,13 +1102,14 @@ struct SettingsView: View {
 struct ProSubscriptionStoreView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.purchase) private var purchase
     private let termsURL = URL(string: "https://permitext.com/terms")!
     private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
 
     var body: some View {
         NavigationStack {
-            SubscriptionStoreView(productIDs: [StoreKitProductID.proMonthly]) {
-                VStack(spacing: 14) {
+            ScrollView {
+                VStack(spacing: 18) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 34, weight: .semibold))
                         .foregroundStyle(Color.appChrome)
@@ -1127,26 +1128,81 @@ struct ProSubscriptionStoreView: View {
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
 
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Permitext Pro Monthly")
+                            .font(.headline)
+                        Text("\(library.proProductDisplayPrice ?? "$20.00")/month")
+                            .font(.title3.weight(.semibold))
+                        Text("Pro: unlimited saves, notes, Projects, Notebook, Report, exports, continuity, sync, and up to 100 Research turns each month.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(18)
+                    .background(Color.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+
+                    Button {
+                        Task {
+                            await library.purchasePro(using: purchase)
+                        }
+                    } label: {
+                        HStack(spacing: 10) {
+                            if library.isStoreKitBusy && !library.isStoreKitRestoreInProgress {
+                                ProgressView()
+                                    .tint(.white)
+                            }
+                            Text(library.isStoreKitBusy ? "Contacting Apple..." : "Subscribe")
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 15)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.white)
+                    .background(Color.appChrome, in: Capsule(style: .continuous))
+                    .disabled(library.isStoreKitBusy)
+                    .opacity(library.isStoreKitBusy ? 0.7 : 1)
+
                     if let operationMessage = library.storeKitOperationMessage {
                         Text(operationMessage)
                             .font(.caption.weight(.medium))
-                            .foregroundStyle(library.currentPlan == .pro ? Color.green : Color.secondary)
+                            .foregroundStyle(library.currentPlan == .pro ? Color.green : Color.primary)
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+
+                    HStack(spacing: 5) {
+                        Link("Terms of Service", destination: termsURL)
+                        Text("and")
+                            .foregroundStyle(.secondary)
+                        Link("Privacy Policy", destination: privacyPolicyURL)
+                    }
+                    .font(.caption)
+
+                    Button {
+                        Task {
+                            await library.restorePurchases()
+                        }
+                    } label: {
+                        HStack(spacing: 10) {
+                            if library.isStoreKitRestoreInProgress {
+                                ProgressView()
+                            }
+                            Text("Restore Subscription")
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.primary)
+                    .background(Color.primary.opacity(0.10), in: Capsule(style: .continuous))
+                    .disabled(library.isStoreKitBusy)
+                    .opacity(library.isStoreKitBusy ? 0.7 : 1)
                 }
                 .padding(.horizontal, 24)
-                .padding(.top, 20)
-            }
-            .subscriptionStoreControlStyle(.prominentPicker)
-            .storeButton(.visible, for: .restorePurchases)
-            .subscriptionStorePolicyDestination(url: termsURL, for: .termsOfService)
-            .subscriptionStorePolicyDestination(url: privacyPolicyURL, for: .privacyPolicy)
-            .onInAppPurchaseStart { product in
-                library.storeKitPurchaseStarted(productID: product.id)
-            }
-            .onInAppPurchaseCompletion { product, result in
-                await library.completeStoreKitPurchase(productID: product.id, result: result)
+                .padding(.vertical, 28)
             }
             .navigationTitle("Upgrade to Pro")
             .navigationBarTitleDisplayMode(.inline)

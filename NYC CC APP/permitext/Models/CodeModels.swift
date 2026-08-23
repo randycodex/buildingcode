@@ -4991,9 +4991,13 @@ actor StoreKitSubscriptionService {
         )
     }
 
-    func proProductForPurchase() async throws -> Product {
+    func proProductForPurchase(refresh: Bool = false) async throws -> Product {
         guard AppStore.canMakePayments else {
             throw StoreKitSubscriptionServiceError.paymentsUnavailable
+        }
+        if refresh {
+            cachedProProduct = nil
+            cachedResearchProduct = nil
         }
         guard let product = await proProducts().first(where: { $0.id == proProductID }) else {
             throw StoreKitSubscriptionServiceError.proProductUnavailable

@@ -1549,7 +1549,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
-    func testStoreKitPurchaseUsesApplesNativeSubscriptionStore() throws {
+    func testStoreKitPurchaseUsesPurchaseActionFromPresentedSwiftUIView() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -1565,13 +1565,38 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             contentsOf: projectRoot.appendingPathComponent("permitext/Models/CodeModels.swift"),
             encoding: .utf8
         )
+        let viewModelSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/ViewModels/CodeLibraryViewModel.swift"),
+            encoding: .utf8
+        )
 
-        XCTAssertTrue(settingsSource.contains("SubscriptionStoreView(productIDs: [StoreKitProductID.proMonthly])"))
-        XCTAssertTrue(settingsSource.contains("onInAppPurchaseCompletion"))
+        XCTAssertTrue(settingsSource.contains("@Environment(\\.purchase) private var purchase"))
+        XCTAssertTrue(settingsSource.contains("await library.purchasePro(using: purchase)"))
         XCTAssertTrue(appSource.contains("ProSubscriptionStoreView()"))
-        XCTAssertFalse(settingsSource.contains("@Environment(\\.purchase)"))
+        XCTAssertTrue(viewModelSource.contains("let purchaseResult = try await purchaseAction(product)"))
+        XCTAssertTrue(viewModelSource.contains("for attempt in 1...2"))
+        XCTAssertFalse(settingsSource.contains("SubscriptionStoreView(groupID:"))
         XCTAssertFalse(appSource.contains("@Environment(\\.purchase)"))
         XCTAssertFalse(storeKitSource.contains("product.purchase()"))
+    }
+
+    func testClerkAuthenticationSheetDismissesWhenSessionActivates() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let appSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/PermitextApp.swift"),
+            encoding: .utf8
+        )
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(appSource.contains("PermitextClerkAuthenticationView()"))
+        XCTAssertTrue(appSource.contains(".onChange(of: clerk.session?.id)"))
+        XCTAssertTrue(settingsSource.contains("await library.signOut(clerk: clerk)"))
+        XCTAssertFalse(settingsSource.contains("try? await clerk.auth.signOut()"))
     }
 
     func testAccountUserDataProfilesNeverExposeSavedPassagesAcrossAccounts() throws {

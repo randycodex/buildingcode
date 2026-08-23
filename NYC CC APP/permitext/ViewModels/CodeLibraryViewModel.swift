@@ -2775,7 +2775,7 @@ final class CodeLibraryViewModel: ObservableObject {
         defer { isStoreKitBusy = false }
 
         do {
-            _ = try await storeKitSubscriptionService.proProductForPurchase()
+            _ = try await storeKitSubscriptionService.proProductForPurchase(refresh: true)
             Self.storeKitPurchaseLogger.info("Presenting Apple's native subscription store.")
             isProSubscriptionStorePresented = true
         } catch {
@@ -2789,80 +2789,84 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func storeKitPurchaseStarted(productID: String) {
-        guard productID == StoreKitProductID.proMonthly else { return }
+    func purchasePro(using purchaseAction: PurchaseAction) async {
+        guard signedInAccount != nil else {
+            statusMessage = "Sign in or create a Permitext account before purchasing Pro."
+            storeKitOperationMessage = statusMessage
+            return
+        }
+        guard !isStoreKitBusy else { return }
         isStoreKitBusy = true
-        storeKitOperationMessage = "Waiting for Apple to complete the purchase..."
-        Self.storeKitPurchaseLogger.info(
-            "Native StoreKit purchase started for product \(productID, privacy: .public)."
-        )
-    }
-
-    func completeStoreKitPurchase(
-        productID: String,
-        result: Result<Product.PurchaseResult, Error>
-    ) async {
-        guard productID == StoreKitProductID.proMonthly else { return }
         defer { isStoreKitBusy = false }
 
-        switch result {
-        case .failure(let error):
+        do {
+            var product = try await storeKitSubscriptionService.proProductForPurchase(refresh: true)
+            for attempt in 1...2 {
+                storeKitOperationMessage = attempt == 1
+                    ? "Waiting for Apple to open the purchase confirmation..."
+                    : "Refreshing the App Store purchase session..."
+                Self.storeKitPurchaseLogger.info(
+                    "Starting native StoreKit purchase attempt \(attempt, privacy: .public) for product \(product.id, privacy: .public)."
+                )
+
+                let purchaseResult = try await purchaseAction(product)
+                switch purchaseResult {
+                case .success:
+                    let snapshot = try await storeKitSubscriptionService.snapshot(after: purchaseResult)
+                    applyStoreKitSnapshot(snapshot)
+                    await syncAppleTransactionIfPossible(snapshot)
+                    if currentPlan == .pro {
+                        isProSubscriptionStorePresented = false
+                        if isStoreKitTestProActive {
+                            statusMessage = "Pro (Test) is active on this device."
+                            storeKitOperationMessage = "Apple confirmed Pro (Test) on this device."
+                        } else {
+                            statusMessage = "Pro is active."
+                            storeKitOperationMessage = "Apple confirmed your Pro subscription."
+                        }
+                        Self.storeKitPurchaseLogger.info("Native StoreKit purchase completed and verified.")
+                        return
+                    }
+
+                    Self.storeKitPurchaseLogger.error(
+                        "StoreKit returned an inactive transaction on attempt \(attempt, privacy: .public): \(snapshot.debugSummary, privacy: .public)"
+                    )
+                    guard attempt == 1 else {
+                        let message = "Apple did not open a new purchase. No charge was made. The App Store returned an expired subscription instead of starting checkout."
+                        statusMessage = message
+                        storeKitOperationMessage = message
+                        return
+                    }
+
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                    product = try await storeKitSubscriptionService.proProductForPurchase(refresh: true)
+
+                case .userCancelled:
+                    statusMessage = "Purchase cancelled."
+                    storeKitOperationMessage = "Apple cancelled the purchase. No charge was made."
+                    Self.storeKitPurchaseLogger.info("Native StoreKit purchase was cancelled by the user.")
+                    return
+
+                case .pending:
+                    statusMessage = StoreKitSubscriptionServiceError.pendingApproval.localizedDescription
+                    storeKitOperationMessage = StoreKitSubscriptionServiceError.pendingApproval.localizedDescription
+                    Self.storeKitPurchaseLogger.info("Native StoreKit purchase is pending approval.")
+                    return
+
+                @unknown default:
+                    statusMessage = StoreKitSubscriptionServiceError.unknownPurchaseResult.localizedDescription
+                    storeKitOperationMessage = StoreKitSubscriptionServiceError.unknownPurchaseResult.localizedDescription
+                    Self.storeKitPurchaseLogger.error("Native StoreKit returned an unknown purchase result.")
+                    return
+                }
+            }
+        } catch {
             let message = error.localizedDescription
             statusMessage = message
             storeKitOperationMessage = message
             Self.storeKitPurchaseLogger.error(
                 "Native StoreKit purchase failed: \(message, privacy: .public)"
             )
-
-        case .success(let purchaseResult):
-            switch purchaseResult {
-            case .success:
-                do {
-                    let snapshot = try await storeKitSubscriptionService.snapshot(after: purchaseResult)
-                    applyStoreKitSnapshot(snapshot)
-                    await syncAppleTransactionIfPossible(snapshot)
-                    if currentPlan == .pro {
-                        isProSubscriptionStorePresented = false
-                    }
-                    if currentPlan != .pro {
-                        let message = "Apple returned a transaction, but no active Pro subscription was found. No Pro access was granted."
-                        statusMessage = message
-                        storeKitOperationMessage = message
-                        Self.storeKitPurchaseLogger.error(
-                            "Native StoreKit purchase returned without an active Pro entitlement."
-                        )
-                    } else if isStoreKitTestProActive {
-                        statusMessage = "Pro (Test) is active on this device."
-                        storeKitOperationMessage = "Apple confirmed Pro (Test) on this device."
-                    } else {
-                        statusMessage = "Pro is active."
-                        storeKitOperationMessage = "Apple confirmed your Pro subscription."
-                    }
-                    Self.storeKitPurchaseLogger.info("Native StoreKit purchase completed and verified.")
-                } catch {
-                    let message = error.localizedDescription
-                    statusMessage = message
-                    storeKitOperationMessage = message
-                    Self.storeKitPurchaseLogger.error(
-                        "Native StoreKit purchase verification failed: \(message, privacy: .public)"
-                    )
-                }
-
-            case .userCancelled:
-                statusMessage = "Purchase cancelled."
-                storeKitOperationMessage = "Apple cancelled the purchase. No charge was made."
-                Self.storeKitPurchaseLogger.info("Native StoreKit purchase was cancelled by the user.")
-
-            case .pending:
-                statusMessage = StoreKitSubscriptionServiceError.pendingApproval.localizedDescription
-                storeKitOperationMessage = StoreKitSubscriptionServiceError.pendingApproval.localizedDescription
-                Self.storeKitPurchaseLogger.info("Native StoreKit purchase is pending approval.")
-
-            @unknown default:
-                statusMessage = StoreKitSubscriptionServiceError.unknownPurchaseResult.localizedDescription
-                storeKitOperationMessage = StoreKitSubscriptionServiceError.unknownPurchaseResult.localizedDescription
-                Self.storeKitPurchaseLogger.error("Native StoreKit returned an unknown purchase result.")
-            }
         }
     }
 
@@ -3598,7 +3602,32 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func signOut(clerk: Clerk?) async {
+        guard !isAccountBusy else { return }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        if let clerk, clerk.session != nil {
+            do {
+                try await clerk.auth.signOut()
+            } catch {
+                let message = "Sign-out could not finish: \(error.localizedDescription)"
+                accountAuthenticationMessage = message
+                statusMessage = message
+                Self.accountAuthenticationLogger.error(
+                    "Clerk sign-out failed: \(String(describing: error), privacy: .public)"
+                )
+                return
+            }
+        }
+        completeLocalSignOut()
+    }
+
     func signOut() {
+        completeLocalSignOut()
+    }
+
+    private func completeLocalSignOut() {
         let account = signedInAccount
         stopForegroundAutomaticSync()
         signedInAccount = nil

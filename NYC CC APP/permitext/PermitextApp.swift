@@ -16,6 +16,24 @@ extension EnvironmentValues {
     }
 }
 
+private struct PermitextClerkAuthenticationView: View {
+    @Environment(Clerk.self) private var clerk
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        AuthView()
+            .onChange(of: clerk.session?.id) { _, sessionID in
+                guard sessionID != nil else { return }
+                dismiss()
+            }
+            .task {
+                guard clerk.session != nil else { return }
+                await Task.yield()
+                dismiss()
+            }
+    }
+}
+
 @main
 struct PermitextApp: App {
     @StateObject private var library: CodeLibraryViewModel
@@ -230,7 +248,7 @@ struct PermitextApp: App {
                 }
             ) {
                 if let clerk {
-                    AuthView()
+                    PermitextClerkAuthenticationView()
                         .environment(clerk)
                 }
             }
