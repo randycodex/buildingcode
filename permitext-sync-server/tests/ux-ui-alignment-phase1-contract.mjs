@@ -44,6 +44,7 @@ assert.equal(canonicalized[0].sectionCount, 13);
 assert.match(clientSource, /&match=exact&limit=\$\{searchResultPageSize\}&offset=0&candidateOffset=0/);
 assert.match(clientSource, /&match=exact` \+[\s\S]*?&candidateOffset=\$\{encodeURIComponent\(String\(options\.candidateOffset\)\)\}/);
 assert.match(clientSource, /function renderWorkspaceLoadError\(error\)[\s\S]*?role", "alert"[\s\S]*?Try again[\s\S]*?window\.location\.reload\(\)/);
+assert.match(stylesSource, /\.workspace-load-error \.toolbar-button \{[\s\S]*?border: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/);
 assert.doesNotMatch(clientSource, /start\(\)\.catch\([\s\S]*?settingsTemplate[\s\S]*?\.settings-list/);
 assert.match(clientSource, /addReaderButton\.disabled = limitReached/);
 assert.match(clientSource, /Two Reader limit reached/);

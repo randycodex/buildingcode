@@ -1341,6 +1341,21 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
 .workspace-load-error .toolbar-button {
   justify-self: center;
   margin-top: var(--space-2);
+  min-height: auto;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.workspace-load-error .toolbar-button:hover {
+  color: var(--code-accent);
+}
+
+.workspace-load-error .toolbar-button:focus-visible {
+  outline: 2px solid var(--code-accent);
+  outline-offset: 3px;
 }
 
 .workspace-panel.is-dragging {
