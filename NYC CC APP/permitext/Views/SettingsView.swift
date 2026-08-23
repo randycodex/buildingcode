@@ -42,6 +42,20 @@ struct SettingsView: View {
         Color(uiColor: .secondaryLabel)
     }
 
+    private var syncStatusSystemImage: String {
+        if library.signedInAccount == nil { return "icloud.slash" }
+        if library.isAccountBusy { return "arrow.triangle.2.circlepath" }
+        if !library.userContentSyncConflicts.isEmpty { return "exclamationmark.icloud" }
+        if library.pendingUserContentSyncCount > 0 { return "icloud.and.arrow.up" }
+        return "checkmark.icloud"
+    }
+
+    private var syncStatusColor: Color {
+        if !library.userContentSyncConflicts.isEmpty { return .orange }
+        if library.signedInAccount == nil || library.isAccountBusy { return .secondary }
+        return Color.appChrome
+    }
+
     private var appVersionLabel: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
@@ -102,11 +116,7 @@ struct SettingsView: View {
                     }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                        projectManagementCard
-                    }
-
-                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
-                        savedDataTools
+                        dataAndStorageCard
                     }
 
                     Text("permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.")
@@ -320,6 +330,17 @@ struct SettingsView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+
+            Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(syncStatusColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.primary.opacity(0.06))
+                )
+                .accessibilityLabel("Sync status: \(library.syncStatusTitle)")
 
             if let message = library.accountAuthenticationMessage {
                 Label(
@@ -623,9 +644,22 @@ struct SettingsView: View {
         }
     }
 
-    private var savedDataTools: some View {
+    private var dataAndStorageCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            CodeEyebrow(text: "Saved Data", accent: settingsChromeColor)
+            CodeEyebrow(text: "Data & Storage", accent: settingsChromeColor)
+
+            projectManagementSection
+
+            CodeHairline()
+
+            settingsDangerButton(
+                title: "Clear All Projects and Saved Collections",
+                systemImage: "minus.circle",
+                action: .clearProjects,
+                disabled: library.folders.isEmpty
+            )
+
+            CodeHairline()
 
             settingsDangerButton(
                 title: "Clear Recent Searches",
@@ -648,33 +682,32 @@ struct SettingsView: View {
                 systemImage: "note.text",
                 action: .clearNotes
             )
-
         }
     }
 
-    private var projectManagementCard: some View {
+    private var projectManagementSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                CodeEyebrow(text: "Projects and References", accent: settingsChromeColor)
+                Text("Projects and saved collections")
+                    .font(.subheadline.weight(.semibold))
 
                 Spacer(minLength: 0)
 
-                if !library.folders.isEmpty {
-                    Button(selectedProjectIDs.count == library.folders.count ? "Clear All" : "Select All") {
-                        if selectedProjectIDs.count == library.folders.count {
-                            selectedProjectIDs.removeAll()
-                        } else {
-                            selectedProjectIDs = Set(library.folders.map(\.id))
-                        }
+                Button(selectedProjectIDs.count == library.folders.count && !library.folders.isEmpty ? "Clear All" : "Select All") {
+                    if selectedProjectIDs.count == library.folders.count {
+                        selectedProjectIDs.removeAll()
+                    } else {
+                        selectedProjectIDs = Set(library.folders.map(\.id))
                     }
-                    .buttonStyle(.plain)
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.secondary)
                 }
+                .buttonStyle(.plain)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .disabled(library.folders.isEmpty)
             }
 
             if library.folders.isEmpty {
-                Text("No projects or references yet.")
+                Text("No Projects or saved collections yet.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
@@ -688,25 +721,26 @@ struct SettingsView: View {
                     }
                 }
 
-                Button(role: .destructive) {
-                    showsProjectDeleteWarning = true
-                } label: {
-                    Label(
-                        selectedProjectIDs.isEmpty
-                            ? "Delete Selected"
-                            : "Delete \(selectedProjectIDs.count) Selected",
-                        systemImage: "trash"
-                    )
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .tint(.red)
-                .disabled(selectedProjectIDs.isEmpty)
-                .popover(isPresented: $showsProjectDeleteWarning, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
-                    projectDeletePopover
-                        .presentationCompactAdaptation(.popover)
-                }
+            }
+
+            Button(role: .destructive) {
+                showsProjectDeleteWarning = true
+            } label: {
+                Label(
+                    selectedProjectIDs.isEmpty
+                        ? "Delete Selected"
+                        : "Delete \(selectedProjectIDs.count) Selected",
+                    systemImage: "trash"
+                )
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.red)
+            .disabled(selectedProjectIDs.isEmpty)
+            .popover(isPresented: $showsProjectDeleteWarning, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
+                projectDeletePopover
+                    .presentationCompactAdaptation(.popover)
             }
         }
     }
@@ -736,7 +770,7 @@ struct SettingsView: View {
                         .lineLimit(1)
 
                     let count = library.bookmarkCount(inFolder: folder.id)
-                    Text("\(folder.folderType == .project ? "Project" : "Reference") · \(count == 1 ? "1 saved item" : "\(count) saved items")")
+                    Text("\(folder.folderType == .project ? "Project" : "Saved collection") · \(count == 1 ? "1 saved item" : "\(count) saved items")")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -747,23 +781,23 @@ struct SettingsView: View {
             .padding(.vertical, 9)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(folder.folderType == .project ? "Project" : "Reference") \(folder.name), \(isSelected ? "selected" : "not selected")")
+        .accessibilityLabel("\(folder.folderType == .project ? "Project" : "Saved collection") \(folder.name), \(isSelected ? "selected" : "not selected")")
     }
 
     private var projectDeletePopover: some View {
         let selectedFolders = library.folders.filter { selectedProjectIDs.contains($0.id) }
         let projectCount = selectedFolders.filter { $0.folderType == .project }.count
-        let referenceCount = selectedFolders.filter { $0.folderType == .reference }.count
+        let collectionCount = selectedFolders.filter { $0.folderType == .reference }.count
         let deletionDescription = folderDeletionDescription(
             projectCount: projectCount,
-            referenceCount: referenceCount
+            collectionCount: collectionCount
         )
         return VStack(alignment: .leading, spacing: 18) {
             Text("Delete selected items?")
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(.primary)
 
-            Text("This will permanently delete \(deletionDescription) from every synced device. Saved passages will remain in Saved. This cannot be undone.")
+            Text("This will permanently delete \(deletionDescription) from every synced device. Saved items will keep their bookmarks. This cannot be undone.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -780,10 +814,10 @@ struct SettingsView: View {
         .padding(24)
     }
 
-    private func folderDeletionDescription(projectCount: Int, referenceCount: Int) -> String {
+    private func folderDeletionDescription(projectCount: Int, collectionCount: Int) -> String {
         let parts = [
             projectCount > 0 ? "\(projectCount) \(projectCount == 1 ? "Project" : "Projects")" : nil,
-            referenceCount > 0 ? "\(referenceCount) \(referenceCount == 1 ? "Reference" : "References")" : nil
+            collectionCount > 0 ? "\(collectionCount) saved \(collectionCount == 1 ? "collection" : "collections")" : nil
         ].compactMap { $0 }
         return parts.isEmpty ? "the selected items" : parts.joined(separator: " and ")
     }
@@ -1042,7 +1076,8 @@ struct SettingsView: View {
     private func settingsDangerButton(
         title: String,
         systemImage: String,
-        action: ClearSettingsAction
+        action: ClearSettingsAction,
+        disabled: Bool = false
     ) -> some View {
         Button {
             pendingClearAction = action
@@ -1060,6 +1095,7 @@ struct SettingsView: View {
             }
         }
         .buttonStyle(.plain)
+        .disabled(disabled)
         .popover(
             isPresented: Binding(
                 get: { pendingClearAction == action },
@@ -1088,7 +1124,7 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Button(action.buttonTitle, role: .destructive) {
+            Button(action.confirmationButtonTitle, role: .destructive) {
                 performClearAction(action)
             }
             .buttonStyle(.borderedProminent)
@@ -1100,6 +1136,9 @@ struct SettingsView: View {
 
     private func performClearAction(_ action: ClearSettingsAction) {
         switch action {
+        case .clearProjects:
+            let deletedIDs = library.deleteFolders(ids: Set(library.folders.map(\.id)))
+            selectedProjectIDs.subtract(deletedIDs)
         case .clearSearches:
             library.clearRecentSearches()
         case .clearBookmarks:
@@ -1255,6 +1294,7 @@ private struct PendingSyncConflictResolution: Identifiable, Equatable {
 }
 
 private enum ClearSettingsAction: Identifiable, Equatable {
+    case clearProjects
     case clearSearches
     case clearBookmarks
     case clearNotes
@@ -1263,6 +1303,8 @@ private enum ClearSettingsAction: Identifiable, Equatable {
 
     var buttonTitle: String {
         switch self {
+        case .clearProjects:
+            return "Clear All Projects and Saved Collections"
         case .clearSearches:
             return "Clear Recent Searches"
         case .clearBookmarks:
@@ -1272,8 +1314,14 @@ private enum ClearSettingsAction: Identifiable, Equatable {
         }
     }
 
+    var confirmationButtonTitle: String {
+        self == .clearProjects ? "Delete All" : buttonTitle
+    }
+
     var confirmationTitle: String {
         switch self {
+        case .clearProjects:
+            return "Clear all Projects and saved collections?"
         case .clearSearches:
             return "Clear recent searches?"
         case .clearBookmarks:
@@ -1285,6 +1333,8 @@ private enum ClearSettingsAction: Identifiable, Equatable {
 
     var message: String {
         switch self {
+        case .clearProjects:
+            return "This permanently deletes all Projects and saved collections from every synced device. Saved items will keep their bookmarks. This cannot be undone."
         case .clearSearches:
             return "This removes the recent-search list for this device."
         case .clearBookmarks:

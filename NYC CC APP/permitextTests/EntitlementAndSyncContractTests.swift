@@ -1980,7 +1980,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(reconcileSource.contains("completeClerkBackendSignIn(session: session, linkFrom: nil)"))
     }
 
-    func testSavedAccountMenuAvoidsDuplicateSettingsAndSyncPrefix() throws {
+    func testSavedAccountButtonOpensSettingsDirectlyAndSyncLivesInAccountCard() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -1988,10 +1988,28 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             contentsOf: projectRoot.appendingPathComponent("permitext/Views/BookmarksView.swift"),
             encoding: .utf8
         )
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
 
-        XCTAssertTrue(bookmarksSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
+        let accountButtonStart = try XCTUnwrap(bookmarksSource.range(of: "private var accountButton: some View"))
+        let nextPropertyStart = try XCTUnwrap(
+            bookmarksSource.range(
+                of: "private func bookmarkAccentColor",
+                range: accountButtonStart.upperBound..<bookmarksSource.endIndex
+            )
+        )
+        let accountButtonSource = String(bookmarksSource[accountButtonStart.lowerBound..<nextPropertyStart.lowerBound])
+
+        XCTAssertTrue(accountButtonSource.contains("Button {\n            showingSettings = true"))
+        XCTAssertTrue(accountButtonSource.contains(".accessibilityLabel(\"Open Settings\")"))
+        XCTAssertFalse(accountButtonSource.contains("Menu {"))
+        XCTAssertFalse(bookmarksSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
         XCTAssertFalse(bookmarksSource.contains("Label(\"Sync: \\(library.syncStatusTitle)\""))
         XCTAssertFalse(bookmarksSource.contains("Label(\"Settings\", systemImage: \"gearshape\")"))
+        XCTAssertTrue(settingsSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
+        XCTAssertTrue(settingsSource.contains(".accessibilityLabel(\"Sync status: \\(library.syncStatusTitle)\")"))
     }
 
     func testSettingsSignInButtonMatchesUpgradeButtonStyle() throws {
@@ -2048,6 +2066,27 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(settingsSource.contains("Reader Typeface"))
         XCTAssertFalse(settingsSource.contains("CodeStatPill(value: \"\\(Int(library.readerTheme.fontSize)) pt\""))
         XCTAssertFalse(settingsSource.contains("CodeStatPill(value: \"\\(Int(library.readerTheme.lineSpacing))\""))
+    }
+
+    func testSettingsDataAndStorageMatchesWebStructureAndTerminology() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(settingsSource.contains("dataAndStorageCard"))
+        XCTAssertTrue(settingsSource.contains("CodeEyebrow(text: \"Data & Storage\""))
+        XCTAssertTrue(settingsSource.contains("Text(\"Projects and saved collections\")"))
+        XCTAssertTrue(settingsSource.contains("Text(\"No Projects or saved collections yet.\")"))
+        XCTAssertTrue(settingsSource.contains("title: \"Clear All Projects and Saved Collections\""))
+        XCTAssertTrue(settingsSource.contains("case .clearProjects:"))
+        XCTAssertTrue(settingsSource.contains("library.deleteFolders(ids: Set(library.folders.map(\\.id)))"))
+        XCTAssertFalse(settingsSource.contains("projectManagementCard"))
+        XCTAssertFalse(settingsSource.contains("savedDataTools"))
+        XCTAssertFalse(settingsSource.contains("Projects and References"))
     }
 
     func testAccountUserDataProfilesNeverExposeSavedPassagesAcrossAccounts() throws {
