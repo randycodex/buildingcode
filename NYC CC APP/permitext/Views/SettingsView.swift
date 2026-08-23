@@ -1103,6 +1103,7 @@ struct ProSubscriptionStoreView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.purchase) private var purchase
+    @Environment(\.colorScheme) private var colorScheme
     private let termsURL = URL(string: "https://permitext.com/terms")!
     private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
 
@@ -1150,7 +1151,7 @@ struct ProSubscriptionStoreView: View {
                         HStack(spacing: 10) {
                             if library.isStoreKitBusy && !library.isStoreKitRestoreInProgress {
                                 ProgressView()
-                                    .tint(.white)
+                                    .tint(subscribeButtonForegroundColor)
                             }
                             Text(library.isStoreKitBusy ? "Contacting Apple..." : "Subscribe")
                                 .font(.headline)
@@ -1159,8 +1160,8 @@ struct ProSubscriptionStoreView: View {
                         .padding(.vertical, 15)
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.white)
-                    .background(Color.appChrome, in: Capsule(style: .continuous))
+                    .foregroundStyle(subscribeButtonForegroundColor)
+                    .background(subscribeButtonBackgroundColor, in: Capsule(style: .continuous))
                     .disabled(library.isStoreKitBusy)
                     .opacity(library.isStoreKitBusy ? 0.7 : 1)
 
@@ -1215,6 +1216,20 @@ struct ProSubscriptionStoreView: View {
                 }
             }
         }
+    }
+
+    private var subscribeButtonBackgroundColor: Color {
+        if library.isStoreKitBusy {
+            return Color(uiColor: .tertiarySystemGroupedBackground)
+        }
+        return colorScheme == .dark ? Color.white.opacity(0.96) : Color.appChrome
+    }
+
+    private var subscribeButtonForegroundColor: Color {
+        if library.isStoreKitBusy {
+            return Color.secondary
+        }
+        return colorScheme == .dark ? Color.black.opacity(0.9) : Color.white
     }
 }
 

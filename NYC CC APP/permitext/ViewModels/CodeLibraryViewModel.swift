@@ -2837,6 +2837,15 @@ final class CodeLibraryViewModel: ObservableObject {
                 guard signedInAccount?.appUserID == purchasingAccount.appUserID else {
                     throw CancellationError()
                 }
+                guard isProSubscriptionStorePresented else { return }
+                if currentPlan == .pro {
+                    isProSubscriptionStorePresented = false
+                    statusMessage = isStoreKitTestProActive
+                        ? "Pro (Test) is already active on this device."
+                        : "Pro is already active."
+                    storeKitOperationMessage = statusMessage
+                    return
+                }
                 let purchaseResult = try await purchaseAction(
                     product,
                     options: [.appAccountToken(appAccountToken)]
@@ -2876,7 +2885,28 @@ final class CodeLibraryViewModel: ObservableObject {
                         return
                     }
 
+                    guard isProSubscriptionStorePresented else { return }
                     try? await Task.sleep(nanoseconds: 500_000_000)
+                    guard isProSubscriptionStorePresented else { return }
+                    let retryPreflightSnapshot = await storeKitSubscriptionService.prepareForPurchase()
+                    _ = await authorizeStoreKitSnapshot(
+                        retryPreflightSnapshot,
+                        allowsNewTestBinding: false
+                    )
+                    if currentPlan == .pro {
+                        if retryPreflightSnapshot.plan == .pro {
+                            await storeKitSubscriptionService.finishActiveProTransactions()
+                        }
+                        isProSubscriptionStorePresented = false
+                        statusMessage = isStoreKitTestProActive
+                            ? "Pro (Test) is active on this device."
+                            : "Pro is active."
+                        storeKitOperationMessage = statusMessage
+                        return
+                    }
+                    if retryPreflightSnapshot.plan == .pro {
+                        return
+                    }
                     product = try await storeKitSubscriptionService.proProductForPurchase(refresh: true)
 
                 case .userCancelled:
@@ -2910,7 +2940,6 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func dismissProSubscriptionStore() {
         isProSubscriptionStorePresented = false
-        isStoreKitBusy = false
     }
 
     func restorePurchases(clerk: Clerk? = nil) async {

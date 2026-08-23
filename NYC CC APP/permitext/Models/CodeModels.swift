@@ -4915,11 +4915,49 @@ enum StoreKitTransactionPolicy {
         return expirationDate.map { $0 > now } ?? true
     }
 
+    static func shouldFinishInactiveTransaction(
+        productID: String,
+        revocationDate: Date?,
+        expirationDate: Date?,
+        now: Date = Date()
+    ) -> Bool {
+        guard isKnownProductID(productID) else { return false }
+        if revocationDate != nil { return true }
+        guard let expirationDate else { return false }
+        return expirationDate <= now
+    }
+
     static func resolvedPlan(
         snapshotPlan: AppPlan,
         verifiedPurchaseIsActive: Bool
     ) -> AppPlan {
         verifiedPurchaseIsActive ? .pro : snapshotPlan
+    }
+}
+
+actor StoreKitTransactionFinishBarrier {
+    private var inFlightTasks: [UInt64: Task<Void, Never>] = [:]
+    private var completedTransactionIDs: Set<UInt64> = []
+
+    func finishOnce(
+        transactionID: UInt64,
+        operation: @escaping @Sendable () async -> Void
+    ) async {
+        if completedTransactionIDs.contains(transactionID) {
+            return
+        }
+        if let inFlightTask = inFlightTasks[transactionID] {
+            await inFlightTask.value
+            return
+        }
+
+        let task = Task {
+            await operation()
+        }
+        inFlightTasks[transactionID] = task
+        await task.value
+        inFlightTasks[transactionID] = nil
+        completedTransactionIDs.insert(transactionID)
     }
 }
 
@@ -5003,6 +5041,7 @@ actor StoreKitSubscriptionService {
     private let researchProductID = StoreKitProductID.researchMonthly
     private var cachedProProduct: Product?
     private var cachedResearchProduct: Product?
+    private let finishBarrier = StoreKitTransactionFinishBarrier()
 
     func snapshot(
         signedTransactionInfo: String? = nil,
@@ -5045,15 +5084,13 @@ actor StoreKitSubscriptionService {
     }
 
     func prepareForPurchase() async -> StoreKitSubscriptionSnapshot {
-        // TestFlight sandbox renewals can leave multiple verified, expired
-        // transactions unfinished. Drain only inactive known transactions so
-        // StoreKit can open a new checkout. An active transaction is not
-        // finished until Permitext has durably authorized it for an account.
+        // TestFlight sandbox renewals can leave multiple expired transactions
+        // unfinished, including transactions whose JWS no longer verifies.
+        // An unverified payload is used only to remove a known, demonstrably
+        // inactive transaction from Apple's queue; it can never grant access.
         for await verification in Transaction.unfinished {
-            guard case .verified(let transaction) = verification else { continue }
-            guard StoreKitTransactionPolicy.isKnownProductID(transaction.productID) else { continue }
-            guard !isActiveOwnedTransaction(transaction) else { continue }
-            await transaction.finish()
+            guard let transaction = inactiveKnownTransaction(from: verification) else { continue }
+            await finishTransactionOnce(transaction)
         }
         return await snapshot()
     }
@@ -5061,10 +5098,31 @@ actor StoreKitSubscriptionService {
     func snapshot(after result: Product.PurchaseResult) async throws -> StoreKitSubscriptionSnapshot {
         switch result {
         case .success(let verification):
-            let transaction = try verifiedTransaction(from: verification)
+            let transaction: Transaction
+            switch verification {
+            case .verified(let verifiedTransaction):
+                transaction = verifiedTransaction
+            case .unverified:
+                guard let inactiveTransaction = inactiveKnownTransaction(from: verification) else {
+                    throw StoreKitSubscriptionServiceError.unverifiedTransaction
+                }
+                await finishTransactionOnce(inactiveTransaction)
+                return await snapshot()
+            }
+
+            guard transaction.productID == proProductID else {
+                throw StoreKitSubscriptionServiceError.unknownPurchaseResult
+            }
             let verifiedPurchaseIsActive = isActiveProTransaction(transaction)
             if !verifiedPurchaseIsActive {
-                await transaction.finish()
+                if StoreKitTransactionPolicy.shouldFinishInactiveTransaction(
+                    productID: transaction.productID,
+                    revocationDate: transaction.revocationDate,
+                    expirationDate: transaction.expirationDate
+                ) {
+                    await finishTransactionOnce(transaction)
+                }
+                return await snapshot()
             }
 
             var purchaseSnapshot = await snapshot(
@@ -5127,17 +5185,26 @@ actor StoreKitSubscriptionService {
         AsyncStream { continuation in
             let task = Task {
                 for await result in Transaction.updates {
-                    guard case .verified(let transaction) = result else { continue }
-                    guard StoreKitTransactionPolicy.isKnownProductID(transaction.productID) else { continue }
-                    if !isActiveOwnedTransaction(transaction) {
-                        await transaction.finish()
-                    }
-                    continuation.yield(
-                        await snapshot(
-                            signedTransactionInfo: result.jwsRepresentation,
-                            transactionEnvironment: transaction.environment.rawValue
+                    switch result {
+                    case .verified(let transaction):
+                        guard StoreKitTransactionPolicy.isKnownProductID(transaction.productID) else { continue }
+                        if let inactiveTransaction = inactiveKnownTransaction(from: result) {
+                            await finishTransactionOnce(inactiveTransaction)
+                            continuation.yield(await snapshot())
+                            continue
+                        }
+                        guard isActiveOwnedTransaction(transaction) else { continue }
+                        continuation.yield(
+                            await snapshot(
+                                signedTransactionInfo: result.jwsRepresentation,
+                                transactionEnvironment: transaction.environment.rawValue
+                            )
                         )
-                    )
+                    case .unverified:
+                        guard let inactiveTransaction = inactiveKnownTransaction(from: result) else { continue }
+                        await finishTransactionOnce(inactiveTransaction)
+                        continuation.yield(await snapshot())
+                    }
                 }
             }
             continuation.onTermination = { _ in task.cancel() }
@@ -5149,6 +5216,32 @@ actor StoreKitSubscriptionService {
             guard case .verified(let transaction) = verification,
                   isActiveProTransaction(transaction)
             else { continue }
+            await finishTransactionOnce(transaction)
+        }
+    }
+
+    private nonisolated func inactiveKnownTransaction(
+        from verification: VerificationResult<Transaction>
+    ) -> Transaction? {
+        let transaction: Transaction
+        switch verification {
+        case .verified(let verifiedTransaction):
+            transaction = verifiedTransaction
+        case .unverified(let unverifiedTransaction, _):
+            transaction = unverifiedTransaction
+        }
+        guard StoreKitTransactionPolicy.shouldFinishInactiveTransaction(
+            productID: transaction.productID,
+            revocationDate: transaction.revocationDate,
+            expirationDate: transaction.expirationDate
+        ) else {
+            return nil
+        }
+        return transaction
+    }
+
+    private func finishTransactionOnce(_ transaction: Transaction) async {
+        await finishBarrier.finishOnce(transactionID: transaction.id) {
             await transaction.finish()
         }
     }

@@ -4,6 +4,41 @@ import UIKit
 import CryptoKit
 @testable import permitext
 
+private actor StoreKitFinishBarrierProbe {
+    private var callerStartCount = 0
+    private var operationStartCount = 0
+    private var callerCompletionCount = 0
+    private var isReleased = false
+    private var continuations: [CheckedContinuation<Void, Never>] = []
+
+    func recordCallerStart() {
+        callerStartCount += 1
+    }
+
+    func holdOperation() async {
+        operationStartCount += 1
+        guard !isReleased else { return }
+        await withCheckedContinuation { continuation in
+            continuations.append(continuation)
+        }
+    }
+
+    func recordCallerCompletion() {
+        callerCompletionCount += 1
+    }
+
+    func snapshot() -> (callerStarts: Int, operationStarts: Int, callerCompletions: Int) {
+        (callerStartCount, operationStartCount, callerCompletionCount)
+    }
+
+    func releaseOperations() {
+        isReleased = true
+        let pendingContinuations = continuations
+        continuations.removeAll()
+        pendingContinuations.forEach { $0.resume() }
+    }
+}
+
 private actor SyncPullRecorder {
     private var contentMapVersions: [Int?] = []
     private var pullCount = 0
@@ -943,6 +978,46 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 now: now
             )
         )
+        XCTAssertTrue(
+            StoreKitTransactionPolicy.shouldFinishInactiveTransaction(
+                productID: StoreKitProductID.proMonthly,
+                revocationDate: nil,
+                expirationDate: now,
+                now: now
+            )
+        )
+        XCTAssertTrue(
+            StoreKitTransactionPolicy.shouldFinishInactiveTransaction(
+                productID: StoreKitProductID.researchMonthly,
+                revocationDate: now,
+                expirationDate: nil,
+                now: now
+            )
+        )
+        XCTAssertFalse(
+            StoreKitTransactionPolicy.shouldFinishInactiveTransaction(
+                productID: StoreKitProductID.proMonthly,
+                revocationDate: nil,
+                expirationDate: nil,
+                now: now
+            )
+        )
+        XCTAssertFalse(
+            StoreKitTransactionPolicy.shouldFinishInactiveTransaction(
+                productID: StoreKitProductID.proMonthly,
+                revocationDate: nil,
+                expirationDate: now.addingTimeInterval(60),
+                now: now
+            )
+        )
+        XCTAssertFalse(
+            StoreKitTransactionPolicy.shouldFinishInactiveTransaction(
+                productID: "unrelated.product",
+                revocationDate: now,
+                expirationDate: now,
+                now: now
+            )
+        )
         XCTAssertFalse(
             StoreKitTransactionPolicy.isActive(
                 productID: StoreKitProductID.researchMonthly,
@@ -960,6 +1035,54 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             StoreKitTransactionPolicy.resolvedPlan(snapshotPlan: .free, verifiedPurchaseIsActive: false),
             .free
         )
+    }
+
+    func testStoreKitTransactionFinishBarrierWaitsForSharedCleanup() async {
+        let barrier = StoreKitTransactionFinishBarrier()
+        let probe = StoreKitFinishBarrierProbe()
+        let transactionID: UInt64 = 42
+
+        let firstCaller = Task {
+            await probe.recordCallerStart()
+            await barrier.finishOnce(transactionID: transactionID) {
+                await probe.holdOperation()
+            }
+            await probe.recordCallerCompletion()
+        }
+
+        while (await probe.snapshot()).operationStarts == 0 {
+            await Task.yield()
+        }
+
+        let secondCaller = Task {
+            await probe.recordCallerStart()
+            await barrier.finishOnce(transactionID: transactionID) {
+                await probe.holdOperation()
+            }
+            await probe.recordCallerCompletion()
+        }
+
+        while (await probe.snapshot()).callerStarts < 2 {
+            await Task.yield()
+        }
+        var probeSnapshot = await probe.snapshot()
+        XCTAssertEqual(probeSnapshot.callerStarts, 2)
+        XCTAssertEqual(probeSnapshot.operationStarts, 1)
+        XCTAssertEqual(probeSnapshot.callerCompletions, 0)
+
+        await probe.releaseOperations()
+        await firstCaller.value
+        await secondCaller.value
+
+        probeSnapshot = await probe.snapshot()
+        XCTAssertEqual(probeSnapshot.operationStarts, 1)
+        XCTAssertEqual(probeSnapshot.callerCompletions, 2)
+
+        await barrier.finishOnce(transactionID: transactionID) {
+            await probe.holdOperation()
+        }
+        probeSnapshot = await probe.snapshot()
+        XCTAssertEqual(probeSnapshot.operationStarts, 1)
     }
 
     func testStoreKitAccountBindingPolicyRequiresAccountSpecificAuthorization() {
@@ -1669,6 +1792,20 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(viewModelSource.contains("let purchaseResult = try await purchaseAction("))
         XCTAssertTrue(viewModelSource.contains("options: [.appAccountToken(appAccountToken)]"))
         XCTAssertTrue(viewModelSource.contains("for attempt in 1...2"))
+
+        let purchaseLoopStart = try XCTUnwrap(viewModelSource.range(of: "for attempt in 1...2"))
+        let purchaseInvocationStart = try XCTUnwrap(
+            viewModelSource.range(
+                of: "let purchaseResult = try await purchaseAction(",
+                range: purchaseLoopStart.upperBound..<viewModelSource.endIndex
+            )
+        )
+        let immediatePurchaseGuards = String(
+            viewModelSource[purchaseLoopStart.lowerBound..<purchaseInvocationStart.lowerBound]
+        )
+        XCTAssertTrue(immediatePurchaseGuards.contains("signedInAccount?.appUserID == purchasingAccount.appUserID"))
+        XCTAssertTrue(immediatePurchaseGuards.contains("guard isProSubscriptionStorePresented else { return }"))
+        XCTAssertTrue(immediatePurchaseGuards.contains("if currentPlan == .pro"))
         XCTAssertFalse(settingsSource.contains("SubscriptionStoreView(groupID:"))
         XCTAssertFalse(appSource.contains("@Environment(\\.purchase)"))
         XCTAssertFalse(storeKitSource.contains("product.purchase()"))
@@ -1682,8 +1819,38 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
         let preflightSource = String(storeKitSource[preflightStart.lowerBound..<purchaseStart.lowerBound])
         XCTAssertTrue(preflightSource.contains("for await verification in Transaction.unfinished"))
-        XCTAssertTrue(preflightSource.contains("guard !isActiveOwnedTransaction(transaction) else { continue }"))
-        XCTAssertTrue(preflightSource.contains("await transaction.finish()"))
+        XCTAssertTrue(preflightSource.contains("inactiveKnownTransaction(from: verification)"))
+        XCTAssertTrue(preflightSource.contains("finishTransactionOnce(transaction)"))
+
+        let updatesStartForSafety = try XCTUnwrap(storeKitSource.range(of: "func transactionUpdates()"))
+        let activeFinishStart = try XCTUnwrap(
+            storeKitSource.range(
+                of: "func finishActiveProTransactions()",
+                range: updatesStartForSafety.upperBound..<storeKitSource.endIndex
+            )
+        )
+        let updatesSource = String(
+            storeKitSource[updatesStartForSafety.lowerBound..<activeFinishStart.lowerBound]
+        )
+        XCTAssertTrue(updatesSource.contains("case .unverified:"))
+        XCTAssertTrue(updatesSource.contains("inactiveKnownTransaction(from: result)"))
+        XCTAssertFalse(updatesSource.contains("case .unverified(let transaction"))
+
+        let cleanupStart = try XCTUnwrap(storeKitSource.range(of: "private nonisolated func inactiveKnownTransaction"))
+        let productLoaderStart = try XCTUnwrap(
+            storeKitSource.range(
+                of: "private func proProducts()",
+                range: cleanupStart.upperBound..<storeKitSource.endIndex
+            )
+        )
+        let cleanupSource = String(storeKitSource[cleanupStart.lowerBound..<productLoaderStart.lowerBound])
+        XCTAssertTrue(cleanupSource.contains("case .unverified(let unverifiedTransaction, _)"))
+        XCTAssertTrue(cleanupSource.contains("shouldFinishInactiveTransaction"))
+        XCTAssertTrue(cleanupSource.contains("finishBarrier.finishOnce(transactionID: transaction.id)"))
+
+        XCTAssertTrue(viewModelSource.contains("let retryPreflightSnapshot = await storeKitSubscriptionService.prepareForPurchase()"))
+        XCTAssertTrue(settingsSource.contains("subscribeButtonBackgroundColor"))
+        XCTAssertTrue(settingsSource.contains("colorScheme == .dark ? Color.white.opacity(0.96) : Color.appChrome"))
 
         let restoreStart = try XCTUnwrap(storeKitSource.range(of: "func restorePurchases()"))
         let updatesStart = try XCTUnwrap(
