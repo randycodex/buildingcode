@@ -124,6 +124,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var isAccountBusy = false
     @Published private(set) var accountAuthenticationMessage: String?
     @Published var isClerkAuthenticationPresented = false
+    @Published var isProSubscriptionStorePresented = false
     @Published private(set) var organizations: [PermitextOrganization] = []
     @Published private(set) var isOrganizationWorkspaceLoading = false
     @Published private(set) var pendingOrganizationInvitationToken: String?
@@ -198,7 +199,6 @@ final class CodeLibraryViewModel: ObservableObject {
     private let ownsAccountSync: Bool
     private let projectHubOfflineCache = ProjectHubOfflineCache()
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
-    private var pendingStoreKitPurchaseAction: PurchaseAction?
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
     private let startupSignpostID = OSSignpostID(log: AppSignpost.startup)
     private var postClerkAuthenticationAction: PostClerkAuthenticationAction = .none
@@ -2767,41 +2767,17 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func purchasePro(
-        clerk: Clerk? = nil,
-        using purchaseAction: PurchaseAction? = nil
-    ) async {
-        if let purchaseAction {
-            pendingStoreKitPurchaseAction = purchaseAction
-        }
+    func requestProSubscriptionStore(clerk: Clerk? = nil) async {
         guard await requireSignedInBillingAccount(clerk: clerk, then: .purchasePro) else { return }
         guard !isStoreKitBusy else { return }
-        guard let purchaseAction = purchaseAction ?? pendingStoreKitPurchaseAction else {
-            storeKitOperationMessage = "Apple could not open the purchase sheet. Close Settings, reopen it, and try again."
-            statusMessage = storeKitOperationMessage
-            return
-        }
-        pendingStoreKitPurchaseAction = nil
         storeKitOperationMessage = nil
         isStoreKitBusy = true
         defer { isStoreKitBusy = false }
 
         do {
-            let product = try await storeKitSubscriptionService.proProductForPurchase()
-            let result = try await purchaseAction(product)
-            let snapshot = try await storeKitSubscriptionService.snapshot(after: result)
-            applyStoreKitSnapshot(snapshot)
-            await syncAppleTransactionIfPossible(snapshot)
-            if currentPlan != .pro {
-                statusMessage = "Purchase cancelled."
-                storeKitOperationMessage = "Apple did not complete the purchase. No charge was made. Tap Upgrade to try again."
-            } else if isStoreKitTestProActive {
-                statusMessage = "Pro (Test) is active on this device. Account-wide Pro still requires a server grant or production purchase."
-                storeKitOperationMessage = "Apple confirmed Pro (Test) on this device."
-            } else {
-                statusMessage = "Pro is active."
-                storeKitOperationMessage = "Apple confirmed your Pro subscription."
-            }
+            _ = try await storeKitSubscriptionService.proProductForPurchase()
+            Self.storeKitPurchaseLogger.info("Presenting Apple's native subscription store.")
+            isProSubscriptionStorePresented = true
         } catch {
             statusMessage = error.localizedDescription
             storeKitOperationMessage = error.localizedDescription
@@ -2811,6 +2787,88 @@ final class CodeLibraryViewModel: ObservableObject {
                 message: error.localizedDescription
             )
         }
+    }
+
+    func storeKitPurchaseStarted(productID: String) {
+        guard productID == StoreKitProductID.proMonthly else { return }
+        isStoreKitBusy = true
+        storeKitOperationMessage = "Waiting for Apple to complete the purchase..."
+        Self.storeKitPurchaseLogger.info(
+            "Native StoreKit purchase started for product \(productID, privacy: .public)."
+        )
+    }
+
+    func completeStoreKitPurchase(
+        productID: String,
+        result: Result<Product.PurchaseResult, Error>
+    ) async {
+        guard productID == StoreKitProductID.proMonthly else { return }
+        defer { isStoreKitBusy = false }
+
+        switch result {
+        case .failure(let error):
+            let message = error.localizedDescription
+            statusMessage = message
+            storeKitOperationMessage = message
+            Self.storeKitPurchaseLogger.error(
+                "Native StoreKit purchase failed: \(message, privacy: .public)"
+            )
+
+        case .success(let purchaseResult):
+            switch purchaseResult {
+            case .success:
+                do {
+                    let snapshot = try await storeKitSubscriptionService.snapshot(after: purchaseResult)
+                    applyStoreKitSnapshot(snapshot)
+                    await syncAppleTransactionIfPossible(snapshot)
+                    if currentPlan == .pro {
+                        isProSubscriptionStorePresented = false
+                    }
+                    if currentPlan != .pro {
+                        let message = "Apple returned a transaction, but no active Pro subscription was found. No Pro access was granted."
+                        statusMessage = message
+                        storeKitOperationMessage = message
+                        Self.storeKitPurchaseLogger.error(
+                            "Native StoreKit purchase returned without an active Pro entitlement."
+                        )
+                    } else if isStoreKitTestProActive {
+                        statusMessage = "Pro (Test) is active on this device."
+                        storeKitOperationMessage = "Apple confirmed Pro (Test) on this device."
+                    } else {
+                        statusMessage = "Pro is active."
+                        storeKitOperationMessage = "Apple confirmed your Pro subscription."
+                    }
+                    Self.storeKitPurchaseLogger.info("Native StoreKit purchase completed and verified.")
+                } catch {
+                    let message = error.localizedDescription
+                    statusMessage = message
+                    storeKitOperationMessage = message
+                    Self.storeKitPurchaseLogger.error(
+                        "Native StoreKit purchase verification failed: \(message, privacy: .public)"
+                    )
+                }
+
+            case .userCancelled:
+                statusMessage = "Purchase cancelled."
+                storeKitOperationMessage = "Apple cancelled the purchase. No charge was made."
+                Self.storeKitPurchaseLogger.info("Native StoreKit purchase was cancelled by the user.")
+
+            case .pending:
+                statusMessage = StoreKitSubscriptionServiceError.pendingApproval.localizedDescription
+                storeKitOperationMessage = StoreKitSubscriptionServiceError.pendingApproval.localizedDescription
+                Self.storeKitPurchaseLogger.info("Native StoreKit purchase is pending approval.")
+
+            @unknown default:
+                statusMessage = StoreKitSubscriptionServiceError.unknownPurchaseResult.localizedDescription
+                storeKitOperationMessage = StoreKitSubscriptionServiceError.unknownPurchaseResult.localizedDescription
+                Self.storeKitPurchaseLogger.error("Native StoreKit returned an unknown purchase result.")
+            }
+        }
+    }
+
+    func dismissProSubscriptionStore() {
+        isProSubscriptionStorePresented = false
+        isStoreKitBusy = false
     }
 
     func restorePurchases(clerk: Clerk? = nil) async {
@@ -2908,9 +2966,6 @@ final class CodeLibraryViewModel: ObservableObject {
             if pendingAction != .none {
                 statusMessage = "Sign in was not completed. No purchase was started."
             }
-            if pendingAction == .purchasePro {
-                pendingStoreKitPurchaseAction = nil
-            }
             return
         }
         guard !isAccountBusy else { return }
@@ -2937,7 +2992,7 @@ final class CodeLibraryViewModel: ObservableObject {
         case .none:
             break
         case .purchasePro:
-            await purchasePro()
+            await requestProSubscriptionStore()
         case .restorePurchases:
             await restorePurchases()
         }
@@ -3012,6 +3067,11 @@ final class CodeLibraryViewModel: ObservableObject {
     private static let accountAuthenticationLogger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "com.randycodex.permitext",
         category: "AccountAuthentication"
+    )
+
+    private static let storeKitPurchaseLogger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.randycodex.permitext",
+        category: "StoreKitPurchase"
     )
 
     private static func accountAuthenticationFailureMessage(for error: Error) -> String {

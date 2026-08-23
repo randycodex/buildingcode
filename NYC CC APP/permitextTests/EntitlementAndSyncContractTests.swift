@@ -952,6 +952,14 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 now: now
             )
         )
+        XCTAssertEqual(
+            StoreKitTransactionPolicy.resolvedPlan(snapshotPlan: .free, verifiedPurchaseIsActive: true),
+            .pro
+        )
+        XCTAssertEqual(
+            StoreKitTransactionPolicy.resolvedPlan(snapshotPlan: .free, verifiedPurchaseIsActive: false),
+            .free
+        )
     }
 
     func testSignedInAccountPersistenceRemovesLegacySessionToken() {
@@ -1541,7 +1549,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
-    func testStoreKitPurchaseUsesTheActiveSwiftUIScene() throws {
+    func testStoreKitPurchaseUsesApplesNativeSubscriptionStore() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -1558,10 +1566,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             encoding: .utf8
         )
 
-        XCTAssertTrue(settingsSource.contains("@Environment(\\.purchase) private var purchaseAction"))
-        XCTAssertTrue(settingsSource.contains("using: purchaseAction"))
-        XCTAssertTrue(appSource.contains("@Environment(\\.purchase) private var purchaseAction"))
-        XCTAssertTrue(appSource.contains("using: purchaseAction"))
+        XCTAssertTrue(settingsSource.contains("SubscriptionStoreView(productIDs: [StoreKitProductID.proMonthly])"))
+        XCTAssertTrue(settingsSource.contains("onInAppPurchaseCompletion"))
+        XCTAssertTrue(appSource.contains("ProSubscriptionStoreView()"))
+        XCTAssertFalse(settingsSource.contains("@Environment(\\.purchase)"))
+        XCTAssertFalse(appSource.contains("@Environment(\\.purchase)"))
         XCTAssertFalse(storeKitSource.contains("product.purchase()"))
     }
 

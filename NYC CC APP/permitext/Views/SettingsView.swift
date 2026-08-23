@@ -13,7 +13,6 @@ struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openURL) private var openURL
-    @Environment(\.purchase) private var purchaseAction
     @Environment(\.permitextClerk) private var clerk
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
@@ -222,7 +221,7 @@ struct SettingsView: View {
 
             if library.currentPlan == .free {
                 Button {
-                    Task { await library.purchasePro(clerk: clerk, using: purchaseAction) }
+                    Task { await library.requestProSubscriptionStore(clerk: clerk) }
                 } label: {
                     Label(upgradeButtonTitle, systemImage: "sparkles")
                         .font(.subheadline.weight(.semibold))
@@ -1097,6 +1096,69 @@ struct SettingsView: View {
             library.clearAllNotes()
         }
         pendingClearAction = nil
+    }
+}
+
+struct ProSubscriptionStoreView: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
+    private let termsURL = URL(string: "https://permitext.com/terms")!
+    private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
+
+    var body: some View {
+        NavigationStack {
+            SubscriptionStoreView(productIDs: [StoreKitProductID.proMonthly]) {
+                VStack(spacing: 14) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 34, weight: .semibold))
+                        .foregroundStyle(Color.appChrome)
+
+                    Text("Permitext Pro")
+                        .font(.title2.weight(.bold))
+
+                    Text("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text("No trial. Renews monthly until canceled. Code reading and search remain free.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    if let operationMessage = library.storeKitOperationMessage {
+                        Text(operationMessage)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(library.currentPlan == .pro ? Color.green : Color.secondary)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 20)
+            }
+            .subscriptionStoreControlStyle(.prominentPicker)
+            .storeButton(.visible, for: .restorePurchases)
+            .subscriptionStorePolicyDestination(url: termsURL, for: .termsOfService)
+            .subscriptionStorePolicyDestination(url: privacyPolicyURL, for: .privacyPolicy)
+            .onInAppPurchaseStart { product in
+                library.storeKitPurchaseStarted(productID: product.id)
+            }
+            .onInAppPurchaseCompletion { product, result in
+                await library.completeStoreKitPurchase(productID: product.id, result: result)
+            }
+            .navigationTitle("Upgrade to Pro")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") {
+                        library.dismissProSubscriptionStore()
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }
 

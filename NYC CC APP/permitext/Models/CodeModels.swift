@@ -4915,6 +4915,13 @@ enum StoreKitTransactionPolicy {
         guard productID == expectedProductID, revocationDate == nil else { return false }
         return expirationDate.map { $0 > now } ?? true
     }
+
+    static func resolvedPlan(
+        snapshotPlan: AppPlan,
+        verifiedPurchaseIsActive: Bool
+    ) -> AppPlan {
+        verifiedPurchaseIsActive ? .pro : snapshotPlan
+    }
 }
 
 struct StoreKitSubscriptionSnapshot: Sendable {
@@ -4999,10 +5006,44 @@ actor StoreKitSubscriptionService {
         switch result {
         case .success(let verification):
             let transaction = try verifiedTransaction(from: verification)
+            let verifiedPurchaseIsActive = isActiveProTransaction(transaction)
             await transaction.finish()
-            return await snapshot(
+
+            var purchaseSnapshot = await snapshot(
                 signedTransactionInfo: verification.jwsRepresentation,
                 transactionEnvironment: transaction.environment.rawValue
+            )
+            if verifiedPurchaseIsActive, purchaseSnapshot.plan != .pro {
+                for _ in 0..<7 {
+                    try? await Task.sleep(nanoseconds: 250_000_000)
+                    purchaseSnapshot = await snapshot(
+                        signedTransactionInfo: verification.jwsRepresentation,
+                        transactionEnvironment: transaction.environment.rawValue
+                    )
+                    if purchaseSnapshot.plan == .pro { break }
+                }
+            }
+
+            let resolvedPlan = StoreKitTransactionPolicy.resolvedPlan(
+                snapshotPlan: purchaseSnapshot.plan,
+                verifiedPurchaseIsActive: verifiedPurchaseIsActive
+            )
+            guard resolvedPlan != purchaseSnapshot.plan else {
+                return purchaseSnapshot
+            }
+
+            LocalEntitlementService.setVerifiedPlan(resolvedPlan)
+            return StoreKitSubscriptionSnapshot(
+                plan: resolvedPlan,
+                researchActive: resolvedPlan == .pro || purchaseSnapshot.researchActive,
+                proDisplayPrice: purchaseSnapshot.proDisplayPrice,
+                researchDisplayPrice: purchaseSnapshot.researchDisplayPrice,
+                loadedProductIDs: purchaseSnapshot.loadedProductIDs,
+                debugSummary: purchaseSnapshot.debugSummary,
+                signedTransactionInfo: purchaseSnapshot.signedTransactionInfo,
+                transactionEnvironment: purchaseSnapshot.transactionEnvironment,
+                researchSignedTransactionInfo: purchaseSnapshot.researchSignedTransactionInfo,
+                researchTransactionEnvironment: purchaseSnapshot.researchTransactionEnvironment
             )
         case .userCancelled:
             return await snapshot()

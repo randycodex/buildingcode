@@ -19,7 +19,6 @@ extension EnvironmentValues {
 @main
 struct PermitextApp: App {
     @StateObject private var library: CodeLibraryViewModel
-    @Environment(\.purchase) private var purchaseAction
     @Environment(\.scenePhase) private var scenePhase
     private let offersFirstUseExperience: Bool
     private let clerk: Clerk?
@@ -143,7 +142,7 @@ struct PermitextApp: App {
                     Button(library.upgradeCallToActionTitle) {
                         library.dismissEntitlementPrompt()
                         Task {
-                            await library.purchasePro(clerk: clerk, using: purchaseAction)
+                            await library.requestProSubscriptionStore(clerk: clerk)
                         }
                     }
                 }
@@ -234,6 +233,19 @@ struct PermitextApp: App {
                     AuthView()
                         .environment(clerk)
                 }
+            }
+            .sheet(
+                isPresented: Binding(
+                    get: { library.isProSubscriptionStorePresented },
+                    set: { isPresented in
+                        if !isPresented {
+                            library.dismissProSubscriptionStore()
+                        }
+                    }
+                )
+            ) {
+                ProSubscriptionStoreView()
+                    .environmentObject(library)
             }
             .onReceive(
                 NotificationCenter.default.publisher(
