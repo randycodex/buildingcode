@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260823-clerk-return-recovery-v3";
+} from "./offline-storage.js?v=20260823-account-navigation-v4";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -84,7 +84,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260823-clerk-return-recovery-v3";
+} from "./research-intent-state.js?v=20260823-account-navigation-v4";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -1101,7 +1101,7 @@ function workspaceTransitionPaneLabel(paneID) {
   if (paneID.startsWith("utility:saved:")) return "Saved";
   if (paneID === "utility:archive") return "Saved archive";
   if (paneID === "utility:analysis") return "Research";
-  if (paneID === "utility:settings") return "Settings";
+  if (paneID === "utility:settings") return "Account";
   if (paneID.startsWith("research:conversation:")) return "Research conversation";
   if (paneID.startsWith("section:detail:")) return "Code section";
   if (paneID.startsWith("project:notebook:")) return "Notebook";
@@ -1406,7 +1406,7 @@ function openMobileMoreSheet() {
       mobileMoreAction("Delete workspace", () => void removeNamedWorkspace(activeWorkspace.id), { danger: true })
     );
   }
-  actions.append(mobileMoreAction("Settings", () => toggleUtilityPane("settings")));
+  actions.append(mobileMoreAction("Account", () => toggleUtilityPane("settings")));
   workspaceActions.append(actionsLabel, actions);
 
   sheet.append(header, workspaceSection, workspaceActions);
@@ -6156,8 +6156,8 @@ function updateConnectionStatus() {
   connectionStatus.setAttribute("role", conflictActionAvailable ? "button" : "status");
   if (conflictActionAvailable) {
     connectionStatus.tabIndex = 0;
-    connectionStatus.title = "Review sync conflicts in Settings";
-    connectionStatus.setAttribute("aria-label", `${connectionStatus.textContent}. Review sync conflicts in Settings.`);
+    connectionStatus.title = "Review sync conflicts in Account";
+    connectionStatus.setAttribute("aria-label", `${connectionStatus.textContent}. Review sync conflicts in Account.`);
   } else {
     connectionStatus.removeAttribute("tabindex");
     connectionStatus.removeAttribute("title");
@@ -10097,7 +10097,7 @@ function startForegroundSyncLoop(options = {}) {
 async function pushMutation(mutation) {
   const account = activeAccount();
   if (!account) {
-    throw new Error("Sign in from Settings before saving from the web.");
+    throw new Error("Sign in from Account before saving from the web.");
   }
   const entry = enqueueSyncMutation(mutation, account);
   let result = await flushSyncOutbox({ refresh: true });
@@ -15574,7 +15574,7 @@ function researchRequestBody(values = {}) {
 
 async function postResearch(path, values = {}) {
   const account = activeAccount();
-  if (!account) throw new Error("Sign in from Settings to use private research conversations.");
+  if (!account) throw new Error("Sign in from Account to use private research conversations.");
   const payload = await postJSON(path, researchRequestBody(values), { token: account.sessionToken });
   if (payload?.artifactRevisions) observeLocalProjectArtifactRevisions(payload.artifactRevisions);
   return payload;
@@ -15582,7 +15582,7 @@ async function postResearch(path, values = {}) {
 
 async function postResearchWithProgress(values, { signal, onProgress } = {}) {
   const account = activeAccount();
-  if (!account) throw new Error("Sign in from Settings to use private research conversations.");
+  if (!account) throw new Error("Sign in from Account to use private research conversations.");
   let response;
   try {
     response = await fetch("/research/conversations/message", {
@@ -15651,7 +15651,7 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
 
 async function fetchAuthoritativeResearchConversation(conversationID) {
   const account = activeAccount();
-  if (!account) throw new Error("Sign in from Settings to open private Research conversations.");
+  if (!account) throw new Error("Sign in from Account to open private Research conversations.");
   const payload = await postJSON("/research/conversations/get", {
     auth: { accountUserID: account.userID },
     conversationID: String(conversationID || "").trim()
@@ -15747,7 +15747,7 @@ async function projectsWithOrganizationAccess(projects = []) {
 
 async function downloadProjectReportFile(projectID, file, title = "Permitext Project Report") {
   const account = activeAccount();
-  if (!account) throw new Error("Sign in from Settings to download private Project Reports.");
+  if (!account) throw new Error("Sign in from Account to download private Project Reports.");
   const response = await fetch("/reports/files/read", {
     method: "POST",
     headers: {
@@ -17557,7 +17557,7 @@ async function renderResearch(paneID = "utility:analysis") {
     const button = document.createElement("button");
     button.className = "ghost-button";
     button.type = "button";
-    button.textContent = "Open Settings";
+    button.textContent = "Open Account";
     button.addEventListener("click", () => focusUtility("settings"));
     empty.append(heading, copy, button);
     content.append(empty);
@@ -20165,7 +20165,7 @@ async function renderProjectNotebook(project) {
   notebookMounts.set(projectID, mountState);
 
   if (!activeAccount()) {
-    status.textContent = "Sign in from Settings to use the private Project Notebook.";
+    status.textContent = "Sign in from Account to use the private Project Notebook.";
     return panel;
   }
 
@@ -21701,7 +21701,7 @@ async function renderProjectReportDraft(project) {
   };
 
   if (!activeAccount()) {
-    showStatusError("Sign in from Settings to use private Project Reports.");
+    showStatusError("Sign in from Account to use private Project Reports.");
     return panel;
   }
 
@@ -26360,7 +26360,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     clear(content);
-    appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced bookmarks and notes.");
+    appendEmptySaved(content, "Sign in to sync", "Open Account and sign in to show synced bookmarks and notes.");
     return;
   }
   if (data.status === "error" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
@@ -34245,7 +34245,7 @@ function workspaceCommandDefinitions() {
       ? [{ label: "New Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
       : []),
     { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
-    { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
+    { label: "Open Account", hint: "Plan, account, sync, and privacy", run: () => focusUtility("settings") },
     { label: "Reset Layout", hint: "Restore default panel widths", run: () => resetVisibleColumnWidths() },
     ...(defaultActivePaneIDs().length
       ? [{ label: "Close All", hint: "Close every column in the current workspace", run: () => closeAllColumns() }]

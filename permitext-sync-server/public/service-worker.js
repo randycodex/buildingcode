@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v728";
+const shellCacheName = "permitext-pro-shell-v729";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -6,15 +6,15 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260823-clerk-return-recovery-v3",
+  "/web/styles.css?v=20260823-account-navigation-v4",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260823-clerk-return-recovery-v3",
+  "/web/app.js?v=20260823-account-navigation-v4",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260813-research-reader-spacing-v120",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260823-clerk-return-recovery-v3",
-  "/web/research-intent-state.js?v=20260823-clerk-return-recovery-v3",
+  "/web/offline-storage.js?v=20260823-account-navigation-v4",
+  "/web/research-intent-state.js?v=20260823-account-navigation-v4",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260811-research-columns-v3",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",
