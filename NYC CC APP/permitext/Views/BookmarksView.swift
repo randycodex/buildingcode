@@ -115,7 +115,7 @@ struct BookmarksView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Open Settings")
+        .accessibilityLabel("Open Account")
     }
 
     private func bookmarkAccentColor(for codeSectionID: Int64?) -> Color {

@@ -2018,11 +2018,13 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         let accountButtonSource = String(bookmarksSource[accountButtonStart.lowerBound..<nextPropertyStart.lowerBound])
 
         XCTAssertTrue(accountButtonSource.contains("Button {\n            showingSettings = true"))
-        XCTAssertTrue(accountButtonSource.contains(".accessibilityLabel(\"Open Settings\")"))
+        XCTAssertTrue(accountButtonSource.contains(".accessibilityLabel(\"Open Account\")"))
         XCTAssertFalse(accountButtonSource.contains("Menu {"))
         XCTAssertFalse(bookmarksSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
         XCTAssertFalse(bookmarksSource.contains("Label(\"Sync: \\(library.syncStatusTitle)\""))
         XCTAssertFalse(bookmarksSource.contains("Label(\"Settings\", systemImage: \"gearshape\")"))
+        XCTAssertTrue(settingsSource.contains("CodeScreenTitle(title: \"Account\", collapseProgress: collapseProgress)\n                        .offset(y: 8)"))
+        XCTAssertTrue(settingsSource.contains("CodeTopContentFade(title: \"Account\", progress: collapseProgress)"))
         XCTAssertTrue(settingsSource.contains("Label(library.syncStatusTitle, systemImage: syncStatusSystemImage)"))
         XCTAssertTrue(settingsSource.contains(".accessibilityLabel(\"Sync status: \\(library.syncStatusTitle)\")"))
     }

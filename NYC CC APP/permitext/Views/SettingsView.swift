@@ -91,7 +91,8 @@ struct SettingsView: View {
                 .frame(height: 0)
 
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-                    CodeScreenTitle(title: "Settings", collapseProgress: collapseProgress)
+                    CodeScreenTitle(title: "Account", collapseProgress: collapseProgress)
+                        .offset(y: 8)
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         planCard
@@ -161,7 +162,7 @@ struct SettingsView: View {
                 .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
-                CodeTopContentFade(title: "Settings", progress: collapseProgress)
+                CodeTopContentFade(title: "Account", progress: collapseProgress)
             }
             .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
             .navigationTitle("")
