@@ -6,7 +6,7 @@ import {
 import {
   settingsAccountSummary,
   settingsPlanCopy
-} from "./settings-copy.js?v=20260823-reader-menu-scrollbar-v7";
+} from "./settings-copy.js?v=20260823-saved-usage-text-v8";
 import {
   researchProgressStages,
   researchProgressStage
@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260823-reader-menu-scrollbar-v7";
+} from "./offline-storage.js?v=20260823-saved-usage-text-v8";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260823-reader-menu-scrollbar-v7";
+} from "./research-intent-state.js?v=20260823-saved-usage-text-v8";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,

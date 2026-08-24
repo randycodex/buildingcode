@@ -1332,6 +1332,7 @@ async function main() {
     assert(
       webRoot.text.includes('id="workspace-issue"') &&
         webRoot.text.includes('class="saved-plan-usage"') &&
+        workspaceStyles.text.match(/\.saved-plan-usage \{[\s\S]*?padding: 0;[\s\S]*?background: transparent;/) &&
         webRoot.text.includes('class="settings-plan-usage" role="status" aria-label="Current plan usage" hidden aria-hidden="true"') &&
         workspaceStyles.text.match(/\.settings-plan-usage \{[\s\S]*?background: transparent;/) &&
         workspaceStyles.text.includes(".settings-plan-usage[hidden] {\n  display: none;") &&
