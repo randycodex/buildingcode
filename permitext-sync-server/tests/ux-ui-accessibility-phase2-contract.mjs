@@ -66,8 +66,12 @@ assert.match(chipsSource, /accessibilityValue\(isSelected \? "Selected" : "Not s
 assert.match(browseSource, /@ScaledMetric\(relativeTo: \.title2\)[^\n]*chapterNumberSize/);
 assert.match(browseSource, /@ScaledMetric\(relativeTo: \.subheadline\)[^\n]*chapterTitleSize/);
 
-assert.match(themeSource, /static let minimumFontSize: Double = 17/);
+assert.match(themeSource, /static let minimumFontSize: Double = 10/);
+assert.match(themeSource, /static let maximumFontSize: Double = 24/);
 assert.match(themeSource, /var fontSize: Double = 17/);
+assert.match(themeSource, /static let minimumLineSpacing: Double = -6/);
+assert.match(themeSource, /static let maximumLineSpacing: Double = 6/);
+assert.match(themeSource, /var lineSpacing: Double = 0/);
 assert.doesNotMatch(`${htmlReaderSource}\n${nativeReaderSource}`, /theme\.fontSize \* 1\.16/);
 assert.doesNotMatch(htmlReaderSource, /maximum-scale=1\.0|user-scalable=no/);
 assert.match(htmlReaderSource, /maximumZoomScale = 5/);

@@ -451,8 +451,8 @@ async function main() {
         settingsTemplateSource.includes('data-plan-option="pro"') &&
         !settingsTemplateSource.includes('data-plan-option="research"') &&
         !settingsTemplateSource.includes("Upgrade option") &&
-        settingsTemplateSource.includes("Pro · $20/month") &&
-        settingsTemplateSource.includes("up to 100 cited Research turns each month") &&
+        settingsTemplateSource.includes("Upgrade to Pro - $20.00/month") &&
+        settingsTemplateSource.includes("up to 100 selected-evidence Research turns each month") &&
         !settingsTemplateSource.includes("Research Add-On") &&
         !settingsTemplateSource.includes("account-research-checkout") &&
         !iosSettingsSource.includes("planFeatureRow(") &&
@@ -655,7 +655,7 @@ async function main() {
         !workspaceScript.text.includes('"Research Included"') &&
         workspaceScript.text.includes('checkoutButton.textContent = pro') &&
         workspaceScript.text.includes('? "Pro Active" : "Manage Subscription"') &&
-        workspaceScript.text.includes(': "Upgrade to Pro"'),
+        workspaceScript.text.includes(': "Upgrade to Pro - $20.00/month"'),
       "Web Settings no longer distinguishes active Free and Pro plan actions."
     );
     assert(
@@ -1203,7 +1203,8 @@ async function main() {
       "iOS project membership removals are no longer durable project-specific tombstones."
     );
     assert(
-      iosSettingsSource.includes("private var projectManagementCard") &&
+      iosSettingsSource.includes("private var dataAndStorageCard") &&
+        iosSettingsSource.includes("private var projectManagementSection") &&
         iosSettingsSource.includes('selectedProjectIDs = Set(library.folders.map(\\.id))') &&
         iosSettingsSource.includes("showsProjectDeleteWarning = true") &&
         iosSettingsSource.includes("library.deleteFolders(ids: selectedProjectIDs)") &&
@@ -1885,10 +1886,15 @@ async function main() {
     assert(
         !webRoot.text.includes("account-plan-detail") &&
         !workspaceScript.text.includes("account-plan-detail") &&
-        webRoot.text.includes("Read and search the code library anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
-        webRoot.text.includes("Includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, web offline access, and up to 100 cited Research turns each month.") &&
+        webRoot.text.includes("Reading and search are available anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
+        webRoot.text.includes("Pro is active, including Research. Projects, Notebook, Report, professional exports, offline access, and selected-evidence Research are unlocked.") &&
+        webRoot.text.includes("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month. Code reading and search remain free.") &&
+        workspaceScript.text.includes("New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices.") &&
+        workspaceScript.text.includes("settingsAccountSummary(account ? state.account : null)") &&
+        workspaceScript.text.includes("settingsPlanCopy({ pro, source })") &&
+        workspaceScript.text.includes("planDetails.hidden = pro;") &&
         !webRoot.text.includes("professional exports, tags"),
-      "Plan details should live in the Free and Pro descriptions instead of a redundant summary."
+      "Web Account wording should match the corresponding iOS Plan and Account copy."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant manual sync card");
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
@@ -2221,7 +2227,7 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes(
-        '"Sign in to sync saved sections, notes, and Projects across your devices."'
+        '"Use passwordless email, Apple, Google, or Microsoft. New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices."'
       ) &&
         !workspaceScript.text.includes(
           '"Sign in to attach local saved work to your account and use cross-device sync."'
@@ -2949,10 +2955,11 @@ async function main() {
       "Column labels no longer maintain high contrast across light and dark appearance."
     );
     assert(
-      !workspaceStyles.text.includes("scrollbar-width: none !important") &&
-        !workspaceStyles.text.includes("*::-webkit-scrollbar") &&
-        workspaceStyles.text.match(/\.reader-content,[\s\S]*?\.project-create-sheet \{[\s\S]*?overflow-y: auto;[\s\S]*?scrollbar-gutter: stable;/),
-      "Web workspace scrollable panes no longer use visible native scrollbars."
+      workspaceStyles.text.match(/\.workspace-panel:not\(\.reader-panel\),[\s\S]*?scrollbar-width: none;/) &&
+        workspaceStyles.text.match(/\.workspace-panel:not\(\.reader-panel\) \*::\-webkit-scrollbar \{[\s\S]*?display: none;/) &&
+        workspaceStyles.text.match(/\.reader-panel \.reader-content \{[\s\S]*?scrollbar-width: thin;/) &&
+        workspaceStyles.text.includes(".reader-panel .reader-content::-webkit-scrollbar"),
+      "Only Reader columns should retain visible native scrollbars."
     );
     assert(
       !webRoot.text.includes('class="reader-reading-progress"') &&

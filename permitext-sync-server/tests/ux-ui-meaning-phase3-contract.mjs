@@ -48,8 +48,9 @@ assert.match(iosSaved, /CodeScreenSectionEyebrow\(text: "Saved sections"/);
 assert.match(iosSaved, /library\.folders\.filter \{ \$0\.folderType == \.project \}/);
 assert.match(iosSaved, /library\.folders\.filter \{ \$0\.folderType == \.reference \}/);
 assert.match(iosSaved, /if isProjectFolder \{[\s\S]*?projectHub/);
-assert.match(iosSettings, /CodeEyebrow\(text: "Projects and References"/);
-assert.match(iosSettings, /folder\.folderType == \.project \? "Project" : "Reference"/);
+assert.match(iosSettings, /CodeEyebrow\(text: "Data & Storage"/);
+assert.match(iosSettings, /Text\("Projects and saved collections"\)/);
+assert.match(iosSettings, /folder\.folderType == \.project \? "Project" : "Saved collection"/);
 assert.match(iosSettings, /folderDeletionDescription\(/);
 assert.doesNotMatch(iosSettings, /Delete project\?|Delete projects\?/);
 

@@ -4,6 +4,10 @@ import {
   rewriteStructuredCodeLinks
 } from "./code-references.js?v=20260720-code-reference-links-v18";
 import {
+  settingsAccountSummary,
+  settingsPlanCopy
+} from "./settings-copy.js?v=20260823-account-wording-parity-v6";
+import {
   researchProgressStages,
   researchProgressStage
 } from "./research-progress.js?v=20260813-research-reader-spacing-v120";
@@ -49,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260823-offline-pro-notice-v5";
+} from "./offline-storage.js?v=20260823-account-wording-parity-v6";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -84,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260823-offline-pro-notice-v5";
+} from "./research-intent-state.js?v=20260823-account-wording-parity-v6";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -29115,6 +29119,7 @@ function renderSettings() {
   const accountCopy = panel.querySelector(".account-status-copy");
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const planUsage = panel.querySelector(".settings-plan-usage");
+  const planDetails = panel.querySelector(".settings-plan-details");
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
   const deleteAccountButton = panel.querySelector(".account-delete");
@@ -29363,6 +29368,7 @@ function renderSettings() {
     const pro = isProAccount();
     const source = currentEntitlement()?.source;
     const canLinkApple = Boolean(account && state.account?.authProvider === "web");
+    const activePlanCopy = settingsPlanCopy({ pro, source });
     planRows.forEach((row) => {
       const active = row.dataset.planOption === "free"
         ? !pro
@@ -29372,20 +29378,27 @@ function renderSettings() {
       row.setAttribute("aria-current", active ? "true" : "false");
       const indicator = row.querySelector(".settings-feature-icon");
       if (indicator) indicator.textContent = active ? "✓" : "";
+      if (active) {
+        const title = row.querySelector("strong");
+        const summary = row.querySelector("span:not(.settings-feature-icon)");
+        if (title) title.textContent = activePlanCopy.title;
+        if (summary) summary.textContent = activePlanCopy.summary;
+      }
     });
     checkoutButton.disabled = !account || (pro && source === "lifetimeGrant");
     checkoutButton.classList.toggle("is-pro-active", pro);
     checkoutButton.textContent = pro
       ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
-      : "Upgrade to Pro";
+      : "Upgrade to Pro - $20.00/month";
+    planDetails.hidden = pro;
     planSecondaryButton.hidden = !account || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
-    accountCopy.hidden = Boolean(account);
+    accountCopy.hidden = false;
     signOutButton.hidden = !account;
     deleteAccountButton.hidden = !account;
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
-    accountCopy.textContent = "Sign in to sync saved sections, notes, and Projects across your devices.";
+    accountCopy.textContent = settingsAccountSummary(account ? state.account : null);
     renderSyncConflictReview();
     renderPlanUsageRows(planUsage);
     void renderOfflineState();
@@ -29434,7 +29447,7 @@ function renderSettings() {
       ? "Connect email, Apple, Google, or Microsoft"
       : "Sign in or create an account";
     if (!account) {
-      accountCopy.textContent = "Use passwordless email, Apple, Google, or Microsoft. New users create an account during sign-in, then saved work can sync across devices.";
+      accountCopy.textContent = "Use passwordless email, Apple, Google, or Microsoft. New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices.";
     }
   }).catch(() => {});
 
