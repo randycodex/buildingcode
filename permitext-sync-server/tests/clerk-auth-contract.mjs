@@ -113,6 +113,12 @@ assert(
   "iOS is not linked to ClerkKit and ClerkKitUI."
 );
 assert(
+  !iosProject.includes("CLERK_PUBLISHABLE_KEY = pk_test_") &&
+    iosProject.match(/CLERK_PUBLISHABLE_KEY = pk_live_/g)?.length === 2 &&
+    iosApp.includes('PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")'),
+  "iOS Debug can issue Clerk development tokens to the production Permitext backend."
+);
+assert(
   iosApp.includes("Clerk.configure(publishableKey:") &&
     iosApp.includes("private let clerk: Clerk?") &&
     iosApp.includes(".environment(\\.permitextClerk, clerk)"),
