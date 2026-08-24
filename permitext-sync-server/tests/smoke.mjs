@@ -1532,6 +1532,8 @@ async function main() {
         workspaceStyles.text.includes("--saved-projects-card-radius: 12px;") &&
         workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu,\n.report-draft-select-menu,\n.research-project-select-menu {") &&
         workspaceStyles.text.includes("background: var(--menu-surface);") &&
+        workspaceStyles.text.includes(".reader-chapter-select-menu::-webkit-scrollbar {") &&
+        workspaceStyles.text.includes("scrollbar-width: none;") &&
         workspaceStyles.text.includes(".reader-code-select-menu .custom-select-group-label {") &&
         workspaceStyles.text.includes(".reader-trust {\n  position: static;") &&
         workspaceStyles.text.includes(".reader-trust-details {\n  position: absolute;") &&

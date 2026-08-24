@@ -2583,6 +2583,15 @@ label {
   display: none;
 }
 
+.reader-chapter-select-menu {
+  scrollbar-width: none;
+}
+
+.reader-chapter-select-menu::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .reader-code-select-menu,
 .reader-chapter-select-menu,
 .report-draft-select-menu,
