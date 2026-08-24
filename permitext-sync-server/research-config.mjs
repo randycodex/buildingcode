@@ -110,8 +110,8 @@ function maximumProviderRequestCost(requestBody, environment = process.env) {
 
 export function beginResearchSpendReservation(reservation, environment = process.env) {
   const guardrails = researchSpendGuardrails(environment);
-  if (!guardrails.ready) {
-    const error = new Error(`Research spend safeguards are not ready. ${guardrails.problems.join(" ")}`.trim());
+  if (!guardrails.enabled) {
+    const error = new Error("Research is temporarily unavailable.");
     error.code = "RESEARCH_SPEND_CAP";
     throw error;
   }
@@ -119,39 +119,89 @@ export function beginResearchSpendReservation(reservation, environment = process
     id: reservation.id,
     maximumRequestUSD: guardrails.maximumRequestUSD,
     reservedUSD: 0,
-    providerRequestCount: 0
+    actualUSD: 0,
+    providerRequestCount: 0,
+    pendingProviderReservations: new Map()
   });
   return guardrails;
 }
 
 export function reserveResearchProviderSpend(requestBody, environment = process.env) {
   const context = productionSpendContext.getStore();
-  const hosted = environment.VERCEL === "1" || Boolean(environment.VERCEL_ENV);
   if (!context) {
-    if (!hosted) return { active: false, reservedUSD: 0, providerRequestCount: 0 };
-    const error = new Error("A production Research model request was attempted without an atomic spend reservation.");
-    error.code = "RESEARCH_SPEND_CAP";
-    throw error;
+    return { active: false, reservedUSD: 0, actualUSD: 0, providerRequestCount: 0 };
   }
-  const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
+  let maximumRequestUSD;
+  try {
+    maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
+  } catch {
+    return {
+      active: false,
+      reservedUSD: context.reservedUSD,
+      actualUSD: context.actualUSD,
+      providerRequestCount: context.providerRequestCount
+    };
+  }
   const nextReservedUSD = Number((context.reservedUSD + maximumRequestUSD).toFixed(6));
-  if (nextReservedUSD > context.maximumRequestUSD) {
-    const error = new Error(
-      `This Research turn could exceed its $${context.maximumRequestUSD.toFixed(2)} maximum ` +
-      `($${context.reservedUSD.toFixed(6)} already reserved; $${maximumRequestUSD.toFixed(6)} next request).`
-    );
-    error.code = "RESEARCH_SPEND_CAP";
-    throw error;
-  }
   context.reservedUSD = nextReservedUSD;
   context.providerRequestCount += 1;
-  return { active: true, ...context };
+  const reservationID = `${context.id}:${context.providerRequestCount}`;
+  context.pendingProviderReservations.set(reservationID, maximumRequestUSD);
+  return {
+    active: true,
+    reservationID,
+    reservedUSD: context.reservedUSD,
+    actualUSD: context.actualUSD,
+    providerRequestCount: context.providerRequestCount
+  };
+}
+
+export function settleResearchProviderSpend(reservation, providerPayload, environment = process.env) {
+  if (!reservation?.active) return { active: false, reservedUSD: 0, actualUSD: 0, providerRequestCount: 0 };
+  const context = productionSpendContext.getStore();
+  const maximumRequestUSD = context?.pendingProviderReservations?.get(reservation.reservationID);
+  if (!context || maximumRequestUSD === undefined) {
+    const error = new Error("A Research provider spend reservation could not be reconciled.");
+    error.code = "RESEARCH_SPEND_CAP";
+    throw error;
+  }
+  const usage = providerPayload?.usage || {};
+  const actualCost = estimatedResearchCost({
+    inputTokens: usage.input_tokens,
+    cachedInputTokens: usage.input_tokens_details?.cached_tokens,
+    outputTokens: usage.output_tokens
+  }, environment).estimatedUSD;
+  if (actualCost === null) {
+    const error = new Error("Research provider usage could not be reconciled against versioned pricing.");
+    error.code = "RESEARCH_SPEND_CAP";
+    throw error;
+  }
+  context.pendingProviderReservations.delete(reservation.reservationID);
+  context.actualUSD = Number((context.actualUSD + actualCost).toFixed(6));
+  context.reservedUSD = Number(Math.max(
+    0,
+    context.reservedUSD - maximumRequestUSD + actualCost
+  ).toFixed(6));
+  return {
+    active: true,
+    reservationID: reservation.reservationID,
+    reservedUSD: context.reservedUSD,
+    actualUSD: context.actualUSD,
+    providerRequestCount: context.providerRequestCount
+  };
 }
 
 export function endResearchSpendReservation() {
   const context = productionSpendContext.getStore();
   productionSpendContext.enterWith(null);
-  return context ? { ...context } : null;
+  return context ? {
+    id: context.id,
+    maximumRequestUSD: context.maximumRequestUSD,
+    reservedUSD: context.reservedUSD,
+    actualUSD: context.actualUSD,
+    providerRequestCount: context.providerRequestCount,
+    pendingProviderReservationCount: context.pendingProviderReservations.size
+  } : null;
 }
 
 export function validatePaidResearchEvaluationEnvironment(environment = process.env) {

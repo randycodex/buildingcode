@@ -163,6 +163,7 @@ import {
   researchSpendGuardrails,
   reserveResearchProviderSpend,
   reserveResearchEvaluationSpend,
+  settleResearchProviderSpend,
   researchModelConfiguration
 } from "./research-config.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
@@ -1633,19 +1634,6 @@ function createFileStoreAdapter() {
             entry.createdAt >= reservation.since && activeResearchUsageEntry(entry)
           );
         if (Number.isSafeInteger(reservation.limit) && entries.length >= reservation.limit) return false;
-        const activeEntries = Object.entries(store.researchUsageByUserID || {})
-          .flatMap(([entryUserID, usageEntries]) => (usageEntries || [])
-            .filter(activeResearchUsageEntry)
-            .map((entry) => ({ ...entry, entryUserID })));
-        const spendSince = (since, matchingUserID = null) => activeEntries
-          .filter((entry) => entry.createdAt >= since && (!matchingUserID || entry.entryUserID === matchingUserID))
-          .reduce((total, entry) => total + Number(entry.estimatedCostUSD || 0), 0);
-        if (
-          spendSince(reservation.daySince, userID) + reservation.maximumRequestUSD > reservation.userDailyCapUSD ||
-          spendSince(reservation.monthSince, userID) + reservation.maximumRequestUSD > reservation.userMonthlyCapUSD ||
-          spendSince(reservation.daySince) + reservation.maximumRequestUSD > reservation.dailyCapUSD ||
-          spendSince(reservation.monthSince) + reservation.maximumRequestUSD > reservation.monthlyCapUSD
-        ) return false;
         store.researchUsageByUserID ||= {};
         store.researchUsageByUserID[userID] = [
           ...retainedEntries,
@@ -4185,32 +4173,6 @@ async function createPostgresStoreAdapter() {
                     )
                 ) < ${reservation.limit}
               )
-              AND (
-                SELECT COALESCE(sum(estimated_cost_usd), 0)
-                FROM permitext_research_usage
-                WHERE user_id = ${userID}
-                  AND created_at >= ${reservation.daySince}::timestamptz
-                  AND (mode <> 'reservation' OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes')
-              ) + ${reservation.maximumRequestUSD} <= ${reservation.userDailyCapUSD}
-              AND (
-                SELECT COALESCE(sum(estimated_cost_usd), 0)
-                FROM permitext_research_usage
-                WHERE user_id = ${userID}
-                  AND created_at >= ${reservation.monthSince}::timestamptz
-                  AND (mode <> 'reservation' OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes')
-              ) + ${reservation.maximumRequestUSD} <= ${reservation.userMonthlyCapUSD}
-              AND (
-                SELECT COALESCE(sum(estimated_cost_usd), 0)
-                FROM permitext_research_usage
-                WHERE created_at >= ${reservation.daySince}::timestamptz
-                  AND (mode <> 'reservation' OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes')
-              ) + ${reservation.maximumRequestUSD} <= ${reservation.dailyCapUSD}
-              AND (
-                SELECT COALESCE(sum(estimated_cost_usd), 0)
-                FROM permitext_research_usage
-                WHERE created_at >= ${reservation.monthSince}::timestamptz
-                  AND (mode <> 'reservation' OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes')
-              ) + ${reservation.maximumRequestUSD} <= ${reservation.monthlyCapUSD}
               ON CONFLICT (id) DO NOTHING
               RETURNING id
             `
@@ -6974,7 +6936,8 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     timeoutMilliseconds: 60_000,
     failureMessage: "The Research evidence-analysis request failed.",
     reserveEvaluationSpend: reserveResearchEvaluationSpend,
-    reserveProviderSpend: reserveResearchProviderSpend
+    reserveProviderSpend: reserveResearchProviderSpend,
+    settleProviderSpend: settleResearchProviderSpend
   });
   let value;
   try {
@@ -7196,7 +7159,8 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
       timeoutMilliseconds: 30_000,
       failureMessage: "The Research web-support request failed.",
       reserveEvaluationSpend: reserveResearchEvaluationSpend,
-      reserveProviderSpend: reserveResearchProviderSpend
+      reserveProviderSpend: reserveResearchProviderSpend,
+      settleProviderSpend: settleResearchProviderSpend
     }));
   } catch (error) {
     const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
@@ -7667,7 +7631,8 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     timeoutMilliseconds: 45_000,
     failureMessage: "The Research interpretation request failed.",
     reserveEvaluationSpend: reserveResearchEvaluationSpend,
-    reserveProviderSpend: reserveResearchProviderSpend
+    reserveProviderSpend: reserveResearchProviderSpend,
+    settleProviderSpend: settleResearchProviderSpend
   });
   let value;
   try {
@@ -7840,7 +7805,8 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     failureMessage: "The Research verifier request failed.",
     failureCode: "RESEARCH_VERIFIER_ERROR",
     reserveEvaluationSpend: reserveResearchEvaluationSpend,
-    reserveProviderSpend: reserveResearchProviderSpend
+    reserveProviderSpend: reserveResearchProviderSpend,
+    settleProviderSpend: settleResearchProviderSpend
   });
   let value;
   try {
@@ -15447,8 +15413,8 @@ async function handleResearchConversationMessage(request, response) {
     const requestLimit = monthlyResearchRequestLimit();
     if (!mockMode) {
       const spendGuardrails = researchSpendGuardrails();
-      if (!spendGuardrails.ready) {
-        const error = new Error(`Research spend safeguards are not ready. ${spendGuardrails.problems.join(" ")}`.trim());
+      if (!spendGuardrails.enabled) {
+        const error = new Error("Research is temporarily unavailable.");
         error.code = "RESEARCH_SPEND_CAP";
         throw error;
       }
@@ -15458,13 +15424,7 @@ async function handleResearchConversationMessage(request, response) {
         id: researchReservationID,
         since: currentMonthStart(),
         limit: requestLimit,
-        maximumRequestUSD: spendGuardrails.maximumRequestUSD,
-        userDailyCapUSD: spendGuardrails.userDailyCapUSD,
-        userMonthlyCapUSD: spendGuardrails.userMonthlyCapUSD,
-        dailyCapUSD: spendGuardrails.dailyCapUSD,
-        monthlyCapUSD: spendGuardrails.monthlyCapUSD,
-        daySince: currentDayStart(),
-        monthSince: currentMonthStart(),
+        maximumRequestUSD: spendGuardrails.maximumRequestUSD || 0,
         pricingVersion: spendGuardrails.pricingVersion,
         createdAt: researchReservationCreatedAt
       });
@@ -15983,7 +15943,9 @@ async function handleResearchConversationMessage(request, response) {
     }
     if (error.code === "RESEARCH_SPEND_CAP") {
       progressResponse.failActive("failed");
-      progressResponse.error(503, error.message, { code: "RESEARCH_SPEND_CAP" });
+      progressResponse.error(503, "Research is temporarily unavailable. Your question is still here.", {
+        code: "RESEARCH_SPEND_CAP"
+      });
       return;
     }
     if (error.code === "RESEARCH_REFUSAL") {
@@ -24654,8 +24616,8 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
   try {
     if (!mockMode) {
       const spendGuardrails = researchSpendGuardrails();
-      if (!spendGuardrails.ready) {
-        const error = new Error(`Research spend safeguards are not ready. ${spendGuardrails.problems.join(" ")}`.trim());
+      if (!spendGuardrails.enabled) {
+        const error = new Error("Research is temporarily unavailable.");
         error.code = "RESEARCH_SPEND_CAP";
         throw error;
       }
@@ -24663,13 +24625,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
         id: reservationID,
         since: currentMonthStart(),
         limit: requestLimit,
-        maximumRequestUSD: spendGuardrails.maximumRequestUSD,
-        userDailyCapUSD: spendGuardrails.userDailyCapUSD,
-        userMonthlyCapUSD: spendGuardrails.userMonthlyCapUSD,
-        dailyCapUSD: spendGuardrails.dailyCapUSD,
-        monthlyCapUSD: spendGuardrails.monthlyCapUSD,
-        daySince: currentDayStart(),
-        monthSince: currentMonthStart(),
+        maximumRequestUSD: spendGuardrails.maximumRequestUSD || 0,
         pricingVersion: spendGuardrails.pricingVersion,
         createdAt: new Date().toISOString()
       });

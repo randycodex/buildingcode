@@ -2,7 +2,8 @@ import {
   beginResearchSpendReservation,
   endResearchSpendReservation,
   researchSpendGuardrails,
-  reserveResearchProviderSpend
+  reserveResearchProviderSpend,
+  settleResearchProviderSpend
 } from "../research-config.mjs";
 
 function assert(condition, message) {
@@ -45,20 +46,29 @@ const first = reserveResearchProviderSpend({ input: "first", max_output_tokens: 
 assert(first.active && first.providerRequestCount === 1, "The first provider request did not reserve spend.");
 const second = reserveResearchProviderSpend({ input: "second", max_output_tokens: 1_000 }, environment);
 assert(second.providerRequestCount === 2, "The second provider request did not accumulate spend.");
-try {
-  reserveResearchProviderSpend({ input: "third", max_output_tokens: 1_000 }, environment);
-  throw new Error("A Research turn exceeded its reserved maximum.");
-} catch (error) {
-  assert(error.code === "RESEARCH_SPEND_CAP", "Research overspend returned the wrong error code.");
-}
+const third = reserveResearchProviderSpend({ input: "third", max_output_tokens: 1_000 }, environment);
+assert(third.providerRequestCount === 3, "Internal dollar telemetry interrupted a Research turn.");
+assert(third.reservedUSD > Number(environment.PERMITEXT_RESEARCH_MAX_REQUEST_USD), "The contract did not cross the advisory threshold.");
 const ended = endResearchSpendReservation();
-assert(ended.providerRequestCount === 2, "Research spend reservation did not preserve its audit count.");
+assert(ended.providerRequestCount === 3, "Research spend telemetry did not preserve its audit count.");
 
-try {
-  reserveResearchProviderSpend({ input: "unreserved", max_output_tokens: 100 }, environment);
-  throw new Error("A hosted provider request ran without a spend reservation.");
-} catch (error) {
-  assert(error.code === "RESEARCH_SPEND_CAP", "Unreserved production spend returned the wrong error code.");
+beginResearchSpendReservation({ id: "settlement-contract" }, environment);
+for (const input of ["analysis", "answer", "verification"]) {
+  const reservation = reserveResearchProviderSpend({ input, max_output_tokens: 1_000 }, environment);
+  settleResearchProviderSpend(reservation, {
+    usage: {
+      input_tokens: 100,
+      input_tokens_details: { cached_tokens: 20 },
+      output_tokens: 100
+    }
+  }, environment);
 }
+const settled = endResearchSpendReservation();
+assert(settled.providerRequestCount === 3, "A normal three-stage Research turn did not complete.");
+assert(settled.pendingProviderReservationCount === 0, "Completed provider reservations remained pending.");
+assert(settled.reservedUSD === settled.actualUSD, "Completed requests retained their worst-case reservations.");
+
+const unreserved = reserveResearchProviderSpend({ input: "unreserved", max_output_tokens: 100 }, environment);
+assert(!unreserved.active, "Missing telemetry context interrupted an otherwise valid provider request.");
 
 console.log("permitext Research cost guardrail contract passed");

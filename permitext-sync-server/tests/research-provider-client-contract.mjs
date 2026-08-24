@@ -22,6 +22,7 @@ function requestOptions(overrides = {}) {
   let fetchAttempts = 0;
   let evaluationReservations = 0;
   let providerReservations = 0;
+  let providerSettlements = 0;
   const result = await requestResearchProvider(requestOptions({
     fetchImpl: async () => {
       fetchAttempts += 1;
@@ -30,13 +31,15 @@ function requestOptions(overrides = {}) {
         : providerResponse(200, { id: "response-after-retry" });
     },
     reserveEvaluationSpend: () => { evaluationReservations += 1; },
-    reserveProviderSpend: () => { providerReservations += 1; }
+    reserveProviderSpend: () => ({ active: true, reservationID: `request-${++providerReservations}` }),
+    settleProviderSpend: () => { providerSettlements += 1; }
   }));
   assert.equal(result.payload.id, "response-after-retry");
   assert.equal(result.attempts, 2);
   assert.equal(fetchAttempts, 2);
   assert.equal(evaluationReservations, 2);
   assert.equal(providerReservations, 2);
+  assert.equal(providerSettlements, 2);
 }
 
 {

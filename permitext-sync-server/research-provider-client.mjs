@@ -79,12 +79,13 @@ export async function requestResearchProvider({
   maximumAttempts = 2,
   fetchImpl = globalThis.fetch,
   reserveEvaluationSpend = () => {},
-  reserveProviderSpend = () => {}
+  reserveProviderSpend = () => ({ active: false }),
+  settleProviderSpend = () => {}
 }) {
   const attempts = Math.max(1, Math.min(2, Number(maximumAttempts) || 1));
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     reserveEvaluationSpend(requestBody);
-    reserveProviderSpend(requestBody);
+    const providerSpendReservation = reserveProviderSpend(requestBody);
     let response;
     try {
       const timeoutSignal = AbortSignal.timeout(timeoutMilliseconds);
@@ -114,6 +115,7 @@ export async function requestResearchProvider({
     }
 
     const payload = await response.json().catch(() => ({}));
+    settleProviderSpend(providerSpendReservation, payload);
     if (response.ok) return { response, payload, attempts: attempt };
     if (attempt < attempts && transientProviderStatuses.has(response.status)) {
       await waitForProviderRetry(providerRetryDelay(attempt), signal);
