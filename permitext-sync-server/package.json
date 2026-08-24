@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test:property-context": "node --check nyc-property-context.mjs && node --check tests/nyc-property-context-contract.mjs && node tests/nyc-property-context-contract.mjs",
+    "test:project-context-research": "node --check tests/research-project-context-summary-contract.mjs && node tests/research-project-context-summary-contract.mjs",
     "prestart": "npm run build:clients",
     "start": "node server.mjs",
     "start:local-research": "zsh scripts/start-local-research.zsh",

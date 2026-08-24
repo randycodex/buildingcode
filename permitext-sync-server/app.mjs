@@ -9491,6 +9491,20 @@ function normalizedResearchProjectStructuredFacts(project) {
   });
 }
 
+function researchProjectFactLine(fact) {
+  const groupLabel = fact.group === "buildingCode"
+    ? "Building / Code Fact"
+    : fact.group === "zoning"
+      ? "Zoning Fact"
+      : "Custom Fact";
+  const qualification = fact.status === "sourced"
+    ? "NYC Planning sourced data; verify current official records"
+    : fact.status === "confirmed"
+      ? "user-confirmed; not independently verified"
+      : "user-stated; not independently verified";
+  return `${groupLabel} — ${fact.label}: ${fact.value} (${qualification})`;
+}
+
 export function researchProjectInformation(projectID, project) {
   if (!projectID || !project) return null;
   const address = String(project.address || "").trim();
@@ -9521,18 +9535,10 @@ export function researchProjectInformation(projectID, project) {
     ...usableStructuredFacts.filter((fact) => fact.group === "zoning" && (!addressFact || fact.key !== "address"))
   ];
   const customFacts = usableStructuredFacts.filter((fact) => fact.group === "custom");
-  const factLine = (groupLabel, fact) => {
-    const qualification = fact.status === "sourced"
-      ? "NYC Planning sourced data; verify current official records"
-      : fact.status === "confirmed"
-        ? "user-confirmed; not independently verified"
-        : "user-stated; not independently verified";
-    return `${groupLabel} — ${fact.label}: ${fact.value} (${qualification})`;
-  };
   const facts = [
-    ...buildingCodeFacts.map((fact) => factLine("Building / Code Fact", fact)),
-    ...zoningFacts.map((fact) => factLine("Zoning Fact", fact)),
-    ...customFacts.map((fact) => factLine("Custom Fact", fact))
+    ...buildingCodeFacts.map(researchProjectFactLine),
+    ...zoningFacts.map(researchProjectFactLine),
+    ...customFacts.map(researchProjectFactLine)
   ];
   if (description) {
     facts.push(`Additional Project facts: ${normalizedResearchText(description, 4_000)}`);
@@ -9610,6 +9616,110 @@ export function researchFactUsageDisclosure({
     projectContext,
     conversation,
     other: used.filter((fact) => !classified.has(fact))
+  };
+}
+
+const researchProjectContextSummaryFactKeys = [
+  "address", "bbl", "borough", "block", "tax-lots", "zip-code",
+  "zoning-districts", "zoning-map", "community-district", "land-use-code",
+  "tax-lot-area", "building-area", "stories-above-grade", "year-built"
+];
+
+const researchProjectContextFactTerms = new Map([
+  ["address", /\b(?:address|location)\b/i],
+  ["bbl", /\bbbl\b|borough[\s/-]*block[\s/-]*lot/i],
+  ["borough", /\bborough\b/i],
+  ["block", /\bblock\b/i],
+  ["tax-lots", /\b(?:tax )?lots?\b/i],
+  ["zip-code", /\b(?:zip|postal) code\b/i],
+  ["zoning-districts", /\bzoning district/i],
+  ["zoning-map", /\bzoning map/i],
+  ["community-district", /\bcommunity district/i],
+  ["land-use-code", /\bland use(?: code)?\b/i],
+  ["tax-lot-area", /\b(?:tax )?lot area\b/i],
+  ["building-area", /\bbuilding area\b/i],
+  ["stories-above-grade", /\b(?:stories|floors)\b/i],
+  ["year-built", /\byear built\b/i]
+]);
+
+export function researchProjectContextOnlyEligibility({ question, projectInformation } = {}) {
+  const text = normalizedResearchText(question, 2_000);
+  if (!text || !projectInformation?.projectID) return false;
+  const usableFacts = [
+    ...(projectInformation.buildingCodeFacts || []),
+    ...(projectInformation.zoningFacts || []),
+    ...(projectInformation.customFacts || [])
+  ].filter((fact) => fact?.usedInResearch && ["sourced", "confirmed"].includes(fact.status));
+  if (!usableFacts.length) return false;
+
+  const factualTarget = /\b(?:project context|structured facts?|imported facts?|property (?:facts?|identifiers?)|address|bbl|borough|block|tax lots?|zoning district|zoning map|community district|land use|year built|building area)\b/i.test(text);
+  const factualRequest = /\b(?:summari[sz]e|summary|identify|list|show|state|report|what (?:is|are)|tell me|provide)\b/i.test(text);
+  if (!factualTarget || !factualRequest) return false;
+
+  const substantiveText = text.replace(
+    /\b(?:do not|don't|without)\s+(?:(?:make|provide|perform)\s+)?(?:any\s+)?(?:determin\w*|analy[sz]\w*|interpret\w*|evaluat\w*|assess\w*)\s+(?:of\s+|about\s+|for\s+)?(?:(?:zoning|code|legal|compliance)\s*(?:(?:or|and)\s*)?){0,3}(?:requirements?|determinations?|analysis|interpretations?|conclusions?)\b/ig,
+    ""
+  );
+  const substantiveRequest = /\b(?:required|requirements?|allowed|permitted|prohibited|comply|compliance|applicable|govern(?:s|ing)?|must|shall|may|calculate|calculation|determine|interpret|violation|off[ -]street parking|floor area ratio|\bfar\b|setback|yards?|height limit|use group)\b/i.test(substantiveText);
+  return !substantiveRequest;
+}
+
+export function researchProjectContextOnlyInterpretation({ question, projectInformation } = {}) {
+  if (!researchProjectContextOnlyEligibility({ question, projectInformation })) {
+    throw new Error("The question is not eligible for a Project-context-only answer.");
+  }
+  const availableFacts = [
+    ...(projectInformation.zoningFacts || []),
+    ...(projectInformation.buildingCodeFacts || []),
+    ...(projectInformation.customFacts || [])
+  ].filter((fact) => fact?.usedInResearch && ["sourced", "confirmed"].includes(fact.status));
+  const summaryRequested = /\b(?:summari[sz]e|summary|structured facts?|imported facts?|property (?:facts?|identifiers?))\b/i.test(question);
+  const requestedKeys = researchProjectContextSummaryFactKeys.filter((key) =>
+    summaryRequested || researchProjectContextFactTerms.get(key)?.test(question)
+  );
+  const selectedFacts = requestedKeys
+    .map((key) => availableFacts.find((fact) => fact.key === key))
+    .filter(Boolean);
+  const facts = selectedFacts.length ? selectedFacts : availableFacts.slice(0, 8);
+  const projectFactsUsed = facts.map(researchProjectFactLine);
+  const factualSummary = facts.map((fact) => `- ${fact.label}: ${fact.value}`).join("\n");
+  const limitationSummary = "These values report the saved Project context only. They do not determine Construction Code or Zoning Resolution requirements. Verify current official NYC records before relying on them; a matched tax lot does not by itself establish the legal zoning-lot composition.";
+  const answerText = [
+    "The imported Project context currently identifies the property as follows:",
+    factualSummary,
+    limitationSummary
+  ].filter(Boolean).join("\n\n");
+  return {
+    answerText,
+    conclusion: [
+      "The imported Project context currently identifies the property as follows:",
+      factualSummary
+    ].join("\n"),
+    explanation: limitationSummary,
+    assumptions: [],
+    missingFacts: [],
+    evidenceLimitations: [
+      "This answer reports saved Project facts and does not interpret or determine Construction Code or Zoning Resolution requirements.",
+      "Verify current official NYC records before relying on these values.",
+      "A matched tax lot does not by itself establish the legal zoning-lot composition."
+    ],
+    additionalEvidenceNeeded: [],
+    followUpQuestions: [],
+    supportedPoints: [],
+    citations: [],
+    supportingSources: [],
+    supportingSourceUses: [],
+    projectFactsUsed,
+    selectedFacts: facts.map((fact) => ({
+      id: fact.id,
+      key: fact.key,
+      label: fact.label,
+      value: fact.value,
+      status: fact.status,
+      source: fact.source,
+      sourceText: fact.sourceText,
+      updatedAt: fact.updatedAt
+    }))
   };
 }
 
@@ -15914,6 +16024,177 @@ async function handleInternalEvaluationReview(request, response) {
   });
 }
 
+async function commitProjectContextOnlyResearchMessage({
+  context,
+  conversation,
+  question,
+  projectInformation,
+  manualProjectFacts,
+  combinedProjectFacts,
+  researchRequestID,
+  progressResponse
+}) {
+  const projectContextCapturedAt = new Date().toISOString();
+  const generated = researchProjectContextOnlyInterpretation({ question, projectInformation });
+  const { selectedFacts, ...interpretation } = generated;
+  const now = new Date().toISOString();
+  const factUsage = researchFactUsageDisclosure({
+    factsUsed: interpretation.projectFactsUsed,
+    projectFacts: combinedProjectFacts
+  });
+  progressResponse.progress("preparing_question", "completed");
+  progressResponse.progress("checking_citation_support", "active");
+  progressResponse.progress("checking_citation_support", "completed");
+  progressResponse.progress("preparing_conclusion", "active");
+
+  const userMessage = {
+    id: randomUUID(),
+    role: "user",
+    question,
+    createdAt: now,
+    ...(researchRequestID ? { researchRequestID } : {})
+  };
+  const assistantMessage = {
+    id: randomUUID(),
+    role: "assistant",
+    createdAt: now,
+    ...(researchRequestID ? { researchRequestID } : {}),
+    answer: {
+      mode: "project_context",
+      model: "permitext-deterministic-project-context",
+      requestedModel: "permitext-deterministic-project-context",
+      promptVersion: "20260824-project-context-v1",
+      evidenceVersion: "project-context-facts-v1",
+      ...interpretation,
+      evidenceSectionIDs: [],
+      evidenceSourceIDs: [],
+      sourceSummary: {
+        projectFactCount: selectedFacts.length,
+        sourcedProjectFactCount: selectedFacts.filter((fact) => fact.status === "sourced").length,
+        enactedProvisionCount: 0,
+        contextualProvisionCount: 0,
+        citedProvisionCount: 0,
+        unresolvedProjectFactCount: 0
+      },
+      structuredEvidenceAnalysis: {
+        projectFactsUsed: interpretation.projectFactsUsed,
+        unresolvedProjectFacts: [],
+        highValueFollowUpQuestions: [],
+        selectedProjectFacts: selectedFacts
+      },
+      factUsage,
+      retrieval: {
+        schemaVersion: 1,
+        assemblyVersion: "project-context-facts-v1",
+        sourceMode: "project_context",
+        projectFactsApplied: true,
+        modelRequested: false,
+        limitations: interpretation.evidenceLimitations
+      },
+      verification: {
+        status: "project_context",
+        pass: true,
+        reason: "PROJECT_CONTEXT_ONLY",
+        attempts: 0,
+        regenerated: false,
+        history: []
+      },
+      disclaimer: "Project-context summary; not an official code or zoning determination."
+    }
+  };
+  progressResponse.progress("preparing_conclusion", "completed");
+  assistantMessage.researchProgress = progressResponse.summary(now);
+
+  const answerRecord = {
+    ...immutableResearchAnswer({
+      id: assistantMessage.id,
+      owner: ownerScope(context.userID),
+      conversationID: conversation.id,
+      projectID: conversation.primaryProjectID || null,
+      question,
+      answer: assistantMessage.answer,
+      evidence: [],
+      citations: [],
+      model: assistantMessage.answer.model,
+      researchSystemVersion: [
+        assistantMessage.answer.promptVersion,
+        assistantMessage.answer.evidenceVersion,
+        researchSourcePolicyVersion
+      ].join(":"),
+      createdAt: now
+    }),
+    projectContextSnapshot: {
+      projectID: conversation.primaryProjectID || null,
+      projectInformation,
+      manualFacts: [...manualProjectFacts],
+      combinedFacts: combinedProjectFacts,
+      selectedFacts,
+      capturedAt: projectContextCapturedAt
+    }
+  };
+  conversation.starterQuestion ||= question;
+  conversation.messages.push(userMessage, assistantMessage);
+  conversation.updatedAt = now;
+  delete conversation.historyHiddenAt;
+  conversation.sourceStatus = "current";
+  refreshGeneratedResearchConversationTitle(conversation);
+  const activityEvents = conversation.primaryProjectID
+    ? [
+        activityEvent({
+          owner: ownerScope(context.userID),
+          projectID: conversation.primaryProjectID,
+          actorUserID: context.userID,
+          action: "research.question.submitted",
+          objectKind: "researchConversation",
+          objectID: conversation.id,
+          newStatus: "submitted",
+          createdAt: now,
+          metadata: { answerID: assistantMessage.id, mode: "project_context" }
+        }),
+        activityEvent({
+          owner: ownerScope(context.userID),
+          projectID: conversation.primaryProjectID,
+          actorUserID: context.userID,
+          action: "research.answer.generated",
+          objectKind: "researchAnswer",
+          objectID: assistantMessage.id,
+          newStatus: "generated",
+          createdAt: now,
+          metadata: { conversationID: conversation.id, mode: "project_context" }
+        })
+      ]
+    : [];
+  progressResponse.assertActive();
+  await commitResearchConversationMessage(context.userID, {
+    reservationID: null,
+    usageEntry: null,
+    answer: answerRecord,
+    conversation,
+    events: activityEvents
+  });
+  const artifactRevisions = await bumpResearchArtifactRevisions(
+    context.userID,
+    conversation.primaryProjectID
+      ? [{ projectID: conversation.primaryProjectID, domains: ["activity", "foundation", "research"] }]
+      : []
+  );
+  console.info(JSON.stringify({
+    event: "research_conversation_message",
+    user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
+    mode: "project_context",
+    model: assistantMessage.answer.model,
+    conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
+    projectFacts: selectedFacts.length,
+    totalTokens: 0
+  }));
+  progressResponse.json(200, {
+    conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+    usage: await researchUsageForClient(context.userID, context.authContext.entitlement),
+    ...(researchRequestID ? { requestID: researchRequestID } : {}),
+    artifactRevisions
+  });
+}
+
 async function handleResearchConversationMessage(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
@@ -15995,6 +16276,24 @@ async function handleResearchConversationMessage(request, response) {
       context.userID,
       conversation.primaryProjectID
     );
+    const manualProjectFacts = conversation.projectContext?.facts || [];
+    const combinedProjectFacts = combinedResearchProjectFacts(
+      projectInformation,
+      manualProjectFacts
+    );
+    if (researchProjectContextOnlyEligibility({ question, projectInformation })) {
+      await commitProjectContextOnlyResearchMessage({
+        context,
+        conversation,
+        question,
+        projectInformation,
+        manualProjectFacts,
+        combinedProjectFacts,
+        researchRequestID,
+        progressResponse
+      });
+      return;
+    }
     const corpusPlan = await researchCorpusPlanForTurn({
       question,
       messages: conversation.messages || [],
@@ -16006,11 +16305,6 @@ async function handleResearchConversationMessage(request, response) {
       projectInformation,
       new Date().toISOString(),
       corpusPlan
-    );
-    const manualProjectFacts = conversation.projectContext?.facts || [];
-    const combinedProjectFacts = combinedResearchProjectFacts(
-      projectInformation,
-      manualProjectFacts
     );
     progressResponse.progress("preparing_question", "completed");
     const evidencePackage = await assembledResearchEvidenceForTurn({

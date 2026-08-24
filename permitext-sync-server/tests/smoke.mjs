@@ -1800,7 +1800,9 @@ async function main() {
         workspaceScript.text.includes('compact.className = "research-feedback-compact"') &&
         workspaceScript.text.includes('details.className = "research-feedback-details"') &&
         workspaceScript.text.includes('reviewRow.className = "research-answer-review-row"') &&
-        workspaceScript.text.includes('evidenceReviewedSummary.textContent = "Evidence reviewed"') &&
+        workspaceScript.text.includes('evidenceReviewedSummary.textContent = result.mode === "project_context"') &&
+        workspaceScript.text.includes('? "Project facts reviewed"') &&
+        workspaceScript.text.includes(': "Evidence reviewed"') &&
         workspaceScript.text.includes("reviewRow.append(evidenceReviewed, compact)") &&
         workspaceScript.text.includes("(evidenceReviewedBody || bubble).append(answerSources)") &&
         workspaceScript.text.includes('void saveFeedback("helpful"') &&

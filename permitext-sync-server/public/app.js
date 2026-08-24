@@ -6,7 +6,7 @@ import {
 import {
   settingsAccountSummary,
   settingsPlanCopy
-} from "./settings-copy.js?v=20260824-property-context-v1";
+} from "./settings-copy.js?v=20260824-project-context-research-v2";
 import {
   researchProgressStages,
   researchProgressStage
@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260824-property-context-v1";
+} from "./offline-storage.js?v=20260824-project-context-research-v2";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260824-property-context-v1";
+} from "./research-intent-state.js?v=20260824-project-context-research-v2";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15442,7 +15442,9 @@ function renderResearchInterpretation(container, result, options = {}) {
   evidenceReviewed.className = "research-evidence-reviewed";
   evidenceReviewed.open = Boolean(options.detailsOpen);
   const evidenceReviewedSummary = document.createElement("summary");
-  evidenceReviewedSummary.textContent = "Evidence reviewed";
+  evidenceReviewedSummary.textContent = result.mode === "project_context"
+    ? "Project facts reviewed"
+    : "Evidence reviewed";
   const evidenceReviewedBody = document.createElement("section");
   evidenceReviewedBody.className = "research-evidence-reviewed-body";
 
@@ -15504,7 +15506,10 @@ function renderResearchInterpretation(container, result, options = {}) {
   const citedProvisionCount = Number(sourceSummary.citedProvisionCount || 0);
   const supportingCitationCount = Number(sourceSummary.supportingCitationCount || 0);
   const reviewedOnlyProvisionCount = Number(sourceSummary.reviewedOnlyProvisionCount || 0);
-  const sourceScope = citedProvisionCount
+  const projectFactCount = Number(sourceSummary.projectFactCount || 0);
+  const sourceScope = result.mode === "project_context" && projectFactCount
+    ? `Based on ${projectFactCount} saved Project ${projectFactCount === 1 ? "fact" : "facts"}`
+    : citedProvisionCount
     ? [
         `Cited ${citedProvisionCount} enacted ${citedProvisionCount === 1 ? "provision" : "provisions"}`,
         supportingCitationCount

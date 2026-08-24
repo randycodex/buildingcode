@@ -598,7 +598,29 @@ export function immutableResearchAnswer({
   reviewStatus = "unreviewed",
   userFeedback = null
 }) {
-  if (!Array.isArray(evidence) || evidence.length < 1) throw new Error("Research answers require evidence.");
+  const researchEvidence = Array.isArray(evidence) ? evidence : [];
+  const researchCitations = Array.isArray(citations) ? citations : [];
+  const projectContextAnswer =
+    answer?.mode === "project_context" &&
+    answer?.verification?.status === "project_context" &&
+    answer?.verification?.pass === true &&
+    answer?.verification?.reason === "PROJECT_CONTEXT_ONLY" &&
+    model === "permitext-deterministic-project-context" &&
+    answer?.model === "permitext-deterministic-project-context" &&
+    Boolean(projectID) &&
+    researchEvidence.length === 0 &&
+    researchCitations.length === 0 &&
+    typeof answer?.answerText === "string" && answer.answerText.trim().length > 0 &&
+    Array.isArray(answer?.factUsage?.projectContext) && answer.factUsage.projectContext.length > 0 &&
+    Array.isArray(answer?.supportedPoints) && answer.supportedPoints.length === 0 &&
+    Array.isArray(answer?.supportingSources) && answer.supportingSources.length === 0 &&
+    Array.isArray(answer?.citations) && answer.citations.length === 0 &&
+    Array.isArray(answer?.evidenceLimitations) && answer.evidenceLimitations.some((item) =>
+      /does not (?:interpret|determine)|not (?:a|an) (?:code|zoning|legal)/i.test(String(item || ""))
+    );
+  if (researchEvidence.length < 1 && !projectContextAnswer) {
+    throw new Error("Research answers require evidence.");
+  }
   const evidenceBoundaryAnswer =
     answer?.mode === "evidence_boundary" &&
     answer?.verification?.status === "evidence_boundary" &&
@@ -610,19 +632,18 @@ export function immutableResearchAnswer({
     Array.isArray(answer?.citations) && answer.citations.length === 0 &&
     Array.isArray(answer?.supportingSources) && answer.supportingSources.length === 0 &&
     Array.isArray(answer?.supportingSourceUses) && answer.supportingSourceUses.length === 0;
-  const researchCitations = Array.isArray(citations) ? citations : [];
-  if (researchCitations.length < 1 && !evidenceBoundaryAnswer) {
+  if (researchCitations.length < 1 && !evidenceBoundaryAnswer && !projectContextAnswer) {
     throw new Error("Research answers require citations.");
   }
-  const evidenceIDs = new Set(evidence.map((item) => item.id));
-  const sourceIDs = new Set(evidence.map((item) => item.sourceID));
+  const evidenceIDs = new Set(researchEvidence.map((item) => item.id));
+  const sourceIDs = new Set(researchEvidence.map((item) => item.sourceID));
   const mapping = researchCitations.map((citation) => {
     const citationSourceIDs = (citation.sourceIDs || []).filter((sourceID) => sourceIDs.has(sourceID));
     if (!citationSourceIDs.length) throw new Error("Research citation is not backed by the approved evidence set.");
     return {
       sectionID: requiredText(citation.sectionID, "citation section ID", 256),
       sourceIDs: citationSourceIDs,
-      evidenceSnapshotIDs: evidence
+      evidenceSnapshotIDs: researchEvidence
         .filter((item) => citationSourceIDs.includes(item.sourceID))
         .map((item) => item.id),
       relevance: String(citation.relevance || "").trim()
@@ -640,8 +661,10 @@ export function immutableResearchAnswer({
     conversationID: requiredText(conversationID, "conversation ID", 256),
     projectID: projectID ? requiredText(projectID, "project ID", 256) : null,
     question: requiredText(question, "research question", 2_000),
-    evidence,
-    evidenceSetVersion: Math.max(...evidence.map((item) => item.evidenceSetVersion)),
+    evidence: researchEvidence,
+    evidenceSetVersion: researchEvidence.length
+      ? Math.max(...researchEvidence.map((item) => item.evidenceSetVersion))
+      : 0,
     answer,
     codeBasis: answer?.codeBasis && typeof answer.codeBasis === "object"
       ? structuredClone(answer.codeBasis)
@@ -669,7 +692,7 @@ export function immutableResearchAnswer({
       typeof answer.structuredEvidenceAnalysis === "object"
       ? structuredClone(answer.structuredEvidenceAnalysis)
       : null,
-    citations,
+    citations: researchCitations,
     passageToCitationMapping: mapping,
     model: requiredText(model, "research model", 256),
     researchSystemVersion: requiredText(researchSystemVersion, "research system version", 256),
