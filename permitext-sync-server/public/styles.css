@@ -1401,6 +1401,10 @@ textarea:focus-visible {
   transition: transform 260ms cubic-bezier(0.2, 0, 0, 1), opacity 180ms ease;
 }
 
+.panel-track > .workspace-panel {
+  border-inline: 0;
+}
+
 .workboard-panel {
   --pane-min-width: min(420px, 82vw);
   --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
@@ -1755,10 +1759,9 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 50%;
-  width: 0.5px;
+  left: 0;
+  width: 1px;
   content: "";
-  transform: translateX(-50%);
   background: var(--border);
   pointer-events: none;
 }

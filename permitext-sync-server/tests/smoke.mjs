@@ -1219,7 +1219,8 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.pane-divider \{[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.pane-divider::before \{[\s\S]*?width: 0\.5px;[\s\S]*?background: var\(--border\);/) &&
+        workspaceStyles.text.match(/\.panel-track > \.workspace-panel \{[\s\S]*?border-inline: 0;/) &&
+        workspaceStyles.text.match(/\.pane-divider::before \{[\s\S]*?width: 1px;[\s\S]*?background: var\(--border\);/) &&
         workspaceStyles.text.match(/\.pane-divider::after \{[\s\S]*?width: 14px;/),
       "Column dividers should render as hairlines without shrinking their resize target."
     );

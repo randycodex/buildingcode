@@ -379,10 +379,19 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             encoding: .utf8
         )
 
-        XCTAssertTrue(browseSource.contains("Text(selectedVersionName)"))
-        XCTAssertTrue(browseSource.contains(".accessibilityIdentifier(\"reader-source-edition\")"))
-        XCTAssertFalse(browseSource.contains("Source jurisdiction ·"))
-        XCTAssertFalse(browseSource.contains("systemImage: \"text.book.closed\""))
+        let headerStart = try XCTUnwrap(browseSource.range(of: "private var libraryHeader: some View"))
+        let headerEnd = try XCTUnwrap(
+            browseSource.range(
+                of: "private var constructionCodeSectionNames",
+                range: headerStart.upperBound..<browseSource.endIndex
+            )
+        )
+        let headerSource = String(browseSource[headerStart.lowerBound..<headerEnd.lowerBound])
+
+        XCTAssertTrue(headerSource.contains("Text(selectedVersionName)"))
+        XCTAssertTrue(headerSource.contains(".accessibilityIdentifier(\"reader-source-edition\")"))
+        XCTAssertFalse(headerSource.contains("Source jurisdiction ·"))
+        XCTAssertFalse(headerSource.contains("systemImage: \"text.book.closed\""))
     }
 
     func testPhase5FirstUseGateOffersOnlyGenuinelyNewInstallations() {
@@ -1965,8 +1974,8 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(appSource.contains("Clerk.clearAllKeychainItemsAndWait()"))
         XCTAssertFalse(appSource.contains("try? await clerk.auth.signOut()"))
         XCTAssertTrue(settingsSource.contains("await library.signOut(clerk: clerk)"))
-        XCTAssertTrue(bookmarksSource.contains("@Environment(\\.permitextClerk) private var clerk"))
-        XCTAssertTrue(bookmarksSource.contains("await library.signOut(clerk: clerk)"))
+        XCTAssertFalse(bookmarksSource.contains("@Environment(\\.permitextClerk) private var clerk"))
+        XCTAssertFalse(bookmarksSource.contains("library.signOut(clerk:"))
         XCTAssertFalse(viewModelSource.contains("while isAccountBusy"))
         XCTAssertFalse(settingsSource.contains("try? await clerk.auth.signOut()"))
 
