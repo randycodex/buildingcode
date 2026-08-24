@@ -6669,6 +6669,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   margin: var(--space-2) 0 0;
 }
 
+.research-usage .ghost-button {
+  margin-top: var(--space-2);
+}
+
 .research-conversation-list {
   display: grid;
 }
@@ -11686,6 +11690,24 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-primary);
   font-size: inherit !important;
   text-align: right;
+}
+
+.settings-research-packs {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.settings-research-packs[hidden] {
+  display: none;
+}
+
+.settings-research-pack-actions {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.settings-research-pack-actions .settings-secondary-button {
+  width: 100%;
 }
 
 .settings-feature-row {

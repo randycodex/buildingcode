@@ -4034,6 +4034,132 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(decoded.document[3].content?.first?.props?.referenceKind, "canonicalSection")
         XCTAssertEqual(decoded.document[4].props.caption, "Existing condition")
     }
+
+    func testResearchTurnAllowanceDecodesServerContract() throws {
+        let data = Data(
+            """
+            {
+              "usage": {
+                "includedLimit": 100,
+                "includedUsed": 100,
+                "includedRemaining": 0,
+                "purchasedRemaining": 25,
+                "totalRemaining": 25,
+                "periodStart": "2026-08-01T00:00:00Z",
+                "resetsAt": "2026-09-01T00:00:00Z",
+                "canResearch": true,
+                "purchaseRequired": false,
+                "paidContinuationEnabled": true,
+                "canBuyMore": true,
+                "packs": [
+                  {
+                    "id": "research_25",
+                    "turns": 25,
+                    "webAvailable": true,
+                    "appleProductID": "com.randycodex.permitext.research.turns.25"
+                  }
+                ],
+                "mockMode": false,
+                "evidenceDiscoveryEnabled": true
+              }
+            }
+            """.utf8
+        )
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+
+        let response = try decoder.decode(BackendResearchUsageResponse.self, from: data)
+
+        XCTAssertEqual(response.usage.includedLimit, 100)
+        XCTAssertEqual(response.usage.includedRemaining, 0)
+        XCTAssertEqual(response.usage.purchasedRemaining, 25)
+        XCTAssertTrue(response.usage.canResearch)
+        XCTAssertTrue(response.usage.paidContinuationEnabled)
+        XCTAssertEqual(response.usage.packs.first?.appleProductID, StoreKitProductID.researchTurns25)
+    }
+
+    func testResearchTurnStoreKitConfigContainsOnlyLocalTestConsumables() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let configurationURL = projectRoot.appendingPathComponent("permitext/Resources/Permitext.storekit")
+        let object = try XCTUnwrap(
+            try JSONSerialization.jsonObject(with: Data(contentsOf: configurationURL)) as? [String: Any]
+        )
+        let products = try XCTUnwrap(object["products"] as? [[String: Any]])
+        let productsByID = Dictionary(
+            uniqueKeysWithValues: products.compactMap { product -> (String, [String: Any])? in
+                guard let productID = product["productID"] as? String else { return nil }
+                return (productID, product)
+            }
+        )
+
+        for productID in StoreKitProductID.researchTurnPacks {
+            let product = try XCTUnwrap(productsByID[productID])
+            XCTAssertEqual(product["type"] as? String, "Consumable")
+            XCTAssertEqual(product["displayPrice"] as? String, "0.99")
+            XCTAssertTrue((product["referenceName"] as? String)?.contains("Local Test") == true)
+        }
+    }
+
+    func testResearchTurnPurchaseRequiresServerAcknowledgementBeforeStoreKitFinish() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let modelSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Models/CodeModels.swift"),
+            encoding: .utf8
+        )
+        let viewModelSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/ViewModels/CodeLibraryViewModel.swift"),
+            encoding: .utf8
+        )
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
+        let researchSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/ResearchView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(modelSource.contains("post(\"billing/apple/account-token\""))
+        XCTAssertTrue(modelSource.contains("post(\"billing/apple/transactions/verify\""))
+        XCTAssertTrue(modelSource.contains("post(\"research/usage\""))
+        XCTAssertTrue(viewModelSource.contains("options: [.appAccountToken(resolvedAccountToken)]"))
+
+        let processingStart = try XCTUnwrap(
+            viewModelSource.range(of: "private func processResearchTurnPurchase(")
+        )
+        let processingEnd = try XCTUnwrap(
+            viewModelSource.range(
+                of: "private func clearResearchTurnState()",
+                range: processingStart.upperBound..<viewModelSource.endIndex
+            )
+        )
+        let processingSource = String(
+            viewModelSource[processingStart.lowerBound..<processingEnd.lowerBound]
+        )
+        let verification = try XCTUnwrap(
+            processingSource.range(of: "verifyAppleResearchTurnPurchase(")
+        )
+        let acknowledgement = try XCTUnwrap(
+            processingSource.range(of: "response.credited == true || response.replayed == true")
+        )
+        let finish = try XCTUnwrap(
+            processingSource.range(of: "storeKitResearchTurnService.finish(purchase)")
+        )
+        XCTAssertLessThan(verification.lowerBound, acknowledgement.lowerBound)
+        XCTAssertLessThan(acknowledgement.lowerBound, finish.lowerBound)
+        XCTAssertTrue(processingSource.contains("backendError.serverCode == \"RESEARCH_PURCHASE_ALREADY_LINKED\""))
+        XCTAssertFalse(processingSource.contains("backendError.statusCode == 409 {"))
+        XCTAssertTrue(processingSource.contains("This Apple purchase is already linked to another Permitext account."))
+
+        XCTAssertTrue(settingsSource.contains("100 turns included monthly"))
+        XCTAssertTrue(settingsSource.contains("Additional turns do not expire and are used after the monthly included turns."))
+        XCTAssertTrue(settingsSource.contains("Unused additional Research turns (they are forfeited and are not automatically refunded)"))
+        XCTAssertTrue(researchSource.contains("You have used this month's included Research turns. Buy more turns to continue; your question is still here."))
+    }
 }
 
 final class NativeReaderPhase3ContractTests: XCTestCase {

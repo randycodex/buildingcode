@@ -38,6 +38,36 @@ const completeEnvironment = {
 };
 assert(beta1ConfigurationReadiness(completeEnvironment).ready, "Complete Beta 1 configuration was rejected.");
 assert(
+  beta1ConfigurationReadiness({
+    ...completeEnvironment,
+    PERMITEXT_RESEARCH_PAID_TURNS_ENABLED: "0"
+  }).ready,
+  "Beta 1 readiness required Research pack configuration while paid turns were disabled."
+);
+const paidTurnsEnvironment = {
+  ...completeEnvironment,
+  PERMITEXT_RESEARCH_PAID_TURNS_ENABLED: "1",
+  STRIPE_RESEARCH_TURNS_25_PRICE_ID: "price_research_25",
+  STRIPE_RESEARCH_TURNS_100_PRICE_ID: "price_research_100",
+  STOREKIT_RESEARCH_TURNS_25_PRODUCT_ID: "com.randycodex.permitext.research.turns.25",
+  STOREKIT_RESEARCH_TURNS_100_PRODUCT_ID: "com.randycodex.permitext.research.turns.100"
+};
+assert(
+  beta1ConfigurationReadiness(paidTurnsEnvironment).ready,
+  "Beta 1 readiness rejected complete paid Research turn pack configuration."
+);
+const missingPaidTurnsConfiguration = beta1ConfigurationReadiness({
+  ...paidTurnsEnvironment,
+  STRIPE_RESEARCH_TURNS_100_PRICE_ID: "",
+  STOREKIT_RESEARCH_TURNS_25_PRODUCT_ID: ""
+});
+assert(
+  !missingPaidTurnsConfiguration.ready &&
+    !missingPaidTurnsConfiguration.checks.find((item) => item.id === "stripe-research-turn-packs")?.ready &&
+    !missingPaidTurnsConfiguration.checks.find((item) => item.id === "apple-research-turn-packs")?.ready,
+  "Beta 1 readiness accepted incomplete paid Research turn pack configuration."
+);
+assert(
   !beta1ConfigurationReadiness({ ...completeEnvironment, CLERK_SECRET_KEY: "" }).ready,
   "Beta 1 readiness accepted missing Clerk verification."
 );

@@ -18,6 +18,11 @@ import {
   validateStripeRestoreOwnership,
   verifyAppleTransactionJWS
 } from "../app.mjs";
+import {
+  appleBillingAccountTokens,
+  mergedAppleBillingAccountTokens
+} from "../postgres-account-repository.mjs";
+import { readFile } from "node:fs/promises";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -40,6 +45,49 @@ function expectClientError(callback, statusCode, messageFragment) {
   }
   throw new Error(`Expected status ${statusCode}, but validation succeeded.`);
 }
+
+const sourceAppleBillingToken = "11111111-1111-4111-8111-111111111111";
+const targetAppleBillingToken = "22222222-2222-4222-8222-222222222222";
+const sourceOnlyBillingMerge = mergedAppleBillingAccountTokens(
+  { appleBillingAccountToken: sourceAppleBillingToken },
+  {}
+);
+assert(
+  sourceOnlyBillingMerge.appleBillingAccountToken === sourceAppleBillingToken,
+  "Account merge dropped the source Apple billing token when the target had no token."
+);
+const distinctBillingMerge = mergedAppleBillingAccountTokens(
+  {
+    appleBillingAccountToken: sourceAppleBillingToken,
+    appleBillingAccountTokenAliases: ["33333333-3333-4333-8333-333333333333"]
+  },
+  { appleBillingAccountToken: targetAppleBillingToken }
+);
+assert(
+  distinctBillingMerge.appleBillingAccountToken === targetAppleBillingToken,
+  "Account merge did not preserve the target Apple billing token as primary."
+);
+const acceptedMergedBillingTokens = appleBillingAccountTokens(distinctBillingMerge);
+assert(
+  acceptedMergedBillingTokens.has(sourceAppleBillingToken) &&
+    acceptedMergedBillingTokens.has(targetAppleBillingToken) &&
+    acceptedMergedBillingTokens.has("33333333-3333-4333-8333-333333333333"),
+  "Account merge did not preserve historical Apple billing tokens as accepted aliases."
+);
+const [billingAppSource, postgresAccountSource] = await Promise.all([
+  readFile(new URL("../app.mjs", import.meta.url), "utf8"),
+  readFile(new URL("../postgres-account-repository.mjs", import.meta.url), "utf8")
+]);
+assert(
+  /acceptedAccountTokens = appleBillingAccountTokens\(accountContext\.account\)/.test(billingAppSource) &&
+    /acceptedAccountTokens\.has\(transactionAccountToken\)/.test(billingAppSource),
+  "Apple consumable verification does not accept merged billing-token aliases."
+);
+assert(
+  /const mergedAppleBillingTokens = mergedAppleBillingAccountTokens\([\s\S]*sourceContext\.account,[\s\S]*targetContext\.account/.test(postgresAccountSource) &&
+    /'appleBillingAccountTokenAliases'/.test(postgresAccountSource),
+  "PostgreSQL account merge does not persist Apple billing-token aliases."
+);
 
 const appleSubscriptionTransaction = {
   productId: "com.randycodex.permitext.pro.monthly",

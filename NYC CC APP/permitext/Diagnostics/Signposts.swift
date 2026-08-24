@@ -269,6 +269,12 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         return response.account
     }
 
+    func appleBillingAccountToken(account: SignedInAccount) async throws -> UUID {
+        try await transport.appleBillingAccountToken(
+            BackendAppleBillingAccountTokenRequest(auth: authContext(for: account))
+        ).appAccountToken
+    }
+
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement? {
         let response = try await transport.verifyAppleTransaction(
             BackendAppleTransactionVerifyRequest(
@@ -277,6 +283,26 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             )
         )
         return response.entitlement
+    }
+
+    func verifyAppleResearchTurnPurchase(
+        account: SignedInAccount,
+        productID: String,
+        signedTransactionInfo: String
+    ) async throws -> BackendAppleTransactionVerifyResponse {
+        try await transport.verifyAppleTransaction(
+            BackendAppleTransactionVerifyRequest(
+                auth: authContext(for: account),
+                signedTransactionInfo: signedTransactionInfo,
+                productID: productID
+            )
+        )
+    }
+
+    func researchTurnAllowance(account: SignedInAccount) async throws -> ResearchTurnAllowance {
+        try await transport.researchUsage(
+            BackendResearchUsageRequest(auth: authContext(for: account))
+        ).usage
     }
 
     func organizations(account: SignedInAccount) async throws -> [PermitextOrganization] {

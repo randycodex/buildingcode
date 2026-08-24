@@ -29,7 +29,8 @@ This is a product-specific working checklist, not legal approval or a substitute
 - Higinio Jimenez Manzano owns urgent support responses.
 - Distribution and marketing: United States only.
 - Free access: code reading and code search remain available.
-- Pro: $20 per month, no trial, no annual plan, and 100 Research turns per billing month.
+- Pro: $20 per month, no trial, no annual plan, and 100 Research turns per UTC calendar month.
+- Optional additional Research turn packs are one-time consumables that do not expire and are used after the included turns.
 - New York law governs. Dispute procedure and venue remain open for legal review.
 - The operator's private residential address must not appear in customer-facing pages. Provider and legal records may retain a nonpublic address where required.
 - Minimum age and confidential-data policy remain open and must not be replaced with placeholders in public documents.
@@ -43,6 +44,7 @@ This is a product-specific working checklist, not legal approval or a substitute
 - Outside those cases, charges are non-refundable and are not prorated, except where law requires otherwise or Permitext grants a remedy for a material service failure.
 - Refunds return to the original payment method. A full Stripe refund ends the related Pro entitlement when the verified provider event is processed; a partial refund does not automatically revoke it.
 - Apple controls App Store purchase and refund decisions. Users request those refunds through Apple, and Permitext follows Apple's verified refund or revocation event.
+- Verified turn-pack refunds reverse the related turns; if those turns were already used, future purchased turns first settle the balance without removing the next month's included turns.
 
 This owner-approved working policy remains subject to attorney review and is not a published promise yet.
 

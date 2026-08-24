@@ -7,7 +7,8 @@ This runbook is an evidence checklist. Passing unit tests does not authorize pub
 - Permitext Web sells Pro through Stripe Checkout and manages it through Stripe Billing Portal.
 - Permitext iOS sells Pro through StoreKit. It does not present a Stripe purchase path for digital access.
 - Both providers update the same Permitext entitlement record.
-- Beta 1 Pro is $20 per month, has no trial or annual plan, and includes 100 Research turns per billing month.
+- Beta 1 Pro is $20 per month, has no trial or annual plan, and includes 100 Research turns per UTC calendar month.
+- Optional Research turn packs are one-time, non-expiring consumables. They are shared through the Permitext account and are used only after the included monthly turns.
 - Code reading and code search remain available without a Pro subscription.
 - Clerk is the canonical sign-in provider for Apple, Google, and Microsoft identities.
 - Web Checkout, web restore, iOS StoreKit purchase, and iOS StoreKit restore all require an authenticated Permitext account before provider billing begins. On iOS, the purchase or restore action starts the production Clerk sign-in flow first when needed.
@@ -111,6 +112,20 @@ Perform Sandbox and TestFlight exercises first, then one controlled production p
 9. An unowned notification receives a retryable error until the signed client transaction establishes ownership.
 10. An account with active Stripe Pro cannot start a second Apple Pro purchase, and an account with active Apple Pro cannot start Stripe Checkout.
 
+## Research turn-pack lifecycle evidence
+
+Keep `PERMITEXT_RESEARCH_PAID_TURNS_ENABLED` disabled until every configured Stripe Price and App Store consumable has passed the applicable checks below. Pack sizes come from Permitext's server catalog; clients never submit an arbitrary credit quantity.
+
+1. A successful Stripe payment-mode Checkout or verified Apple consumable transaction credits the authenticated Permitext account exactly once.
+2. The Apple transaction's signed `appAccountToken` matches the stable token issued for that Permitext account.
+3. Duplicate Stripe events, Apple transaction uploads, notification retries, and client recovery after a lost response do not grant duplicate turns.
+4. Included turns are reserved first; purchased turns are reserved only after the monthly included allowance is exhausted.
+5. A failed or canceled Research request releases its reservation. A completed answer debits a purchased turn exactly once in the same durable commit as the saved answer.
+6. Full refunds and Apple `REFUND` or `REVOKE` add an idempotent reversal. Stripe partial refunds reconcile only the newly refunded fraction. Already-spent refunded credits create internal debt without removing the new month's included turns.
+7. Account merge combines balances without duplicating provider purchases. Account deletion forfeits spendable turns while retaining a minimal purchase tombstone that prevents replay after recreation.
+8. iOS finishes a consumable transaction only after the backend acknowledges the credit, and reprocesses unfinished transactions after relaunch or temporary network failure.
+9. Sandbox and TestFlight exercises use a staging backend configured to accept Sandbox transactions; Production continues to reject Sandbox transactions.
+
 ## Research cost safeguards
 
 Production Research fails closed unless all of these are configured:
@@ -134,6 +149,18 @@ PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT=100
 ```
 
 These are exposure ceilings, not spending targets. Review actual provider usage weekly and lower the request limit or disable Research before increasing the $100 system cap.
+
+The cost safeguards remain operational controls and must not be presented as customer-facing error messages. Before enabling paid continuation, configure:
+
+```text
+PERMITEXT_RESEARCH_PAID_TURNS_ENABLED=1
+STRIPE_RESEARCH_TURNS_25_PRICE_ID=<live one-time Stripe Price>
+STRIPE_RESEARCH_TURNS_100_PRICE_ID=<live one-time Stripe Price>
+STOREKIT_RESEARCH_TURNS_25_PRODUCT_ID=<approved consumable product ID>
+STOREKIT_RESEARCH_TURNS_100_PRODUCT_ID=<approved consumable product ID>
+```
+
+Do not enable the flag if either platform would show a pack that cannot be fulfilled and reconciled by the shared ledger.
 
 `PERMITEXT_RESEARCH_KILL_SWITCH=1` immediately prevents new paid Research requests. Each accepted turn atomically reserves its maximum exposure before a provider call, and every provider request consumes that reservation using its declared output-token ceiling.
 

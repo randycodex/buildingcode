@@ -44,6 +44,7 @@ struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openURL) private var openURL
+    @Environment(\.purchase) private var purchase
     @Environment(\.permitextClerk) private var clerk
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
@@ -286,7 +287,7 @@ struct SettingsView: View {
                         .accessibilityIdentifier("storekit-operation-message")
                 }
 
-                Text("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month. Code reading and search remain free.")
+                Text("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 selected-evidence Research turns each month. Code reading and search remain free.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -295,6 +296,10 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if library.currentPlan == .pro {
+                researchTurnPurchaseSection
             }
 
             if library.currentPlan == .pro,
@@ -359,6 +364,61 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .task {
             await library.refreshStoreKitEntitlements()
+        }
+    }
+
+    private var researchTurnPurchaseSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Divider()
+
+            Text("100 turns included monthly")
+                .font(.subheadline.weight(.semibold))
+
+            Text(library.researchTurnAllowanceSummary)
+                .font(.headline)
+                .foregroundStyle(.primary)
+
+            Text("Additional turns do not expire and are used after the monthly included turns.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(library.availableResearchTurnPacks) { pack in
+                Button {
+                    Task { await library.purchaseResearchTurnPack(pack, using: purchase) }
+                } label: {
+                    HStack {
+                        Text("\(pack.turns) additional turns")
+                        Spacer()
+                        Text(library.researchTurnDisplayPrice(for: pack) ?? "")
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(Color.black)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.96), in: Capsule(style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(library.isResearchTurnPurchaseBusy)
+                .opacity(library.isResearchTurnPurchaseBusy ? 0.6 : 1)
+            }
+
+            if library.isResearchTurnPurchaseBusy {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text("Contacting Apple...")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+
+            if let message = library.researchTurnPurchaseMessage {
+                Text(message)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
@@ -911,6 +971,7 @@ struct SettingsView: View {
             "Projects and their stored content",
             "Research history and reports",
             "Private images and synchronized data",
+            "Unused additional Research turns (they are forfeited and are not automatically refunded)",
             "Entitlements and organizations you own",
             "Permitext data stored on this device"
         ])
@@ -1467,7 +1528,7 @@ struct ProSubscriptionStoreView: View {
                     Text("Permitext Pro")
                         .font(.title2.weight(.bold))
 
-                    Text("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month.")
+                    Text("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 selected-evidence Research turns each month.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -1483,7 +1544,7 @@ struct ProSubscriptionStoreView: View {
                             .font(.headline)
                         Text("\(library.proProductDisplayPrice ?? "$20.00")/month")
                             .font(.title3.weight(.semibold))
-                        Text("Pro: unlimited saves, notes, Projects, Notebook, Report, exports, continuity, sync, and up to 100 Research turns each month.")
+                        Text("Pro: unlimited saves, notes, Projects, Notebook, Report, exports, continuity, sync, and 100 selected-evidence Research turns each month.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)

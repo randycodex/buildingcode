@@ -10,7 +10,11 @@ import {
 import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
+import {
+  appleBillingAccountTokens,
+  createPostgresAccountRepository,
+  mergedAppleBillingAccountTokens
+} from "./postgres-account-repository.mjs";
 import { ClerkCredentialError, clerkConfigurationStatus, verifyClerkCredential } from "./clerk-auth.mjs";
 import {
   LifetimeGrantAdminError,
@@ -69,6 +73,18 @@ import {
   hasActiveProEntitlement,
   hasActiveResearchEntitlement
 } from "./entitlement-contract.mjs";
+import {
+  includedResearchTurnLimit,
+  paidResearchTurnsEnabled,
+  publicResearchTurnPacks,
+  researchCreditClaimReconciliation,
+  researchCreditPackByID,
+  researchCreditPackForAppleProductID,
+  researchCreditPackForStripeObject,
+  researchCreditRefundTarget,
+  researchTurnFundingDecision,
+  researchTurnState
+} from "./research-turns.mjs";
 import {
   evidenceReviewPayload,
   invitationState,
@@ -430,6 +446,8 @@ const emptyStore = () => ({
   migrationCheckpointsByUserID: {},
   researchConversationsByUserID: {},
   researchUsageByUserID: {},
+  researchCreditsByUserID: {},
+  researchPurchaseClaimsByID: {},
   researchFeedbackByUserID: {},
   organizations: {},
   organizationMembershipsByOrganizationID: {},
@@ -844,6 +862,16 @@ function createFileStoreAdapter() {
       delete store.migrationCheckpointsByUserID[userID];
       delete store.researchConversationsByUserID[userID];
       delete store.researchUsageByUserID[userID];
+      delete store.researchCreditsByUserID[userID];
+      for (const [claimID, claim] of Object.entries(store.researchPurchaseClaimsByID || {})) {
+        if (claim.creditedUserID === userID) {
+          store.researchPurchaseClaimsByID[claimID] = {
+            ...claim,
+            creditedUserID: null,
+            deletedAt: new Date().toISOString()
+          };
+        }
+      }
       delete store.researchFeedbackByUserID[userID];
 
       for (const [credentialID, ownerUserID] of Object.entries(store.passkeyCredentials || {})) {
@@ -907,6 +935,11 @@ function createFileStoreAdapter() {
             (count, entries) => count + (entries?.length || 0),
             0
           ),
+          researchCredits: Object.values(store.researchCreditsByUserID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
+          ),
+          researchPurchaseClaims: Object.keys(store.researchPurchaseClaimsByID || {}).length,
           researchFeedback: Object.values(store.researchFeedbackByUserID || {}).reduce(
             (count, entries) => count + (entries?.length || 0),
             0
@@ -1600,6 +1633,107 @@ function createFileStoreAdapter() {
         entry.createdAt >= since && activeResearchUsageEntry(entry)
       );
     },
+    async researchCreditEntries(userID) {
+      const store = await this.read();
+      return (store.researchCreditsByUserID?.[userID] || []).slice();
+    },
+    async saveResearchCreditEntry(userID, entry) {
+      return withResearchUsageLock("__global_research_credits__", async () => {
+        const store = await this.read();
+        const existing = Object.entries(store.researchCreditsByUserID || {})
+          .flatMap(([ownerUserID, entries]) => (entries || []).map((item) => ({ ownerUserID, item })))
+          .find(({ item }) => item.id === entry.id);
+        if (existing) {
+          return {
+            created: false,
+            ownerUserID: existing.ownerUserID,
+            entry: existing.item
+          };
+        }
+        store.researchCreditsByUserID ||= {};
+        store.researchCreditsByUserID[userID] ||= [];
+        store.researchCreditsByUserID[userID].push(entry);
+        await this.write(store);
+        return { created: true, ownerUserID: userID, entry };
+      });
+    },
+    async claimResearchCreditPurchase(userID, claim, creditEntry) {
+      return withResearchUsageLock("__global_research_credits__", async () => {
+        const store = await this.read();
+        store.researchPurchaseClaimsByID ||= {};
+        const existing = store.researchPurchaseClaimsByID[claim.id];
+        if (existing) {
+          return {
+            created: false,
+            ownerUserID: existing.creditedUserID || null,
+            claim: existing
+          };
+        }
+        store.researchCreditsByUserID ||= {};
+        store.researchCreditsByUserID[userID] ||= [];
+        store.researchPurchaseClaimsByID[claim.id] = claim;
+        store.researchCreditsByUserID[userID].push(creditEntry);
+        await this.write(store);
+        return { created: true, ownerUserID: userID, claim };
+      });
+    },
+    async researchCreditPurchaseClaim(claimID) {
+      const store = await this.read();
+      return store.researchPurchaseClaimsByID?.[claimID] || null;
+    },
+    async researchCreditPurchaseClaimByPaymentID(provider, providerPaymentID) {
+      const store = await this.read();
+      return Object.values(store.researchPurchaseClaimsByID || {}).find((claim) =>
+        claim.provider === provider && claim.providerPaymentID === providerPaymentID
+      ) || null;
+    },
+    async reconcileResearchCreditPurchase(claimID, reconciliation) {
+      return withResearchUsageLock("__global_research_credits__", async () => {
+        const store = await this.read();
+        const claim = store.researchPurchaseClaimsByID?.[claimID] || null;
+        if (!claim) return { applied: false, reason: "claim_not_found", claim: null };
+        const decision = researchCreditClaimReconciliation({ claim, ...reconciliation });
+        if (!decision.applied) return { ...decision, claim };
+
+        store.researchPurchaseClaimsByID[claimID] = decision.nextClaim;
+        let creditEntry = null;
+        if (decision.creditUnits !== 0 && decision.nextClaim.creditedUserID) {
+          const entryID = `reconciliation:${claimID}:${reconciliation.eventID}`;
+          const existingEntry = Object.values(store.researchCreditsByUserID || {})
+            .flatMap((entries) => entries || [])
+            .find((entry) => entry.id === entryID);
+          if (!existingEntry) {
+            const source = decision.creditUnits > 0
+              ? `${decision.nextClaim.provider}_refund_reversed`
+              : `${decision.nextClaim.provider}_${decision.nextClaim.status}`;
+            creditEntry = {
+              id: entryID,
+              units: decision.creditUnits,
+              source,
+              sourceID: reconciliation.eventID,
+              packID: decision.nextClaim.metadata?.packID || null,
+              providerPaymentID: decision.nextClaim.providerPaymentID || null,
+              metadata: {
+                reason: reconciliation.reason || null,
+                targetRevokedUnits: decision.targetRevokedUnits,
+                refundedAmount: decision.nextClaim.refundedAmount
+              },
+              createdAt: reconciliation.createdAt || new Date().toISOString()
+            };
+            store.researchCreditsByUserID ||= {};
+            store.researchCreditsByUserID[decision.nextClaim.creditedUserID] ||= [];
+            store.researchCreditsByUserID[decision.nextClaim.creditedUserID].push(creditEntry);
+          }
+        }
+        await this.write(store);
+        return {
+          ...decision,
+          ownerUserID: decision.nextClaim.creditedUserID || null,
+          claim: decision.nextClaim,
+          creditEntry
+        };
+      });
+    },
     async researchSpendSince(since) {
       const store = await this.read();
       return Object.entries(store.researchUsageByUserID || {}).map(([userID, entries]) => {
@@ -1628,12 +1762,20 @@ function createFileStoreAdapter() {
         const retentionCutoff = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString();
         const retainedEntries = (store.researchUsageByUserID?.[userID] || [])
           .filter((entry) => entry.createdAt >= retentionCutoff);
-        if (retainedEntries.some((entry) => entry.id === reservation.id)) return false;
-        const entries = retainedEntries
-          .filter((entry) =>
-            entry.createdAt >= reservation.since && activeResearchUsageEntry(entry)
-          );
-        if (Number.isSafeInteger(reservation.limit) && entries.length >= reservation.limit) return false;
+        if (retainedEntries.some((entry) => entry.id === reservation.id)) {
+          return { reserved: false, reason: "duplicate" };
+        }
+        const decision = researchTurnFundingDecision({
+          usageEntries: retainedEntries,
+          creditEntries: store.researchCreditsByUserID?.[userID] || [],
+          periodStart: reservation.since,
+          periodEnd: reservation.periodEnd,
+          includedLimit: reservation.limit,
+          paidContinuationEnabled: reservation.paidContinuationEnabled
+        });
+        if (!decision.allowed) {
+          return { reserved: false, reason: "payment_required", state: decision.state };
+        }
         store.researchUsageByUserID ||= {};
         store.researchUsageByUserID[userID] = [
           ...retainedEntries,
@@ -1645,13 +1787,18 @@ function createFileStoreAdapter() {
             cachedInputTokens: 0,
             outputTokens: 0,
             totalTokens: 0,
+            fundingSource: decision.fundingSource,
             estimatedCostUSD: reservation.maximumRequestUSD,
             pricingVersion: reservation.pricingVersion,
             createdAt: reservation.createdAt
           }
         ];
         await this.write(store);
-        return true;
+        return {
+          reserved: true,
+          fundingSource: decision.fundingSource,
+          state: decision.state
+        };
       });
     },
     async completeResearchUsageReservation(userID, reservationID, entry) {
@@ -1664,7 +1811,25 @@ function createFileStoreAdapter() {
         if (index === -1) {
           throw new Error("Research usage reservation was not found.");
         }
-        entries[index] = { ...entry, id: reservationID };
+        const fundingSource = entries[index].fundingSource || "included";
+        entries[index] = { ...entry, id: reservationID, fundingSource };
+        if (fundingSource === "purchased") {
+          store.researchCreditsByUserID ||= {};
+          store.researchCreditsByUserID[userID] ||= [];
+          const debitID = `usage:${reservationID}`;
+          if (!store.researchCreditsByUserID[userID].some((item) => item.id === debitID)) {
+            store.researchCreditsByUserID[userID].push({
+              id: debitID,
+              units: -1,
+              source: "research_turn",
+              sourceID: reservationID,
+              packID: null,
+              providerPaymentID: null,
+              metadata: {},
+              createdAt: entry.createdAt
+            });
+          }
+        }
         await this.write(store);
       });
     },
@@ -1734,6 +1899,8 @@ function storeHasData(store) {
     migrationCheckpointsByUserID: store.migrationCheckpointsByUserID,
     researchConversationsByUserID: store.researchConversationsByUserID,
     researchUsageByUserID: store.researchUsageByUserID,
+    researchCreditsByUserID: store.researchCreditsByUserID,
+    researchPurchaseClaimsByID: store.researchPurchaseClaimsByID,
     researchFeedbackByUserID: store.researchFeedbackByUserID,
     organizations: store.organizations,
     organizationMembershipsByOrganizationID: store.organizationMembershipsByOrganizationID,
@@ -1793,8 +1960,11 @@ async function createPostgresStoreAdapter() {
   const organizationRepository = createPostgresOrganizationRepository(sql);
   const rateLimitRepository = createPostgresRateLimitRepository(sql);
   const accountRepository = createPostgresAccountRepository(sql, {
-    mergeUserQueries: (sourceUserID, targetUserID) =>
-      organizationRepository.mergeUserQueries(sourceUserID, targetUserID)
+    mergeUserQueries: (sourceUserID, targetUserID) => [
+      ...organizationRepository.mergeUserQueries(sourceUserID, targetUserID),
+      sql`UPDATE permitext_research_credits SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
+      sql`UPDATE permitext_research_purchase_claims SET credited_user_id = ${targetUserID} WHERE credited_user_id = ${sourceUserID}`
+    ]
   });
   const syncRepository = createPostgresSyncRepository(sql);
 
@@ -2251,9 +2421,62 @@ async function createPostgresStoreAdapter() {
     await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS evidence_version TEXT`;
     await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS estimated_cost_usd NUMERIC`;
     await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS pricing_version TEXT`;
+    await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS funding_source TEXT NOT NULL DEFAULT 'included'`;
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_research_usage_user_created_idx
       ON permitext_research_usage (user_id, created_at DESC)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_research_credits (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        units INTEGER NOT NULL CHECK (units <> 0),
+        source TEXT NOT NULL,
+        source_id TEXT NOT NULL,
+        pack_id TEXT,
+        provider_payment_id TEXT,
+        metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_credits_user_created_idx
+      ON permitext_research_credits (user_id, created_at DESC)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_research_purchase_claims (
+        id TEXT PRIMARY KEY,
+        provider TEXT NOT NULL,
+        provider_purchase_id TEXT NOT NULL,
+        provider_payment_id TEXT,
+        product_id TEXT NOT NULL,
+        units INTEGER NOT NULL CHECK (units > 0),
+        credited_user_id TEXT,
+        status TEXT NOT NULL DEFAULT 'credited',
+        revoked_units INTEGER NOT NULL DEFAULT 0,
+        refunded_amount BIGINT NOT NULL DEFAULT 0,
+        last_reversal_event_id TEXT,
+        last_reversal_signed_date BIGINT NOT NULL DEFAULT 0,
+        metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ,
+        CHECK (revoked_units >= 0 AND revoked_units <= units),
+        CHECK (refunded_amount >= 0),
+        CHECK (last_reversal_signed_date >= 0)
+      )
+    `;
+    await sql`ALTER TABLE permitext_research_purchase_claims ADD COLUMN IF NOT EXISTS provider_payment_id TEXT`;
+    await sql`ALTER TABLE permitext_research_purchase_claims ADD COLUMN IF NOT EXISTS revoked_units INTEGER NOT NULL DEFAULT 0`;
+    await sql`ALTER TABLE permitext_research_purchase_claims ADD COLUMN IF NOT EXISTS refunded_amount BIGINT NOT NULL DEFAULT 0`;
+    await sql`ALTER TABLE permitext_research_purchase_claims ADD COLUMN IF NOT EXISTS last_reversal_event_id TEXT`;
+    await sql`ALTER TABLE permitext_research_purchase_claims ADD COLUMN IF NOT EXISTS last_reversal_signed_date BIGINT NOT NULL DEFAULT 0`;
+    await sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS permitext_research_purchase_provider_id_idx
+      ON permitext_research_purchase_claims (provider, provider_purchase_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_purchase_provider_payment_idx
+      ON permitext_research_purchase_claims (provider, provider_payment_id)
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_research_feedback (
@@ -2630,6 +2853,8 @@ async function createPostgresStoreAdapter() {
         (SELECT count(*) FROM permitext_project_activity)::int AS project_activity,
         (SELECT count(*) FROM permitext_migration_checkpoints)::int AS migration_checkpoints,
         (SELECT count(*) FROM permitext_research_usage)::int AS research_usage,
+        (SELECT count(*) FROM permitext_research_credits)::int AS research_credits,
+        (SELECT count(*) FROM permitext_research_purchase_claims)::int AS research_purchase_claims,
         (SELECT count(*) FROM permitext_research_feedback)::int AS research_feedback,
         (SELECT count(*) FROM permitext_organizations)::int AS organizations,
         (SELECT count(*) FROM permitext_organization_memberships)::int AS organization_memberships,
@@ -2665,6 +2890,8 @@ async function createPostgresStoreAdapter() {
         activityEvents: Number(row.project_activity || 0),
         migrationCheckpoints: Number(row.migration_checkpoints || 0),
         researchUsage: Number(row.research_usage || 0),
+        researchCredits: Number(row.research_credits || 0),
+        researchPurchaseClaims: Number(row.research_purchase_claims || 0),
         researchFeedback: Number(row.research_feedback || 0),
         organizations: Number(row.organizations || 0),
         organizationMemberships: Number(row.organization_memberships || 0),
@@ -3201,6 +3428,13 @@ async function createPostgresStoreAdapter() {
         sql`DELETE FROM permitext_migration_checkpoints WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_research_feedback WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_research_usage WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_research_credits WHERE user_id = ${userID}`,
+        sql`
+          UPDATE permitext_research_purchase_claims
+          SET credited_user_id = NULL,
+              deleted_at = now()
+          WHERE credited_user_id = ${userID}
+        `,
         sql`DELETE FROM permitext_research_conversations WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_user_content_records WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_account_sessions WHERE user_id = ${userID}`,
@@ -4005,6 +4239,162 @@ async function createPostgresStoreAdapter() {
         })
       };
     },
+    async claimResearchCreditPurchase(userID, claim, creditEntry) {
+      await ensureSchema();
+      const rows = await sql`
+        WITH claimed AS (
+          INSERT INTO permitext_research_purchase_claims (
+            id, provider, provider_purchase_id, provider_payment_id, product_id, units,
+            credited_user_id, status, revoked_units, refunded_amount,
+            last_reversal_event_id, last_reversal_signed_date, metadata, created_at
+          )
+          VALUES (
+            ${claim.id}, ${claim.provider}, ${claim.providerPurchaseID},
+            ${claim.providerPaymentID || null}, ${claim.productID}, ${claim.units},
+            ${userID}, ${claim.status || "credited"}, ${claim.revokedUnits || 0},
+            ${claim.refundedAmount || 0}, ${claim.lastReversalEventID || null},
+            ${claim.lastReversalSignedDate || 0},
+            ${JSON.stringify(claim.metadata || {})}::jsonb, ${claim.createdAt}::timestamptz
+          )
+          ON CONFLICT (id) DO NOTHING
+          RETURNING id
+        )
+        INSERT INTO permitext_research_credits (
+          id, user_id, units, source, source_id, pack_id, provider_payment_id, metadata, created_at
+        )
+        SELECT
+          ${creditEntry.id}, ${userID}, ${creditEntry.units}, ${creditEntry.source},
+          ${creditEntry.sourceID}, ${creditEntry.packID || null},
+          ${creditEntry.providerPaymentID || null},
+          ${JSON.stringify(creditEntry.metadata || {})}::jsonb, ${creditEntry.createdAt}::timestamptz
+        FROM claimed
+        ON CONFLICT (id) DO NOTHING
+        RETURNING id
+      `;
+      if (rows.length) return { created: true, ownerUserID: userID, claim };
+      const existing = await sql`
+        SELECT credited_user_id
+        FROM permitext_research_purchase_claims
+        WHERE id = ${claim.id}
+        LIMIT 1
+      `;
+      return {
+        created: false,
+        ownerUserID: existing[0]?.credited_user_id || null,
+        claim
+      };
+    },
+    async researchCreditPurchaseClaim(claimID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT id, provider, provider_purchase_id, provider_payment_id, product_id, units,
+               credited_user_id, status, revoked_units, refunded_amount,
+               last_reversal_event_id, last_reversal_signed_date, metadata, created_at, deleted_at
+        FROM permitext_research_purchase_claims
+        WHERE id = ${claimID}
+        LIMIT 1
+      `;
+      const row = rows[0];
+      return row ? {
+        id: row.id,
+        provider: row.provider,
+        providerPurchaseID: row.provider_purchase_id,
+        providerPaymentID: row.provider_payment_id || null,
+        productID: row.product_id,
+        units: Number(row.units),
+        creditedUserID: row.credited_user_id || null,
+        status: row.status,
+        revokedUnits: Number(row.revoked_units || 0),
+        refundedAmount: Number(row.refunded_amount || 0),
+        lastReversalEventID: row.last_reversal_event_id || null,
+        lastReversalSignedDate: Number(row.last_reversal_signed_date || 0),
+        metadata: safeJSON(row.metadata, {}),
+        createdAt: dateToISO(row.created_at),
+        deletedAt: dateToISO(row.deleted_at)
+      } : null;
+    },
+    async researchCreditPurchaseClaimByPaymentID(provider, providerPaymentID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT id
+        FROM permitext_research_purchase_claims
+        WHERE provider = ${provider}
+          AND provider_payment_id = ${providerPaymentID}
+        ORDER BY created_at DESC
+        LIMIT 1
+      `;
+      return rows[0]?.id ? this.researchCreditPurchaseClaim(rows[0].id) : null;
+    },
+    async reconcileResearchCreditPurchase(claimID, reconciliation) {
+      await ensureSchema();
+      for (let attempt = 1; attempt <= 3; attempt += 1) {
+        const claim = await this.researchCreditPurchaseClaim(claimID);
+        if (!claim) return { applied: false, reason: "claim_not_found", claim: null };
+        const decision = researchCreditClaimReconciliation({ claim, ...reconciliation });
+        if (!decision.applied) return { ...decision, claim };
+
+        const entryID = `reconciliation:${claimID}:${reconciliation.eventID}`;
+        const source = decision.creditUnits > 0
+          ? `${claim.provider}_refund_reversed`
+          : `${claim.provider}_${decision.nextClaim.status}`;
+        let transactionResults;
+        try {
+          transactionResults = await sql.transaction([
+            sql`
+            WITH updated AS (
+              UPDATE permitext_research_purchase_claims
+              SET status = ${decision.nextClaim.status},
+                  revoked_units = ${decision.nextClaim.revokedUnits},
+                  refunded_amount = ${decision.nextClaim.refundedAmount},
+                  last_reversal_event_id = ${decision.nextClaim.lastReversalEventID},
+                  last_reversal_signed_date = ${decision.nextClaim.lastReversalSignedDate},
+                  metadata = ${JSON.stringify(decision.nextClaim.metadata || {})}::jsonb
+              WHERE id = ${claimID}
+                AND revoked_units = ${claim.revokedUnits || 0}
+                AND last_reversal_signed_date = ${claim.lastReversalSignedDate || 0}
+              RETURNING credited_user_id
+            ), credit AS (
+              INSERT INTO permitext_research_credits (
+                id, user_id, units, source, source_id, pack_id,
+                provider_payment_id, metadata, created_at
+              )
+              SELECT
+                ${entryID}, updated.credited_user_id, ${decision.creditUnits}, ${source},
+                ${reconciliation.eventID}, ${claim.metadata?.packID || null},
+                ${claim.providerPaymentID || null},
+                ${JSON.stringify({
+                  reason: reconciliation.reason || null,
+                  targetRevokedUnits: decision.targetRevokedUnits,
+                  refundedAmount: decision.nextClaim.refundedAmount
+                })}::jsonb,
+                ${reconciliation.createdAt || new Date().toISOString()}::timestamptz
+              FROM updated
+              WHERE updated.credited_user_id IS NOT NULL
+                AND ${decision.creditUnits}::integer <> 0
+              ON CONFLICT (id) DO NOTHING
+              RETURNING id
+            )
+            SELECT credited_user_id FROM updated
+            `
+          ], { isolationLevel: "Serializable" });
+        } catch (error) {
+          if (error?.code === "40001" && attempt < 3) continue;
+          throw error;
+        }
+        const [rows] = transactionResults;
+        if (rows?.length) {
+          return {
+            ...decision,
+            ownerUserID: rows[0].credited_user_id || null,
+            claim: decision.nextClaim
+          };
+        }
+        if (attempt === 3) {
+          throw new Error("Research credit reconciliation conflicted repeatedly.");
+        }
+      }
+      throw new Error("Research credit reconciliation was not applied.");
+    },
     async bumpArtifactRevisions(userID, { accountDomains = [], projects = [] } = {}) {
       await ensureSchema();
       const changes = [
@@ -4088,8 +4478,9 @@ async function createPostgresStoreAdapter() {
     async researchUsageSince(userID, since) {
       await ensureSchema();
       const rows = await sql`
-        SELECT id, model, mode, input_tokens, cached_input_tokens, output_tokens, total_tokens,
-               prompt_version, evidence_version, estimated_cost_usd, pricing_version, created_at
+        SELECT id, model, mode, funding_source, input_tokens, cached_input_tokens, output_tokens,
+               total_tokens, prompt_version, evidence_version, estimated_cost_usd,
+               pricing_version, created_at
         FROM permitext_research_usage
         WHERE user_id = ${userID}
           AND created_at >= ${since}::timestamptz
@@ -4103,6 +4494,7 @@ async function createPostgresStoreAdapter() {
         id: row.id,
         model: row.model,
         mode: row.mode,
+        fundingSource: row.funding_source || "included",
         inputTokens: Number(row.input_tokens || 0),
         cachedInputTokens: Number(row.cached_input_tokens || 0),
         outputTokens: Number(row.output_tokens || 0),
@@ -4113,6 +4505,62 @@ async function createPostgresStoreAdapter() {
         pricingVersion: row.pricing_version || null,
         createdAt: dateToISO(row.created_at)
       }));
+    },
+    async researchCreditEntries(userID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT id, units, source, source_id, pack_id, provider_payment_id, metadata, created_at
+        FROM permitext_research_credits
+        WHERE user_id = ${userID}
+        ORDER BY created_at ASC, id ASC
+      `;
+      return rows.map((row) => ({
+        id: row.id,
+        units: Number(row.units),
+        source: row.source,
+        sourceID: row.source_id,
+        packID: row.pack_id || null,
+        providerPaymentID: row.provider_payment_id || null,
+        metadata: safeJSON(row.metadata, {}),
+        createdAt: dateToISO(row.created_at)
+      }));
+    },
+    async saveResearchCreditEntry(userID, entry) {
+      await ensureSchema();
+      const rows = await sql`
+        INSERT INTO permitext_research_credits (
+          id, user_id, units, source, source_id, pack_id, provider_payment_id, metadata, created_at
+        )
+        VALUES (
+          ${entry.id}, ${userID}, ${entry.units}, ${entry.source}, ${entry.sourceID},
+          ${entry.packID || null}, ${entry.providerPaymentID || null},
+          ${JSON.stringify(entry.metadata || {})}::jsonb, ${entry.createdAt}::timestamptz
+        )
+        ON CONFLICT (id) DO NOTHING
+        RETURNING id
+      `;
+      if (rows.length) return { created: true, ownerUserID: userID, entry };
+      const existing = await sql`
+        SELECT user_id, units, source, source_id, pack_id, provider_payment_id, metadata, created_at
+        FROM permitext_research_credits
+        WHERE id = ${entry.id}
+        LIMIT 1
+      `;
+      const row = existing[0];
+      return {
+        created: false,
+        ownerUserID: row?.user_id || null,
+        entry: row ? {
+          id: entry.id,
+          units: Number(row.units),
+          source: row.source,
+          sourceID: row.source_id,
+          packID: row.pack_id || null,
+          providerPaymentID: row.provider_payment_id || null,
+          metadata: safeJSON(row.metadata, {}),
+          createdAt: dateToISO(row.created_at)
+        } : null
+      };
     },
     async researchSpendSince(since) {
       await ensureSchema();
@@ -4152,58 +4600,106 @@ async function createPostgresStoreAdapter() {
         try {
           const [rows] = await sql.transaction([
             sql`
+              WITH included_usage AS (
+                SELECT count(*)::integer AS used
+                FROM permitext_research_usage
+                WHERE user_id = ${userID}
+                  AND created_at >= ${reservation.since}::timestamptz
+                  AND funding_source NOT IN ('purchased', 'unmetered')
+                  AND (
+                    mode <> 'reservation'
+                    OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes'
+                  )
+              ), credit_balance AS (
+                SELECT COALESCE(sum(units), 0)::integer AS available
+                FROM permitext_research_credits
+                WHERE user_id = ${userID}
+              ), purchased_reservations AS (
+                SELECT count(*)::integer AS reserved
+                FROM permitext_research_usage
+                WHERE user_id = ${userID}
+                  AND funding_source = 'purchased'
+                  AND mode = 'reservation'
+                  AND created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes'
+              ), funding AS (
+                SELECT CASE
+                  WHEN included_usage.used < ${reservation.limit}::integer THEN 'included'
+                  WHEN ${Boolean(reservation.paidContinuationEnabled)}::boolean = false THEN 'unmetered'
+                  WHEN credit_balance.available - purchased_reservations.reserved > 0 THEN 'purchased'
+                  ELSE NULL
+                END AS source
+                FROM included_usage, credit_balance, purchased_reservations
+              )
               INSERT INTO permitext_research_usage (
-                id, user_id, model, mode, input_tokens, cached_input_tokens,
+                id, user_id, model, mode, funding_source, input_tokens, cached_input_tokens,
                 output_tokens, total_tokens, estimated_cost_usd, pricing_version, created_at
               )
               SELECT
-                ${reservation.id}, ${userID}, 'pending', 'reservation', 0, 0, 0, 0,
+                ${reservation.id}, ${userID}, 'pending', 'reservation', funding.source, 0, 0, 0, 0,
                 ${reservation.maximumRequestUSD}, ${reservation.pricingVersion},
                 ${reservation.createdAt}::timestamptz
-              WHERE (
-                ${reservation.limit}::integer IS NULL
-                OR (
-                  SELECT count(*)
-                  FROM permitext_research_usage
-                  WHERE user_id = ${userID}
-                    AND created_at >= ${reservation.since}::timestamptz
-                    AND (
-                      mode <> 'reservation'
-                      OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes'
-                    )
-                ) < ${reservation.limit}
-              )
+              FROM funding
+              WHERE funding.source IS NOT NULL
               ON CONFLICT (id) DO NOTHING
-              RETURNING id
+              RETURNING id, funding_source
             `
           ], { isolationLevel: "Serializable" });
-          return Boolean(rows?.length);
+          if (rows?.length) {
+            return {
+              reserved: true,
+              fundingSource: rows[0].funding_source || "included"
+            };
+          }
+          const duplicate = await sql`
+            SELECT id FROM permitext_research_usage
+            WHERE id = ${reservation.id} AND user_id = ${userID}
+            LIMIT 1
+          `;
+          return {
+            reserved: false,
+            reason: duplicate.length ? "duplicate" : "payment_required"
+          };
         } catch (error) {
           if (error?.code !== "40001" || attempt === 3) throw error;
         }
       }
-      return false;
+      return { reserved: false, reason: "payment_required" };
     },
     async completeResearchUsageReservation(userID, reservationID, entry) {
       await ensureSchema();
-      const rows = await sql`
-        UPDATE permitext_research_usage
-        SET model = ${entry.model},
-            mode = ${entry.mode},
-            input_tokens = ${entry.inputTokens},
-            cached_input_tokens = ${entry.cachedInputTokens || 0},
-            output_tokens = ${entry.outputTokens},
-            total_tokens = ${entry.totalTokens},
-            prompt_version = ${entry.promptVersion || null},
-            evidence_version = ${entry.evidenceVersion || null},
-            estimated_cost_usd = ${entry.estimatedCostUSD ?? null},
-            pricing_version = ${entry.pricingVersion || null},
-            created_at = ${entry.createdAt}::timestamptz
-        WHERE id = ${reservationID}
-          AND user_id = ${userID}
-          AND mode = 'reservation'
-        RETURNING id
-      `;
+      const [rows] = await sql.transaction([
+        sql`
+          UPDATE permitext_research_usage
+          SET model = ${entry.model},
+              mode = ${entry.mode},
+              input_tokens = ${entry.inputTokens},
+              cached_input_tokens = ${entry.cachedInputTokens || 0},
+              output_tokens = ${entry.outputTokens},
+              total_tokens = ${entry.totalTokens},
+              prompt_version = ${entry.promptVersion || null},
+              evidence_version = ${entry.evidenceVersion || null},
+              estimated_cost_usd = ${entry.estimatedCostUSD ?? null},
+              pricing_version = ${entry.pricingVersion || null},
+              created_at = ${entry.createdAt}::timestamptz
+          WHERE id = ${reservationID}
+            AND user_id = ${userID}
+            AND mode = 'reservation'
+          RETURNING id
+        `,
+        sql`
+          INSERT INTO permitext_research_credits (
+            id, user_id, units, source, source_id, metadata, created_at
+          )
+          SELECT
+            ${`usage:${reservationID}`}, ${userID}, -1, 'research_turn', ${reservationID},
+            '{}'::jsonb, ${entry.createdAt}::timestamptz
+          FROM permitext_research_usage
+          WHERE id = ${reservationID}
+            AND user_id = ${userID}
+            AND funding_source = 'purchased'
+          ON CONFLICT (id) DO NOTHING
+        `
+      ], { isolationLevel: "Serializable" });
       if (!rows.length) {
         throw new Error("Research usage reservation was not found.");
       }
@@ -4233,22 +4729,43 @@ async function createPostgresStoreAdapter() {
       const queries = [];
       if (reservationID && usageEntry) {
         queries.push(sql`
-          UPDATE permitext_research_usage
-          SET model = ${usageEntry.model},
-              mode = ${usageEntry.mode},
-              input_tokens = ${usageEntry.inputTokens},
-              cached_input_tokens = ${usageEntry.cachedInputTokens || 0},
-              output_tokens = ${usageEntry.outputTokens},
-              total_tokens = ${usageEntry.totalTokens},
-              prompt_version = ${usageEntry.promptVersion || null},
-              evidence_version = ${usageEntry.evidenceVersion || null},
-              estimated_cost_usd = ${usageEntry.estimatedCostUSD ?? null},
-              pricing_version = ${usageEntry.pricingVersion || null},
-              created_at = ${usageEntry.createdAt}::timestamptz
+          WITH committed_usage AS (
+            UPDATE permitext_research_usage
+            SET model = ${usageEntry.model},
+                mode = ${usageEntry.mode},
+                input_tokens = ${usageEntry.inputTokens},
+                cached_input_tokens = ${usageEntry.cachedInputTokens || 0},
+                output_tokens = ${usageEntry.outputTokens},
+                total_tokens = ${usageEntry.totalTokens},
+                prompt_version = ${usageEntry.promptVersion || null},
+                evidence_version = ${usageEntry.evidenceVersion || null},
+                estimated_cost_usd = ${usageEntry.estimatedCostUSD ?? null},
+                pricing_version = ${usageEntry.pricingVersion || null},
+                created_at = ${usageEntry.createdAt}::timestamptz
+            WHERE id = ${reservationID}
+              AND user_id = ${userID}
+              AND mode = 'reservation'
+            RETURNING id
+          ), committed_state AS (
+            SELECT (SELECT id FROM committed_usage LIMIT 1) AS id
+          )
+          SELECT
+            id,
+            1 / CASE WHEN id IS NULL THEN 0 ELSE 1 END AS reservation_assertion
+          FROM committed_state
+        `);
+        queries.push(sql`
+          INSERT INTO permitext_research_credits (
+            id, user_id, units, source, source_id, metadata, created_at
+          )
+          SELECT
+            ${`usage:${reservationID}`}, ${userID}, -1, 'research_turn', ${reservationID},
+            '{}'::jsonb, ${usageEntry.createdAt}::timestamptz
+          FROM permitext_research_usage
           WHERE id = ${reservationID}
             AND user_id = ${userID}
-            AND mode = 'reservation'
-          RETURNING id
+            AND funding_source = 'purchased'
+          ON CONFLICT (id) DO NOTHING
         `);
       }
       for (const snapshot of answer.evidence || []) {
@@ -4963,6 +5480,51 @@ async function researchUsageSince(userID, since) {
     : [];
 }
 
+async function researchCreditEntries(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.researchCreditEntries === "function"
+    ? adapter.researchCreditEntries(userID)
+    : [];
+}
+
+async function saveResearchCreditEntry(userID, entry) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveResearchCreditEntry !== "function") {
+    throw new Error("Research credit fulfillment is unavailable.");
+  }
+  return adapter.saveResearchCreditEntry(userID, entry);
+}
+
+async function claimResearchCreditPurchase(userID, claim, creditEntry) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.claimResearchCreditPurchase !== "function") {
+    throw new Error("Research purchase fulfillment is unavailable.");
+  }
+  return adapter.claimResearchCreditPurchase(userID, claim, creditEntry);
+}
+
+async function researchCreditPurchaseClaim(claimID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.researchCreditPurchaseClaim === "function"
+    ? adapter.researchCreditPurchaseClaim(claimID)
+    : null;
+}
+
+async function researchCreditPurchaseClaimByPaymentID(provider, providerPaymentID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.researchCreditPurchaseClaimByPaymentID === "function"
+    ? adapter.researchCreditPurchaseClaimByPaymentID(provider, providerPaymentID)
+    : null;
+}
+
+async function reconcileResearchCreditPurchase(claimID, reconciliation) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.reconcileResearchCreditPurchase !== "function") {
+    throw new Error("Research purchase reconciliation is unavailable.");
+  }
+  return adapter.reconcileResearchCreditPurchase(claimID, reconciliation);
+}
+
 async function researchSpendSince(since) {
   const adapter = await storeAdapter();
   return typeof adapter.researchSpendSince === "function"
@@ -5003,6 +5565,7 @@ export function applyResearchConversationMessageCommit(store, userID, {
   store.researchConversationsByUserID ||= {};
   store.activityEventsByUserID ||= {};
   store.researchUsageByUserID ||= {};
+  store.researchCreditsByUserID ||= {};
 
   const answers = store.researchAnswersByUserID[userID] || [];
   const existingAnswer = answers.find((item) => item.id === answer.id);
@@ -5026,8 +5589,25 @@ export function applyResearchConversationMessageCommit(store, userID, {
     if (usageIndex === -1) {
       throw new Error("Research usage reservation was not found.");
     }
-    usageEntries[usageIndex] = { ...usageEntry, id: reservationID };
+    const fundingSource = usageEntries[usageIndex].fundingSource || "included";
+    usageEntries[usageIndex] = { ...usageEntry, id: reservationID, fundingSource };
     store.researchUsageByUserID[userID] = usageEntries;
+    if (fundingSource === "purchased") {
+      store.researchCreditsByUserID[userID] ||= [];
+      const debitID = `usage:${reservationID}`;
+      if (!store.researchCreditsByUserID[userID].some((item) => item.id === debitID)) {
+        store.researchCreditsByUserID[userID].push({
+          id: debitID,
+          units: -1,
+          source: "research_turn",
+          sourceID: reservationID,
+          packID: null,
+          providerPaymentID: null,
+          metadata: {},
+          createdAt: usageEntry.createdAt
+        });
+      }
+    }
   }
 
   if (testThrowAfterUsage) {
@@ -14739,8 +15319,7 @@ function currentDayStart() {
 }
 
 function monthlyResearchRequestLimit() {
-  const configured = Number(process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT);
-  return Number.isSafeInteger(configured) && configured >= 1 && configured <= 100_000 ? configured : 100;
+  return includedResearchTurnLimit(process.env);
 }
 
 function researchMockMode() {
@@ -14753,13 +15332,51 @@ function nextMonthStart() {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
 }
 
-function researchUsageSummary(_entries, options = {}) {
-  const unlimited = hasActiveProEntitlement(options.entitlement);
+function researchUsageSummary(entries, options = {}) {
+  const pro = hasActiveProEntitlement(options.entitlement);
+  const paidContinuationEnabled = pro && paidResearchTurnsEnabled(process.env);
+  const state = researchTurnState({
+    usageEntries: entries,
+    creditEntries: options.creditEntries || [],
+    periodStart: currentMonthStart(),
+    periodEnd: nextMonthStart(),
+    includedLimit: monthlyResearchRequestLimit(),
+    paidContinuationEnabled
+  });
   return {
-    unlimited,
+    includedLimit: state.includedTurnLimit,
+    includedUsed: state.includedTurnsUsed,
+    includedRemaining: state.includedTurnsRemaining,
+    purchasedRemaining: state.purchasedTurnsRemaining,
+    totalRemaining: state.turnsRemaining,
+    periodStart: currentMonthStart(),
+    resetsAt: state.resetDate,
+    canResearch: pro && state.canResearch,
+    purchaseRequired: pro && state.purchaseRequired,
+    paidContinuationEnabled,
+    canBuyMore: paidContinuationEnabled && publicResearchTurnPacks(process.env).some((pack) =>
+      pack.webAvailable || pack.appleProductID
+    ),
+    packs: publicResearchTurnPacks(process.env),
     mockMode: Boolean(options.mockMode),
     evidenceDiscoveryEnabled: Boolean(options.evidenceDiscoveryEnabled)
   };
+}
+
+async function researchUsageForClient(userID, entitlement, options = {}) {
+  const mockMode = Boolean(options.mockMode);
+  const [entries, creditEntries] = mockMode
+    ? [[], []]
+    : await Promise.all([
+        researchUsageSince(userID, currentMonthStart()),
+        researchCreditEntries(userID)
+      ]);
+  return researchUsageSummary(entries, {
+    ...options,
+    mockMode,
+    entitlement,
+    creditEntries
+  });
 }
 
 async function internalResearchSpendReport() {
@@ -14788,11 +15405,9 @@ async function handleResearchUsage(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
   const mockMode = researchMockMode();
-  const entries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
   sendJSON(response, 200, {
-    usage: researchUsageSummary(entries, {
+    usage: await researchUsageForClient(context.userID, context.authContext.entitlement, {
       mockMode,
-      entitlement: context.authContext.entitlement,
       evidenceDiscoveryEnabled: evidenceDiscoveryFeatureEnabled() &&
         hasActiveResearchEntitlement(context.authContext.entitlement)
     })
@@ -15300,13 +15915,13 @@ async function handleResearchConversationMessage(request, response) {
       if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
     }
     const mockMode = researchMockMode();
-    const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
     progressResponse.json(200, {
       conversation: await researchConversationForClient(conversation, { userID: context.userID }),
-      usage: researchUsageSummary(usageEntries, {
-        mockMode,
-        entitlement: context.authContext.entitlement
-      }),
+      usage: await researchUsageForClient(
+        context.userID,
+        context.authContext.entitlement,
+        { mockMode }
+      ),
       requestID: researchRequestID,
       replayed: true
     });
@@ -15409,7 +16024,6 @@ async function handleResearchConversationMessage(request, response) {
       claimRole: "governing"
     }));
     const mockMode = researchMockMode();
-    const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
     const requestLimit = monthlyResearchRequestLimit();
     if (!mockMode) {
       const spendGuardrails = researchSpendGuardrails();
@@ -15420,19 +16034,26 @@ async function handleResearchConversationMessage(request, response) {
       }
       researchReservationID = randomUUID();
       researchReservationCreatedAt = new Date().toISOString();
-      const reserved = await reserveResearchUsage(context.userID, {
+      const reservation = await reserveResearchUsage(context.userID, {
         id: researchReservationID,
         since: currentMonthStart(),
+        periodEnd: nextMonthStart(),
         limit: requestLimit,
+        paidContinuationEnabled: paidResearchTurnsEnabled(process.env),
         maximumRequestUSD: spendGuardrails.maximumRequestUSD || 0,
         pricingVersion: spendGuardrails.pricingVersion,
         createdAt: researchReservationCreatedAt
       });
-      if (!reserved) {
+      if (!reservation.reserved) {
         researchReservationID = null;
-        progressResponse.json(429, {
-          error: "Research is temporarily unavailable while account capacity is reviewed.",
-          code: "RESEARCH_CAPACITY_REVIEW"
+        const usage = await researchUsageForClient(
+          context.userID,
+          context.authContext.entitlement
+        );
+        progressResponse.json(402, {
+          error: "You have used this month's included Research turns. Buy more turns to continue; your question is still here.",
+          code: "RESEARCH_TURNS_REQUIRED",
+          usage
         });
         return;
       }
@@ -15904,14 +16525,11 @@ async function handleResearchConversationMessage(request, response) {
     }));
     progressResponse.json(200, {
       conversation: await researchConversationForClient(conversation, { userID: context.userID }),
-      usage: researchUsageSummary(mockMode ? [] : [
-        ...usageEntries,
-        {
-          ...result.usage,
-          estimatedCostUSD: estimatedCost.estimatedUSD,
-          pricingVersion: estimatedCost.pricingVersion
-        }
-      ], { mockMode, entitlement: context.authContext.entitlement }),
+      usage: await researchUsageForClient(
+        context.userID,
+        context.authContext.entitlement,
+        { mockMode }
+      ),
       ...(researchRequestID ? { requestID: researchRequestID } : {}),
       artifactRevisions
     });
@@ -17936,6 +18554,69 @@ function stripeConfigured(packageID = entitlementPackageIDs.pro) {
   return stripeConfigurationStatus({ packageID }).ready;
 }
 
+function stripeResearchCreditConfigurationStatus(pack) {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const mode = stripeSecretKeyMode(secretKey);
+  if (!paidResearchTurnsEnabled(process.env)) {
+    return { ready: false, mode, message: "Additional Research turns are not available yet." };
+  }
+  if (!pack) {
+    return { ready: false, mode, message: "Choose an available Research turn pack." };
+  }
+  if (!String(secretKey || "").trim() || !pack.stripePriceID) {
+    return { ready: false, mode, message: "This Research turn pack is not configured yet." };
+  }
+  if (mode === "unknown" || (liveStripeRequired() && mode !== "live")) {
+    return { ready: false, mode, message: "Research turn checkout is not ready." };
+  }
+  return { ready: true, mode, message: null };
+}
+
+function researchPurchaseClaimID(provider, providerPurchaseID) {
+  return `${provider}:${String(providerPurchaseID || "").trim()}`;
+}
+
+async function fulfillResearchCreditPurchase({
+  userID,
+  provider,
+  providerPurchaseID,
+  providerPaymentID = null,
+  productID,
+  pack,
+  metadata = {},
+  createdAt = new Date().toISOString()
+}) {
+  const claimID = researchPurchaseClaimID(provider, providerPurchaseID);
+  if (!userID || !providerPurchaseID || !pack || !productID) {
+    throw new Error("Research credit fulfillment is missing verified purchase data.");
+  }
+  return claimResearchCreditPurchase(userID, {
+    id: claimID,
+    provider,
+    providerPurchaseID,
+    providerPaymentID,
+    productID,
+    units: pack.turns,
+    creditedUserID: userID,
+    status: "credited",
+    revokedUnits: 0,
+    refundedAmount: 0,
+    lastReversalEventID: null,
+    lastReversalSignedDate: 0,
+    metadata: { ...metadata, packID: pack.id },
+    createdAt
+  }, {
+    id: `purchase:${claimID}`,
+    units: pack.turns,
+    source: `${provider}_purchase`,
+    sourceID: providerPurchaseID,
+    packID: pack.id,
+    providerPaymentID,
+    metadata,
+    createdAt
+  });
+}
+
 function configuredPublicBaseURL(request) {
   const explicitURL =
     process.env.PERMITEXT_PUBLIC_BASE_URL ||
@@ -18505,7 +19186,10 @@ export function verifyAppleTransactionJWS(signedTransactionInfo) {
   if (bundleID && payload.bundleId !== bundleID) {
     throw new ClientAuthError(422, "Apple transaction bundle is invalid.");
   }
-  if (!applePackageIDForProductID(payload.productId)) {
+  if (
+    !applePackageIDForProductID(payload.productId) &&
+    !researchCreditPackForAppleProductID(payload.productId, process.env)
+  ) {
     throw new ClientAuthError(422, "Apple transaction product is invalid.");
   }
   validateAppleTransactionEnvironment(payload);
@@ -19187,7 +19871,16 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
   }));
   moveUserEntries("researchConversationsByUserID");
   moveUserEntries("researchUsageByUserID");
+  moveUserEntries("researchCreditsByUserID");
   moveUserEntries("researchFeedbackByUserID");
+  for (const [claimID, claim] of Object.entries(store.researchPurchaseClaimsByID || {})) {
+    if (claim.creditedUserID === sourceUserID) {
+      store.researchPurchaseClaimsByID[claimID] = {
+        ...claim,
+        creditedUserID: targetUserID
+      };
+    }
+  }
   store.migrationCheckpointsByUserID ||= {};
   store.migrationCheckpointsByUserID[targetUserID] = {
     ...(store.migrationCheckpointsByUserID[sourceUserID] || {}),
@@ -19303,6 +19996,15 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
   if (!targetAccount.displayName && sourceAccount.displayName) {
     targetAccount.displayName = sourceAccount.displayName;
   }
+  const mergedAppleBillingTokens = mergedAppleBillingAccountTokens(
+    sourceAccount,
+    targetAccount
+  );
+  if (mergedAppleBillingTokens.appleBillingAccountToken) {
+    targetAccount.appleBillingAccountToken = mergedAppleBillingTokens.appleBillingAccountToken;
+  }
+  targetAccount.appleBillingAccountTokenAliases =
+    mergedAppleBillingTokens.appleBillingAccountTokenAliases;
   targetAccount.migrationState = "localDataAttached";
   targetAccount.mergedAccountIDs = Array.from(new Set([
     ...(Array.isArray(targetAccount.mergedAccountIDs) ? targetAccount.mergedAccountIDs : []),
@@ -21106,6 +21808,81 @@ async function handleWebCheckout(request, response) {
   });
 }
 
+async function handleResearchCreditCheckout(request, response) {
+  const body = await readJSON(request);
+  const pack = researchCreditPackByID(body.packID, process.env);
+  const stripeStatus = stripeResearchCreditConfigurationStatus(pack);
+  if (!stripeStatus.ready) {
+    sendError(response, pack ? 503 : 400, stripeStatus.message);
+    return;
+  }
+  const userID = body.auth?.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  const accountContext = await authenticatedUserContext(request, response, userID);
+  if (!accountContext) return;
+  if (!hasActiveProEntitlement(accountContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Permitext Pro is required before buying additional Research turns.",
+      code: "PRO_REQUIRED_FOR_RESEARCH"
+    });
+    return;
+  }
+
+  const baseURL = configuredPublicBaseURL(request);
+  const successURL = sameOriginAbsoluteURL(
+    baseURL,
+    body.successURL,
+    `/?checkout=success&package=research-turns&session_id={CHECKOUT_SESSION_ID}`
+  );
+  const cancelURL = sameOriginAbsoluteURL(baseURL, body.cancelURL, "/?checkout=cancel");
+  if (!successURL || !cancelURL) {
+    sendError(response, 400, "Checkout return URLs must use the Permitext origin.");
+    return;
+  }
+  const purchaseMetadata = {
+    accountUserID: userID,
+    purchaseKind: "research_credits",
+    researchCreditPackID: pack.id,
+    researchCredits: String(pack.turns)
+  };
+  const formBody = encodedFormBody({
+    mode: "payment",
+    client_reference_id: userID,
+    success_url: successURL,
+    cancel_url: cancelURL,
+    allow_promotion_codes: true,
+    line_items: [{ price: pack.stripePriceID, quantity: 1 }],
+    metadata: purchaseMetadata,
+    payment_intent_data: { metadata: purchaseMetadata }
+  });
+  const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    method: "POST",
+    headers: {
+      authorization: `Basic ${Buffer.from(`${process.env.STRIPE_SECRET_KEY}:`).toString("base64")}`,
+      "content-type": "application/x-www-form-urlencoded"
+    },
+    body: formBody
+  });
+  const text = await stripeResponse.text();
+  const json = text ? JSON.parse(text) : {};
+  if (!stripeResponse.ok) {
+    sendError(response, stripeResponse.status, json.error?.message || "Stripe checkout failed.");
+    return;
+  }
+  if (liveStripeRequired() && json.livemode !== true) {
+    sendError(response, 502, "Stripe returned a test-mode checkout. No purchase was started.");
+    return;
+  }
+  sendJSON(response, 200, {
+    checkoutSessionID: json.id,
+    pack: { id: pack.id, turns: pack.turns },
+    url: json.url
+  });
+}
+
 async function handleWebPortal(request, response) {
   const stripeStatus = stripeConfigurationStatus();
   if (!stripeStatus.ready) {
@@ -21261,6 +22038,70 @@ async function handleStripeRestore(request, response) {
   });
 }
 
+async function fulfillStripeResearchCreditCheckout(object, event) {
+  if (
+    object?.mode !== "payment" ||
+    object?.payment_status !== "paid" ||
+    object?.metadata?.purchaseKind !== "research_credits"
+  ) return false;
+  const userID = stripeUserIDFromObject(object);
+  const pack = researchCreditPackForStripeObject(object, process.env);
+  if (!userID || !pack || !await persistedAccountExists(userID)) return false;
+  const result = await fulfillResearchCreditPurchase({
+    userID,
+    provider: "stripe",
+    providerPurchaseID: object.id,
+    providerPaymentID: stripeSubscriptionID(object.payment_intent),
+    productID: pack.stripePriceID,
+    pack,
+    metadata: {
+      stripeCheckoutSessionID: object.id,
+      stripeCustomerID: stripeSubscriptionID(object.customer),
+      stripePaymentIntentID: stripeSubscriptionID(object.payment_intent)
+    },
+    createdAt: stripeEventCreatedAt(event) || new Date().toISOString()
+  });
+  if (!result.created && result.ownerUserID && result.ownerUserID !== userID) {
+    console.error("Stripe Research credit purchase is already linked to another account.", {
+      checkoutSessionID: object.id
+    });
+    return false;
+  }
+  return result.created;
+}
+
+async function reconcileStripeResearchCreditRefund(object, event) {
+  const paymentIntentID = stripeSubscriptionID(object?.payment_intent);
+  const eventID = String(event?.id || "").trim();
+  if (!paymentIntentID || !eventID) return false;
+  const claim = await researchCreditPurchaseClaimByPaymentID("stripe", paymentIntentID);
+  if (!claim) return false;
+  const targetRevokedUnits = researchCreditRefundTarget({
+    units: claim.units,
+    amountTotal: object.amount,
+    amountRefunded: object.amount_refunded
+  });
+  if (targetRevokedUnits === null) {
+    console.error("Stripe Research credit refund amounts are not safely derivable.", {
+      stripeEventID: eventID,
+      chargeID: object?.id || null,
+      paymentIntentID
+    });
+    return false;
+  }
+  const signedDate = Number(event?.created) * 1000;
+  const result = await reconcileResearchCreditPurchase(claim.id, {
+    targetRevokedUnits,
+    eventID,
+    signedDate: Number.isSafeInteger(signedDate) && signedDate > 0 ? signedDate : null,
+    refundedAmount: Number(object.amount_refunded),
+    fullRevocationStatus: "refunded",
+    reason: targetRevokedUnits === claim.units ? "stripe_full_refund" : "stripe_partial_refund",
+    createdAt: stripeEventCreatedAt(event) || new Date().toISOString()
+  });
+  return result.applied;
+}
+
 async function handleStripeWebhook(request, response) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
@@ -21285,6 +22126,10 @@ async function handleStripeWebhook(request, response) {
 
   switch (event.type) {
   case "checkout.session.completed": {
+    if (object.mode === "payment") {
+      changed = await fulfillStripeResearchCreditCheckout(object, event);
+      break;
+    }
     const userID = stripeUserIDFromObject(object);
     const completedSubscriptionCheckout =
       object.mode === "subscription" &&
@@ -21304,6 +22149,10 @@ async function handleStripeWebhook(request, response) {
       });
       changed = true;
     }
+    break;
+  }
+  case "checkout.session.async_payment_succeeded": {
+    changed = await fulfillStripeResearchCreditCheckout(object, event);
     break;
   }
   case "customer.subscription.created":
@@ -21389,6 +22238,7 @@ async function handleStripeWebhook(request, response) {
     break;
   }
   case "charge.refunded": {
+    changed = await reconcileStripeResearchCreditRefund(object, event);
     const amount = Number(object.amount || 0);
     const amountRefunded = Number(object.amount_refunded || 0);
     const invoiceID = stripeSubscriptionID(object.invoice);
@@ -21412,7 +22262,7 @@ async function handleStripeWebhook(request, response) {
           source: "webSubscription",
           providerKey: "stripeSubscriptionID",
           providerValue: subscriptionID
-        });
+        }) || changed;
       }
     }
     break;
@@ -21457,6 +22307,56 @@ async function handleAppleTransactionVerify(request, response) {
 
   const transactionID = String(payload.transactionId || "");
   const originalTransactionID = String(payload.originalTransactionId || transactionID);
+  const creditPack = researchCreditPackForAppleProductID(payload.productId, process.env);
+  if (creditPack) {
+    if (!paidResearchTurnsEnabled(process.env)) {
+      sendError(response, 409, "Additional Research turns are not available yet.");
+      return;
+    }
+    const acceptedAccountTokens = appleBillingAccountTokens(accountContext.account);
+    const transactionAccountToken = String(payload.appAccountToken || "").toLowerCase();
+    if (!transactionAccountToken || !acceptedAccountTokens.has(transactionAccountToken)) {
+      sendError(response, 403, "This Apple purchase is not linked to the signed-in Permitext account.");
+      return;
+    }
+    if (!transactionID || Number(payload.quantity || 1) !== 1 || payload.revocationDate) {
+      sendError(response, 422, "This Apple Research turn purchase is not valid for fulfillment.");
+      return;
+    }
+    if (payload.type && String(payload.type).toLowerCase() !== "consumable") {
+      sendError(response, 422, "This Apple product is not a consumable Research turn pack.");
+      return;
+    }
+    const result = await fulfillResearchCreditPurchase({
+      userID,
+      provider: "apple",
+      providerPurchaseID: transactionID,
+      providerPaymentID: transactionID,
+      productID: payload.productId,
+      pack: creditPack,
+      metadata: {
+        appleTransactionID: transactionID,
+        appleEnvironment: payload.environment || null
+      },
+      createdAt: Number(payload.purchaseDate) > 0
+        ? new Date(Number(payload.purchaseDate)).toISOString()
+        : new Date().toISOString()
+    });
+    if (!result.created && result.ownerUserID !== userID) {
+      sendJSON(response, 409, {
+        error: "This Apple purchase is already linked to another Permitext account.",
+        code: "RESEARCH_PURCHASE_ALREADY_LINKED"
+      });
+      return;
+    }
+    sendJSON(response, 200, {
+      credited: result.created,
+      replayed: !result.created,
+      transaction: { productID: payload.productId, packID: creditPack.id },
+      usage: await researchUsageForClient(userID, accountContext.entitlement)
+    });
+    return;
+  }
   const packageID = applePackageIDForProductID(payload.productId);
   if (!transactionID || !originalTransactionID) {
     sendError(response, 422, "Apple transaction identifier is missing.");
@@ -21529,6 +22429,41 @@ async function handleAppleTransactionVerify(request, response) {
   });
 }
 
+async function handleAppleBillingAccountToken(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) return;
+  const existingToken = String(context.account?.appleBillingAccountToken || "").trim();
+  const accountToken = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    .test(existingToken)
+    ? existingToken
+    : randomUUID();
+  if (accountToken !== existingToken) {
+    const updatedAccount = {
+      ...context.account,
+      appleBillingAccountToken: accountToken
+    };
+    const adapter = await storeAdapter();
+    if (typeof adapter.updateAccount === "function") {
+      await adapter.updateAccount(userID, updatedAccount);
+    } else {
+      const store = await readStore();
+      if (!store.users?.[userID]) {
+        sendError(response, 404, "User not found.");
+        return;
+      }
+      store.users[userID] = updatedAccount;
+      await writeStore(store);
+    }
+  }
+  sendJSON(response, 200, { appAccountToken: accountToken });
+}
+
 async function handleAppleServerNotification(request, response) {
   const body = await readJSON(request);
   if (!body.signedPayload) {
@@ -21576,6 +22511,46 @@ async function handleAppleServerNotification(request, response) {
   const notificationType = String(notification.notificationType || "").trim().toUpperCase();
   if (!originalTransactionID || !notificationUUID || !notificationType || !Number.isSafeInteger(signedDate) || signedDate <= 0) {
     sendError(response, 422, "Apple notification identity is incomplete.");
+    return;
+  }
+
+  const creditPack = researchCreditPackForAppleProductID(transaction.productId, process.env);
+  if (creditPack) {
+    if (!transactionID) {
+      sendError(response, 422, "Apple Research purchase transaction identifier is missing.");
+      return;
+    }
+    if (!["REFUND", "REVOKE", "REFUND_REVERSED"].includes(notificationType)) {
+      sendJSON(response, 200, {
+        received: true,
+        changed: false,
+        reason: "no-credit-change"
+      });
+      return;
+    }
+    const claim = await researchCreditPurchaseClaim(
+      researchPurchaseClaimID("apple", transactionID)
+    );
+    if (!claim) {
+      sendError(response, 503, "Apple Research purchase ownership is not available yet; retry this notification.");
+      return;
+    }
+    const targetRevokedUnits = notificationType === "REFUND_REVERSED" ? 0 : claim.units;
+    const result = await reconcileResearchCreditPurchase(claim.id, {
+      targetRevokedUnits,
+      eventID: notificationUUID,
+      signedDate,
+      refundedAmount: 0,
+      fullRevocationStatus: notificationType === "REVOKE" ? "revoked" : "refunded",
+      reason: `apple_${notificationType.toLowerCase()}`,
+      createdAt: new Date(signedDate).toISOString()
+    });
+    sendJSON(response, 200, {
+      received: true,
+      changed: result.applied,
+      action: notificationType === "REFUND_REVERSED" ? "restore" : "revoke",
+      reason: result.reason
+    });
     return;
   }
 
@@ -24600,14 +25575,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
   if (mockMode && mockDelayMilliseconds) {
     await new Promise((resolve) => setTimeout(resolve, mockDelayMilliseconds));
   }
-  const usageEntries = mockMode ? [] : await researchUsageSince(actorUserID, currentMonthStart());
   const requestLimit = monthlyResearchRequestLimit();
-  if (!mockMode && usageEntries.length >= requestLimit) {
-    throw new CodeQuestionCommandError("Research is temporarily unavailable while account capacity is reviewed.", {
-      code: "RESEARCH_CAPACITY_REVIEW",
-      status: 429
-    });
-  }
   const reservationID = `cq-analysis-${createHash("sha256")
     .update(`${actorUserID}:${questionID}:${requestID}`)
     .digest("hex")}`;
@@ -24621,14 +25589,23 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
         error.code = "RESEARCH_SPEND_CAP";
         throw error;
       }
-      reserved = await reserveResearchUsage(actorUserID, {
+      const reservation = await reserveResearchUsage(actorUserID, {
         id: reservationID,
         since: currentMonthStart(),
+        periodEnd: nextMonthStart(),
         limit: requestLimit,
+        paidContinuationEnabled: paidResearchTurnsEnabled(process.env),
         maximumRequestUSD: spendGuardrails.maximumRequestUSD || 0,
         pricingVersion: spendGuardrails.pricingVersion,
         createdAt: new Date().toISOString()
       });
+      reserved = reservation.reserved;
+      if (!reserved && reservation.reason === "payment_required") {
+        throw new CodeQuestionCommandError(
+          "You have used this month's included Research turns. Buy more turns to continue.",
+          { code: "RESEARCH_TURNS_REQUIRED", status: 402 }
+        );
+      }
       if (!reserved) {
         throw new CodeQuestionCommandError("This analysis request is already running or completed.", {
           code: "CODE_QUESTION_ANALYSIS_IN_PROGRESS",
@@ -25998,10 +26975,12 @@ const handlers = {
   "account/profile": handleProfileUpdate,
   "account/passkeys/link": handlePasskeyLink,
   "billing/web/checkout": handleWebCheckout,
+  "billing/research/checkout": handleResearchCreditCheckout,
   "billing/web/portal": handleWebPortal,
   "billing/stripe/restore": handleStripeRestore,
   "billing/stripe/webhook": handleStripeWebhook,
   "billing/apple/transactions/verify": handleAppleTransactionVerify,
+  "billing/apple/account-token": handleAppleBillingAccountToken,
   "billing/apple/notifications": handleAppleServerNotification,
   "client-errors/report": handleClientErrorReport,
   "research/interpret": handleResearchInterpretation,
@@ -26296,8 +27275,10 @@ function requestMutatesFileStore(request) {
     path === "research/evidence/discover" ||
     path === "billing/stripe/webhook" ||
     path === "billing/web/checkout" ||
+    path === "billing/research/checkout" ||
     path === "billing/web/portal" ||
     path === "billing/apple/transactions/verify" ||
+    path === "billing/apple/account-token" ||
     path === "billing/apple/notifications" ||
     path === "client-errors/report"
   ) {

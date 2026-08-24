@@ -4,7 +4,36 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "2",
+      "localizations" : [
+        {
+          "description" : "Local StoreKit test product for 25 non-expiring Research turns.",
+          "displayName" : "25 Research Turns (Local Test)",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.randycodex.permitext.research.turns.25",
+      "referenceName" : "Permitext Research Turns 25 - Local Test",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "3",
+      "localizations" : [
+        {
+          "description" : "Local StoreKit test product for 100 non-expiring Research turns.",
+          "displayName" : "100 Research Turns (Local Test)",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.randycodex.permitext.research.turns.100",
+      "referenceName" : "Permitext Research Turns 100 - Local Test",
+      "type" : "Consumable"
+    }
   ],
   "settings" : {
     "_applicationInternalID" : "0",

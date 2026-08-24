@@ -452,7 +452,7 @@ async function main() {
         !settingsTemplateSource.includes('data-plan-option="research"') &&
         !settingsTemplateSource.includes("Upgrade option") &&
         settingsTemplateSource.includes("Upgrade to Pro - $20.00/month") &&
-        settingsTemplateSource.includes("up to 100 selected-evidence Research turns each month") &&
+        settingsTemplateSource.includes("100 selected-evidence Research turns each month") &&
         !settingsTemplateSource.includes("Research Add-On") &&
         !settingsTemplateSource.includes("account-research-checkout") &&
         !iosSettingsSource.includes("planFeatureRow(") &&
@@ -460,7 +460,7 @@ async function main() {
         iosSettingsSource.includes('Label(currentPlanTitle, systemImage: "checkmark.circle.fill")') &&
         iosSettingsSource.includes('Text("Active")') &&
         iosSettingsSource.includes('return "Lifetime Pro"') &&
-        iosSettingsSource.includes("up to 100 selected-evidence Research turns each month") &&
+        iosSettingsSource.includes("100 selected-evidence Research turns each month") &&
         !settingsTemplateSource.includes('class="settings-billing-line"'),
       "Settings lost the single $20 Pro plan with included Research or restored a separate Research add-on."
     );
@@ -1344,6 +1344,7 @@ async function main() {
         workspaceStyles.text.match(/\.settings-plan-usage \{[\s\S]*?background: transparent;/) &&
         workspaceStyles.text.includes(".settings-plan-usage[hidden] {\n  display: none;") &&
         workspaceScript.text.includes("function renderPlanUsageRows") &&
+        workspaceScript.text.includes('container.hidden = false;\n  container.setAttribute("aria-hidden", "false");') &&
         workspaceScript.text.includes("function refreshVisiblePlanUsage") &&
         workspaceScript.text.includes("scheduleAnnotationPush(record);\n  refreshVisiblePlanUsage();") &&
         workspaceScript.text.includes('card.style.removeProperty("--settings-card-content-height");') &&
@@ -1898,7 +1899,7 @@ async function main() {
         !workspaceScript.text.includes("account-plan-detail") &&
         webRoot.text.includes("Reading and search are available anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
         webRoot.text.includes("Pro is active, including Research. Projects, Notebook, Report, professional exports, offline access, and selected-evidence Research are unlocked.") &&
-        webRoot.text.includes("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month. Code reading and search remain free.") &&
+        webRoot.text.includes("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 selected-evidence Research turns each month. Code reading and search remain free.") &&
         workspaceScript.text.includes("New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices.") &&
         workspaceScript.text.includes("settingsAccountSummary(account ? state.account : null)") &&
         workspaceScript.text.includes("settingsPlanCopy({ pro, source })") &&
@@ -6180,14 +6181,18 @@ async function main() {
     });
     assert(
       researchUsage.response.ok &&
-        researchUsage.json.usage.unlimited === true &&
-        !("requestsUsed" in researchUsage.json.usage) &&
-        !("requestLimit" in researchUsage.json.usage) &&
-        !("resetDate" in researchUsage.json.usage) &&
+        researchUsage.json.usage.includedLimit === 100 &&
+        Number.isSafeInteger(researchUsage.json.usage.includedUsed) &&
+        Number.isSafeInteger(researchUsage.json.usage.includedRemaining) &&
+        Number.isSafeInteger(researchUsage.json.usage.purchasedRemaining) &&
+        researchUsage.json.usage.includedUsed + researchUsage.json.usage.includedRemaining === 100 &&
+        typeof researchUsage.json.usage.resetsAt === "string" &&
+        researchUsage.json.usage.canResearch === true &&
+        researchUsage.json.usage.purchaseRequired === false &&
         !("tokens" in researchUsage.json.usage) &&
         !("estimatedCostUSD" in researchUsage.json.usage) &&
         researchUsage.json.usage.evidenceDiscoveryEnabled === true,
-      "The public Pro Research contract exposed an internal quota or spend metric."
+      "The public Pro Research contract did not expose the customer allowance without leaking provider spend metrics."
     );
     const evaluationCasesBeforeFeedback = await readFile(
       join(evaluationRoot, "research-cases.json"),

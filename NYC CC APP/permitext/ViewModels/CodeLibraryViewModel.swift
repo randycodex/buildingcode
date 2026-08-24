@@ -139,6 +139,10 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var isStoreKitBusy = false
     @Published private(set) var isStoreKitRestoreInProgress = false
     @Published private(set) var storeKitOperationMessage: String?
+    @Published private(set) var researchTurnAllowance: ResearchTurnAllowance?
+    @Published private(set) var researchTurnProductDisplayPrices: [String: String] = [:]
+    @Published private(set) var isResearchTurnPurchaseBusy = false
+    @Published private(set) var researchTurnPurchaseMessage: String?
     /// sectionID → ordered list of folderIDs containing that section. Cached
     /// up front so the Reader and Saved screens don't make per-section DB
     /// round trips when rendering the Projects row.
@@ -200,6 +204,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let ownsAccountSync: Bool
     private let projectHubOfflineCache = ProjectHubOfflineCache()
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
+    private let storeKitResearchTurnService = StoreKitResearchTurnService()
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
     private let startupSignpostID = OSSignpostID(log: AppSignpost.startup)
     private var postClerkAuthenticationAction: PostClerkAuthenticationAction = .none
@@ -259,6 +264,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var projectPresentationRefreshGeneration: UInt64 = 0
     private var foregroundAutomaticSyncTask: Task<Void, Never>?
     private var storeKitUpdatesTask: Task<Void, Never>?
+    private var researchTurnStoreKitUpdatesTask: Task<Void, Never>?
     private let networkMonitor = NWPathMonitor()
     private let networkMonitorQueue = DispatchQueue(label: "com.permitext.foreground-sync-network")
     private var isNetworkAvailable = false
@@ -396,6 +402,7 @@ final class CodeLibraryViewModel: ObservableObject {
         projectPresentationRefreshTask?.cancel()
         foregroundAutomaticSyncTask?.cancel()
         storeKitUpdatesTask?.cancel()
+        researchTurnStoreKitUpdatesTask?.cancel()
         startupWarmupTask?.cancel()
         networkMonitor.cancel()
     }
@@ -2369,12 +2376,22 @@ final class CodeLibraryViewModel: ObservableObject {
         requestID: String = UUID().uuidString
     ) async throws -> ResearchConversation {
         guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.sendResearchMessage(
-            account: signedInAccount,
-            conversationID: conversationID,
-            question: question,
-            requestID: requestID
-        )
+        do {
+            let conversation = try await accountBackendClient.sendResearchMessage(
+                account: signedInAccount,
+                conversationID: conversationID,
+                question: question,
+                requestID: requestID
+            )
+            await refreshResearchTurnAllowance(showsErrors: false)
+            return conversation
+        } catch {
+            if let backendError = error as? PermitextBackendHTTPError,
+               backendError.serverCode == "RESEARCH_TURNS_REQUIRED" {
+                await refreshResearchTurnAllowance(showsErrors: false)
+            }
+            throw error
+        }
     }
 
     func renameResearchConversation(id: String, title: String) async throws -> ResearchConversation {
@@ -2707,6 +2724,25 @@ final class CodeLibraryViewModel: ObservableObject {
         hasCapability(.research)
     }
 
+    var researchTurnAllowanceSummary: String {
+        guard let researchTurnAllowance else { return "100 turns included monthly" }
+        return "\(researchTurnAllowance.includedRemaining) included + \(researchTurnAllowance.purchasedRemaining) additional"
+    }
+
+    var availableResearchTurnPacks: [ResearchTurnPack] {
+        guard let researchTurnAllowance,
+              researchTurnAllowance.paidContinuationEnabled,
+              researchTurnAllowance.canBuyMore else { return [] }
+        return researchTurnAllowance.packs.filter { pack in
+            guard let productID = pack.appleProductID else { return false }
+            return researchTurnProductDisplayPrices[productID] != nil
+        }
+    }
+
+    func researchTurnDisplayPrice(for pack: ResearchTurnPack) -> String? {
+        pack.appleProductID.flatMap { researchTurnProductDisplayPrices[$0] }
+    }
+
     func hasCapability(_ capability: PermitextCapabilityID) -> Bool {
         if capability == .research, accountAuthorizedStoreKitPlan == .pro {
             return true
@@ -2754,15 +2790,26 @@ final class CodeLibraryViewModel: ObservableObject {
     func refreshStoreKitEntitlements() async {
         let snapshot = await storeKitSubscriptionService.snapshot()
         _ = await authorizeStoreKitSnapshot(snapshot, allowsNewTestBinding: false)
+        await refreshResearchTurnAllowance(recoverUnfinishedPurchases: true, showsErrors: false)
     }
 
     func startStoreKitTransactionObservation() {
-        guard storeKitUpdatesTask == nil else { return }
-        let service = storeKitSubscriptionService
-        storeKitUpdatesTask = Task { [weak self] in
-            let updates = await service.transactionUpdates()
-            for await snapshot in updates {
-                _ = await self?.authorizeStoreKitSnapshot(snapshot, allowsNewTestBinding: false)
+        if storeKitUpdatesTask == nil {
+            let service = storeKitSubscriptionService
+            storeKitUpdatesTask = Task { [weak self] in
+                let updates = await service.transactionUpdates()
+                for await snapshot in updates {
+                    _ = await self?.authorizeStoreKitSnapshot(snapshot, allowsNewTestBinding: false)
+                }
+            }
+        }
+        if researchTurnStoreKitUpdatesTask == nil {
+            let service = storeKitResearchTurnService
+            researchTurnStoreKitUpdatesTask = Task { [weak self] in
+                let updates = await service.transactionUpdates()
+                for await purchase in updates {
+                    await self?.processResearchTurnPurchase(purchase, source: "Apple")
+                }
             }
         }
     }
@@ -2978,6 +3025,133 @@ final class CodeLibraryViewModel: ObservableObject {
             statusMessage = message
             storeKitOperationMessage = message
         }
+    }
+
+    func refreshResearchTurnAllowance(
+        recoverUnfinishedPurchases: Bool = false,
+        showsErrors: Bool = false
+    ) async {
+        guard let account = signedInAccount, hasResearchAccess else {
+            clearResearchTurnState()
+            return
+        }
+        do {
+            let allowance = try await accountBackendClient.researchTurnAllowance(account: account)
+            guard signedInAccount?.appUserID == account.appUserID else { return }
+            researchTurnAllowance = allowance
+            let productIDs = allowance.packs.compactMap(\.appleProductID)
+            let products = await storeKitResearchTurnService.products(for: productIDs)
+            researchTurnProductDisplayPrices = Dictionary(
+                uniqueKeysWithValues: products.map { ($0.id, $0.displayPrice) }
+            )
+            if recoverUnfinishedPurchases, allowance.paidContinuationEnabled {
+                await recoverUnfinishedResearchTurnPurchases()
+            }
+        } catch {
+            if showsErrors {
+                researchTurnPurchaseMessage = "Permitext could not load Research turns: \(error.localizedDescription)"
+            }
+        }
+    }
+
+    func purchaseResearchTurnPack(
+        _ pack: ResearchTurnPack,
+        using purchaseAction: PurchaseAction
+    ) async {
+        guard let account = signedInAccount else {
+            researchTurnPurchaseMessage = "Sign in to buy additional Research turns."
+            return
+        }
+        guard currentPlan == .pro, hasResearchAccess else {
+            researchTurnPurchaseMessage = "Research turn packs require an active Pro plan."
+            return
+        }
+        guard let productID = pack.appleProductID, !productID.isEmpty else {
+            researchTurnPurchaseMessage = "This Research turn pack is not available from Apple yet."
+            return
+        }
+        guard !isResearchTurnPurchaseBusy else { return }
+        isResearchTurnPurchaseBusy = true
+        researchTurnPurchaseMessage = nil
+        defer { isResearchTurnPurchaseBusy = false }
+
+        do {
+            async let accountToken = accountBackendClient.appleBillingAccountToken(account: account)
+            async let product = storeKitResearchTurnService.product(for: productID)
+            let (resolvedAccountToken, resolvedProduct) = try await (accountToken, product)
+            guard signedInAccount?.appUserID == account.appUserID else {
+                throw CancellationError()
+            }
+            let result = try await purchaseAction(
+                resolvedProduct,
+                options: [.appAccountToken(resolvedAccountToken)]
+            )
+            guard let purchase = try await storeKitResearchTurnService.purchase(after: result) else {
+                researchTurnPurchaseMessage = "Purchase cancelled."
+                return
+            }
+            await processResearchTurnPurchase(purchase, source: "Apple")
+        } catch is CancellationError {
+            return
+        } catch {
+            researchTurnPurchaseMessage = error.localizedDescription
+        }
+    }
+
+    private func recoverUnfinishedResearchTurnPurchases() async {
+        let purchases = await storeKitResearchTurnService.unfinishedPurchases()
+        for purchase in purchases {
+            await processResearchTurnPurchase(purchase, source: "Recovered Apple purchase")
+        }
+    }
+
+    private func processResearchTurnPurchase(
+        _ purchase: StoreKitResearchTurnPurchase,
+        source: String
+    ) async {
+        guard let account = signedInAccount else { return }
+        let allowedProductIDs = Set(researchTurnAllowance?.packs.compactMap(\.appleProductID) ?? [])
+        guard allowedProductIDs.contains(purchase.transaction.productID) else { return }
+        do {
+            let response = try await accountBackendClient.verifyAppleResearchTurnPurchase(
+                account: account,
+                productID: purchase.transaction.productID,
+                signedTransactionInfo: purchase.signedTransactionInfo
+            )
+            guard signedInAccount?.appUserID == account.appUserID else {
+                throw CancellationError()
+            }
+            guard response.credited == true || response.replayed == true,
+                  let usage = response.usage else {
+                throw StoreKitResearchTurnServiceError.unverifiedTransaction
+            }
+            researchTurnAllowance = usage
+            await storeKitResearchTurnService.finish(purchase)
+            researchTurnPurchaseMessage = response.credited == true
+                ? "\(source) added Research turns to your Permitext account."
+                : "\(source) was already added to your Permitext account."
+        } catch is CancellationError {
+            return
+        } catch {
+            if let backendError = error as? PermitextBackendHTTPError,
+               backendError.statusCode == 409,
+               backendError.serverCode == "RESEARCH_PURCHASE_ALREADY_LINKED" {
+                // The verified purchase was already fulfilled for another
+                // Permitext account. Do not leave it permanently in StoreKit's
+                // unfinished queue, but never grant access to this account.
+                await storeKitResearchTurnService.finish(purchase)
+                researchTurnPurchaseMessage = "This Apple purchase is already linked to another Permitext account. Sign in to that account to use the turns."
+                return
+            }
+            researchTurnPurchaseMessage = "Apple confirmed the purchase, but Permitext could not add the turns yet: \(error.localizedDescription)"
+        }
+    }
+
+    private func clearResearchTurnState() {
+        researchTurnAllowance = nil
+        researchTurnProductDisplayPrices = [:]
+        researchTurnPurchaseMessage = nil
+        isResearchTurnPurchaseBusy = false
     }
 
     private func requireSignedInBillingAccount(
@@ -3780,6 +3954,7 @@ final class CodeLibraryViewModel: ObservableObject {
         currentCapabilityContract = nil
         LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
         clearAccountAuthorizedStoreKitState()
+        clearResearchTurnState()
         applyBackendEntitlement(nil)
         activateUserContentScope(account: nil)
         statusMessage = "Signed out."
@@ -3841,6 +4016,7 @@ final class CodeLibraryViewModel: ObservableObject {
         Self.clearSignedInAccount()
         LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
         clearAccountAuthorizedStoreKitState()
+        clearResearchTurnState()
         applyBackendEntitlement(nil)
         activateUserContentScope(account: nil)
         recentSearches = []
@@ -3888,6 +4064,7 @@ final class CodeLibraryViewModel: ObservableObject {
         currentCapabilityContract = nil
         LocalEntitlementService.clearLifetimeGrant(defaults: preferencesDefaults)
         clearAccountAuthorizedStoreKitState()
+        clearResearchTurnState()
         applyBackendEntitlement(nil)
         activateUserContentScope(account: nil)
         userContentSyncCheckpoint = nil

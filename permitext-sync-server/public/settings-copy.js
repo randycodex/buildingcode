@@ -2,7 +2,7 @@ export const settingsCopy = Object.freeze({
   freePlanSummary: "Reading and search are available anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.",
   proPlanSummary: "Pro is active, including Research. Projects, Notebook, Report, professional exports, offline access, and selected-evidence Research are unlocked.",
   lifetimePlanSummary: "Lifetime Pro is active, including Research. This gifted account does not need an App Store subscription.",
-  freePlanDetails: "No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month. Code reading and search remain free.",
+  freePlanDetails: "No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 selected-evidence Research turns each month. Code reading and search remain free.",
   signedOutAccountSummary: "Use passwordless email, Apple, Google, or Microsoft. New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices.",
   signedInAccountSuffix: "Saved sections, notes, and Projects can sync across your devices."
 });

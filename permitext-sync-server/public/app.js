@@ -6,7 +6,7 @@ import {
 import {
   settingsAccountSummary,
   settingsPlanCopy
-} from "./settings-copy.js?v=20260823-thin-dividers-v11";
+} from "./settings-copy.js?v=20260824-research-turns-v2";
 import {
   researchProgressStages,
   researchProgressStage
@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260823-thin-dividers-v11";
+} from "./offline-storage.js?v=20260824-research-turns-v2";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260823-thin-dividers-v11";
+} from "./research-intent-state.js?v=20260824-research-turns-v2";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -4823,6 +4823,7 @@ function confirmAccountDeletion({ appleManaged, stripeManaged, lifetimeGrant }) 
     "Research history and reports",
     "Private images and synchronized data",
     "Entitlements and organizations you own",
+    "Unused additional Research turns (they are forfeited and are not automatically refunded)",
     "Permitext data stored on this device"
   ]);
   const billing = document.createElement("section");
@@ -7379,14 +7380,32 @@ function planUsageRows() {
         }
       ];
   if (hasCapability("research")) {
+    const researchValue = researchUsage
+      ? researchUsage.totalRemaining === null
+        ? `${researchUsage.includedRemaining} included remaining · continued access available`
+        : `${researchUsage.includedRemaining} included + ${researchUsage.purchasedRemaining} additional`
+      : "100 turns included monthly";
     rows.push({
       label: "Research",
-      value: isProAccount() ? "Unlimited" : "Available"
+      value: isProAccount() ? researchValue : "Available with Pro"
     });
   } else if (isProAccount()) {
-    rows.push({ label: "Research", value: "Add-on not active" });
+    rows.push({ label: "Research", value: "100 turns included monthly" });
   }
   return rows;
+}
+
+function researchUsageCopy(usage) {
+  if (!usage) return "Research turn status is unavailable.";
+  const included = Number(usage.includedRemaining) || 0;
+  const purchased = Number(usage.purchasedRemaining) || 0;
+  if (usage.totalRemaining === null) {
+    return `${included.toLocaleString()} included turns remain this month. Continued access is available.`;
+  }
+  const additionalCopy = purchased > 0
+    ? ` ${purchased.toLocaleString()} additional ${purchased === 1 ? "turn is" : "turns are"} also available.`
+    : "";
+  return `${included.toLocaleString()} included turns remain this month.${additionalCopy}`;
 }
 
 function renderPlanUsageRows(container) {
@@ -7401,6 +7420,8 @@ function renderPlanUsageRows(container) {
     item.append(label, value);
     container.append(item);
   });
+  container.hidden = false;
+  container.setAttribute("aria-hidden", "false");
 }
 
 function renderSavedPlanUsage(container) {
@@ -15611,6 +15632,7 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
     if (!response.ok) {
       const error = new Error(payload.error || `Request failed: ${response.status}`);
       error.status = response.status;
+      error.code = payload.code || null;
       error.payload = payload;
       throw error;
     }
@@ -17228,6 +17250,13 @@ function renderResearchProgressCard(progress, { completed = false } = {}) {
       cancel.textContent = "Cancel";
       cancel.addEventListener("click", () => progress.controller.abort());
       actions.append(cancel);
+    } else if (progress.errorCode === "RESEARCH_TURNS_REQUIRED") {
+      const purchase = document.createElement("button");
+      purchase.className = "ghost-button research-progress-retry";
+      purchase.type = "button";
+      purchase.textContent = "Buy more turns";
+      purchase.addEventListener("click", () => toggleUtilityPane("settings"));
+      actions.append(purchase);
     } else if (typeof progress.retry === "function") {
       const retry = document.createElement("button");
       retry.className = "ghost-button research-progress-retry";
@@ -17286,6 +17315,7 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
       progress.stages.set("preparing_question", "retrying");
       progress.status = "retrying";
       progress.error = "";
+      progress.errorCode = "";
       progress.startedAt = Date.now();
       progress.endedAt = null;
       progress.controller = new AbortController();
@@ -17316,6 +17346,8 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
       progress.error = cancelled
         ? "Research was cancelled before an answer was saved."
         : error.message || "Permitext could not complete this Research question.";
+      progress.errorCode = error.code || error.payload?.code || "";
+      if (error.payload?.usage) researchUsage = error.payload.usage;
       progress.endedAt = Date.now();
       clearInterval(progress.timer);
       refreshResearchProgressCard(progress);
@@ -17580,6 +17612,25 @@ async function renderResearch(paneID = "utility:analysis") {
   }
 
   const researchEnabled = hasCapability("research");
+  if (researchEnabled && researchUsage) {
+    const usage = document.createElement("section");
+    usage.className = "research-usage";
+    usage.setAttribute("role", "status");
+    const heading = document.createElement("strong");
+    heading.textContent = "Research turns";
+    const copy = document.createElement("p");
+    copy.textContent = researchUsageCopy(researchUsage);
+    usage.append(heading, copy);
+    if (researchUsage.canBuyMore) {
+      const buyMore = document.createElement("button");
+      buyMore.type = "button";
+      buyMore.className = "ghost-button";
+      buyMore.textContent = "Buy more turns";
+      buyMore.addEventListener("click", () => focusUtility("settings"));
+      usage.append(buyMore);
+    }
+    content.append(usage);
+  }
   if (!researchEnabled) {
     const upgrade = document.createElement("article");
     upgrade.className = "analysis-card research-empty-state";
@@ -29119,6 +29170,8 @@ function renderSettings() {
   const accountCopy = panel.querySelector(".account-status-copy");
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const planUsage = panel.querySelector(".settings-plan-usage");
+  const researchPacks = panel.querySelector(".settings-research-packs");
+  const researchPackActions = panel.querySelector(".settings-research-pack-actions");
   const planDetails = panel.querySelector(".settings-plan-details");
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
@@ -29147,6 +29200,43 @@ function renderSettings() {
   if (clerkSignInReturnNotice) {
     setStatus(clerkSignInReturnNotice.message, clerkSignInReturnNotice.isError);
   }
+
+  const renderResearchPacks = () => {
+    clear(researchPackActions);
+    const account = activeAccount();
+    const availablePacks = (researchUsage?.packs || []).filter((pack) => pack.webAvailable);
+    researchPacks.hidden = !account || !isProAccount() || availablePacks.length === 0;
+    if (researchPacks.hidden) return;
+    availablePacks.forEach((pack) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "settings-secondary-button";
+      button.textContent = `Buy ${Number(pack.turns).toLocaleString()} more turns`;
+      button.addEventListener("click", async () => {
+        Array.from(researchPackActions.querySelectorAll("button")).forEach((item) => {
+          item.disabled = true;
+        });
+        setStatus("Opening Research turn checkout...");
+        try {
+          const current = activeAccount();
+          if (!current) throw new Error("Sign in before buying Research turns.");
+          const payload = await postJSON(
+            "/billing/research/checkout",
+            { auth: { accountUserID: current.userID }, packID: pack.id },
+            { token: current.sessionToken }
+          );
+          if (!payload.url) throw new Error("Checkout did not return a URL.");
+          window.location.href = payload.url;
+        } catch (error) {
+          setStatus(error.message || "Could not open Research turn checkout.", true);
+          Array.from(researchPackActions.querySelectorAll("button")).forEach((item) => {
+            item.disabled = false;
+          });
+        }
+      });
+      researchPackActions.append(button);
+    });
+  };
 
   const renderSyncConflictReview = () => {
     const account = activeAccount();
@@ -29401,6 +29491,7 @@ function renderSettings() {
     accountCopy.textContent = settingsAccountSummary(account ? state.account : null);
     renderSyncConflictReview();
     renderPlanUsageRows(planUsage);
+    renderResearchPacks();
     void renderOfflineState();
   };
 
@@ -29410,7 +29501,10 @@ function renderSettings() {
     void postResearch("/research/usage")
       .then((payload) => {
         researchUsage = payload.usage || null;
-        if (panel.isConnected) renderPlanUsageRows(planUsage);
+        if (panel.isConnected) {
+          renderPlanUsageRows(planUsage);
+          renderResearchPacks();
+        }
       })
       .catch(() => {
         if (!panel.isConnected || !planUsage) return;

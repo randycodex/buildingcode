@@ -1,5 +1,6 @@
 import { clerkConfigurationStatus } from "./clerk-auth.mjs";
 import { researchSpendGuardrails } from "./research-config.mjs";
+import { paidResearchTurnsEnabled } from "./research-turns.mjs";
 
 export const requiredStripeWebhookEvents = Object.freeze([
   "checkout.session.completed",
@@ -46,6 +47,15 @@ export function beta1ConfigurationReadiness(environment = process.env) {
   const publicBaseURL = String(environment.PERMITEXT_PUBLIC_BASE_URL || "").trim().replace(/\/+$/, "");
   const clerk = clerkConfigurationStatus(environment);
   const research = researchSpendGuardrails(environment);
+  const paidTurnsEnabled = paidResearchTurnsEnabled(environment);
+  const stripeResearchPackPriceIDs = [
+    environment.STRIPE_RESEARCH_TURNS_25_PRICE_ID,
+    environment.STRIPE_RESEARCH_TURNS_100_PRICE_ID
+  ];
+  const appleResearchPackProductIDs = [
+    environment.STOREKIT_RESEARCH_TURNS_25_PRODUCT_ID,
+    environment.STOREKIT_RESEARCH_TURNS_100_PRODUCT_ID
+  ];
   const checks = [
     check("durable-postgres", durableDatabaseConfigured(environment), "Configure durable PostgreSQL storage; the local JSON store is not a public-production data store."),
     check("private-blob-storage", privateBlobStorageConfigured(environment), "Configure private Vercel Blob storage for uploaded images and generated files."),
@@ -55,6 +65,20 @@ export function beta1ConfigurationReadiness(environment = process.env) {
     check("public-base-url", publicBaseURL.startsWith("https://"), "Set the canonical HTTPS Permitext production URL."),
     check("apple-bundle", Boolean(String(environment.APPLE_BUNDLE_ID || "").trim()), "Configure the App Store bundle identifier."),
     check("apple-pro-product", Boolean(String(environment.STOREKIT_PRO_PRODUCT_ID || "").trim()), "Configure the App Store Pro product identifier."),
+    check(
+      "stripe-research-turn-packs",
+      !paidTurnsEnabled || stripeResearchPackPriceIDs.every((value) => String(value || "").startsWith("price_")),
+      paidTurnsEnabled
+        ? "Configure Stripe Price IDs for both Research turn packs."
+        : "Paid Research turns are disabled; Stripe pack prices are not required."
+    ),
+    check(
+      "apple-research-turn-packs",
+      !paidTurnsEnabled || appleResearchPackProductIDs.every((value) => Boolean(String(value || "").trim())),
+      paidTurnsEnabled
+        ? "Configure App Store product identifiers for both Research turn packs."
+        : "Paid Research turns are disabled; App Store pack products are not required."
+    ),
     check("apple-production-only", environment.PERMITEXT_REQUIRE_PRODUCTION_APPLE_TRANSACTIONS === "1" || environment.VERCEL_ENV === "production", "Production must reject Sandbox and Xcode transactions."),
     check("apple-root-pins", Boolean(String(environment.APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS || "").trim()), "Pin the trusted Apple App Store root certificate fingerprints."),
     check("clerk", clerk.webReady, clerk.webReady ? "Clerk production identity and hosted web sign-in are configured." : clerk.webMessage),

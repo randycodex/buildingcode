@@ -30,6 +30,26 @@ assert.match(
   /async commitResearchConversationMessage\(userID/,
   "File/Postgres adapters missing commitResearchConversationMessage."
 );
+assert.match(
+  appSource,
+  /WITH committed_usage AS \([\s\S]*UPDATE permitext_research_usage[\s\S]*RETURNING id[\s\S]*1 \/ CASE WHEN id IS NULL THEN 0 ELSE 1 END AS reservation_assertion/,
+  "PostgreSQL Research commit does not abort its SQL transaction when the reservation update is missing."
+);
+const postgresCommitIndex = appSource.indexOf("WITH committed_usage AS (");
+const postgresTransactionIndex = appSource.indexOf(
+  "const results = await sql.transaction(queries",
+  postgresCommitIndex
+);
+const postCommitReservationCheckIndex = appSource.indexOf(
+  "const usageResult = results[0]",
+  postgresTransactionIndex
+);
+assert.ok(
+  postgresCommitIndex >= 0 &&
+    postgresTransactionIndex > postgresCommitIndex &&
+    postCommitReservationCheckIndex > postgresTransactionIndex,
+  "PostgreSQL Research commit no longer retains its defensive post-transaction reservation check."
+);
 
 const reservationID = "reservation-1";
 const userID = "apple:durable-test";
@@ -125,6 +145,48 @@ assert.deepEqual(
   successStore.researchConversationsByUserID[userID][0].topicContext,
   conversation.topicContext,
   "Successful answer commit did not preserve the conversation topic state."
+);
+
+// Purchased reservations debit exactly once in the same durable mutation.
+const purchasedStore = baseStore();
+purchasedStore.researchUsageByUserID[userID][0].fundingSource = "purchased";
+purchasedStore.researchCreditsByUserID = {
+  [userID]: [{
+    id: "purchase:stripe:cs_durable",
+    units: 25,
+    source: "stripe_purchase",
+    sourceID: "cs_durable",
+    createdAt: "2026-08-01T00:00:00.000Z"
+  }]
+};
+applyResearchConversationMessageCommit(purchasedStore, userID, {
+  reservationID,
+  usageEntry,
+  answer,
+  conversation,
+  events: []
+});
+assert.equal(
+  purchasedStore.researchCreditsByUserID[userID].filter((entry) => entry.id === `usage:${reservationID}`).length,
+  1,
+  "Purchased Research completion did not create exactly one credit debit."
+);
+assert.equal(
+  purchasedStore.researchCreditsByUserID[userID].reduce((sum, entry) => sum + entry.units, 0),
+  24,
+  "Purchased Research completion did not reduce the durable credit balance by one."
+);
+applyResearchConversationMessageCommit(purchasedStore, userID, {
+  reservationID,
+  usageEntry,
+  answer,
+  conversation,
+  events: []
+});
+assert.equal(
+  purchasedStore.researchCreditsByUserID[userID].filter((entry) => entry.id === `usage:${reservationID}`).length,
+  1,
+  "A replay double-debited purchased Research credits."
 );
 
 // Mid-commit failure after usage mutation must not be treated as durable success:

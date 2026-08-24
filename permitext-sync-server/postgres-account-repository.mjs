@@ -16,6 +16,37 @@ function withoutSessionToken(account) {
   return stored;
 }
 
+function normalizedAppleBillingAccountToken(value) {
+  const token = String(value || "").trim().toLowerCase();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(token)
+    ? token
+    : null;
+}
+
+export function appleBillingAccountTokens(account) {
+  return new Set([
+    account?.appleBillingAccountToken,
+    ...(Array.isArray(account?.appleBillingAccountTokenAliases)
+      ? account.appleBillingAccountTokenAliases
+      : [])
+  ].map(normalizedAppleBillingAccountToken).filter(Boolean));
+}
+
+export function mergedAppleBillingAccountTokens(sourceAccount, targetAccount) {
+  const sourceTokens = appleBillingAccountTokens(sourceAccount);
+  const targetTokens = appleBillingAccountTokens(targetAccount);
+  const sourcePrimary = normalizedAppleBillingAccountToken(sourceAccount?.appleBillingAccountToken);
+  const targetPrimary = normalizedAppleBillingAccountToken(targetAccount?.appleBillingAccountToken);
+  const primary = targetPrimary || sourcePrimary || null;
+  const aliases = Array.from(new Set([...targetTokens, ...sourceTokens]))
+    .filter((token) => token !== primary)
+    .sort();
+  return {
+    appleBillingAccountToken: primary,
+    appleBillingAccountTokenAliases: aliases
+  };
+}
+
 export function appleSubjectIDs(account) {
   return new Set([
     account?.authProvider === "apple" ? account?.authProviderUserID : null,
@@ -211,6 +242,10 @@ export function createPostgresAccountRepository(sql, options = {}) {
         entitlementConflict: true
       };
     }
+    const mergedAppleBillingTokens = mergedAppleBillingAccountTokens(
+      sourceContext.account,
+      targetContext.account
+    );
 
     const queries = [
       sql`
@@ -256,7 +291,10 @@ export function createPostgresAccountRepository(sql, options = {}) {
                   UNION SELECT NULLIF(target.apple_user_id, '')
                 ) AS identities
                 WHERE identities.subject IS NOT NULL
-              )
+              ),
+              'appleBillingAccountToken', ${mergedAppleBillingTokens.appleBillingAccountToken},
+              'appleBillingAccountTokenAliases',
+                ${JSON.stringify(mergedAppleBillingTokens.appleBillingAccountTokenAliases)}::jsonb
             ),
             updated_at = now()
         FROM permitext_users AS source

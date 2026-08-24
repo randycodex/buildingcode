@@ -9,7 +9,8 @@ This record captures owner decisions for implementation and provider setup. It i
 - Pro: $20 per month, recurring monthly until canceled.
 - Trial: none.
 - Annual plan: none for Beta 1; reconsider only after actual Research cost and retention data exist.
-- Included Research: 100 turns per billing month, subject to safety and cost guardrails.
+- Included Research: 100 turns per UTC calendar month, subject to safety and cost guardrails.
+- Additional Research: optional one-time, non-expiring turn packs, used only after included turns and shared through the Permitext account.
 
 ## Research exposure limits
 
@@ -37,15 +38,17 @@ This record captures owner decisions for implementation and provider setup. It i
 - No routine prorated refunds outside those cases, except where required by law or granted for a material service failure.
 - Refunds return to the original payment method. A verified full refund revokes the related Pro entitlement; a partial refund does not automatically revoke it.
 - Apple decides App Store refund requests and sends Permitext the authoritative refund or revocation event.
+- Verified turn-pack refunds reverse the related credits. If refunded credits were already used, future purchased turns first settle the balance while monthly included turns remain available.
 
 ## Provider sequence
 
 1. Configure Stripe live Pro Product/Price, Customer Portal, webhook, and refund/cancellation copy.
 2. Configure Clerk production Apple, Google, and Microsoft sign-in plus account-linking protections.
 3. Configure App Store Connect Pro subscription, United States territory, Sandbox, notifications, and TestFlight.
-4. Configure Vercel production environment variables, alerts, release diagnostics, and Research safeguards.
-5. Confirm DNS for Clerk and all public policy/support URLs.
-6. Run sandbox lifecycle tests, then request immediate approval before any controlled live charge or refund.
+4. Create and approve the Research consumables in Stripe and App Store Connect, but keep paid continuation disabled until the shared-ledger lifecycle passes on both platforms.
+5. Configure Vercel production environment variables, alerts, release diagnostics, and Research safeguards.
+6. Confirm DNS for Clerk and all public policy/support URLs.
+7. Run sandbox lifecycle tests, then request immediate approval before any controlled live charge or refund.
 
 ## Vercel production configuration recorded 2026-08-21
 

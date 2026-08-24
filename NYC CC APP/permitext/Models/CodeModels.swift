@@ -1417,10 +1417,77 @@ struct BackendProfileUpdateResponse: Codable, Hashable, Sendable {
 struct BackendAppleTransactionVerifyRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let signedTransactionInfo: String
+    var productID: String? = nil
 }
 
 struct BackendAppleTransactionVerifyResponse: Codable, Hashable, Sendable {
     let entitlement: AppEntitlement?
+    var credited: Bool? = nil
+    var replayed: Bool? = nil
+    var transaction: BackendAppleTransactionSummary? = nil
+    var usage: ResearchTurnAllowance? = nil
+}
+
+struct BackendAppleTransactionSummary: Codable, Hashable, Sendable {
+    var active: Bool? = nil
+    var productID: String? = nil
+    var packageID: String? = nil
+    var packID: String? = nil
+}
+
+struct BackendAppleBillingAccountTokenRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+}
+
+struct BackendAppleBillingAccountTokenResponse: Codable, Hashable, Sendable {
+    let appAccountToken: UUID
+}
+
+struct ResearchTurnPack: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let turns: Int
+    let webAvailable: Bool
+    let appleProductID: String?
+}
+
+struct ResearchTurnAllowance: Codable, Hashable, Sendable {
+    let includedLimit: Int
+    let includedUsed: Int
+    let includedRemaining: Int
+    let purchasedRemaining: Int
+    let totalRemaining: Int?
+    let periodStart: Date
+    let resetsAt: Date
+    let canResearch: Bool
+    let purchaseRequired: Bool
+    let paidContinuationEnabled: Bool
+    let canBuyMore: Bool
+    let packs: [ResearchTurnPack]
+    var mockMode: Bool? = nil
+    var evidenceDiscoveryEnabled: Bool? = nil
+
+    static let unavailable = ResearchTurnAllowance(
+        includedLimit: 100,
+        includedUsed: 0,
+        includedRemaining: 100,
+        purchasedRemaining: 0,
+        totalRemaining: nil,
+        periodStart: .distantPast,
+        resetsAt: .distantFuture,
+        canResearch: false,
+        purchaseRequired: false,
+        paidContinuationEnabled: false,
+        canBuyMore: false,
+        packs: []
+    )
+}
+
+struct BackendResearchUsageRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+}
+
+struct BackendResearchUsageResponse: Codable, Hashable, Sendable {
+    let usage: ResearchTurnAllowance
 }
 
 struct BackendProjectFoundationRequest: Codable, Hashable, Sendable {
@@ -2347,7 +2414,9 @@ protocol PermitextBackendTransport {
     func deleteAccount(_ request: BackendAccountDeleteRequest) async throws -> BackendAccountDeleteResponse
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
+    func appleBillingAccountToken(_ request: BackendAppleBillingAccountTokenRequest) async throws -> BackendAppleBillingAccountTokenResponse
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse
+    func researchUsage(_ request: BackendResearchUsageRequest) async throws -> BackendResearchUsageResponse
     func organizations(_ request: BackendOrganizationListRequest) async throws -> BackendOrganizationListResponse
     func acceptOrganizationInvitation(
         _ request: BackendOrganizationInvitationAcceptRequest
@@ -2574,8 +2643,16 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("account/profile", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    func appleBillingAccountToken(_ request: BackendAppleBillingAccountTokenRequest) async throws -> BackendAppleBillingAccountTokenResponse {
+        try await post("billing/apple/account-token", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse {
         try await post("billing/apple/transactions/verify", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func researchUsage(_ request: BackendResearchUsageRequest) async throws -> BackendResearchUsageResponse {
+        try await post("research/usage", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func organizations(_ request: BackendOrganizationListRequest) async throws -> BackendOrganizationListResponse {
@@ -2852,6 +2929,8 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     nonisolated let name = "local-dev-backend"
     private var accountsByUserID: [String: SignedInAccount] = [:]
     private var userContentByUserID: [String: [ServerUserContentMutation]] = [:]
+    private var localResearchPurchasedTurnsByUserID: [String: Int] = [:]
+    private let localAppleBillingAccountToken = UUID(uuidString: "11111111-1111-4111-8111-111111111111")!
 
     #if DEBUG
     private let phase3ResearchFixtureEnabled: Bool
@@ -2894,6 +2973,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     func deleteAccount(_ request: BackendAccountDeleteRequest) async throws -> BackendAccountDeleteResponse {
         accountsByUserID.removeValue(forKey: request.auth.accountUserID)
         userContentByUserID.removeValue(forKey: request.auth.accountUserID)
+        localResearchPurchasedTurnsByUserID.removeValue(forKey: request.auth.accountUserID)
         return BackendAccountDeleteResponse(
             deleted: true,
             deletedPrivateAssetCount: 0,
@@ -2920,8 +3000,71 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         )
     }
 
+    func appleBillingAccountToken(_ request: BackendAppleBillingAccountTokenRequest) async throws -> BackendAppleBillingAccountTokenResponse {
+        BackendAppleBillingAccountTokenResponse(appAccountToken: localAppleBillingAccountToken)
+    }
+
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse {
-        BackendAppleTransactionVerifyResponse(entitlement: .appleSubscriptionPro)
+        let turnsByProductID = [
+            StoreKitProductID.researchTurns25: 25,
+            StoreKitProductID.researchTurns100: 100
+        ]
+        if let productID = request.productID,
+           let turns = turnsByProductID[productID] {
+            localResearchPurchasedTurnsByUserID[request.auth.accountUserID, default: 0] += turns
+            return BackendAppleTransactionVerifyResponse(
+                entitlement: nil,
+                credited: true,
+                replayed: false,
+                transaction: BackendAppleTransactionSummary(
+                    productID: productID,
+                    packID: turns == 25 ? "research-turns-25" : "research-turns-100"
+                ),
+                usage: localResearchAllowance(userID: request.auth.accountUserID)
+            )
+        }
+        return BackendAppleTransactionVerifyResponse(entitlement: .appleSubscriptionPro)
+    }
+
+    func researchUsage(_ request: BackendResearchUsageRequest) async throws -> BackendResearchUsageResponse {
+        BackendResearchUsageResponse(usage: localResearchAllowance(userID: request.auth.accountUserID))
+    }
+
+    private func localResearchAllowance(userID: String) -> ResearchTurnAllowance {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let now = Date()
+        let periodStart = calendar.date(from: calendar.dateComponents([.year, .month], from: now)) ?? now
+        let resetsAt = calendar.date(byAdding: .month, value: 1, to: periodStart) ?? now
+        let purchased = localResearchPurchasedTurnsByUserID[userID, default: 0]
+        return ResearchTurnAllowance(
+            includedLimit: 100,
+            includedUsed: 0,
+            includedRemaining: 100,
+            purchasedRemaining: purchased,
+            totalRemaining: 100 + purchased,
+            periodStart: periodStart,
+            resetsAt: resetsAt,
+            canResearch: true,
+            purchaseRequired: false,
+            paidContinuationEnabled: true,
+            canBuyMore: true,
+            packs: [
+                ResearchTurnPack(
+                    id: "research-turns-25",
+                    turns: 25,
+                    webAvailable: false,
+                    appleProductID: StoreKitProductID.researchTurns25
+                ),
+                ResearchTurnPack(
+                    id: "research-turns-100",
+                    turns: 100,
+                    webAvailable: false,
+                    appleProductID: StoreKitProductID.researchTurns100
+                )
+            ],
+            mockMode: true
+        )
     }
 
     func organizations(_ request: BackendOrganizationListRequest) async throws -> BackendOrganizationListResponse {
@@ -4563,7 +4706,14 @@ protocol AccountBackendClient {
     func deleteAccount(account: SignedInAccount) async throws -> BackendAccountDeleteResponse
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
+    func appleBillingAccountToken(account: SignedInAccount) async throws -> UUID
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?
+    func verifyAppleResearchTurnPurchase(
+        account: SignedInAccount,
+        productID: String,
+        signedTransactionInfo: String
+    ) async throws -> BackendAppleTransactionVerifyResponse
+    func researchTurnAllowance(account: SignedInAccount) async throws -> ResearchTurnAllowance
     func organizations(account: SignedInAccount) async throws -> [PermitextOrganization]
     func acceptOrganizationInvitation(
         account: SignedInAccount,
@@ -4908,6 +5058,127 @@ struct LocalEntitlementService: EntitlementService {
 enum StoreKitProductID {
     static let proMonthly = "com.randycodex.permitext.pro.monthly"
     static let researchMonthly = "com.randycodex.permitext.research.monthly"
+    static let researchTurns25 = "com.randycodex.permitext.research.turns.25"
+    static let researchTurns100 = "com.randycodex.permitext.research.turns.100"
+
+    static let researchTurnPacks: Set<String> = [researchTurns25, researchTurns100]
+}
+
+struct StoreKitResearchTurnPurchase: Sendable {
+    let transaction: Transaction
+    let signedTransactionInfo: String
+}
+
+enum StoreKitResearchTurnServiceError: LocalizedError {
+    case paymentsUnavailable
+    case productUnavailable
+    case unverifiedTransaction
+    case pendingApproval
+    case unknownPurchaseResult
+
+    var errorDescription: String? {
+        switch self {
+        case .paymentsUnavailable:
+            return "Apple purchases are disabled for this device or App Store account."
+        case .productUnavailable:
+            return "This Research turn pack is not available from the App Store yet."
+        case .unverifiedTransaction:
+            return "The Research turn purchase could not be verified."
+        case .pendingApproval:
+            return "The Research turn purchase is pending approval."
+        case .unknownPurchaseResult:
+            return "The Research turn purchase did not complete."
+        }
+    }
+}
+
+actor StoreKitResearchTurnService {
+    private var cachedProductsByID: [String: Product] = [:]
+
+    func products(for productIDs: [String], refresh: Bool = false) async -> [Product] {
+        let requestedIDs = Set(productIDs.filter { !$0.isEmpty })
+        guard !requestedIDs.isEmpty else { return [] }
+        if refresh {
+            for productID in requestedIDs {
+                cachedProductsByID.removeValue(forKey: productID)
+            }
+        }
+        let missingIDs = requestedIDs.filter { cachedProductsByID[$0] == nil }
+        if !missingIDs.isEmpty,
+           let loadedProducts = try? await Product.products(for: Array(missingIDs)) {
+            for product in loadedProducts where product.type == .consumable {
+                cachedProductsByID[product.id] = product
+            }
+        }
+        return requestedIDs.compactMap { cachedProductsByID[$0] }
+            .sorted { $0.price < $1.price }
+    }
+
+    func product(for productID: String, refresh: Bool = false) async throws -> Product {
+        guard AppStore.canMakePayments else {
+            throw StoreKitResearchTurnServiceError.paymentsUnavailable
+        }
+        guard let product = await products(for: [productID], refresh: refresh).first else {
+            throw StoreKitResearchTurnServiceError.productUnavailable
+        }
+        return product
+    }
+
+    func purchase(after result: Product.PurchaseResult) async throws -> StoreKitResearchTurnPurchase? {
+        switch result {
+        case .success(let verification):
+            guard case .verified(let transaction) = verification,
+                  StoreKitProductID.researchTurnPacks.contains(transaction.productID)
+            else {
+                throw StoreKitResearchTurnServiceError.unverifiedTransaction
+            }
+            return StoreKitResearchTurnPurchase(
+                transaction: transaction,
+                signedTransactionInfo: verification.jwsRepresentation
+            )
+        case .userCancelled:
+            return nil
+        case .pending:
+            throw StoreKitResearchTurnServiceError.pendingApproval
+        @unknown default:
+            throw StoreKitResearchTurnServiceError.unknownPurchaseResult
+        }
+    }
+
+    func unfinishedPurchases() async -> [StoreKitResearchTurnPurchase] {
+        var purchases: [StoreKitResearchTurnPurchase] = []
+        for await verification in Transaction.unfinished {
+            guard case .verified(let transaction) = verification,
+                  StoreKitProductID.researchTurnPacks.contains(transaction.productID)
+            else { continue }
+            purchases.append(StoreKitResearchTurnPurchase(
+                transaction: transaction,
+                signedTransactionInfo: verification.jwsRepresentation
+            ))
+        }
+        return purchases
+    }
+
+    func transactionUpdates() -> AsyncStream<StoreKitResearchTurnPurchase> {
+        AsyncStream { continuation in
+            let task = Task {
+                for await verification in Transaction.updates {
+                    guard case .verified(let transaction) = verification,
+                          StoreKitProductID.researchTurnPacks.contains(transaction.productID)
+                    else { continue }
+                    continuation.yield(StoreKitResearchTurnPurchase(
+                        transaction: transaction,
+                        signedTransactionInfo: verification.jwsRepresentation
+                    ))
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+
+    func finish(_ purchase: StoreKitResearchTurnPurchase) async {
+        await purchase.transaction.finish()
+    }
 }
 
 enum StoreKitTransactionPolicy {

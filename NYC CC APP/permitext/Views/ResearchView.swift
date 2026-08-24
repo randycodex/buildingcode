@@ -1,3 +1,4 @@
+import StoreKit
 import SwiftUI
 
 private struct ResearchQuestionAttempt: Identifiable, Equatable {
@@ -105,6 +106,10 @@ struct ResearchRequestFailurePresentation: Equatable {
             return retainedQuestion(serverMessage ?? "Research needs updated enacted evidence before it can answer.")
         case "RESEARCH_CAPACITY_REVIEW":
             return retainedQuestion(serverMessage ?? "Research is temporarily unavailable while account capacity is reviewed.")
+        case "RESEARCH_TURNS_REQUIRED":
+            return ResearchRequestFailurePresentation(
+                message: "You have used this month's included Research turns. Buy more turns to continue; your question is still here."
+            )
         case "RESEARCH_CANCELLED":
             return retainedQuestion("Research was cancelled.")
         case let value? where verificationCodes.contains(value):
@@ -150,6 +155,7 @@ struct ResearchRequestFailurePresentation: Equatable {
 
 struct ResearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.purchase) private var purchase
     @Environment(\.scenePhase) private var scenePhase
     @State private var summaries: [ResearchConversationSummary] = []
     @State private var conversation: ResearchConversation?
@@ -269,6 +275,10 @@ struct ResearchView: View {
                 Text("\u{201c}\(pending.title)\u{201d} will be permanently deleted from Permitext. This cannot be undone.")
             }
             .task(id: "\(library.signedInAccount?.appUserID ?? "signed-out"):\(library.hasResearchAccess)") {
+                await library.refreshResearchTurnAllowance(
+                    recoverUnfinishedPurchases: true,
+                    showsErrors: false
+                )
                 await loadHistory()
                 await openActiveConversationIfNeeded()
                 await consumePendingSelectionIfNeeded()
@@ -493,6 +503,10 @@ struct ResearchView: View {
                                 statusMessage(questionErrorMessage)
                                     .id("failed-message:\(failedQuestionAttempt.id)")
                             }
+                            if library.researchTurnAllowance?.purchaseRequired == true {
+                                researchTurnRecoveryView
+                                    .id("research-turn-recovery:\(failedQuestionAttempt.id)")
+                            }
                         }
                         if conversation.messages.isEmpty,
                            pendingQuestionAttempt == nil,
@@ -520,6 +534,12 @@ struct ResearchView: View {
 
     private var researchComposer: some View {
         VStack(alignment: .leading, spacing: 8) {
+            if library.researchTurnAllowance?.paidContinuationEnabled == true {
+                Text(library.researchTurnAllowanceSummary)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .accessibilityLabel("Research turns: \(library.researchTurnAllowanceSummary)")
+            }
             Text("AI-assisted—not an official interpretation.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -564,11 +584,15 @@ struct ResearchView: View {
     }
 
     private var researchSendIsBlocked: Bool {
-        conversation?.sourceStatus == "changed" ||
+        library.researchTurnAllowance?.purchaseRequired == true ||
+            conversation?.sourceStatus == "changed" ||
             conversation?.projectContextReviewRequired == true
     }
 
     private var composerBlockMessage: String? {
+        if library.researchTurnAllowance?.purchaseRequired == true {
+            return "Buy additional Research turns above to continue."
+        }
         if conversation?.sourceStatus == "changed" {
             return "Refresh the changed enacted sources before asking another question."
         }
@@ -748,12 +772,59 @@ struct ResearchView: View {
                 .padding(.vertical, 10)
                 .foregroundStyle(.primary)
                 .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: 16))
-            Button("Try again", systemImage: "arrow.clockwise") {
-                Task { await sendQuestion(attempt) }
+            if library.researchTurnAllowance?.purchaseRequired != true {
+                Button("Try again", systemImage: "arrow.clockwise") {
+                    Task { await sendQuestion(attempt) }
+                }
+                .font(.caption.weight(.semibold))
             }
-            .font(.caption.weight(.semibold))
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+
+    private var researchTurnRecoveryView: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("100 turns included monthly")
+                .font(.subheadline.weight(.semibold))
+            Text("Additional turns do not expire and are used after the monthly included turns.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(library.availableResearchTurnPacks) { pack in
+                Button {
+                    Task { await library.purchaseResearchTurnPack(pack, using: purchase) }
+                } label: {
+                    HStack {
+                        Text("Buy \(pack.turns) turns")
+                        Spacer()
+                        Text(library.researchTurnDisplayPrice(for: pack) ?? "")
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(Color.black)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.96), in: Capsule(style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(library.isResearchTurnPurchaseBusy)
+            }
+
+            if library.isResearchTurnPurchaseBusy {
+                ProgressView("Contacting Apple...")
+                    .font(.caption)
+            }
+            if let message = library.researchTurnPurchaseMessage {
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
     }
 
     private func statusMessage(_ text: String) -> some View {
@@ -819,6 +890,7 @@ struct ResearchView: View {
     }
 
     private func refreshFromWeb() async {
+        await library.refreshResearchTurnAllowance(showsErrors: false)
         await loadHistory(forceNetwork: true)
         guard let id = library.activeResearchConversationID,
               let account = library.signedInAccount else { return }
