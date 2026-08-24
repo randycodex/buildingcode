@@ -6,7 +6,7 @@ import {
 import {
   settingsAccountSummary,
   settingsPlanCopy
-} from "./settings-copy.js?v=20260823-saved-usage-text-v8";
+} from "./settings-copy.js?v=20260823-saved-hierarchy-v9";
 import {
   researchProgressStages,
   researchProgressStage
@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260823-saved-usage-text-v8";
+} from "./offline-storage.js?v=20260823-saved-hierarchy-v9";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260823-saved-usage-text-v8";
+} from "./research-intent-state.js?v=20260823-saved-hierarchy-v9";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33856,10 +33856,10 @@ function renderCodeQuestionShellChrome() {
   if (project) ensureCodeQuestionShellForProject(project);
   document.querySelector(".code-decision-context-bar")?.remove();
   document.querySelector(".code-question-stage-control")?.remove();
-  // Promote Projects button labeling when CQ shell is on (Projects remain primary).
+  // Preserve the Saved destination label when the Code Question shell is active.
   if (toggleSavedButton) {
-    toggleSavedButton.setAttribute("aria-label", "Projects");
-    toggleSavedButton.title = "Projects";
+    toggleSavedButton.setAttribute("aria-label", "Saved");
+    toggleSavedButton.title = "Saved";
   }
 }
 

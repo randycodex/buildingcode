@@ -394,8 +394,8 @@ async function main() {
       "Web topbar tools or right-side workspace controls are no longer in their intended order."
     );
     assert(
-      topbarSource.includes('id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false" data-mobile-label="Projects">'),
-      "The Projects toolbar control no longer exposes its visible and accessible label."
+      topbarSource.includes('id="toggle-saved" type="button" aria-label="Saved" title="Saved" aria-pressed="false" data-mobile-label="Saved">'),
+      "The Saved toolbar control no longer exposes its visible and accessible label."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -1715,10 +1715,10 @@ async function main() {
       "Saved Evidence items should open or reuse an exact-passage Reader beside Saved."
     );
     assert(
-      savedTemplateSource.includes('<p class="eyebrow panel-kind">Projects</p>') &&
-        savedTemplateSource.includes('<h2 class="panel-title">Projects</h2>') &&
-        !savedTemplateSource.includes('<p class="eyebrow panel-kind">Saved</p>'),
-      "The Projects column should identify itself as Projects rather than Saved."
+      savedTemplateSource.includes('<p class="eyebrow panel-kind">Saved</p>') &&
+        savedTemplateSource.includes('<h2 class="panel-title">Saved</h2>') &&
+        savedTemplateSource.includes('<span class="code-filter-menu-label">Projects</span>'),
+      "The Saved column should retain Projects as its internal section label."
     );
     assert(
       workspaceStyles.text.includes(".topbar {\n  position: relative;\n  display: flex;") &&

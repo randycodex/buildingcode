@@ -515,7 +515,7 @@ assert.match(clientSource, /renderNewResearchComposer\(panel, researchEnabled\)/
 assert.match(stylesSource, /\.analysis-panel\.has-research-composer > \.research-composer \{[\s\S]*?padding: var\(--space-3\) 0 var\(--panel-padding\);/, "The Research history composer does not share the conversation composer's bottom position.");
 assert.match(stylesSource, /\.research-composer \.research-question-input \{[\s\S]*?background: rgb\(246 244 241 \/ 10%\);[\s\S]*?color: #ffffff;/, "Research composer textareas do not share the annotated fill and text color.");
 assert.match(indexSource, /id="add-reader"[^>]*data-mobile-label="Reader"/, "The mobile Reader action lacks its compact label.");
-assert.match(indexSource, /id="toggle-saved"[^>]*data-mobile-label="Projects"/, "The mobile Projects action lacks its compact label.");
+assert.match(indexSource, /id="toggle-saved"[^>]*data-mobile-label="Saved"/, "The mobile Saved action lacks its compact label.");
 assert.match(indexSource, /id="mobile-more"[\s\S]*?aria-haspopup="dialog"[\s\S]*?data-mobile-label="More"/, "The mobile dock lacks its More action.");
 assert.match(stylesSource, /@media \(max-width: 760px\) \{[\s\S]*?grid-template-columns: repeat\(5, minmax\(0, 1fr\)\);[\s\S]*?#toggle-saved \{ order: 1; \}[\s\S]*?#mobile-more \{ order: 5; \}/, "The mobile dock is not a five-action layout.");
 assert.match(stylesSource, /\.topbar #fit-columns,[\s\S]*?\.topbar #collapse-readers,[\s\S]*?display: none !important;/, "Desktop column-layout controls remain visible in the mobile dock.");
