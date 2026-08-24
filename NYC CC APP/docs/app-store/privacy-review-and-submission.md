@@ -6,7 +6,7 @@ This is the working checklist for App Store version 1.0. It separates preparatio
 
 - Bundle ID: `com.randycodex.permitext`
 - Version: `1.0`
-- Current uploaded build: `33`
+- Current uploaded build: `34`
 - Minimum iOS: `17.0`
 - Device family: iPhone only
 - Uses non-exempt encryption: no
@@ -102,7 +102,7 @@ Recommended configuration:
 
 ## Version 1.0 items still required in App Store Connect
 
-- Select build 33 for version 1.0
+- Select build 34 for version 1.0
 - Upload the prepared iPhone 6.9-inch screenshots from `screenshots/iphone-6.9/submission/`
 - Enter description, keywords, URLs, and copyright
 - Add the app's free price schedule
