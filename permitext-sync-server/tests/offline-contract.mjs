@@ -18,7 +18,8 @@ const [html, app, offlineStorage, serviceWorker, manifest] = await Promise.all([
 assert(html.includes('rel="manifest"'), "Web app does not advertise its install manifest.");
 assert(html.includes("Offline Access"), "Settings does not expose the offline-access card.");
 assert(!html.includes('class="settings-pro-badge"'), "Offline access still renders a redundant Pro feature badge.");
-assert(app.includes("Offline reading is a Pro feature."), "Free users are not told that offline reading requires Pro.");
+assert(app.includes('offlineStatus.textContent = "Available with Pro."'), "Free users are not told that offline access requires Pro.");
+assert.match(app, /offlineDownload\.hidden = !pro;[\s\S]*?if \(!pro\)[\s\S]*?Available with Pro\.[\s\S]*?return;/, "Free users should see a Pro availability notice without a duplicate upgrade button.");
 assert(app.includes("isProAccount()"), "Offline access is not connected to the Pro entitlement.");
 assert(app.includes("offlineAPI(path)"), "Network failures do not fall back to the offline code library.");
 assert(

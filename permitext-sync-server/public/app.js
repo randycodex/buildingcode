@@ -49,7 +49,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260823-account-navigation-v4";
+} from "./offline-storage.js?v=20260823-offline-pro-notice-v5";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -84,7 +84,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260823-account-navigation-v4";
+} from "./research-intent-state.js?v=20260823-offline-pro-notice-v5";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -29315,15 +29315,14 @@ function renderSettings() {
   updateProjectSelection();
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");
-    const account = activeAccount();
     const library = await offlineLibraryStatus().catch(() => ({ available: false, supported: false }));
     offlineProgress.hidden = true;
+    offlineDownload.hidden = !pro;
     offlineDownload.disabled = false;
     offlineRemove.hidden = !library.available;
     if (!pro) {
-      offlineCopy.textContent = `Offline reading is a Pro feature. The complete searchable code library is ${offlineFeatureMetadata.estimatedDownload}.`;
-      offlineStatus.textContent = account ? "Upgrade to Pro to download." : "Sign in and upgrade to Pro to download.";
-      offlineDownload.textContent = account ? "Upgrade to Pro" : "Sign In to Continue";
+      offlineCopy.textContent = "Download the complete searchable code library for use without an internet connection.";
+      offlineStatus.textContent = "Available with Pro.";
       return;
     }
     offlineCopy.textContent = `Keep the app and the complete searchable enacted-code library on this device. Estimated download: ${offlineFeatureMetadata.estimatedDownload}.`;
