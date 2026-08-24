@@ -1218,6 +1218,12 @@ async function main() {
       "Four-or-more-column workspaces no longer enforce every pane's default width."
     );
     assert(
+      workspaceStyles.text.match(/\.pane-divider \{[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.pane-divider::before \{[\s\S]*?width: 0\.5px;[\s\S]*?background: var\(--border\);/) &&
+        workspaceStyles.text.match(/\.pane-divider::after \{[\s\S]*?width: 14px;/),
+      "Column dividers should render as hairlines without shrinking their resize target."
+    );
+    assert(
       workspaceScript.text.includes("function isFlexibleReaderPaneID(paneID)") &&
         workspaceScript.text.includes("if (isProAccount()) return true;") &&
         workspaceScript.text.includes("(state.readers || []).length === 2") &&

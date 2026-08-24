@@ -1748,11 +1748,19 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   z-index: 12;
   cursor: col-resize;
   touch-action: none;
-  background: var(--border);
+  background: transparent;
 }
 
 .pane-divider::before {
-  content: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 0.5px;
+  content: "";
+  transform: translateX(-50%);
+  background: var(--border);
+  pointer-events: none;
 }
 
 .pane-divider::after {

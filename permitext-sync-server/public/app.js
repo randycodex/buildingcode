@@ -6,7 +6,7 @@ import {
 import {
   settingsAccountSummary,
   settingsPlanCopy
-} from "./settings-copy.js?v=20260823-saved-hierarchy-v9";
+} from "./settings-copy.js?v=20260823-thin-dividers-v10";
 import {
   researchProgressStages,
   researchProgressStage
@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260823-saved-hierarchy-v9";
+} from "./offline-storage.js?v=20260823-thin-dividers-v10";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260823-saved-hierarchy-v9";
+} from "./research-intent-state.js?v=20260823-thin-dividers-v10";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
