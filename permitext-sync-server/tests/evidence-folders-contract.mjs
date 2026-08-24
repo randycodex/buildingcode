@@ -186,7 +186,7 @@ assert.deepEqual(
 const normalizeProjectStructuredFact = new Function(
   "projectStructuredFactStatuses",
   `${functionSource(appSource, "normalizeProjectStructuredFact")}; return normalizeProjectStructuredFact;`
-)(new Set(["stated", "confirmed", "unknown", "rejected"]));
+)(new Set(["stated", "confirmed", "sourced", "unknown", "rejected"]));
 const projectStructuredFacts = new Function(
   "normalizeProjectStructuredFact",
   `${functionSource(appSource, "projectStructuredFacts")}; return projectStructuredFacts;`
@@ -764,7 +764,9 @@ assert.match(appSource, /\["reference", "Saved collection", "Reusable research t
 assert.match(appSource, /nameInput\.placeholder = selectedFolderType === "reference" \? "Saved collection name" : "Project Name"/);
 assert.match(appSource, /addressLabel\.hidden = selectedFolderType === "reference"/);
 assert.match(appSource, /sheet\.classList\.toggle\("is-reference-folder", selectedFolderType === "reference"\)/);
-assert.match(appSource, /address: selectedFolderType === "reference" \? "" : addressInput\.value/);
+assert.match(appSource, /address: selectedFolderType === "reference" \? "" : property\?\.normalizedAddress \|\| addressInput\.value/);
+assert.match(appSource, /postResearch\("\/projects\/property\/lookup", \{ address \}\)/);
+assert.match(appSource, /structuredFacts: property\?\.structuredFacts \|\| \[\]/);
 assert.doesNotMatch(appSource, /colorGroup\.hidden = selectedFolderType === "reference"/);
 assert.match(stylesSource, /\.project-sheet-field\[hidden\] \{[\s\S]*?display: none;/);
 assert.match(stylesSource, /\.project-create-sheet\.is-reference-folder \.project-description-input \{[\s\S]*?min-height: calc\(126px \+ var\(--space-3\)\);[\s\S]*?max-height: 230px;/);

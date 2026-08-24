@@ -133,26 +133,28 @@ const structuredProjectInformation = researchProjectInformation("project-structu
     { id: "project-fact:lot-composition", key: "zoning-lot-composition", label: "Zoning Lot Composition", value: "Tax Lots 52, 53, 54 and 55 comprise one zoning lot.", status: "stated", source: "user" },
     { id: "project-fact:districts", key: "zoning-districts", label: "Zoning District(s)", value: "C4-4D, R7-2", status: "stated", source: "user" },
     { id: "project-fact:frontages", key: "street-frontages", label: "Street Frontage(s)", value: "Third Avenue — Wide Street; East 120th Street — Narrow Street", status: "stated", source: "user" },
+    { id: "nyc-planning:bbl", key: "bbl", label: "BBL", value: "1017190052", status: "sourced", source: "nyc-planning", sourceText: "NYC Planning MapPLUTO" },
     { id: "project-fact:travel", key: "travel-distance", label: "Travel Distance", value: "95 feet", status: "stated", source: "user" }
   ]
 });
 assert.deepEqual(structuredProjectInformation.facts, [
   "Building / Code Fact — Occupancy: Group R-2 (user-confirmed; not independently verified)",
-  "Building / Code Fact — Stories Above Grade: 6 (user-confirmed; not independently verified)",
+  "Building / Code Fact — Stories Above Grade: 6 (user-stated; not independently verified)",
   "Zoning Fact — Address: 214 West 118th Street (user-confirmed; not independently verified)",
-  "Zoning Fact — Tax Lot(s): 52, 53, 54, 55 (user-confirmed; not independently verified)",
-  "Zoning Fact — Zoning Lot Composition: Tax Lots 52, 53, 54 and 55 comprise one zoning lot. (user-confirmed; not independently verified)",
-  "Zoning Fact — Zoning District(s): C4-4D, R7-2 (user-confirmed; not independently verified)",
-  "Zoning Fact — Street Frontage(s): Third Avenue — Wide Street; East 120th Street — Narrow Street (user-confirmed; not independently verified)",
-  "Custom Fact — Travel Distance: 95 feet (user-confirmed; not independently verified)",
+  "Zoning Fact — Tax Lot(s): 52, 53, 54, 55 (user-stated; not independently verified)",
+  "Zoning Fact — Zoning Lot Composition: Tax Lots 52, 53, 54 and 55 comprise one zoning lot. (user-stated; not independently verified)",
+  "Zoning Fact — Zoning District(s): C4-4D, R7-2 (user-stated; not independently verified)",
+  "Zoning Fact — Street Frontage(s): Third Avenue — Wide Street; East 120th Street — Narrow Street (user-stated; not independently verified)",
+  "Zoning Fact — BBL: 1017190052 (NYC Planning sourced data; verify current official records)",
+  "Custom Fact — Travel Distance: 95 feet (user-stated; not independently verified)",
   "Additional Project facts: An existing six-story Group R-2 building of Type IIIA construction."
 ]);
-assert.equal(structuredProjectInformation.structuredFacts.length, 10);
+assert.equal(structuredProjectInformation.structuredFacts.length, 11);
 assert.equal(structuredProjectInformation.structuredFacts[0].usedInResearch, true);
 assert.equal(structuredProjectInformation.structuredFacts[2].usedInResearch, false);
 assert.equal(structuredProjectInformation.facts.some((fact) => fact.includes("Floor affected:")), false);
 assert.equal(structuredProjectInformation.buildingCodeFacts.length, 2);
-assert.equal(structuredProjectInformation.zoningFacts.length, 5);
+assert.equal(structuredProjectInformation.zoningFacts.length, 6);
 assert.equal(structuredProjectInformation.customFacts.length, 1);
 assert.equal(structuredProjectInformation.missingFactsAreUnknown, true);
 assert.equal(structuredProjectInformation.facts.some((fact) => fact.includes("Commercial Overlay")), false);

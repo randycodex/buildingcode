@@ -10807,6 +10807,28 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   font-weight: 650;
 }
 
+.project-sheet-field .project-property-lookup-status {
+  min-height: 1.2em;
+  padding: var(--space-1) var(--space-2) 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.7) !important;
+  font-weight: 450;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.project-property-lookup-status:empty {
+  display: none;
+}
+
+.project-property-lookup-status[data-state="success"] {
+  color: var(--status-success, #68c98c);
+}
+
+.project-property-lookup-status[data-state="warning"] {
+  color: var(--text-secondary);
+}
+
 .project-sheet-field input,
 .project-sheet-field textarea {
   width: 100%;

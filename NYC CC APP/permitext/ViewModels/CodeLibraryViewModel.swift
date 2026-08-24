@@ -1935,6 +1935,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     name: record.name,
                     address: record.address,
                     description: record.description,
+                    structuredFacts: record.structuredFacts,
                     colorHex: record.colorHex,
                     folderType: CodeFolderType(serverValue: record.folderType),
                     sortOrder: record.sortOrder,
@@ -2036,6 +2037,7 @@ final class CodeLibraryViewModel: ObservableObject {
         name: String,
         address: String = "",
         description: String = "",
+        structuredFacts: [ProjectStructuredFact] = [],
         colorHex: String = CodeFolder.defaultColorHex,
         folderType: CodeFolderType = .project
     ) -> CodeFolder? {
@@ -2051,6 +2053,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 name: name,
                 address: address,
                 description: description,
+                structuredFacts: structuredFacts,
                 colorHex: colorHex,
                 folderType: folderType,
                 codeVersion: selectedVersion.codeVersion
@@ -2065,7 +2068,14 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func updateFolder(_ folder: CodeFolder, name: String, address: String, description: String, colorHex: String) {
+    func updateFolder(
+        _ folder: CodeFolder,
+        name: String,
+        address: String,
+        description: String,
+        structuredFacts: [ProjectStructuredFact]? = nil,
+        colorHex: String
+    ) {
         guard let userContentRepository else { return }
         do {
             try userContentRepository.updateFolder(
@@ -2073,6 +2083,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 name: name,
                 address: address,
                 description: description,
+                structuredFacts: structuredFacts ?? folder.structuredFacts,
                 colorHex: colorHex,
                 folderType: folder.folderType,
                 codeVersion: folder.codeVersion
@@ -2083,6 +2094,14 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             statusMessage = error.localizedDescription
         }
+    }
+
+    func projectPropertyContext(address: String) async throws -> BackendProjectPropertyContext {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.projectPropertyContext(
+            account: signedInAccount,
+            address: address
+        )
     }
 
     func deleteFolder(id: Int64) {

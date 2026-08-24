@@ -52,6 +52,10 @@ import {
 import { resolveContainedPrivatePath } from "./private-path-containment.mjs";
 import { createImageStorageProvider } from "./image-storage.mjs";
 import {
+  lookupNYCPropertyContext,
+  NYCPropertyLookupError
+} from "./nyc-property-context.mjs";
+import {
   createResearchProgressEvent,
   researchProgressSummary
 } from "./public/research-progress.js";
@@ -9430,7 +9434,7 @@ async function ownedProjectRecord(userID, projectID) {
   return projectMutation ? mutationKindAndRecord(projectMutation).record : null;
 }
 
-const researchProjectFactStatuses = new Set(["stated", "confirmed", "unknown", "rejected"]);
+const researchProjectFactStatuses = new Set(["stated", "confirmed", "sourced", "unknown", "rejected"]);
 const researchProjectFactAliases = new Map([
   ["stories", ["stories-above-grade", "Stories Above Grade"]],
   ["sprinkler-status", ["sprinkler-protection", "Sprinkler Protection"]],
@@ -9439,14 +9443,17 @@ const researchProjectFactAliases = new Map([
 const researchBuildingCodeFactKeys = new Set([
   "occupancy", "construction-type", "stories-above-grade", "levels-below-grade",
   "building-height", "sprinkler-protection", "project-status", "work-filing-type",
-  "code-basis", "building-area"
+  "code-basis", "building-area", "building-count", "residential-units", "total-units",
+  "year-built", "years-altered", "building-class"
 ]);
 const researchZoningFactKeys = new Set([
-  "address", "borough", "block", "tax-lots", "zoning-lot-composition", "zoning-districts",
+  "address", "bbl", "borough", "block", "tax-lots", "zip-code", "tax-lot-area",
+  "land-use-code", "zoning-lot-composition", "zoning-districts",
   "commercial-overlays", "special-purpose-district", "zoning-map", "community-district",
   "zoning-lot-area", "lot-width", "lot-depth", "lot-type", "street-frontages",
   "mih-area-options", "affordable-housing-zoning-status", "transit-zone",
-  "limited-height-district", "waterfront-status", "lower-density-growth-management-area"
+  "limited-height-district", "waterfront-status", "lower-density-growth-management-area",
+  "fresh-program-area", "appendix-j-designated-m-district"
 ]);
 
 function researchProjectFactGroup(key) {
@@ -9479,7 +9486,7 @@ function normalizedResearchProjectStructuredFacts(project) {
       source: normalizedResearchText(fact.source || "description", 100),
       sourceText: normalizedResearchText(fact.sourceText || "", 500),
       updatedAt: fact.updatedAt || null,
-      usedInResearch: status === "stated" || status === "confirmed"
+      usedInResearch: status === "stated" || status === "confirmed" || status === "sourced"
     }];
   });
 }
@@ -9491,25 +9498,37 @@ export function researchProjectInformation(projectID, project) {
   const codeVersion = String(project.codeVersion || "").trim() || null;
   const structuredFacts = normalizedResearchProjectStructuredFacts(project);
   const usableStructuredFacts = structuredFacts.filter((fact) => fact.usedInResearch && fact.key !== "floor-affected");
-  const addressFact = address ? {
+  const sourcedAddressFact = usableStructuredFacts.find((fact) => fact.key === "address") || null;
+  const sourcedAddressMatchesProject = sourcedAddressFact && address &&
+    sourcedAddressFact.value.localeCompare(address, undefined, { sensitivity: "base" }) === 0;
+  const addressFact = sourcedAddressMatchesProject
+    ? sourcedAddressFact
+    : (address ? {
     id: "project-address",
     key: "address",
     label: "Address",
     value: normalizedResearchText(address, 1_000),
     group: "zoning",
-    status: "stated",
+    status: "confirmed",
     source: "project-record",
     sourceText: "",
     updatedAt: project.updatedAt || null,
     usedInResearch: true
-  } : null;
+  } : sourcedAddressFact);
   const buildingCodeFacts = usableStructuredFacts.filter((fact) => fact.group === "buildingCode");
   const zoningFacts = [
     ...(addressFact ? [addressFact] : []),
     ...usableStructuredFacts.filter((fact) => fact.group === "zoning" && (!addressFact || fact.key !== "address"))
   ];
   const customFacts = usableStructuredFacts.filter((fact) => fact.group === "custom");
-  const factLine = (groupLabel, fact) => `${groupLabel} — ${fact.label}: ${fact.value} (user-confirmed; not independently verified)`;
+  const factLine = (groupLabel, fact) => {
+    const qualification = fact.status === "sourced"
+      ? "NYC Planning sourced data; verify current official records"
+      : fact.status === "confirmed"
+        ? "user-confirmed; not independently verified"
+        : "user-stated; not independently verified";
+    return `${groupLabel} — ${fact.label}: ${fact.value} (${qualification})`;
+  };
   const facts = [
     ...buildingCodeFacts.map((fact) => factLine("Building / Code Fact", fact)),
     ...zoningFacts.map((fact) => factLine("Zoning Fact", fact)),
@@ -10173,6 +10192,24 @@ async function handleProjectFoundationState(request, response) {
     return;
   }
   sendJSON(response, 200, state);
+}
+
+async function handleProjectPropertyLookup(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  try {
+    const property = await lookupNYCPropertyContext(context.body.address);
+    sendJSON(response, 200, { property });
+  } catch (error) {
+    if (error instanceof NYCPropertyLookupError) {
+      sendJSON(response, error.status, {
+        error: error.message,
+        code: error.code
+      });
+      return;
+    }
+    throw error;
+  }
 }
 
 function organizationInvitationForClient(invitation) {
@@ -27005,6 +27042,7 @@ const handlers = {
   "research/conversations/candidate-disposition": handleResearchCandidateDisposition,
   "projects/foundation/state": handleProjectFoundationState,
   "projects/hub/bootstrap": handleProjectHubBootstrap,
+  "projects/property/lookup": handleProjectPropertyLookup,
   "projects/artifacts/checkpoint": handleProjectArtifactCheckpoint,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,
@@ -27267,6 +27305,7 @@ function requestMutatesFileStore(request) {
   // handler. Adapter-level withMutation() still serializes short JSON RMW sections.
   if (
     path === "projects/artifacts/checkpoint" ||
+    path === "projects/property/lookup" ||
     path === "research/interpret" ||
     path === "research/conversations/message" ||
     path === "research/conversations/refresh" ||

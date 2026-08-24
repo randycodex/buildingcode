@@ -215,14 +215,15 @@ struct BookmarksView: View {
                 FolderEditorSheet(
                     existing: target.folder,
                     defaultFolderType: target.folder?.folderType ?? .project,
-                    onSave: { name, address, description, colorHex, folderType in
+                    onSave: { name, address, description, structuredFacts, colorHex, folderType in
                         if let existing = target.folder {
-                            library.updateFolder(existing, name: name, address: address, description: description, colorHex: colorHex)
+                            library.updateFolder(existing, name: name, address: address, description: description, structuredFacts: structuredFacts, colorHex: colorHex)
                         } else {
                             _ = library.createFolder(
                                 name: name,
                                 address: address,
                                 description: description,
+                                structuredFacts: structuredFacts,
                                 colorHex: colorHex,
                                 folderType: folderType
                             )
@@ -1074,6 +1075,7 @@ struct ProjectView: View {
     @State private var collapsedEvidenceGroupIDs: Set<String> = []
     @State private var evidenceSearchQuery = ""
     @State private var isEvidenceSearchPresented = false
+    @State private var isStructuredFactsExpanded = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let automaticProjectHubRefreshInterval: TimeInterval = 30
@@ -1200,9 +1202,9 @@ struct ProjectView: View {
             FolderEditorSheet(
                 existing: target.folder,
                 defaultFolderType: target.folder?.folderType ?? .project,
-                onSave: { name, address, description, colorHex, _ in
+                onSave: { name, address, description, structuredFacts, colorHex, _ in
                     if let existing = target.folder {
-                        library.updateFolder(existing, name: name, address: address, description: description, colorHex: colorHex)
+                        library.updateFolder(existing, name: name, address: address, description: description, structuredFacts: structuredFacts, colorHex: colorHex)
                     }
                 },
                 onDelete: {
@@ -1741,6 +1743,34 @@ struct ProjectView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if let facts = folder?.structuredFacts, !facts.isEmpty {
+                DisclosureGroup(isExpanded: $isStructuredFactsExpanded) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(facts) { fact in
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(fact.label)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                                Text(fact.value)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.primary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 8)
+                            if fact.id != facts.last?.id {
+                                Divider()
+                            }
+                        }
+                    }
+                    .padding(.top, 6)
+                } label: {
+                    Label("Structured facts (\(facts.count))", systemImage: "building.2")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .tint(accentColor)
             }
 
             projectActionRow
