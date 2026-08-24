@@ -3729,6 +3729,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             "The Research evidence-analysis request failed.",
             code: "RESEARCH_PROVIDER_ERROR"
         )
+        let verifierProviderError = PermitextBackendHTTPError.serverStatus(
+            502,
+            "The Research verifier request failed.",
+            code: "RESEARCH_VERIFIER_ERROR"
+        )
 
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(verificationError).message,
@@ -3736,6 +3741,10 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(providerError).message,
+            "Terra's research service is temporarily unavailable. Your question is still here."
+        )
+        XCTAssertEqual(
+            ResearchRequestFailurePresentation.resolve(verifierProviderError).message,
             "Terra's research service is temporarily unavailable. Your question is still here."
         )
     }

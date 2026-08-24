@@ -76,13 +76,16 @@ assert.deepEqual(assemblyStages, [
   ["following_cross_references", "completed"]
 ], "Evidence assembly no longer reports its real observable stages in order.");
 
-const [serverSource, clientSource, styleSource] = await Promise.all([
+const [serverSource, providerClientSource, clientSource, styleSource] = await Promise.all([
   readFile(new URL("../app.mjs", import.meta.url), "utf8"),
+  readFile(new URL("../research-provider-client.mjs", import.meta.url), "utf8"),
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
   readFile(new URL("../public/styles.css", import.meta.url), "utf8")
 ]);
 assert(serverSource.includes('context.body.progressStream === "ndjson"'));
-assert(serverSource.includes("researchRequestSignal(options.signal"));
+assert(serverSource.includes("requestResearchProvider({"));
+assert(serverSource.includes("signal: options.signal"));
+assert(providerClientSource.includes("AbortSignal.any([signal, timeoutSignal])"));
 assert(clientSource.includes("new AbortController()"));
 assert(clientSource.includes('progress.retry = () => void execute(true)'));
 assert(clientSource.includes('error.name === "AbortError"'));

@@ -165,6 +165,7 @@ import {
   reserveResearchEvaluationSpend,
   researchModelConfiguration
 } from "./research-config.mjs";
+import { requestResearchProvider } from "./research-provider-client.mjs";
 import {
   discoverRelevantEvidence,
   evidenceDiscoveryVersion,
@@ -5216,11 +5217,6 @@ function sendError(response, status, message, extraHeaders = {}) {
   sendJSON(response, status, { error: message }, extraHeaders);
 }
 
-function researchRequestSignal(signal, timeoutMilliseconds) {
-  const timeoutSignal = AbortSignal.timeout(timeoutMilliseconds);
-  return signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal;
-}
-
 function researchProgressResponder(request, response, enabled) {
   let started = false;
   let ended = false;
@@ -6968,36 +6964,18 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       }
     }
   };
-  let response;
-  try {
-    reserveResearchEvaluationSpend(requestBody);
-    reserveResearchProviderSpend(requestBody);
-    response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${apiKey}`,
-        "content-type": "application/json"
-      },
-      body: JSON.stringify(requestBody),
-      // Terra can spend more than 35 seconds organizing a dense, multi-branch
-      // evidence package even when retrieval itself is compact. Keep this
-      // bounded, but allow the structured analysis call to finish.
-      signal: researchRequestSignal(options.signal, 60_000)
-    });
-  } catch (error) {
-    const providerError = new Error("The Research evidence-analysis request failed.");
-    providerError.code = "RESEARCH_PROVIDER_ERROR";
-    providerError.cause = error;
-    providerError.providerCause = String(error?.name || error?.code || "network-error").slice(0, 120);
-    throw providerError;
-  }
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const error = new Error("The Research evidence-analysis request failed.");
-    error.code = "RESEARCH_PROVIDER_ERROR";
-    error.status = response.status;
-    throw error;
-  }
+  const { payload } = await requestResearchProvider({
+    apiKey,
+    requestBody,
+    signal: options.signal,
+    // Terra can spend more than 35 seconds organizing a dense, multi-branch
+    // evidence package even when retrieval itself is compact. Keep this
+    // bounded, but allow the structured analysis call to finish.
+    timeoutMilliseconds: 60_000,
+    failureMessage: "The Research evidence-analysis request failed.",
+    reserveEvaluationSpend: reserveResearchEvaluationSpend,
+    reserveProviderSpend: reserveResearchProviderSpend
+  });
   let value;
   try {
     value = JSON.parse(outputTextFromResponse(payload));
@@ -7209,36 +7187,34 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
     ].join(" "),
     input: sanitizedQuery
   };
-  let response;
+  let payload;
   try {
-    reserveResearchEvaluationSpend(requestBody);
-    reserveResearchProviderSpend(requestBody);
-    response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${apiKey}`,
-        "content-type": "application/json"
-      },
-      body: JSON.stringify(requestBody),
-      signal: researchRequestSignal(options.signal, 30_000)
-    });
-  } catch {
+    ({ payload } = await requestResearchProvider({
+      apiKey,
+      requestBody,
+      signal: options.signal,
+      timeoutMilliseconds: 30_000,
+      failureMessage: "The Research web-support request failed.",
+      reserveEvaluationSpend: reserveResearchEvaluationSpend,
+      reserveProviderSpend: reserveResearchProviderSpend
+    }));
+  } catch (error) {
+    const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
+    if ([
+      "RESEARCH_CANCELLED",
+      "RESEARCH_EVAL_SPEND_CAP",
+      "RESEARCH_SPEND_CAP",
+      "AbortError",
+      "TimeoutError"
+    ].includes(failureCode)) {
+      throw error;
+    }
     return {
       summary: "",
       sources: [],
       usage: combinedResearchUsage(),
       searched: true,
       limitation: "Permitext could not reach the approved supporting web sources for this answer."
-    };
-  }
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    return {
-      summary: "",
-      sources: [],
-      usage: researchUsageFromProviderPayload(payload),
-      searched: true,
-      limitation: "Permitext could not retrieve approved supporting web material for this answer."
     };
   }
   let summary = "";
@@ -7619,9 +7595,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     codeVersion: section.codeVersion || defaultSyncCodeVersion
   }));
   const supportingSources = options.webSupport?.sources || [];
-  let response;
-  try {
-    const requestBody = {
+  const requestBody = {
       model,
       store: false,
       reasoning: { effort: conversational ? "low" : configuration.reasoningEffort },
@@ -7685,31 +7659,16 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           schema: researchInterpretationSchemaForEvidence(passageEvidence, supportingSources)
         }
       }
-    };
-    reserveResearchEvaluationSpend(requestBody);
-    reserveResearchProviderSpend(requestBody);
-    response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${apiKey}`,
-        "content-type": "application/json"
-      },
-      body: JSON.stringify(requestBody),
-      signal: researchRequestSignal(options.signal, 45_000)
-    });
-  } catch (error) {
-    if (error.name === "TimeoutError") throw error;
-    const providerError = new Error("The research model request failed.");
-    providerError.code = "RESEARCH_PROVIDER_ERROR";
-    throw providerError;
-  }
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const error = new Error("The research model request failed.");
-    error.code = "RESEARCH_PROVIDER_ERROR";
-    error.status = response.status;
-    throw error;
-  }
+  };
+  const { payload } = await requestResearchProvider({
+    apiKey,
+    requestBody,
+    signal: options.signal,
+    timeoutMilliseconds: 45_000,
+    failureMessage: "The Research interpretation request failed.",
+    reserveEvaluationSpend: reserveResearchEvaluationSpend,
+    reserveProviderSpend: reserveResearchProviderSpend
+  });
   let value;
   try {
     value = JSON.parse(outputTextFromResponse(payload));
@@ -7873,32 +7832,16 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       }
     }
   };
-  let response;
-  try {
-    reserveResearchEvaluationSpend(requestBody);
-    reserveResearchProviderSpend(requestBody);
-    response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${apiKey}`,
-        "content-type": "application/json"
-      },
-      body: JSON.stringify(requestBody),
-      signal: researchRequestSignal(options.signal, 30_000)
-    });
-  } catch (error) {
-    const providerError = new Error("The Research verifier request failed.");
-    providerError.code = "RESEARCH_VERIFIER_ERROR";
-    providerError.cause = error;
-    throw providerError;
-  }
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const error = new Error("The Research verifier request failed.");
-    error.code = "RESEARCH_VERIFIER_ERROR";
-    error.status = response.status;
-    throw error;
-  }
+  const { payload } = await requestResearchProvider({
+    apiKey,
+    requestBody,
+    signal: options.signal,
+    timeoutMilliseconds: 30_000,
+    failureMessage: "The Research verifier request failed.",
+    failureCode: "RESEARCH_VERIFIER_ERROR",
+    reserveEvaluationSpend: reserveResearchEvaluationSpend,
+    reserveProviderSpend: reserveResearchProviderSpend
+  });
   let value;
   try {
     value = JSON.parse(outputTextFromResponse(payload));
@@ -16020,6 +15963,7 @@ async function handleResearchConversationMessage(request, response) {
         console.error("Failed to release Research usage reservation.", releaseError);
       }
     }
+    const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
     if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
       progressResponse.failActive("failed");
       progressResponse.error(422, "A cited code section is incomplete and cannot be analyzed yet.", {
@@ -16047,7 +15991,7 @@ async function handleResearchConversationMessage(request, response) {
       progressResponse.error(422, error.message, { code: "RESEARCH_REFUSAL" });
       return;
     }
-    if (["RESEARCH_CANCELLED", "AbortError"].includes(error.code || error.name)) {
+    if (["RESEARCH_CANCELLED", "AbortError"].includes(failureCode)) {
       progressResponse.failActive("cancelled");
       progressResponse.error(499, "Research was cancelled.", { code: "RESEARCH_CANCELLED" });
       return;
@@ -16062,25 +16006,31 @@ async function handleResearchConversationMessage(request, response) {
       "RESEARCH_VERIFICATION_FAILED",
       "RESEARCH_PROVIDER_ERROR",
       "TimeoutError"
-    ].includes(error.code || error.name)) {
+    ].includes(failureCode)) {
       console.warn(JSON.stringify({
         event: "research_conversation_failure",
         user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
         conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
-        code: error.code || error.name,
+        code: failureCode,
         message: String(error.message || "").slice(0, 500),
         verificationAttempts: Array.isArray(error.verificationAttempts)
           ? error.verificationAttempts.map((attempt) => ({ pass: attempt.pass, issues: attempt.issues }))
           : [],
-        providerStatus: error.providerStatus || null,
+        providerStatus: error.providerStatus || error.status || null,
         incompleteReason: error.incompleteReason || null,
         providerUsage: error.providerUsage || null,
         bindingIssue: error.bindingIssue || null,
-        providerCause: error.providerCause || null
+        providerCause: error.providerCause || null,
+        providerRequestID: error.providerRequestID || null,
+        providerAttempts: error.providerAttempts || null
       }));
       progressResponse.failActive("failed");
-      progressResponse.error(502, "The research model could not return a verified, cited answer.", {
-        code: error.code || error.name
+      const providerUnavailable = ["RESEARCH_PROVIDER_ERROR", "RESEARCH_VERIFIER_ERROR", "TimeoutError"]
+        .includes(failureCode);
+      progressResponse.error(502, providerUnavailable
+        ? "Terra's research service is temporarily unavailable. Your question is still here."
+        : "The research model could not return a verified, cited answer.", {
+        code: failureCode
       });
       return;
     }

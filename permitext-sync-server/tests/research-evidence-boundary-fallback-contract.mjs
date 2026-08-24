@@ -204,8 +204,8 @@ assert.ok(
 assert.match(handler, /requestID: researchRequestID/);
 assert.match(
   handler,
-  /progressResponse\.error\(502, "The research model could not return a verified, cited answer\.", \{[\s\S]*?code: error\.code \|\| error\.name/,
-  "Research verification failures must preserve their server code for native clients."
+  /const providerUnavailable = \["RESEARCH_PROVIDER_ERROR", "RESEARCH_VERIFIER_ERROR", "TimeoutError"\][\s\S]*?"Terra's research service is temporarily unavailable\. Your question is still here\."[\s\S]*?"The research model could not return a verified, cited answer\."[\s\S]*?code: failureCode/,
+  "Research provider outages must be recoverable while verification failures preserve their server code for native clients."
 );
 
 console.log("Permitext Research deterministic evidence-boundary fallback contract passed.");

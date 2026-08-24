@@ -86,12 +86,12 @@ struct ResearchRequestFailurePresentation: Equatable {
             "INVALID_RESEARCH_WEB_CITATION",
             "INVALID_RESEARCH_EVIDENCE_ANALYSIS",
             "INVALID_RESEARCH_VERIFICATION",
-            "RESEARCH_VERIFIER_ERROR",
             "RESEARCH_VERIFICATION_FAILED"
         ]
         let providerCodes: Set<String> = [
             "RESEARCH_NOT_CONFIGURED",
             "RESEARCH_PROVIDER_ERROR",
+            "RESEARCH_VERIFIER_ERROR",
             "RESEARCH_EVAL_SPEND_CAP",
             "TIMEOUTERROR"
         ]
