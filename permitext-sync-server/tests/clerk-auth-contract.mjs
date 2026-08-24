@@ -122,8 +122,9 @@ assert(
   iosSettings.includes("Sign in or create an account") &&
     iosSettings.includes("passwordless email, Apple, Google, or Microsoft") &&
     iosSettings.includes("SignInWithAppleButton") &&
-    iosSettings.includes("clerk.user?.delete()"),
-  "iOS lost the Clerk social sign-in path, its Apple fallback, or identity deletion."
+    iosSettings.includes("request.requestedScopes = [.fullName, .email]") &&
+    iosSettings.includes("try await user.delete()"),
+  "iOS lost the Clerk social sign-in path, its email-capable Apple fallback, or identity deletion."
 );
 assert(
   iosApp.includes("import ClerkKitUI") &&
@@ -140,9 +141,9 @@ assert(
   iosViewModel.includes("guard await requireSignedInBillingAccount(clerk: clerk, then: .purchasePro) else { return }") &&
     iosViewModel.includes("guard await requireSignedInBillingAccount(clerk: clerk, then: .restorePurchases) else { return }") &&
     iosViewModel.includes("Sign in or create a Permitext account before purchasing or restoring Pro.") &&
-    iosSettings.includes("purchasePro(clerk: clerk)") &&
+    iosSettings.includes("requestProSubscriptionStore(clerk: clerk)") &&
     iosSettings.includes("restorePurchases(clerk: clerk)") &&
-    iosApp.includes("purchasePro(clerk: clerk)"),
+    iosApp.includes("requestProSubscriptionStore(clerk: clerk)"),
   "iOS can start StoreKit purchase or restore before establishing its Permitext account."
 );
 assert(iosInfo.includes("PermitextClerkPublishableKey"), "iOS does not expose its Clerk publishable-key build setting.");

@@ -410,7 +410,7 @@ struct SettingsView: View {
 
             } else if library.signedInAccount == nil {
                 SignInWithAppleButton(.signIn) { request in
-                    request.requestedScopes = [.fullName]
+                    request.requestedScopes = [.fullName, .email]
                 } onCompletion: { result in
                     Task {
                         await library.handleAppleSignIn(result: result)
