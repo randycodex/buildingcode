@@ -13,7 +13,9 @@ let evaluationSpendReservation = {
   configurationKey: "",
   capUSD: null,
   reservedUSD: 0,
-  requestCount: 0
+  actualUSD: 0,
+  requestCount: 0,
+  pendingReservations: new Map()
 };
 const productionSpendContext = new AsyncLocalStorage();
 
@@ -252,7 +254,16 @@ export function estimatedResearchCost(usage, environment = process.env) {
 
 export function reserveResearchEvaluationSpend(requestBody, environment = process.env) {
   const rawCap = String(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD || "").trim();
-  if (!rawCap) return { active: false, capUSD: null, reservedUSD: 0, requestCount: 0 };
+  if (!rawCap) {
+    return {
+      active: false,
+      capUSD: null,
+      reservedUSD: 0,
+      actualUSD: 0,
+      requestCount: 0,
+      pendingRequestCount: 0
+    };
+  }
 
   const capUSD = nonnegativeNumber(rawCap);
   const { inputRate, cachedInputRate, outputRate, pricingVersion } = researchPricing(environment);
@@ -270,7 +281,14 @@ export function reserveResearchEvaluationSpend(requestBody, environment = proces
 
   const configurationKey = [capUSD, inputRate, cachedInputRate, outputRate, pricingVersion].join(":");
   if (evaluationSpendReservation.configurationKey !== configurationKey) {
-    evaluationSpendReservation = { configurationKey, capUSD, reservedUSD: 0, requestCount: 0 };
+    evaluationSpendReservation = {
+      configurationKey,
+      capUSD,
+      reservedUSD: 0,
+      actualUSD: 0,
+      requestCount: 0,
+      pendingReservations: new Map()
+    };
   }
 
   // A tokenizer token cannot represent less than one byte. Treating every UTF-8
@@ -291,12 +309,80 @@ export function reserveResearchEvaluationSpend(requestBody, environment = proces
     throw error;
   }
 
-  evaluationSpendReservation = {
-    ...evaluationSpendReservation,
+  const requestCount = evaluationSpendReservation.requestCount + 1;
+  const reservationID = `${pricingVersion}:${requestCount}`;
+  evaluationSpendReservation.reservedUSD = nextReservedUSD;
+  evaluationSpendReservation.requestCount = requestCount;
+  evaluationSpendReservation.pendingReservations.set(reservationID, maximumRequestUSD);
+  const reservation = {
+    active: true,
+    configurationKey,
+    reservationID,
+    maximumRequestUSD,
+    capUSD,
     reservedUSD: nextReservedUSD,
-    requestCount: evaluationSpendReservation.requestCount + 1
+    actualUSD: evaluationSpendReservation.actualUSD,
+    requestCount,
+    pendingRequestCount: evaluationSpendReservation.pendingReservations.size
   };
-  return { active: true, ...evaluationSpendReservation };
+  return {
+    ...reservation,
+    settle: (providerPayload) => settleResearchEvaluationSpend(reservation, providerPayload, environment)
+  };
+}
+
+export function settleResearchEvaluationSpend(reservation, providerPayload, environment = process.env) {
+  if (!reservation?.active) {
+    return {
+      active: false,
+      capUSD: null,
+      reservedUSD: 0,
+      actualUSD: 0,
+      requestCount: 0,
+      pendingRequestCount: 0,
+      settled: false
+    };
+  }
+  const maximumRequestUSD = evaluationSpendReservation.pendingReservations
+    ?.get(reservation.reservationID);
+  if (
+    reservation.configurationKey !== evaluationSpendReservation.configurationKey ||
+    maximumRequestUSD === undefined
+  ) {
+    const error = new Error("A paid evaluation spend reservation could not be reconciled.");
+    error.code = "RESEARCH_EVAL_SPEND_CAP";
+    throw error;
+  }
+  const usage = providerPayload?.usage;
+  const inputTokens = nonnegativeNumber(usage?.input_tokens);
+  const outputTokens = nonnegativeNumber(usage?.output_tokens);
+  if (inputTokens === null || outputTokens === null) {
+    return { ...researchEvaluationSpendStatus(), reservationID: reservation.reservationID, settled: false };
+  }
+  const actualCost = estimatedResearchCost({
+    inputTokens,
+    cachedInputTokens: usage?.input_tokens_details?.cached_tokens,
+    outputTokens
+  }, environment).estimatedUSD;
+  if (actualCost === null) {
+    const error = new Error("Paid evaluation usage could not be reconciled against versioned pricing.");
+    error.code = "RESEARCH_EVAL_SPEND_CAP";
+    throw error;
+  }
+  evaluationSpendReservation.pendingReservations.delete(reservation.reservationID);
+  evaluationSpendReservation.actualUSD = Number(
+    (evaluationSpendReservation.actualUSD + actualCost).toFixed(6)
+  );
+  evaluationSpendReservation.reservedUSD = Number(Math.max(
+    evaluationSpendReservation.actualUSD,
+    evaluationSpendReservation.reservedUSD - maximumRequestUSD + actualCost
+  ).toFixed(6));
+  return {
+    ...researchEvaluationSpendStatus(),
+    reservationID: reservation.reservationID,
+    settledUSD: actualCost,
+    settled: true
+  };
 }
 
 export function researchEvaluationSpendStatus() {
@@ -304,6 +390,8 @@ export function researchEvaluationSpendStatus() {
     active: Boolean(evaluationSpendReservation.configurationKey),
     capUSD: evaluationSpendReservation.capUSD,
     reservedUSD: evaluationSpendReservation.reservedUSD,
-    requestCount: evaluationSpendReservation.requestCount
+    actualUSD: evaluationSpendReservation.actualUSD,
+    requestCount: evaluationSpendReservation.requestCount,
+    pendingRequestCount: evaluationSpendReservation.pendingReservations.size
   };
 }

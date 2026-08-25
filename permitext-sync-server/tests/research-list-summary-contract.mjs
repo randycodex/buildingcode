@@ -18,6 +18,17 @@ const [appSource, clientSource, stylesSource, indexSource] = await Promise.all([
   readFile(join(root, "../public/index.html"), "utf8")
 ]);
 
+assert.match(
+  appSource,
+  /catch \(error\) \{[\s\S]*?if \(response\.headersSent\) \{[\s\S]*?if \(!response\.writableEnded\) response\.end\(\);[\s\S]*?return;/,
+  "A failure after Research streaming starts must end the response without attempting to write HTTP headers again."
+);
+assert.match(
+  appSource,
+  /evidenceLimitations: \{ type: "array", minItems: 1, items: \{ type: "string", minLength: 1 \} \}/,
+  "The Research response schema must prevent blank or missing evidence limitations before validation."
+);
+
 function functionSource(source, name) {
   const asyncStart = source.indexOf(`async function ${name}(`);
   const start = asyncStart >= 0 ? asyncStart : source.indexOf(`function ${name}(`);
@@ -377,6 +388,8 @@ assert.match(appSource, /"repeated_established_fact"/, "The verifier cannot clas
 assert.match(appSource, /Fail with unnecessary_qualification/, "The verifier is not instructed to reject unjustified caution.");
 assert.match(appSource, /Fail with repeated_established_fact/, "The verifier is not instructed to reject repeated fact requests.");
 assert.match(appSource, /If the value complies with a stricter baseline limit/, "The answer model is not instructed to preserve the strongest numeric-table conclusion.");
+assert.match(appSource, /same supplied table row places the user's stated category beside a materially different conditional category/, "The answer model can omit a material adjacent table category that explains the result.");
+assert.match(appSource, /table answer omits a materially different conditional category supplied beside the user's category/, "The verifier cannot catch misleading omissions from the applicable table row.");
 assert.match(appSource, /Treat a corpus or evidence limitation as a boundary/, "The answer model may still turn a missing source into an unsupported legal requirement.");
 assert.match(appSource, /Preserve the factual content of an established user shorthand such as fully sprinklered/, "The answer model may still re-ask an established sprinkler fact.");
 assert.match(appSource, /accumulatedResearchVerificationIssues\(verificationAttempts\)/, "Bounded revisions do not retain earlier verifier corrections.");
@@ -406,7 +419,8 @@ assert.deepEqual(
 );
 assert.match(appSource, /projectFactsUsed\.maxItems = 0/, "The evidence-analysis schema does not forbid invented Project facts when no Project facts exist.");
 assert.match(appSource, /max_output_tokens: 6_000,/, "The evidence-analysis model can still be cut off before returning its structured legal-research map.");
-assert.match(appSource, /max_output_tokens: 2_000,/, "The Research verifier can still be cut off before returning its structured result.");
+assert.match(appSource, /max_output_tokens: 4_000,/, "The Research verifier can still be cut off before returning its structured result.");
+assert.match(appSource, /timeoutMilliseconds: 45_000,[\s\S]*?failureMessage: "The Research verifier request failed\."/, "The Research verifier timeout is too short for a complex evidence package.");
 assert.match(appSource, /maximumResearchVerificationAttempts = 3/, "Research does not preserve two bounded correction opportunities behind the verifier gate.");
 assert.match(clientSource, /function wireResearchDetailsMotion\(details, body\)/, "Research disclosures do not share the standard collapsible motion helper.");
 assert.match(clientSource, /wireResearchDetailsMotion\(evidenceReviewed, evidenceReviewedBody\)/, "Evidence reviewed does not use the shared disclosure motion.");

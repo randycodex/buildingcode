@@ -66,6 +66,7 @@ export function researchProviderFailure({
   error.providerCause = providerCause({ cause, payload, status });
   error.providerRequestID = providerResponseHeader(response, "x-request-id");
   error.providerAttempts = Math.max(1, Number(attempts) || 1);
+  error.providerUsage = payload?.usage || null;
   return error;
 }
 
@@ -79,12 +80,13 @@ export async function requestResearchProvider({
   maximumAttempts = 2,
   fetchImpl = globalThis.fetch,
   reserveEvaluationSpend = () => {},
+  settleEvaluationSpend = null,
   reserveProviderSpend = () => ({ active: false }),
   settleProviderSpend = () => {}
 }) {
   const attempts = Math.max(1, Math.min(2, Number(maximumAttempts) || 1));
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    reserveEvaluationSpend(requestBody);
+    const evaluationSpendReservation = reserveEvaluationSpend(requestBody);
     const providerSpendReservation = reserveProviderSpend(requestBody);
     let response;
     try {
@@ -116,6 +118,11 @@ export async function requestResearchProvider({
 
     const payload = await response.json().catch(() => ({}));
     settleProviderSpend(providerSpendReservation, payload);
+    if (typeof settleEvaluationSpend === "function") {
+      settleEvaluationSpend(evaluationSpendReservation, payload);
+    } else if (typeof evaluationSpendReservation?.settle === "function") {
+      evaluationSpendReservation.settle(payload);
+    }
     if (response.ok) return { response, payload, attempts: attempt };
     if (attempt < attempts && transientProviderStatuses.has(response.status)) {
       await waitForProviderRetry(providerRetryDelay(attempt), signal);

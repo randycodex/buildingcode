@@ -46,6 +46,28 @@ assert.equal(
   0,
   "A code classification statement was incorrectly promoted into a project fact."
 );
+const classificationQuestion = resolve(
+  "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?"
+);
+assert.equal(
+  classificationQuestion.facts.establishedFacts.some((item) => item.key === "occupancy_group"),
+  false,
+  "A requested occupancy classification was incorrectly promoted into an established fact."
+);
+assert.equal(
+  resolve("The room is classified as Group B.").facts.establishedFacts
+    .find((item) => item.key === "occupancy_group")?.value,
+  "B",
+  "A declarative occupancy classification should remain an established fact."
+);
+const mixedOccupancyBuilding = resolve(
+  "A residential-building cellar contains Group B, F, and S spaces plus a multipurpose assembly room with fewer than 75 occupants."
+);
+assert.equal(
+  mixedOccupancyBuilding.facts.establishedFacts.some((item) => item.key === "occupancy_group"),
+  false,
+  "A contained occupancy was incorrectly promoted into the principal building occupancy."
+);
 
 const officeFollowUp = resolve(
   "Why do the 1,200 sf area and 12 employees not change that classification under the cited provision?",

@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260817-routed-multi-corpus-evidence-v11";
+export const researchEvidenceAssemblyVersion = "20260824-routed-multi-corpus-evidence-v12";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -136,6 +136,32 @@ function previousConversationTopic(messages) {
   return "";
 }
 
+function prioritizedProjectFacts(question, projectFacts) {
+  const values = (Array.isArray(projectFacts) ? projectFacts : [])
+    .map((fact) => compactText(fact))
+    .filter(Boolean);
+  const normalizedQuestion = compactText(question).toLowerCase();
+  const questionTerms = new Set(
+    normalizedQuestion.match(/[a-z0-9][a-z0-9-]{2,}/g) || []
+  );
+  const zoningQuestion = /\b(?:zoning|district|far|floor area ratio|parking|setback|yard|lot coverage|permitted use|use permitted|development rights?)\b/i.test(normalizedQuestion);
+  const constructionQuestion = /\b(?:building code|construction|occupancy|egress|travel distance|plumbing|fixture|sprinkler|fire code)\b/i.test(normalizedQuestion);
+  return values
+    .map((text, index) => {
+      const normalizedFact = text.toLowerCase();
+      let score = 0;
+      if (zoningQuestion && /^zoning fact\s+—/i.test(text)) score += 1_000;
+      if (constructionQuestion && /^building\s*\/\s*code fact\s+—/i.test(text)) score += 1_000;
+      for (const term of questionTerms) {
+        if (normalizedFact.includes(term)) score += 10;
+      }
+      if (/\b(?:address|borough|bbl|block|tax lot|community district)\b/i.test(text)) score += 2;
+      return { text, index, score };
+    })
+    .sort((left, right) => right.score - left.score || left.index - right.index)
+    .map(({ text }) => text);
+}
+
 export function researchEvidenceRetrievalQuery({
   question,
   previousTopic = "",
@@ -163,9 +189,10 @@ export function researchEvidenceRetrievalQuery({
   });
   const rootTopic = topicDecision.rootTopic.text;
   const immediateTopic = topicDecision.currentTopic.text || previousConversationTopic(previousMessages);
-  const factContext = Array.isArray(projectFacts)
-    ? projectFacts.map((fact) => compactText(fact)).filter(Boolean).slice(0, 30).join("; ").slice(0, 4_000)
-    : "";
+  const factContext = prioritizedProjectFacts(normalizedQuestion, projectFacts)
+    .slice(0, 30)
+    .join("; ")
+    .slice(0, 4_000);
   const maximumQueryCharacters = 2_000;
   let retrievalQuery = normalizedQuestion;
   let previousTopicApplied = false;
@@ -281,6 +308,9 @@ function candidateValues(discovery) {
 
 async function canonicalSection(resolveSection, value, origin) {
   const requested = sectionDescriptor(value);
+  const requestedRichSourceIDs = Array.isArray(value?.richSourceIDs)
+    ? new Set(value.richSourceIDs.map((item) => compactText(item)).filter(Boolean))
+    : null;
   const resolved = await resolveSection({ ...requested, origin });
   if (!resolved || typeof resolved !== "object") {
     throw new Error(`Canonical enacted text is unavailable for ${requested.sectionID || requested.sectionNumber || "the requested section"}.`);
@@ -295,7 +325,9 @@ async function canonicalSection(resolveSection, value, origin) {
     text,
     body: resolved.body,
     crossReferences: Array.isArray(resolved.crossReferences) ? resolved.crossReferences : [],
-    richSources: Array.isArray(resolved.richSources) ? structuredClone(resolved.richSources) : []
+    richSources: (Array.isArray(resolved.richSources) ? resolved.richSources : [])
+      .filter((source) => requestedRichSourceIDs === null || requestedRichSourceIDs.has(compactText(source?.id)))
+      .map((source) => structuredClone(source))
   };
 }
 
@@ -373,30 +405,51 @@ function attachStructuredTable(record, value, characterAllowance) {
 function inlineCrossReferences(text, fallbackCodePrefix) {
   const source = compactText(text);
   const references = [];
-  const rangePattern = /\b(?:(AC|BC|EBC|FC|FGC|MC|PC)\s+)?(?:Sections?|§{1,2})\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\s+(?:through|to|[-–])\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
+  const rangePattern = /\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?(?:Sections?|§{1,2})\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\s+(?:through|to|[-–])\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
   for (const match of source.matchAll(rangePattern)) {
     const start = String(match[2] || "").replace(/\.$/, "");
     const end = String(match[3] || "").replace(/\.$/, "");
     const startParts = start.split(".");
     const endParts = end.split(".");
-    const sameParent = startParts.length === endParts.length &&
+    const sameDottedParent = startParts.length === endParts.length &&
       startParts.length > 1 &&
       startParts.slice(0, -1).join(".") === endParts.slice(0, -1).join(".");
-    const first = Number(startParts.at(-1));
-    const last = Number(endParts.at(-1));
-    if (!sameParent || !Number.isInteger(first) || !Number.isInteger(last) || last < first || last - first > 50) {
-      continue;
-    }
     const codePrefix = String(match[1] || fallbackCodePrefix || "").toUpperCase();
-    for (let value = first; value <= last; value += 1) {
-      references.push({
-        codePrefix,
-        sectionNumber: [...startParts.slice(0, -1), value].join("."),
-        referenceKind: "section"
-      });
+    if (sameDottedParent) {
+      const first = Number(startParts.at(-1));
+      const last = Number(endParts.at(-1));
+      if (Number.isInteger(first) && Number.isInteger(last) && last >= first && last - first <= 50) {
+        for (let value = first; value <= last; value += 1) {
+          references.push({
+            codePrefix,
+            sectionNumber: [...startParts.slice(0, -1), value].join("."),
+            referenceKind: "section"
+          });
+        }
+        continue;
+      }
+    }
+    const startHyphen = start.match(/^([A-Z]?\d+)-(\d+)$/i);
+    const endHyphen = end.match(/^([A-Z]?\d+)-(\d+)$/i);
+    const first = Number(startHyphen?.[2]);
+    const last = Number(endHyphen?.[2]);
+    if (
+      startHyphen && endHyphen &&
+      startHyphen[1].toUpperCase() === endHyphen[1].toUpperCase() &&
+      startHyphen[2].length === endHyphen[2].length &&
+      Number.isInteger(first) && Number.isInteger(last) &&
+      last >= first && last - first <= 50
+    ) {
+      for (let value = first; value <= last; value += 1) {
+        references.push({
+          codePrefix,
+          sectionNumber: `${startHyphen[1]}-${String(value).padStart(startHyphen[2].length, "0")}`,
+          referenceKind: "section"
+        });
+      }
     }
   }
-  const pattern = /\b(?:(AC|BC|EBC|FC|FGC|MC|PC)\s+)?(?:Sections?|§{1,2}|Table)\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
+  const pattern = /\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?(?:Sections?|§{1,2}|Table)\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
   for (const match of source.matchAll(pattern)) {
     references.push({
       codePrefix: String(match[1] || fallbackCodePrefix || "").toUpperCase(),
@@ -577,12 +630,20 @@ export async function assembleResearchEvidence({
   const routedTopicPresent = prioritizedCandidates.some((candidate) =>
     candidate?.signals?.exactTopicRouteTarget === true
   );
-  const candidates = query.relevanceComparison && routedTopicPresent
+  const relevanceCandidates = query.relevanceComparison && routedTopicPresent
     ? prioritizedCandidates.filter((candidate) =>
         ["governing", "contextual"].includes(candidate?.evidencePriority?.evidenceRole) ||
         candidate?.evidencePriority?.primaryFunction === "definition"
       )
     : prioritizedCandidates;
+  const selectedBuildingCodePassageBoundary =
+    /\bbased only on (?:the )?selected Building Code passages?\b/i.test(query.question);
+  const candidates = selectedBuildingCodePassageBoundary && routedTopicPresent
+    ? relevanceCandidates.filter((candidate) =>
+        candidate?.signals?.exactTopicRouteTarget === true &&
+        compactText(candidate?.codePrefix).toUpperCase() === "BC"
+      )
+    : relevanceCandidates;
   const nonMaterialCandidateCount = prioritizedCandidates.length - candidates.length;
   await onStage?.("searching_authorized_library", "completed");
   await onStage?.("reviewing_provisions", "active");
@@ -728,10 +789,20 @@ export async function assembleResearchEvidence({
       targetedDefinition: targeted.excerpt,
       retrievedAt
     });
+    const useSelectedPassageOnly = candidate?.signals?.useSelectedPassageOnly === true;
+    if (useSelectedPassageOnly) {
+      const selectedPassage = compactText(candidate.selectedText).slice(0, allowance);
+      if (selectedPassage) {
+        record.text = selectedPassage;
+        record.canonicalContextComplete = false;
+        record.truncated = false;
+        record.discoveryPassageOnly = true;
+      }
+    }
     if (!record.text) break;
     sources.push(record);
     if (targeted.excerpt) targetedDefinitionCount += 1;
-    canonicalForExpansion.push(query.relevanceComparison
+    canonicalForExpansion.push(useSelectedPassageOnly || query.relevanceComparison
       ? { ...resolved, text: record.text, canonicalText: record.text, crossReferences: [] }
       : resolved);
     includedSectionIdentities.add(sectionIdentity(resolved));

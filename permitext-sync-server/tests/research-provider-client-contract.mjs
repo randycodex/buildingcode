@@ -21,6 +21,7 @@ function requestOptions(overrides = {}) {
 {
   let fetchAttempts = 0;
   let evaluationReservations = 0;
+  let evaluationSettlements = 0;
   let providerReservations = 0;
   let providerSettlements = 0;
   const result = await requestResearchProvider(requestOptions({
@@ -30,7 +31,12 @@ function requestOptions(overrides = {}) {
         ? providerResponse(503, { error: { code: "service_unavailable" } })
         : providerResponse(200, { id: "response-after-retry" });
     },
-    reserveEvaluationSpend: () => { evaluationReservations += 1; },
+    reserveEvaluationSpend: () => ({ active: true, reservationID: `evaluation-${++evaluationReservations}` }),
+    settleEvaluationSpend: (reservation, payload) => {
+      evaluationSettlements += 1;
+      assert.equal(reservation.reservationID, `evaluation-${evaluationSettlements}`);
+      assert(payload.error || payload.id);
+    },
     reserveProviderSpend: () => ({ active: true, reservationID: `request-${++providerReservations}` }),
     settleProviderSpend: () => { providerSettlements += 1; }
   }));
@@ -38,8 +44,24 @@ function requestOptions(overrides = {}) {
   assert.equal(result.attempts, 2);
   assert.equal(fetchAttempts, 2);
   assert.equal(evaluationReservations, 2);
+  assert.equal(evaluationSettlements, 2);
   assert.equal(providerReservations, 2);
   assert.equal(providerSettlements, 2);
+}
+
+{
+  let fallbackSettlements = 0;
+  await requestResearchProvider(requestOptions({
+    fetchImpl: async () => providerResponse(200, { id: "settled-by-reservation" }),
+    reserveEvaluationSpend: () => ({
+      active: true,
+      settle: (payload) => {
+        fallbackSettlements += 1;
+        assert.equal(payload.id, "settled-by-reservation");
+      }
+    })
+  }));
+  assert.equal(fallbackSettlements, 1);
 }
 
 {
@@ -59,6 +81,7 @@ function requestOptions(overrides = {}) {
       assert.equal(error.providerCause, "invalid_request_error");
       assert.equal(error.providerRequestID, "req_test_400");
       assert.equal(error.providerAttempts, 1);
+      assert.equal(error.providerUsage, null);
       return true;
     }
   );

@@ -213,7 +213,8 @@ import {
   createResearchCorpusRegistry,
   researchCorpusByPrefix,
   researchCorpusRegistryVersion,
-  routeResearchCorpora
+  routeResearchCorpora,
+  unapprovedZoningDiagnosticEnabled
 } from "./research-corpus-registry.mjs";
 import {
   evaluateResearchRequiredClaimCoverage,
@@ -500,7 +501,7 @@ const researchInterpretationSchema = {
     assumptions: { type: "array", items: { type: "string" } },
     missingFacts: { type: "array", items: { type: "string" } },
     followUpQuestions: { type: "array", maxItems: 8, items: { type: "string" } },
-    evidenceLimitations: { type: "array", items: { type: "string" } },
+    evidenceLimitations: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } },
     additionalEvidenceNeeded: { type: "array", items: { type: "string" } },
     supportingSourceUses: {
       type: "array",
@@ -6730,9 +6731,10 @@ const cachedResearchCorpusResources = new Map();
 async function currentResearchCorpusRegistry() {
   if (cachedResearchCorpusRegistry) return cachedResearchCorpusRegistry;
   const zoningMetadata = await zoningContentMetadata();
+  const zoningDiagnosticEnabled = unapprovedZoningDiagnosticEnabled();
   cachedResearchCorpusRegistry = createResearchCorpusRegistry({
-    zoningResearchEligibility: zoningMetadata.researchEligibility === true,
-    zoningBlockedReason: zoningMetadata.researchBlockedReason
+    zoningResearchEligibility: zoningMetadata.researchEligibility === true || zoningDiagnosticEnabled,
+    zoningBlockedReason: zoningDiagnosticEnabled ? null : zoningMetadata.researchBlockedReason
   });
   return cachedResearchCorpusRegistry;
 }
@@ -6741,6 +6743,7 @@ async function researchCorpusPlanForTurn({
   question,
   messages = [],
   projectCodeVersion = null,
+  projectFacts = [],
   pinnedEvidence = []
 }) {
   const registry = await currentResearchCorpusRegistry();
@@ -6748,6 +6751,7 @@ async function researchCorpusPlanForTurn({
     question,
     previousMessages: messages,
     projectCodeVersion,
+    projectFacts,
     registry
   });
   const selectedIDs = new Set(routed.selected.map((corpus) => corpus.id));
@@ -7481,6 +7485,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       "Treat evidence labeled contextual only as the subject of a relevance comparison. Do not place it among controlling provisions or general rules, and do not treat evidence labeled irrelevant as answer support.",
       "Treat evidence labeled with a collateral topic route as internally reviewed material matched only by a supplied project fact. Do not classify it as controlling or a general rule for the current question unless the question expressly asks that separate legal topic.",
       "Separate general rules, exceptions, conditions, limitations, definitions, cross-references, tables, known project facts, unresolved project facts, and evidence limitations.",
+      "When a supplied table places the stated project category beside a materially different conditional category in the same row, record both values and the fact that selects between them. Do not apply the alternative category unless the user supplied its qualifying fact.",
       "Make the strongest supported distinctions, including contradictions in the user's premise and requirements attributed to the wrong exception.",
       "Use only exact supplied Project facts, established conversation facts, or current-turn hypothetical facts in projectFactsUsed. Do not turn missing facts into assumptions.",
       "A fact explicitly established by the user in the active topic is known for this discussion even when it came from an earlier turn. Do not list it as unresolved or ask the user to reconfirm it merely because it is conversational state.",
@@ -7601,10 +7606,33 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole) &&
     section?.evidencePriority?.topicRouteRelationship !== "collateral"
   );
-  const answerEvidence = materialEvidence.length ? materialEvidence : evidence;
-  const subject = answerEvidence.length === 1
-    ? `the enacted provision, ${answerEvidence[0].sectionNumber || answerEvidence[0].title}`
-    : `the ${answerEvidence.length} enacted provisions Permitext assembled`;
+  const requiredSourceIDs = new Set(
+    (Array.isArray(options.requiredClaims) ? options.requiredClaims : []).flatMap((claim) => [
+      ...(Array.isArray(claim?.sourceIDs) ? claim.sourceIDs : []),
+      ...(Array.isArray(claim?.evidenceOptions)
+        ? claim.evidenceOptions.flatMap((option) => option?.sourceIDs || [])
+        : [])
+    ]).map((sourceID) => String(sourceID || "").trim()).filter(Boolean)
+  );
+  const eligibleEvidence = materialEvidence.length ? materialEvidence : evidence;
+  const requiredEvidence = evidence.filter((section) => requiredSourceIDs.has(section.sourceID));
+  const answerEvidence = [
+    ...requiredEvidence,
+    ...eligibleEvidence.filter((section) => !requiredSourceIDs.has(section.sourceID))
+  ];
+  const answerEvidenceGroups = Array.from(answerEvidence.reduce((groups, section) => {
+    const key = String(section.sectionID || section.sourceID);
+    const existing = groups.get(key);
+    if (existing) {
+      if (!existing.sourceIDs.includes(section.sourceID)) existing.sourceIDs.push(section.sourceID);
+    } else {
+      groups.set(key, { section, sourceIDs: [section.sourceID] });
+    }
+    return groups;
+  }, new Map()).values());
+  const subject = answerEvidenceGroups.length === 1
+    ? `the enacted provision, ${answerEvidenceGroups[0].section.sectionNumber || answerEvidenceGroups[0].section.title}`
+    : `the ${answerEvidenceGroups.length} enacted provisions Permitext assembled`;
   const conversational = options.responseStyle === "conversational";
   const acceptsConditionalYes = /^(?:can|could|does|is|are|may|must|should|will|would)\b/i
     .test(String(question || "").trim());
@@ -7618,13 +7646,13 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     : "The assembled enacted code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.";
   return {
     answerText: [directAnswer, application].join("\n\n"),
-    supportedPoints: answerEvidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
+    supportedPoints: answerEvidenceGroups.slice(0, maximumResearchSupportedPoints).map(({ section, sourceIDs }) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
         ? `This provision supplies one of the rules that controls the answer to “${question}”.`
         : `The enacted text from ${section.sectionNumber || section.title} is part of the evidence authorized for this Research.`,
       sectionID: section.sectionID,
-      sourceIDs: [section.sourceID || `section-${section.sectionID}`]
+      sourceIDs
     })),
     assumptions: ["Only the enacted 2022 New York City Construction Code provisions assembled for this answer were treated as governing authority."],
     missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
@@ -7632,9 +7660,9 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     evidenceLimitations: ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
     additionalEvidenceNeeded: ["Confirm any referenced standard, agency rule, figure, or other authority outside the current enacted corpus before final reliance."],
     supportingSourceUses: [],
-    citations: answerEvidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
+    citations: answerEvidenceGroups.slice(0, maximumResearchSupportedPoints).map(({ section, sourceIDs }) => ({
       sectionID: section.sectionID,
-      sourceIDs: [section.sourceID || `section-${section.sectionID}`],
+      sourceIDs,
       relevance: `Enacted evidence from ${section.sectionNumber || section.title}.`
     }))
   };
@@ -8180,10 +8208,12 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Use answerText to apply the supported rules to the question and user-provided Project facts. Do not merely repeat the structured supportedPoints.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
         "For a numeric limit or table comparison, compare the stated project value with every directly applicable supplied limit. If the value complies with a stricter baseline limit, state that direct conclusion and do not make it conditional on qualifying for a more generous allowance.",
+        "When the same supplied table row places the user's stated category beside a materially different conditional category, briefly identify the alternate value and its qualifying condition when that contrast explains the result. Never apply the alternate value without the qualifying fact.",
         "A missing fact belongs in missingFacts or followUpQuestions only when it can change the requested conclusion. A fact that merely confirms an already-supported, more conservative result may be identified as a professional validation item, but it must not weaken or condition that result.",
         "Treat a corpus or evidence limitation as a boundary on what Permitext evaluated, not as proof that another provision imposes a requirement. Do not say an outside or unsupplied provision requires verification or might change the result unless supplied enacted evidence establishes that consequence.",
         "Every passage marked REQUIRED_CLAIM_COVERAGE must be addressed in at least one supportedPoint and cited with that exact PASSAGE_ID. Combine closely related passages in one coherent supportedPoint when needed; do not satisfy this by adding an orphan citation without explaining the rule.",
         "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
+          "evidenceLimitations must contain at least one non-empty statement describing the boundary of the supplied evidence; never return an empty array or blank item.",
           "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
           "Facts stated by the user may support the answer. Restate a material fact when it helps explain the result, but do not make the answer conditional merely because that fact came from an earlier user turn.",
           "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
@@ -8321,7 +8351,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     model: configuration.model,
     store: false,
     reasoning: { effort: "low" },
-    max_output_tokens: 2_000,
+    max_output_tokens: 4_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
@@ -8336,6 +8366,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Fail with repeated_established_fact when the answer asks the user to establish or reconfirm a fact already supplied for the active topic. Independent professional verification of documents or measurements is different and may still be identified when material.",
       "When the user has established that a building is fully sprinklered, treat installed throughout as established factual context. The answer may request documentation of compliance with a named installation standard when material, but must not return fully sprinklered or installed throughout as a missing fact or follow-up question.",
       "For a numeric limit or table comparison, fail with weakest_supported_conclusion when the stated value satisfies a stricter directly applicable supplied limit but the answer makes compliance conditional on qualifying for a more generous allowance.",
+      "Fail with missed_material_conclusion when a table answer omits a materially different conditional category supplied beside the user's category in the same row and that omission could mislead the user about why the stated value fails or passes. Do not demand unrelated rows or categories.",
       "Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement, or says unsupplied law requires verification or could change the result without enacted support.",
       "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",
       "Treat established active-topic facts as supplied user facts. Fail an answer that calls one of them missing, makes the conclusion conditional solely because it came from an earlier turn, or asks the user to reconfirm it without a contradiction. Do not treat prior assistant conclusions as established facts.",
@@ -8385,7 +8416,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     apiKey,
     requestBody,
     signal: options.signal,
-    timeoutMilliseconds: 30_000,
+    timeoutMilliseconds: 45_000,
     failureMessage: "The Research verifier request failed.",
     failureCode: "RESEARCH_VERIFIER_ERROR",
     reserveEvaluationSpend: reserveResearchEvaluationSpend,
@@ -9229,7 +9260,11 @@ async function assembledResearchEvidenceForTurn({
   corpusPlan,
   onStage
 }) {
-  const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({ question, messages });
+  const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({
+    question,
+    messages,
+    projectFacts
+  });
   const { catalog, invertedIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
   const strategy = researchEvidenceStrategyForTurn({
     question,
@@ -16298,6 +16333,7 @@ async function handleResearchConversationMessage(request, response) {
       question,
       messages: conversation.messages || [],
       projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
+      projectFacts: combinedProjectFacts,
       pinnedEvidence
     });
     const answerCodeBasis = researchCodeBasis(
@@ -16458,7 +16494,8 @@ async function handleResearchConversationMessage(request, response) {
     let result = mockMode
       ? {
           interpretation: validateResearchInterpretation(mockResearchInterpretation(question, assembledEvidence, {
-            responseStyle: "conversational"
+            responseStyle: "conversational",
+            requiredClaims
           }), assembledEvidence, webSupport.sources),
           model: "permitext-mock",
           configuration: {
@@ -16495,6 +16532,7 @@ async function handleResearchConversationMessage(request, response) {
       answer: result.interpretation
     });
     let answerQuality = evaluateResearchAnswerQuality({
+      question,
       evidence: assembledEvidence,
       answer: result.interpretation
     });
@@ -16519,6 +16557,7 @@ async function handleResearchConversationMessage(request, response) {
         answer: result.interpretation
       });
       answerQuality = evaluateResearchAnswerQuality({
+        question,
         evidence: assembledEvidence,
         answer: result.interpretation
       });
@@ -16571,6 +16610,7 @@ async function handleResearchConversationMessage(request, response) {
           answer: result.interpretation
         });
         answerQuality = evaluateResearchAnswerQuality({
+          question,
           evidence: assembledEvidence,
           answer: result.interpretation
         });
@@ -27667,6 +27707,15 @@ export async function handleRequest(request, response) {
   try {
     await withFileStoreLock(dataPath, () => handleRequestUnlocked(request, response));
   } catch (error) {
+    if (response.headersSent) {
+      console.error(JSON.stringify(sanitizedServerErrorReport(error, {
+        route: requestTelemetryRoute(normalizePath(request.url)),
+        method: request.method,
+        requestID: request.headers?.["x-vercel-id"]
+      })));
+      if (!response.writableEnded) response.end();
+      return;
+    }
     if (error?.code === "FILE_STORE_LOCK_TIMEOUT") {
       sendError(response, 503, "Local data storage is busy. Please retry.");
       return;
@@ -27676,8 +27725,6 @@ export async function handleRequest(request, response) {
       method: request.method,
       requestID: request.headers?.["x-vercel-id"]
     })));
-    if (!response.headersSent) {
-      sendError(response, 500, "Internal server error.");
-    }
+    sendError(response, 500, "Internal server error.");
   }
 }

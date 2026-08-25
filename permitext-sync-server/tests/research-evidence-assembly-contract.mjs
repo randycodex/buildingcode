@@ -39,6 +39,22 @@ const canonicalSections = new Map([
     title: "Overflow candidate",
     canonicalText: "BC 1019.3.3 Overflow candidate. This candidate must be excluded by the discovered-source bound."
   }],
+  ["prose-table", {
+    sectionID: "prose-table",
+    codePrefix: "BC",
+    sectionNumber: "1006.3.2",
+    title: "Single exits",
+    canonicalText: "Item 7 permits one exit for a Group R-2 Type I or II building not exceeding six stories and 2,000 square feet per story. See Table 1006.3.2.",
+    richSources: [{
+      id: "table-1006.3.2",
+      kind: "table",
+      reference: "BC Table 1006.3.2",
+      contentHash: "b".repeat(64),
+      rowCount: 1,
+      text: "Story Occupancy Maximum occupant load First R-2 10",
+      grids: [{ rows: [{ cells: [{ text: "First" }, { text: "R-2" }, { text: "10" }] }] }]
+    }]
+  }],
   ["cross-1", {
     sectionID: "cross-1",
     codePrefix: "BC",
@@ -80,7 +96,24 @@ const canonicalSections = new Map([
     sectionNumber: "1107.6.3",
     title: "Group R-3",
     canonicalText: "Group R-3 enacted text."
-  }]
+  }],
+  ["zr-range-root", {
+    sectionID: "zr-range-root",
+    codePrefix: "ZR",
+    sectionNumber: "73-62",
+    title: "Bulk modifications",
+    canonicalText: "The special permit provisions are set forth in ZR Sections 73-621 through 73-624."
+  }],
+  ...["73-621", "73-622", "73-623", "73-624"].map((sectionNumber) => [
+    `zr-${sectionNumber}`,
+    {
+      sectionID: `zr-${sectionNumber}`,
+      codePrefix: "ZR",
+      sectionNumber,
+      title: `Zoning provision ${sectionNumber}`,
+      canonicalText: `ZR ${sectionNumber} enacted text.`
+    }
+  ])
 ]);
 
 const resolverCalls = [];
@@ -259,6 +292,40 @@ assert.equal(structuredPinned.sources[0].text, "Exact structured table text.");
 assert.equal(structuredPinned.sources[0].richSourceID, "table-source-1");
 assert.equal(structuredPinned.sources[0].richSourceGrids[0].rows[0].cells[0].rowSpan, 1);
 
+const structuredProse = await assembleResearchEvidence({
+  question: "Can this six-story R-2 building use one exit?",
+  discover: async () => ({
+    candidates: [{
+      sectionID: "prose-table",
+      codePrefix: "BC",
+      sectionNumber: "1006.3.2",
+      richSourceIDs: [],
+      signals: { exactTopicRouteTarget: true, referencesTable: false, includesStructuredTable: false }
+    }]
+  }),
+  resolveSection,
+  limits: { maximumDiscovered: 1, maximumCharacters: 2_000, maximumCharactersPerSource: 1_000 }
+});
+assert.match(structuredProse.sources[0].text, /Item 7 permits one exit/);
+assert.equal(structuredProse.sources[0].richSourceID, undefined);
+
+const structuredTableOnly = await assembleResearchEvidence({
+  question: "What does Table 1006.3.2 say?",
+  discover: async () => ({
+    candidates: [{
+      sectionID: "prose-table",
+      codePrefix: "BC",
+      sectionNumber: "1006.3.2",
+      richSourceIDs: ["table-1006.3.2"],
+      signals: { exactTopicRouteTarget: true, referencesTable: true, includesStructuredTable: true }
+    }]
+  }),
+  resolveSection,
+  limits: { maximumDiscovered: 1, maximumCharacters: 2_000, maximumCharactersPerSource: 1_000 }
+});
+assert.equal(structuredTableOnly.sources[0].text, "Story Occupancy Maximum occupant load First R-2 10");
+assert.equal(structuredTableOnly.sources[0].richSourceID, "table-1006.3.2");
+
 const rangedCrossReferences = await assembleResearchEvidence({
   question: "Which residential accessibility category applies?",
   discover: async () => ({ candidates: [{ sectionID: "range-root", codePrefix: "BC", sectionNumber: "1107.6" }] }),
@@ -271,6 +338,22 @@ assert.deepEqual(
     .map((source) => source.sectionNumber),
   ["1107.6.1", "1107.6.2", "1107.6.3"],
   "Same-parent enacted section ranges must expand into each direct cross-reference."
+);
+
+const zoningRangedCrossReferences = await assembleResearchEvidence({
+  question: "Which provisions govern this zoning special permit?",
+  discover: async () => ({
+    candidates: [{ sectionID: "zr-range-root", codePrefix: "ZR", sectionNumber: "73-62" }]
+  }),
+  resolveSection,
+  limits: { maximumDiscovered: 1, maximumCrossReferences: 4, maximumCharacters: 3_000 }
+});
+assert.deepEqual(
+  zoningRangedCrossReferences.sources
+    .filter((source) => source.origin === "permitext_cross_reference")
+    .map((source) => source.sectionNumber),
+  ["73-621", "73-622", "73-623", "73-624"],
+  "Zoning Resolution hyphen ranges must expand into every bounded interior provision."
 );
 
 const independentQuery = researchEvidenceRetrievalQuery({
@@ -297,6 +380,25 @@ const maximumLengthQuestion = researchEvidenceRetrievalQuery({
 assert.equal(maximumLengthQuestion.retrievalQuery, maximumLengthQuestion.question);
 assert.equal(maximumLengthQuestion.previousTopicApplied, false);
 assert.equal(maximumLengthQuestion.projectFactsApplied, false);
+
+const zoningFactAfterBuildingFacts = researchEvidenceRetrievalQuery({
+  question: "What FAR applies in this zoning district?",
+  projectFacts: [
+    ...Array.from({ length: 35 }, (_, index) =>
+      `Building / Code Fact — Building detail ${index + 1}: ${"unrelated ".repeat(8)}`
+    ),
+    "Zoning Fact — Zoning District(s): R7A (NYC Planning sourced data; verify current official records)",
+    "Zoning Fact — Zoning Map: 3b (NYC Planning sourced data; verify current official records)"
+  ]
+});
+assert.equal(zoningFactAfterBuildingFacts.projectFactsApplied, true);
+assert.match(zoningFactAfterBuildingFacts.retrievalQuery, /Zoning District\(s\): R7A/);
+assert.match(zoningFactAfterBuildingFacts.retrievalQuery, /Zoning Map: 3b/);
+assert(
+  zoningFactAfterBuildingFacts.retrievalQuery.indexOf("Zoning District(s): R7A") <
+    zoningFactAfterBuildingFacts.retrievalQuery.indexOf("Building detail 1"),
+  "Question-relevant Zoning facts must be inserted before unrelated building facts can consume the retrieval limit."
+);
 
 assert.equal(researchEvidenceAssemblyLimits.maximumCandidates, 12);
 assert.equal(researchEvidenceAssemblyLimits.maximumDiscovered, 10);
@@ -387,6 +489,67 @@ assert(adaptivePinnedOnly.sources.some((source) => source.origin === "user_pinne
 assert(
   adaptivePinnedOnly.sources.every((source) => source.origin !== "permitext_discovered"),
   "Pinned-first assembly unexpectedly included broad discovered evidence."
+);
+
+canonicalSections.set("passage-only", {
+  sectionID: "passage-only",
+  codePrefix: "BC",
+  sectionNumber: "1101.3.1",
+  title: "Changes of use or occupancy",
+  canonicalText: "Item 1 applies to an entire building. Item 2 applies throughout the changed space, including its immediate entrances. Item 2.2 separately addresses rooftops.",
+  crossReferences: [{ sectionID: "cross-1", codePrefix: "BC", sectionNumber: "1006.2" }]
+});
+canonicalSections.set("outside-selected-bc", {
+  sectionID: "outside-selected-bc",
+  codePrefix: "AC",
+  sectionNumber: "28-118.3",
+  title: "Certificate of occupancy exception",
+  canonicalText: "This Administrative Code provision was not among the selected Building Code passages."
+});
+const passageBoundedDiscovery = await assembleResearchEvidence({
+  question: "Based only on the selected Building Code passage, what accessibility consequence applies throughout the space?",
+  discover: async () => ({
+    retrievalVersion: "passage-only-test-v1",
+    searchedSectionCount: 1,
+    candidates: [{
+      sectionID: "passage-only",
+      codePrefix: "BC",
+      sectionNumber: "1101.3.1",
+      title: "Changes of use or occupancy",
+      selectedText: "Item 2 applies throughout the changed space, including its immediate entrances.",
+      whyRelevant: "The question is expressly bounded to this routed passage.",
+      signals: { exactTopicRouteTarget: true, useSelectedPassageOnly: true }
+    }, {
+      sectionID: "outside-selected-bc",
+      codePrefix: "AC",
+      sectionNumber: "28-118.3",
+      title: "Certificate of occupancy exception",
+      selectedText: "This Administrative Code provision is outside the selected Building Code passages.",
+      whyRelevant: "Lexically related but outside the explicit passage boundary.",
+      signals: { exactTopicRouteTarget: false }
+    }]
+  }),
+  resolveSection,
+  limits: { maximumDiscovered: 1, maximumCrossReferences: 2, maximumCharacters: 2_000 }
+});
+const passageBoundedSource = passageBoundedDiscovery.sources.find((source) =>
+  source.sectionID === "passage-only"
+);
+assert.equal(
+  passageBoundedSource.text,
+  "Item 2 applies throughout the changed space, including its immediate entrances."
+);
+assert.equal(passageBoundedSource.discoveryPassageOnly, true);
+assert.equal(passageBoundedSource.canonicalContextComplete, false);
+assert.equal(
+  passageBoundedDiscovery.sources.some((source) => source.sectionID === "outside-selected-bc"),
+  false,
+  "An explicit selected-Building-Code passage boundary must exclude lexically related Administrative Code text."
+);
+assert.equal(
+  passageBoundedDiscovery.sources.some((source) => source.origin === "permitext_cross_reference"),
+  false,
+  "A passage-bounded route must not expand cross-references from omitted canonical section text."
 );
 assert.throws(
   () => researchEvidenceRetrievalQuery({ question: "" }),

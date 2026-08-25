@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import {
   createResearchCorpusRegistry,
   researchCorpusByPrefix,
-  routeResearchCorpora
+  routeResearchCorpora,
+  unapprovedZoningDiagnosticEnabled
 } from "../research-corpus-registry.mjs";
 import {
   enactedSearchIndex,
@@ -62,6 +63,104 @@ const zoningEnabled = routeResearchCorpora({
   registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })
 });
 assert.deepEqual(zoningEnabled.selected.map((corpus) => corpus.id), ["nyc-zoning-resolution"]);
+
+const naturalLanguageZoning = routeResearchCorpora({
+  question: "For this C6-4 project, is off-street parking required for an office alteration?",
+  registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })
+});
+assert.deepEqual(
+  naturalLanguageZoning.selected.map((corpus) => corpus.id),
+  ["nyc-zoning-resolution"],
+  "Natural-language parking questions with a zoning district must route to the Zoning Resolution."
+);
+
+const plainCommercialDistrictZoning = routeResearchCorpora({
+  question: "A 1,500-square-foot architectural office is proposed in a C3 district. Is the professional office use permitted as-of-right under the underlying C3 use regulations?",
+  registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })
+});
+assert.deepEqual(
+  plainCommercialDistrictZoning.selected.map((corpus) => corpus.id),
+  ["nyc-zoning-resolution"],
+  "An unsuffixed commercial zoning district such as C3 must route to the Zoning Resolution."
+);
+
+const bareZoningSection = routeResearchCorpora({
+  question: "What does Section 23-151 establish?",
+  registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })
+});
+assert.deepEqual(
+  bareZoningSection.selected.map((corpus) => corpus.id),
+  ["nyc-zoning-resolution"],
+  "A bare hyphenated Zoning Resolution citation must not fall back to the Construction Codes."
+);
+
+const longZoningFollowUp = routeResearchCorpora({
+  question: "And what if that condition is unknown?",
+  previousMessages: [
+    { role: "user", question: "Under the Zoning Resolution, is this use permitted in C6-4?" },
+    { role: "user", question: "What exception applies?" },
+    { role: "user", question: "Does that change for an existing building?" },
+    { role: "user", question: "Explain the transition rule." }
+  ],
+  registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })
+});
+assert.deepEqual(
+  longZoningFollowUp.selected.map((corpus) => corpus.id),
+  ["nyc-zoning-resolution"],
+  "A fourth cue-less follow-up must retain the active Zoning Resolution corpus."
+);
+
+const projectFactZoning = routeResearchCorpora({
+  question: "Is this use permitted on the lot?",
+  projectFacts: ["Zoning Fact — Zoning District(s): C6-4 (NYC Planning imported)"],
+  registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })
+});
+assert.deepEqual(projectFactZoning.selected.map((corpus) => corpus.id), ["nyc-zoning-resolution"]);
+assert.equal(projectFactZoning.selected[0].routeReason, "zoning question with Project zoning facts");
+
+const projectFactConstructionQuestion = routeResearchCorpora({
+  question: "How many plumbing fixtures are required for this office?",
+  projectFacts: ["Zoning Fact — Zoning District(s): C6-4 (NYC Planning imported)"],
+  registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })
+});
+assert.deepEqual(
+  projectFactConstructionQuestion.selected.map((corpus) => corpus.id),
+  ["nyc-2022-construction-codes"],
+  "A collateral Project zoning fact must not reroute a Construction Code question."
+);
+
+const buildingCodeOnlyBoundary = routeResearchCorpora({
+  question: "A change between Group B and Group M follows a zoning Use Group renumbering. Based only on the selected Building Code passages, what accessibility consequence can be stated?",
+  registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })
+});
+assert.deepEqual(
+  buildingCodeOnlyBoundary.selected.map((corpus) => corpus.id),
+  ["nyc-2022-construction-codes"],
+  "An express Building-Code-only evidence boundary must not retrieve the Zoning Resolution merely because the question identifies a missing zoning transition issue."
+);
+
+assert.equal(
+  unapprovedZoningDiagnosticEnabled({
+    PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1"
+  }),
+  true
+);
+assert.equal(
+  unapprovedZoningDiagnosticEnabled({
+    PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1",
+    VERCEL: "1"
+  }),
+  false,
+  "The unapproved Zoning diagnostic must never enable hosted Research."
+);
+assert.equal(
+  unapprovedZoningDiagnosticEnabled({
+    PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1",
+    VERCEL_ENV: "preview"
+  }),
+  false,
+  "The unapproved Zoning diagnostic must remain local-only."
+);
 
 const future = routeResearchCorpora({
   question: "Does EBC 101 apply now?",

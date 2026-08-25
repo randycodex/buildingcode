@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20260817-routed-authorized-corpora-v1";
+export const researchCorpusRegistryVersion = "20260824-routed-authorized-corpora-v2";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -9,7 +9,8 @@ const zoningCodeVersion =
 
 const constructionCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b(?:building|construction|plumbing|mechanical|fuel\s+gas)\s+code\b|\b(?:means\s+of\s+egress|occupancy|travel\s+distance|fixture\s+count|construction\s+type)\b/i;
 const fireCue = /\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\bFire\s+Department\b|\b(?:hot\s+work|operational|hazardous\s+materials?)\s+permit\b/i;
-const zoningCue = /\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability)\b|\b(?:special\s+purpose|special)\s+district\b/i;
+const zoningCue = /\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\b(?:Sections?|Table|§{1,2})\s+\d{1,3}-\d{2,4}\b|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability)\b|\b(?:special\s+purpose|special)\s+district\b|\boff[-\s]street\s+parking\b|\bparking\s+(?:requirement|required|spaces?|waiver|reduction)\b|\b(?:floor\s+area\s+ratio|FAR|use\s+group|lot\s+coverage|development\s+rights?)\b|\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i;
+const projectDependentZoningCue = /\b(?:parking|floor\s+area|FAR|permitted\s+use|use\s+permitted|bulk|setback|yard|lot\s+coverage|development\s+rights?)\b/i;
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\s*(?:§\s*)?[A-Z]?\d/i;
 const historicalBuildingCue = /\b(?:1968|prior|historical)\s+(?:NYC\s+)?Building\s+Code\b|\bBC68\b/i;
 
@@ -20,7 +21,7 @@ function compactText(value) {
 function recentUserContext(messages) {
   return (Array.isArray(messages) ? messages : [])
     .filter((message) => !message?.role || message.role === "user")
-    .slice(-2)
+    .slice(-8)
     .map((message) => compactText(message?.question || message?.content || message?.text))
     .filter(Boolean)
     .join("\n");
@@ -108,6 +109,12 @@ export function createResearchCorpusRegistry({
   ]);
 }
 
+export function unapprovedZoningDiagnosticEnabled(environment = process.env) {
+  return environment.PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS === "1" &&
+    environment.VERCEL !== "1" &&
+    !String(environment.VERCEL_ENV || "").trim();
+}
+
 function routeRecord(corpus, reason) {
   return {
     ...corpus,
@@ -119,6 +126,7 @@ export function routeResearchCorpora({
   question,
   previousMessages = [],
   projectCodeVersion = null,
+  projectFacts = [],
   registry
 } = {}) {
   const availableRegistry = Array.isArray(registry)
@@ -126,27 +134,37 @@ export function routeResearchCorpora({
     : createResearchCorpusRegistry();
   const currentQuestion = compactText(question);
   if (!currentQuestion) throw new Error("Research corpus routing requires a question.");
+  const projectHasZoningContext = (Array.isArray(projectFacts) ? projectFacts : [])
+    .some((fact) => /^(?:Zoning Fact|NYC Planning Fact)\s+—\s+(?:Zoning District|Zoning Map|BBL|Block|Tax Lot)/i.test(compactText(fact)));
+  const projectZoningRequested = projectHasZoningContext && projectDependentZoningCue.test(currentQuestion);
   const currentHasCorpusCue = [
     constructionCue,
     fireCue,
     zoningCue,
     futureExistingBuildingCue,
     historicalBuildingCue
-  ].some((pattern) => pattern.test(currentQuestion));
+  ].some((pattern) => pattern.test(currentQuestion)) || projectZoningRequested;
   const context = currentHasCorpusCue
     ? currentQuestion
     : [currentQuestion, recentUserContext(previousMessages)].filter(Boolean).join("\n");
   const futureRequested = futureExistingBuildingCue.test(context);
   const historicalRequested = historicalBuildingCue.test(context);
+  const buildingCodeOnlyScope =
+    /\bbased only on (?:the )?(?:selected )?Building Code passages\b/i.test(currentQuestion);
   const explicitCurrentConstructionCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b2022\s+(?:NYC\s+)?(?:Building|Construction|Plumbing|Mechanical|Fuel\s+Gas)\s+Code\b/i.test(context);
   const constructionRequested = constructionCue.test(context) &&
     (!futureRequested && !historicalRequested || explicitCurrentConstructionCue);
   const fireRequested = fireCue.test(context);
-  const zoningRequested = zoningCue.test(context);
+  const zoningRequested = !buildingCodeOnlyScope && (zoningCue.test(context) || projectZoningRequested);
   const requestedIDs = new Map();
   if (constructionRequested) requestedIDs.set("nyc-2022-construction-codes", "construction-code cue");
   if (fireRequested) requestedIDs.set("nyc-2022-fire-code", "Fire Code or FDNY cue");
-  if (zoningRequested) requestedIDs.set("nyc-zoning-resolution", "zoning cue");
+  if (zoningRequested) {
+    requestedIDs.set(
+      "nyc-zoning-resolution",
+      projectZoningRequested ? "zoning question with Project zoning facts" : "zoning cue"
+    );
+  }
   if (futureRequested) requestedIDs.set("nyc-existing-building-code-2027", "future-effective EBC cue");
   if (historicalRequested) requestedIDs.set("nyc-1968-building-code", "historical-code cue");
   if (!requestedIDs.size) {

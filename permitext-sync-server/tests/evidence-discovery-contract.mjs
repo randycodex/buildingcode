@@ -56,6 +56,22 @@ const catalog = [{
   id: "9", codePrefix: "BC", chapterNumber: "3", sectionNumber: "302.1", title: "Occupancy classification"
 }, {
   id: "10", codePrefix: "BC", chapterNumber: "5", sectionNumber: "508.2", title: "Accessory occupancies"
+}, {
+  id: "11", codePrefix: "ZR", chapterNumber: "I-3", sectionNumber: "13-041", title: "Applicability of parking regulations within the Manhattan Core"
+}, {
+  id: "12", codePrefix: "ZR", chapterNumber: "I-3", sectionNumber: "13-07", title: "Existing Buildings and Off-street Parking Facilities"
+}, {
+  id: "13", codePrefix: "ZR", chapterNumber: "I-3", sectionNumber: "13-12", title: "Permitted Parking for Non-Residential Uses"
+}, {
+  id: "14", codePrefix: "BC", chapterNumber: "3", sectionNumber: "303.1.3", title: "Accessory assembly spaces"
+}, {
+  id: "15", codePrefix: "BC", chapterNumber: "5", sectionNumber: "508.2.3", title: "Allowable building area and height"
+}, {
+  id: "16", codePrefix: "BC", chapterNumber: "5", sectionNumber: "508.2.4", title: "Separation of occupancies"
+}, {
+  id: "17", codePrefix: "PC", chapterNumber: "4", sectionNumber: "403.1.1", title: "Fixture calculations"
+}, {
+  id: "18", codePrefix: "ZR", chapterNumber: "I-2", sectionNumber: "12-01", title: "Rules Applying to Text of Resolution"
 }];
 
 const invertedIndex = new Map([
@@ -79,6 +95,14 @@ const invertedIndex = new Map([
   ,["architects", ["7"]]
   ,["community", ["8"]]
   ,["multiple", ["9", "10"]]
+  ,["parking", ["11", "12", "13"]]
+  ,["manhattan", ["11", "12", "13"]]
+  ,["non-residential", ["13"]]
+  ,["accessory", ["10", "14", "15", "16"]]
+  ,["multipurpose", ["14", "15", "16"]]
+  ,["fractional", ["2", "17"]]
+  ,["illustration", ["18"]]
+  ,["text", ["18"]]
 ]);
 
 const bodies = new Map([
@@ -130,7 +154,89 @@ const bodies = new Map([
   ,["8", { blocks: [{ id: "community-hall", plainText: "Assembly Group A-3 includes community halls and recreation or social activities." }] }]
   ,["9", { blocks: [{ id: "multiple-occupancy", plainText: "Structures or portions shall be classified in one or more occupancy groups; multiple occupancies shall comply with Section 508." }] }]
   ,["10", { blocks: [{ id: "accessory-classification", plainText: "Accessory occupancies are ancillary to the main occupancy and shall comply with Section 508.2." }] }]
+  ,["11", { blocks: [{ id: "manhattan-parking-applicability", plainText: "For accessory off-street parking facilities developed or enlarged after May 8, 2013, the as-of-right number of parking spaces permitted shall be as set forth in Section 13-10." }] }]
+  ,["12", { blocks: [{ id: "existing-manhattan-parking", plainText: "This Section applies to existing buildings developed without parking and existing required or permitted accessory off-street parking spaces established before May 8, 2013." }] }]
+  ,["13", { blocks: [{ id: "non-residential-manhattan-parking", plainText: "Accessory off-street parking spaces are permitted for non-residential uses in developments or enlargements, subject to the stated maximums." }] }]
+  ,["14", { blocks: [{ id: "accessory-assembly", plainText: "An assembly room with fewer than 75 persons and accessory to another occupancy is Group B or part of that occupancy, except plumbing fixtures may be calculated under Assembly requirements." }] }]
+  ,["15", { blocks: [{ id: "accessory-area", plainText: "Accessory occupancies are generally limited to ten percent of the story area." }] }]
+  ,["16", { blocks: [{ id: "accessory-separation", plainText: "No separation is required between accessory and main occupancies except as stated." }] }]
+  ,["17", { blocks: [{ id: "fixture-fractions", plainText: "Fractional fixture requirements for multiple occupancies are added and fractions are rounded up." }] }]
+  ,["18", { blocks: [{ id: "zr-text-control", plainText: "The particular shall control the general. In case of any difference of meaning or implication between the text of this Resolution and any caption, illustration, summary table or illustrative table, the text shall control." }] }]
 ]);
+
+const zoningTextControl = await discoverRelevantEvidence({
+  question: "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+  catalog,
+  invertedIndex,
+  readSectionBody: async (section) => bodies.get(section.id),
+  availableCodePrefixes: ["ZR"],
+  limit: 12
+});
+assert.equal(zoningTextControl.candidates[0].sectionID, "18");
+assert.equal(zoningTextControl.candidates[0].signals.exactTopicRouteTarget, true);
+assert.match(zoningTextControl.candidates[0].selectedText, /text shall control/i);
+
+const accessoryFixtureRouting = await discoverRelevantEvidence({
+  question: "A residential-building cellar contains Group B, F, and S spaces plus a multipurpose assembly room with fewer than 75 occupants that may qualify as accessory to the residential occupancy. After the correct Table 403.1 ratio has been applied separately to each occupancy, may the resulting fractional fixture requirements be added before rounding, and may the accessory multipurpose room use Assembly fixture requirements?",
+  catalog,
+  invertedIndex,
+  readSectionBody: async (section) => bodies.get(section.id),
+  availableCodePrefixes: ["BC", "PC"],
+  limit: 12
+});
+assert.equal(
+  accessoryFixtureRouting.candidates.find((candidate) => candidate.sectionID === "14")?.signals.exactTopicRouteTarget,
+  true,
+  "The accessory-assembly exception must remain an exact plumbing-fixture route target."
+);
+for (const sectionID of ["15", "16"]) {
+  assert.notEqual(
+    accessoryFixtureRouting.candidates.find((candidate) => candidate.sectionID === sectionID)?.signals.exactTopicRouteTarget,
+    true,
+    `BC ${sectionID === "15" ? "508.2.3" : "508.2.4"} must not become a mandatory route target for a fixture-calculation question.`
+  );
+}
+
+const manhattanOfficeParking = await discoverRelevantEvidence({
+  question: "For this Project in C6-4, is off-street parking required for an office alteration? Project facts: Borough: Manhattan; Community District: Manhattan 1.",
+  catalog,
+  invertedIndex,
+  readSectionBody: async (section) => bodies.get(section.id),
+  availableCodePrefixes: ["ZR"],
+  limit: 12
+});
+assert.deepEqual(
+  manhattanOfficeParking.candidates.slice(0, 3).map((candidate) => candidate.sectionID).sort(),
+  ["11", "12", "13"],
+  "A Manhattan C6-4 office-parking question must retrieve applicability, existing-building, and non-residential parking provisions."
+);
+assert(
+  manhattanOfficeParking.candidates.slice(0, 3).every((candidate) =>
+    candidate.signals.exactTopicRouteTarget === true
+  ),
+  "Manhattan Core parking provisions must be explicit topic-route targets rather than incidental lexical matches."
+);
+
+for (const citationQuestion of [
+  "What does ZR Section 13-12 provide?",
+  "What does ZR Table 13-12 provide?",
+  "What does Section 13-12 provide?"
+]) {
+  const citedZoning = await discoverRelevantEvidence({
+    question: citationQuestion,
+    catalog,
+    invertedIndex,
+    readSectionBody: async (section) => bodies.get(section.id),
+    availableCodePrefixes: ["ZR"],
+    limit: 12
+  });
+  assert.equal(
+    citedZoning.candidates[0].sectionID,
+    "13",
+    `${citationQuestion} must resolve as an exact ZR provision reference.`
+  );
+  assert.equal(citedZoning.candidates[0].signals.exactReference, true);
+}
 
 const officeClassification = await discoverRelevantEvidence({
   question: "A 1,200 sf space is used as a small architectural office with 12 employees. What occupancy group should it be classified as?",
