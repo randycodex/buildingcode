@@ -3818,22 +3818,22 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(verificationError).message,
-            "Terra produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here."
+            "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(providerError).message,
-            "Terra's research service is temporarily unavailable. Your question is still here."
+            "Permitext's Research service is temporarily unavailable. Your question is still here."
         )
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(verifierProviderError).message,
-            "Terra's research service is temporarily unavailable. Your question is still here."
+            "Permitext's Research service is temporarily unavailable. Your question is still here."
         )
     }
 
     func testResearchFailurePreservesQuestionAfterNetworkTimeout() {
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(URLError(.timedOut)).message,
-            "Terra is taking longer than expected. Permitext checked for a completed answer but did not find one yet. Your question is still here."
+            "Research is taking longer than expected. Permitext checked for a completed answer but did not find one yet. Your question is still here."
         )
     }
 
