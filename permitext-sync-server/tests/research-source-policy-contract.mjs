@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   classifyResearchWebSource,
+  extractResearchOfficialDocumentReferences,
   normalizeResearchOfficialDomains,
   normalizeResearchWebSources,
   researchSourcePolicyConfiguration,
@@ -40,6 +41,14 @@ const sanitized = sanitizeResearchWebQuery(
 );
 assert.doesNotMatch(sanitized, /Acme Tower|lead@|212|123 West 42nd|Suite 9/i);
 assert.match(sanitized, /NYC BC 1019\.3 DOB guidance/);
+
+assert.deepEqual(
+  extractResearchOfficialDocumentReferences(
+    "Use Buildings Bulletin 2022-013, BB 2022-013, and DOB Bulletin No. 2025-001."
+  ),
+  ["Buildings Bulletin 2022-013", "Buildings Bulletin 2025-001"]
+);
+assert.deepEqual(extractResearchOfficialDocumentReferences("What does BC 718.2.6 require?"), []);
 
 assert.equal(
   shouldUseResearchWebSupport({ question: "Find official DOB guidance about this exception." }, {}),

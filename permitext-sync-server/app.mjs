@@ -213,6 +213,7 @@ import {
   researchSourcePolicyVersion,
   researchSourcePolicyConfiguration,
   sanitizeResearchWebQuery,
+  extractResearchOfficialDocumentReferences,
   shouldUseResearchWebSupport
 } from "./research-source-policy.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
@@ -7800,11 +7801,20 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
     ...(options.model ? { model: options.model } : {})
   };
   const allowedDomains = policyConfiguration.officialDomains;
+  const namedOfficialDocuments = extractResearchOfficialDocumentReferences(sanitizedQuery);
+  const webInput = namedOfficialDocuments.length
+    ? [
+        "OFFICIAL DOCUMENTS TO RETRIEVE FIRST",
+        ...namedOfficialDocuments.map((reference) => `- ${reference}`),
+        "QUESTION",
+        sanitizedQuery
+      ].join("\n")
+    : sanitizedQuery;
   const requestBody = {
     model: configuration.model,
     store: false,
     reasoning: { effort: "low" },
-    max_output_tokens: 700,
+    max_output_tokens: 1_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     tools: [{
       type: "web_search",
@@ -7816,10 +7826,12 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
       "Find concise supporting information from the allowed official websites for a building-code research answer.",
       "The enacted Permitext corpus remains the primary legal authority.",
       "Do not make a project compliance determination and do not treat guidance as enacted law.",
+      "When the question names an official bulletin or other official document, open that document and summarize the substantive passages relevant to the question; returning only a title or link is not sufficient.",
+      "Identify any named official document that could not be opened or read instead of inferring its contents.",
       "Return only useful explanatory, administrative, effective-date, or technical context with inline web citations.",
       "If no official supporting material is useful, say that briefly."
     ].join(" "),
-    input: sanitizedQuery
+    input: webInput
   };
   let payload;
   try {

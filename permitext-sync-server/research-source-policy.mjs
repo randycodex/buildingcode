@@ -66,6 +66,20 @@ export function sanitizeResearchWebQuery(value) {
     .trim();
 }
 
+export function extractResearchOfficialDocumentReferences(value) {
+  const text = normalizedText(value);
+  const references = [];
+  const seen = new Set();
+  const bulletinPattern = /\b(?:(?:buildings?|dob)\s+)?(?:bulletin|bb)\s*(?:no\.?\s*)?((?:19|20)\d{2})\s*[-\u2013\u2014]\s*(\d{3})\b/gi;
+  for (const match of text.matchAll(bulletinPattern)) {
+    const reference = `Buildings Bulletin ${match[1]}-${match[2]}`;
+    if (seen.has(reference)) continue;
+    seen.add(reference);
+    references.push(reference);
+  }
+  return references;
+}
+
 const guidanceRequestPattern =
   /\b(?:official\s+)?(?:guidance|interpretation|bulletin|service notice|advisory|faq|agency practice|dob guidance|department guidance)\b/i;
 const outsideLibraryRequestPattern =
