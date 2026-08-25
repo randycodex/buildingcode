@@ -1,6 +1,7 @@
 import {
   beginResearchSpendReservation,
   endResearchSpendReservation,
+  estimatedResearchCost,
   researchSpendGuardrails,
   reserveResearchProviderSpend,
   settleResearchProviderSpend
@@ -22,6 +23,26 @@ const environment = {
   PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "10",
   PERMITEXT_RESEARCH_PRICING_VERSION: "contract-v1"
 };
+
+const hybridEnvironment = {
+  ...environment,
+  PERMITEXT_RESEARCH_FAST_MODEL: "gpt-5.6-luna",
+  PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS: "1",
+  PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS: "0.1",
+  PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS: "2",
+  PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "luna-contract-v1"
+};
+const hybridCost = estimatedResearchCost({
+  modelUsage: [
+    { model: "gpt-5.6-luna", inputTokens: 1_000_000, cachedInputTokens: 0, outputTokens: 1_000_000 },
+    { model: "gpt-5.6-terra", inputTokens: 1_000_000, cachedInputTokens: 0, outputTokens: 1_000_000 }
+  ]
+}, hybridEnvironment);
+assert(hybridCost.estimatedUSD === 23, "Hybrid model usage was not priced by the model that incurred it.");
+assert(
+  hybridCost.pricingVersion === "contract-v1+luna-contract-v1",
+  "Hybrid pricing did not retain both version identifiers."
+);
 
 assert(researchSpendGuardrails(environment).ready, "Complete production Research spend caps were rejected.");
 assert(

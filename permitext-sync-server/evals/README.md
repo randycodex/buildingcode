@@ -26,7 +26,7 @@ Every case supports:
 - `expectedConclusion` and explicit `expectedUncertainty` level/description.
 - `reviewer`, `reviewedAt`, and `notes`.
 
-Draft cases may use `null` reviewer fields. `reviewed`, `approved`, and `retired` cases require a reviewer and timestamp. Only `approved` cases can run.
+Draft cases may use `null` reviewer fields. `reviewed`, `approved`, and `retired` cases require a reviewer and timestamp. Only `approved` cases participate in normal runs or baselines. A separately locked diagnostic mode may exercise committed drafts without changing their review status; those runs remain baseline-ineligible.
 
 Approval means a knowledgeable human confirmed the jurisdiction and edition, copied exact enacted passages from Permitext's canonical content, matched required citations to selected evidence, and reviewed the expected conclusion, concepts, forbidden claims, missing facts, and uncertainty. AI-generated answer keys are never self-approved.
 
@@ -97,7 +97,7 @@ node tests/research-evals.mjs --list
 
 ## Paid live runs
 
-A live repetition makes one production-path answer request and one separate structured grader request per case. It is locked unless spending was explicitly approved and every required value is supplied:
+A live repetition runs one production-path Research turn and one separate structured grader per case. The production turn can make additional provider requests for planning, verification, or revision. Every provider request is reserved against the same hard evaluation cap before dispatch. Live evaluation is locked unless spending was explicitly approved and every required value is supplied:
 
 ```sh
 PERMITEXT_RUN_PAID_RESEARCH_EVALS=1 \
@@ -119,6 +119,16 @@ npm run eval:research:live -- --difficulty advanced --repeat 3
 npm run eval:research:live -- --model MODEL
 npm run eval:research:live -- --prompt-version 20260722-grounded-passages-v7
 ```
+
+Committed draft cases may be exercised only as explicitly non-baseline diagnostics:
+
+```sh
+PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1 \
+...paid environment from above... \
+npm run eval:research:live -- --include-drafts --exclude-case CASE_ID
+```
+
+Diagnostic runs retain each case's real review status, use `suiteScope: "diagnostic"`, and are never eligible to create or replace an approved baseline. This mode does not approve a draft answer key; knowledgeable human review is still required for promotion.
 
 The model option uses the production configuration boundary. Prompt selection is intentionally stricter: a requested version must exist in the current application build, so a run cannot relabel unchanged prompt text as a different prompt.
 

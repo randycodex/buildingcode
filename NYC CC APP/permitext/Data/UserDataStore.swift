@@ -37,8 +37,8 @@ protocol UserContentRepository {
     func folderMembership(codeVersion: String) throws -> [Int64: [Int64]]
     func sections(inFolder folderID: Int64, codeVersion: String) throws -> [Int64]
     func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String)]
-    func createFolder(name: String, address: String, description: String, colorHex: String, folderType: CodeFolderType, codeVersion: String) throws -> Int64
-    func updateFolder(id: Int64, name: String, address: String, description: String, colorHex: String, folderType: CodeFolderType, codeVersion: String) throws
+    func createFolder(name: String, address: String, description: String, structuredFacts: [ProjectStructuredFact], colorHex: String, folderType: CodeFolderType, codeVersion: String) throws -> Int64
+    func updateFolder(id: Int64, name: String, address: String, description: String, structuredFacts: [ProjectStructuredFact], colorHex: String, folderType: CodeFolderType, codeVersion: String) throws
     func deleteFolder(id: Int64, codeVersion: String) throws
     func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String) throws
     func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws
@@ -839,6 +839,7 @@ final class UserDataStore: UserContentRepository {
                 name TEXT NOT NULL,
                 address TEXT NOT NULL DEFAULT '',
                 description TEXT NOT NULL DEFAULT '',
+                structured_facts_json TEXT NOT NULL DEFAULT '[]',
                 color_hex TEXT NOT NULL,
                 sort_order INTEGER NOT NULL DEFAULT 0,
                 archived_at TEXT,
@@ -933,6 +934,7 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "folders", column: "deleted_at", definition: "TEXT")
         try addColumnIfMissing(table: "folders", column: "archived_at", definition: "TEXT")
         try addColumnIfMissing(table: "folders", column: "folder_type", definition: "TEXT NOT NULL DEFAULT 'project'")
+        try addColumnIfMissing(table: "folders", column: "structured_facts_json", definition: "TEXT NOT NULL DEFAULT '[]'")
         try addColumnIfMissing(table: "folder_sections", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folder_sections", column: "owner_id", definition: "TEXT NOT NULL DEFAULT 'local'")
         try addColumnIfMissing(table: "folder_sections", column: "visibility", definition: "TEXT NOT NULL DEFAULT 'personal'")
@@ -1154,7 +1156,7 @@ final class UserDataStore: UserContentRepository {
             ],
             "folders": [
                 "id", "client_id", "owner_id", "visibility", "sync_state",
-                "code_version", "folder_type", "name", "address", "description", "color_hex", "sort_order",
+                "code_version", "folder_type", "name", "address", "description", "structured_facts_json", "color_hex", "sort_order",
                 "archived_at", "created_at", "updated_at", "deleted_at"
             ],
             "folder_sections": [
@@ -2000,11 +2002,30 @@ final class UserDataStore: UserContentRepository {
 
     // MARK: - Folders
 
+    private func encodedProjectStructuredFacts(_ facts: [ProjectStructuredFact]) throws -> String {
+        let data = try jsonEncoder.encode(facts)
+        guard let value = String(data: data, encoding: .utf8) else {
+            throw NSError(
+                domain: "UserDataStore",
+                code: 4,
+                userInfo: [NSLocalizedDescriptionKey: "Project facts could not be encoded."]
+            )
+        }
+        return value
+    }
+
+    private func decodedProjectStructuredFacts(_ value: String) -> [ProjectStructuredFact] {
+        guard let data = value.data(using: .utf8),
+              let facts = try? jsonDecoder.decode([ProjectStructuredFact].self, from: data)
+        else { return [] }
+        return facts
+    }
+
     /// All folders for a code version, ordered by sort_order then name.
     func folders(codeVersion: String) throws -> [FolderRecord] {
         let statement = try connection.prepare(
             """
-            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at
+            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at, structured_facts_json
             FROM folders
             WHERE code_version = ? AND archived_at IS NULL
             ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
@@ -2031,7 +2052,8 @@ final class UserDataStore: UserContentRepository {
                     folderType: connection.string(at: 11, in: statement),
                     sortOrder: Int(connection.int64(at: 12, in: statement)),
                     createdAt: connection.string(at: 13, in: statement),
-                    updatedAt: connection.string(at: 14, in: statement)
+                    updatedAt: connection.string(at: 14, in: statement),
+                    structuredFacts: decodedProjectStructuredFacts(connection.string(at: 15, in: statement))
                 )
             )
         }
@@ -2043,7 +2065,7 @@ final class UserDataStore: UserContentRepository {
     func allFolders() throws -> [FolderRecord] {
         let statement = try connection.prepare(
             """
-            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at
+            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at, structured_facts_json
             FROM folders
             WHERE archived_at IS NULL
             ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
@@ -2069,7 +2091,8 @@ final class UserDataStore: UserContentRepository {
                     folderType: connection.string(at: 11, in: statement),
                     sortOrder: Int(connection.int64(at: 12, in: statement)),
                     createdAt: connection.string(at: 13, in: statement),
-                    updatedAt: connection.string(at: 14, in: statement)
+                    updatedAt: connection.string(at: 14, in: statement),
+                    structuredFacts: decodedProjectStructuredFacts(connection.string(at: 15, in: statement))
                 )
             )
         }
@@ -2160,6 +2183,7 @@ final class UserDataStore: UserContentRepository {
         name: String,
         address: String,
         description: String,
+        structuredFacts: [ProjectStructuredFact] = [],
         colorHex: String,
         folderType: CodeFolderType = .project,
         codeVersion: String
@@ -2187,13 +2211,14 @@ final class UserDataStore: UserContentRepository {
         }()
 
         let clientID = UUID().uuidString
+        let structuredFactsJSON = try encodedProjectStructuredFacts(structuredFacts)
         let statement = try connection.prepare(
             """
             INSERT INTO folders (
                 client_id, owner_id, visibility, sync_state, code_version, name,
-                address, description, color_hex, folder_type, sort_order, created_at, updated_at
+                address, description, structured_facts_json, color_hex, folder_type, sort_order, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """
         )
         defer { connection.finalize(statement) }
@@ -2206,11 +2231,12 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: trimmedName, index: 6, to: statement)
         try connection.bind(text: address, index: 7, to: statement)
         try connection.bind(text: description, index: 8, to: statement)
-        try connection.bind(text: colorHex, index: 9, to: statement)
-        try connection.bind(text: folderType.rawValue, index: 10, to: statement)
-        sqlite3_bind_int64(statement, 11, Int64(nextSortOrder))
-        try connection.bind(text: now, index: 12, to: statement)
+        try connection.bind(text: structuredFactsJSON, index: 9, to: statement)
+        try connection.bind(text: colorHex, index: 10, to: statement)
+        try connection.bind(text: folderType.rawValue, index: 11, to: statement)
+        sqlite3_bind_int64(statement, 12, Int64(nextSortOrder))
         try connection.bind(text: now, index: 13, to: statement)
+        try connection.bind(text: now, index: 14, to: statement)
         _ = try connection.step(statement)
 
         let folderID = connection.lastInsertedRowID()
@@ -2225,6 +2251,7 @@ final class UserDataStore: UserContentRepository {
                     "name": trimmedName,
                     "address": address,
                     "description": description,
+                    "structuredFacts": structuredFactsJSON,
                     "colorHex": colorHex,
                     "folderType": folderType.rawValue,
                     "sortOrder": String(nextSortOrder)
@@ -2239,6 +2266,7 @@ final class UserDataStore: UserContentRepository {
         name: String,
         address: String,
         description: String,
+        structuredFacts: [ProjectStructuredFact] = [],
         colorHex: String,
         folderType: CodeFolderType = .project,
         codeVersion: String
@@ -2252,11 +2280,12 @@ final class UserDataStore: UserContentRepository {
             )
         }
         let clientID = try folderClientID(id: id, codeVersion: codeVersion)
+        let structuredFactsJSON = try encodedProjectStructuredFacts(structuredFacts)
 
         let statement = try connection.prepare(
             """
             UPDATE folders
-            SET name = ?, address = ?, description = ?, color_hex = ?, folder_type = ?, updated_at = ?, sync_state = ?
+            SET name = ?, address = ?, description = ?, structured_facts_json = ?, color_hex = ?, folder_type = ?, updated_at = ?, sync_state = ?
             WHERE id = ? AND code_version = ?;
             """
         )
@@ -2264,12 +2293,13 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: trimmedName, index: 1, to: statement)
         try connection.bind(text: address, index: 2, to: statement)
         try connection.bind(text: description, index: 3, to: statement)
-        try connection.bind(text: colorHex, index: 4, to: statement)
-        try connection.bind(text: folderType.rawValue, index: 5, to: statement)
-        try connection.bind(text: isoFormatter.string(from: Date()), index: 6, to: statement)
-        try connection.bind(text: pendingSyncState, index: 7, to: statement)
-        sqlite3_bind_int64(statement, 8, id)
-        try connection.bind(text: codeVersion, index: 9, to: statement)
+        try connection.bind(text: structuredFactsJSON, index: 4, to: statement)
+        try connection.bind(text: colorHex, index: 5, to: statement)
+        try connection.bind(text: folderType.rawValue, index: 6, to: statement)
+        try connection.bind(text: isoFormatter.string(from: Date()), index: 7, to: statement)
+        try connection.bind(text: pendingSyncState, index: 8, to: statement)
+        sqlite3_bind_int64(statement, 9, id)
+        try connection.bind(text: codeVersion, index: 10, to: statement)
         _ = try connection.step(statement)
         enqueueSyncOperationIfPossible(
             entityType: .folder,
@@ -2282,11 +2312,23 @@ final class UserDataStore: UserContentRepository {
                     "name": trimmedName,
                     "address": address,
                     "description": description,
+                    "structuredFacts": structuredFactsJSON,
                     "colorHex": colorHex,
                     "folderType": folderType.rawValue
                 ]
             )
         )
+    }
+
+    private func folderStructuredFactsJSON(id: Int64, codeVersion: String) throws -> String {
+        let statement = try connection.prepare(
+            "SELECT structured_facts_json FROM folders WHERE id = ? AND code_version = ? LIMIT 1;"
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, id)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        guard try connection.step(statement) == SQLITE_ROW else { return "[]" }
+        return connection.string(at: 0, in: statement)
     }
 
     func deleteFolder(id: Int64, codeVersion: String) throws {
@@ -3052,6 +3094,7 @@ final class UserDataStore: UserContentRepository {
                 name: record.name,
                 address: record.address,
                 description: record.description,
+                structuredFacts: record.structuredFacts,
                 colorHex: record.colorHex,
                 sortOrder: record.sortOrder,
                 folderType: record.folderType,
@@ -3268,13 +3311,14 @@ final class UserDataStore: UserContentRepository {
 
     private func insertServerProject(_ record: ServerProjectRecord, clientID: String) throws {
         let timestamp = isoFormatter.string(from: record.updatedAt)
+        let structuredFactsJSON = try encodedProjectStructuredFacts(record.structuredFacts ?? [])
         let statement = try connection.prepare(
             """
             INSERT INTO folders (
                 client_id, owner_id, visibility, sync_state, code_version, name,
-                address, description, color_hex, folder_type, sort_order, archived_at, created_at, updated_at, deleted_at
+                address, description, structured_facts_json, color_hex, folder_type, sort_order, archived_at, created_at, updated_at, deleted_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
             """
         )
         defer { connection.finalize(statement) }
@@ -3286,16 +3330,17 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: record.name ?? "Project", index: 6, to: statement)
         try connection.bind(text: record.address ?? "", index: 7, to: statement)
         try connection.bind(text: record.description ?? "", index: 8, to: statement)
-        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 9, to: statement)
-        try connection.bind(text: record.folderType.rawValue, index: 10, to: statement)
-        sqlite3_bind_int64(statement, 11, Int64(record.sortOrder ?? 0))
+        try connection.bind(text: structuredFactsJSON, index: 9, to: statement)
+        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 10, to: statement)
+        try connection.bind(text: record.folderType.rawValue, index: 11, to: statement)
+        sqlite3_bind_int64(statement, 12, Int64(record.sortOrder ?? 0))
         if let archivedAt = record.archivedAt {
-            try connection.bind(text: isoFormatter.string(from: archivedAt), index: 12, to: statement)
+            try connection.bind(text: isoFormatter.string(from: archivedAt), index: 13, to: statement)
         } else {
-            sqlite3_bind_null(statement, 12)
+            sqlite3_bind_null(statement, 13)
         }
-        try connection.bind(text: timestamp, index: 13, to: statement)
         try connection.bind(text: timestamp, index: 14, to: statement)
+        try connection.bind(text: timestamp, index: 15, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -3353,6 +3398,8 @@ final class UserDataStore: UserContentRepository {
 
     private func updateServerProject(_ record: ServerProjectRecord, localFolderID: Int64, clientID: String) throws {
         let timestamp = isoFormatter.string(from: record.updatedAt)
+        let structuredFactsJSON = try record.structuredFacts.map(encodedProjectStructuredFacts) ??
+            folderStructuredFactsJSON(id: localFolderID, codeVersion: record.codeVersion)
         let statement = try connection.prepare(
             """
             UPDATE folders
@@ -3364,6 +3411,7 @@ final class UserDataStore: UserContentRepository {
                 name = ?,
                 address = ?,
                 description = ?,
+                structured_facts_json = ?,
                 color_hex = ?,
                 folder_type = ?,
                 sort_order = ?,
@@ -3381,17 +3429,18 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: record.name ?? "Project", index: 5, to: statement)
         try connection.bind(text: record.address ?? "", index: 6, to: statement)
         try connection.bind(text: record.description ?? "", index: 7, to: statement)
-        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 8, to: statement)
-        try connection.bind(text: record.folderType.rawValue, index: 9, to: statement)
-        sqlite3_bind_int64(statement, 10, Int64(record.sortOrder ?? 0))
+        try connection.bind(text: structuredFactsJSON, index: 8, to: statement)
+        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 9, to: statement)
+        try connection.bind(text: record.folderType.rawValue, index: 10, to: statement)
+        sqlite3_bind_int64(statement, 11, Int64(record.sortOrder ?? 0))
         if let archivedAt = record.archivedAt {
-            try connection.bind(text: isoFormatter.string(from: archivedAt), index: 11, to: statement)
+            try connection.bind(text: isoFormatter.string(from: archivedAt), index: 12, to: statement)
         } else {
-            sqlite3_bind_null(statement, 11)
+            sqlite3_bind_null(statement, 12)
         }
-        try connection.bind(text: timestamp, index: 12, to: statement)
-        sqlite3_bind_int64(statement, 13, localFolderID)
-        try connection.bind(text: record.codeVersion, index: 14, to: statement)
+        try connection.bind(text: timestamp, index: 13, to: statement)
+        sqlite3_bind_int64(statement, 14, localFolderID)
+        try connection.bind(text: record.codeVersion, index: 15, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -3682,4 +3731,5 @@ struct FolderRecord: Sendable {
     let sortOrder: Int
     let createdAt: String
     let updatedAt: String
+    let structuredFacts: [ProjectStructuredFact]
 }

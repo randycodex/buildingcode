@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
+  discoverRelevantEvidence,
+  structuredRichSources
+} from "../evidence-discovery.mjs";
+import {
+  zoningSearchIndex,
   zoningSection,
+  zoningSectionCatalog,
   zoningSectionSummary,
   zoningSourceManifest,
   zoningSyncCodeVersion
@@ -136,10 +142,72 @@ assert(
 );
 assert.equal(dataset.researchEligibility, false, "Zoning cases cannot enable public Research.");
 
+const [retrievalCatalog, retrievalIndex] = await Promise.all([
+  zoningSectionCatalog(),
+  zoningSearchIndex()
+]);
+let retrievalTopThreeCoverage = 0;
+for (const testCase of dataset.cases) {
+  const discovery = await discoverRelevantEvidence({
+    question: testCase.question,
+    catalog: retrievalCatalog,
+    invertedIndex: retrievalIndex,
+    readSectionBody: (section) => zoningSection(section.id),
+    availableCodePrefixes: ["ZR"],
+    limit: 12
+  });
+  const rankedIDs = discovery.candidates.map((candidate) => Number(candidate.sectionID));
+  const expectedIDs = testCase.selectedEvidenceSectionIDs.map(Number);
+  assert(
+    expectedIDs.every((sectionID) => rankedIDs.includes(sectionID)),
+    `${testCase.id} retrieval omitted reviewed evidence. Expected ${expectedIDs.join(", ")}; received ${rankedIDs.join(", ")}.`
+  );
+  if (expectedIDs.some((sectionID) => rankedIDs.slice(0, 3).includes(sectionID))) {
+    retrievalTopThreeCoverage += 1;
+  }
+}
+assert(
+  retrievalTopThreeCoverage >= 19,
+  `Zoning retrieval top-three coverage regressed to ${retrievalTopThreeCoverage}/${dataset.cases.length}.`
+);
+
+const useGroupTableBody = await zoningSection(20017276);
+const [useGroupTable] = structuredRichSources(useGroupTableBody);
+assert.equal(useGroupTable?.id, "zr-17276-table-001");
+assert.equal(useGroupTable?.reference, "ZR Table 42-111");
+assert.equal(useGroupTable?.sourceOrdinal, 0);
+assert.equal(useGroupTable?.sourceContentHash, useGroupTableBody.zoning.tables[0].contentHash);
+assert.equal(useGroupTable?.rowCount, 12);
+assert.match(useGroupTable?.text || "", /Use Group I/);
+assert.match(useGroupTable?.text || "", /M1/);
+assert.match(useGroupTable?.text || "", /M2/);
+assert.match(useGroupTable?.text || "", /M3/);
+
+const manufacturingParkingBody = await zoningSection(20017449);
+const manufacturingParkingTables = structuredRichSources(manufacturingParkingBody);
+assert.equal(manufacturingParkingTables.length, 5);
+assert.deepEqual(
+  manufacturingParkingTables.map((table) => table.id),
+  manufacturingParkingBody.zoning.tables.map((table) => table.id)
+);
+assert(
+  manufacturingParkingTables.every((table, index) =>
+    table.sourceOrdinal === index &&
+    table.sourceContentHash === manufacturingParkingBody.zoning.tables[index].contentHash &&
+    table.rowCount > 0 &&
+    table.grids[0]?.rows?.length === table.rowCount &&
+    table.grids[0].rows.every((row) => row.cells.every((cell) => cell.text))
+  ),
+  "Every imported Zoning Resolution table must retain its stable source identity, hash, order, and non-empty structured grid."
+);
+
 console.log("zoning evaluation review cases passed", {
   total: dataset.cases.length,
   draft: dataset.cases.filter((testCase) => testCase.status === "draft").length,
   approved: dataset.cases.filter((testCase) => testCase.status === "approved").length,
   rejected: dataset.cases.filter((testCase) => testCase.status === "rejected").length,
+  reviewedEvidenceRetrieved: `${dataset.cases.length}/${dataset.cases.length}`,
+  reviewedEvidenceInTopThree: `${retrievalTopThreeCoverage}/${dataset.cases.length}`,
+  structuredZoningTables: manufacturingParkingTables.length + 1,
   publicResearchEnabled: false
 });

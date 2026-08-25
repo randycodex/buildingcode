@@ -206,6 +206,10 @@ struct ResearchAnswer: Codable, Hashable, Sendable {
     var answerText: String? = nil
     var conclusion: String = ""
     var explanation: String = ""
+    var authorityStatus: String? = nil
+    var authorityLabel: String? = nil
+    var codeEdition: String? = nil
+    var sourceAsOf: String? = nil
     var supportedPoints: [ResearchSupportedPoint] = []
     var assumptions: [String] = []
     var missingFacts: [String] = []

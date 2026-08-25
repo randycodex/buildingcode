@@ -52,6 +52,10 @@ import {
 import { resolveContainedPrivatePath } from "./private-path-containment.mjs";
 import { createImageStorageProvider } from "./image-storage.mjs";
 import {
+  lookupNYCPropertyContext,
+  NYCPropertyLookupError
+} from "./nyc-property-context.mjs";
+import {
   createResearchProgressEvent,
   researchProgressSummary
 } from "./public/research-progress.js";
@@ -184,6 +188,13 @@ import {
 } from "./research-config.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
 import {
+  researchEscalationModel,
+  researchModelRoutingConfiguration,
+  researchModelRoutingVersion,
+  researchQuestionIsBoundedCitationLookup,
+  routeResearchAnswerModel
+} from "./research-model-routing.mjs";
+import {
   discoverRelevantEvidence,
   evidenceDiscoveryVersion,
   evidenceDiscoveryFeatureEnabled,
@@ -209,7 +220,8 @@ import {
   createResearchCorpusRegistry,
   researchCorpusByPrefix,
   researchCorpusRegistryVersion,
-  routeResearchCorpora
+  routeResearchCorpora,
+  unapprovedZoningDiagnosticEnabled
 } from "./research-corpus-registry.mjs";
 import {
   evaluateResearchRequiredClaimCoverage,
@@ -496,7 +508,7 @@ const researchInterpretationSchema = {
     assumptions: { type: "array", items: { type: "string" } },
     missingFacts: { type: "array", items: { type: "string" } },
     followUpQuestions: { type: "array", maxItems: 8, items: { type: "string" } },
-    evidenceLimitations: { type: "array", items: { type: "string" } },
+    evidenceLimitations: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } },
     additionalEvidenceNeeded: { type: "array", items: { type: "string" } },
     supportingSourceUses: {
       type: "array",
@@ -6726,9 +6738,10 @@ const cachedResearchCorpusResources = new Map();
 async function currentResearchCorpusRegistry() {
   if (cachedResearchCorpusRegistry) return cachedResearchCorpusRegistry;
   const zoningMetadata = await zoningContentMetadata();
+  const zoningDiagnosticEnabled = unapprovedZoningDiagnosticEnabled();
   cachedResearchCorpusRegistry = createResearchCorpusRegistry({
-    zoningResearchEligibility: zoningMetadata.researchEligibility === true,
-    zoningBlockedReason: zoningMetadata.researchBlockedReason
+    zoningResearchEligibility: zoningMetadata.researchEligibility === true || zoningDiagnosticEnabled,
+    zoningBlockedReason: zoningDiagnosticEnabled ? null : zoningMetadata.researchBlockedReason
   });
   return cachedResearchCorpusRegistry;
 }
@@ -6737,6 +6750,7 @@ async function researchCorpusPlanForTurn({
   question,
   messages = [],
   projectCodeVersion = null,
+  projectFacts = [],
   pinnedEvidence = []
 }) {
   const registry = await currentResearchCorpusRegistry();
@@ -6744,6 +6758,7 @@ async function researchCorpusPlanForTurn({
     question,
     previousMessages: messages,
     projectCodeVersion,
+    projectFacts,
     registry
   });
   const selectedIDs = new Set(routed.selected.map((corpus) => corpus.id));
@@ -7448,7 +7463,10 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const configuration = researchModelConfiguration();
+  const configuration = {
+    ...researchModelConfiguration(),
+    ...(options.model ? { model: options.model } : {})
+  };
   const schema = structuredClone(researchEvidenceAnalysisSchema);
   const sourceIDs = evidence.map((source) => source.sourceID);
   for (const collection of researchEvidenceAnalysisCollections) {
@@ -7477,6 +7495,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       "Treat evidence labeled contextual only as the subject of a relevance comparison. Do not place it among controlling provisions or general rules, and do not treat evidence labeled irrelevant as answer support.",
       "Treat evidence labeled with a collateral topic route as internally reviewed material matched only by a supplied project fact. Do not classify it as controlling or a general rule for the current question unless the question expressly asks that separate legal topic.",
       "Separate general rules, exceptions, conditions, limitations, definitions, cross-references, tables, known project facts, unresolved project facts, and evidence limitations.",
+      "When a supplied table places the stated project category beside a materially different conditional category in the same row, record both values and the fact that selects between them. Do not apply the alternative category unless the user supplied its qualifying fact.",
       "Make the strongest supported distinctions, including contradictions in the user's premise and requirements attributed to the wrong exception.",
       "Use only exact supplied Project facts, established conversation facts, or current-turn hypothetical facts in projectFactsUsed. Do not turn missing facts into assumptions.",
       "A fact explicitly established by the user in the active topic is known for this discussion even when it came from an earlier turn. Do not list it as unresolved or ask the user to reconfirm it merely because it is conversational state.",
@@ -7538,7 +7557,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       options.validUserFacts || options.projectContextFacts || []
     ),
     model: payload.model || configuration.model,
-    usage: researchUsageFromProviderPayload(payload)
+    usage: researchUsageFromProviderPayload(payload, configuration.model)
   };
 }
 
@@ -7597,10 +7616,33 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole) &&
     section?.evidencePriority?.topicRouteRelationship !== "collateral"
   );
-  const answerEvidence = materialEvidence.length ? materialEvidence : evidence;
-  const subject = answerEvidence.length === 1
-    ? `the enacted provision, ${answerEvidence[0].sectionNumber || answerEvidence[0].title}`
-    : `the ${answerEvidence.length} enacted provisions Permitext assembled`;
+  const requiredSourceIDs = new Set(
+    (Array.isArray(options.requiredClaims) ? options.requiredClaims : []).flatMap((claim) => [
+      ...(Array.isArray(claim?.sourceIDs) ? claim.sourceIDs : []),
+      ...(Array.isArray(claim?.evidenceOptions)
+        ? claim.evidenceOptions.flatMap((option) => option?.sourceIDs || [])
+        : [])
+    ]).map((sourceID) => String(sourceID || "").trim()).filter(Boolean)
+  );
+  const eligibleEvidence = materialEvidence.length ? materialEvidence : evidence;
+  const requiredEvidence = evidence.filter((section) => requiredSourceIDs.has(section.sourceID));
+  const answerEvidence = [
+    ...requiredEvidence,
+    ...eligibleEvidence.filter((section) => !requiredSourceIDs.has(section.sourceID))
+  ];
+  const answerEvidenceGroups = Array.from(answerEvidence.reduce((groups, section) => {
+    const key = String(section.sectionID || section.sourceID);
+    const existing = groups.get(key);
+    if (existing) {
+      if (!existing.sourceIDs.includes(section.sourceID)) existing.sourceIDs.push(section.sourceID);
+    } else {
+      groups.set(key, { section, sourceIDs: [section.sourceID] });
+    }
+    return groups;
+  }, new Map()).values());
+  const subject = answerEvidenceGroups.length === 1
+    ? `the enacted provision, ${answerEvidenceGroups[0].section.sectionNumber || answerEvidenceGroups[0].section.title}`
+    : `the ${answerEvidenceGroups.length} enacted provisions Permitext assembled`;
   const conversational = options.responseStyle === "conversational";
   const acceptsConditionalYes = /^(?:can|could|does|is|are|may|must|should|will|would)\b/i
     .test(String(question || "").trim());
@@ -7614,13 +7656,13 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     : "The assembled enacted code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.";
   return {
     answerText: [directAnswer, application].join("\n\n"),
-    supportedPoints: answerEvidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
+    supportedPoints: answerEvidenceGroups.slice(0, maximumResearchSupportedPoints).map(({ section, sourceIDs }) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
         ? `This provision supplies one of the rules that controls the answer to “${question}”.`
         : `The enacted text from ${section.sectionNumber || section.title} is part of the evidence authorized for this Research.`,
       sectionID: section.sectionID,
-      sourceIDs: [section.sourceID || `section-${section.sectionID}`]
+      sourceIDs
     })),
     assumptions: ["Only the enacted 2022 New York City Construction Code provisions assembled for this answer were treated as governing authority."],
     missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
@@ -7628,9 +7670,9 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     evidenceLimitations: ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
     additionalEvidenceNeeded: ["Confirm any referenced standard, agency rule, figure, or other authority outside the current enacted corpus before final reliance."],
     supportingSourceUses: [],
-    citations: answerEvidence.slice(0, maximumResearchSupportedPoints).map((section) => ({
+    citations: answerEvidenceGroups.slice(0, maximumResearchSupportedPoints).map(({ section, sourceIDs }) => ({
       sectionID: section.sectionID,
-      sourceIDs: [section.sourceID || `section-${section.sectionID}`],
+      sourceIDs,
       relevance: `Enacted evidence from ${section.sectionNumber || section.title}.`
     }))
   };
@@ -7652,22 +7694,30 @@ function outputTextFromResponse(response) {
   throw error;
 }
 
-function researchUsageFromProviderPayload(payload) {
-  return {
+function researchUsageFromProviderPayload(payload, requestedModel = null) {
+  const usage = {
     inputTokens: Number(payload?.usage?.input_tokens || 0),
     cachedInputTokens: Number(payload?.usage?.input_tokens_details?.cached_tokens || 0),
     outputTokens: Number(payload?.usage?.output_tokens || 0),
     totalTokens: Number(payload?.usage?.total_tokens || 0)
   };
+  return {
+    ...usage,
+    modelUsage: [{ model: payload?.model || requestedModel || null, ...usage }]
+  };
 }
 
 function combinedResearchUsage(...entries) {
-  return entries.filter(Boolean).reduce((total, entry) => ({
-    inputTokens: total.inputTokens + Number(entry.inputTokens || 0),
-    cachedInputTokens: total.cachedInputTokens + Number(entry.cachedInputTokens || 0),
-    outputTokens: total.outputTokens + Number(entry.outputTokens || 0),
-    totalTokens: total.totalTokens + Number(entry.totalTokens || 0)
-  }), { inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, totalTokens: 0 });
+  return entries.filter(Boolean).reduce((total, entry) => {
+    const modelUsage = Array.isArray(entry.modelUsage) ? entry.modelUsage : [];
+    return {
+      inputTokens: total.inputTokens + Number(entry.inputTokens || 0),
+      cachedInputTokens: total.cachedInputTokens + Number(entry.cachedInputTokens || 0),
+      outputTokens: total.outputTokens + Number(entry.outputTokens || 0),
+      totalTokens: total.totalTokens + Number(entry.totalTokens || 0),
+      modelUsage: [...total.modelUsage, ...modelUsage]
+    };
+  }, { inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, totalTokens: 0, modelUsage: [] });
 }
 
 function webSourcesFromProviderPayload(payload) {
@@ -7707,7 +7757,10 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   if (!apiKey) {
     return { summary: "", sources: [], usage: combinedResearchUsage(), searched: false };
   }
-  const configuration = researchModelConfiguration();
+  const configuration = {
+    ...researchModelConfiguration(),
+    ...(options.model ? { model: options.model } : {})
+  };
   const allowedDomains = policyConfiguration.officialDomains;
   const requestBody = {
     model: configuration.model,
@@ -7779,7 +7832,7 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
         role: source.sourceRole,
         retrievedAt: new Date().toISOString()
       })),
-    usage: researchUsageFromProviderPayload(payload),
+    usage: researchUsageFromProviderPayload(payload, configuration.model),
     searched: true,
     sanitizedQuery,
     sourcePolicyVersion: researchSourcePolicyVersion
@@ -8123,7 +8176,10 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const baseConfiguration = researchModelConfiguration();
+  const baseConfiguration = {
+    ...researchModelConfiguration(),
+    ...(options.model ? { model: options.model } : {})
+  };
   const conversational = options.responseStyle === "conversational";
   const configuration = conversational
     ? {
@@ -8176,10 +8232,12 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Use answerText to apply the supported rules to the question and user-provided Project facts. Do not merely repeat the structured supportedPoints.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
         "For a numeric limit or table comparison, compare the stated project value with every directly applicable supplied limit. If the value complies with a stricter baseline limit, state that direct conclusion and do not make it conditional on qualifying for a more generous allowance.",
+        "When the same supplied table row places the user's stated category beside a materially different conditional category, briefly identify the alternate value and its qualifying condition when that contrast explains the result. Never apply the alternate value without the qualifying fact.",
         "A missing fact belongs in missingFacts or followUpQuestions only when it can change the requested conclusion. A fact that merely confirms an already-supported, more conservative result may be identified as a professional validation item, but it must not weaken or condition that result.",
         "Treat a corpus or evidence limitation as a boundary on what Permitext evaluated, not as proof that another provision imposes a requirement. Do not say an outside or unsupplied provision requires verification or might change the result unless supplied enacted evidence establishes that consequence.",
         "Every passage marked REQUIRED_CLAIM_COVERAGE must be addressed in at least one supportedPoint and cited with that exact PASSAGE_ID. Combine closely related passages in one coherent supportedPoint when needed; do not satisfy this by adding an orphan citation without explaining the rule.",
         "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
+          "evidenceLimitations must contain at least one non-empty statement describing the boundary of the supplied evidence; never return an empty array or blank item.",
           "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
           "Facts stated by the user may support the answer. Restate a material fact when it helps explain the result, but do not make the answer conditional merely because that fact came from an earlier user turn.",
           "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
@@ -8232,7 +8290,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     requestedModel: model,
     model: payload.model || model,
     configuration,
-    usage: researchUsageFromProviderPayload(payload)
+    usage: researchUsageFromProviderPayload(payload, model)
   };
 }
 
@@ -8305,7 +8363,10 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const configuration = researchModelConfiguration();
+  const configuration = {
+    ...researchModelConfiguration(),
+    ...(options.model ? { model: options.model } : {})
+  };
   const evidenceText = evidence.map((source) => [
     `PASSAGE_ID: ${source.sourceID}`,
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
@@ -8317,7 +8378,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     model: configuration.model,
     store: false,
     reasoning: { effort: "low" },
-    max_output_tokens: 2_000,
+    max_output_tokens: 4_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
@@ -8332,6 +8393,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Fail with repeated_established_fact when the answer asks the user to establish or reconfirm a fact already supplied for the active topic. Independent professional verification of documents or measurements is different and may still be identified when material.",
       "When the user has established that a building is fully sprinklered, treat installed throughout as established factual context. The answer may request documentation of compliance with a named installation standard when material, but must not return fully sprinklered or installed throughout as a missing fact or follow-up question.",
       "For a numeric limit or table comparison, fail with weakest_supported_conclusion when the stated value satisfies a stricter directly applicable supplied limit but the answer makes compliance conditional on qualifying for a more generous allowance.",
+      "Fail with missed_material_conclusion when a table answer omits a materially different conditional category supplied beside the user's category in the same row and that omission could mislead the user about why the stated value fails or passes. Do not demand unrelated rows or categories.",
       "Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement, or says unsupplied law requires verification or could change the result without enacted support.",
       "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",
       "Treat established active-topic facts as supplied user facts. Fail an answer that calls one of them missing, makes the conclusion conditional solely because it came from an earlier turn, or asks the user to reconfirm it without a contradiction. Do not treat prior assistant conclusions as established facts.",
@@ -8381,7 +8443,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     apiKey,
     requestBody,
     signal: options.signal,
-    timeoutMilliseconds: 30_000,
+    timeoutMilliseconds: 45_000,
     failureMessage: "The Research verifier request failed.",
     failureCode: "RESEARCH_VERIFIER_ERROR",
     reserveEvaluationSpend: reserveResearchEvaluationSpend,
@@ -8403,7 +8465,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
   return {
     result: validateResearchVerification(value),
     model: payload.model || configuration.model,
-    usage: researchUsageFromProviderPayload(payload)
+    usage: researchUsageFromProviderPayload(payload, configuration.model)
   };
 }
 
@@ -9225,7 +9287,11 @@ async function assembledResearchEvidenceForTurn({
   corpusPlan,
   onStage
 }) {
-  const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({ question, messages });
+  const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({
+    question,
+    messages,
+    projectFacts
+  });
   const { catalog, invertedIndex, availableCodePrefixes } = await researchCorpusResources(appliedCorpusPlan);
   const strategy = researchEvidenceStrategyForTurn({
     question,
@@ -9430,7 +9496,7 @@ async function ownedProjectRecord(userID, projectID) {
   return projectMutation ? mutationKindAndRecord(projectMutation).record : null;
 }
 
-const researchProjectFactStatuses = new Set(["stated", "confirmed", "unknown", "rejected"]);
+const researchProjectFactStatuses = new Set(["stated", "confirmed", "sourced", "unknown", "rejected"]);
 const researchProjectFactAliases = new Map([
   ["stories", ["stories-above-grade", "Stories Above Grade"]],
   ["sprinkler-status", ["sprinkler-protection", "Sprinkler Protection"]],
@@ -9439,14 +9505,17 @@ const researchProjectFactAliases = new Map([
 const researchBuildingCodeFactKeys = new Set([
   "occupancy", "construction-type", "stories-above-grade", "levels-below-grade",
   "building-height", "sprinkler-protection", "project-status", "work-filing-type",
-  "code-basis", "building-area"
+  "code-basis", "building-area", "building-count", "residential-units", "total-units",
+  "year-built", "years-altered", "building-class"
 ]);
 const researchZoningFactKeys = new Set([
-  "address", "borough", "block", "tax-lots", "zoning-lot-composition", "zoning-districts",
+  "address", "bbl", "borough", "block", "tax-lots", "zip-code", "tax-lot-area",
+  "land-use-code", "zoning-lot-composition", "zoning-districts",
   "commercial-overlays", "special-purpose-district", "zoning-map", "community-district",
   "zoning-lot-area", "lot-width", "lot-depth", "lot-type", "street-frontages",
   "mih-area-options", "affordable-housing-zoning-status", "transit-zone",
-  "limited-height-district", "waterfront-status", "lower-density-growth-management-area"
+  "limited-height-district", "waterfront-status", "lower-density-growth-management-area",
+  "fresh-program-area", "appendix-j-designated-m-district"
 ]);
 
 function researchProjectFactGroup(key) {
@@ -9479,9 +9548,23 @@ function normalizedResearchProjectStructuredFacts(project) {
       source: normalizedResearchText(fact.source || "description", 100),
       sourceText: normalizedResearchText(fact.sourceText || "", 500),
       updatedAt: fact.updatedAt || null,
-      usedInResearch: status === "stated" || status === "confirmed"
+      usedInResearch: status === "stated" || status === "confirmed" || status === "sourced"
     }];
   });
+}
+
+function researchProjectFactLine(fact) {
+  const groupLabel = fact.group === "buildingCode"
+    ? "Building / Code Fact"
+    : fact.group === "zoning"
+      ? "Zoning Fact"
+      : "Custom Fact";
+  const qualification = fact.status === "sourced"
+    ? "NYC Planning sourced data; verify current official records"
+    : fact.status === "confirmed"
+      ? "user-confirmed; not independently verified"
+      : "user-stated; not independently verified";
+  return `${groupLabel} — ${fact.label}: ${fact.value} (${qualification})`;
 }
 
 export function researchProjectInformation(projectID, project) {
@@ -9491,29 +9574,33 @@ export function researchProjectInformation(projectID, project) {
   const codeVersion = String(project.codeVersion || "").trim() || null;
   const structuredFacts = normalizedResearchProjectStructuredFacts(project);
   const usableStructuredFacts = structuredFacts.filter((fact) => fact.usedInResearch && fact.key !== "floor-affected");
-  const addressFact = address ? {
+  const sourcedAddressFact = usableStructuredFacts.find((fact) => fact.key === "address") || null;
+  const sourcedAddressMatchesProject = sourcedAddressFact && address &&
+    sourcedAddressFact.value.localeCompare(address, undefined, { sensitivity: "base" }) === 0;
+  const addressFact = sourcedAddressMatchesProject
+    ? sourcedAddressFact
+    : (address ? {
     id: "project-address",
     key: "address",
     label: "Address",
     value: normalizedResearchText(address, 1_000),
     group: "zoning",
-    status: "stated",
+    status: "confirmed",
     source: "project-record",
     sourceText: "",
     updatedAt: project.updatedAt || null,
     usedInResearch: true
-  } : null;
+  } : sourcedAddressFact);
   const buildingCodeFacts = usableStructuredFacts.filter((fact) => fact.group === "buildingCode");
   const zoningFacts = [
     ...(addressFact ? [addressFact] : []),
     ...usableStructuredFacts.filter((fact) => fact.group === "zoning" && (!addressFact || fact.key !== "address"))
   ];
   const customFacts = usableStructuredFacts.filter((fact) => fact.group === "custom");
-  const factLine = (groupLabel, fact) => `${groupLabel} — ${fact.label}: ${fact.value} (user-confirmed; not independently verified)`;
   const facts = [
-    ...buildingCodeFacts.map((fact) => factLine("Building / Code Fact", fact)),
-    ...zoningFacts.map((fact) => factLine("Zoning Fact", fact)),
-    ...customFacts.map((fact) => factLine("Custom Fact", fact))
+    ...buildingCodeFacts.map(researchProjectFactLine),
+    ...zoningFacts.map(researchProjectFactLine),
+    ...customFacts.map(researchProjectFactLine)
   ];
   if (description) {
     facts.push(`Additional Project facts: ${normalizedResearchText(description, 4_000)}`);
@@ -9591,6 +9678,110 @@ export function researchFactUsageDisclosure({
     projectContext,
     conversation,
     other: used.filter((fact) => !classified.has(fact))
+  };
+}
+
+const researchProjectContextSummaryFactKeys = [
+  "address", "bbl", "borough", "block", "tax-lots", "zip-code",
+  "zoning-districts", "zoning-map", "community-district", "land-use-code",
+  "tax-lot-area", "building-area", "stories-above-grade", "year-built"
+];
+
+const researchProjectContextFactTerms = new Map([
+  ["address", /\b(?:address|location)\b/i],
+  ["bbl", /\bbbl\b|borough[\s/-]*block[\s/-]*lot/i],
+  ["borough", /\bborough\b/i],
+  ["block", /\bblock\b/i],
+  ["tax-lots", /\b(?:tax )?lots?\b/i],
+  ["zip-code", /\b(?:zip|postal) code\b/i],
+  ["zoning-districts", /\bzoning district/i],
+  ["zoning-map", /\bzoning map/i],
+  ["community-district", /\bcommunity district/i],
+  ["land-use-code", /\bland use(?: code)?\b/i],
+  ["tax-lot-area", /\b(?:tax )?lot area\b/i],
+  ["building-area", /\bbuilding area\b/i],
+  ["stories-above-grade", /\b(?:stories|floors)\b/i],
+  ["year-built", /\byear built\b/i]
+]);
+
+export function researchProjectContextOnlyEligibility({ question, projectInformation } = {}) {
+  const text = normalizedResearchText(question, 2_000);
+  if (!text || !projectInformation?.projectID) return false;
+  const usableFacts = [
+    ...(projectInformation.buildingCodeFacts || []),
+    ...(projectInformation.zoningFacts || []),
+    ...(projectInformation.customFacts || [])
+  ].filter((fact) => fact?.usedInResearch && ["sourced", "confirmed"].includes(fact.status));
+  if (!usableFacts.length) return false;
+
+  const factualTarget = /\b(?:project context|structured facts?|imported facts?|property (?:facts?|identifiers?)|address|bbl|borough|block|tax lots?|zoning district|zoning map|community district|land use|year built|building area)\b/i.test(text);
+  const factualRequest = /\b(?:summari[sz]e|summary|identify|list|show|state|report|what (?:is|are)|tell me|provide)\b/i.test(text);
+  if (!factualTarget || !factualRequest) return false;
+
+  const substantiveText = text.replace(
+    /\b(?:do not|don't|without)\s+(?:(?:make|provide|perform)\s+)?(?:any\s+)?(?:determin\w*|analy[sz]\w*|interpret\w*|evaluat\w*|assess\w*)\s+(?:of\s+|about\s+|for\s+)?(?:(?:zoning|code|legal|compliance)\s*(?:(?:or|and)\s*)?){0,3}(?:requirements?|determinations?|analysis|interpretations?|conclusions?)\b/ig,
+    ""
+  );
+  const substantiveRequest = /\b(?:required|requirements?|allowed|permitted|prohibited|comply|compliance|applicable|govern(?:s|ing)?|must|shall|may|calculate|calculation|determine|interpret|violation|off[ -]street parking|floor area ratio|\bfar\b|setback|yards?|height limit|use group)\b/i.test(substantiveText);
+  return !substantiveRequest;
+}
+
+export function researchProjectContextOnlyInterpretation({ question, projectInformation } = {}) {
+  if (!researchProjectContextOnlyEligibility({ question, projectInformation })) {
+    throw new Error("The question is not eligible for a Project-context-only answer.");
+  }
+  const availableFacts = [
+    ...(projectInformation.zoningFacts || []),
+    ...(projectInformation.buildingCodeFacts || []),
+    ...(projectInformation.customFacts || [])
+  ].filter((fact) => fact?.usedInResearch && ["sourced", "confirmed"].includes(fact.status));
+  const summaryRequested = /\b(?:summari[sz]e|summary|structured facts?|imported facts?|property (?:facts?|identifiers?))\b/i.test(question);
+  const requestedKeys = researchProjectContextSummaryFactKeys.filter((key) =>
+    summaryRequested || researchProjectContextFactTerms.get(key)?.test(question)
+  );
+  const selectedFacts = requestedKeys
+    .map((key) => availableFacts.find((fact) => fact.key === key))
+    .filter(Boolean);
+  const facts = selectedFacts.length ? selectedFacts : availableFacts.slice(0, 8);
+  const projectFactsUsed = facts.map(researchProjectFactLine);
+  const factualSummary = facts.map((fact) => `- ${fact.label}: ${fact.value}`).join("\n");
+  const limitationSummary = "These values report the saved Project context only. They do not determine Construction Code or Zoning Resolution requirements. Verify current official NYC records before relying on them; a matched tax lot does not by itself establish the legal zoning-lot composition.";
+  const answerText = [
+    "The imported Project context currently identifies the property as follows:",
+    factualSummary,
+    limitationSummary
+  ].filter(Boolean).join("\n\n");
+  return {
+    answerText,
+    conclusion: [
+      "The imported Project context currently identifies the property as follows:",
+      factualSummary
+    ].join("\n"),
+    explanation: limitationSummary,
+    assumptions: [],
+    missingFacts: [],
+    evidenceLimitations: [
+      "This answer reports saved Project facts and does not interpret or determine Construction Code or Zoning Resolution requirements.",
+      "Verify current official NYC records before relying on these values.",
+      "A matched tax lot does not by itself establish the legal zoning-lot composition."
+    ],
+    additionalEvidenceNeeded: [],
+    followUpQuestions: [],
+    supportedPoints: [],
+    citations: [],
+    supportingSources: [],
+    supportingSourceUses: [],
+    projectFactsUsed,
+    selectedFacts: facts.map((fact) => ({
+      id: fact.id,
+      key: fact.key,
+      label: fact.label,
+      value: fact.value,
+      status: fact.status,
+      source: fact.source,
+      sourceText: fact.sourceText,
+      updatedAt: fact.updatedAt
+    }))
   };
 }
 
@@ -10173,6 +10364,24 @@ async function handleProjectFoundationState(request, response) {
     return;
   }
   sendJSON(response, 200, state);
+}
+
+async function handleProjectPropertyLookup(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  try {
+    const property = await lookupNYCPropertyContext(context.body.address);
+    sendJSON(response, 200, { property });
+  } catch (error) {
+    if (error instanceof NYCPropertyLookupError) {
+      sendJSON(response, error.status, {
+        error: error.message,
+        code: error.code
+      });
+      return;
+    }
+    throw error;
+  }
 }
 
 function organizationInvitationForClient(invitation) {
@@ -15877,6 +16086,199 @@ async function handleInternalEvaluationReview(request, response) {
   });
 }
 
+export function researchRequestMessageIdentity(userID, conversationID, requestID) {
+  const normalizedRequestID = normalizedResearchText(requestID, 100);
+  if (!normalizedRequestID) return null;
+  return `research-${createHash("sha256")
+    .update(`${userID}\u0000${conversationID}\u0000${normalizedRequestID}`)
+    .digest("hex")}`;
+}
+
+export function researchRequestReservationID(userID, conversationID, requestID) {
+  const identity = researchRequestMessageIdentity(userID, conversationID, requestID);
+  if (!identity) throw new Error("Research usage reservation requires a request identifier.");
+  return `${identity}:usage`;
+}
+
+async function commitProjectContextOnlyResearchMessage({
+  context,
+  conversation,
+  question,
+  projectInformation,
+  manualProjectFacts,
+  combinedProjectFacts,
+  researchRequestID,
+  progressResponse
+}) {
+  const requestIdentity = researchRequestMessageIdentity(
+    context.userID,
+    conversation.id,
+    researchRequestID
+  );
+  const projectContextCapturedAt = new Date().toISOString();
+  const generated = researchProjectContextOnlyInterpretation({ question, projectInformation });
+  const { selectedFacts, ...interpretation } = generated;
+  const now = new Date().toISOString();
+  const factUsage = researchFactUsageDisclosure({
+    factsUsed: interpretation.projectFactsUsed,
+    projectFacts: combinedProjectFacts
+  });
+  progressResponse.progress("preparing_question", "completed");
+  progressResponse.progress("checking_citation_support", "active");
+  progressResponse.progress("checking_citation_support", "completed");
+  progressResponse.progress("preparing_conclusion", "active");
+
+  const userMessage = {
+    id: requestIdentity ? `${requestIdentity}:question` : randomUUID(),
+    role: "user",
+    question,
+    createdAt: now,
+    ...(researchRequestID ? { researchRequestID } : {})
+  };
+  const assistantMessage = {
+    id: requestIdentity ? `${requestIdentity}:answer` : randomUUID(),
+    role: "assistant",
+    createdAt: now,
+    ...(researchRequestID ? { researchRequestID } : {}),
+    answer: {
+      mode: "project_context",
+      model: "permitext-deterministic-project-context",
+      requestedModel: "permitext-deterministic-project-context",
+      promptVersion: "20260824-project-context-v1",
+      evidenceVersion: "project-context-facts-v1",
+      ...interpretation,
+      evidenceSectionIDs: [],
+      evidenceSourceIDs: [],
+      sourceSummary: {
+        projectFactCount: selectedFacts.length,
+        sourcedProjectFactCount: selectedFacts.filter((fact) => fact.status === "sourced").length,
+        enactedProvisionCount: 0,
+        contextualProvisionCount: 0,
+        citedProvisionCount: 0,
+        unresolvedProjectFactCount: 0
+      },
+      structuredEvidenceAnalysis: {
+        projectFactsUsed: interpretation.projectFactsUsed,
+        unresolvedProjectFacts: [],
+        highValueFollowUpQuestions: [],
+        selectedProjectFacts: selectedFacts
+      },
+      factUsage,
+      retrieval: {
+        schemaVersion: 1,
+        assemblyVersion: "project-context-facts-v1",
+        sourceMode: "project_context",
+        projectFactsApplied: true,
+        modelRequested: false,
+        limitations: interpretation.evidenceLimitations
+      },
+      verification: {
+        status: "project_context",
+        pass: true,
+        reason: "PROJECT_CONTEXT_ONLY",
+        attempts: 0,
+        regenerated: false,
+        history: []
+      },
+      authorityStatus: "project_context",
+      authorityLabel: "Project facts only",
+      sourceAsOf: projectContextCapturedAt,
+      disclaimer: "Project-context summary—not an official code or zoning determination. Verify source records and Project facts before relying on it."
+    }
+  };
+  progressResponse.progress("preparing_conclusion", "completed");
+  assistantMessage.researchProgress = progressResponse.summary(now);
+
+  const answerRecord = {
+    ...immutableResearchAnswer({
+      id: assistantMessage.id,
+      owner: ownerScope(context.userID),
+      conversationID: conversation.id,
+      projectID: conversation.primaryProjectID || null,
+      question,
+      answer: assistantMessage.answer,
+      evidence: [],
+      citations: [],
+      model: assistantMessage.answer.model,
+      researchSystemVersion: [
+        assistantMessage.answer.promptVersion,
+        assistantMessage.answer.evidenceVersion,
+        researchSourcePolicyVersion
+      ].join(":"),
+      createdAt: now
+    }),
+    projectContextSnapshot: {
+      projectID: conversation.primaryProjectID || null,
+      projectInformation,
+      manualFacts: [...manualProjectFacts],
+      combinedFacts: combinedProjectFacts,
+      selectedFacts,
+      capturedAt: projectContextCapturedAt
+    }
+  };
+  conversation.starterQuestion ||= question;
+  conversation.messages.push(userMessage, assistantMessage);
+  conversation.updatedAt = now;
+  delete conversation.historyHiddenAt;
+  conversation.sourceStatus = "current";
+  refreshGeneratedResearchConversationTitle(conversation);
+  const activityEvents = conversation.primaryProjectID
+    ? [
+        activityEvent({
+          owner: ownerScope(context.userID),
+          projectID: conversation.primaryProjectID,
+          actorUserID: context.userID,
+          action: "research.question.submitted",
+          objectKind: "researchConversation",
+          objectID: conversation.id,
+          newStatus: "submitted",
+          createdAt: now,
+          metadata: { answerID: assistantMessage.id, mode: "project_context" }
+        }),
+        activityEvent({
+          owner: ownerScope(context.userID),
+          projectID: conversation.primaryProjectID,
+          actorUserID: context.userID,
+          action: "research.answer.generated",
+          objectKind: "researchAnswer",
+          objectID: assistantMessage.id,
+          newStatus: "generated",
+          createdAt: now,
+          metadata: { conversationID: conversation.id, mode: "project_context" }
+        })
+      ]
+    : [];
+  progressResponse.assertActive();
+  await commitResearchConversationMessage(context.userID, {
+    reservationID: null,
+    usageEntry: null,
+    answer: answerRecord,
+    conversation,
+    events: activityEvents
+  });
+  const artifactRevisions = await bumpResearchArtifactRevisions(
+    context.userID,
+    conversation.primaryProjectID
+      ? [{ projectID: conversation.primaryProjectID, domains: ["activity", "foundation", "research"] }]
+      : []
+  );
+  console.info(JSON.stringify({
+    event: "research_conversation_message",
+    user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
+    mode: "project_context",
+    model: assistantMessage.answer.model,
+    conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
+    projectFacts: selectedFacts.length,
+    totalTokens: 0
+  }));
+  progressResponse.json(200, {
+    conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+    usage: await researchUsageForClient(context.userID, context.authContext.entitlement),
+    ...(researchRequestID ? { requestID: researchRequestID } : {}),
+    artifactRevisions
+  });
+}
+
 async function handleResearchConversationMessage(request, response) {
   const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
@@ -15905,16 +16307,39 @@ async function handleResearchConversationMessage(request, response) {
     context.body.progressStream === "ndjson"
   );
   const researchRequestID = normalizedResearchText(context.body.requestID, 100);
+  const mockMode = researchMockMode();
+  if (!mockMode && !researchRequestID) {
+    progressResponse.json(400, {
+      error: "Research requires a request identifier so retries cannot consume another turn.",
+      code: "RESEARCH_REQUEST_ID_REQUIRED"
+    });
+    return;
+  }
+  const priorRequestMessage = researchRequestID
+    ? (conversation.messages || []).find((message) =>
+        message.researchRequestID === researchRequestID || message.requestID === researchRequestID
+      )
+    : null;
+  if (
+    priorRequestMessage?.role === "user" &&
+    normalizedResearchText(priorRequestMessage.question, 2_000) !== question
+  ) {
+    progressResponse.json(409, {
+      error: "That Research request identifier was already used for a different question.",
+      code: "RESEARCH_REQUEST_ID_CONFLICT"
+    });
+    return;
+  }
   const replayedAnswer = researchRequestID
     ? (conversation.messages || []).find((message) =>
-        message.role === "assistant" && message.researchRequestID === researchRequestID
+        message.role === "assistant" &&
+        (message.researchRequestID === researchRequestID || message.requestID === researchRequestID)
       )
     : null;
   if (replayedAnswer) {
     for (const stage of replayedAnswer.researchProgress?.stages || []) {
       if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
     }
-    const mockMode = researchMockMode();
     progressResponse.json(200, {
       conversation: await researchConversationForClient(conversation, { userID: context.userID }),
       usage: await researchUsageForClient(
@@ -15958,10 +16383,29 @@ async function handleResearchConversationMessage(request, response) {
       context.userID,
       conversation.primaryProjectID
     );
+    const manualProjectFacts = conversation.projectContext?.facts || [];
+    const combinedProjectFacts = combinedResearchProjectFacts(
+      projectInformation,
+      manualProjectFacts
+    );
+    if (researchProjectContextOnlyEligibility({ question, projectInformation })) {
+      await commitProjectContextOnlyResearchMessage({
+        context,
+        conversation,
+        question,
+        projectInformation,
+        manualProjectFacts,
+        combinedProjectFacts,
+        researchRequestID,
+        progressResponse
+      });
+      return;
+    }
     const corpusPlan = await researchCorpusPlanForTurn({
       question,
       messages: conversation.messages || [],
       projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
+      projectFacts: combinedProjectFacts,
       pinnedEvidence
     });
     const answerCodeBasis = researchCodeBasis(
@@ -15969,11 +16413,6 @@ async function handleResearchConversationMessage(request, response) {
       projectInformation,
       new Date().toISOString(),
       corpusPlan
-    );
-    const manualProjectFacts = conversation.projectContext?.facts || [];
-    const combinedProjectFacts = combinedResearchProjectFacts(
-      projectInformation,
-      manualProjectFacts
     );
     progressResponse.progress("preparing_question", "completed");
     const evidencePackage = await assembledResearchEvidenceForTurn({
@@ -16023,7 +16462,6 @@ async function handleResearchConversationMessage(request, response) {
       ...claim,
       claimRole: "governing"
     }));
-    const mockMode = researchMockMode();
     const requestLimit = monthlyResearchRequestLimit();
     if (!mockMode) {
       const spendGuardrails = researchSpendGuardrails();
@@ -16032,7 +16470,11 @@ async function handleResearchConversationMessage(request, response) {
         error.code = "RESEARCH_SPEND_CAP";
         throw error;
       }
-      researchReservationID = randomUUID();
+      researchReservationID = researchRequestReservationID(
+        context.userID,
+        conversation.id,
+        researchRequestID
+      );
       researchReservationCreatedAt = new Date().toISOString();
       const reservation = await reserveResearchUsage(context.userID, {
         id: researchReservationID,
@@ -16046,6 +16488,14 @@ async function handleResearchConversationMessage(request, response) {
       });
       if (!reservation.reserved) {
         researchReservationID = null;
+        if (reservation.reason === "duplicate") {
+          progressResponse.json(409, {
+            error: "This Research question is already being processed. Its reserved turn will not be charged twice.",
+            code: "RESEARCH_REQUEST_IN_PROGRESS",
+            requestID: researchRequestID
+          });
+          return;
+        }
         const usage = await researchUsageForClient(
           context.userID,
           context.authContext.entitlement
@@ -16086,24 +16536,45 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const webSupportRequested = shouldUseResearchWebSupport({
+    const boundedCitationLookup = researchQuestionIsBoundedCitationLookup(question);
+    const webSupportRequested = !boundedCitationLookup && shouldUseResearchWebSupport({
       question,
       outsideLibraryRequired: Boolean(evidencePackage.discovery?.outsideCurrentLibrary?.length)
     });
-    const webSupport = !mockMode && webSupportRequested
-      ? await openAIResearchWebSupport(question, context.userID, {
-          retrievalQuery: question,
-          signal: progressResponse.signal
-        })
-      : {
-          summary: "",
-          sources: [],
-          usage: combinedResearchUsage(),
-          searched: false,
-          sourcePolicyVersion: researchSourcePolicyVersion
-        };
-    const evidenceAnalysisResult = mockMode
-      ? {
+    const modelRouting = routeResearchAnswerModel({
+      question,
+      evidence: assembledEvidence,
+      requiredClaims,
+      codeBasis: answerCodeBasis,
+      webSupportRequested
+    });
+    const accurateModel = researchEscalationModel(modelRouting);
+    const runEvidenceAnalysis = async (model) => openAIResearchEvidenceAnalysis(
+      question,
+      assembledEvidence,
+      context.userID,
+      {
+        messages: conversation.messages,
+        projectContextFacts: combinedProjectFacts,
+        conversationFactContext,
+        validUserFacts,
+        retrievalLimitations: turnRetrievalLimitations,
+        codeBasis: answerCodeBasis,
+        requiredClaims,
+        model,
+        signal: progressResponse.signal
+      }
+    );
+    const emptyWebSupport = {
+      summary: "",
+      sources: [],
+      usage: combinedResearchUsage(),
+      searched: false,
+      sourcePolicyVersion: researchSourcePolicyVersion
+    };
+    let evidenceAnalysisEscalated = false;
+    const evidenceAnalysisPromise = mockMode
+      ? Promise.resolve({
           analysis: mockResearchEvidenceAnalysis(
             assembledEvidence,
             validUserFacts,
@@ -16111,23 +16582,49 @@ async function handleResearchConversationMessage(request, response) {
           ),
           model: "permitext-mock",
           usage: combinedResearchUsage()
-        }
-      : await openAIResearchEvidenceAnalysis(question, assembledEvidence, context.userID, {
-          messages: conversation.messages,
-          projectContextFacts: combinedProjectFacts,
-          conversationFactContext,
-          validUserFacts,
-          retrievalLimitations: turnRetrievalLimitations,
-          codeBasis: answerCodeBasis,
-          requiredClaims,
-          signal: progressResponse.signal
+        })
+      : runEvidenceAnalysis(modelRouting.configuration.evidenceAnalysisModel).catch(async (error) => {
+          if (
+            modelRouting.configuration.mode !== "hybrid" ||
+            modelRouting.configuration.evidenceAnalysisModel === accurateModel ||
+            ["RESEARCH_CANCELLED", "AbortError", "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP"].includes(error?.code || error?.name)
+          ) throw error;
+          evidenceAnalysisEscalated = true;
+          return runEvidenceAnalysis(accurateModel);
         });
+    const webSupportPromise = !mockMode && webSupportRequested
+      ? openAIResearchWebSupport(question, context.userID, {
+          retrievalQuery: question,
+          model: modelRouting.configuration.webSupportModel,
+          signal: progressResponse.signal
+        })
+      : Promise.resolve(emptyWebSupport);
+    // Web guidance and enacted-evidence organization are independent. Running
+    // them together shortens the turn without removing either quality gate.
+    const [webSupport, evidenceAnalysisResult] = await Promise.all([
+      webSupportPromise,
+      evidenceAnalysisPromise
+    ]);
     progressResponse.progress("checking_citation_support", "completed");
     progressResponse.progress("preparing_conclusion", "active");
+    let answerEscalated = false;
+    const interpretationOptions = {
+      selections,
+      messages: conversation.messages,
+      projectContextFacts: combinedProjectFacts,
+      conversationFactContext,
+      responseStyle: "conversational",
+      structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+      webSupport,
+      codeBasis: answerCodeBasis,
+      requiredClaims,
+      signal: progressResponse.signal
+    };
     let result = mockMode
       ? {
           interpretation: validateResearchInterpretation(mockResearchInterpretation(question, assembledEvidence, {
-            responseStyle: "conversational"
+            responseStyle: "conversational",
+            requiredClaims
           }), assembledEvidence, webSupport.sources),
           model: "permitext-mock",
           configuration: {
@@ -16138,16 +16635,19 @@ async function handleResearchConversationMessage(request, response) {
           usage: combinedResearchUsage()
         }
       : await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
-          selections,
-          messages: conversation.messages,
-          projectContextFacts: combinedProjectFacts,
-          conversationFactContext,
-          responseStyle: "conversational",
-          structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
-          webSupport,
-          codeBasis: answerCodeBasis,
-          requiredClaims,
-          signal: progressResponse.signal
+          ...interpretationOptions,
+          model: modelRouting.model
+        }).catch(async (error) => {
+          if (
+            modelRouting.tier !== "fast" ||
+            modelRouting.model === accurateModel ||
+            ["RESEARCH_CANCELLED", "AbortError", "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP"].includes(error?.code || error?.name)
+          ) throw error;
+          answerEscalated = true;
+          return openAIResearchInterpretation(question, assembledEvidence, context.userID, {
+            ...interpretationOptions,
+            model: accurateModel
+          });
         });
     let verificationAttempts = [];
     let evidenceBoundaryFallback = false;
@@ -16164,6 +16664,7 @@ async function handleResearchConversationMessage(request, response) {
       answer: result.interpretation
     });
     let answerQuality = evaluateResearchAnswerQuality({
+      question,
       evidence: assembledEvidence,
       answer: result.interpretation
     });
@@ -16188,6 +16689,7 @@ async function handleResearchConversationMessage(request, response) {
         answer: result.interpretation
       });
       answerQuality = evaluateResearchAnswerQuality({
+        question,
         evidence: assembledEvidence,
         answer: result.interpretation
       });
@@ -16213,18 +16715,11 @@ async function handleResearchConversationMessage(request, response) {
     } else {
       for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
         if (attempt > 0) {
+          answerEscalated ||= result.requestedModel !== accurateModel;
           const revised = await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
-            selections,
-            messages: conversation.messages,
-            projectContextFacts: combinedProjectFacts,
-            conversationFactContext,
-            responseStyle: "conversational",
-            structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
-            webSupport,
-            codeBasis: answerCodeBasis,
-            requiredClaims,
+            ...interpretationOptions,
+            model: accurateModel,
             revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts),
-            signal: progressResponse.signal
           });
           answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
           result = revised;
@@ -16240,6 +16735,7 @@ async function handleResearchConversationMessage(request, response) {
           answer: result.interpretation
         });
         answerQuality = evaluateResearchAnswerQuality({
+          question,
           evidence: assembledEvidence,
           answer: result.interpretation
         });
@@ -16269,6 +16765,7 @@ async function handleResearchConversationMessage(request, response) {
             webSupport,
             codeBasis: answerCodeBasis,
             requiredClaims,
+            model: modelRouting.configuration.verificationModel,
             signal: progressResponse.signal
           }
         );
@@ -16296,7 +16793,17 @@ async function handleResearchConversationMessage(request, response) {
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
     progressResponse.progress("preparing_conclusion", "completed");
-    const disclaimer = "AI-generated research assistance, not an official code determination.";
+    const authorityStatus = evidenceBoundaryFallback
+      ? "insufficient_evidence"
+      : result.interpretation.missingFacts?.length
+        ? "conditional"
+        : "supported_by_enacted_text";
+    const authorityLabel = authorityStatus === "insufficient_evidence"
+      ? "Insufficient enacted evidence"
+      : authorityStatus === "conditional"
+        ? "Conditional on Project facts"
+        : "Supported by enacted text";
+    const disclaimer = "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.";
     const materialAssembledEvidence = assembledEvidence.filter((section) =>
       !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole)
     );
@@ -16304,14 +16811,18 @@ async function handleResearchConversationMessage(request, response) {
       section?.evidencePriority?.evidenceRole === "contextual"
     );
     const userMessage = {
-      id: randomUUID(),
+      id: researchRequestID
+        ? `${researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID)}:question`
+        : randomUUID(),
       role: "user",
       question,
       createdAt: now,
       ...(researchRequestID ? { researchRequestID } : {})
     };
     const assistantMessage = {
-      id: randomUUID(),
+      id: researchRequestID
+        ? `${researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID)}:answer`
+        : randomUUID(),
       role: "assistant",
       createdAt: now,
       ...(researchRequestID ? { researchRequestID } : {}),
@@ -16390,6 +16901,20 @@ async function handleResearchConversationMessage(request, response) {
           attempts: verificationAttempts.length,
           regenerated: verificationAttempts.length > 1,
           history: verificationAttempts
+        },
+        authorityStatus,
+        authorityLabel,
+        sourceAsOf: answerCodeBasis.resolvedAt,
+        routing: {
+          version: researchModelRoutingVersion,
+          mode: modelRouting.configuration.mode,
+          answerTier: modelRouting.tier,
+          reasons: modelRouting.reasons,
+          evidenceAnalysisModel: evidenceAnalysisResult.model,
+          requestedAnswerModel: modelRouting.model,
+          actualAnswerModel: result.model,
+          verificationModel: modelRouting.configuration.verificationModel,
+          escalated: evidenceAnalysisEscalated || answerEscalated
         },
         disclaimer
       }
@@ -16492,6 +17017,10 @@ async function handleResearchConversationMessage(request, response) {
       usageEntry: mockMode ? null : {
         model: result.model,
         requestedModel: result.requestedModel || result.model,
+        routingVersion: researchModelRoutingVersion,
+        routingMode: modelRouting.configuration.mode,
+        answerTier: modelRouting.tier,
+        escalated: evidenceAnalysisEscalated || answerEscalated,
         mode: "openai",
         ...result.usage,
         promptVersion: result.configuration.promptVersion,
@@ -16608,7 +17137,7 @@ async function handleResearchConversationMessage(request, response) {
       const providerUnavailable = ["RESEARCH_PROVIDER_ERROR", "RESEARCH_VERIFIER_ERROR", "TimeoutError"]
         .includes(failureCode);
       progressResponse.error(502, providerUnavailable
-        ? "Terra's research service is temporarily unavailable. Your question is still here."
+        ? "Permitext Research is temporarily unavailable. Your question is still here."
         : "The research model could not return a verified, cited answer.", {
         code: failureCode
       });
@@ -27005,6 +27534,7 @@ const handlers = {
   "research/conversations/candidate-disposition": handleResearchCandidateDisposition,
   "projects/foundation/state": handleProjectFoundationState,
   "projects/hub/bootstrap": handleProjectHubBootstrap,
+  "projects/property/lookup": handleProjectPropertyLookup,
   "projects/artifacts/checkpoint": handleProjectArtifactCheckpoint,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,
@@ -27267,6 +27797,7 @@ function requestMutatesFileStore(request) {
   // handler. Adapter-level withMutation() still serializes short JSON RMW sections.
   if (
     path === "projects/artifacts/checkpoint" ||
+    path === "projects/property/lookup" ||
     path === "research/interpret" ||
     path === "research/conversations/message" ||
     path === "research/conversations/refresh" ||
@@ -27334,6 +27865,15 @@ export async function handleRequest(request, response) {
   try {
     await withFileStoreLock(dataPath, () => handleRequestUnlocked(request, response));
   } catch (error) {
+    if (response.headersSent) {
+      console.error(JSON.stringify(sanitizedServerErrorReport(error, {
+        route: requestTelemetryRoute(normalizePath(request.url)),
+        method: request.method,
+        requestID: request.headers?.["x-vercel-id"]
+      })));
+      if (!response.writableEnded) response.end();
+      return;
+    }
     if (error?.code === "FILE_STORE_LOCK_TIMEOUT") {
       sendError(response, 503, "Local data storage is busy. Please retry.");
       return;
@@ -27343,8 +27883,6 @@ export async function handleRequest(request, response) {
       method: request.method,
       requestID: request.headers?.["x-vercel-id"]
     })));
-    if (!response.headersSent) {
-      sendError(response, 500, "Internal server error.");
-    }
+    sendError(response, 500, "Internal server error.");
   }
 }

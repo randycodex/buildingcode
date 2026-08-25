@@ -404,7 +404,7 @@ private struct NotebookCardEditorView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(reference.label)
                         .font(.subheadline.weight(.semibold))
-                    Text(reference.referenceKind == "researchAnswer" ? "Terra Research" : "Saved Evidence")
+                    Text(reference.referenceKind == "researchAnswer" ? "Permitext Research" : "Saved Evidence")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

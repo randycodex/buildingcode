@@ -71,21 +71,28 @@ struct FolderEditorSheet: View {
     let existing: CodeFolder?
     let defaultFolderType: CodeFolderType
     /// Called on Save tap. Validation (non-empty name) is handled inside.
-    let onSave: (_ name: String, _ address: String, _ description: String, _ colorHex: String, _ folderType: CodeFolderType) -> Void
+    let onSave: (_ name: String, _ address: String, _ description: String, _ structuredFacts: [ProjectStructuredFact], _ colorHex: String, _ folderType: CodeFolderType) -> Void
     /// Called on Delete tap. Only invoked when `existing != nil`.
     let onDelete: () -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var name: String = ""
     @State private var address: String = ""
     @State private var description: String = ""
     @State private var colorHex: String = CodeFolder.defaultColorHex
     @State private var showsDeleteConfirm = false
+    @State private var isSaving = false
+    @State private var propertyLookupStatus = ""
+    @State private var propertyLookupSucceeded = false
+    @State private var propertyLookupAddress = ""
+    @State private var propertyContext: BackendProjectPropertyContext?
+    @FocusState private var addressIsFocused: Bool
 
     private var isEditing: Bool { existing != nil }
     private var folderType: CodeFolderType { existing?.folderType ?? defaultFolderType }
     private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
-    private var canSave: Bool { !trimmedName.isEmpty }
+    private var canSave: Bool { !trimmedName.isEmpty && !isSaving }
     private var detents: Set<PresentationDetent> {
         isEditing ? [.large] : [.medium, .large]
     }
@@ -104,6 +111,21 @@ struct FolderEditorSheet: View {
                         TextField("Address", text: $address, axis: .vertical)
                             .textInputAutocapitalization(.words)
                             .lineLimit(1...3)
+                            .focused($addressIsFocused)
+                            .onSubmit { Task { _ = await lookupPropertyContext() } }
+                        if !propertyLookupStatus.isEmpty {
+                            HStack(spacing: 6) {
+                                if isSaving && propertyContext == nil {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                } else {
+                                    Image(systemName: propertyLookupSucceeded ? "checkmark.circle.fill" : "info.circle")
+                                }
+                                Text(propertyLookupStatus)
+                            }
+                            .font(.caption)
+                            .foregroundStyle(propertyLookupSucceeded ? Color.green : Color.secondary)
+                        }
                     }
                 }
 
@@ -146,8 +168,7 @@ struct FolderEditorSheet: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
-                        onSave(trimmedName, address, description, colorHex, folderType)
-                        dismiss()
+                        Task { await save() }
                     }
                     .disabled(!canSave)
                     .fontWeight(.semibold)
@@ -174,8 +195,67 @@ struct FolderEditorSheet: View {
                     colorHex = existing.colorHex
                 }
             }
+            .onChange(of: address) { _, newValue in
+                if newValue.trimmingCharacters(in: .whitespacesAndNewlines) != propertyLookupAddress {
+                    propertyContext = nil
+                    propertyLookupAddress = ""
+                    propertyLookupStatus = ""
+                    propertyLookupSucceeded = false
+                }
+            }
+            .onChange(of: addressIsFocused) { _, isFocused in
+                if !isFocused {
+                    Task { _ = await lookupPropertyContext() }
+                }
+            }
         }
         .presentationDetents(detents)
+    }
+
+    @MainActor
+    private func lookupPropertyContext() async -> BackendProjectPropertyContext? {
+        let trimmedAddress = address.trimmingCharacters(in: .whitespacesAndNewlines)
+        let existingAddress = existing?.address.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard folderType == .project,
+              !trimmedAddress.isEmpty,
+              !isEditing || trimmedAddress != existingAddress
+        else { return nil }
+        if propertyLookupAddress == trimmedAddress, let propertyContext { return propertyContext }
+        guard library.signedInAccount != nil else {
+            propertyLookupStatus = "Sign in to import official NYC property facts. The Project can still be saved."
+            propertyLookupSucceeded = false
+            return nil
+        }
+        propertyLookupStatus = "Looking up official NYC property data…"
+        propertyLookupSucceeded = false
+        do {
+            let result = try await library.projectPropertyContext(address: trimmedAddress)
+            propertyContext = result
+            propertyLookupAddress = result.normalizedAddress
+            address = result.normalizedAddress
+            propertyLookupStatus = "Imported \(result.structuredFacts.count) sourced facts from NYC Planning."
+            propertyLookupSucceeded = true
+            return result
+        } catch {
+            propertyContext = nil
+            propertyLookupAddress = trimmedAddress
+            propertyLookupStatus = "NYC property facts could not be imported. The Project can still be saved."
+            propertyLookupSucceeded = false
+            return nil
+        }
+    }
+
+    @MainActor
+    private func save() async {
+        guard canSave else { return }
+        isSaving = true
+        let property = await lookupPropertyContext()
+        let savedAddress = property?.normalizedAddress ?? address
+        let addressChanged = savedAddress.trimmingCharacters(in: .whitespacesAndNewlines) !=
+            (existing?.address.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+        let savedFacts = property?.structuredFacts ?? (addressChanged ? [] : existing?.structuredFacts ?? [])
+        onSave(trimmedName, savedAddress, description, savedFacts, colorHex, folderType)
+        dismiss()
     }
 
     private func colorSwatch(_ hex: String) -> some View {

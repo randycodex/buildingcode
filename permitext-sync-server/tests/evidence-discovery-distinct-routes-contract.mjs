@@ -14,6 +14,7 @@ const checks = [
   ["In a residential project containing 100 dwelling units, explain which categories of accessible units must be considered and what additional project information is necessary to calculate the required quantities.", ["1107.6", "1107.6.1", "1107.6.1.1", "1107.6.1.2", "1107.6.2", "1107.6.2.1", "1107.6.2.2", "1107.6.3", "1107.7", "1107.7.4"]],
   ["What structural live load applies to a community room?", ["1607.1"]],
   ["Does converting an office to dense file storage require structural evaluation?", ["1604.2", "1607.1"]]
+  ,["A small existing establishment proposes an alteration described as a change between Group B and Group M after the 2024 zoning Use Group renumbering. Based only on the selected Building Code passages, can we conclude that the work qualifies for an exception to amending the Certificate of Occupancy, and what accessibility consequence can be stated?", ["1101.3", "1101.3.1"]]
 ];
 const wanted = new Set(checks.flatMap(([, references]) => references));
 const catalog = [];
@@ -30,12 +31,31 @@ for (const [question, expected] of checks) {
     question,
     catalog,
     invertedIndex: new Map(),
-    readSectionBody: async (section) => ({ blocks: [{ plainText: `${section.title} enacted provision.` }] }),
+    readSectionBody: async (section) => ({ blocks: [{ plainText:
+      section.sectionNumber === "1101.3"
+        ? "The provisions of this chapter shall apply to alterations, including minor alterations but excluding ordinary repairs, and changes of use or occupancy to prior code buildings, portions of such buildings, and spaces within such buildings in accordance with Sections 1101.3.1 through 1101.3.5."
+        : section.sectionNumber === "1101.3.1"
+          ? "Accessible features and construction governed by this chapter shall be provided:\n\n1. To the entire building where a change is made in the main use.\n\n2. Throughout a space, including the immediate entrance(s) thereto, where an alteration is made that is considered either: (i) a change in occupancy classification of such space in accordance with this code, or (ii) a change in the zoning use group of such space in accordance with the New York City Zoning Resolution.\n\n2.2. A separate rooftop condition applies."
+          : `${section.title} enacted provision.`
+    }] }),
     limit: 12
   });
   const actual = new Set(result.candidates.map((candidate) => candidate.sectionNumber));
   for (const sectionNumber of expected) {
     assert(actual.has(sectionNumber), `${question} did not route to BC ${sectionNumber}.`);
+  }
+  if (/Certificate of Occupancy/i.test(question)) {
+    for (const candidate of result.candidates) {
+      assert.equal(
+        candidate.signals.useSelectedPassageOnly,
+        true,
+        `BC ${candidate.sectionNumber} must preserve the routed passage boundary for this selected-passage question.`
+      );
+      if (candidate.sectionNumber === "1101.3.1") {
+        assert.doesNotMatch(candidate.selectedText, /entire building|rooftop/i);
+        assert.match(candidate.selectedText, /Throughout a space, including the immediate entrance/);
+      }
+    }
   }
 }
 

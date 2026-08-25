@@ -167,6 +167,54 @@ assert.deepEqual(
     reference: "BC § 101.1"
   }]
 );
+assert.deepEqual(
+  extractResearchCodeReferences("Compare ZR § 25-23 with ZR Table 25-23 and Sections 25-24 through 25-26."),
+  [{
+    codePrefix: "ZR",
+    sectionNumber: "25-23",
+    referenceKind: "section",
+    reference: "ZR § 25-23"
+  }, {
+    codePrefix: "ZR",
+    sectionNumber: "25-23",
+    referenceKind: "table",
+    reference: "ZR Table 25-23"
+  }, {
+    codePrefix: "ZR",
+    sectionNumber: "25-24",
+    referenceKind: "section",
+    reference: "ZR § 25-24"
+  }, {
+    codePrefix: "ZR",
+    sectionNumber: "25-26",
+    referenceKind: "section",
+    reference: "ZR § 25-26"
+  }]
+);
+assert.deepEqual(
+  extractResearchCodeReferences("Apply ZR Sections 25-23, 25-24, and 25-25, then check ZR Section 36-21."),
+  [{
+    codePrefix: "ZR",
+    sectionNumber: "25-23",
+    referenceKind: "section",
+    reference: "ZR § 25-23"
+  }, {
+    codePrefix: "ZR",
+    sectionNumber: "25-24",
+    referenceKind: "section",
+    reference: "ZR § 25-24"
+  }, {
+    codePrefix: "ZR",
+    sectionNumber: "25-25",
+    referenceKind: "section",
+    reference: "ZR § 25-25"
+  }, {
+    codePrefix: "ZR",
+    sectionNumber: "36-21",
+    referenceKind: "section",
+    reference: "ZR § 36-21"
+  }]
+);
 assert.deepEqual(history, historySnapshot, "Topic classification must not mutate conversation history.");
 assert.throws(() => decideResearchConversationTopic({ question: "" }), /requires a question/);
 

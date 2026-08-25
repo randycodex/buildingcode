@@ -7,7 +7,8 @@ export const researchConversationTopicDecisions = Object.freeze({
   topicSwitch: "topic_switch"
 });
 
-const codePrefixes = "AC|BC|EBC|FC|FGC|MC|PC";
+const codePrefixes = "AC|BC|EBC|FC|FGC|MC|PC|ZR";
+const directReferenceNumber = String.raw`(?:[A-Z]?\d+-\d+(?:\.[0-9A-Za-z-]+)*|[A-Z]?\d+(?:\.[0-9A-Za-z-]+)+)`;
 const stopWords = new Set([
   "a", "about", "after", "all", "also", "an", "and", "any", "are", "as", "at",
   "be", "because", "been", "before", "being", "but", "by", "can", "could", "did",
@@ -60,21 +61,21 @@ export function extractResearchCodeReferences(value) {
   };
   const hasSentenceBoundary = (between) => /[;!?]|\.(?:\s+[A-Z]|$)/.test(between);
   const directPattern = new RegExp(
-    `\\b(${codePrefixes})\\s+(?:(Table)\\s+|§{1,2}\\s*)?([A-Z]?\\d+(?:-\\d+)?(?:\\.[0-9A-Za-z-]+)+)`,
+    `\\b(${codePrefixes})\\s+(?:(Table)\\s+|(Sections?)\\s+|§{1,2}\\s*)?(${directReferenceNumber})`,
     "gi"
   );
   const directMatches = Array.from(text.matchAll(directPattern));
   for (const match of directMatches) {
-    add(normalizedReference(match[1], match[3], match[2] ? "table" : "section"), match.index);
+    add(normalizedReference(match[1], match[4], match[2] ? "table" : "section"), match.index);
   }
   const headingPattern = new RegExp(
-    `\\bSECTION\\s+(${codePrefixes})\\s+[A-Z]?\\d+(?:-\\d+)?\\s*:[^\\n]{0,120}?\\b([A-Z]?\\d+(?:-\\d+)?(?:\\.[0-9A-Za-z-]+)+)\\b`,
+    `\\bSECTION\\s+(${codePrefixes})\\s+[A-Z]?\\d+(?:-\\d+)?\\s*:[^\\n]{0,120}?\\b(${directReferenceNumber})\\b`,
     "gi"
   );
   for (const match of text.matchAll(headingPattern)) {
     add(normalizedReference(match[1], match[2], "section"), match.index);
   }
-  const markedPattern = /\b(Table)\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)+)|§{1,2}\s*([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)+)/gi;
+  const markedPattern = /\b(Table|Sections?)\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)|§{1,2}\s*([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
   for (const match of text.matchAll(markedPattern)) {
     const previousDirect = directMatches.filter((direct) => direct.index <= match.index).at(-1);
     const between = previousDirect
@@ -84,10 +85,10 @@ export function extractResearchCodeReferences(value) {
     add(normalizedReference(
       inheritedPrefix,
       match[2] || match[3],
-      match[1] ? "table" : "section"
+      /^table$/i.test(match[1] || "") ? "table" : "section"
     ), match.index);
   }
-  const continuationPattern = /(?:,|\b(?:and|or|through|to)\b)\s*(?:§{1,2}\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)+)/gi;
+  const continuationPattern = /(?:,|\b(?:and|or|through|to)\b)\s*(?:§{1,2}\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi;
   for (const match of text.matchAll(continuationPattern)) {
     const previousDirect = directMatches.filter((direct) => direct.index <= match.index).at(-1);
     if (!previousDirect) continue;

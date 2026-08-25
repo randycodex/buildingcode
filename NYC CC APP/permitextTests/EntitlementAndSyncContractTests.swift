@@ -1434,6 +1434,78 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         #endif
     }
 
+    func testProjectStructuredFactsRoundTripThroughSQLiteAndSync() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-property-facts-\(UUID().uuidString).sqlite")
+        let remoteDatabaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-property-facts-remote-\(UUID().uuidString).sqlite")
+        defer {
+            for url in [databaseURL, remoteDatabaseURL] {
+                for suffix in ["", "-shm", "-wal"] {
+                    try? FileManager.default.removeItem(atPath: url.path + suffix)
+                }
+            }
+        }
+
+        let facts = [
+            ProjectStructuredFact(
+                id: "nyc-planning:bbl",
+                key: "bbl",
+                label: "BBL",
+                value: "2028500003",
+                status: "sourced",
+                source: "nyc-planning",
+                sourceText: "NYC Planning MapPLUTO",
+                updatedAt: nil
+            ),
+            ProjectStructuredFact(
+                id: "nyc-planning:zoning-districts",
+                key: "zoning-districts",
+                label: "Zoning District(s)",
+                value: "R8A",
+                status: "sourced",
+                source: "nyc-planning",
+                sourceText: "NYC Planning mapped zoning layers",
+                updatedAt: nil
+            )
+        ]
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let codeVersion = UserContentSyncCodeVersion.localNYC2022
+        _ = try store.createFolder(
+            name: "1760 Jerome Avenue",
+            address: "1760 JEROME AVENUE, Bronx, NY 10453",
+            description: "",
+            structuredFacts: facts,
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .project,
+            codeVersion: codeVersion
+        )
+
+        XCTAssertEqual(try XCTUnwrap(store.folders(codeVersion: codeVersion).first).structuredFacts, facts)
+
+        let account = SignedInAccount(
+            appUserID: "apple:property-context-test",
+            appleUserID: "property-context-test",
+            displayName: "Property Context Test",
+            signedInAt: Date()
+        )
+        let queueItem = try XCTUnwrap(
+            store.pendingSyncQueueItems(limit: 20).first { $0.entityType == .folder }
+        )
+        let mutation = try ServerUserContentMutation(syncQueueItem: queueItem, account: account)
+        guard case .project(let record) = mutation else {
+            return XCTFail("Expected a project mutation for the folder queue item.")
+        }
+        XCTAssertEqual(record.structuredFacts, facts)
+
+        let remoteStore = try UserDataStore(databaseURL: remoteDatabaseURL)
+        try remoteStore.applyServerUserContentMutation(mutation)
+        XCTAssertEqual(
+            try XCTUnwrap(remoteStore.folders(codeVersion: codeVersion).first).structuredFacts,
+            facts
+        )
+    }
+
     func testServerProjectRecordDefaultsLegacyFolderTypeAndEncodesReferenceType() throws {
         let legacyJSON = Data(
             """

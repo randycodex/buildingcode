@@ -196,9 +196,9 @@ struct ReaderView: View {
             FolderEditorSheet(
                 existing: target.folder,
                 defaultFolderType: target.folderType,
-                onSave: { name, address, description, colorHex, folderType in
+                onSave: { name, address, description, structuredFacts, colorHex, folderType in
                     if let existing = target.folder {
-                        library.updateFolder(existing, name: name, address: address, description: description, colorHex: colorHex)
+                        library.updateFolder(existing, name: name, address: address, description: description, structuredFacts: structuredFacts, colorHex: colorHex)
                     } else {
                         // Creating a destination does not save the section.
                         // Stage it, then return to the picker for confirmation.
@@ -206,6 +206,7 @@ struct ReaderView: View {
                             name: name,
                             address: address,
                             description: description,
+                            structuredFacts: structuredFacts,
                             colorHex: colorHex,
                             folderType: folderType
                         ) {

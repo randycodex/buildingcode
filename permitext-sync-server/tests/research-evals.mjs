@@ -22,9 +22,11 @@ import {
   reserveResearchEvaluationSpend,
   researchEvaluationSpendStatus,
   researchModelConfiguration,
+  settleResearchEvaluationSpend,
   supportedResearchPromptVersions,
   validatePaidResearchEvaluationEnvironment
 } from "../research-config.mjs";
+import { requestResearchProvider } from "../research-provider-client.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
@@ -212,11 +214,17 @@ function thresholdScore(value, thresholds) {
 function outputTextFromResponse(response) {
   for (const item of response?.output || []) {
     for (const content of item?.content || []) {
-      if (content?.type === "refusal") throw new Error("The evaluation judge declined the request.");
+      if (content?.type === "refusal") {
+        const error = new Error("The evaluation judge declined the request.");
+        error.code = "RESEARCH_EVAL_JUDGE_REFUSAL";
+        throw error;
+      }
       if (content?.type === "output_text" && content.text) return content.text;
     }
   }
-  throw new Error("The evaluation judge returned no output text.");
+  const error = new Error("The evaluation judge returned no output text.");
+  error.code = "RESEARCH_EVAL_JUDGE_INVALID_OUTPUT";
+  throw error;
 }
 
 function rubricItems(items, prefix) {
@@ -237,7 +245,6 @@ const scoredJudgmentSchema = {
 };
 
 const rubricDecisionProperties = {
-  id: { type: "string" },
   rationale: { type: "string" },
   failureExcerpt: { type: "string" },
   confidence: { type: "string", enum: ["low", "medium", "high"] },
@@ -262,42 +269,9 @@ const judgeSchema = {
     evidenceInsufficiencyRecognition: scoredJudgmentSchema,
     practicalUsefulness: scoredJudgmentSchema,
     directlyAddressesQuestion: scoredJudgmentSchema,
-    requiredConcepts: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        properties: {
-          ...rubricDecisionProperties,
-          met: { type: "boolean" },
-        },
-        required: [...Object.keys(rubricDecisionProperties), "met"]
-      }
-    },
-    forbiddenClaims: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        properties: {
-          ...rubricDecisionProperties,
-          violated: { type: "boolean" },
-        },
-        required: [...Object.keys(rubricDecisionProperties), "violated"]
-      }
-    },
-    missingFacts: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        properties: {
-          ...rubricDecisionProperties,
-          met: { type: "boolean" },
-        },
-        required: [...Object.keys(rubricDecisionProperties), "met"]
-      }
-    }
+    requiredConcepts: { type: "object" },
+    forbiddenClaims: { type: "object" },
+    missingFacts: { type: "object" }
   },
   required: [
     "citationSupport",
@@ -312,17 +286,29 @@ const judgeSchema = {
   ]
 };
 
+function keyedRubricSchema(items, decisionProperty) {
+  const decisionSchema = {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      ...rubricDecisionProperties,
+      [decisionProperty]: { type: "boolean" }
+    },
+    required: [...Object.keys(rubricDecisionProperties), decisionProperty]
+  };
+  return {
+    type: "object",
+    additionalProperties: false,
+    properties: Object.fromEntries(items.map((item) => [item.id, decisionSchema])),
+    required: items.map((item) => item.id)
+  };
+}
+
 function judgeSchemaForRubric(concepts, forbidden, uncertainty) {
   const schema = structuredClone(judgeSchema);
-  for (const [property, items] of [
-    ["requiredConcepts", concepts],
-    ["forbiddenClaims", forbidden],
-    ["missingFacts", uncertainty]
-  ]) {
-    schema.properties[property].minItems = items.length;
-    schema.properties[property].maxItems = items.length;
-    schema.properties[property].items.properties.id.enum = items.map((item) => item.id);
-  }
+  schema.properties.requiredConcepts = keyedRubricSchema(concepts, "met");
+  schema.properties.forbiddenClaims = keyedRubricSchema(forbidden, "violated");
+  schema.properties.missingFacts = keyedRubricSchema(uncertainty, "met");
   return schema;
 }
 
@@ -341,28 +327,79 @@ function answerForJudge(answer) {
   };
 }
 
-function validateJudgeItems(actualItems, expectedItems, label) {
-  assert(Array.isArray(actualItems) && actualItems.length === expectedItems.length, `Judge returned the wrong number of ${label}.`);
+function normalizeJudgeItems(actualItems, expectedItems, label) {
+  assert(actualItems && typeof actualItems === "object" && !Array.isArray(actualItems), `Judge returned invalid ${label}.`);
   const expectedIDs = expectedItems.map((item) => item.id);
-  const actualIDs = actualItems.map((item) => item.id);
-  assert(new Set(actualIDs).size === actualIDs.length, `Judge returned duplicate ${label} IDs.`);
+  const actualIDs = Object.keys(actualItems);
   assert(
-    expectedIDs.every((id) => actualIDs.includes(id)) && actualIDs.every((id) => expectedIDs.includes(id)),
+    expectedIDs.length === actualIDs.length &&
+      expectedIDs.every((id) => actualIDs.includes(id)) &&
+      actualIDs.every((id) => expectedIDs.includes(id)),
     `Judge returned an unknown or omitted ${label} ID.`
   );
+  return expectedIDs.map((id) => ({ id, ...actualItems[id] }));
 }
 
-async function judgeAnswer(testCase, answer) {
+function normalizeJudgeJudgment(judgment, concepts, forbidden, uncertainty) {
+  return {
+    ...judgment,
+    requiredConcepts: normalizeJudgeItems(judgment.requiredConcepts, concepts, "required concepts"),
+    forbiddenClaims: normalizeJudgeItems(judgment.forbiddenClaims, forbidden, "forbidden claims"),
+    missingFacts: normalizeJudgeItems(judgment.missingFacts, uncertainty, "missing facts")
+  };
+}
+
+function judgeUsageFromProviderUsage(usage) {
+  const inputTokens = Number(usage?.input_tokens || 0);
+  const cachedInputTokens = Number(usage?.input_tokens_details?.cached_tokens || 0);
+  const outputTokens = Number(usage?.output_tokens || 0);
+  return {
+    inputTokens,
+    cachedInputTokens,
+    outputTokens,
+    totalTokens: Number(usage?.total_tokens || inputTokens + outputTokens)
+  };
+}
+
+function addJudgeUsage(total, usage) {
+  return {
+    inputTokens: total.inputTokens + usage.inputTokens,
+    cachedInputTokens: total.cachedInputTokens + usage.cachedInputTokens,
+    outputTokens: total.outputTokens + usage.outputTokens,
+    totalTokens: total.totalTokens + usage.totalTokens
+  };
+}
+
+function judgeRetryable(error) {
+  if (["RESEARCH_EVAL_JUDGE_INCOMPLETE", "RESEARCH_EVAL_JUDGE_INVALID_OUTPUT"].includes(error?.code)) return true;
+  if ([408, 409, 425, 429, 500, 502, 503, 504].includes(Number(error?.providerStatus))) return true;
+  if (["TimeoutError", "TypeError"].includes(error?.name) || error?.cause?.name === "TypeError") return true;
+  return [
+    "ECONNRESET",
+    "ECONNREFUSED",
+    "ENETDOWN",
+    "ENETRESET",
+    "ENETUNREACH",
+    "EHOSTUNREACH",
+    "EAI_AGAIN",
+    "UND_ERR_CONNECT_TIMEOUT",
+    "UND_ERR_HEADERS_TIMEOUT",
+    "UND_ERR_SOCKET"
+  ].includes(error?.providerCause || error?.cause?.code);
+}
+
+async function judgeAnswer(testCase, answer, options = {}) {
   const concepts = rubricItems(testCase.requiredConcepts, "concept");
   const forbidden = rubricItems(testCase.forbiddenClaims, "forbidden");
   const uncertainty = rubricItems(testCase.missingFacts, "missing-fact");
-  const model = process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL ||
-    process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra";
+  const environment = options.environment || process.env;
+  const model = environment.PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL ||
+    environment.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra";
   const requestBody = {
     model,
     store: false,
-    reasoning: { effort: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT || "medium" },
-    max_output_tokens: 2_500,
+    reasoning: { effort: environment.PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT || "medium" },
+    max_output_tokens: 4_000,
     safety_identifier: createHash("sha256").update(`permitext-eval-${testCase.id}`).digest("hex"),
     instructions: [
       "You are grading a building-code research answer against a human-authored rubric.",
@@ -375,6 +412,7 @@ async function judgeAnswer(testCase, answer) {
       "Use requiredCitationClaims to test the claim-specific role of each required citation; a selected identifier attached to an unsupported proposition is a citation failure.",
       "For unsupported or invented claims, a score of 4 means no invented requirement or unsupported conclusion.",
       "For every criterion and rubric decision, return confidence, whether the judgment is objective or subjective, and the shortest relevant candidate-answer excerpt when a failure exists. Use an empty failureExcerpt when there is no failure.",
+      "Return requiredConcepts, forbiddenClaims, and missingFacts as objects keyed by the supplied rubric IDs; each exact supplied ID must appear once as an object property.",
       "Score evidence-insufficiency recognition separately: the answer must directly say when the selected evidence cannot establish the requested conclusion.",
       "Score directness separately from practical usefulness."
     ].join(" "),
@@ -406,36 +444,93 @@ async function judgeAnswer(testCase, answer) {
       }
     }
   };
-  reserveResearchEvaluationSpend(requestBody);
   const startedAt = performance.now();
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      "content-type": "application/json"
-    },
-    body: JSON.stringify(requestBody),
-    signal: AbortSignal.timeout(45_000)
-  });
-  const payload = await response.json().catch(() => ({}));
-  assert(response.ok, `Evaluation judge failed (${response.status}): ${payload.error?.message || "unknown provider error"}`);
-  const judgment = JSON.parse(outputTextFromResponse(payload));
-  validateJudgeItems(judgment.requiredConcepts, concepts, "required concepts");
-  validateJudgeItems(judgment.forbiddenClaims, forbidden, "forbidden claims");
-  validateJudgeItems(judgment.missingFacts, uncertainty, "missing facts");
-  return {
-    requestedModel: model,
-    model: payload.model || model,
-    promptVersion: judgePromptVersion,
-    responseTimeMilliseconds: Math.round(performance.now() - startedAt),
-    usage: {
-      inputTokens: payload.usage?.input_tokens || 0,
-      cachedInputTokens: payload.usage?.input_tokens_details?.cached_tokens || 0,
-      outputTokens: payload.usage?.output_tokens || 0,
-      totalTokens: payload.usage?.total_tokens || 0
-    },
-    judgment
-  };
+  const maximumAttempts = 2;
+  const attempts = [];
+  let aggregateUsage = { inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, totalTokens: 0 };
+  for (let attempt = 1; attempt <= maximumAttempts; attempt += 1) {
+    let recorded = false;
+    try {
+      const { response, payload } = await requestResearchProvider({
+        apiKey: environment.OPENAI_API_KEY,
+        requestBody,
+        timeoutMilliseconds: 45_000,
+        failureMessage: "The evaluation judge request failed.",
+        failureCode: "RESEARCH_EVAL_JUDGE_PROVIDER",
+        maximumAttempts: 1,
+        fetchImpl: options.fetchImpl || globalThis.fetch,
+        reserveEvaluationSpend: (body) => reserveResearchEvaluationSpend(body, environment),
+        settleEvaluationSpend: (reservation, value) =>
+          settleResearchEvaluationSpend(reservation, value, environment)
+      });
+      const usage = judgeUsageFromProviderUsage(payload?.usage);
+      aggregateUsage = addJudgeUsage(aggregateUsage, usage);
+      const attemptRecord = {
+        attempt,
+        httpStatus: response.status,
+        completionStatus: payload?.status || null,
+        incompleteReason: payload?.incomplete_details?.reason || null,
+        usage
+      };
+      attempts.push(attemptRecord);
+      recorded = true;
+      if (payload?.status !== "completed") {
+        const error = new Error(
+          `The evaluation judge did not complete (${payload?.status || "unknown"}${attemptRecord.incompleteReason ? `: ${attemptRecord.incompleteReason}` : ""}).`
+        );
+        error.code = "RESEARCH_EVAL_JUDGE_INCOMPLETE";
+        throw error;
+      }
+      let judgment;
+      try {
+        judgment = normalizeJudgeJudgment(
+          JSON.parse(outputTextFromResponse(payload)),
+          concepts,
+          forbidden,
+          uncertainty
+        );
+      } catch (error) {
+        if (error.code === "RESEARCH_EVAL_JUDGE_REFUSAL") throw error;
+        const invalid = new Error(`The evaluation judge returned invalid structured output: ${error.message}`);
+        invalid.code = "RESEARCH_EVAL_JUDGE_INVALID_OUTPUT";
+        throw invalid;
+      }
+      return {
+        requestedModel: model,
+        model: payload.model || model,
+        promptVersion: judgePromptVersion,
+        responseTimeMilliseconds: Math.round(performance.now() - startedAt),
+        attemptCount: attempt,
+        attempts,
+        usage: aggregateUsage,
+        judgment
+      };
+    } catch (error) {
+      if (!recorded) {
+        const usage = judgeUsageFromProviderUsage(error.providerUsage);
+        aggregateUsage = addJudgeUsage(aggregateUsage, usage);
+        attempts.push({
+          attempt,
+          httpStatus: error.providerStatus || null,
+          completionStatus: null,
+          incompleteReason: null,
+          usage
+        });
+      }
+      attempts.at(-1).errorCode = error.code || error.name || "Error";
+      if (attempt < maximumAttempts && judgeRetryable(error)) {
+        const retryDelayMilliseconds = Math.max(0, Number(options.retryDelayMilliseconds ?? 200) || 0);
+        if (retryDelayMilliseconds) {
+          await new Promise((resolveRetry) => setTimeout(resolveRetry, retryDelayMilliseconds));
+        }
+        continue;
+      }
+      error.judgeAttempts = attempts;
+      error.providerUsage = aggregateUsage;
+      throw error;
+    }
+  }
+  throw new Error("The evaluation judge exhausted its bounded attempts.");
 }
 
 function answerProseStrings(answer) {
@@ -992,7 +1087,7 @@ function reviewMarkdown(dataset, results, createdAt, configuration) {
     "",
     `Estimated cost: $${answerCost.toFixed(6)} answers + $${judgeCost.toFixed(6)} judging = $${(answerCost + judgeCost).toFixed(6)} (${configuration.pricingVersion || "pricing unavailable"}).`,
     "",
-    `Approved spend cap: $${Number(configuration.approvedSpendCapUSD || 0).toFixed(2)}; conservative pre-request reservation: $${Number(configuration.conservativeReservedUSD || 0).toFixed(6)} across ${configuration.paidRequestCount || 0} requests.`,
+    `Approved spend cap: $${Number(configuration.approvedSpendCapUSD || 0).toFixed(2)}; reconciled conservative upper: $${Number(configuration.conservativeReservedUSD || 0).toFixed(6)} across ${configuration.paidRequestCount || 0} requests; settled actual: $${Number(configuration.actualUSD || 0).toFixed(6)} with ${configuration.pendingPaidRequestCount || 0} pending.`,
     "",
     "| Case | Result | Score / 4 | Answer ms | Answer tokens |",
     "| --- | --- | ---: | ---: | ---: |",
@@ -1044,7 +1139,8 @@ async function askEvaluationQuestion(baseURL, account, conversationID, question)
     body: {
       auth: { accountUserID: account.appUserID },
       conversationID,
-      question
+      question,
+      requestID: randomUUID()
     }
   });
   const answerTimeMilliseconds = Math.round(performance.now() - startedAt);
@@ -1061,8 +1157,8 @@ async function askEvaluationQuestion(baseURL, account, conversationID, question)
   };
 }
 
-async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
-  const testCase = checkedCases[0];
+async function verifyResearchWorkflowContracts(baseURL, account, checkedCases, workflowFixtureCase) {
+  const testCase = workflowFixtureCase || checkedCases[0];
   const passages = selectedPassages(testCase);
   const [passage, legacyAddedPassage, ...batchAddedPassages] = passages;
   const legacy = await jsonRequest(baseURL, "/research/conversations/create", {
@@ -1301,9 +1397,9 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
   );
 }
 
-async function runMockConversationCases(baseURL, checkedCases) {
+async function runMockConversationCases(baseURL, checkedCases, workflowFixtureCase) {
   const account = await signInEvalUser(baseURL);
-  await verifyResearchWorkflowContracts(baseURL, account, checkedCases);
+  await verifyResearchWorkflowContracts(baseURL, account, checkedCases, workflowFixtureCase);
   const emptyChat = await jsonRequest(baseURL, "/research/conversations/create", {
     method: "POST",
     token: account.backendSessionToken,
@@ -1815,7 +1911,24 @@ function evaluationRunTerminalStatus(results, expectedResultCount, interrupted =
     results.length === expectedResultCount &&
     successfulCount === expectedResultCount;
   if (complete) return "completed";
-  return successfulCount > 0 ? "partial" : "failed";
+  return results.some((result) => result?.answer || result?.scoring) ? "partial" : "failed";
+}
+
+function evaluationResultKey(testCase, repetition) {
+  return `${testCase.id}:${repetition}`;
+}
+
+function evaluationErrorRecord(error) {
+  return {
+    code: error.code || null,
+    name: error.name || "Error",
+    message: error.message,
+    timestamp: new Date().toISOString(),
+    ...(error.providerStatus ? { providerStatus: error.providerStatus } : {}),
+    ...(error.providerCause ? { providerCause: error.providerCause } : {}),
+    ...(error.providerUsage ? { providerUsage: error.providerUsage } : {}),
+    ...(error.judgeAttempts ? { judgeAttempts: error.judgeAttempts } : {})
+  };
 }
 
 async function persistEvaluationRunSnapshot(jsonPath, snapshot) {
@@ -1825,6 +1938,7 @@ async function persistEvaluationRunSnapshot(jsonPath, snapshot) {
 async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options = {}) {
   const account = await signInEvalUser(baseURL);
   const results = [];
+  const resultsByKey = new Map();
   const repeat = options.repeat || 1;
   const createdAt = new Date().toISOString();
   const stamp = createdAt.replace(/[:.]/g, "-");
@@ -1842,13 +1956,14 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
     suiteScope: options.suiteScope || "full",
     repeat,
     caseIDs: checkedCases.map((testCase) => testCase.id),
+    caseStatuses: Array.from(new Set(checkedCases.map((testCase) => testCase.status))),
     judgeModel: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL || process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra",
     judgeReasoningEffort: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT || "medium",
     judgePromptVersion,
     pricingVersion: estimatedResearchCost({ inputTokens: 0, outputTokens: 0 }).pricingVersion,
     gitCommit: await currentGitCommit()
   };
-  const priorBaseline = await latestBaseline();
+  const priorBaseline = options.suiteScope === "diagnostic" ? null : await latestBaseline();
   await mkdir(resultsDirectory, { recursive: true });
   const resultName = `${stamp}-${baseConfiguration.runID}`;
   const jsonPath = join(resultsDirectory, `${resultName}.json`);
@@ -1859,6 +1974,8 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
       ...baseConfiguration,
       approvedSpendCapUSD: spendStatus.capUSD,
       conservativeReservedUSD: spendStatus.reservedUSD,
+      actualUSD: spendStatus.actualUSD,
+      pendingPaidRequestCount: spendStatus.pendingRequestCount,
       paidRequestCount: spendStatus.requestCount
     };
     const baseline = compareWithBaseline(results, priorBaseline, configuration);
@@ -1890,42 +2007,48 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
     }
   };
 
-  const maximumRequests = checkedCases.length * repeat * 2;
-  console.log(`Approved live run: ${checkedCases.length} cases × ${repeat} repetition(s), with up to ${maximumRequests} paid model requests.`);
+  const runLabel = options.suiteScope === "diagnostic"
+    ? "Diagnostic, non-baseline live run"
+    : "Approved live run";
+  console.log(
+    `${runLabel}: ${checkedCases.length} cases × ${repeat} repetition(s). ` +
+    "Each case runs one production Research turn and one separate grader; internal verification or revision can add provider requests. " +
+    "The approved spend cap is checked before every paid request."
+  );
+  await saveSnapshot("running");
   let haltedFailure = null;
   runLoop:
   for (let repetition = 1; repetition <= repeat; repetition += 1) {
     for (const testCase of checkedCases) {
+      const resultKey = evaluationResultKey(testCase, repetition);
+      let result = resultsByKey.get(resultKey);
+      if (!result) {
+        result = { testCase, repetition };
+        resultsByKey.set(resultKey, result);
+        results.push(result);
+      }
       try {
         const conversationID = await createEvaluationConversation(baseURL, account, testCase);
         const { answer, answerTimeMilliseconds, answeredAt } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
         answer.estimatedCost = estimatedResearchCost(answer.usage);
+        Object.assign(result, {
+          conversationID,
+          answeredAt,
+          answerTimeMilliseconds,
+          answer
+        });
+        await saveSnapshot("running");
         const judge = await judgeAnswer(testCase, answer);
         judge.estimatedCost = estimatedResearchCost(judge.usage);
         const scoring = scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge);
-        results.push({
-          testCase,
-          repetition,
-          conversationID,
-          answeredAt,
+        Object.assign(result, {
           judgedAt: new Date().toISOString(),
-          answerTimeMilliseconds,
-          answer,
           judge,
           scoring
         });
         console.log(`${scoring.passed ? "PASS" : "FAIL"} ${testCase.title}${repeat > 1 ? ` #${repetition}` : ""}: ${scoring.overallScore.toFixed(2)}/4, ${answer.usage?.totalTokens || 0} answer tokens`);
       } catch (error) {
-        results.push({
-          testCase,
-          repetition,
-          error: {
-            code: error.code || null,
-            name: error.name || "Error",
-            message: error.message,
-            timestamp: new Date().toISOString()
-          }
-        });
+        result.error = evaluationErrorRecord(error);
         console.error(`ERROR ${testCase.title}${repeat > 1 ? ` #${repetition}` : ""}: ${error.message}`);
         if (error.code === "RESEARCH_EVAL_SPEND_CAP" || error.name === "AbortError") {
           haltedFailure = {
@@ -1985,6 +2108,16 @@ function selfTestJudge(testCase) {
       missingFacts: rubricItems(testCase.missingFacts, "missing-fact")
         .map((item) => decision(item, "met", true, "Requested."))
     }
+  };
+}
+
+function providerJudgmentFromSelfTestJudge(judge) {
+  const keyed = (items) => Object.fromEntries(items.map(({ id, ...decision }) => [id, decision]));
+  return {
+    ...judge.judgment,
+    requiredConcepts: keyed(judge.judgment.requiredConcepts),
+    forbiddenClaims: keyed(judge.judgment.forbiddenClaims),
+    missingFacts: keyed(judge.judgment.missingFacts)
   };
 }
 
@@ -2091,30 +2224,32 @@ async function runSelfTest(dataset, datasetText) {
     rubricItems(testCase.forbiddenClaims, "forbidden"),
     rubricItems(testCase.missingFacts, "missing-fact")
   );
+  const expectedConceptIDs = rubricItems(testCase.requiredConcepts, "concept").map((item) => item.id);
+  const requiredConceptSchema = constrainedJudgeSchema.properties.requiredConcepts;
   assert(
-    constrainedJudgeSchema.properties.requiredConcepts.minItems === testCase.requiredConcepts.length &&
-      constrainedJudgeSchema.properties.requiredConcepts.maxItems === testCase.requiredConcepts.length,
-    "Research eval judge schema did not constrain rubric cardinality."
+    requiredConceptSchema.type === "object" &&
+      requiredConceptSchema.additionalProperties === false &&
+      JSON.stringify(requiredConceptSchema.required) === JSON.stringify(expectedConceptIDs) &&
+      JSON.stringify(Object.keys(requiredConceptSchema.properties)) === JSON.stringify(expectedConceptIDs),
+    "Research eval judge schema did not require one exact keyed property per rubric item."
   );
-  let duplicateJudgeIDsRejected = false;
-  try {
-    validateJudgeItems(
-      [{ id: "concept-1" }, { id: "concept-1" }],
-      [{ id: "concept-1" }, { id: "concept-2" }],
-      "self-test concepts"
-    );
-  } catch {
-    duplicateJudgeIDsRejected = true;
-  }
-  assert(duplicateJudgeIDsRejected, "Research eval judge validation did not reject duplicate rubric IDs.");
+  const orderedJudgeItems = normalizeJudgeItems(
+    { "concept-2": { met: true }, "concept-1": { met: false } },
+    [{ id: "concept-1" }, { id: "concept-2" }],
+    "self-test concepts"
+  );
+  assert(
+    orderedJudgeItems.map((item) => item.id).join(",") === "concept-1,concept-2",
+    "Research eval judge normalization did not restore rubric order."
+  );
   for (const [label, actual] of [
-    ["missing", [{ id: "concept-1" }]],
-    ["unknown", [{ id: "concept-1" }, { id: "concept-unknown" }]],
-    ["incorrectly counted", [{ id: "concept-1" }, { id: "concept-2" }, { id: "concept-3" }]]
+    ["missing", { "concept-1": {} }],
+    ["unknown", { "concept-1": {}, "concept-unknown": {} }],
+    ["incorrectly counted", { "concept-1": {}, "concept-2": {}, "concept-3": {} }]
   ]) {
     let rejected = false;
     try {
-      validateJudgeItems(actual, [{ id: "concept-1" }, { id: "concept-2" }], "self-test concepts");
+      normalizeJudgeItems(actual, [{ id: "concept-1" }, { id: "concept-2" }], "self-test concepts");
     } catch {
       rejected = true;
     }
@@ -2609,6 +2744,10 @@ async function runSelfTest(dataset, datasetText) {
       ...governanceRun,
       configuration: { ...governanceRun.configuration, suiteScope: "filtered" }
     }],
+    ["diagnostic", {
+      ...governanceRun,
+      configuration: { ...governanceRun.configuration, suiteScope: "diagnostic" }
+    }],
     ["repeated", {
       ...governanceRun,
       configuration: { ...governanceRun.configuration, repeat: 2 }
@@ -2730,6 +2869,21 @@ async function runSelfTest(dataset, datasetText) {
       secondReservation.reservedUSD > reservation.reservedUSD,
     "Research eval spend-cap self-test did not reserve cumulatively before every bounded request."
   );
+  const settledReservation = settleResearchEvaluationSpend(reservation, {
+    usage: {
+      input_tokens: 100,
+      input_tokens_details: { cached_tokens: 0 },
+      output_tokens: 10,
+      total_tokens: 110
+    }
+  }, spendEnvironment);
+  assert(
+    settledReservation.settled &&
+      settledReservation.actualUSD === 0.0004 &&
+      settledReservation.pendingRequestCount === 1 &&
+      settledReservation.reservedUSD < secondReservation.reservedUSD,
+    "Research eval spend settlement did not replace a maximum reservation with actual provider usage."
+  );
   let rejectedByCap = false;
   try {
     reserveResearchEvaluationSpend({
@@ -2741,6 +2895,115 @@ async function runSelfTest(dataset, datasetText) {
     rejectedByCap = error.code === "RESEARCH_EVAL_SPEND_CAP";
   }
   assert(rejectedByCap, "Research eval spend-cap self-test did not reject a request above the approved cap.");
+  const judgeEnvironment = {
+    ...spendEnvironment,
+    PERMITEXT_RESEARCH_PRICING_VERSION: "judge-retry-self-test",
+    PERMITEXT_RESEARCH_EVAL_MAX_USD: "1.00"
+  };
+  const completedJudgePayload = (judgment, usage = {}) => ({
+    id: "judge-self-test",
+    model: "permitext-eval-self-test",
+    status: "completed",
+    output: [{
+      type: "message",
+      content: [{ type: "output_text", text: JSON.stringify(judgment) }]
+    }],
+    usage: {
+      input_tokens: 1_100,
+      input_tokens_details: { cached_tokens: 200 },
+      output_tokens: 300,
+      total_tokens: 1_400,
+      ...usage
+    }
+  });
+  const judgeResponse = (payload) => new Response(JSON.stringify(payload), {
+    status: 200,
+    headers: { "content-type": "application/json" }
+  });
+  const wireJudgment = providerJudgmentFromSelfTestJudge(judge);
+  let incompleteAttempts = 0;
+  const recoveredIncompleteJudge = await judgeAnswer(testCase, answer, {
+    environment: judgeEnvironment,
+    retryDelayMilliseconds: 0,
+    fetchImpl: async () => {
+      incompleteAttempts += 1;
+      if (incompleteAttempts === 1) {
+        return judgeResponse({
+          id: "judge-incomplete-self-test",
+          status: "incomplete",
+          incomplete_details: { reason: "max_output_tokens" },
+          output: [],
+          usage: {
+            input_tokens: 1_000,
+            input_tokens_details: { cached_tokens: 100 },
+            output_tokens: 200,
+            total_tokens: 1_200
+          }
+        });
+      }
+      return judgeResponse(completedJudgePayload(wireJudgment));
+    }
+  });
+  assert(
+    incompleteAttempts === 2 &&
+      recoveredIncompleteJudge.attemptCount === 2 &&
+      recoveredIncompleteJudge.usage.inputTokens === 2_100 &&
+      recoveredIncompleteJudge.usage.cachedInputTokens === 300 &&
+      recoveredIncompleteJudge.usage.outputTokens === 500 &&
+      recoveredIncompleteJudge.judgment.requiredConcepts.every((item, index) => item.id === `concept-${index + 1}`),
+    "Research eval judge did not retry one incomplete response, aggregate usage, and normalize keyed rubric output."
+  );
+  let malformedAttempts = 0;
+  const recoveredMalformedJudge = await judgeAnswer(testCase, answer, {
+    environment: judgeEnvironment,
+    retryDelayMilliseconds: 0,
+    fetchImpl: async () => {
+      malformedAttempts += 1;
+      if (malformedAttempts === 1) {
+        const malformed = completedJudgePayload(wireJudgment);
+        malformed.output[0].content[0].text = '{"citationSupport":';
+        return judgeResponse(malformed);
+      }
+      return judgeResponse(completedJudgePayload(wireJudgment));
+    }
+  });
+  assert(
+    malformedAttempts === 2 && recoveredMalformedJudge.attemptCount === 2,
+    "Research eval judge did not retry one unterminated structured-output response."
+  );
+  let boundedAttempts = 0;
+  let boundedFailure = null;
+  try {
+    await judgeAnswer(testCase, answer, {
+      environment: judgeEnvironment,
+      retryDelayMilliseconds: 0,
+      fetchImpl: async () => {
+        boundedAttempts += 1;
+        return judgeResponse({
+          id: `judge-bounded-${boundedAttempts}`,
+          status: "incomplete",
+          incomplete_details: { reason: "max_output_tokens" },
+          output: [],
+          usage: {
+            input_tokens: 100,
+            input_tokens_details: { cached_tokens: 0 },
+            output_tokens: 100,
+            total_tokens: 200
+          }
+        });
+      }
+    });
+  } catch (error) {
+    boundedFailure = error;
+  }
+  assert(
+    boundedAttempts === 2 &&
+      boundedFailure?.code === "RESEARCH_EVAL_JUDGE_INCOMPLETE" &&
+      boundedFailure.judgeAttempts?.length === 2 &&
+      boundedFailure.providerUsage?.totalTokens === 400 &&
+      researchEvaluationSpendStatus().pendingRequestCount === 0,
+    "Research eval judge retry was not capped at one retry with settled attempt usage."
+  );
   const visualInputBody = Buffer.from("official visual input");
   const visualInput = researchInputForEvidence("What does the selected map show?", [{
     sourceID: "source-visual-self-test",
@@ -2778,6 +3041,33 @@ async function runSelfTest(dataset, datasetText) {
   const snapshotDirectory = await mkdtemp(join(tmpdir(), "permitext-eval-snapshot-self-test-"));
   try {
     const snapshotPath = join(snapshotDirectory, "run.json");
+    const pendingJudgeResult = {
+      testCase,
+      repetition: 1,
+      conversationID: "self-test-conversation",
+      answeredAt: new Date(0).toISOString(),
+      answerTimeMilliseconds: 15_000,
+      answer,
+      error: evaluationErrorRecord(Object.assign(
+        new Error("Self-test judge failure after answer persistence."),
+        { code: "RESEARCH_EVAL_JUDGE_INVALID_OUTPUT" }
+      ))
+    };
+    const answerBeforeJudgeSnapshot = {
+      schemaVersion: 3,
+      status: evaluationRunTerminalStatus([pendingJudgeResult], 1),
+      results: [pendingJudgeResult]
+    };
+    await persistEvaluationRunSnapshot(snapshotPath, answerBeforeJudgeSnapshot);
+    const persistedBeforeJudge = JSON.parse(await readFile(snapshotPath, "utf8"));
+    assert(
+      evaluationResultKey(testCase, 1) === `${testCase.id}:1` &&
+        persistedBeforeJudge.status === "partial" &&
+        persistedBeforeJudge.results.length === 1 &&
+        persistedBeforeJudge.results[0].answer?.usage?.totalTokens === answer.usage.totalTokens &&
+        persistedBeforeJudge.results[0].error?.code === "RESEARCH_EVAL_JUDGE_INVALID_OUTPUT",
+      "Research eval snapshot storage lost a keyed production answer when judging failed."
+    );
     const partialSnapshot = {
       schemaVersion: 3,
       status: evaluationRunTerminalStatus(
@@ -2819,12 +3109,14 @@ async function runSelfTest(dataset, datasetText) {
 async function main() {
   if (process.argv.includes("--help")) {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
-    console.log("Filters: --case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
+    console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
+    console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
     console.log("Compare: --compare CURRENT_RUN_JSON --against BASELINE_RUN_OR_BASELINE_JSON");
     console.log("Default/--dry-run mode validates the dataset and canonical evidence without calling OpenAI.");
-    console.log("Live mode makes two paid model requests per case and additionally requires PERMITEXT_RUN_PAID_RESEARCH_EVALS=1 and OPENAI_API_KEY.");
+    console.log("Live mode makes one production Research turn plus a separate grader request per case; production verification or revision may require additional paid requests.");
+    console.log("Every paid request is conservatively reserved against PERMITEXT_RESEARCH_EVAL_MAX_USD before dispatch.");
     console.log("Use --case with an approved case ID for a targeted diagnostic run; targeted runs never replace the full baseline.");
     return;
   }
@@ -2854,7 +3146,18 @@ async function main() {
   }
   const approvedCases = approvedEvaluationCases(dataset);
   assert(approvedCases.length > 0, "Research eval dataset has no approved cases.");
+  const includeDrafts = process.argv.includes("--include-drafts");
+  if (includeDrafts) {
+    assert(
+      process.env.PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS === "1",
+      "Draft diagnostics are locked. Set PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1 after explicitly choosing a non-baseline diagnostic run."
+    );
+  }
+  const eligibleCases = includeDrafts
+    ? dataset.cases.filter((testCase) => ["approved", "draft"].includes(testCase.status))
+    : approvedCases;
   const requestedCaseID = argumentValue("--case");
+  const excludedCaseID = argumentValue("--exclude-case");
   const requestedTopic = argumentValue("--topic");
   const requestedDifficulty = argumentValue("--difficulty");
   const requestedCodeEdition = argumentValue("--code-edition");
@@ -2870,10 +3173,20 @@ async function main() {
     process.env.PERMITEXT_RESEARCH_PROMPT_VERSION = requestedPromptVersion;
   }
   let selectedCases = requestedCaseID
-    ? approvedCases.filter((testCase) => testCase.id === requestedCaseID)
-    : approvedCases;
+    ? eligibleCases.filter((testCase) => testCase.id === requestedCaseID)
+    : eligibleCases;
   if (requestedCaseID) {
-    assert(selectedCases.length === 1, `No approved research evaluation case matches --case ${requestedCaseID}.`);
+    assert(
+      selectedCases.length === 1,
+      `No ${includeDrafts ? "approved or draft" : "approved"} research evaluation case matches --case ${requestedCaseID}.`
+    );
+  }
+  if (excludedCaseID) {
+    assert(
+      eligibleCases.some((testCase) => testCase.id === excludedCaseID),
+      `No ${includeDrafts ? "approved or draft" : "approved"} research evaluation case matches --exclude-case ${excludedCaseID}.`
+    );
+    selectedCases = selectedCases.filter((testCase) => testCase.id !== excludedCaseID);
   }
   if (requestedTopic) {
     const topic = normalizedText(requestedTopic);
@@ -2892,11 +3205,11 @@ async function main() {
     );
   }
   assert(selectedCases.length > 0, "No approved evaluation cases match the requested filters.");
-  const filtered = Boolean(requestedTopic || requestedDifficulty || requestedCodeEdition);
-  const suiteScope = requestedCaseID ? "targeted" : filtered ? "filtered" : "full";
-  const approvedDataset = { ...dataset, cases: selectedCases };
+  const filtered = Boolean(excludedCaseID || requestedTopic || requestedDifficulty || requestedCodeEdition);
+  const suiteScope = includeDrafts ? "diagnostic" : requestedCaseID ? "targeted" : filtered ? "filtered" : "full";
+  const selectedDataset = { ...dataset, cases: selectedCases };
   if (selfTestMode) {
-    await runSelfTest(approvedDataset, datasetText);
+    await runSelfTest(selectedDataset, datasetText);
     return;
   }
 
@@ -2936,7 +3249,7 @@ async function main() {
     const address = server.address();
     assert(address && typeof address === "object", "Research eval server did not start.");
     const baseURL = `http://127.0.0.1:${address.port}`;
-    const checkedCases = await preflightCases(baseURL, approvedDataset);
+    const checkedCases = await preflightCases(baseURL, selectedDataset);
     printPreflight(checkedCases);
     const blockedCases = checkedCases.filter((testCase) => !testCase.ready);
     if (blockedCases.length) {
@@ -2945,9 +3258,13 @@ async function main() {
       return;
     }
     if (liveMode) {
-      await runLiveCases(baseURL, approvedDataset, checkedCases, datasetText, { suiteScope, repeat });
+      await runLiveCases(baseURL, selectedDataset, checkedCases, datasetText, { suiteScope, repeat });
     } else {
-      await runMockConversationCases(baseURL, checkedCases);
+      await runMockConversationCases(
+        baseURL,
+        checkedCases,
+        approvedCases.find((testCase) => testCase.id === "scissor-stair-two-exits")
+      );
       console.log("All cases are ready. Paid evals remain locked until explicitly approved.");
     }
   } finally {

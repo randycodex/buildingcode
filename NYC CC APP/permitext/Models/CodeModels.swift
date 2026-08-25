@@ -645,6 +645,17 @@ enum CodeFolderType: String, Codable, CaseIterable, Hashable, Sendable {
     }
 }
 
+struct ProjectStructuredFact: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let key: String
+    let label: String
+    let value: String
+    let status: String
+    let source: String
+    let sourceText: String
+    let updatedAt: Date?
+}
+
 struct ServerProjectRecord: Codable, Hashable, Sendable {
     let id: String
     let userID: String
@@ -654,6 +665,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
     let name: String?
     let address: String?
     let description: String?
+    let structuredFacts: [ProjectStructuredFact]?
     let colorHex: String?
     let sortOrder: Int?
     let folderType: CodeFolderType
@@ -671,6 +683,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
         name: String?,
         address: String?,
         description: String?,
+        structuredFacts: [ProjectStructuredFact]? = nil,
         colorHex: String?,
         sortOrder: Int?,
         folderType: CodeFolderType = .project,
@@ -687,6 +700,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
         self.name = name
         self.address = address
         self.description = description
+        self.structuredFacts = structuredFacts
         self.colorHex = colorHex
         self.sortOrder = sortOrder
         self.folderType = folderType
@@ -698,7 +712,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
 
     private enum CodingKeys: String, CodingKey {
         case id, userID, codeVersion, clientID, localFolderID, name, address
-        case description, colorHex, sortOrder, folderType, archivedAt, updatedAt
+        case description, structuredFacts, colorHex, sortOrder, folderType, archivedAt, updatedAt
         case deletedAt, serverEventID
     }
 
@@ -712,6 +726,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
         name = try container.decodeIfPresent(String.self, forKey: .name)
         address = try container.decodeIfPresent(String.self, forKey: .address)
         description = try container.decodeIfPresent(String.self, forKey: .description)
+        structuredFacts = try container.decodeIfPresent([ProjectStructuredFact].self, forKey: .structuredFacts)
         colorHex = try container.decodeIfPresent(String.self, forKey: .colorHex)
         sortOrder = try container.decodeIfPresent(Int.self, forKey: .sortOrder)
         folderType = CodeFolderType(
@@ -929,6 +944,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     name: item.operationType == .delete ? nil : payload.values["name"],
                     address: item.operationType == .delete ? nil : payload.values["address"],
                     description: item.operationType == .delete ? nil : payload.values["description"],
+                    structuredFacts: item.operationType == .delete ? nil : Self.structuredFacts(from: payload.values["structuredFacts"]),
                     colorHex: item.operationType == .delete ? nil : payload.values["colorHex"],
                     sortOrder: payload.values["sortOrder"].flatMap(Int.init),
                     folderType: CodeFolderType(serverValue: payload.values["folderType"]),
@@ -994,6 +1010,13 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             .split(separator: "\n")
             .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
+    }
+
+    private static func structuredFacts(from rawValue: String?) -> [ProjectStructuredFact]? {
+        guard let rawValue,
+              let data = rawValue.data(using: .utf8)
+        else { return nil }
+        return try? JSONDecoder().decode([ProjectStructuredFact].self, from: data)
     }
 
     private static func recordID(
@@ -1493,6 +1516,32 @@ struct BackendResearchUsageResponse: Codable, Hashable, Sendable {
 struct BackendProjectFoundationRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let projectID: String
+}
+
+struct BackendProjectPropertyLookupRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let address: String
+}
+
+struct BackendProjectPropertyLookupSource: Codable, Hashable, Sendable {
+    let agency: String
+    let datasets: [String]
+}
+
+struct BackendProjectPropertyContext: Codable, Hashable, Sendable {
+    let schemaVersion: Int
+    let query: String
+    let normalizedAddress: String
+    let bbl: String
+    let zolaURL: String
+    let retrievedAt: Date
+    let source: BackendProjectPropertyLookupSource
+    let structuredFacts: [ProjectStructuredFact]
+    let warnings: [String]
+}
+
+struct BackendProjectPropertyLookupResponse: Codable, Hashable, Sendable {
+    let property: BackendProjectPropertyContext
 }
 
 struct BackendProjectHubBootstrapRequest: Codable, Hashable, Sendable {
@@ -2425,6 +2474,7 @@ protocol PermitextBackendTransport {
         _ request: BackendOrganizationProjectSnapshotRequest
     ) async throws -> BackendOrganizationProjectSnapshotResponse
     func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse
+    func projectPropertyLookup(_ request: BackendProjectPropertyLookupRequest) async throws -> BackendProjectPropertyLookupResponse
     func projectHubBootstrap(_ request: BackendProjectHubBootstrapRequest) async throws -> BackendProjectHubBootstrapResponse
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse
     func researchConversationList(_ request: ResearchConversationListRequest) async throws -> ResearchConversationListResponse
@@ -2673,6 +2723,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse {
         try await post("projects/foundation/state", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func projectPropertyLookup(_ request: BackendProjectPropertyLookupRequest) async throws -> BackendProjectPropertyLookupResponse {
+        try await post("projects/property/lookup", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func projectHubBootstrap(_ request: BackendProjectHubBootstrapRequest) async throws -> BackendProjectHubBootstrapResponse {
@@ -3090,6 +3144,10 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             researchAnswers: [],
             activity: []
         )
+    }
+
+    func projectPropertyLookup(_ request: BackendProjectPropertyLookupRequest) async throws -> BackendProjectPropertyLookupResponse {
+        throw URLError(.unsupportedURL)
     }
 
     func projectHubBootstrap(_ request: BackendProjectHubBootstrapRequest) async throws -> BackendProjectHubBootstrapResponse {
@@ -3755,11 +3813,48 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
     let name: String
     let address: String
     let description: String
+    let structuredFacts: [ProjectStructuredFact]
     let colorHex: String
     let folderType: CodeFolderType
     let sortOrder: Int
     let createdAt: Date
     let updatedAt: Date
+
+    init(
+        id: Int64,
+        clientID: String,
+        ownerID: String,
+        visibility: UserContentVisibility,
+        syncState: UserContentSyncState,
+        deletedAt: Date?,
+        codeVersion: String,
+        name: String,
+        address: String,
+        description: String,
+        structuredFacts: [ProjectStructuredFact] = [],
+        colorHex: String,
+        folderType: CodeFolderType,
+        sortOrder: Int,
+        createdAt: Date,
+        updatedAt: Date
+    ) {
+        self.id = id
+        self.clientID = clientID
+        self.ownerID = ownerID
+        self.visibility = visibility
+        self.syncState = syncState
+        self.deletedAt = deletedAt
+        self.codeVersion = codeVersion
+        self.name = name
+        self.address = address
+        self.description = description
+        self.structuredFacts = structuredFacts
+        self.colorHex = colorHex
+        self.folderType = folderType
+        self.sortOrder = sortOrder
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
 
     /// Shared web/iOS project palette. Keep this in the same order as
     /// `projectColorOptions` in the web client so a project keeps both its
@@ -4724,6 +4819,7 @@ protocol AccountBackendClient {
         projectID: String
     ) async throws -> BackendOrganizationProjectSnapshotResponse
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot
+    func projectPropertyContext(account: SignedInAccount, address: String) async throws -> BackendProjectPropertyContext
     func researchConversations(account: SignedInAccount) async throws -> [ResearchConversationSummary]
     func researchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation
     func refreshResearchConversation(account: SignedInAccount, conversationID: String) async throws -> ResearchConversation

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260811-hybrid-candidates-v14";
+export const evidenceDiscoveryVersion = "20260824-hybrid-candidates-v17";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -60,10 +60,128 @@ const conceptExpansions = [
   {
     pattern: /\b(mechanical|ventilation|exhaust|air changes?)\b/i,
     terms: ["mechanical", "ventilation", "exhaust", "air"]
+  },
+  {
+    pattern: /\b(?:off[- ]street|accessory)\s+parking\b|\bparking\s+(?:required|requirement|spaces?|waiver|reduction|permitted)\b/i,
+    terms: ["off-street", "parking", "accessory", "required", "requirement", "permitted", "development", "enlargement"]
   }
 ];
 
 const topicRoutes = [
+  {
+    pattern: /\b(?:conflict|difference)\b[\s\S]*\b(?:enacted\s+)?text\b[\s\S]*\b(?:caption|illustration|summary\s+table|illustrative\s+table)\b|\b(?:caption|illustration|summary\s+table|illustrative\s+table)\b[\s\S]*\b(?:conflict|difference)\b[\s\S]*\b(?:enacted\s+)?text\b/i,
+    label: "Zoning Resolution text-control and construction rules",
+    targets: [{ codePrefix: "ZR", sectionPrefix: "12-01" }]
+  },
+  {
+    pattern: /\bAppendix\s+J\b|\bdesignated\s+areas?\b.*\b(?:manufacturing|mapped|subarea)\b/i,
+    label: "Appendix J designated-area maps and applicability",
+    targets: [{ codePrefix: "ZR", sectionPrefix: "APPENDIX J" }]
+  },
+  {
+    pattern: /\bself(?:[- ]service)?[- ]storage\b/i,
+    label: "self-service storage use and mapped-area provisions",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "42-191" },
+      { codePrefix: "ZR", sectionPrefix: "42-192" },
+      { codePrefix: "ZR", sectionPrefix: "42-193" },
+      { codePrefix: "ZR", sectionPrefix: "74-192" },
+      { codePrefix: "ZR", sectionPrefix: "APPENDIX J" }
+    ]
+  },
+  {
+    pattern: /\b(?:mapped\s+zoning\s+district|zoning\s+maps?|mapped\s+(?:district|condition))\b.*\b(?:FAR|floor\s+area\s+ratio|maximum|determin)\b|\b(?:FAR|floor\s+area\s+ratio)\b.*\bmapped\s+(?:zoning\s+)?district\b/i,
+    label: "mapped zoning-district applicability",
+    targets: [{ codePrefix: "ZR", sectionPrefix: "11-14" }]
+  },
+  {
+    pattern: /\b(?:R6|R7A?|R8A?|R9A?|R10|R11|R12)\b.*\b(?:FAR|floor\s+area\s+ratio|residential\s+floor\s+area)\b|\b(?:FAR|floor\s+area\s+ratio)\b.*\b(?:R6|R7A?|R8A?|R9A?|R10|R11|R12)\b/i,
+    label: "R6 through R12 residential floor-area limits",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "23-22" },
+      { codePrefix: "ZR", sectionPrefix: "12-10" }
+    ]
+  },
+  {
+    pattern: /\bqualifying\s+(?:affordable|senior)\s+housing\b.*\b(?:FAR|floor\s+area|limit|qualif)\b|\b(?:FAR|floor\s+area)\b.*\bqualifying\s+(?:affordable|senior)\s+housing\b/i,
+    label: "qualifying affordable-housing floor-area prerequisites",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "27-111" },
+      { codePrefix: "ZR", sectionPrefix: "27-16" }
+    ]
+  },
+  {
+    pattern: /\b(?:R6|R7A?|R8A?|R9A?|R10|R11|R12)\b.*\b(?:height|tall|setback)\b|\b(?:height|tall|setback)\b.*\b(?:R6|R7A?|R8A?|R9A?|R10|R11|R12)\b/i,
+    label: "R6 through R12 residential height and setback limits",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "23-432" },
+      { codePrefix: "ZR", sectionPrefix: "23-434" }
+    ]
+  },
+  {
+    pattern: /\b(?:R6|R7A?|R8A?|R9A?|R10|R11|R12)\b.*\blot[-\s]+coverage\b|\blot[-\s]+coverage\b.*\b(?:R6|R7A?|R8A?|R9A?|R10|R11|R12)\b/i,
+    label: "R6 through R12 lot coverage and open-area limits",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "23-362" },
+      { codePrefix: "ZR", sectionPrefix: "23-363" },
+      { codePrefix: "ZR", sectionPrefix: "23-342" }
+    ]
+  },
+  {
+    pattern: /\bC3\b.*\b(?:professional|architectural|business)\s+office\b|\b(?:professional|architectural|business)\s+office\b.*\bC3\b/i,
+    label: "C3 professional-office use permissions",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "32-17" },
+      { codePrefix: "ZR", sectionPrefix: "32-171" }
+    ]
+  },
+  {
+    pattern: /\bC4(?:-\d+[A-Z]?)?\b.*\b(?:apartments?|residential\s+use|residences?)\b|\b(?:apartments?|residential\s+use|residences?)\b.*\bC4(?:-\d+[A-Z]?)?\b/i,
+    label: "C4 residential-use permissions",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "32-121" },
+      { codePrefix: "ZR", sectionPrefix: "32-123" }
+    ]
+  },
+  {
+    pattern: /\bInner\s+Transit\s+Zone\b.*\b(?:residential|dwelling|rooming|parking)\b|\b(?:residential|dwelling|rooming)\b.*\bInner\s+Transit\s+Zone\b/i,
+    label: "Inner Transit Zone residential parking requirements",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "25-20" },
+      { codePrefix: "ZR", sectionPrefix: "25-211" }
+    ]
+  },
+  {
+    pattern: /\b(?:December\s+5,?\s+2024|vested\s+rights?|timely\s+application)\b.*\b(?:parking|dwelling|rooming)\b|\b(?:parking|dwelling|rooming)\b.*\b(?:December\s+5,?\s+2024|vested\s+rights?|timely\s+application)\b/i,
+    label: "December 2024 transition and vested-right provisions",
+    targets: [{ codePrefix: "ZR", sectionPrefix: "11-333" }]
+  },
+  {
+    pattern: /\b(?:divided|straddles?)\b.*\bzoning\s+districts?\b|\bzoning\s+lot\b.*\b(?:majority\s+district|less\s+restrictive\s+district)\b/i,
+    label: "zoning lots divided by district boundaries",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "77-02" },
+      { codePrefix: "ZR", sectionPrefix: "77-11" },
+      { codePrefix: "ZR", sectionPrefix: "77-22" }
+    ]
+  },
+  {
+    pattern: /\b(?:demolition\s+permit|demolish|demolition)\b.*\b(?:Subdistrict|special\s+district|101-75)\b|\b101-75\b/i,
+    label: "Special Downtown Brooklyn demolition prerequisites",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "101-04" },
+      { codePrefix: "ZR", sectionPrefix: "101-75" }
+    ]
+  },
+  {
+    pattern: /^(?=[\s\S]*\b(?:(?:off[- ]street|accessory)\s+parking|parking\s+(?:required|requirement|spaces?|permitted))\b)(?=[\s\S]*\b(?:manhattan(?:\s+core)?|C6-4)\b)/i,
+    label: "Manhattan Core non-residential parking applicability and limits",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "13-041" },
+      { codePrefix: "ZR", sectionPrefix: "13-07" },
+      { codePrefix: "ZR", sectionPrefix: "13-12" }
+    ]
+  },
   {
     pattern: /\bexterior\s+wall\b.*\b(?:lot\s+line|fire[- ]separation\s+distance|unprotected\s+(?:window|opening)|fire[- ]resistance\s+rating)\b/i,
     label: "exterior-wall rating and opening-area provisions",
@@ -144,7 +262,7 @@ const topicRoutes = [
     targets: [{ codePrefix: "BC", sectionPrefix: "1006.3.2" }]
   },
   {
-    pattern: /\b(?:multipurpose|community)\s+(?:room|hall)\b|accessory\s+assembly|fewer\s+than\s+75/i,
+    pattern: /^(?![\s\S]*\b(?:plumbing fixtures?|fixture requirements?|fixture ratios?|fixture calculations?|fractional fixture)\b)[\s\S]*(?:\b(?:multipurpose|community)\s+(?:room|hall)\b|accessory\s+assembly|fewer\s+than\s+75)/i,
     label: "accessory-assembly classification and occupant-load provisions",
     targets: [
       { codePrefix: "BC", sectionPrefix: "302.1" },
@@ -174,7 +292,7 @@ const topicRoutes = [
     ]
   },
   {
-    pattern: /\baccessory\s+occupanc|\b(?:office|room|space)\b.*\baccessory\b.*\b(?:principal|primary|residential)\b/i,
+    pattern: /^(?![\s\S]*\b(?:plumbing fixtures?|fixture requirements?|fixture ratios?|fixture calculations?|fractional fixture)\b)[\s\S]*(?:\baccessory\s+occupanc|\b(?:office|room|space)\b.*\baccessory\b.*\b(?:principal|primary|residential)\b)/i,
     label: "accessory-occupancy classification and area provisions",
     targets: [
       { codePrefix: "BC", sectionPrefix: "304.1" },
@@ -340,9 +458,32 @@ const topicRoutes = [
     targets: [{ codePrefix: "BC", sectionPrefix: "901.9.1" }]
   },
   {
-    pattern: /\b(change|changes)\s+(?:in\s+)?(?:use|occupancy)|prior[- ]code.*accessib|alteration.*accessib/i,
+    pattern: /^(?![\s\S]*\b(?:Certificate of Occupancy|Use Group renumbering)\b)[\s\S]*(?:\b(?:change|changes)\s+(?:in\s+)?(?:use|occupancy)|prior[- ]code.*accessib|alteration.*accessib)/i,
     label: "alteration and change-of-occupancy accessibility provisions",
     targets: [{ codePrefix: "BC", sectionPrefix: "1101.3", includeDescendants: true }]
+  },
+  {
+    pattern: /\b(?:Group B\b[\s\S]*\bGroup M|Group M\b[\s\S]*\bGroup B)\b[\s\S]*\b(?:Certificate of Occupancy|accessib(?:le|ility)|Use Group renumbering)\b/i,
+    label: "B-M change accessibility boundary",
+    targets: [
+      {
+        codePrefix: "BC",
+        sectionPrefix: "1101.3",
+        useSelectedPassageOnly: true,
+        selectedExcerptPatterns: [
+          /The provisions of this chapter shall apply to alterations,[\s\S]*?Sections 1101\.3\.1 through 1101\.3\.5\./i
+        ]
+      },
+      {
+        codePrefix: "BC",
+        sectionPrefix: "1101.3.1",
+        useSelectedPassageOnly: true,
+        selectedExcerptPatterns: [
+          /Accessible features and construction governed by this chapter shall be provided:/i,
+          /2\.\s*Throughout a space,[\s\S]*?New York City Zoning Resolution\./i
+        ]
+      }
+    ]
   },
   {
     pattern: /\bsidewalk\s+caf[eé]|outdoor[- ]dining|exterior\s+seats?\b/i,
@@ -679,13 +820,17 @@ function codeReferences(question) {
     seen.add(key);
     references.push(reference);
   };
-  const pattern = /\b(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
+  const pattern = /\b(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:(?:Sections?|Table)\s+|§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
   for (const match of String(question || "").matchAll(pattern)) {
     add(match[1], match[2]);
   }
   const headingPattern = /\bSECTION\s+(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+[A-Z]?\d+(?:-\d+)?\s*:[^\n]{0,120}?\b([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
   for (const match of String(question || "").matchAll(headingPattern)) {
     add(match[1], match[2]);
+  }
+  const bareSectionPattern = /\bSections?\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)\b/gi;
+  for (const match of String(question || "").matchAll(bareSectionPattern)) {
+    add("*", match[1]);
   }
   return references;
 }
@@ -762,7 +907,7 @@ function tableReferenceFromHTML(value) {
 }
 
 function comparableTableReference(value) {
-  return normalizedText(value).replace(/^(?:ac|bc|ebc|fc|mc|pc)\s+/, "");
+  return normalizedText(value).replace(/^(?:ac|bc|ebc|fc|mc|pc|zr)\s+/, "");
 }
 
 export function visualSourceReferences(body) {
@@ -792,13 +937,15 @@ export function visualSourceReferences(body) {
 export function structuredRichSources(body) {
   const sources = [];
   const blocks = Array.isArray(body?.blocks) ? body.blocks : [];
+  const zoningTables = Array.isArray(body?.zoning?.tables) ? body.zoning.tables : [];
+  let zoningTableOrdinal = 0;
   const continuationHTML = (blockIndex) => {
     const fragments = [];
     for (let index = blockIndex + 1; index < blocks.length && fragments.length < 8; index += 1) {
       const block = blocks[index] || {};
       const html = String(block.html || "");
       const text = plainTextFromPublishedHTML(html || block.plainText || "");
-      const isTableNote = /^(?:For SI\b|Footnotes?\b|[a-z]\.)/i.test(text) ||
+      const isTableNote = /^(?:For SI\b|Footnotes?\b|[a-z]\.|\d+\b)/i.test(text) ||
         /class=["'][^"']*\bSmall\b/i.test(html);
       if (!isTableNote) break;
       fragments.push(html || String(block.plainText || ""));
@@ -860,6 +1007,56 @@ export function structuredRichSources(body) {
         kind: "table",
         reference,
         blockID: String(block.id || "") || null,
+        contentHash,
+        text,
+        textLength: text.length,
+        rowCount,
+        grids
+      });
+    }
+    if (tableMatches.length || !/<table\b/i.test(html)) continue;
+
+    for (const tableMatch of html.matchAll(/<table\b[\s\S]*?<\/table>/gi)) {
+      const sourceTable = zoningTables[zoningTableOrdinal] || null;
+      const sourceOrdinal = sourceTable?.ordinal ?? zoningTableOrdinal;
+      zoningTableOrdinal += 1;
+      const previousBlock = blocks[blockIndex - 1] || null;
+      const previousHTML = String(previousBlock?.html || previousBlock?.plainText || "");
+      const previousText = plainTextFromPublishedHTML(previousHTML);
+      const precedingContextHTML = previousBlock?.kind !== "table" && (
+        /\btable\b/i.test(previousText) ||
+        (/^[A-Z0-9 ,&()\-/]+$/.test(previousText) && previousText.length <= 240)
+      ) ? previousHTML : "";
+      const followingNotesHTML = continuationHTML(blockIndex);
+      const sourceHTML = [precedingContextHTML, tableMatch[0], followingNotesHTML]
+        .filter(Boolean)
+        .join("\n");
+      const tableCount = Math.max(zoningTables.length, 1);
+      const inferredReference = body?.sectionNumber
+        ? `ZR Table ${body.sectionNumber}${tableCount > 1 ? ` (${sourceOrdinal + 1} of ${tableCount})` : ""}`
+        : "Official table";
+      const detectedReference = tableReferenceFromHTML(sourceHTML);
+      const reference = String(sourceTable?.caption || sourceTable?.sourceAnchor || "").trim() ||
+        (detectedReference === "Official table" ? inferredReference : detectedReference);
+      const grids = [{ rows: structuredRowsFromTableHTML(tableMatch[0]) }]
+        .filter((grid) => grid.rows.length);
+      const rowCount = grids.reduce((count, grid) => count + grid.rows.length, 0);
+      const text = plainTextFromPublishedHTML(sourceHTML);
+      if (!text || !rowCount) continue;
+      const contentHash = createHash("sha256")
+        .update(JSON.stringify({ reference, text, grids }))
+        .digest("hex");
+      sources.push({
+        id: String(sourceTable?.id || "").trim() || `rich-source-${createHash("sha256")
+          .update([String(block.id || ""), reference, contentHash].join("\u001f"))
+          .digest("hex")
+          .slice(0, 24)}`,
+        kind: "table",
+        reference,
+        blockID: String(block.id || "") || null,
+        sourceID: String(sourceTable?.id || "").trim() || null,
+        sourceOrdinal,
+        sourceContentHash: String(sourceTable?.contentHash || "").trim() || null,
         contentHash,
         text,
         textLength: text.length,
@@ -1048,7 +1245,7 @@ export async function discoverRelevantEvidence({
 
   for (const reference of references) {
     sections.filter((section) =>
-      String(section.codePrefix || "").toUpperCase() === reference.codePrefix &&
+      (reference.codePrefix === "*" || String(section.codePrefix || "").toUpperCase() === reference.codePrefix) &&
       String(section.sectionNumber || "") === reference.sectionNumber
     ).forEach((section) => exactReferenceIDs.add(comparableSectionID(section.id)));
   }
@@ -1069,12 +1266,18 @@ export async function discoverRelevantEvidence({
         const routeMatch = routesByID.get(id) || {
           score: 0,
           labels: new Set(),
-          exactTarget: false
+          exactTarget: false,
+          useSelectedPassageOnly: false,
+          selectedExcerptPatterns: []
         };
         routeMatch.score += 45;
         routeMatch.labels.add(route.label);
         if (sectionNumber === target.sectionPrefix) {
           routeMatch.exactTarget = true;
+          routeMatch.useSelectedPassageOnly ||= target.useSelectedPassageOnly === true;
+          if (Array.isArray(target.selectedExcerptPatterns)) {
+            routeMatch.selectedExcerptPatterns.push(...target.selectedExcerptPatterns);
+          }
         }
         routesByID.set(id, routeMatch);
       }
@@ -1127,12 +1330,26 @@ export async function discoverRelevantEvidence({
       relevanceComparison &&
       exactReference &&
       !routeMatch &&
-      comparisonReferenceKeys.has(
-        `${String(section.codePrefix || "").toUpperCase()}:${String(section.sectionNumber || "")}`
+      (
+        comparisonReferenceKeys.has(
+          `${String(section.codePrefix || "").toUpperCase()}:${String(section.sectionNumber || "")}`
+        ) || comparisonReferenceKeys.has(`*:${String(section.sectionNumber || "")}`)
       )
     );
-    const passage = bestPassage(body, terms, bigrams);
+    let passage = bestPassage(body, terms, bigrams);
     if (!passage) continue;
+    if (routeMatch?.useSelectedPassageOnly && routeMatch.selectedExcerptPatterns.length) {
+      const selectedExcerpts = routeMatch.selectedExcerptPatterns
+        .map((pattern) => fullText.match(pattern)?.[0]?.trim() || "")
+        .filter(Boolean);
+      if (selectedExcerpts.length === routeMatch.selectedExcerptPatterns.length) {
+        passage = {
+          ...passage,
+          text: selectedExcerpts.join("\n\n"),
+          blockID: null
+        };
+      }
+    }
     const richSources = structuredRichSources(body);
     const reviewRequirements = sourceReviewRequirements(body, passage, richSources);
     const visualSources = [];
@@ -1171,6 +1388,7 @@ export async function discoverRelevantEvidence({
       exactReference,
       contextualReference,
       exactTopicRouteTarget: Boolean(routeMatch?.exactTarget),
+      useSelectedPassageOnly: routeMatch?.useSelectedPassageOnly === true,
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
       sourceReviewRequirements: reviewRequirements,
@@ -1259,6 +1477,7 @@ export async function discoverRelevantEvidence({
         matchedTerms: item.matchedTerms.slice(0, 12),
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
+        useSelectedPassageOnly: item.useSelectedPassageOnly,
         exactReference: item.exactReference,
         contextualReference: item.contextualReference,
         relevanceComparison,

@@ -139,13 +139,32 @@ PERMITEXT_RESEARCH_REASONING_EFFORT=medium \
 node server.mjs
 ```
 
+Hybrid routing is opt-in. Luna organizes evidence and answers bounded,
+straightforward questions; Terra answers complex questions, verifies every
+model answer, and handles bounded revisions or fast-model failures:
+
+```sh
+PERMITEXT_RESEARCH_ROUTING_MODE=hybrid \
+PERMITEXT_RESEARCH_FAST_MODEL=gpt-5.6-luna \
+PERMITEXT_RESEARCH_ACCURATE_MODEL=gpt-5.6-terra \
+node server.mjs
+```
+
+Configure `PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS`,
+`PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS`,
+`PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS`, and
+`PERMITEXT_RESEARCH_FAST_PRICING_VERSION` to keep mixed-model cost telemetry
+accurate. If these are absent, Permitext deliberately uses the accurate-model
+rates as a conservative estimate.
+
 For persistent localhost Research on macOS, store the server-only key in the login Keychain with service name `permitext-openai-api-key`, then run:
 
 ```sh
 npm run start:local-research
 ```
 
-That command fails closed when the Keychain entry is missing or invalid, always defaults to `gpt-5.6-terra`, and never enables test mock generation.
+That command fails closed when the Keychain entry is missing or invalid,
+enables the Luna/Terra hybrid locally, and never enables test mock generation.
 
 `OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, and records versioned model/token usage without logging the question or code text. Customer Account and Research views show included and purchased turns plus the monthly reset date; token totals and estimated provider cost remain owner-only operational data. The OpenAI account that owns the API key is responsible for model usage charges.
 

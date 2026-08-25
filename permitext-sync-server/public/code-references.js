@@ -1,6 +1,10 @@
 const inlineReferenceNumberSource = String.raw`[A-Z]?\d{2,}(?:-\d+)?(?:\.[0-9A-Za-z-]+)*(?:\([^)]+\))*`;
 const inlineReferencePhrasePattern = new RegExp(
-  String.raw`\b(?:(BC|PC|MC|FGC|AC)\s+)?(?:Sections?|§{1,2})\s+(${inlineReferenceNumberSource})((?:\s*(?:,\s*(?:(?:and|or)\s+)?|(?:and|or|through|to)\s+)${inlineReferenceNumberSource})*)`,
+  String.raw`\b(?:(BC|PC|MC|FGC|AC|ZR)\s+)?(?:Sections?|§{1,2})\s+(${inlineReferenceNumberSource})((?:\s*(?:,\s*(?:(?:and|or)\s+)?|(?:and|or|through|to)\s+)${inlineReferenceNumberSource})*)`,
+  "gi"
+);
+const inlineDirectReferencePhrasePattern = new RegExp(
+  String.raw`\b(BC|PC|MC|FGC|AC|ZR)\s+(?:(Table)\s+)?(${inlineReferenceNumberSource})((?:\s*(?:,\s*(?:(?:and|or)\s+)?|(?:and|or|through|to)\s+)${inlineReferenceNumberSource})*)`,
   "gi"
 );
 const inlineReferenceNumberPattern = new RegExp(inlineReferenceNumberSource, "gi");
@@ -125,30 +129,47 @@ export function rewriteStructuredCodeLinks(html) {
 
 export function inlineCodeReferencePhrases(text) {
   const source = String(text || "");
-  const pattern = new RegExp(inlineReferencePhrasePattern.source, inlineReferencePhrasePattern.flags);
   const phrases = [];
+  const addMatches = (pattern, { direct = false } = {}) => {
+    for (const match of source.matchAll(new RegExp(pattern.source, pattern.flags))) {
+      const phraseText = match[0];
+      const codePrefix = String(match[1] || "").toUpperCase();
+      const kind = direct && match[2] ? "table" : "section";
+      const firstNumber = direct ? match[3] : match[2];
+      const phraseStart = match.index;
+      const firstNumberOffset = phraseText.indexOf(firstNumber);
+      if (firstNumberOffset < 0) continue;
+      const numberPattern = new RegExp(inlineReferenceNumberPattern.source, inlineReferenceNumberPattern.flags);
+      const numberMatches = [...phraseText.slice(firstNumberOffset).matchAll(numberPattern)];
+      if (!numberMatches.length) continue;
+      const references = numberMatches.map((numberMatch, index) => {
+        const numberStart = phraseStart + firstNumberOffset + numberMatch.index;
+        return {
+          start: index === 0 ? phraseStart : numberStart,
+          end: numberStart + numberMatch[0].length,
+          sectionNumber: normalizedSectionNumber(numberMatch[0]),
+          kind
+        };
+      });
+      phrases.push({
+        start: phraseStart,
+        end: phraseStart + phraseText.length,
+        codePrefix,
+        kind,
+        references
+      });
+    }
+  };
+  addMatches(inlineReferencePhrasePattern);
+  addMatches(inlineDirectReferencePhrasePattern, { direct: true });
 
-  for (const match of source.matchAll(pattern)) {
-    const phraseText = match[0];
-    const numberPattern = new RegExp(inlineReferenceNumberPattern.source, inlineReferenceNumberPattern.flags);
-    const numberMatches = [...phraseText.matchAll(numberPattern)];
-    if (!numberMatches.length) continue;
-    const phraseStart = match.index;
-    const references = numberMatches.map((numberMatch, index) => {
-      const numberStart = phraseStart + numberMatch.index;
-      return {
-        start: index === 0 ? phraseStart : numberStart,
-        end: numberStart + numberMatch[0].length,
-        sectionNumber: normalizedSectionNumber(numberMatch[0])
-      };
+  const seen = new Set();
+  return phrases
+    .sort((left, right) => left.start - right.start || right.end - left.end)
+    .filter((phrase) => {
+      const identity = `${phrase.start}:${phrase.end}:${phrase.codePrefix}:${phrase.kind}`;
+      if (seen.has(identity)) return false;
+      seen.add(identity);
+      return true;
     });
-    phrases.push({
-      start: phraseStart,
-      end: phraseStart + phraseText.length,
-      codePrefix: String(match[1] || "").toUpperCase(),
-      references
-    });
-  }
-
-  return phrases;
 }

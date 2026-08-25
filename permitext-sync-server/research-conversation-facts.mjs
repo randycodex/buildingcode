@@ -1,5 +1,5 @@
 export const researchConversationFactsVersion =
-  "20260811-topic-scoped-user-facts-v2";
+  "20260824-topic-scoped-user-facts-v4";
 
 export const researchConversationFactKinds = Object.freeze({
   established: "established",
@@ -94,6 +94,30 @@ function matchedValue(text, pattern, index = 1) {
   return match ? compactText(match[index]) : "";
 }
 
+function occupancyFactValue(text) {
+  const patterns = [
+    /\b(?:building|space|project|room|it|this)\b[^.;?]{0,40}\b(?:is|as)\s+(?:an?\s+)?(?:occupancy\s+)?Group\s+([A-Z](?:-\d+)?)\b/i,
+    /\b(?:is|as)\s+(?:an?\s+)?([A-Z]-\d+)\s+(?:occupancy|building)\b/i,
+    /\b([A-Z]-\d+)\s+building\b/i
+  ];
+  for (const pattern of patterns) {
+    const match = pattern.exec(text);
+    if (!match) continue;
+    const sentenceStart = Math.max(
+      text.lastIndexOf(".", match.index),
+      text.lastIndexOf("?", match.index),
+      text.lastIndexOf("!", match.index),
+      text.lastIndexOf(";", match.index)
+    ) + 1;
+    const clausePrefix = text.slice(sentenceStart, match.index);
+    const classificationQuestion =
+      /\b(?:classif(?:y|ied)|treat(?:ed)?|consider(?:ed)?|count(?:ed)?)\s+as\s+(?:an?\s+)?(?:occupancy\s+)?Group\b/i.test(match[0]) &&
+      /\b(?:does|do|can|could|may|must|should|would|will|is|are)\b/i.test(clausePrefix);
+    if (!classificationQuestion) return compactText(match[1]);
+  }
+  return "";
+}
+
 function structuredFacts(question, kind, topicDecision) {
   const text = compactText(question);
   if (!assertionLike(text, kind, topicDecision)) return [];
@@ -186,16 +210,7 @@ function structuredFacts(question, kind, topicDecision) {
   );
   if (travelDistance && !startsWithLegalAuthority) add("travel_distance_feet", travelDistance, `The active-topic exit access travel distance is ${formattedNumber(travelDistance)} feet.`);
 
-  const occupancy = matchedValue(
-    text,
-    /\b(?:building|space|project|it|this)\b[^.;?]{0,30}\b(?:is|as|contains?|includes?)\s+(?:an?\s+)?(?:occupancy\s+)?Group\s+([A-Z](?:-\d+)?)\b/i
-  ) || matchedValue(
-    text,
-    /\b(?:is|as)\s+(?:an?\s+)?([A-Z]-\d+)\s+(?:occupancy|building)\b/i
-  ) || matchedValue(
-    text,
-    /\b([A-Z]-\d+)\s+building\b/i
-  );
+  const occupancy = occupancyFactValue(text);
   if (occupancy) add("occupancy_group", occupancy.toUpperCase(), `The active-topic building is Group ${occupancy.toUpperCase()}.`);
 
   if (/^(?:an?\s+)?existing\b[^.;?]{0,120}\b(?:building|structure|project)\b|\b(?:this|that)\s+is\s+an?\s+existing\b[^.;?]{0,80}\b(?:building|structure|project)\b|\b(?:this|the|an?)\s+(?:building|structure|project)\s+(?:is|was)\s+existing\b|\bexisting\s+(?:building|structure|project)\b/i.test(text)) {

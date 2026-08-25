@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260817-answer-evidence-economy-applicability-v2";
+  "20260824-answer-evidence-economy-applicability-v5";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -21,7 +21,8 @@ function normalizedEvidence(evidence) {
       evidenceRole: compactText(source?.evidencePriority?.evidenceRole) || "supporting",
       evidenceFunction: compactText(source?.evidencePriority?.primaryFunction) || "candidate",
       topicRouteRelationship: compactText(source?.evidencePriority?.topicRouteRelationship) || "unrestricted",
-      applicabilityStatus: compactText(source?.applicabilityStatus).toLowerCase()
+      applicabilityStatus: compactText(source?.applicabilityStatus).toLowerCase(),
+      text: compactText(source?.text)
     });
   }
   return result;
@@ -63,7 +64,7 @@ function disclosesApplicability(source, answerText) {
   return true;
 }
 
-export function evaluateResearchAnswerQuality({ evidence = [], answer = {} } = {}) {
+export function evaluateResearchAnswerQuality({ question = "", evidence = [], answer = {} } = {}) {
   const availableEvidence = normalizedEvidence(evidence);
   const bindings = answerBindings(answer);
   const citedSet = new Set(bindings.citedSourceIDs);
@@ -86,6 +87,60 @@ export function evaluateResearchAnswerQuality({ evidence = [], answer = {} } = {
   const missingApplicabilityDisclosureSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
     !disclosesApplicability(availableEvidence.get(sourceID), applicabilityText)
   );
+  const standardResidenceTableQuestion = /\bstandard\s+(?:residences?|residential)\b/i.test(question);
+  const parallelCategorySourceIDs = standardResidenceTableQuestion
+    ? Array.from(availableEvidence.values())
+      .filter((source) =>
+        /\bstandard residences\b/i.test(source.text) &&
+        /\bqualifying affordable housing\b/i.test(source.text)
+      )
+      .map((source) => source.sourceID)
+    : [];
+  const missingParallelTableCategorySourceIDs =
+    parallelCategorySourceIDs.length &&
+    !/\bqualifying (?:affordable housing|senior housing)\b/i.test(applicabilityText)
+      ? parallelCategorySourceIDs
+      : [];
+  const underlyingZoningUseQuestion =
+    /\b(?:as[- ]of[- ]right|underlying)\b/i.test(question) &&
+    /\b(?:permitted|permission|use)\b/i.test(question) &&
+    /\b(?:C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?|R\d{1,2}[A-Z]?)\b/i.test(question);
+  const zoningUseDenied = underlyingZoningUseQuestion &&
+    /\b(?:no|not permitted|prohibited|does not permit)\b/i.test(applicabilityText);
+  const zoningModificationPathDisclosed =
+    /\b(?:special(?:[- ]purpose)? district|authorization|variance|special permit|mapped overlay)\b/i.test(applicabilityText);
+  const missingZoningModificationPathDisclosureSourceIDs =
+    zoningUseDenied && !zoningModificationPathDisclosed
+      ? knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.reference.startsWith("ZR "))
+      : [];
+  const accessoryAssemblyPlumbingQuestion =
+    /\b(?:plumbing fixtures?|fixture requirements?)\b/i.test(question) &&
+    /\bGroup B\b/i.test(question) &&
+    /\b(?:fewer than|under|less than)\s+75\b/i.test(question);
+  const accessoryAssemblySourceIDs = accessoryAssemblyPlumbingQuestion
+    ? knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.reference === "BC 303.1.3")
+    : [];
+  const userStatesGroupBPrincipalOccupancy =
+    /\baccessory to (?:an?|the)\s+Group B occupancy\b/i.test(question);
+  const misattributedAccessoryAssemblyRelationshipSourceIDs =
+    accessoryAssemblySourceIDs.length &&
+    !userStatesGroupBPrincipalOccupancy &&
+    /\baccessory to (?:an?|the)\s+Group B occupancy\b/i.test(applicabilityText)
+      ? accessoryAssemblySourceIDs
+      : [];
+  const hcrVanityQuestion =
+    /\bHCR\b/i.test(question) &&
+    /\bvanity\b/i.test(question) &&
+    /\b1107\.2\.2\.7\.2\.2\b/i.test(question);
+  const hcrVanitySourceIDs = hcrVanityQuestion
+    ? knownCitedSourceIDs.filter((sourceID) =>
+      availableEvidence.get(sourceID)?.reference === "BC 1107.2.2.7.2.2"
+    )
+    : [];
+  const missingTypeBNYCContextSourceIDs =
+    hcrVanitySourceIDs.length && !/\bType B\+NYC\b/i.test(applicabilityText)
+      ? hcrVanitySourceIDs
+      : [];
   const citationSourceIDsByRole = {
     governing: knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.evidenceRole === "governing"),
     supporting: knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.evidenceRole === "supporting"),
@@ -111,13 +166,21 @@ export function evaluateResearchAnswerQuality({ evidence = [], answer = {} } = {
       uncitedSupportedPointSourceIDs.length === 0 &&
       irrelevantCitationSourceIDs.length === 0 &&
       collateralCitationSourceIDs.length === 0 &&
-      missingApplicabilityDisclosureSourceIDs.length === 0,
+      missingApplicabilityDisclosureSourceIDs.length === 0 &&
+      missingParallelTableCategorySourceIDs.length === 0 &&
+      missingZoningModificationPathDisclosureSourceIDs.length === 0 &&
+      misattributedAccessoryAssemblyRelationshipSourceIDs.length === 0 &&
+      missingTypeBNYCContextSourceIDs.length === 0,
     unknownAnswerSourceIDs,
     orphanCitationSourceIDs,
     uncitedSupportedPointSourceIDs,
     irrelevantCitationSourceIDs,
     collateralCitationSourceIDs,
     missingApplicabilityDisclosureSourceIDs,
+    missingParallelTableCategorySourceIDs,
+    missingZoningModificationPathDisclosureSourceIDs,
+    misattributedAccessoryAssemblyRelationshipSourceIDs,
+    missingTypeBNYCContextSourceIDs,
     citedSourceIDs: knownCitedSourceIDs,
     reviewedOnlySourceIDs,
     evidenceEconomy,
@@ -167,6 +230,30 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "missed_material_conclusion",
       detail: `State the historical or future-effective applicability status for explicitly selected evidence before relying on it: ${references(result.missingApplicabilityDisclosureSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.missingParallelTableCategorySourceIDs?.length) {
+    issues.push({
+      type: "missed_material_conclusion",
+      detail: `For the stated standard-residence category, also state the materially different qualifying-affordable or qualifying-senior value supplied in the same table row and identify the fact that selects that alternative. Bind the comparison to: ${references(result.missingParallelTableCategorySourceIDs, result.sources)}.`
+    });
+  }
+  if (result.missingZoningModificationPathDisclosureSourceIDs?.length) {
+    issues.push({
+      type: "missed_material_conclusion",
+      detail: `When concluding that a use is not permitted as-of-right under the underlying zoning district, limit that conclusion to the underlying district rules and expressly preserve separate special-purpose-district, authorization, special-permit, or variance pathways not resolved by the supplied evidence. Bind the underlying use conclusion to: ${references(result.missingZoningModificationPathDisclosureSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.misattributedAccessoryAssemblyRelationshipSourceIDs?.length) {
+    issues.push({
+      type: "wrong_attribution",
+      detail: `BC 303.1.3 requires the assembly room to be accessory to another or served principal occupancy; Group B is the resulting room classification, not necessarily the principal occupancy to which it is accessory. Correct that relationship and bind it to: ${references(result.misattributedAccessoryAssemblyRelationshipSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.missingTypeBNYCContextSourceIDs?.length) {
+    issues.push({
+      type: "missed_material_conclusion",
+      detail: `Place BC 1107.2.2.7.2.2 in its Type B+NYC unit toilet-and-bathing-room context before explaining its water-closet clearance and permitted lavatory location. Bind that applicability context to: ${references(result.missingTypeBNYCContextSourceIDs, result.sources)}.`
     });
   }
   return issues;

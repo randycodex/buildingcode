@@ -399,6 +399,15 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         )
     }
 
+    func projectPropertyContext(account: SignedInAccount, address: String) async throws -> BackendProjectPropertyContext {
+        try await transport.projectPropertyLookup(
+            BackendProjectPropertyLookupRequest(
+                auth: authContext(for: account),
+                address: address
+            )
+        ).property
+    }
+
     func researchConversations(account: SignedInAccount) async throws -> [ResearchConversationSummary] {
         try await transport.researchConversationList(
             ResearchConversationListRequest(auth: authContext(for: account))

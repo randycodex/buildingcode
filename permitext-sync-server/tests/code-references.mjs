@@ -27,6 +27,19 @@ assert(list?.references.length === 3, "Section lists must expose every cited sec
 const prefixed = inlineCodeReferencePhrases("MC Sections 501.2 and 501.3")[0];
 assert(prefixed?.codePrefix === "MC", "Text references must preserve an explicit code prefix.");
 
+const zoningPrefixed = inlineCodeReferencePhrases("ZR Sections 25-23 through 25-26")[0];
+assert(zoningPrefixed?.codePrefix === "ZR", "Zoning references must preserve the ZR prefix.");
+assert(zoningPrefixed?.references.length === 2, "Zoning ranges must expose both endpoints.");
+assert(zoningPrefixed?.references[0].sectionNumber === "25-23");
+assert(zoningPrefixed?.references[1].sectionNumber === "25-26");
+
+const directZoning = inlineCodeReferencePhrases("Compare ZR 25-23 with ZR Table 25-31.");
+assert(directZoning.length === 2, "Direct ZR section and table citations must both be linkable.");
+assert(directZoning[0].codePrefix === "ZR" && directZoning[0].references[0].sectionNumber === "25-23");
+assert(directZoning[0].kind === "section" && directZoning[0].references[0].kind === "section");
+assert(directZoning[1].codePrefix === "ZR" && directZoning[1].references[0].sectionNumber === "25-31");
+assert(directZoning[1].kind === "table" && directZoning[1].references[0].kind === "table");
+
 const buildingTarget = parseCodeJumpAnchor("JD_BC3321");
 assert(
   buildingTarget?.kind === "section" && buildingTarget.codePrefix === "BC" && buildingTarget.sectionNumber === "3321",

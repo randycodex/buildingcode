@@ -775,11 +775,12 @@ struct ReaderCurrentSectionBookmarkButton: View {
             FolderEditorSheet(
                 existing: nil,
                 defaultFolderType: request.folderType,
-                onSave: { name, address, description, colorHex, folderType in
+                onSave: { name, address, description, structuredFacts, colorHex, folderType in
                     if let folder = library.createFolder(
                         name: name,
                         address: address,
                         description: description,
+                        structuredFacts: structuredFacts,
                         colorHex: colorHex,
                         folderType: folderType
                     ) {

@@ -6,7 +6,7 @@ import {
 import {
   settingsAccountSummary,
   settingsPlanCopy
-} from "./settings-copy.js?v=20260824-research-turns-v2";
+} from "./settings-copy.js?v=20260824-project-context-research-v2";
 import {
   researchProgressStages,
   researchProgressStage
@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260824-research-turns-v2";
+} from "./offline-storage.js?v=20260824-hybrid-research-trust-v4";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260824-research-turns-v2";
+} from "./research-intent-state.js?v=20260824-hybrid-research-trust-v4";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -10362,7 +10362,7 @@ function numericLocalFolderID(project) {
   return Number.isInteger(value) && value > 0 ? value : 0;
 }
 
-const projectStructuredFactStatuses = new Set(["stated", "confirmed", "unknown", "rejected"]);
+const projectStructuredFactStatuses = new Set(["stated", "confirmed", "sourced", "unknown", "rejected"]);
 
 function normalizeProjectStructuredFact(fact) {
   if (!fact || typeof fact !== "object") return null;
@@ -10405,7 +10405,13 @@ const projectStructuredFactGroups = [
       { key: "project-status", label: "Project Status" },
       { key: "work-filing-type", label: "Work / Filing Type" },
       { key: "code-basis", label: "Code Basis" },
-      { key: "building-area", label: "Building Area" }
+      { key: "building-area", label: "Building Area" },
+      { key: "building-count", label: "Number of Buildings" },
+      { key: "residential-units", label: "Residential Units" },
+      { key: "total-units", label: "Total Units" },
+      { key: "year-built", label: "Year Built" },
+      { key: "years-altered", label: "Year(s) Altered" },
+      { key: "building-class", label: "Building Class" }
     ]
   },
   {
@@ -10413,9 +10419,13 @@ const projectStructuredFactGroups = [
     label: "Zoning",
     fields: [
       { key: "address", label: "Address", projectAddress: true },
+      { key: "bbl", label: "BBL" },
       { key: "borough", label: "Borough" },
       { key: "block", label: "Block" },
       { key: "tax-lots", label: "Tax Lot(s)" },
+      { key: "zip-code", label: "ZIP Code" },
+      { key: "tax-lot-area", label: "Tax Lot Area" },
+      { key: "land-use-code", label: "Land Use Code" },
       { key: "zoning-lot-composition", label: "Zoning Lot Composition" },
       { key: "zoning-districts", label: "Zoning District(s)" },
       { key: "commercial-overlays", label: "Commercial Overlay(s)" },
@@ -10432,7 +10442,9 @@ const projectStructuredFactGroups = [
       { key: "transit-zone", label: "Transit Zone" },
       { key: "limited-height-district", label: "Limited Height District" },
       { key: "waterfront-status", label: "Waterfront Status / Waterfront Access Plan" },
-      { key: "lower-density-growth-management-area", label: "Lower Density Growth Management Area" }
+      { key: "lower-density-growth-management-area", label: "Lower Density Growth Management Area" },
+      { key: "fresh-program-area", label: "FRESH Program Area" },
+      { key: "appendix-j-designated-m-district", label: "Appendix J Designated M District" }
     ]
   }
 ];
@@ -10646,6 +10658,7 @@ async function createProjectFolder(details = {}) {
     title: name,
     address,
     description,
+    structuredFacts: projectStructuredFacts({ structuredFacts: details.structuredFacts }),
     folderType: type,
     color: details.color || projectColorOptions[0],
     sortOrder: nextProjectSortOrder(),
@@ -15408,6 +15421,13 @@ function renderResearchInterpretation(container, result, options = {}) {
 
   const card = document.createElement("article");
   card.className = "analysis-card research-result-card";
+  if (result.authorityLabel) {
+    const authority = document.createElement("p");
+    authority.className = "research-authority-status";
+    authority.dataset.authorityStatus = result.authorityStatus || "";
+    authority.textContent = result.authorityLabel;
+    card.append(authority);
+  }
   appendResearchAnswerNarrative(card, result);
 
   const codeBasis = result.codeBasis || null;
@@ -15418,7 +15438,12 @@ function renderResearchInterpretation(container, result, options = {}) {
   if (codeBasisText) {
     const codeDisclosure = document.createElement("p");
     codeDisclosure.className = "research-answer-code-basis";
-    codeDisclosure.textContent = codeBasisText;
+    const sourceAsOf = result.sourceAsOf && Number.isFinite(Date.parse(result.sourceAsOf))
+      ? new Date(result.sourceAsOf).toLocaleDateString()
+      : "";
+    codeDisclosure.textContent = [codeBasisText, sourceAsOf ? `Research basis captured ${sourceAsOf}` : ""]
+      .filter(Boolean)
+      .join(" · ");
     if (codeBasis?.limitation) codeDisclosure.title = codeBasis.limitation;
     card.append(codeDisclosure);
   }
@@ -15429,7 +15454,9 @@ function renderResearchInterpretation(container, result, options = {}) {
   evidenceReviewed.className = "research-evidence-reviewed";
   evidenceReviewed.open = Boolean(options.detailsOpen);
   const evidenceReviewedSummary = document.createElement("summary");
-  evidenceReviewedSummary.textContent = "Evidence reviewed";
+  evidenceReviewedSummary.textContent = result.mode === "project_context"
+    ? "Project facts reviewed"
+    : "Evidence reviewed";
   const evidenceReviewedBody = document.createElement("section");
   evidenceReviewedBody.className = "research-evidence-reviewed-body";
 
@@ -15491,7 +15518,10 @@ function renderResearchInterpretation(container, result, options = {}) {
   const citedProvisionCount = Number(sourceSummary.citedProvisionCount || 0);
   const supportingCitationCount = Number(sourceSummary.supportingCitationCount || 0);
   const reviewedOnlyProvisionCount = Number(sourceSummary.reviewedOnlyProvisionCount || 0);
-  const sourceScope = citedProvisionCount
+  const projectFactCount = Number(sourceSummary.projectFactCount || 0);
+  const sourceScope = result.mode === "project_context" && projectFactCount
+    ? `Based on ${projectFactCount} saved Project ${projectFactCount === 1 ? "fact" : "facts"}`
+    : citedProvisionCount
     ? [
         `Cited ${citedProvisionCount} enacted ${citedProvisionCount === 1 ? "provision" : "provisions"}`,
         supportingCitationCount
@@ -17358,6 +17388,21 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
   await execute(false);
 }
 
+function researchComposerDisclosure() {
+  const disclosure = document.createElement("p");
+  disclosure.className = "research-composer-disclosure";
+  disclosure.append(document.createTextNode(
+    "Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI for generation. Do not include confidential or unnecessary personal information. "
+  ));
+  const privacyLink = document.createElement("a");
+  privacyLink.href = "/privacy";
+  privacyLink.target = "_blank";
+  privacyLink.rel = "noopener noreferrer";
+  privacyLink.textContent = "Privacy";
+  disclosure.append(privacyLink);
+  return disclosure;
+}
+
 function renderNewResearchComposer(container, researchEnabled) {
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
@@ -17460,7 +17505,7 @@ function renderNewResearchComposer(container, researchEnabled) {
     }
   });
   composerBox.append(input, sendButton);
-  form.append(projectField, composerBox, status);
+  form.append(projectField, researchComposerDisclosure(), composerBox, status);
   container.append(form);
 }
 
@@ -19337,7 +19382,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     });
   });
   composerBox.append(input, sendButton);
-  composer.append(composerBox, status);
+  composer.append(researchComposerDisclosure(), composerBox, status);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);
@@ -25078,7 +25123,11 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   addressInput.setAttribute("aria-label", "Project address");
   addressInput.autocomplete = "street-address";
   if (identity) addressInput.value = identity.address;
-  addressLabel.append(addressInput);
+  const propertyLookupStatus = document.createElement("span");
+  propertyLookupStatus.className = "project-property-lookup-status";
+  propertyLookupStatus.setAttribute("role", "status");
+  propertyLookupStatus.setAttribute("aria-live", "polite");
+  addressLabel.append(addressInput, propertyLookupStatus);
 
   const colorGroup = document.createElement("fieldset");
   colorGroup.className = "project-sheet-colors";
@@ -25114,8 +25163,71 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   if (identity) descriptionInput.value = identity.description;
   descriptionLabel.append(descriptionInput);
 
+  let propertyLookupAddress = "";
+  let propertyLookupResult = null;
+  let propertyLookupPromise = null;
+  let propertyLookupRequestID = 0;
+  const resetPropertyLookup = () => {
+    propertyLookupAddress = "";
+    propertyLookupResult = null;
+    propertyLookupStatus.textContent = "";
+    propertyLookupStatus.dataset.state = "";
+  };
+  const lookupPropertyContext = async () => {
+    const address = addressInput.value.trim();
+    if (isEditing || selectedFolderType !== "project" || !address) {
+      resetPropertyLookup();
+      return null;
+    }
+    if (propertyLookupResult && propertyLookupAddress === address) return propertyLookupResult;
+    if (propertyLookupPromise && propertyLookupAddress === address) return propertyLookupPromise;
+    const requestID = ++propertyLookupRequestID;
+    propertyLookupAddress = address;
+    propertyLookupResult = null;
+    propertyLookupStatus.dataset.state = "loading";
+    propertyLookupStatus.textContent = "Looking up official NYC property data…";
+    propertyLookupPromise = postResearch("/projects/property/lookup", { address })
+      .then((payload) => {
+        if (requestID !== propertyLookupRequestID) return null;
+        const property = payload?.property || null;
+        if (!property?.structuredFacts?.length) throw new Error("No property facts were returned.");
+        propertyLookupResult = property;
+        addressInput.value = property.normalizedAddress || address;
+        propertyLookupAddress = addressInput.value.trim();
+        propertyLookupStatus.dataset.state = "success";
+        propertyLookupStatus.textContent = `Imported ${property.structuredFacts.length} sourced facts from NYC Planning.`;
+        return property;
+      })
+      .catch((error) => {
+        if (requestID !== propertyLookupRequestID) return null;
+        propertyLookupResult = null;
+        propertyLookupStatus.dataset.state = "warning";
+        if (error?.code === "NYC_PROPERTY_NOT_FOUND" || error?.code === "NYC_PROPERTY_DATA_NOT_FOUND") {
+          propertyLookupStatus.textContent = "No NYC tax lot matched. The Project can still be saved with this address.";
+        } else if (!activeAccount()) {
+          propertyLookupStatus.textContent = "Sign in to import official NYC property facts. The Project can still be saved.";
+        } else {
+          propertyLookupStatus.textContent = "NYC property facts could not be imported. The Project can still be saved.";
+        }
+        return null;
+      })
+      .finally(() => {
+        if (requestID === propertyLookupRequestID) propertyLookupPromise = null;
+      });
+    return propertyLookupPromise;
+  };
+
   nameInput.addEventListener("input", () => {
     saveButton.disabled = !nameInput.value.trim();
+  });
+  addressInput.addEventListener("input", () => {
+    if (addressInput.value.trim() !== propertyLookupAddress) {
+      propertyLookupRequestID += 1;
+      resetPropertyLookup();
+    }
+  });
+  addressInput.addEventListener("blur", () => {
+    void lookupPropertyContext();
   });
   const restoreSheetFocus = () => {
     if (previousFocus?.isConnected) {
@@ -25143,12 +25255,16 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     if (!nameInput.value.trim()) return;
     saveButton.disabled = true;
     try {
+      const property = !isEditing && selectedFolderType === "project" && addressInput.value.trim()
+        ? await lookupPropertyContext()
+        : null;
       const details = {
         name: nameInput.value,
-        address: selectedFolderType === "reference" ? "" : addressInput.value,
+        address: selectedFolderType === "reference" ? "" : property?.normalizedAddress || addressInput.value,
         color: selectedColor,
         description: descriptionInput.value,
-        folderType: selectedFolderType
+        folderType: selectedFolderType,
+        structuredFacts: property?.structuredFacts || []
       };
       if (isEditing) {
         await updateProjectFolder(project, details);
