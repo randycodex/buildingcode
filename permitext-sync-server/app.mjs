@@ -179,7 +179,7 @@ import { recordSurvivesBulkClear } from "./public/sync-state.js";
 import {
   beginResearchSpendReservation,
   endResearchSpendReservation,
-  estimatedResearchCost,
+  estimatedResearchCostWithProviderAllowance,
   researchSpendGuardrails,
   reserveResearchProviderSpend,
   reserveResearchEvaluationSpend,
@@ -1774,8 +1774,13 @@ function createFileStoreAdapter() {
         const retentionCutoff = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString();
         const retainedEntries = (store.researchUsageByUserID?.[userID] || [])
           .filter((entry) => entry.createdAt >= retentionCutoff);
-        if (retainedEntries.some((entry) => entry.id === reservation.id)) {
-          return { reserved: false, reason: "duplicate" };
+        const duplicate = retainedEntries.find((entry) => entry.id === reservation.id);
+        if (duplicate) {
+          return {
+            reserved: false,
+            reason: "duplicate",
+            requestFingerprint: duplicate.requestFingerprint || null
+          };
         }
         const decision = researchTurnFundingDecision({
           usageEntries: retainedEntries,
@@ -1802,6 +1807,7 @@ function createFileStoreAdapter() {
             fundingSource: decision.fundingSource,
             estimatedCostUSD: reservation.maximumRequestUSD,
             pricingVersion: reservation.pricingVersion,
+            requestFingerprint: reservation.requestFingerprint || null,
             createdAt: reservation.createdAt
           }
         ];
@@ -1809,6 +1815,7 @@ function createFileStoreAdapter() {
         return {
           reserved: true,
           fundingSource: decision.fundingSource,
+          requestFingerprint: reservation.requestFingerprint || null,
           state: decision.state
         };
       });
@@ -1824,7 +1831,8 @@ function createFileStoreAdapter() {
           throw new Error("Research usage reservation was not found.");
         }
         const fundingSource = entries[index].fundingSource || "included";
-        entries[index] = { ...entry, id: reservationID, fundingSource };
+        const requestFingerprint = entries[index].requestFingerprint || null;
+        entries[index] = { ...entry, id: reservationID, fundingSource, requestFingerprint };
         if (fundingSource === "purchased") {
           store.researchCreditsByUserID ||= {};
           store.researchCreditsByUserID[userID] ||= [];
@@ -2425,6 +2433,7 @@ async function createPostgresStoreAdapter() {
         evidence_version TEXT,
         estimated_cost_usd NUMERIC,
         pricing_version TEXT,
+        request_fingerprint TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
@@ -2434,6 +2443,7 @@ async function createPostgresStoreAdapter() {
     await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS estimated_cost_usd NUMERIC`;
     await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS pricing_version TEXT`;
     await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS funding_source TEXT NOT NULL DEFAULT 'included'`;
+    await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS request_fingerprint TEXT`;
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_research_usage_user_created_idx
       ON permitext_research_usage (user_id, created_at DESC)
@@ -4644,32 +4654,36 @@ async function createPostgresStoreAdapter() {
               )
               INSERT INTO permitext_research_usage (
                 id, user_id, model, mode, funding_source, input_tokens, cached_input_tokens,
-                output_tokens, total_tokens, estimated_cost_usd, pricing_version, created_at
+                output_tokens, total_tokens, estimated_cost_usd, pricing_version,
+                request_fingerprint, created_at
               )
               SELECT
                 ${reservation.id}, ${userID}, 'pending', 'reservation', funding.source, 0, 0, 0, 0,
                 ${reservation.maximumRequestUSD}, ${reservation.pricingVersion},
+                ${reservation.requestFingerprint || null},
                 ${reservation.createdAt}::timestamptz
               FROM funding
               WHERE funding.source IS NOT NULL
               ON CONFLICT (id) DO NOTHING
-              RETURNING id, funding_source
+              RETURNING id, funding_source, request_fingerprint
             `
           ], { isolationLevel: "Serializable" });
           if (rows?.length) {
             return {
               reserved: true,
-              fundingSource: rows[0].funding_source || "included"
+              fundingSource: rows[0].funding_source || "included",
+              requestFingerprint: rows[0].request_fingerprint || null
             };
           }
           const duplicate = await sql`
-            SELECT id FROM permitext_research_usage
+            SELECT id, request_fingerprint FROM permitext_research_usage
             WHERE id = ${reservation.id} AND user_id = ${userID}
             LIMIT 1
           `;
           return {
             reserved: false,
-            reason: duplicate.length ? "duplicate" : "payment_required"
+            reason: duplicate.length ? "duplicate" : "payment_required",
+            requestFingerprint: duplicate[0]?.request_fingerprint || null
           };
         } catch (error) {
           if (error?.code !== "40001" || attempt === 3) throw error;
@@ -5602,7 +5616,13 @@ export function applyResearchConversationMessageCommit(store, userID, {
       throw new Error("Research usage reservation was not found.");
     }
     const fundingSource = usageEntries[usageIndex].fundingSource || "included";
-    usageEntries[usageIndex] = { ...usageEntry, id: reservationID, fundingSource };
+    const requestFingerprint = usageEntries[usageIndex].requestFingerprint || null;
+    usageEntries[usageIndex] = {
+      ...usageEntry,
+      id: reservationID,
+      fundingSource,
+      requestFingerprint
+    };
     store.researchUsageByUserID[userID] = usageEntries;
     if (fundingSource === "purchased") {
       store.researchCreditsByUserID[userID] ||= [];
@@ -7695,11 +7715,17 @@ function outputTextFromResponse(response) {
 }
 
 function researchUsageFromProviderPayload(payload, requestedModel = null) {
+  const providerAccounting = payload?.permitext_provider_accounting || {};
   const usage = {
     inputTokens: Number(payload?.usage?.input_tokens || 0),
     cachedInputTokens: Number(payload?.usage?.input_tokens_details?.cached_tokens || 0),
     outputTokens: Number(payload?.usage?.output_tokens || 0),
-    totalTokens: Number(payload?.usage?.total_tokens || 0)
+    totalTokens: Number(payload?.usage?.total_tokens || 0),
+    providerRequestCount: Math.max(0, Number(providerAccounting.attempts || 0)),
+    unreconciledProviderCostUSD: Math.max(
+      0,
+      Number(providerAccounting.unreconciled_cost_usd || 0)
+    )
   };
   return {
     ...usage,
@@ -7715,9 +7741,21 @@ function combinedResearchUsage(...entries) {
       cachedInputTokens: total.cachedInputTokens + Number(entry.cachedInputTokens || 0),
       outputTokens: total.outputTokens + Number(entry.outputTokens || 0),
       totalTokens: total.totalTokens + Number(entry.totalTokens || 0),
+      providerRequestCount: total.providerRequestCount + Number(entry.providerRequestCount || 0),
+      unreconciledProviderCostUSD: Number((
+        total.unreconciledProviderCostUSD + Number(entry.unreconciledProviderCostUSD || 0)
+      ).toFixed(6)),
       modelUsage: [...total.modelUsage, ...modelUsage]
     };
-  }, { inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, totalTokens: 0, modelUsage: [] });
+  }, {
+    inputTokens: 0,
+    cachedInputTokens: 0,
+    outputTokens: 0,
+    totalTokens: 0,
+    providerRequestCount: 0,
+    unreconciledProviderCostUSD: 0,
+    modelUsage: []
+  });
 }
 
 function webSourcesFromProviderPayload(payload) {
@@ -16100,6 +16138,43 @@ export function researchRequestReservationID(userID, conversationID, requestID) 
   return `${identity}:usage`;
 }
 
+export function researchRequestQuestionFingerprint(question) {
+  return createHash("sha256")
+    .update(normalizedResearchText(question, 2_000))
+    .digest("hex");
+}
+
+function researchMessagesForRequest(conversation, requestID) {
+  const messages = (conversation?.messages || []).filter((message) =>
+    message.researchRequestID === requestID || message.requestID === requestID
+  );
+  return {
+    user: messages.find((message) => message.role === "user") || null,
+    assistant: messages.find((message) => message.role === "assistant") || null
+  };
+}
+
+export function researchDuplicateReservationDisposition({
+  conversation,
+  question,
+  requestID,
+  reservationRequestFingerprint
+}) {
+  const requestedFingerprint = researchRequestQuestionFingerprint(question);
+  const requestMessages = researchMessagesForRequest(conversation, requestID);
+  const storedQuestion = normalizedResearchText(requestMessages.user?.question, 2_000);
+  if (
+    (reservationRequestFingerprint && reservationRequestFingerprint !== requestedFingerprint) ||
+    (requestMessages.user && storedQuestion !== normalizedResearchText(question, 2_000))
+  ) {
+    return { outcome: "conflict" };
+  }
+  if (requestMessages.assistant) {
+    return { outcome: "replay", answer: requestMessages.assistant };
+  }
+  return { outcome: "in_progress" };
+}
+
 async function commitProjectContextOnlyResearchMessage({
   context,
   conversation,
@@ -16315,11 +16390,10 @@ async function handleResearchConversationMessage(request, response) {
     });
     return;
   }
-  const priorRequestMessage = researchRequestID
-    ? (conversation.messages || []).find((message) =>
-        message.researchRequestID === researchRequestID || message.requestID === researchRequestID
-      )
-    : null;
+  const requestMessages = researchRequestID
+    ? researchMessagesForRequest(conversation, researchRequestID)
+    : { user: null, assistant: null };
+  const priorRequestMessage = requestMessages.user;
   if (
     priorRequestMessage?.role === "user" &&
     normalizedResearchText(priorRequestMessage.question, 2_000) !== question
@@ -16330,12 +16404,7 @@ async function handleResearchConversationMessage(request, response) {
     });
     return;
   }
-  const replayedAnswer = researchRequestID
-    ? (conversation.messages || []).find((message) =>
-        message.role === "assistant" &&
-        (message.researchRequestID === researchRequestID || message.requestID === researchRequestID)
-      )
-    : null;
+  const replayedAnswer = requestMessages.assistant;
   if (replayedAnswer) {
     for (const stage of replayedAnswer.researchProgress?.stages || []) {
       if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
@@ -16465,7 +16534,7 @@ async function handleResearchConversationMessage(request, response) {
     const requestLimit = monthlyResearchRequestLimit();
     if (!mockMode) {
       const spendGuardrails = researchSpendGuardrails();
-      if (!spendGuardrails.enabled) {
+      if (!spendGuardrails.ready) {
         const error = new Error("Research is temporarily unavailable.");
         error.code = "RESEARCH_SPEND_CAP";
         throw error;
@@ -16484,11 +16553,48 @@ async function handleResearchConversationMessage(request, response) {
         paidContinuationEnabled: paidResearchTurnsEnabled(process.env),
         maximumRequestUSD: spendGuardrails.maximumRequestUSD || 0,
         pricingVersion: spendGuardrails.pricingVersion,
+        requestFingerprint: researchRequestQuestionFingerprint(question),
         createdAt: researchReservationCreatedAt
       });
       if (!reservation.reserved) {
         researchReservationID = null;
         if (reservation.reason === "duplicate") {
+          const duplicateConversation = await storedResearchConversation(
+            context.userID,
+            conversation.id
+          ) || conversation;
+          const duplicateDisposition = researchDuplicateReservationDisposition({
+            conversation: duplicateConversation,
+            question,
+            requestID: researchRequestID,
+            reservationRequestFingerprint: reservation.requestFingerprint
+          });
+          if (duplicateDisposition.outcome === "conflict") {
+            progressResponse.json(409, {
+              error: "That Research request identifier was already used for a different question.",
+              code: "RESEARCH_REQUEST_ID_CONFLICT"
+            });
+            return;
+          }
+          if (duplicateDisposition.outcome === "replay") {
+            for (const stage of duplicateDisposition.answer.researchProgress?.stages || []) {
+              if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
+            }
+            progressResponse.json(200, {
+              conversation: await researchConversationForClient(
+                duplicateConversation,
+                { userID: context.userID }
+              ),
+              usage: await researchUsageForClient(
+                context.userID,
+                context.authContext.entitlement,
+                { mockMode }
+              ),
+              requestID: researchRequestID,
+              replayed: true
+            });
+            return;
+          }
           progressResponse.json(409, {
             error: "This Research question is already being processed. Its reserved turn will not be charged twice.",
             code: "RESEARCH_REQUEST_IN_PROGRESS",
@@ -16790,7 +16896,7 @@ async function handleResearchConversationMessage(request, response) {
       answerGenerationUsage,
       verifierUsage
     );
-    const estimatedCost = estimatedResearchCost(result.usage);
+    const estimatedCost = estimatedResearchCostWithProviderAllowance(result.usage);
     const now = new Date().toISOString();
     progressResponse.progress("preparing_conclusion", "completed");
     const authorityStatus = evidenceBoundaryFallback
@@ -26125,7 +26231,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
   try {
     if (!mockMode) {
       const spendGuardrails = researchSpendGuardrails();
-      if (!spendGuardrails.enabled) {
+      if (!spendGuardrails.ready) {
         const error = new Error("Research is temporarily unavailable.");
         error.code = "RESEARCH_SPEND_CAP";
         throw error;
@@ -26172,7 +26278,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
           projectContextFacts: projectFacts,
           messages: []
         });
-    const estimatedCost = estimatedResearchCost(result.usage);
+    const estimatedCost = estimatedResearchCostWithProviderAllowance(result.usage);
     const createdAt = new Date().toISOString();
     const answerID = `cq-answer-${createHash("sha256").update(`${questionID}:${requestID}`).digest("hex")}`;
     const answerPayload = {

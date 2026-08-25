@@ -2,6 +2,7 @@ import {
   beginResearchSpendReservation,
   endResearchSpendReservation,
   estimatedResearchCost,
+  estimatedResearchCostWithProviderAllowance,
   researchSpendGuardrails,
   reserveResearchProviderSpend,
   settleResearchProviderSpend
@@ -43,6 +44,17 @@ assert(
   hybridCost.pricingVersion === "contract-v1+luna-contract-v1",
   "Hybrid pricing did not retain both version identifiers."
 );
+const hybridCostWithAllowance = estimatedResearchCostWithProviderAllowance({
+  modelUsage: [
+    { model: "gpt-5.6-luna", inputTokens: 1_000_000, cachedInputTokens: 0, outputTokens: 1_000_000 },
+    { model: "gpt-5.6-terra", inputTokens: 1_000_000, cachedInputTokens: 0, outputTokens: 1_000_000 }
+  ],
+  unreconciledProviderCostUSD: 0.05
+}, hybridEnvironment);
+assert(
+  hybridCostWithAllowance.estimatedUSD === 23.05,
+  "Unreconciled provider-attempt allowance was not included in internal cost telemetry."
+);
 
 assert(researchSpendGuardrails(environment).ready, "Complete production Research spend caps were rejected.");
 assert(
@@ -62,9 +74,24 @@ assert(
   "Missing cached-input pricing was accepted even though actual spend reconciliation needs it."
 );
 
+let invalidConfigurationFailedClosed = false;
+try {
+  beginResearchSpendReservation(
+    { id: "invalid-configuration-contract" },
+    { ...environment, PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: "" }
+  );
+} catch (error) {
+  invalidConfigurationFailedClosed = error?.code === "RESEARCH_SPEND_CAP";
+}
+assert(
+  invalidConfigurationFailedClosed,
+  "Incomplete pricing configuration did not fail before a provider spend context could begin."
+);
+
 beginResearchSpendReservation({ id: "reservation-contract" }, environment);
 const first = reserveResearchProviderSpend({ input: "first", max_output_tokens: 1_000 }, environment);
 assert(first.active && first.providerRequestCount === 1, "The first provider request did not reserve spend.");
+assert(first.maximumRequestUSD > 0, "The provider reservation did not expose its bounded attempt allowance.");
 const second = reserveResearchProviderSpend({ input: "second", max_output_tokens: 1_000 }, environment);
 assert(second.providerRequestCount === 2, "The second provider request did not accumulate spend.");
 const third = reserveResearchProviderSpend({ input: "third", max_output_tokens: 1_000 }, environment);
@@ -88,6 +115,22 @@ const settled = endResearchSpendReservation();
 assert(settled.providerRequestCount === 3, "A normal three-stage Research turn did not complete.");
 assert(settled.pendingProviderReservationCount === 0, "Completed provider reservations remained pending.");
 assert(settled.reservedUSD === settled.actualUSD, "Completed requests retained their worst-case reservations.");
+
+beginResearchSpendReservation({ id: "unsettled-contract" }, environment);
+const unresolved = reserveResearchProviderSpend({ input: "unresolved", max_output_tokens: 1_000 }, environment);
+const unresolvedSettlement = settleResearchProviderSpend(unresolved, {
+  error: { code: "service_unavailable" }
+}, environment);
+assert(!unresolvedSettlement.settled, "Missing provider usage was incorrectly settled as zero cost.");
+const unresolvedEnded = endResearchSpendReservation();
+assert(
+  unresolvedEnded.pendingProviderReservationCount === 1,
+  "A failed attempt without usage did not retain its conservative cost reservation."
+);
+assert(
+  unresolvedEnded.reservedUSD === unresolved.maximumRequestUSD && unresolvedEnded.actualUSD === 0,
+  "Unresolved provider billing did not retain the exact bounded attempt allowance."
+);
 
 const unreserved = reserveResearchProviderSpend({ input: "unreserved", max_output_tokens: 100 }, environment);
 assert(!unreserved.active, "Missing telemetry context interrupted an otherwise valid provider request.");

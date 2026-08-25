@@ -28,8 +28,26 @@ function requestOptions(overrides = {}) {
     fetchImpl: async () => {
       fetchAttempts += 1;
       return fetchAttempts === 1
-        ? providerResponse(503, { error: { code: "service_unavailable" } })
-        : providerResponse(200, { id: "response-after-retry" });
+        ? providerResponse(503, {
+            model: "test-model",
+            error: { code: "service_unavailable" },
+            usage: {
+              input_tokens: 10,
+              input_tokens_details: { cached_tokens: 2 },
+              output_tokens: 3,
+              total_tokens: 13
+            }
+          })
+        : providerResponse(200, {
+            id: "response-after-retry",
+            model: "test-model",
+            usage: {
+              input_tokens: 20,
+              input_tokens_details: { cached_tokens: 5 },
+              output_tokens: 7,
+              total_tokens: 27
+            }
+          });
     },
     reserveEvaluationSpend: () => ({ active: true, reservationID: `evaluation-${++evaluationReservations}` }),
     settleEvaluationSpend: (reservation, payload) => {
@@ -37,7 +55,11 @@ function requestOptions(overrides = {}) {
       assert.equal(reservation.reservationID, `evaluation-${evaluationSettlements}`);
       assert(payload.error || payload.id);
     },
-    reserveProviderSpend: () => ({ active: true, reservationID: `request-${++providerReservations}` }),
+    reserveProviderSpend: () => ({
+      active: true,
+      reservationID: `request-${++providerReservations}`,
+      maximumRequestUSD: 0.05
+    }),
     settleProviderSpend: () => { providerSettlements += 1; }
   }));
   assert.equal(result.payload.id, "response-after-retry");
@@ -47,6 +69,37 @@ function requestOptions(overrides = {}) {
   assert.equal(evaluationSettlements, 2);
   assert.equal(providerReservations, 2);
   assert.equal(providerSettlements, 2);
+  assert.deepEqual(result.payload.usage, {
+    input_tokens: 30,
+    input_tokens_details: { cached_tokens: 7 },
+    output_tokens: 10,
+    total_tokens: 40
+  });
+  assert.deepEqual(result.payload.permitext_provider_accounting, {
+    attempts: 2,
+    unreconciled_cost_usd: 0
+  });
+}
+
+{
+  let fetchAttempts = 0;
+  const result = await requestResearchProvider(requestOptions({
+    fetchImpl: async () => {
+      fetchAttempts += 1;
+      return fetchAttempts === 1
+        ? providerResponse(503, { error: { code: "service_unavailable" } })
+        : providerResponse(200, {
+            id: "response-after-unreconciled-retry",
+            model: "test-model",
+            usage: { input_tokens: 12, output_tokens: 4, total_tokens: 16 }
+          });
+    },
+    reserveProviderSpend: () => ({ active: true, maximumRequestUSD: 0.05 })
+  }));
+  assert.equal(fetchAttempts, 2);
+  assert.equal(result.payload.usage.input_tokens, 12);
+  assert.equal(result.payload.permitext_provider_accounting.attempts, 2);
+  assert.equal(result.payload.permitext_provider_accounting.unreconciled_cost_usd, 0.05);
 }
 
 {
@@ -81,7 +134,8 @@ function requestOptions(overrides = {}) {
       assert.equal(error.providerCause, "invalid_request_error");
       assert.equal(error.providerRequestID, "req_test_400");
       assert.equal(error.providerAttempts, 1);
-      assert.equal(error.providerUsage, null);
+      assert.equal(error.providerUsage.permitext_provider_attempts, 1);
+      assert.equal(error.providerUsage.permitext_unreconciled_cost_usd, 0);
       return true;
     }
   );
@@ -94,11 +148,16 @@ function requestOptions(overrides = {}) {
     fetchImpl: async () => {
       fetchAttempts += 1;
       if (fetchAttempts === 1) throw new TypeError("temporary connection failure");
-      return providerResponse(200, { id: "network-recovered" });
-    }
+      return providerResponse(200, {
+        id: "network-recovered",
+        usage: { input_tokens: 8, output_tokens: 2, total_tokens: 10 }
+      });
+    },
+    reserveProviderSpend: () => ({ active: true, maximumRequestUSD: 0.04 })
   }));
   assert.equal(result.payload.id, "network-recovered");
   assert.equal(result.attempts, 2);
+  assert.equal(result.payload.permitext_provider_accounting.unreconciled_cost_usd, 0.04);
 }
 
 for (const name of ["TimeoutError", "AbortError"]) {
@@ -106,12 +165,18 @@ for (const name of ["TimeoutError", "AbortError"]) {
   const original = new DOMException(`${name} from test`, name);
   await assert.rejects(
     requestResearchProvider(requestOptions({
+      reserveProviderSpend: () => ({ active: true, maximumRequestUSD: 0.03 }),
       fetchImpl: async () => {
         fetchAttempts += 1;
         throw original;
       }
     })),
-    (error) => error === original
+    (error) => {
+      assert.equal(error, original);
+      assert.equal(error.providerAttempts, 1);
+      assert.equal(error.providerUsage.permitext_unreconciled_cost_usd, 0.03);
+      return true;
+    }
   );
   assert.equal(fetchAttempts, 1);
 }
@@ -137,6 +202,7 @@ for (const name of ["TimeoutError", "AbortError"]) {
   await assert.rejects(
     requestResearchProvider(requestOptions({
       maximumAttempts: 1,
+      reserveProviderSpend: () => ({ active: true, maximumRequestUSD: 0.06 }),
       fetchImpl: async () => providerResponse(502, {
         error: { code: "do not log this sentence" }
       }, { "x-request-id": "request id with spaces" })
@@ -145,6 +211,7 @@ for (const name of ["TimeoutError", "AbortError"]) {
       assert.equal(error.providerCause, "http_502");
       assert.equal(error.providerRequestID, null);
       assert.equal(error.providerAttempts, 1);
+      assert.equal(error.providerUsage.permitext_unreconciled_cost_usd, 0.06);
       return true;
     }
   );

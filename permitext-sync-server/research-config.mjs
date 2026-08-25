@@ -123,7 +123,7 @@ function maximumProviderRequestCost(requestBody, environment = process.env) {
 
 export function beginResearchSpendReservation(reservation, environment = process.env) {
   const guardrails = researchSpendGuardrails(environment);
-  if (!guardrails.enabled) {
+  if (!guardrails.ready) {
     const error = new Error("Research is temporarily unavailable.");
     error.code = "RESEARCH_SPEND_CAP";
     throw error;
@@ -144,17 +144,7 @@ export function reserveResearchProviderSpend(requestBody, environment = process.
   if (!context) {
     return { active: false, reservedUSD: 0, actualUSD: 0, providerRequestCount: 0 };
   }
-  let maximumRequestUSD;
-  try {
-    maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
-  } catch {
-    return {
-      active: false,
-      reservedUSD: context.reservedUSD,
-      actualUSD: context.actualUSD,
-      providerRequestCount: context.providerRequestCount
-    };
-  }
+  const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
   const nextReservedUSD = Number((context.reservedUSD + maximumRequestUSD).toFixed(6));
   context.reservedUSD = nextReservedUSD;
   context.providerRequestCount += 1;
@@ -163,6 +153,7 @@ export function reserveResearchProviderSpend(requestBody, environment = process.
   return {
     active: true,
     reservationID,
+    maximumRequestUSD,
     reservedUSD: context.reservedUSD,
     actualUSD: context.actualUSD,
     providerRequestCount: context.providerRequestCount
@@ -178,16 +169,29 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
     error.code = "RESEARCH_SPEND_CAP";
     throw error;
   }
-  const usage = providerPayload?.usage || {};
+  const usage = providerPayload?.usage;
+  const inputTokens = nonnegativeNumber(usage?.input_tokens);
+  const outputTokens = nonnegativeNumber(usage?.output_tokens);
+  if (inputTokens === null || outputTokens === null) {
+    return {
+      active: true,
+      reservationID: reservation.reservationID,
+      maximumRequestUSD,
+      reservedUSD: context.reservedUSD,
+      actualUSD: context.actualUSD,
+      providerRequestCount: context.providerRequestCount,
+      settled: false
+    };
+  }
   const actualCost = estimatedResearchCost({
-    inputTokens: usage.input_tokens,
+    inputTokens,
     cachedInputTokens: usage.input_tokens_details?.cached_tokens,
-    outputTokens: usage.output_tokens,
+    outputTokens,
     modelUsage: [{
       model: providerPayload?.model || null,
-      inputTokens: usage.input_tokens,
+      inputTokens,
       cachedInputTokens: usage.input_tokens_details?.cached_tokens,
-      outputTokens: usage.output_tokens
+      outputTokens
     }]
   }, environment).estimatedUSD;
   if (actualCost === null) {
@@ -204,9 +208,12 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
   return {
     active: true,
     reservationID: reservation.reservationID,
+    maximumRequestUSD,
     reservedUSD: context.reservedUSD,
     actualUSD: context.actualUSD,
-    providerRequestCount: context.providerRequestCount
+    providerRequestCount: context.providerRequestCount,
+    settledUSD: actualCost,
+    settled: true
   };
 }
 
@@ -278,6 +285,16 @@ export function estimatedResearchCost(usage, environment = process.env) {
   return {
     estimatedUSD: Number(estimatedUSD.toFixed(6)),
     pricingVersion: Array.from(versions).sort().join("+")
+  };
+}
+
+export function estimatedResearchCostWithProviderAllowance(usage, environment = process.env) {
+  const estimated = estimatedResearchCost(usage, environment);
+  if (estimated.estimatedUSD === null) return estimated;
+  const unreconciledProviderCostUSD = nonnegativeNumber(usage?.unreconciledProviderCostUSD) || 0;
+  return {
+    ...estimated,
+    estimatedUSD: Number((estimated.estimatedUSD + unreconciledProviderCostUSD).toFixed(6))
   };
 }
 

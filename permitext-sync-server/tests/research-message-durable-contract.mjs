@@ -26,6 +26,16 @@ assert.equal(
   "Research message handler still completes usage outside the durable commit."
 );
 assert.match(
+  messageHandlerSlice,
+  /estimatedResearchCostWithProviderAllowance\(result\.usage\)/,
+  "Research message handler does not persist unreconciled provider-attempt allowance in internal cost telemetry."
+);
+assert.match(
+  messageHandlerSlice,
+  /catch \(error\) \{[\s\S]*if \(researchReservationID && !researchReservationCompleted\) \{[\s\S]*await releaseResearchUsageReservation\(context\.userID, researchReservationID\)/,
+  "Research provider/customer failures no longer release the reserved customer turn."
+);
+assert.match(
   appSource,
   /async commitResearchConversationMessage\(userID/,
   "File/Postgres adapters missing commitResearchConversationMessage."
@@ -49,6 +59,21 @@ assert.ok(
     postgresTransactionIndex > postgresCommitIndex &&
     postCommitReservationCheckIndex > postgresTransactionIndex,
   "PostgreSQL Research commit no longer retains its defensive post-transaction reservation check."
+);
+
+const codeQuestionStart = appSource.indexOf("async function generateCodeQuestionAnalysis");
+const codeQuestionEnd = appSource.indexOf("async function handleCodeQuestionAnalysisCreate", codeQuestionStart);
+assert.ok(codeQuestionStart >= 0 && codeQuestionEnd > codeQuestionStart, "Could not locate Code Question Research analysis.");
+const codeQuestionSlice = appSource.slice(codeQuestionStart, codeQuestionEnd);
+assert.match(
+  codeQuestionSlice,
+  /estimatedResearchCostWithProviderAllowance\(result\.usage\)/,
+  "Code Question Research does not persist unreconciled provider-attempt allowance in internal cost telemetry."
+);
+assert.match(
+  codeQuestionSlice,
+  /catch \(error\) \{[\s\S]*if \(reserved && !completedReservation\) await releaseResearchUsageReservation\(actorUserID, reservationID\)/,
+  "Code Question provider/customer failures no longer release the reserved customer turn."
 );
 
 const reservationID = "reservation-1";
