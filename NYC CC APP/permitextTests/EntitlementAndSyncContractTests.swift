@@ -5213,6 +5213,25 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
 
         XCTAssertEqual(actions.map(\.title), ["Copy", "Share", "Research"])
         XCTAssertEqual(ReaderSelectionMenuBuilder.researchSystemImageName, "sparkle")
+        XCTAssertEqual(
+            ReaderSelectionMenuBuilder.selectableTextAccessibilityIdentifier,
+            "native-reader-enacted-text"
+        )
+    }
+
+    func testFirstUseResearchExampleAlwaysUsesBundledBuildingCodeTitle() throws {
+        let versions = BundleDatabaseLocator().availableCodeVersions()
+        let example = try XCTUnwrap(
+            FirstUseResearchExample.bundledBuildingCodeTitle(in: versions)
+        )
+
+        XCTAssertEqual(example.section.sectionNumber, "101.1")
+        XCTAssertEqual(example.codePrefix, "BC")
+        XCTAssertEqual(
+            UserContentSyncCodeVersion.server(try XCTUnwrap(example.codeVersion)),
+            UserContentSyncCodeVersion.canonicalNYC2022
+        )
+        XCTAssertFalse(example.officialText.isEmpty)
     }
 
     func testPhaseSixLinkResolverDecodesAuthoredTemplatesAndCrossCodeAnchors() throws {

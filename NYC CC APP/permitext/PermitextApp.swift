@@ -391,11 +391,13 @@ private struct Phase3EntitledResearchConfiguration {
     }
 
     static let launchArgument = "--phase3-entitled-research-fixture"
+    static let seededSelectionLaunchArgument = "--phase3-seeded-selection-fixture"
     private static let defaultsSuiteName = "com.randycodex.permitext.phase3-entitled-research"
     private static let temporaryDirectoryName = "permitext-phase3-entitled-research"
 
     let defaults: UserDefaults
     let cacheDirectoryURL: URL
+    let seedsReaderSelection: Bool
 
     @MainActor
     static func prepareIfRequested() -> PreparedHarness? {
@@ -452,6 +454,9 @@ private struct Phase3EntitledResearchConfiguration {
                     cacheDirectoryURL: testDirectory.appendingPathComponent(
                         "research-cache",
                         isDirectory: true
+                    ),
+                    seedsReaderSelection: ProcessInfo.processInfo.arguments.contains(
+                        seededSelectionLaunchArgument
                     )
                 ),
                 library: library
@@ -501,8 +506,11 @@ private struct Phase3EntitledResearchHarness: View {
                 .tag(AppTab.search)
 
             ResearchView(cacheDirectoryURL: configuration.cacheDirectoryURL)
-                .tabItem { Image(systemName: "sparkle") }
-                .accessibilityLabel("Research")
+                .tabItem {
+                    Image(systemName: "sparkle")
+                        .accessibilityLabel("Research")
+                        .accessibilityIdentifier("research-tab")
+                }
                 .tag(AppTab.research)
         }
         .overlay(alignment: .topTrailing) {
@@ -601,6 +609,15 @@ private struct Phase3EntitledResearchHarness: View {
         chapter = chapterOne
         initialSection = section1011
         isReady = true
+        if configuration.seedsReaderSelection,
+           let detail = library.loadSectionDetail(sectionID: section1011.id) {
+            library.sendToResearch(
+                ResearchSelectionRequest(
+                    sectionID: String(section1011.id),
+                    selectedText: detail.officialText
+                )
+            )
+        }
     }
 
     @MainActor
@@ -988,8 +1005,9 @@ private struct PermitextTabNavigation: View {
             ResearchView()
                 .tabItem {
                     Image(systemName: "sparkle")
+                        .accessibilityLabel("Research")
+                        .accessibilityIdentifier("research-tab")
                 }
-                .accessibilityLabel("Research")
                 .tag(AppTab.research)
         }
         .task {
@@ -1085,6 +1103,7 @@ private struct PermitextFirstUseSheet: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showsResearchExample = false
+    @State private var installedResearchExample: FirstUseResearchExample?
     let onContinue: (FirstUseDestination) -> Void
 
     var body: some View {
@@ -1167,6 +1186,12 @@ private struct PermitextFirstUseSheet: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .accessibilityIdentifier("phase5-first-use-sheet")
+        .task(id: bundledExampleSourceSignature) {
+            let versions = library.availableVersions
+            installedResearchExample = await Task.detached(priority: .userInitiated) {
+                FirstUseResearchExample.bundledBuildingCodeTitle(in: versions)
+            }.value
+        }
     }
 
     @ViewBuilder
@@ -1237,35 +1262,8 @@ private struct PermitextFirstUseSheet: View {
         return "What does \(installedResearchExample.citationLabel) establish?"
     }
 
-    private var installedResearchExample: FirstUseResearchExample? {
-        let codeSection = library.codeSections.first(where: {
-            $0.name.localizedCaseInsensitiveContains("building")
-        }) ?? library.codeSections.first
-        guard let codeSection,
-              let chapter = library.chapters(for: codeSection.id).first(where: {
-                  $0.chapterNumber == "1"
-              }) ?? library.chapters(for: codeSection.id).first,
-              let section = library.sections(for: chapter).first(where: {
-                  $0.sectionNumber == "101.1"
-              }) ?? library.sections(for: chapter).first,
-              let detail = library.loadSectionDetail(sectionID: section.id)
-        else { return nil }
-
-        return FirstUseResearchExample(
-            section: section,
-            officialText: detail.officialText,
-            codePrefix: codePrefix(for: codeSection.name),
-            codeVersion: library.selectedVersion?.codeVersion
-        )
-    }
-
-    private func codePrefix(for codeSectionName: String) -> String {
-        let normalized = codeSectionName.lowercased()
-        if normalized.contains("building") { return "BC" }
-        if normalized.contains("fuel gas") { return "FGC" }
-        if normalized.contains("mechanical") { return "MC" }
-        if normalized.contains("plumbing") { return "PC" }
-        return "Code"
+    private var bundledExampleSourceSignature: [String] {
+        library.availableVersions.map(\.fileName)
     }
 
     private func firstUseBenefit(title: String, detail: String, symbol: String) -> some View {
@@ -1286,11 +1284,43 @@ private struct PermitextFirstUseSheet: View {
     }
 }
 
-private struct FirstUseResearchExample {
+struct FirstUseResearchExample: Sendable {
     let section: CodeSectionSummary
     let officialText: String
     let codePrefix: String
     let codeVersion: String?
+
+    static func bundledBuildingCodeTitle(
+        in versions: [BundledCodeVersion]
+    ) -> FirstUseResearchExample? {
+        guard let constructionVersion = versions.first(where: {
+            UserContentSyncCodeVersion.server($0.codeVersion) ==
+                UserContentSyncCodeVersion.canonicalNYC2022
+        }),
+        let authoredCodeID = constructionVersion.authoredCodeID,
+        let jurisdictionID = constructionVersion.jurisdictionID,
+        let store = try? AuthoredCodeStore(
+            jsonURL: constructionVersion.fileURL,
+            codeID: authoredCodeID,
+            jurisdictionID: jurisdictionID
+        ),
+        let buildingCode = store.codeSections().first(where: {
+            $0.name.caseInsensitiveCompare("BUILDING CODE") == .orderedSame
+        }),
+        let section = try? store.sectionSummary(
+            sectionNumber: "101.1",
+            codeSectionID: buildingCode.id
+        ),
+        let detail = store.sectionDetail(sectionID: section.id)
+        else { return nil }
+
+        return FirstUseResearchExample(
+            section: section,
+            officialText: detail.officialText,
+            codePrefix: "BC",
+            codeVersion: constructionVersion.codeVersion
+        )
+    }
 
     var citationLabel: String {
         "\(codePrefix) § \(section.sectionNumber) · \(section.displayTitle)"

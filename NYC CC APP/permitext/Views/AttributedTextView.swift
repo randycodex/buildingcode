@@ -8,6 +8,7 @@ extension Notification.Name {
 
 enum ReaderSelectionMenuBuilder {
     static let researchSystemImageName = "sparkle"
+    static let selectableTextAccessibilityIdentifier = "native-reader-enacted-text"
 
     static func menu(
         selectedText: String,
@@ -217,6 +218,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
         textView.textContainerInset = .zero
         textView.textContainer.lineFragmentPadding = 0
         textView.adjustsFontForContentSizeCategory = true
+        updateAccessibility(for: textView)
         textView.delegate = context.coordinator
         textView.attachmentTapHandler = { image in
             context.coordinator.onOpenImage?(image)
@@ -247,6 +249,7 @@ private struct AttributedTextContainer: UIViewRepresentable {
             context.coordinator.onSelectionChange?(hasSelection)
         }
         uiView.isAuxiliaryTapHandlingEnabled = onOpenImage != nil || onContentTap != nil
+        updateAccessibility(for: uiView)
 
         let contentSizeCategory = uiView.traitCollection.preferredContentSizeCategory
         if context.coordinator.requiresTextUpdate(
@@ -266,6 +269,17 @@ private struct AttributedTextContainer: UIViewRepresentable {
                 contentSizeCategory: contentSizeCategory
             )
         }
+    }
+
+    private func updateAccessibility(for textView: RichTextView) {
+        guard onResearchSelection != nil else {
+            textView.accessibilityIdentifier = nil
+            textView.accessibilityLabel = nil
+            return
+        }
+
+        textView.accessibilityIdentifier = ReaderSelectionMenuBuilder.selectableTextAccessibilityIdentifier
+        textView.accessibilityLabel = attributedText.string.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: RichTextView, context: Context) -> CGSize? {
