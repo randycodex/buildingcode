@@ -188,6 +188,13 @@ import {
 } from "./research-config.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
 import {
+  researchEscalationModel,
+  researchModelRoutingConfiguration,
+  researchModelRoutingVersion,
+  researchQuestionIsBoundedCitationLookup,
+  routeResearchAnswerModel
+} from "./research-model-routing.mjs";
+import {
   discoverRelevantEvidence,
   evidenceDiscoveryVersion,
   evidenceDiscoveryFeatureEnabled,
@@ -7456,7 +7463,10 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const configuration = researchModelConfiguration();
+  const configuration = {
+    ...researchModelConfiguration(),
+    ...(options.model ? { model: options.model } : {})
+  };
   const schema = structuredClone(researchEvidenceAnalysisSchema);
   const sourceIDs = evidence.map((source) => source.sourceID);
   for (const collection of researchEvidenceAnalysisCollections) {
@@ -7547,7 +7557,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
       options.validUserFacts || options.projectContextFacts || []
     ),
     model: payload.model || configuration.model,
-    usage: researchUsageFromProviderPayload(payload)
+    usage: researchUsageFromProviderPayload(payload, configuration.model)
   };
 }
 
@@ -7684,22 +7694,30 @@ function outputTextFromResponse(response) {
   throw error;
 }
 
-function researchUsageFromProviderPayload(payload) {
-  return {
+function researchUsageFromProviderPayload(payload, requestedModel = null) {
+  const usage = {
     inputTokens: Number(payload?.usage?.input_tokens || 0),
     cachedInputTokens: Number(payload?.usage?.input_tokens_details?.cached_tokens || 0),
     outputTokens: Number(payload?.usage?.output_tokens || 0),
     totalTokens: Number(payload?.usage?.total_tokens || 0)
   };
+  return {
+    ...usage,
+    modelUsage: [{ model: payload?.model || requestedModel || null, ...usage }]
+  };
 }
 
 function combinedResearchUsage(...entries) {
-  return entries.filter(Boolean).reduce((total, entry) => ({
-    inputTokens: total.inputTokens + Number(entry.inputTokens || 0),
-    cachedInputTokens: total.cachedInputTokens + Number(entry.cachedInputTokens || 0),
-    outputTokens: total.outputTokens + Number(entry.outputTokens || 0),
-    totalTokens: total.totalTokens + Number(entry.totalTokens || 0)
-  }), { inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, totalTokens: 0 });
+  return entries.filter(Boolean).reduce((total, entry) => {
+    const modelUsage = Array.isArray(entry.modelUsage) ? entry.modelUsage : [];
+    return {
+      inputTokens: total.inputTokens + Number(entry.inputTokens || 0),
+      cachedInputTokens: total.cachedInputTokens + Number(entry.cachedInputTokens || 0),
+      outputTokens: total.outputTokens + Number(entry.outputTokens || 0),
+      totalTokens: total.totalTokens + Number(entry.totalTokens || 0),
+      modelUsage: [...total.modelUsage, ...modelUsage]
+    };
+  }, { inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, totalTokens: 0, modelUsage: [] });
 }
 
 function webSourcesFromProviderPayload(payload) {
@@ -7739,7 +7757,10 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   if (!apiKey) {
     return { summary: "", sources: [], usage: combinedResearchUsage(), searched: false };
   }
-  const configuration = researchModelConfiguration();
+  const configuration = {
+    ...researchModelConfiguration(),
+    ...(options.model ? { model: options.model } : {})
+  };
   const allowedDomains = policyConfiguration.officialDomains;
   const requestBody = {
     model: configuration.model,
@@ -7811,7 +7832,7 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
         role: source.sourceRole,
         retrievedAt: new Date().toISOString()
       })),
-    usage: researchUsageFromProviderPayload(payload),
+    usage: researchUsageFromProviderPayload(payload, configuration.model),
     searched: true,
     sanitizedQuery,
     sourcePolicyVersion: researchSourcePolicyVersion
@@ -8155,7 +8176,10 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const baseConfiguration = researchModelConfiguration();
+  const baseConfiguration = {
+    ...researchModelConfiguration(),
+    ...(options.model ? { model: options.model } : {})
+  };
   const conversational = options.responseStyle === "conversational";
   const configuration = conversational
     ? {
@@ -8266,7 +8290,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     requestedModel: model,
     model: payload.model || model,
     configuration,
-    usage: researchUsageFromProviderPayload(payload)
+    usage: researchUsageFromProviderPayload(payload, model)
   };
 }
 
@@ -8339,7 +8363,10 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const configuration = researchModelConfiguration();
+  const configuration = {
+    ...researchModelConfiguration(),
+    ...(options.model ? { model: options.model } : {})
+  };
   const evidenceText = evidence.map((source) => [
     `PASSAGE_ID: ${source.sourceID}`,
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
@@ -8438,7 +8465,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
   return {
     result: validateResearchVerification(value),
     model: payload.model || configuration.model,
-    usage: researchUsageFromProviderPayload(payload)
+    usage: researchUsageFromProviderPayload(payload, configuration.model)
   };
 }
 
@@ -16059,6 +16086,20 @@ async function handleInternalEvaluationReview(request, response) {
   });
 }
 
+export function researchRequestMessageIdentity(userID, conversationID, requestID) {
+  const normalizedRequestID = normalizedResearchText(requestID, 100);
+  if (!normalizedRequestID) return null;
+  return `research-${createHash("sha256")
+    .update(`${userID}\u0000${conversationID}\u0000${normalizedRequestID}`)
+    .digest("hex")}`;
+}
+
+export function researchRequestReservationID(userID, conversationID, requestID) {
+  const identity = researchRequestMessageIdentity(userID, conversationID, requestID);
+  if (!identity) throw new Error("Research usage reservation requires a request identifier.");
+  return `${identity}:usage`;
+}
+
 async function commitProjectContextOnlyResearchMessage({
   context,
   conversation,
@@ -16069,6 +16110,11 @@ async function commitProjectContextOnlyResearchMessage({
   researchRequestID,
   progressResponse
 }) {
+  const requestIdentity = researchRequestMessageIdentity(
+    context.userID,
+    conversation.id,
+    researchRequestID
+  );
   const projectContextCapturedAt = new Date().toISOString();
   const generated = researchProjectContextOnlyInterpretation({ question, projectInformation });
   const { selectedFacts, ...interpretation } = generated;
@@ -16083,14 +16129,14 @@ async function commitProjectContextOnlyResearchMessage({
   progressResponse.progress("preparing_conclusion", "active");
 
   const userMessage = {
-    id: randomUUID(),
+    id: requestIdentity ? `${requestIdentity}:question` : randomUUID(),
     role: "user",
     question,
     createdAt: now,
     ...(researchRequestID ? { researchRequestID } : {})
   };
   const assistantMessage = {
-    id: randomUUID(),
+    id: requestIdentity ? `${requestIdentity}:answer` : randomUUID(),
     role: "assistant",
     createdAt: now,
     ...(researchRequestID ? { researchRequestID } : {}),
@@ -16134,7 +16180,10 @@ async function commitProjectContextOnlyResearchMessage({
         regenerated: false,
         history: []
       },
-      disclaimer: "Project-context summary; not an official code or zoning determination."
+      authorityStatus: "project_context",
+      authorityLabel: "Project facts only",
+      sourceAsOf: projectContextCapturedAt,
+      disclaimer: "Project-context summary—not an official code or zoning determination. Verify source records and Project facts before relying on it."
     }
   };
   progressResponse.progress("preparing_conclusion", "completed");
@@ -16258,16 +16307,39 @@ async function handleResearchConversationMessage(request, response) {
     context.body.progressStream === "ndjson"
   );
   const researchRequestID = normalizedResearchText(context.body.requestID, 100);
+  const mockMode = researchMockMode();
+  if (!mockMode && !researchRequestID) {
+    progressResponse.json(400, {
+      error: "Research requires a request identifier so retries cannot consume another turn.",
+      code: "RESEARCH_REQUEST_ID_REQUIRED"
+    });
+    return;
+  }
+  const priorRequestMessage = researchRequestID
+    ? (conversation.messages || []).find((message) =>
+        message.researchRequestID === researchRequestID || message.requestID === researchRequestID
+      )
+    : null;
+  if (
+    priorRequestMessage?.role === "user" &&
+    normalizedResearchText(priorRequestMessage.question, 2_000) !== question
+  ) {
+    progressResponse.json(409, {
+      error: "That Research request identifier was already used for a different question.",
+      code: "RESEARCH_REQUEST_ID_CONFLICT"
+    });
+    return;
+  }
   const replayedAnswer = researchRequestID
     ? (conversation.messages || []).find((message) =>
-        message.role === "assistant" && message.researchRequestID === researchRequestID
+        message.role === "assistant" &&
+        (message.researchRequestID === researchRequestID || message.requestID === researchRequestID)
       )
     : null;
   if (replayedAnswer) {
     for (const stage of replayedAnswer.researchProgress?.stages || []) {
       if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
     }
-    const mockMode = researchMockMode();
     progressResponse.json(200, {
       conversation: await researchConversationForClient(conversation, { userID: context.userID }),
       usage: await researchUsageForClient(
@@ -16390,7 +16462,6 @@ async function handleResearchConversationMessage(request, response) {
       ...claim,
       claimRole: "governing"
     }));
-    const mockMode = researchMockMode();
     const requestLimit = monthlyResearchRequestLimit();
     if (!mockMode) {
       const spendGuardrails = researchSpendGuardrails();
@@ -16399,7 +16470,11 @@ async function handleResearchConversationMessage(request, response) {
         error.code = "RESEARCH_SPEND_CAP";
         throw error;
       }
-      researchReservationID = randomUUID();
+      researchReservationID = researchRequestReservationID(
+        context.userID,
+        conversation.id,
+        researchRequestID
+      );
       researchReservationCreatedAt = new Date().toISOString();
       const reservation = await reserveResearchUsage(context.userID, {
         id: researchReservationID,
@@ -16413,6 +16488,14 @@ async function handleResearchConversationMessage(request, response) {
       });
       if (!reservation.reserved) {
         researchReservationID = null;
+        if (reservation.reason === "duplicate") {
+          progressResponse.json(409, {
+            error: "This Research question is already being processed. Its reserved turn will not be charged twice.",
+            code: "RESEARCH_REQUEST_IN_PROGRESS",
+            requestID: researchRequestID
+          });
+          return;
+        }
         const usage = await researchUsageForClient(
           context.userID,
           context.authContext.entitlement
@@ -16453,24 +16536,45 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const webSupportRequested = shouldUseResearchWebSupport({
+    const boundedCitationLookup = researchQuestionIsBoundedCitationLookup(question);
+    const webSupportRequested = !boundedCitationLookup && shouldUseResearchWebSupport({
       question,
       outsideLibraryRequired: Boolean(evidencePackage.discovery?.outsideCurrentLibrary?.length)
     });
-    const webSupport = !mockMode && webSupportRequested
-      ? await openAIResearchWebSupport(question, context.userID, {
-          retrievalQuery: question,
-          signal: progressResponse.signal
-        })
-      : {
-          summary: "",
-          sources: [],
-          usage: combinedResearchUsage(),
-          searched: false,
-          sourcePolicyVersion: researchSourcePolicyVersion
-        };
-    const evidenceAnalysisResult = mockMode
-      ? {
+    const modelRouting = routeResearchAnswerModel({
+      question,
+      evidence: assembledEvidence,
+      requiredClaims,
+      codeBasis: answerCodeBasis,
+      webSupportRequested
+    });
+    const accurateModel = researchEscalationModel(modelRouting);
+    const runEvidenceAnalysis = async (model) => openAIResearchEvidenceAnalysis(
+      question,
+      assembledEvidence,
+      context.userID,
+      {
+        messages: conversation.messages,
+        projectContextFacts: combinedProjectFacts,
+        conversationFactContext,
+        validUserFacts,
+        retrievalLimitations: turnRetrievalLimitations,
+        codeBasis: answerCodeBasis,
+        requiredClaims,
+        model,
+        signal: progressResponse.signal
+      }
+    );
+    const emptyWebSupport = {
+      summary: "",
+      sources: [],
+      usage: combinedResearchUsage(),
+      searched: false,
+      sourcePolicyVersion: researchSourcePolicyVersion
+    };
+    let evidenceAnalysisEscalated = false;
+    const evidenceAnalysisPromise = mockMode
+      ? Promise.resolve({
           analysis: mockResearchEvidenceAnalysis(
             assembledEvidence,
             validUserFacts,
@@ -16478,19 +16582,44 @@ async function handleResearchConversationMessage(request, response) {
           ),
           model: "permitext-mock",
           usage: combinedResearchUsage()
-        }
-      : await openAIResearchEvidenceAnalysis(question, assembledEvidence, context.userID, {
-          messages: conversation.messages,
-          projectContextFacts: combinedProjectFacts,
-          conversationFactContext,
-          validUserFacts,
-          retrievalLimitations: turnRetrievalLimitations,
-          codeBasis: answerCodeBasis,
-          requiredClaims,
-          signal: progressResponse.signal
+        })
+      : runEvidenceAnalysis(modelRouting.configuration.evidenceAnalysisModel).catch(async (error) => {
+          if (
+            modelRouting.configuration.mode !== "hybrid" ||
+            modelRouting.configuration.evidenceAnalysisModel === accurateModel ||
+            ["RESEARCH_CANCELLED", "AbortError", "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP"].includes(error?.code || error?.name)
+          ) throw error;
+          evidenceAnalysisEscalated = true;
+          return runEvidenceAnalysis(accurateModel);
         });
+    const webSupportPromise = !mockMode && webSupportRequested
+      ? openAIResearchWebSupport(question, context.userID, {
+          retrievalQuery: question,
+          model: modelRouting.configuration.webSupportModel,
+          signal: progressResponse.signal
+        })
+      : Promise.resolve(emptyWebSupport);
+    // Web guidance and enacted-evidence organization are independent. Running
+    // them together shortens the turn without removing either quality gate.
+    const [webSupport, evidenceAnalysisResult] = await Promise.all([
+      webSupportPromise,
+      evidenceAnalysisPromise
+    ]);
     progressResponse.progress("checking_citation_support", "completed");
     progressResponse.progress("preparing_conclusion", "active");
+    let answerEscalated = false;
+    const interpretationOptions = {
+      selections,
+      messages: conversation.messages,
+      projectContextFacts: combinedProjectFacts,
+      conversationFactContext,
+      responseStyle: "conversational",
+      structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+      webSupport,
+      codeBasis: answerCodeBasis,
+      requiredClaims,
+      signal: progressResponse.signal
+    };
     let result = mockMode
       ? {
           interpretation: validateResearchInterpretation(mockResearchInterpretation(question, assembledEvidence, {
@@ -16506,16 +16635,19 @@ async function handleResearchConversationMessage(request, response) {
           usage: combinedResearchUsage()
         }
       : await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
-          selections,
-          messages: conversation.messages,
-          projectContextFacts: combinedProjectFacts,
-          conversationFactContext,
-          responseStyle: "conversational",
-          structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
-          webSupport,
-          codeBasis: answerCodeBasis,
-          requiredClaims,
-          signal: progressResponse.signal
+          ...interpretationOptions,
+          model: modelRouting.model
+        }).catch(async (error) => {
+          if (
+            modelRouting.tier !== "fast" ||
+            modelRouting.model === accurateModel ||
+            ["RESEARCH_CANCELLED", "AbortError", "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP"].includes(error?.code || error?.name)
+          ) throw error;
+          answerEscalated = true;
+          return openAIResearchInterpretation(question, assembledEvidence, context.userID, {
+            ...interpretationOptions,
+            model: accurateModel
+          });
         });
     let verificationAttempts = [];
     let evidenceBoundaryFallback = false;
@@ -16583,18 +16715,11 @@ async function handleResearchConversationMessage(request, response) {
     } else {
       for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
         if (attempt > 0) {
+          answerEscalated ||= result.requestedModel !== accurateModel;
           const revised = await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
-            selections,
-            messages: conversation.messages,
-            projectContextFacts: combinedProjectFacts,
-            conversationFactContext,
-            responseStyle: "conversational",
-            structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
-            webSupport,
-            codeBasis: answerCodeBasis,
-            requiredClaims,
+            ...interpretationOptions,
+            model: accurateModel,
             revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts),
-            signal: progressResponse.signal
           });
           answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
           result = revised;
@@ -16640,6 +16765,7 @@ async function handleResearchConversationMessage(request, response) {
             webSupport,
             codeBasis: answerCodeBasis,
             requiredClaims,
+            model: modelRouting.configuration.verificationModel,
             signal: progressResponse.signal
           }
         );
@@ -16667,7 +16793,17 @@ async function handleResearchConversationMessage(request, response) {
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
     progressResponse.progress("preparing_conclusion", "completed");
-    const disclaimer = "AI-generated research assistance, not an official code determination.";
+    const authorityStatus = evidenceBoundaryFallback
+      ? "insufficient_evidence"
+      : result.interpretation.missingFacts?.length
+        ? "conditional"
+        : "supported_by_enacted_text";
+    const authorityLabel = authorityStatus === "insufficient_evidence"
+      ? "Insufficient enacted evidence"
+      : authorityStatus === "conditional"
+        ? "Conditional on Project facts"
+        : "Supported by enacted text";
+    const disclaimer = "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.";
     const materialAssembledEvidence = assembledEvidence.filter((section) =>
       !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole)
     );
@@ -16675,14 +16811,18 @@ async function handleResearchConversationMessage(request, response) {
       section?.evidencePriority?.evidenceRole === "contextual"
     );
     const userMessage = {
-      id: randomUUID(),
+      id: researchRequestID
+        ? `${researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID)}:question`
+        : randomUUID(),
       role: "user",
       question,
       createdAt: now,
       ...(researchRequestID ? { researchRequestID } : {})
     };
     const assistantMessage = {
-      id: randomUUID(),
+      id: researchRequestID
+        ? `${researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID)}:answer`
+        : randomUUID(),
       role: "assistant",
       createdAt: now,
       ...(researchRequestID ? { researchRequestID } : {}),
@@ -16761,6 +16901,20 @@ async function handleResearchConversationMessage(request, response) {
           attempts: verificationAttempts.length,
           regenerated: verificationAttempts.length > 1,
           history: verificationAttempts
+        },
+        authorityStatus,
+        authorityLabel,
+        sourceAsOf: answerCodeBasis.resolvedAt,
+        routing: {
+          version: researchModelRoutingVersion,
+          mode: modelRouting.configuration.mode,
+          answerTier: modelRouting.tier,
+          reasons: modelRouting.reasons,
+          evidenceAnalysisModel: evidenceAnalysisResult.model,
+          requestedAnswerModel: modelRouting.model,
+          actualAnswerModel: result.model,
+          verificationModel: modelRouting.configuration.verificationModel,
+          escalated: evidenceAnalysisEscalated || answerEscalated
         },
         disclaimer
       }
@@ -16863,6 +17017,10 @@ async function handleResearchConversationMessage(request, response) {
       usageEntry: mockMode ? null : {
         model: result.model,
         requestedModel: result.requestedModel || result.model,
+        routingVersion: researchModelRoutingVersion,
+        routingMode: modelRouting.configuration.mode,
+        answerTier: modelRouting.tier,
+        escalated: evidenceAnalysisEscalated || answerEscalated,
         mode: "openai",
         ...result.usage,
         promptVersion: result.configuration.promptVersion,
@@ -16979,7 +17137,7 @@ async function handleResearchConversationMessage(request, response) {
       const providerUnavailable = ["RESEARCH_PROVIDER_ERROR", "RESEARCH_VERIFIER_ERROR", "TimeoutError"]
         .includes(failureCode);
       progressResponse.error(502, providerUnavailable
-        ? "Terra's research service is temporarily unavailable. Your question is still here."
+        ? "Permitext Research is temporarily unavailable. Your question is still here."
         : "The research model could not return a verified, cited answer.", {
         code: failureCode
       });

@@ -1139,7 +1139,8 @@ async function askEvaluationQuestion(baseURL, account, conversationID, question)
     body: {
       auth: { accountUserID: account.appUserID },
       conversationID,
-      question
+      question,
+      requestID: randomUUID()
     }
   });
   const answerTimeMilliseconds = Math.round(performance.now() - startedAt);

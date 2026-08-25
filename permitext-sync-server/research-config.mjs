@@ -34,13 +34,24 @@ function nonnegativeNumber(value) {
   return Number.isFinite(number) && number >= 0 ? number : null;
 }
 
-function researchPricing(environment = process.env) {
-  return {
+function researchPricing(environment = process.env, model = null) {
+  const base = {
     inputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS),
     cachedInputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS),
     outputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS),
     pricingVersion: String(environment.PERMITEXT_RESEARCH_PRICING_VERSION || "").trim()
   };
+  const fastModel = String(environment.PERMITEXT_RESEARCH_FAST_MODEL || "").trim();
+  if (!model || !fastModel || String(model).trim() !== fastModel) return base;
+  const fast = {
+    inputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS),
+    cachedInputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS),
+    outputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS),
+    pricingVersion: String(environment.PERMITEXT_RESEARCH_FAST_PRICING_VERSION || "").trim()
+  };
+  return fast.inputRate !== null && fast.cachedInputRate !== null && fast.outputRate !== null && fast.pricingVersion
+    ? fast
+    : base;
 }
 
 export function researchSpendGuardrails(environment = process.env) {
@@ -97,7 +108,7 @@ export function researchSpendGuardrails(environment = process.env) {
 }
 
 function maximumProviderRequestCost(requestBody, environment = process.env) {
-  const pricing = researchPricing(environment);
+  const pricing = researchPricing(environment, requestBody?.model);
   const maxOutputTokens = nonnegativeNumber(requestBody?.max_output_tokens);
   if (pricing.inputRate === null || pricing.outputRate === null || !pricing.pricingVersion || !maxOutputTokens) {
     const error = new Error("Research model requests require versioned pricing and a positive max_output_tokens ceiling.");
@@ -171,7 +182,13 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
   const actualCost = estimatedResearchCost({
     inputTokens: usage.input_tokens,
     cachedInputTokens: usage.input_tokens_details?.cached_tokens,
-    outputTokens: usage.output_tokens
+    outputTokens: usage.output_tokens,
+    modelUsage: [{
+      model: providerPayload?.model || null,
+      inputTokens: usage.input_tokens,
+      cachedInputTokens: usage.input_tokens_details?.cached_tokens,
+      outputTokens: usage.output_tokens
+    }]
   }, environment).estimatedUSD;
   if (actualCost === null) {
     const error = new Error("Research provider usage could not be reconciled against versioned pricing.");
@@ -238,17 +255,29 @@ export function validatePaidResearchEvaluationEnvironment(environment = process.
 }
 
 export function estimatedResearchCost(usage, environment = process.env) {
-  const { inputRate, cachedInputRate, outputRate, pricingVersion } = researchPricing(environment);
-  if (inputRate === null || cachedInputRate === null || outputRate === null || !pricingVersion) {
-    return { estimatedUSD: null, pricingVersion: null };
+  const entries = Array.isArray(usage?.modelUsage) && usage.modelUsage.length
+    ? usage.modelUsage
+    : [usage || {}];
+  let estimatedUSD = 0;
+  const versions = new Set();
+  for (const entry of entries) {
+    const { inputRate, cachedInputRate, outputRate, pricingVersion } = researchPricing(
+      environment,
+      entry?.model
+    );
+    if (inputRate === null || cachedInputRate === null || outputRate === null || !pricingVersion) {
+      return { estimatedUSD: null, pricingVersion: null };
+    }
+    const inputTokens = nonnegativeNumber(entry?.inputTokens) || 0;
+    const cachedInputTokens = Math.min(inputTokens, nonnegativeNumber(entry?.cachedInputTokens) || 0);
+    const uncachedInputTokens = inputTokens - cachedInputTokens;
+    const outputTokens = nonnegativeNumber(entry?.outputTokens) || 0;
+    estimatedUSD += (uncachedInputTokens * inputRate + cachedInputTokens * cachedInputRate + outputTokens * outputRate) / 1_000_000;
+    versions.add(pricingVersion);
   }
-  const inputTokens = nonnegativeNumber(usage?.inputTokens) || 0;
-  const cachedInputTokens = Math.min(inputTokens, nonnegativeNumber(usage?.cachedInputTokens) || 0);
-  const uncachedInputTokens = inputTokens - cachedInputTokens;
-  const outputTokens = nonnegativeNumber(usage?.outputTokens) || 0;
   return {
-    estimatedUSD: Number(((uncachedInputTokens * inputRate + cachedInputTokens * cachedInputRate + outputTokens * outputRate) / 1_000_000).toFixed(6)),
-    pricingVersion
+    estimatedUSD: Number(estimatedUSD.toFixed(6)),
+    pricingVersion: Array.from(versions).sort().join("+")
   };
 }
 
@@ -362,7 +391,13 @@ export function settleResearchEvaluationSpend(reservation, providerPayload, envi
   const actualCost = estimatedResearchCost({
     inputTokens,
     cachedInputTokens: usage?.input_tokens_details?.cached_tokens,
-    outputTokens
+    outputTokens,
+    modelUsage: [{
+      model: providerPayload?.model || null,
+      inputTokens,
+      cachedInputTokens: usage?.input_tokens_details?.cached_tokens,
+      outputTokens
+    }]
   }, environment).estimatedUSD;
   if (actualCost === null) {
     const error = new Error("Paid evaluation usage could not be reconciled against versioned pricing.");

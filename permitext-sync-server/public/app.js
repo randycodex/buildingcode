@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260824-project-context-research-v2";
+} from "./offline-storage.js?v=20260824-hybrid-research-trust-v4";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260824-project-context-research-v2";
+} from "./research-intent-state.js?v=20260824-hybrid-research-trust-v4";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15421,6 +15421,13 @@ function renderResearchInterpretation(container, result, options = {}) {
 
   const card = document.createElement("article");
   card.className = "analysis-card research-result-card";
+  if (result.authorityLabel) {
+    const authority = document.createElement("p");
+    authority.className = "research-authority-status";
+    authority.dataset.authorityStatus = result.authorityStatus || "";
+    authority.textContent = result.authorityLabel;
+    card.append(authority);
+  }
   appendResearchAnswerNarrative(card, result);
 
   const codeBasis = result.codeBasis || null;
@@ -15431,7 +15438,12 @@ function renderResearchInterpretation(container, result, options = {}) {
   if (codeBasisText) {
     const codeDisclosure = document.createElement("p");
     codeDisclosure.className = "research-answer-code-basis";
-    codeDisclosure.textContent = codeBasisText;
+    const sourceAsOf = result.sourceAsOf && Number.isFinite(Date.parse(result.sourceAsOf))
+      ? new Date(result.sourceAsOf).toLocaleDateString()
+      : "";
+    codeDisclosure.textContent = [codeBasisText, sourceAsOf ? `Research basis captured ${sourceAsOf}` : ""]
+      .filter(Boolean)
+      .join(" · ");
     if (codeBasis?.limitation) codeDisclosure.title = codeBasis.limitation;
     card.append(codeDisclosure);
   }
@@ -17376,6 +17388,21 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
   await execute(false);
 }
 
+function researchComposerDisclosure() {
+  const disclosure = document.createElement("p");
+  disclosure.className = "research-composer-disclosure";
+  disclosure.append(document.createTextNode(
+    "Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI for generation. Do not include confidential or unnecessary personal information. "
+  ));
+  const privacyLink = document.createElement("a");
+  privacyLink.href = "/privacy";
+  privacyLink.target = "_blank";
+  privacyLink.rel = "noopener noreferrer";
+  privacyLink.textContent = "Privacy";
+  disclosure.append(privacyLink);
+  return disclosure;
+}
+
 function renderNewResearchComposer(container, researchEnabled) {
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
@@ -17478,7 +17505,7 @@ function renderNewResearchComposer(container, researchEnabled) {
     }
   });
   composerBox.append(input, sendButton);
-  form.append(projectField, composerBox, status);
+  form.append(projectField, researchComposerDisclosure(), composerBox, status);
   container.append(form);
 }
 
@@ -19355,7 +19382,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     });
   });
   composerBox.append(input, sendButton);
-  composer.append(composerBox, status);
+  composer.append(researchComposerDisclosure(), composerBox, status);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);

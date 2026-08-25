@@ -70,15 +70,29 @@
         Apple for in-app purchases; Stripe for web subscriptions and one-time Research turn packs; Vercel for application hosting and
         private file storage; and Neon for hosted PostgreSQL storage.
         When paid Research generation is enabled, Permitext also uses OpenAI for user-requested
-        Research responses. Those requests send the question and the evidence selected for that
-        request to OpenAI, and Permitext requests that generated API responses not be stored through
-        the Responses API. Each provider also processes information under its own terms and privacy
-        practices.
+        Research responses. A Research request can send the question, recent conversation messages,
+        selected and Permitext-retrieved enacted evidence, current Project facts, established or
+        hypothetical conversation facts, structured evidence analysis, and any separately identified
+        supporting official-web context needed to generate and verify the answer. Private notes are
+        not included. Permitext uses the Responses API with <code>store: false</code>, so the generated
+        response is not stored for later API retrieval. OpenAI's default API policy states that API
+        data is not used to train its models unless the API account owner opts in, and that abuse-
+        monitoring logs may be retained for up to 30 days unless longer retention is legally required.
+        These controls and provider practices may change; see
+        <a href="https://platform.openai.com/docs/models/default-usage-policies-by-endpoint" target="_blank" rel="noopener noreferrer">OpenAI's current data-controls policy</a>.
+        Each provider also processes information under its own terms and privacy practices.
       </p>
       <p>
         For Research, Permitext grounds code conclusions in applicable enacted text and cites the
         sources used. Supporting sources are identified separately, and private notes are excluded
         from Research evidence sent for generation.
+      </p>
+      <p>
+        When Research requests an official-web search, Permitext removes email addresses, phone
+        numbers, personal or client names, and street addresses from the search query before limiting
+        that search to configured official domains. This search-query protection is separate from the
+        core Research generation described above, which may include current Project facts when you
+        assign the conversation to a Project.
       </p>
 
       <h2>Local and hosted storage</h2>
@@ -109,6 +123,36 @@
         When a Clerk-authenticated account is deleted from the web or iOS app, the client also asks
         Clerk to delete its Permitext sign-in identity.
       </p>
+      <div class="retention-table-wrap">
+        <table>
+          <caption>Retention summary</caption>
+          <thead>
+            <tr><th>Information</th><th>Typical retention</th><th>Deletion behavior</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Account and synchronized workspace content</td>
+              <td>While the Permitext account is active and as needed to provide the service</td>
+              <td>Removed from active Permitext storage through account deletion, subject to temporary backups and legal obligations</td>
+            </tr>
+            <tr>
+              <td>Research conversations and answers</td>
+              <td>Until you remove the conversation or delete the account</td>
+              <td>Removed from active Permitext storage with the selected conversation or account</td>
+            </tr>
+            <tr>
+              <td>OpenAI Research request data</td>
+              <td>Response storage is disabled; default abuse-monitoring logs may remain for up to 30 days</td>
+              <td>Controlled by OpenAI's API retention policy; approved Zero Data Retention controls may differ</td>
+            </tr>
+            <tr>
+              <td>Purchase-ownership and fraud-prevention records</td>
+              <td>As needed to prevent replay or fraud and restore qualifying purchases</td>
+              <td>A minimal record may remain after account deletion</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <h2>Your choices</h2>
       <p>

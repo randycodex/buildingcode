@@ -63,6 +63,40 @@ li {
   color: var(--secondary);
 }
 
+code {
+  color: var(--text);
+}
+
+.retention-table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--secondary);
+  font-size: 0.9rem;
+}
+
+caption {
+  margin-bottom: 8px;
+  color: var(--text);
+  font-weight: 700;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 25%, transparent);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  color: var(--text);
+}
+
 ul,
 ol {
   padding-left: 1.25rem;

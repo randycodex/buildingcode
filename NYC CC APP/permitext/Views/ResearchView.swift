@@ -61,18 +61,18 @@ struct ResearchRequestFailurePresentation: Equatable {
             switch urlError.code {
             case .timedOut:
                 return retainedQuestion(
-                    "Terra is taking longer than expected. Permitext checked for a completed answer but did not find one yet."
+                    "Research is taking longer than expected. Permitext checked for a completed answer but did not find one yet."
                 )
             case .notConnectedToInternet, .networkConnectionLost:
                 return retainedQuestion("Research could not connect to the internet.")
             case .cancelled:
                 return retainedQuestion("Research was cancelled.")
             default:
-                return retainedQuestion("Research could not reach Terra.")
+                return retainedQuestion("Permitext could not reach the Research service.")
             }
         }
 
-        return retainedQuestion("Research could not reach Terra.")
+        return retainedQuestion("Permitext could not reach the Research service.")
     }
 
     private static func resolve(
@@ -114,10 +114,10 @@ struct ResearchRequestFailurePresentation: Equatable {
             return retainedQuestion("Research was cancelled.")
         case let value? where verificationCodes.contains(value):
             return retainedQuestion(
-                "Terra produced a response, but Permitext could not verify it against the enacted evidence."
+                "A Research model produced a response, but Permitext could not verify it against the enacted evidence."
             )
         case let value? where providerCodes.contains(value):
-            return retainedQuestion("Terra's research service is temporarily unavailable.")
+            return retainedQuestion("Permitext's Research service is temporarily unavailable.")
         default:
             break
         }
@@ -129,19 +129,19 @@ struct ResearchRequestFailurePresentation: Equatable {
         if error.statusCode == 502,
            serverMessage?.localizedCaseInsensitiveContains("verified") == true {
             return retainedQuestion(
-                "Terra produced a response, but Permitext could not verify it against the enacted evidence."
+                "A Research model produced a response, but Permitext could not verify it against the enacted evidence."
             )
         }
 
         if let statusCode = error.statusCode, statusCode >= 500 {
-            return retainedQuestion("Terra's research service is temporarily unavailable.")
+            return retainedQuestion("Permitext's Research service is temporarily unavailable.")
         }
 
         if let serverMessage, !serverMessage.isEmpty {
             return retainedQuestion(serverMessage)
         }
 
-        return retainedQuestion("Research could not reach Terra.")
+        return retainedQuestion("Permitext could not reach the Research service.")
     }
 
     private static func retainedQuestion(_ explanation: String) -> ResearchRequestFailurePresentation {
@@ -254,7 +254,7 @@ struct ResearchView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Terra will use the destination Project’s current facts for future answers. Existing answers keep their original evidence and context.")
+                Text("Permitext Research will use the destination Project’s current facts for future answers. Existing answers keep their original evidence and context.")
             }
             .alert(
                 "Delete Research conversation?",
@@ -511,7 +511,7 @@ struct ResearchView: View {
                         if conversation.messages.isEmpty,
                            pendingQuestionAttempt == nil,
                            failedQuestionAttempt == nil {
-                            Text("Ask Terra a question about the selected enacted text or the current Project.")
+                            Text("Ask a question about the selected enacted text or the current Project.")
                                 .font(.body)
                                 .foregroundStyle(.secondary)
                                 .padding(.top, 36)
@@ -544,13 +544,20 @@ struct ResearchView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("research-composer-trust-boundary")
+            HStack(spacing: 3) {
+                Text("Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Do not include confidential or unnecessary personal information.")
+                Link("Privacy", destination: URL(string: "https://permitext.com/privacy")!)
+            }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .accessibilityIdentifier("research-composer-privacy-disclosure")
             if let composerBlockMessage {
                 Text(composerBlockMessage)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             HStack(alignment: .bottom, spacing: 10) {
-                TextField("Ask Terra…", text: $question, axis: .vertical)
+                TextField("Ask a Research question…", text: $question, axis: .vertical)
                     .textFieldStyle(.plain)
                     .lineLimit(1...6)
                     .padding(.horizontal, 14)
@@ -757,7 +764,7 @@ struct ResearchView: View {
             HStack(spacing: 7) {
                 ProgressView()
                     .controlSize(.small)
-                Text("Terra is researching…")
+                Text("Permitext is researching…")
             }
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -1074,7 +1081,7 @@ struct ResearchView: View {
             errorMessage = nil
             questionErrorMessage = nil
         } catch {
-            // A network timeout can arrive after Terra has completed on the
+            // A network timeout can arrive after Research has completed on the
             // server. Reconcile before offering a retry; the same request ID
             // makes a retry idempotent if the first response was merely lost.
             if let authoritative = await completedConversationAfterLostResponse(
@@ -1213,7 +1220,7 @@ private struct ResearchVisualReviewSheet: View {
                     VStack(alignment: .leading, spacing: 7) {
                         Text("Review official visual evidence")
                             .font(.title2.weight(.bold))
-                        Text("This enacted section contains official visual material. Select only the images Terra should analyze with your passage.")
+                        Text("This enacted section contains official visual material. Select only the images Permitext should analyze with your passage.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Text("Select up to \(review.maximumVisualSelections) official images.")
@@ -1337,12 +1344,22 @@ private struct ResearchAnswerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(answer.conclusion)
-                .font(.body.weight(.semibold))
+            if let authorityLabel = answer.authorityLabel, !authorityLabel.isEmpty {
+                Text(authorityLabel)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(Color.secondary.opacity(0.12), in: Capsule())
+                    .accessibilityIdentifier("research-answer-authority-status")
+            }
+            Text(primaryNarrative)
+                .font(.body)
                 .textSelection(.enabled)
-            if !answer.explanation.isEmpty {
-                Text(answer.explanation)
-                    .font(.body)
+            if let basisText {
+                Text(basisText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                     .textSelection(.enabled)
             }
             if !answer.citations.isEmpty {
@@ -1417,6 +1434,25 @@ private struct ResearchAnswerView: View {
                 .accessibilityIdentifier("research-answer")
                 .allowsHitTesting(false)
         }
+    }
+
+    private var primaryNarrative: String {
+        if let answerText = answer.answerText?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !answerText.isEmpty {
+            return answerText
+        }
+        return [answer.conclusion, answer.explanation]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n\n")
+    }
+
+    private var basisText: String? {
+        let captured = answer.sourceAsOf.map { String($0.prefix(10)) }
+        let parts = [answer.codeEdition, captured.map { "Research basis captured \($0)" }]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
     private var hasEvidenceDetails: Bool {

@@ -1140,7 +1140,7 @@ struct ProjectView: View {
                 kind: "researchAnswer",
                 referenceID: answer.id,
                 label: answer.question,
-                detail: "Terra Research"
+                detail: "Permitext Research"
             )
         }
         return evidence + research
