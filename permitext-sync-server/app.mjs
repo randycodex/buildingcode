@@ -17047,6 +17047,18 @@ async function handleResearchConversationMessage(request, response) {
       user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
       mode: mockMode ? "mock" : "openai",
       model: result.model,
+      requestedModel: result.requestedModel || modelRouting.model,
+      routingMode: modelRouting.configuration.mode,
+      answerTier: modelRouting.tier,
+      routingReasons: modelRouting.reasons,
+      evidenceAnalysisModel: evidenceAnalysisResult.model,
+      verificationModel: modelRouting.configuration.verificationModel,
+      escalated: evidenceAnalysisEscalated || answerEscalated,
+      modelUsage: Array.from(new Set(
+        (result.usage.modelUsage || []).map((entry) => entry.model).filter(Boolean)
+      )),
+      estimatedCostUSD: estimatedCost.estimatedUSD,
+      pricingVersion: estimatedCost.pricingVersion,
       conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
       evidenceSections: new Set(assembledEvidence.map((section) => section.sectionID)).size,
       evidencePassages: assembledEvidence.length,
