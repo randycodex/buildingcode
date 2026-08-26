@@ -5,6 +5,13 @@ import {
   hasActiveResearchEntitlement,
   researchEntitlementMode
 } from "./entitlement-contract.mjs";
+import {
+  canonicalResearchOfficialGuidanceNarrative,
+  classifyResearchWebSource,
+  researchOfficialGuidanceAuthorityStatement,
+  researchOfficialGuidanceEnactedBoundary,
+  researchSourcePolicyConfiguration
+} from "./research-source-policy.mjs";
 
 export const projectFoundationSchemaVersion = 1;
 export const syncSchemaVersion = 2;
@@ -618,7 +625,80 @@ export function immutableResearchAnswer({
     Array.isArray(answer?.evidenceLimitations) && answer.evidenceLimitations.some((item) =>
       /does not (?:interpret|determine)|not (?:a|an) (?:code|zoning|legal)/i.test(String(item || ""))
     );
-  if (researchEvidence.length < 1 && !projectContextAnswer) {
+  const supportingSourceUses = Array.isArray(answer?.supportingSourceUses)
+    ? answer.supportingSourceUses
+    : [];
+  const supportingSources = Array.isArray(answer?.supportingSources)
+    ? answer.supportingSources
+    : [];
+  const supportingSourceIdentities = supportingSourceUses.map((use) =>
+    `${String(use?.sourceID || "").trim()}\u0000${String(use?.claimID || "").trim()}`
+  );
+  const sourcePolicy = researchSourcePolicyConfiguration();
+  const canonicalGuidanceSources =
+    supportingSourceUses.length > 0 &&
+    supportingSources.length === supportingSourceUses.length &&
+    new Set(supportingSourceIdentities).size === supportingSourceIdentities.length &&
+    supportingSourceUses.every((use, index) => {
+      const source = supportingSources[index];
+      return (
+        typeof use?.sourceID === "string" && use.sourceID.trim().length > 0 &&
+        typeof use?.claimID === "string" && use.claimID.trim().length > 0 &&
+        typeof use?.claim === "string" && use.claim.trim().length > 0 &&
+        source?.id === use.sourceID &&
+        source?.authorityClass === "official_guidance" &&
+        source?.role === "supporting" &&
+        source?.controlling === false &&
+        source?.claim === use.claim &&
+        classifyResearchWebSource(source, {
+          officialDomains: sourcePolicy.officialDomains
+        }).sourceClassification === "official_guidance" &&
+        Array.isArray(source?.attributedClaims) &&
+        source.attributedClaims.length === 1 &&
+        source.attributedClaims[0]?.id === use.claimID &&
+        source.attributedClaims[0]?.text === use.claim
+      );
+    });
+  const canonicalGuidanceNarrative = canonicalResearchOfficialGuidanceNarrative(
+    supportingSourceUses.map((use) => use.claim)
+  );
+  const structuredGuidanceAnalysis = answer?.structuredEvidenceAnalysis;
+  const emptyStructuredGuidanceAnalysis =
+    structuredGuidanceAnalysis &&
+    [
+      "controllingProvisions", "generalRules", "exceptions", "conditions",
+      "limitations", "definitions", "crossReferences", "tables",
+      "userPinnedEvidence", "permitextDiscoveredEvidence", "projectFactsUsed",
+      "unresolvedProjectFacts", "evidenceLimitations", "highValueFollowUpQuestions"
+    ].every((key) => Array.isArray(structuredGuidanceAnalysis[key]) && structuredGuidanceAnalysis[key].length === 0);
+  const emptyGuidanceFactUsage =
+    answer?.factUsage &&
+    ["projectContext", "conversation", "other"].every((key) =>
+      Array.isArray(answer.factUsage[key]) && answer.factUsage[key].length === 0
+    );
+  const officialSupportingGuidanceAnswer =
+    answer?.authorityStatus === "official_supporting_guidance" &&
+    answer?.authorityLabel === "Official supporting guidance — noncontrolling" &&
+    answer?.retrieval?.allowOfficialGuidanceOnly === true &&
+    answer?.verification?.status === "passed" &&
+    answer?.verification?.pass === true &&
+    answer?.answerText === canonicalGuidanceNarrative.answerText &&
+    answer?.conclusion === researchOfficialGuidanceAuthorityStatement &&
+    answer?.explanation === canonicalGuidanceNarrative.explanation &&
+    Array.isArray(answer?.supportedPoints) && answer.supportedPoints.length === 0 &&
+    Array.isArray(answer?.citations) && answer.citations.length === 0 &&
+    researchCitations.length === 0 &&
+    Array.isArray(answer?.assumptions) && answer.assumptions.length === 0 &&
+    Array.isArray(answer?.missingFacts) && answer.missingFacts.length === 0 &&
+    Array.isArray(answer?.followUpQuestions) && answer.followUpQuestions.length === 0 &&
+    Array.isArray(answer?.additionalEvidenceNeeded) && answer.additionalEvidenceNeeded.length === 0 &&
+    Array.isArray(answer?.evidenceLimitations) &&
+    answer.evidenceLimitations.length === 1 &&
+    answer.evidenceLimitations[0] === researchOfficialGuidanceEnactedBoundary &&
+    canonicalGuidanceSources &&
+    emptyStructuredGuidanceAnalysis &&
+    emptyGuidanceFactUsage;
+  if (researchEvidence.length < 1 && !projectContextAnswer && !officialSupportingGuidanceAnswer) {
     throw new Error("Research answers require evidence.");
   }
   const evidenceBoundaryAnswer =
@@ -632,7 +712,12 @@ export function immutableResearchAnswer({
     Array.isArray(answer?.citations) && answer.citations.length === 0 &&
     Array.isArray(answer?.supportingSources) && answer.supportingSources.length === 0 &&
     Array.isArray(answer?.supportingSourceUses) && answer.supportingSourceUses.length === 0;
-  if (researchCitations.length < 1 && !evidenceBoundaryAnswer && !projectContextAnswer) {
+  if (
+    researchCitations.length < 1 &&
+    !evidenceBoundaryAnswer &&
+    !projectContextAnswer &&
+    !officialSupportingGuidanceAnswer
+  ) {
     throw new Error("Research answers require citations.");
   }
   const evidenceIDs = new Set(researchEvidence.map((item) => item.id));

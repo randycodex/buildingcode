@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  canonicalResearchOfficialGuidanceNarrative,
   classifyResearchWebSource,
   extractResearchOfficialDocumentReferences,
   normalizeResearchOfficialDomains,
@@ -12,6 +13,16 @@ import {
 } from "../research-source-policy.mjs";
 
 assert.match(researchSourcePolicyVersion, /^\d{8}-supporting-web-v\d+$/);
+assert.deepEqual(
+  canonicalResearchOfficialGuidanceNarrative(["Same claim.", "Same   claim."]),
+  {
+    claims: ["Same claim."],
+    authorityStatement: "Official supporting guidance — noncontrolling and not an enacted-code conclusion.",
+    enactedBoundary: "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below.",
+    explanation: "- Same claim.",
+    answerText: "Official supporting guidance — noncontrolling and not an enacted-code conclusion.\n\n- Same claim."
+  }
+);
 
 assert.equal(researchSourcePolicyConfiguration({}).webSupportEnabled, true);
 for (const disabledValue of ["0", "false", "OFF", "disabled", "no"]) {

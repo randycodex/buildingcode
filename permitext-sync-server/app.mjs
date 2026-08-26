@@ -211,6 +211,7 @@ import {
   researchEvidenceStrategyForTurn
 } from "./research-evidence-assembly.mjs";
 import {
+  canonicalResearchOfficialGuidanceNarrative,
   normalizeResearchWebSources,
   researchSourcePolicyVersion,
   researchSourcePolicyConfiguration,
@@ -8503,25 +8504,31 @@ export function finalizeResearchGuidanceOnlyInterpretation(
     interpretation.citations?.length ||
     !interpretation.supportingSources?.length
   ) return interpretation;
-  const sourceClaims = Array.from(new Set(interpretation.supportingSources
-    .map((source) => String(source?.claim || "").replace(/\s+/g, " ").trim())
-    .filter(Boolean)));
-  if (!sourceClaims.length) return interpretation;
-  const authorityStatement =
-    "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
-  const enactedBoundary =
-    "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below.";
-  const explanation = sourceClaims.map((claim) => `- ${claim}`).join("\n");
+  const narrative = canonicalResearchOfficialGuidanceNarrative(
+    interpretation.supportingSources.map((source) => source?.claim)
+  );
+  if (!narrative.claims.length) return interpretation;
+  const supportingSources = interpretation.supportingSourceUses.map((use) => {
+    const source = interpretation.supportingSources.find((candidate) =>
+      candidate?.id === use.sourceID && candidate?.claim === use.claim
+    );
+    return {
+      ...source,
+      attributedClaims: [{ id: use.claimID, text: use.claim }],
+      claim: use.claim
+    };
+  });
   return {
     ...interpretation,
-    answerText: `${authorityStatement}\n\n${explanation}`,
-    conclusion: authorityStatement,
-    explanation,
+    answerText: narrative.answerText,
+    conclusion: narrative.authorityStatement,
+    explanation: narrative.explanation,
     assumptions: [],
     missingFacts: [],
     followUpQuestions: [],
-    evidenceLimitations: [enactedBoundary],
-    additionalEvidenceNeeded: []
+    evidenceLimitations: [narrative.enactedBoundary],
+    additionalEvidenceNeeded: [],
+    supportingSources
   };
 }
 
@@ -8534,6 +8541,30 @@ export function researchFollowUpQuestionsForResponse(
   return interpretation?.followUpQuestions?.length
     ? interpretation.followUpQuestions
     : evidenceAnalysis?.highValueFollowUpQuestions || [];
+}
+
+export function researchEvidenceAnalysisForResponse(
+  evidenceAnalysis,
+  { supportingGuidanceOnly = false } = {}
+) {
+  if (!supportingGuidanceOnly) return evidenceAnalysis;
+  return {
+    ...evidenceAnalysis,
+    controllingProvisions: [],
+    generalRules: [],
+    exceptions: [],
+    conditions: [],
+    limitations: [],
+    definitions: [],
+    crossReferences: [],
+    tables: [],
+    userPinnedEvidence: [],
+    permitextDiscoveredEvidence: [],
+    projectFactsUsed: [],
+    unresolvedProjectFacts: [],
+    evidenceLimitations: [],
+    highValueFollowUpQuestions: []
+  };
 }
 
 async function openAIResearchInterpretation(question, evidence, userID, options = {}) {
@@ -17415,9 +17446,14 @@ async function handleResearchConversationMessage(request, response) {
             result.interpretation.citations.map((citation) => citation.corpusID).filter(Boolean)
           ).size
         },
-        structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+        structuredEvidenceAnalysis: researchEvidenceAnalysisForResponse(
+          evidenceAnalysisResult.analysis,
+          { supportingGuidanceOnly }
+        ),
         factUsage: researchFactUsageDisclosure({
-          factsUsed: evidenceAnalysisResult.analysis.projectFactsUsed,
+          factsUsed: supportingGuidanceOnly
+            ? []
+            : evidenceAnalysisResult.analysis.projectFactsUsed,
           projectFacts: combinedProjectFacts,
           conversationFactContext
         }),

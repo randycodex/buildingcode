@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {
   accumulatedResearchVerificationIssues,
   finalizeResearchGuidanceOnlyInterpretation,
+  researchEvidenceAnalysisForResponse,
   researchFollowUpQuestionsForResponse,
   researchInputForEvidence,
   researchInterpretationSchemaForEvidence,
@@ -287,6 +288,25 @@ assert.deepEqual(
   [],
   "Response assembly must not reintroduce model-generated follow-ups after guidance-only finalization."
 );
+const safeGuidanceOnlyAnalysis = researchEvidenceAnalysisForResponse({
+  controllingProvisions: [{ summary: "An invented governing rule." }],
+  generalRules: [{ summary: "An invented general rule." }],
+  exceptions: [{ summary: "An invented exception." }],
+  conditions: [{ summary: "An invented condition." }],
+  limitations: [{ summary: "An invented limitation." }],
+  definitions: [{ summary: "An invented definition." }],
+  crossReferences: [{ summary: "An invented cross-reference." }],
+  tables: [{ summary: "An invented table value." }],
+  userPinnedEvidence: ["invented-user-source"],
+  permitextDiscoveredEvidence: ["invented-discovered-source"],
+  projectFactsUsed: ["An invented Project fact."],
+  unresolvedProjectFacts: ["An invented unresolved fact."],
+  evidenceLimitations: ["An invented analysis limitation."],
+  highValueFollowUpQuestions: ["An invented analysis follow-up?"]
+}, { supportingGuidanceOnly: true });
+for (const values of Object.values(safeGuidanceOnlyAnalysis)) {
+  assert.deepEqual(values, []);
+}
 assert.equal(evaluateResearchWebAttribution({
   question: "What does current official NYC DOB guidance say about annual boiler inspections?",
   answer: finalizedWebOnly,

@@ -299,6 +299,157 @@ const immutableAnswer = immutableResearchAnswer({
 });
 assert.equal(immutableAnswer.immutable, true);
 assert.deepEqual(immutableAnswer.passageToCitationMapping[0].evidenceSnapshotIDs, ["evidence-1"]);
+const officialGuidanceClaim = "Registered low-pressure boilers listed by DOB require annual inspections.";
+const officialGuidanceAuthority = "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
+const officialGuidanceExplanation = `- ${officialGuidanceClaim}`;
+const officialGuidanceBoundary = "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below.";
+const emptyGuidanceAnalysis = {
+  controllingProvisions: [],
+  generalRules: [],
+  exceptions: [],
+  conditions: [],
+  limitations: [],
+  definitions: [],
+  crossReferences: [],
+  tables: [],
+  userPinnedEvidence: [],
+  permitextDiscoveredEvidence: [],
+  projectFactsUsed: [],
+  unresolvedProjectFacts: [],
+  evidenceLimitations: [],
+  highValueFollowUpQuestions: []
+};
+const officialGuidanceInputAnswer = {
+  answerText: `${officialGuidanceAuthority}\n\n${officialGuidanceExplanation}`,
+  conclusion: officialGuidanceAuthority,
+  explanation: officialGuidanceExplanation,
+  authorityStatus: "official_supporting_guidance",
+  authorityLabel: "Official supporting guidance — noncontrolling",
+  supportedPoints: [],
+  assumptions: [],
+  missingFacts: [],
+  followUpQuestions: [],
+  evidenceLimitations: [officialGuidanceBoundary],
+  additionalEvidenceNeeded: [],
+  citations: [],
+  retrieval: { allowOfficialGuidanceOnly: true },
+  verification: { status: "passed", pass: true },
+  structuredEvidenceAnalysis: emptyGuidanceAnalysis,
+  factUsage: { schemaVersion: 1, projectContext: [], conversation: [], other: [] },
+  supportingSourceUses: [{
+    sourceID: "web-source-boiler",
+    claimID: "web-claim-boiler",
+    claim: officialGuidanceClaim
+  }],
+  supportingSources: [{
+    id: "web-source-boiler",
+    url: "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page",
+    title: "Boiler Compliance",
+    publisher: "NYC Department of Buildings",
+    attributedClaims: [{ id: "web-claim-boiler", text: officialGuidanceClaim }],
+    authorityClass: "official_guidance",
+    role: "supporting",
+    controlling: false,
+    claim: officialGuidanceClaim
+  }]
+};
+const officialGuidanceAnswer = immutableResearchAnswer({
+  id: "answer-official-guidance",
+  owner,
+  conversationID: "conversation-official-guidance",
+  question: "What does current official DOB boiler guidance say?",
+  evidence: [],
+  answer: officialGuidanceInputAnswer,
+  citations: [],
+  model: "permitext-test",
+  researchSystemVersion: "prompt-1:evidence-1:official-web-v1",
+  createdAt
+});
+assert.deepEqual(officialGuidanceAnswer.citations, []);
+assert.deepEqual(officialGuidanceAnswer.passageToCitationMapping, []);
+const duplicateClaimGuidanceInput = structuredClone(officialGuidanceInputAnswer);
+duplicateClaimGuidanceInput.supportingSourceUses.push({
+  sourceID: "web-source-boiler-duplicate",
+  claimID: "web-claim-boiler-duplicate",
+  claim: officialGuidanceClaim
+});
+duplicateClaimGuidanceInput.supportingSources.push({
+  ...structuredClone(officialGuidanceInputAnswer.supportingSources[0]),
+  id: "web-source-boiler-duplicate",
+  url: "https://www.nyc.gov/site/buildings/safety/boiler-faq.page",
+  attributedClaims: [{ id: "web-claim-boiler-duplicate", text: officialGuidanceClaim }]
+});
+const duplicateClaimGuidanceAnswer = immutableResearchAnswer({
+  id: "answer-official-guidance-duplicate-claim",
+  owner,
+  conversationID: "conversation-official-guidance-duplicate-claim",
+  question: "What do two current official DOB boiler pages say?",
+  evidence: [],
+  answer: duplicateClaimGuidanceInput,
+  citations: [],
+  model: "permitext-test",
+  researchSystemVersion: "prompt-1:evidence-1:official-web-v1",
+  createdAt
+});
+assert.equal(duplicateClaimGuidanceAnswer.answer.explanation, officialGuidanceExplanation);
+let unsafeGuidanceCounter = 0;
+function assertRejectsUnsafeOfficialGuidance(mutate, message) {
+  const unsafeAnswer = structuredClone(officialGuidanceInputAnswer);
+  mutate(unsafeAnswer);
+  unsafeGuidanceCounter += 1;
+  assert.throws(
+    () => immutableResearchAnswer({
+      id: `answer-unsafe-guidance-${unsafeGuidanceCounter}`,
+      owner,
+      conversationID: `conversation-unsafe-guidance-${unsafeGuidanceCounter}`,
+      question: "What does current official DOB boiler guidance say?",
+      evidence: [],
+      answer: unsafeAnswer,
+      citations: [],
+      model: "permitext-test",
+      researchSystemVersion: "prompt-1:evidence-1:official-web-v1",
+      createdAt
+    }),
+    /require evidence/,
+    message
+  );
+}
+assertRejectsUnsafeOfficialGuidance(
+  (answer) => { answer.authorityLabel = "Supported by enacted text"; },
+  "Citation-free official guidance must retain the exact authority label."
+);
+assertRejectsUnsafeOfficialGuidance(
+  (answer) => { answer.answerText += "\n\nAn unbound extra conclusion."; },
+  "Citation-free official guidance must reject extra unbound prose."
+);
+assertRejectsUnsafeOfficialGuidance(
+  (answer) => { answer.supportingSources.push(structuredClone(answer.supportingSources[0])); },
+  "Citation-free official guidance must reject an extra unreferenced source."
+);
+assertRejectsUnsafeOfficialGuidance(
+  (answer) => { answer.supportingSources[0].url = "https://nyc.gov.evil.example/boiler"; },
+  "Citation-free official guidance must reject a spoofed official host."
+);
+assertRejectsUnsafeOfficialGuidance(
+  (answer) => { answer.evidenceLimitations.push("An unbound extra limitation."); },
+  "Citation-free official guidance must reject extra limitations."
+);
+assert.throws(
+  () => immutableResearchAnswer({
+    id: "answer-unsafe-guidance-citation",
+    owner,
+    conversationID: "conversation-unsafe-guidance-citation",
+    question: "What does current official DOB boiler guidance say?",
+    evidence: [],
+    answer: officialGuidanceInputAnswer,
+    citations: [{ sectionID: "x", sourceIDs: ["unknown"] }],
+    model: "permitext-test",
+    researchSystemVersion: "prompt-1:evidence-1:official-web-v1",
+    createdAt
+  }),
+  /require evidence|not backed/,
+  "Official guidance must not accept an unbound enacted citation."
+);
 assert.throws(
   () => immutableResearchAnswer({
     owner,

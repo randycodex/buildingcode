@@ -1,5 +1,28 @@
 export const researchSourcePolicyVersion = "20260825-supporting-web-v4";
 
+export const researchOfficialGuidanceAuthorityStatement =
+  "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
+export const researchOfficialGuidanceEnactedBoundary =
+  "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below.";
+
+export function canonicalResearchOfficialGuidanceNarrative(values = []) {
+  const claims = Array.from(new Set(
+    (Array.isArray(values) ? values : [])
+      .map((value) => normalizedText(value).replace(/\s+/g, " "))
+      .filter(Boolean)
+  ));
+  const explanation = claims.map((claim) => `- ${claim}`).join("\n");
+  return {
+    claims,
+    authorityStatement: researchOfficialGuidanceAuthorityStatement,
+    enactedBoundary: researchOfficialGuidanceEnactedBoundary,
+    explanation,
+    answerText: explanation
+      ? `${researchOfficialGuidanceAuthorityStatement}\n\n${explanation}`
+      : researchOfficialGuidanceAuthorityStatement
+  };
+}
+
 export const defaultResearchOfficialDomains = Object.freeze([
   "nyc.gov",
   "rules.cityofnewyork.us"
