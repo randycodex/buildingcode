@@ -235,4 +235,20 @@ const contextualVanityAnswer = evaluateResearchAnswerQuality({
 });
 assert.equal(contextualVanityAnswer.pass, true);
 
+const implicitSectionVanityAnswer = evaluateResearchAnswerQuality({
+  question: "Does this section prove that HCR requires a vanity in the bathroom?",
+  evidence: vanityEvidence,
+  answer: {
+    answerText: "No. It permits a lavatory location and does not establish an HCR vanity requirement.",
+    supportedPoints: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }],
+    citations: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }]
+  }
+});
+assert.equal(implicitSectionVanityAnswer.pass, false);
+assert.deepEqual(
+  implicitSectionVanityAnswer.missingTypeBNYCContextSourceIDs,
+  ["bc-type-b-nyc-toilet-room"],
+  "Pinned-section questions must retain their governing Type B+NYC scope even when the user says only this section."
+);
+
 console.log("Permitext Research answer-quality and evidence-economy contract passed.");

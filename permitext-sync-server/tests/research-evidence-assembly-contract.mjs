@@ -104,6 +104,40 @@ const canonicalSections = new Map([
     title: "Bulk modifications",
     canonicalText: "The special permit provisions are set forth in ZR Sections 73-621 through 73-624."
   }],
+  ["deep-pinned", {
+    sectionID: "deep-pinned",
+    codePrefix: "BC",
+    sectionNumber: "1107.2.2.7.2.2",
+    title: "Forward approach",
+    canonicalText: "A forward approach shall be provided at the water closet. See Table 1006.3.2.",
+    crossReferences: [{
+      sectionID: "prose-table",
+      codePrefix: "BC",
+      sectionNumber: "1006.3.2",
+      referenceKind: "table"
+    }]
+  }],
+  ["ancestor-clearance", {
+    sectionID: "ancestor-clearance",
+    codePrefix: "BC",
+    sectionNumber: "1107.2.2.7.2",
+    title: "Clearance",
+    canonicalText: "Clearance shall be provided around the water closet."
+  }],
+  ["ancestor-water-closet", {
+    sectionID: "ancestor-water-closet",
+    codePrefix: "BC",
+    sectionNumber: "1107.2.2.7",
+    title: "Water closet",
+    canonicalText: "At least one water closet shall comply with this section."
+  }],
+  ["ancestor-type-b-nyc", {
+    sectionID: "ancestor-type-b-nyc",
+    codePrefix: "BC",
+    sectionNumber: "1107.2.2",
+    title: "Type B+NYC unit toilet and bathing rooms",
+    canonicalText: "Where toilet and bathing rooms are provided in a Type B+NYC dwelling unit or sleeping unit, the applicable fixtures shall comply with Sections 1107.2.2.1 through 1107.2.2.9."
+  }],
   ...["73-621", "73-622", "73-623", "73-624"].map((sectionNumber) => [
     `zr-${sectionNumber}`,
     {
@@ -490,6 +524,34 @@ assert(
   adaptivePinnedOnly.sources.every((source) => source.origin !== "permitext_discovered"),
   "Pinned-first assembly unexpectedly included broad discovered evidence."
 );
+
+const pinnedAncestorContext = await assembleResearchEvidence({
+  question: "What does the selected forward-approach rule require for this project?",
+  pinnedEvidence: [{
+    sectionID: "deep-pinned",
+    codePrefix: "BC",
+    sectionNumber: "1107.2.2.7.2.2"
+  }],
+  strategy: {
+    mode: researchEvidenceStrategies.pinnedFirst,
+    reason: "reader_question_bounded_to_selected_evidence"
+  },
+  discover: async () => ({ candidates: [] }),
+  resolveSection,
+  limits: { maximumCrossReferences: 3, maximumCharacters: 4_000 }
+});
+const ancestorContextSources = pinnedAncestorContext.sources.filter((source) =>
+  source.origin === "permitext_cross_reference"
+);
+assert.deepEqual(
+  ancestorContextSources.map((source) => source.sectionNumber),
+  ["1107.2.2.7.2", "1107.2.2.7", "1107.2.2"],
+  "Deeply nested pinned evidence must include its nearest governing ancestor scopes."
+);
+assert.match(ancestorContextSources[2].title, /Type B\+NYC/);
+assert.match(ancestorContextSources[2].relationship, /Governing ancestor scope/);
+assert.equal(ancestorContextSources[2].evidencePriority.claimCoverageRequired, false);
+assert.equal(pinnedAncestorContext.usage.crossReferenceCount, 3);
 
 canonicalSections.set("passage-only", {
   sectionID: "passage-only",

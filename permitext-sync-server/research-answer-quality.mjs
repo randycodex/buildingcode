@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260824-answer-evidence-economy-applicability-v5";
+  "20260826-answer-ancestor-scope-applicability-v6";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -130,8 +130,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       : [];
   const hcrVanityQuestion =
     /\bHCR\b/i.test(question) &&
-    /\bvanity\b/i.test(question) &&
-    /\b1107\.2\.2\.7\.2\.2\b/i.test(question);
+    /\bvanity\b/i.test(question);
   const hcrVanitySourceIDs = hcrVanityQuestion
     ? knownCitedSourceIDs.filter((sourceID) =>
       availableEvidence.get(sourceID)?.reference === "BC 1107.2.2.7.2.2"

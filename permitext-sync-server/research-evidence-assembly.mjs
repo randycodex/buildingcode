@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260824-routed-multi-corpus-evidence-v12";
+export const researchEvidenceAssemblyVersion = "20260826-pinned-ancestor-context-v13";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -25,6 +25,8 @@ const sourceOrigins = Object.freeze({
   discovered: "permitext_discovered",
   crossReference: "permitext_cross_reference"
 });
+
+const maximumPinnedAncestorContextSections = 3;
 
 export const researchEvidenceStrategies = Object.freeze({
   broad: "broad",
@@ -483,6 +485,24 @@ function normalizedCrossReferences(source, { inlineOnly = false } = {}) {
     .filter((reference) => sectionIdentity(reference));
 }
 
+function canonicalAncestorReferences(source, maximum = maximumPinnedAncestorContextSections) {
+  const codePrefix = compactText(source?.codePrefix).toUpperCase();
+  const sectionNumber = compactText(source?.sectionNumber).replace(/\.$/, "");
+  const parts = sectionNumber.split(".").filter(Boolean);
+  if (!codePrefix || parts.length < 3) return [];
+  const references = [];
+  while (parts.length > 2 && references.length < maximum) {
+    parts.pop();
+    references.push({
+      codePrefix,
+      sectionNumber: parts.join("."),
+      referenceKind: "ancestor_scope",
+      referencePurpose: "canonical_ancestor_scope"
+    });
+  }
+  return references;
+}
+
 function targetedDefinitionValue(value, context, maximumCharacters) {
   const excerpt = targetedDefinitionExcerpt(value, context, { maximumCharacters });
   if (!excerpt) return { value, excerpt: null };
@@ -865,6 +885,20 @@ export async function assembleResearchEvidence({
 
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
+  for (const entry of resolvedPins) {
+    if (!entry.resolved) continue;
+    const ancestorReferences = canonicalAncestorReferences(entry.value);
+    for (const reference of ancestorReferences) {
+      const identity = sectionIdentity(reference);
+      if (
+        !identity ||
+        includedSectionIdentities.has(identity) ||
+        queuedCrossReferenceIdentities.has(identity)
+      ) continue;
+      queuedCrossReferenceIdentities.add(identity);
+      crossReferenceQueue.push(reference);
+    }
+  }
   for (const source of canonicalForExpansion) {
     for (const reference of normalizedCrossReferences(source, {
       inlineOnly: query.relevanceComparison
@@ -879,9 +913,13 @@ export async function assembleResearchEvidence({
       crossReferenceQueue.push(reference);
     }
   }
+  const crossReferencePriority = (reference) => {
+    if (reference?.referencePurpose === "canonical_ancestor_scope") return 3;
+    if (String(reference?.referenceKind || "").toLowerCase() === "table") return 2;
+    return 0;
+  };
   crossReferenceQueue.sort((left, right) =>
-    Number(String(right.referenceKind || "").toLowerCase() === "table") -
-      Number(String(left.referenceKind || "").toLowerCase() === "table")
+    crossReferencePriority(right) - crossReferencePriority(left)
   );
 
   let crossReferenceCount = 0;
@@ -906,13 +944,19 @@ export async function assembleResearchEvidence({
           allowance
         )
       : { value: resolved, excerpt: null };
+    const ancestorScope = reference.referencePurpose === "canonical_ancestor_scope";
+    const relationship = ancestorScope
+      ? `Governing ancestor scope for pinned ${reference.codePrefix || resolved.codePrefix} ${reference.sectionNumber || resolved.sectionNumber}`
+      : `Direct enacted-text cross-reference from this answer's primary evidence`;
     const record = sourceRecord(targeted.value, {
       origin: sourceOrigins.crossReference,
       sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, index),
-      relationship: `Direct enacted-text cross-reference from this answer's primary evidence`,
+      relationship,
       characterAllowance: allowance,
       canonicalResolved: true,
-      retrievalReason: `Direct cross-reference to ${reference.codePrefix || resolved.codePrefix} ${reference.sectionNumber || resolved.sectionNumber}`,
+      retrievalReason: ancestorScope
+        ? `Canonical ancestor scope for pinned ${reference.codePrefix || resolved.codePrefix} ${reference.sectionNumber || resolved.sectionNumber}`
+        : `Direct cross-reference to ${reference.codePrefix || resolved.codePrefix} ${reference.sectionNumber || resolved.sectionNumber}`,
       retrievalVersion: compactText(discovery?.retrievalVersion) || researchEvidenceAssemblyVersion,
       retrievalDepth: 1,
       evidencePriority: researchEvidencePriorityMetadata({

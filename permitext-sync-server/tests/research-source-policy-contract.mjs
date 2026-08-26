@@ -9,7 +9,8 @@ import {
   researchSourcePolicyVersion,
   researchWebSupportTrigger,
   sanitizeResearchWebQuery,
-  shouldUseResearchWebSupport
+  shouldUseResearchWebSupport,
+  unresolvedResearchAuthorityAcronyms
 } from "../research-source-policy.mjs";
 
 assert.match(researchSourcePolicyVersion, /^\d{8}-supporting-web-v\d+$/);
@@ -80,6 +81,22 @@ assert.equal(
 assert.deepEqual(
   researchWebSupportTrigger({ corpusCoverage: "incomplete" }, {}).reasons,
   ["outside_library_support_needed"]
+);
+assert.deepEqual(unresolvedResearchAuthorityAcronyms("Does HCR require a vanity?"), ["HCR"]);
+assert.deepEqual(
+  unresolvedResearchAuthorityAcronyms("What does Homes and Community Renewal (HCR) require?"),
+  []
+);
+assert.deepEqual(
+  researchWebSupportTrigger({
+    question: "Does this section prove that HCR requires a vanity?",
+    outsideLibraryRequired: true
+  }, {}),
+  {
+    useWeb: false,
+    reasons: ["outside_authority_identity_required"],
+    configuration: researchSourcePolicyConfiguration({})
+  }
 );
 assert.deepEqual(
   researchWebSupportTrigger({

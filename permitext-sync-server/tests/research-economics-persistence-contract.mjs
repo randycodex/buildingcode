@@ -4,10 +4,11 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const [appSource, internalSource, accountRepositorySource] = await Promise.all([
+const [appSource, internalSource, accountRepositorySource, evaluationSource] = await Promise.all([
   readFile(join(root, "../app.mjs"), "utf8"),
   readFile(join(root, "../internal/app.js"), "utf8"),
-  readFile(join(root, "../postgres-account-repository.mjs"), "utf8")
+  readFile(join(root, "../postgres-account-repository.mjs"), "utf8"),
+  readFile(join(root, "research-evals.mjs"), "utf8")
 ]);
 
 assert.match(
@@ -24,6 +25,11 @@ assert.match(
   appSource,
   /const providerSpend = endResearchSpendReservation\(\);[\s\S]*conservativeProviderCostUSD[\s\S]*durationMilliseconds[\s\S]*saveResearchOperationMetricBestEffort/,
   "The Research handler does not record provider spend and duration after every terminal outcome."
+);
+assert.match(
+  appSource,
+  /operationMetrics: operations\.map\(\(operation\) =>[\s\S]*createResearchOperationMetric\(operation\)/,
+  "The private owner report does not expose content-free operation metrics to the evaluator."
 );
 assert.match(
   appSource,
@@ -54,6 +60,16 @@ assert.match(
   internalSource,
   /Projected cost per 100 completed turns[\s\S]*Turn cost p50 \/ p90[\s\S]*Latency p50 \/ p90[\s\S]*Charging integrity/,
   "The owner console does not render the hybrid economics gates."
+);
+assert.match(
+  evaluationSource,
+  /async function evaluationResearchSpend[\s\S]*researchSpend\.operationMetrics[\s\S]*completedEvaluationOperation[\s\S]*const economics = status === "running"[\s\S]*economics,\n\s+baseline/,
+  "Paid Research evaluation artifacts do not preserve their private economics report."
+);
+assert.match(
+  evaluationSource,
+  /completedEvaluationOperation\([\s\S]*operationMetric\.estimatedCostUSD[\s\S]*operationMetric\.pricingVersion/,
+  "Paid Research evaluation scoring does not use the completed operation's measured usage and cost."
 );
 
 console.log("permitext Research economics persistence contract passed");

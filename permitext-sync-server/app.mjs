@@ -7576,6 +7576,8 @@ function researchPrompt(question, evidence, options = {}) {
       `EVIDENCE_FUNCTION: ${section.evidencePriority?.primaryFunction || "candidate"}`,
       `EVIDENCE_ROLE: ${section.evidencePriority?.evidenceRole || "supporting"}`,
       `TOPIC_ROUTE_RELATIONSHIP: ${section.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
+      `RELATIONSHIP: ${section.relationship || "Automatically assembled enacted evidence"}`,
+      `RETRIEVAL_REASON: ${section.retrievalReason || section.relationship || "Authorized enacted evidence"}`,
       `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
       section.evidencePriority?.claimCoverageReason
         ? `REQUIRED_CLAIM_REASON: ${section.evidencePriority.claimCoverageReason}`
@@ -8134,6 +8136,12 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     ? `the enacted provision, ${answerEvidenceGroups[0].section.sectionNumber || answerEvidenceGroups[0].section.title}`
     : `the ${answerEvidenceGroups.length} enacted provisions Permitext assembled`;
   const conversational = options.responseStyle === "conversational";
+  const governingAncestorScopes = evidence.filter((section) =>
+    /Governing ancestor scope for pinned/i.test(String(section?.relationship || ""))
+  );
+  const governingAncestorScope = governingAncestorScopes.find((section) =>
+    /Type B\+NYC/i.test([section?.title, section?.text].join(" "))
+  ) || governingAncestorScopes.at(-1);
   const acceptsConditionalYes = /^(?:can|could|does|is|are|may|must|should|will|would)\b/i
     .test(String(question || "").trim());
   const directAnswer = conversational
@@ -8144,8 +8152,11 @@ function mockResearchInterpretation(question, evidence, options = {}) {
   const application = conversational
     ? `The enacted text gives a governing starting point, but it is not a blanket approval. Read ${subject} together, then confirm the project facts that control the cited conditions before relying on the result.`
     : "The assembled enacted code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.";
+  const ancestorScopeApplication = governingAncestorScope
+    ? `The pinned provision sits within the ${governingAncestorScope.title || governingAncestorScope.sectionNumber} scope. Confirm whether that scope applies to the project before applying the descendant rule.`
+    : "";
   return {
-    answerText: [directAnswer, application].join("\n\n"),
+    answerText: [directAnswer, application, ancestorScopeApplication].filter(Boolean).join("\n\n"),
     supportedPoints: answerEvidenceGroups.slice(0, maximumResearchSupportedPoints).map(({ section, sourceIDs }) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
@@ -8155,7 +8166,11 @@ function mockResearchInterpretation(question, evidence, options = {}) {
       sourceIDs
     })),
     assumptions: ["Only the enacted 2022 New York City Construction Code provisions assembled for this answer were treated as governing authority."],
-    missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
+    missingFacts: [
+      governingAncestorScope
+        ? `Confirm whether the project is subject to the ${governingAncestorScope.title || governingAncestorScope.sectionNumber} scope.`
+        : "Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."
+    ],
     followUpQuestions: ["What project fact would determine whether the cited conditions apply?"],
     evidenceLimitations: ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
     additionalEvidenceNeeded: ["Confirm any referenced standard, agency rule, figure, or other authority outside the current enacted corpus before final reliance."],
@@ -8441,6 +8456,7 @@ export function researchWebSupportRequestBody({
       "Find concise supporting information from the allowed official websites for a building-code research answer.",
       "The enacted Permitext corpus remains the primary legal authority.",
       "Do not make a project compliance determination and do not treat guidance as enacted law.",
+      "Do not guess the identity of an unexplained acronym, agency, or program, and do not substitute a similarly named authority. Use a source only when it explicitly identifies the named authority and jurisdiction.",
       "When the question names an official bulletin or other official document, open that document and summarize the substantive passages relevant to the question; returning only a title or link is not sufficient.",
       "Identify any named official document that could not be opened or read instead of inferring its contents.",
       "Write each useful source-derived claim as its own short bullet and attach an inline web citation from that exact source to the same bullet. Do not combine facts from multiple sources in one bullet.",
@@ -9086,6 +9102,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Make governing code conclusions only from the authorized enacted evidence supplied in the request.",
         "Evidence marked user_pinned must be considered, but Permitext-discovered enacted evidence may identify a different controlling provision.",
         "Supporting web context may explain or contextualize an answer but is noncontrolling and must never create or override an enacted requirement.",
+        "Never use web support to guess the identity of an unexplained acronym, agency, or program, or to substitute a similarly named authority. Request the exact authority when its identity is unresolved.",
         "When a selected source includes attached official visual evidence, examine only the attached images and identify the exact visual source used through its PASSAGE_ID; never infer what an unselected map or image shows.",
         "Treat maps and figures as evidence that can be misread. State any illegible label, uncertain boundary, missing lot location, or other visual ambiguity explicitly instead of guessing.",
         "Do not use pretrained or uncited outside knowledge as legal authority and do not invent requirements.",
@@ -9097,6 +9114,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
         "Evidence labeled historical or future-effective is available only because the user explicitly pinned it. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence.",
         "Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic.",
+        "When RELATIONSHIP identifies a source as governing ancestor scope for pinned evidence, treat that source as material applicability context for the pinned descendant, not as a collateral example. State the ancestor scope when relying on the descendant. If the supplied facts do not establish whether that scope applies, identify the applicability fact as unresolved without weakening a conclusion that is independently supported.",
         "supportedPoints are exclusively for rules established by the assembled enacted evidence. Never put a bulletin, agency-guidance, or other supporting-web claim in supportedPoints, and never attach an enacted SECTION_ID or PASSAGE_ID to such a claim.",
         "Put every material source-specific web-guidance statement only in supportingSourceUses by selecting the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair. Never write a new claim for that pair. In answerText, identify it as noncontrolling guidance and keep it distinct from the enacted rule.",
         options.allowOfficialGuidanceOnly
@@ -9264,6 +9282,8 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
     `EVIDENCE_ROLE: ${source.evidencePriority?.evidenceRole || "supporting"}`,
     `TOPIC_ROUTE_RELATIONSHIP: ${source.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
+    `RELATIONSHIP: ${source.relationship || "Automatically assembled enacted evidence"}`,
+    `RETRIEVAL_REASON: ${source.retrievalReason || source.relationship || "Authorized enacted evidence"}`,
     `TEXT: ${source.text}`
   ].join("\n")).join("\n\n---\n\n");
   const requestBody = {
@@ -9286,6 +9306,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Fail with missed_material_conclusion if cited historical or future-effective evidence is not expressly identified as historical or not yet effective, or if the answer silently presents it as ordinary current law.",
       "Fail an answer that introduces a collateral code example or citation that does not materially qualify the requested conclusion and was not requested by the user.",
       "Fail with irrelevant_citation when the answer cites evidence labeled with a collateral topic route merely because a supplied project fact matched that separate code topic. Such evidence may be reviewed internally without appearing in the answer.",
+      "A source whose RELATIONSHIP identifies it as governing ancestor scope for pinned evidence materially qualifies the pinned descendant. Do not classify that applicability context or its citation as collateral or irrelevant merely because the ancestor is broader. Fail with missed_material_conclusion if an answer relies on the descendant while omitting a supplied material ancestor scope; if applicability to the project is not established, preserve that unresolved fact without weakening an independently supported conclusion.",
       "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
       "Fail with repeated_established_fact when the answer asks the user to establish or reconfirm a fact already supplied for the active topic. Independent professional verification of documents or measurements is different and may still be identified when material.",
       "When the user has established that a building is fully sprinklered, treat installed throughout as established factual context. The answer may request documentation of compliance with a named installation standard when material, but must not return fully sprinklered or installed throughout as a missing fact or follow-up question.",
@@ -16516,6 +16537,9 @@ async function internalResearchSpendReport() {
       ).toFixed(6))
     },
     users,
+    operationMetrics: operations.map((operation) =>
+      createResearchOperationMetric(operation)
+    ),
     economics
   };
 }

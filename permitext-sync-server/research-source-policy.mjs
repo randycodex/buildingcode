@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260826-supporting-web-v6";
+export const researchSourcePolicyVersion = "20260826-supporting-web-v7";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -109,6 +109,19 @@ const officialPageRequestPattern =
   /\bofficial\b[^.?!\n]{0,120}\b(?:page|webpage|website|web page|web source)\b/i;
 const outsideLibraryRequestPattern =
   /\b(?:web|internet|online source|outside (?:the )?(?:library|corpus)|external source|supporting source|manufacturer(?:'s)? (?:instructions|data|documentation)|referenced standard)\b/i;
+const knownResearchAcronyms = new Set([
+  "AC", "ADA", "BC", "DOB", "DOT", "FDNY", "FGC", "HPD", "IBC", "ICC",
+  "IEBC", "IFGC", "IMC", "IPC", "MC", "MTA", "NFPA", "NYC", "PC", "ZR"
+]);
+
+export function unresolvedResearchAuthorityAcronyms(value) {
+  const text = normalizedText(value);
+  return Array.from(new Set(
+    Array.from(text.matchAll(/\b[A-Z]{2,6}\b/g), (match) => match[0])
+      .filter((acronym) => !knownResearchAcronyms.has(acronym))
+      .filter((acronym) => !new RegExp(`\\(${acronym}\\)`).test(text))
+  ));
+}
 
 export function researchWebSupportTrigger(input = {}, environment = process.env) {
   const configuration = researchSourcePolicyConfiguration(environment);
@@ -131,9 +144,26 @@ export function researchWebSupportTrigger(input = {}, environment = process.env)
     ["incomplete", "unavailable", "outside_library"].includes(input.corpusCoverage) ||
     outsideLibraryRequestPattern.test(question)
   ) {
-    reasons.push("outside_library_support_needed");
+    const unresolvedAcronyms = unresolvedResearchAuthorityAcronyms(question);
+    if (
+      unresolvedAcronyms.length > 0 &&
+      !guidanceRequestPattern.test(question) &&
+      !officialPageRequestPattern.test(question) &&
+      !outsideLibraryRequestPattern.test(question)
+    ) {
+      reasons.push("outside_authority_identity_required");
+    } else {
+      reasons.push("outside_library_support_needed");
+    }
   }
-  return { useWeb: reasons.length > 0, reasons: [...new Set(reasons)], configuration };
+  const uniqueReasons = [...new Set(reasons)];
+  return {
+    useWeb: uniqueReasons.some((reason) =>
+      ["official_guidance_requested", "outside_library_support_needed"].includes(reason)
+    ),
+    reasons: uniqueReasons,
+    configuration
+  };
 }
 
 export function shouldUseResearchWebSupport(input = {}, environment = process.env) {
