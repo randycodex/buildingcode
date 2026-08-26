@@ -93,14 +93,25 @@ assert.match(handler, /reservationRequestFingerprint: reservation\.requestFinger
 assert.match(handler, /researchRequestReservationID\(/);
 assert.match(handler, /await releaseResearchUsageReservation\(context\.userID, researchReservationID\)/);
 assert.match(handler, /researchReservationCompleted = !mockMode && Boolean\(researchReservationID\)/);
+assert.match(handler, /allowOfficialGuidanceOnly && webSupport\.sources\.length === 0/);
+assert.match(handler, /RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE/);
 
 const reservationIndex = handler.indexOf("const reservation = await reserveResearchUsage");
 const providerWorkflowIndex = handler.indexOf("const evidenceAnalysisPromise = mockMode");
+const officialGuidanceFailureIndex = handler.indexOf(
+  "allowOfficialGuidanceOnly && webSupport.sources.length === 0"
+);
+const durableCommitIndex = handler.indexOf("await commitResearchConversationMessage");
 const duplicateIndex = handler.indexOf('reservation.reason === "duplicate"', reservationIndex);
 const paymentRequiredIndex = handler.indexOf("progressResponse.json(402", duplicateIndex);
 assert.ok(
   reservationIndex >= 0 && providerWorkflowIndex > reservationIndex,
   "The paid provider workflow must not start before the request-specific usage reservation succeeds."
+);
+assert.ok(
+  officialGuidanceFailureIndex > providerWorkflowIndex &&
+    durableCommitIndex > officialGuidanceFailureIndex,
+  "An explicit official-guidance turn without attributable official sources must fail before the durable answer/usage commit."
 );
 assert.ok(
   duplicateIndex >= 0 && paymentRequiredIndex > duplicateIndex,

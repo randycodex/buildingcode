@@ -2189,6 +2189,85 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(reconcileSource.contains("completeClerkBackendSignIn(session: session, linkFrom: nil)"))
     }
 
+    func testClerkCallbackSupportsColdPasswordlessEmailAndFreshBackendExchange() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let infoURL = projectRoot.appendingPathComponent("permitext/Info.plist")
+        let infoData = try Data(contentsOf: infoURL)
+        let info = try XCTUnwrap(
+            PropertyListSerialization.propertyList(from: infoData, format: nil) as? [String: Any]
+        )
+        let urlTypes = try XCTUnwrap(info["CFBundleURLTypes"] as? [[String: Any]])
+        let registeredSchemes = urlTypes.flatMap { entry in
+            entry["CFBundleURLSchemes"] as? [String] ?? []
+        }
+        XCTAssertTrue(registeredSchemes.contains("com.randycodex.permitext"))
+
+        XCTAssertTrue(
+            ClerkCallbackRoutingPolicy.matches(
+                URL(string: "com.randycodex.permitext://callback?flow_id=flow&approval_token=token")!,
+                configuredRedirectURL: "com.randycodex.permitext://callback"
+            )
+        )
+        XCTAssertFalse(
+            ClerkCallbackRoutingPolicy.matches(
+                URL(string: "permitext://section/123")!,
+                configuredRedirectURL: "com.randycodex.permitext://callback"
+            )
+        )
+
+        let appSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/PermitextApp.swift"),
+            encoding: .utf8
+        )
+        let viewModelSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/ViewModels/CodeLibraryViewModel.swift"),
+            encoding: .utf8
+        )
+
+        let openURLStart = try XCTUnwrap(appSource.range(of: ".onOpenURL { url in"))
+        let openURLEnd = try XCTUnwrap(
+            appSource.range(of: ".onAppear {", range: openURLStart.upperBound..<appSource.endIndex)
+        )
+        let openURLSource = String(appSource[openURLStart.lowerBound..<openURLEnd.lowerBound])
+        let clerkRoute = try XCTUnwrap(openURLSource.range(of: "await library.handleClerkOpenURL(url, clerk: clerk)"))
+        let appRoute = try XCTUnwrap(openURLSource.range(of: "library.handleOpenURL(url)"))
+        XCTAssertLessThan(clerkRoute.lowerBound, appRoute.lowerBound)
+        XCTAssertTrue(appSource.contains("if library.isResumingClerkAuthenticationCallback"))
+        XCTAssertTrue(appSource.contains("AuthView()"))
+
+        let callbackStart = try XCTUnwrap(viewModelSource.range(of: "func handleClerkOpenURL"))
+        let finishedStart = try XCTUnwrap(
+            viewModelSource.range(
+                of: "func handleClerkAuthenticationFinished",
+                range: callbackStart.upperBound..<viewModelSource.endIndex
+            )
+        )
+        let callbackSource = String(viewModelSource[callbackStart.lowerBound..<finishedStart.lowerBound])
+        let attemptRegistration = try XCTUnwrap(callbackSource.range(of: "clerkAuthenticationAttemptID = UUID()"))
+        let clerkHandler = try XCTUnwrap(callbackSource.range(of: "try await clerk.handle(url)"))
+        XCTAssertLessThan(attemptRegistration.lowerBound, clerkHandler.lowerBound)
+        XCTAssertTrue(callbackSource.contains("if clerk.session == nil"))
+        XCTAssertTrue(callbackSource.contains("isResumingClerkAuthenticationCallback = true"))
+        XCTAssertTrue(callbackSource.contains("else if createdCallbackAttempt"))
+        XCTAssertTrue(callbackSource.contains("await handleClerkAuthenticationFinished(clerk: clerk)"))
+        XCTAssertFalse(callbackSource.contains("else if !isClerkAuthenticationPresented"))
+
+        let exchangeStart = try XCTUnwrap(viewModelSource.range(of: "private func completeClerkBackendSignIn"))
+        let backendCompletionStart = try XCTUnwrap(
+            viewModelSource.range(
+                of: "private func completeBackendSignIn",
+                range: exchangeStart.upperBound..<viewModelSource.endIndex
+            )
+        )
+        let exchangeSource = String(viewModelSource[exchangeStart.lowerBound..<backendCompletionStart.lowerBound])
+        XCTAssertTrue(exchangeSource.contains("session.getToken()"))
+        XCTAssertTrue(exchangeSource.contains("provider: .clerk"))
+        XCTAssertTrue(exchangeSource.contains("sessionToken: sessionToken"))
+        XCTAssertTrue(exchangeSource.contains("expectedAccountGeneration == accountMutationGeneration"))
+    }
+
     func testSavedAccountButtonOpensSettingsDirectlyAndSyncLivesInAccountCard() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
@@ -3829,6 +3908,55 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testResearchQuestionAttemptPersistsForRelaunchAndCanBeRemovedAfterCompletion() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        let attempt = ResearchQuestionAttempt(
+            id: "stable-request-id",
+            question: "What official guidance applies?"
+        )
+
+        try cache.store(
+            attempt,
+            accountID: "account-a",
+            projectID: "conversation-a",
+            scope: ResearchQuestionAttempt.cacheScope
+        )
+        let recovered = try XCTUnwrap(
+            cache.load(
+                ResearchQuestionAttempt.self,
+                accountID: "account-a",
+                projectID: "conversation-a",
+                scope: ResearchQuestionAttempt.cacheScope
+            )
+        )
+        XCTAssertEqual(recovered.value, attempt)
+        XCTAssertNil(
+            try cache.load(
+                ResearchQuestionAttempt.self,
+                accountID: "account-b",
+                projectID: "conversation-a",
+                scope: ResearchQuestionAttempt.cacheScope
+            )
+        )
+
+        try cache.remove(
+            accountID: "account-a",
+            projectID: "conversation-a",
+            scope: ResearchQuestionAttempt.cacheScope
+        )
+        XCTAssertNil(
+            try cache.load(
+                ResearchQuestionAttempt.self,
+                accountID: "account-a",
+                projectID: "conversation-a",
+                scope: ResearchQuestionAttempt.cacheScope
+            )
+        )
+    }
+
     func testQuestionFirstResearchCreationOmitsEmptySelections() throws {
         let request = ResearchConversationCreateRequest(
             auth: BackendAuthContext(accountUserID: "account-1", bearerToken: "token"),
@@ -4032,23 +4160,81 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         }
 
         let recorder = ResearchRequestPathRecorder()
+        let importedFacts = [
+            ProjectStructuredFact(
+                id: "nyc-planning:bbl",
+                key: "bbl",
+                label: "BBL",
+                value: "2028500003",
+                status: "sourced",
+                source: "nyc-planning",
+                sourceText: "NYC Planning MapPLUTO",
+                updatedAt: Date(timeIntervalSince1970: 1_787_745_600)
+            ),
+            ProjectStructuredFact(
+                id: "nyc-planning:zoning-districts",
+                key: "zoning-districts",
+                label: "Zoning District(s)",
+                value: "R8A",
+                status: "sourced",
+                source: "nyc-planning",
+                sourceText: "NYC Planning mapped zoning layers",
+                updatedAt: Date(timeIntervalSince1970: 1_787_745_600)
+            )
+        ]
         ScopedPermitextURLProtocol.install({ request in
             let path = request.url?.path ?? ""
             let body = try permitextRequestBody(request)
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
             let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601
+            encoder.dateEncodingStrategy = .custom { _, encoder in
+                var container = encoder.singleValueContainer()
+                try container.encode("2026-08-26T12:00:00.000Z")
+            }
 
             switch path {
+            case "/projects/property/lookup":
+                recorder.record(path)
+                let lookup = try decoder.decode(BackendProjectPropertyLookupRequest.self, from: body)
+                guard lookup.address == "1760 Jerome Ave, Bronx" else {
+                    return (422, Data(#"{"error":"Unexpected property address."}"#.utf8))
+                }
+                let response = BackendProjectPropertyLookupResponse(
+                    property: BackendProjectPropertyContext(
+                        schemaVersion: 1,
+                        query: lookup.address,
+                        normalizedAddress: "1760 JEROME AVENUE, Bronx, NY 10453",
+                        bbl: "2028500003",
+                        zolaURL: "https://zola.planninglabs.nyc/l/lot/2/2850/3",
+                        retrievedAt: Date(timeIntervalSince1970: 1_787_745_600),
+                        source: BackendProjectPropertyLookupSource(
+                            agency: "NYC Department of City Planning",
+                            datasets: ["MapPLUTO", "Zoning Tax Lot Database"]
+                        ),
+                        structuredFacts: importedFacts,
+                        warnings: ["Tax-lot facts do not establish zoning-lot composition."]
+                    )
+                )
+                return (200, try encoder.encode(response))
+
             case "/sync/push":
                 recorder.record(path)
                 let push = try decoder.decode(BackendUserContentPushRequest.self, from: body)
+                let project = push.batch.mutations.compactMap { mutation -> ServerProjectRecord? in
+                    guard case .project(let record) = mutation else { return nil }
+                    return record
+                }.first
+                guard project?.address == "1760 JEROME AVENUE, Bronx, NY 10453",
+                      project?.structuredFacts == importedFacts
+                else {
+                    return (422, Data(#"{"error":"Imported Project facts were not synchronized."}"#.utf8))
+                }
                 let response = BackendUserContentPushResponse(
                     acceptedMutationIDs: push.batch.mutations.map(\.recordID),
                     rejectedMutationIDs: [],
                     rejectionReasons: [:],
-                    serverTime: Date(timeIntervalSince1970: 1_777_377_600)
+                    serverTime: Date(timeIntervalSince1970: 1_787_745_600)
                 )
                 return (200, try encoder.encode(response))
 
@@ -4109,8 +4295,14 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             try await Task.sleep(for: .milliseconds(50))
         }
         XCTAssertTrue(model.isInitialContentLoaded)
+        let property = try await model.projectPropertyContext(address: "1760 Jerome Ave, Bronx")
+        XCTAssertEqual(property.structuredFacts, importedFacts)
         let folder = try XCTUnwrap(
-            model.createFolder(name: "Immediate Research Project", address: "1760 Jerome Ave, Bronx")
+            model.createFolder(
+                name: "Immediate Research Project",
+                address: property.normalizedAddress,
+                structuredFacts: property.structuredFacts
+            )
         )
         XCTAssertNotEqual(folder.syncState, .synced)
         let projectID = try XCTUnwrap(model.backendProjectID(for: folder.id))
@@ -4124,9 +4316,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(model.folder(id: folder.id)?.syncState, .synced)
         XCTAssertEqual(
             recorder.snapshot().filter {
-                $0 == "/sync/push" || $0 == "/research/conversations/create"
+                $0 == "/projects/property/lookup" ||
+                $0 == "/sync/push" ||
+                $0 == "/research/conversations/create"
             },
-            ["/sync/push", "/research/conversations/create"]
+            ["/projects/property/lookup", "/sync/push", "/research/conversations/create"]
         )
     }
 
@@ -4361,6 +4555,11 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             "The Research verifier request failed.",
             code: "RESEARCH_VERIFIER_ERROR"
         )
+        let officialGuidanceError = PermitextBackendHTTPError.serverStatus(
+            502,
+            "Unsafe server wording that the app must not show.",
+            code: "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"
+        )
 
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(verificationError).message,
@@ -4373,6 +4572,10 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(
             ResearchRequestFailurePresentation.resolve(verifierProviderError).message,
             "Permitext's Research service is temporarily unavailable. Your question is still here."
+        )
+        XCTAssertEqual(
+            ResearchRequestFailurePresentation.resolve(officialGuidanceError).message,
+            "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."
         )
     }
 
@@ -4457,6 +4660,20 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 requestID: "request-new",
                 question: "What are the requirements for a bike room?",
                 priorMessageIDs: []
+            )
+        )
+        XCTAssertTrue(
+            ResearchRequestReconciliation.containsCompletedRequest(
+                messages: messages,
+                requestID: "request-new",
+                question: "What are the requirements for a bike room?"
+            )
+        )
+        XCTAssertFalse(
+            ResearchRequestReconciliation.containsCompletedRequest(
+                messages: Array(messages.dropLast()),
+                requestID: "request-new",
+                question: "What are the requirements for a bike room?"
             )
         )
     }

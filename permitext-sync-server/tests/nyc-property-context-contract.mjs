@@ -111,7 +111,16 @@ const [serverSource, clientSource] = await Promise.all([
 assert.match(serverSource, /"projects\/property\/lookup": handleProjectPropertyLookup/);
 assert.match(serverSource, /status === "sourced"/);
 assert.match(clientSource, /postResearch\("\/projects\/property\/lookup", \{ address \}\)/);
-assert.match(clientSource, /structuredFacts: property\?\.structuredFacts \|\| \[\]/);
+assert.match(clientSource, /const originalProjectAddress = String\(identity\?\.address \|\| ""\)\.trim\(\)/,
+  "The web editor must distinguish an unchanged Project address from a new address lookup.");
+assert.match(clientSource, /\(isEditing && address === originalProjectAddress\)/,
+  "An unchanged address must not trigger a redundant NYC Planning lookup.");
+assert.match(clientSource, /if \(selectedFolderType === "reference" \|\| !isEditing \|\| addressChanged\) \{[\s\S]*?details\.structuredFacts = property\?\.structuredFacts \|\| \[\]/,
+  "Creation and address changes must replace facts, while ordinary Project edits preserve existing sourced facts.");
+assert.match(clientSource, /path === "\/research\/conversations\/create"[\s\S]*?await ensureResearchProjectSynced\(values\.projectID, account\)/,
+  "Assigned Research creation must wait for any pending web Project mutation.");
+assert.match(clientSource, /async function ensureResearchProjectSynced[\s\S]*?await pushMutation\(projectMutationForRecord\(pendingProject, account\)\)/,
+  "The web sync gate must durably push the current Project, including its structured facts.");
 assert.match(clientSource, /Imported \$\{property\.structuredFacts\.length\} sourced facts from NYC Planning/);
 
 console.log("nyc-property-context contract passed");

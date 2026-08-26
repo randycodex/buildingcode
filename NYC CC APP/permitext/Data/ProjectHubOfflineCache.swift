@@ -68,6 +68,12 @@ struct ProjectHubOfflineCache: Sendable {
         return ProjectHubOfflineCacheLoad(value: envelope.value, cachedAt: envelope.cachedAt)
     }
 
+    func remove(accountID: String, projectID: String, scope: String) throws {
+        let url = cacheURL(accountID: accountID, projectID: projectID, scope: scope)
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+        try FileManager.default.removeItem(at: url)
+    }
+
     private func cacheURL(accountID: String, projectID: String, scope: String) -> URL {
         let identity = [accountID, projectID, scope].joined(separator: "\u{1f}")
         let digest = SHA256.hash(data: Data(identity.utf8))

@@ -1,4 +1,8 @@
-export const researchProgressVersion = "20260813-research-reader-spacing-v120";
+export const researchProgressVersion = "20260826-research-request-recovery-v121";
+
+export const researchRequestRecoveryStorageKey = "permitext:research-request-recovery:v1";
+export const researchRequestRecoveryMaxAgeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
+const researchRequestRecoveryMaximumRecords = 20;
 
 export const researchProgressStages = Object.freeze([
   Object.freeze({ id: "preparing_question", label: "Preparing the question" }),
@@ -20,6 +24,7 @@ export const researchProgressStates = Object.freeze([
 
 const stageByID = new Map(researchProgressStages.map((stage, index) => [stage.id, { ...stage, index }]));
 const allowedStates = new Set(researchProgressStates);
+const recoverableRequestStates = new Set(["active", "retrying", "failed", "cancelled"]);
 
 export function researchProgressStage(stageID) {
   return stageByID.get(String(stageID || "")) || null;
@@ -65,4 +70,112 @@ export function researchProgressSummary(events, { startedAt, completedAt } = {})
       state: latestByStage.get(stage.id) || "pending"
     }))
   };
+}
+
+function normalizedResearchRequestRecovery(value) {
+  if (!value || typeof value !== "object") return null;
+  const accountUserID = String(value.accountUserID || "").trim();
+  const workspaceID = String(value.workspaceID || "").trim();
+  const conversationID = String(value.conversationID || "").trim();
+  const requestID = String(value.requestID || "").trim();
+  const question = String(value.question || "").replace(/\s+/g, " ").trim().slice(0, 2_000);
+  const status = String(value.status || "").trim().toLowerCase();
+  const startedAt = Number(value.startedAt);
+  const endedAt = value.endedAt == null ? null : Number(value.endedAt);
+  const updatedAt = Number(value.updatedAt);
+  if (
+    !accountUserID || !workspaceID || !conversationID || !requestID || question.length < 3 ||
+    !recoverableRequestStates.has(status) || !Number.isFinite(startedAt) || !Number.isFinite(updatedAt)
+  ) return null;
+  const stages = researchProgressStages.map((stage) => {
+    const saved = Array.isArray(value.stages)
+      ? value.stages.find((candidate) => candidate?.id === stage.id)?.state
+      : null;
+    return {
+      id: stage.id,
+      state: allowedStates.has(saved) ? saved : "pending"
+    };
+  });
+  return {
+    accountUserID,
+    workspaceID,
+    conversationID,
+    requestID,
+    question,
+    status,
+    startedAt,
+    endedAt: endedAt == null ? null : (Number.isFinite(endedAt) ? endedAt : null),
+    updatedAt,
+    error: String(value.error || "").trim().slice(0, 1_000),
+    errorCode: String(value.errorCode || "").trim().slice(0, 160),
+    stages
+  };
+}
+
+function researchRequestRecoveries(storage, now = Date.now()) {
+  if (!storage || typeof storage.getItem !== "function") return [];
+  try {
+    const decoded = JSON.parse(storage.getItem(researchRequestRecoveryStorageKey) || "[]");
+    if (!Array.isArray(decoded)) return [];
+    return decoded
+      .map(normalizedResearchRequestRecovery)
+      .filter((record) => record && now - record.updatedAt <= researchRequestRecoveryMaxAgeMilliseconds)
+      .sort((left, right) => right.updatedAt - left.updatedAt)
+      .slice(0, researchRequestRecoveryMaximumRecords);
+  } catch {
+    return [];
+  }
+}
+
+function saveResearchRequestRecoveries(storage, records) {
+  if (!storage || typeof storage.setItem !== "function") return false;
+  try {
+    storage.setItem(researchRequestRecoveryStorageKey, JSON.stringify(records));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function researchRequestRecoveryMatches(record, scope = {}) {
+  const accountUserID = String(scope.accountUserID || "").trim();
+  const workspaceID = String(scope.workspaceID || "").trim();
+  const conversationID = String(scope.conversationID || "").trim();
+  const requestID = String(scope.requestID || "").trim();
+  return (!accountUserID || record.accountUserID === accountUserID) &&
+    (!workspaceID || record.workspaceID === workspaceID) &&
+    (!conversationID || record.conversationID === conversationID) &&
+    (!requestID || record.requestID === requestID);
+}
+
+export function writeResearchRequestRecovery(storage, value, now = Date.now()) {
+  const normalized = normalizedResearchRequestRecovery({ ...value, updatedAt: now });
+  if (!normalized) return false;
+  const records = researchRequestRecoveries(storage, now)
+    .filter((record) => !researchRequestRecoveryMatches(record, normalized));
+  records.unshift(normalized);
+  return saveResearchRequestRecoveries(storage, records.slice(0, researchRequestRecoveryMaximumRecords));
+}
+
+export function readResearchRequestRecovery(storage, scope, now = Date.now()) {
+  const records = researchRequestRecoveries(storage, now);
+  // Reading also prunes expired or malformed data so private failed questions
+  // cannot accumulate indefinitely on a shared browser.
+  saveResearchRequestRecoveries(storage, records);
+  return records.find((record) => researchRequestRecoveryMatches(record, scope)) || null;
+}
+
+export function removeResearchRequestRecovery(storage, scope, now = Date.now()) {
+  const records = researchRequestRecoveries(storage, now);
+  const retained = records.filter((record) => !researchRequestRecoveryMatches(record, scope));
+  return saveResearchRequestRecoveries(storage, retained);
+}
+
+export function clearResearchRequestRecoveries(storage, { accountUserID } = {}, now = Date.now()) {
+  const normalizedAccountID = String(accountUserID || "").trim();
+  const records = researchRequestRecoveries(storage, now);
+  const retained = normalizedAccountID
+    ? records.filter((record) => record.accountUserID !== normalizedAccountID)
+    : [];
+  return saveResearchRequestRecoveries(storage, retained);
 }

@@ -71,6 +71,34 @@ enum NoteSaveResult: Equatable {
     case failed(persistedBody: String, message: String)
 }
 
+enum ClerkCallbackRoutingPolicy {
+    static func matches(_ url: URL, configuredRedirectURL: String) -> Bool {
+        guard
+            let actual = URLComponents(url: url, resolvingAgainstBaseURL: false),
+            let expected = URLComponents(string: configuredRedirectURL),
+            actual.scheme?.lowercased() == expected.scheme?.lowercased()
+        else {
+            return false
+        }
+
+        let expectedHost = expected.host?.lowercased()
+        let expectedPath = normalizedPath(expected.path)
+        if expectedHost != nil || !expectedPath.isEmpty {
+            guard
+                actual.host?.lowercased() == expectedHost,
+                normalizedPath(actual.path) == expectedPath
+            else {
+                return false
+            }
+        }
+        return true
+    }
+
+    private static func normalizedPath(_ path: String) -> String {
+        path.isEmpty || path == "/" ? "" : path
+    }
+}
+
 @MainActor
 final class CodeLibraryViewModel: ObservableObject {
     private enum PostClerkAuthenticationAction: Equatable {
@@ -132,6 +160,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var isAccountBusy = false
     @Published private(set) var accountAuthenticationMessage: String?
     @Published var isClerkAuthenticationPresented = false
+    @Published private(set) var isResumingClerkAuthenticationCallback = false
     @Published var isProSubscriptionStorePresented = false
     @Published private(set) var organizations: [PermitextOrganization] = []
     @Published private(set) var isOrganizationWorkspaceLoading = false
@@ -3268,12 +3297,68 @@ final class CodeLibraryViewModel: ObservableObject {
         accountMutationGeneration &+= 1
         clerkAuthenticationAttemptID = UUID()
         postClerkAuthenticationAction = action
+        isResumingClerkAuthenticationCallback = false
         accountAuthenticationMessage = nil
         isClerkAuthenticationPresented = true
     }
 
+    func handleClerkOpenURL(_ url: URL, clerk: Clerk?) async -> Bool {
+        guard
+            let clerk,
+            ClerkCallbackRoutingPolicy.matches(
+                url,
+                configuredRedirectURL: clerk.options.redirectConfig.redirectUrl
+            )
+        else {
+            return false
+        }
+
+        let createdCallbackAttempt = clerkAuthenticationAttemptID == nil
+        if createdCallbackAttempt {
+            accountMutationGeneration &+= 1
+            clerkAuthenticationAttemptID = UUID()
+            postClerkAuthenticationAction = .none
+            accountAuthenticationMessage = "Finishing Permitext sign-in..."
+        }
+
+        do {
+            guard try await clerk.handle(url) else {
+                if createdCallbackAttempt {
+                    clerkAuthenticationAttemptID = nil
+                    accountAuthenticationMessage = nil
+                }
+                return false
+            }
+
+            if clerk.session == nil {
+                // A cold-open email-link sign-up can require another Clerk step.
+                // Mount AuthView without clearing the callback continuation that
+                // Clerk just restored from its durable PKCE state.
+                isResumingClerkAuthenticationCallback = true
+                isClerkAuthenticationPresented = true
+            } else if createdCallbackAttempt {
+                // A callback received without an existing authentication sheet
+                // has no onDismiss completion owner. Existing sheet flows are
+                // completed only by onDismiss so the backend exchange cannot
+                // race with a second completion task.
+                await handleClerkAuthenticationFinished(clerk: clerk)
+            }
+        } catch {
+            if createdCallbackAttempt {
+                clerkAuthenticationAttemptID = nil
+                postClerkAuthenticationAction = .none
+            }
+            isResumingClerkAuthenticationCallback = false
+            let message = Self.accountAuthenticationFailureMessage(for: error)
+            accountAuthenticationMessage = message
+            statusMessage = message
+        }
+        return true
+    }
+
     func handleClerkAuthenticationFinished(clerk: Clerk?) async {
         guard let authenticationAttemptID = clerkAuthenticationAttemptID else { return }
+        defer { isResumingClerkAuthenticationCallback = false }
         guard let clerk, let session = clerk.session else {
             let pendingAction = postClerkAuthenticationAction
             postClerkAuthenticationAction = .none
@@ -3961,6 +4046,7 @@ final class CodeLibraryViewModel: ObservableObject {
         clerkAuthenticationAttemptID = nil
         postClerkAuthenticationAction = .none
         isClerkAuthenticationPresented = false
+        isResumingClerkAuthenticationCallback = false
         completeLocalSignOut()
 
         isAccountBusy = true
@@ -3993,6 +4079,7 @@ final class CodeLibraryViewModel: ObservableObject {
         clerkAuthenticationAttemptID = nil
         postClerkAuthenticationAction = .none
         isClerkAuthenticationPresented = false
+        isResumingClerkAuthenticationCallback = false
         completeLocalSignOut()
     }
 

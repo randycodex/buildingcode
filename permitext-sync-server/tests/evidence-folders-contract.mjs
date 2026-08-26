@@ -766,7 +766,7 @@ assert.match(appSource, /addressLabel\.hidden = selectedFolderType === "referenc
 assert.match(appSource, /sheet\.classList\.toggle\("is-reference-folder", selectedFolderType === "reference"\)/);
 assert.match(appSource, /address: selectedFolderType === "reference" \? "" : property\?\.normalizedAddress \|\| addressInput\.value/);
 assert.match(appSource, /postResearch\("\/projects\/property\/lookup", \{ address \}\)/);
-assert.match(appSource, /structuredFacts: property\?\.structuredFacts \|\| \[\]/);
+assert.match(appSource, /details\.structuredFacts = property\?\.structuredFacts \|\| \[\]/);
 assert.doesNotMatch(appSource, /colorGroup\.hidden = selectedFolderType === "reference"/);
 assert.match(stylesSource, /\.project-sheet-field\[hidden\] \{[\s\S]*?display: none;/);
 assert.match(stylesSource, /\.project-create-sheet\.is-reference-folder \.project-description-input \{[\s\S]*?min-height: calc\(126px \+ var\(--space-3\)\);[\s\S]*?max-height: 230px;/);

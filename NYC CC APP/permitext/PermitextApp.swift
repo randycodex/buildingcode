@@ -321,8 +321,13 @@ struct PermitextApp: App {
                 }
             ) {
                 if let clerk {
-                    PermitextClerkAuthenticationView()
-                        .environment(clerk)
+                    if library.isResumingClerkAuthenticationCallback {
+                        AuthView()
+                            .environment(clerk)
+                    } else {
+                        PermitextClerkAuthenticationView()
+                            .environment(clerk)
+                    }
                 }
             }
             .sheet(
@@ -354,7 +359,10 @@ struct PermitextApp: App {
             }
             .onOpenURL { url in
                 guard runsNormalLifecycle else { return }
-                library.handleOpenURL(url)
+                Task {
+                    if await library.handleClerkOpenURL(url, clerk: clerk) { return }
+                    library.handleOpenURL(url)
+                }
             }
             .onAppear {
                 guard runsNormalLifecycle else { return }

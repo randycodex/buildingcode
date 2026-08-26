@@ -8,9 +8,13 @@ import {
   settingsPlanCopy
 } from "./settings-copy.js?v=20260824-project-context-research-v2";
 import {
+  clearResearchRequestRecoveries,
+  readResearchRequestRecovery,
+  removeResearchRequestRecovery,
   researchProgressStages,
-  researchProgressStage
-} from "./research-progress.js?v=20260813-research-reader-spacing-v120";
+  researchProgressStage,
+  writeResearchRequestRecovery
+} from "./research-progress.js?v=20260826-research-request-recovery-v121";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
@@ -53,7 +57,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260826-research-parity-v10";
+} from "./offline-storage.js?v=20260826-research-recovery-v11";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +92,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260826-research-parity-v10";
+} from "./research-intent-state.js?v=20260826-research-recovery-v11";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -6340,6 +6344,11 @@ function linkedResearchDecisionDismissalKey(questionID, projectID = activeProjec
 
 function clearResearchAccountRuntime() {
   researchOpenGeneration += 1;
+  activeResearchProgress.forEach((progress) => {
+    clearInterval(progress.timer);
+    progress.controller?.abort();
+  });
+  activeResearchProgress.clear();
   clearActiveResearchConversation();
   researchConversationList = [];
   researchUsage = null;
@@ -15685,9 +15694,32 @@ function researchRequestBody(values = {}) {
 async function postResearch(path, values = {}) {
   const account = activeAccount();
   if (!account) throw new Error("Sign in from Account to use private research conversations.");
+  if (path === "/research/conversations/create" && String(values.projectID || "").trim()) {
+    await ensureResearchProjectSynced(values.projectID, account);
+  }
   const payload = await postJSON(path, researchRequestBody(values), { token: account.sessionToken });
   if (payload?.artifactRevisions) observeLocalProjectArtifactRevisions(payload.artifactRevisions);
   return payload;
+}
+
+async function ensureResearchProjectSynced(projectID, account = activeAccount()) {
+  const normalizedProjectID = String(projectID || "").trim();
+  if (!normalizedProjectID) return;
+  const pendingProject = (state.localProjects || []).find((project) =>
+    researchProjectID(project) === normalizedProjectID
+  );
+  if (!pendingProject) return;
+  if (!account) {
+    throw new Error("Sign in and sync this Project before starting assigned Research.");
+  }
+
+  const pendingUpdatedAt = pendingProject.updatedAt || null;
+  await pushMutation(projectMutationForRecord(pendingProject, account));
+  state.localProjects = (state.localProjects || []).filter((project) =>
+    researchProjectID(project) !== normalizedProjectID ||
+    (project.updatedAt || null) !== pendingUpdatedAt
+  );
+  saveWorkspaceState();
 }
 
 async function postResearchWithProgress(values, { signal, onProgress } = {}) {
@@ -16338,6 +16370,12 @@ async function deleteResearchConversationFromList(conversation, button) {
   button.disabled = true;
   try {
     await postResearch("/research/conversations/delete", { conversationID: conversation.id });
+    activeResearchProgress.get(conversation.id)?.controller?.abort();
+    activeResearchProgress.delete(conversation.id);
+    removeResearchRequestRecovery(localStorage, {
+      accountUserID: activeAccount()?.userID || "",
+      conversationID: conversation.id
+    });
     if (state.researchConversationID === conversation.id) {
       researchOpenGeneration += 1;
       state.researchConversationID = "";
@@ -16395,6 +16433,14 @@ async function clearResearchConversationHistory(button, selectedConversations = 
       removalAnimation
     ]);
     const clearedIDs = new Set(conversations.map((conversation) => conversation.id));
+    clearedIDs.forEach((conversationID) => {
+      activeResearchProgress.get(conversationID)?.controller?.abort();
+      activeResearchProgress.delete(conversationID);
+      removeResearchRequestRecovery(localStorage, {
+        accountUserID: activeAccount()?.userID || "",
+        conversationID
+      });
+    });
     if (clearedIDs.has(String(state.researchConversationID || ""))) {
       researchOpenGeneration += 1;
       state.researchConversationID = "";
@@ -17269,6 +17315,80 @@ function createResearchProgressSession(conversationID, question) {
   return session;
 }
 
+function researchRequestRecoveryScope(conversationID, requestID = "") {
+  return {
+    accountUserID: activeAccount()?.userID || "",
+    workspaceID: activeWorkspaceID,
+    conversationID: String(conversationID || "").trim(),
+    requestID: String(requestID || "").trim()
+  };
+}
+
+function persistResearchProgressSession(progress) {
+  const scope = researchRequestRecoveryScope(progress?.conversationID, progress?.id);
+  if (!scope.accountUserID || !scope.workspaceID || !scope.conversationID || !scope.requestID) return false;
+  return writeResearchRequestRecovery(localStorage, {
+    ...scope,
+    question: progress.question,
+    status: progress.status,
+    startedAt: progress.startedAt,
+    endedAt: progress.endedAt,
+    error: progress.error,
+    errorCode: progress.errorCode,
+    stages: researchProgressStages.map((stage) => ({
+      id: stage.id,
+      state: progress.stages.get(stage.id) || "pending"
+    }))
+  });
+}
+
+function researchConversationContainsCompletedRequest(conversation, requestID, question) {
+  const matching = (conversation?.messages || []).filter((message) => message.requestID === requestID);
+  return matching.some((message) => message.role === "user" && message.question === question) &&
+    matching.some((message) => message.role === "assistant" && message.answer);
+}
+
+function restoreResearchProgressSession(conversation) {
+  const conversationID = String(conversation?.id || "").trim();
+  if (!conversationID) return null;
+  const scope = researchRequestRecoveryScope(conversationID);
+  if (!scope.accountUserID || !scope.workspaceID) return null;
+  const saved = readResearchRequestRecovery(localStorage, scope);
+  if (!saved) return null;
+  if (researchConversationContainsCompletedRequest(conversation, saved.requestID, saved.question)) {
+    removeResearchRequestRecovery(localStorage, { ...scope, requestID: saved.requestID });
+    return null;
+  }
+
+  const interrupted = ["active", "retrying"].includes(saved.status);
+  const stages = new Map(saved.stages.map((stage) => [stage.id, stage.state]));
+  if (interrupted) {
+    const activeStage = researchProgressStages.find((stage) =>
+      ["active", "retrying"].includes(stages.get(stage.id))
+    ) || researchProgressStages.find((stage) => stages.get(stage.id) === "pending");
+    if (activeStage) stages.set(activeStage.id, "failed");
+  }
+  const progress = {
+    id: saved.requestID,
+    conversationID,
+    question: saved.question,
+    startedAt: saved.startedAt,
+    endedAt: saved.endedAt || Date.now(),
+    status: interrupted ? "failed" : saved.status,
+    stages,
+    controller: new AbortController(),
+    retry: null,
+    timer: null,
+    error: interrupted
+      ? "Research was interrupted before an answer was saved. Retry to recover the same request. Your question is still here."
+      : saved.error,
+    errorCode: saved.errorCode
+  };
+  activeResearchProgress.set(conversationID, progress);
+  persistResearchProgressSession(progress);
+  return progress;
+}
+
 function researchProgressElapsed(startedAt, endedAt = Date.now()) {
   const elapsedSeconds = Math.max(0, Math.floor(((endedAt || Date.now()) - startedAt) / 1_000));
   const minutes = Math.floor(elapsedSeconds / 60);
@@ -17389,10 +17509,15 @@ function updateResearchProgressSession(progress, event) {
   if (!stage || stage.label !== event.label) return;
   progress.stages.set(stage.id, event.state);
   if (["active", "retrying"].includes(event.state)) progress.status = event.state;
+  persistResearchProgressSession(progress);
   refreshResearchProgressCard(progress);
 }
 
-async function runResearchProgressSession(progress, { onSuccess, onFailure, onRetry } = {}) {
+async function runResearchProgressSession(
+  progress,
+  { onSuccess, onFailure, onRetry } = {},
+  { retrying = false } = {}
+) {
   const execute = async (retrying = false) => {
     if (retrying) {
       onRetry?.();
@@ -17404,9 +17529,11 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
       progress.startedAt = Date.now();
       progress.endedAt = null;
       progress.controller = new AbortController();
+      persistResearchProgressSession(progress);
       refreshResearchProgressCard(progress);
       startResearchProgressTimer(progress);
     }
+    persistResearchProgressSession(progress);
     try {
       const result = await postResearchWithProgress({
         conversationID: progress.conversationID,
@@ -17420,6 +17547,10 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
       progress.endedAt = Date.now();
       clearInterval(progress.timer);
       activeResearchProgress.delete(progress.conversationID);
+      removeResearchRequestRecovery(
+        localStorage,
+        researchRequestRecoveryScope(progress.conversationID, progress.id)
+      );
       await onSuccess?.(result);
     } catch (error) {
       const cancelled = error.name === "AbortError" || error.code === "RESEARCH_CANCELLED";
@@ -17429,18 +17560,60 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
       if (activeStage) progress.stages.set(activeStage.id, cancelled ? "cancelled" : "failed");
       progress.status = cancelled ? "cancelled" : "failed";
       progress.error = cancelled
-        ? "Research was cancelled before an answer was saved."
+        ? "Research was cancelled before an answer was saved. Your question is still here."
         : researchFailureMessage(error);
       progress.errorCode = error.code || error.payload?.code || "";
       if (error.payload?.usage) researchUsage = error.payload.usage;
       progress.endedAt = Date.now();
       clearInterval(progress.timer);
+      persistResearchProgressSession(progress);
       refreshResearchProgressCard(progress);
       onFailure?.(error, { cancelled });
     }
   };
-  progress.retry = () => void execute(true);
-  await execute(false);
+  const callbacks = { onSuccess, onFailure, onRetry };
+  progress.retry = () => void runResearchProgressSession(progress, callbacks, { retrying: true });
+  await execute(retrying);
+}
+
+function recoveredResearchProgressCallbacks(conversationID, { supplemental = false } = {}) {
+  const composerControls = () => {
+    const dialogue = document.getElementById(`research-dialogue-${conversationID}`)?.parentElement;
+    return {
+      input: dialogue?.querySelector(".research-question-input") || null,
+      sendButton: dialogue?.querySelector(".research-send-button") || null,
+      status: dialogue?.querySelector(".research-composer-status") || null
+    };
+  };
+  return {
+    onRetry: () => {
+      const controls = composerControls();
+      if (controls.input) controls.input.disabled = true;
+      if (controls.sendButton) controls.sendButton.disabled = true;
+      if (controls.status) controls.status.textContent = "";
+    },
+    onSuccess: async (result) => {
+      if (supplemental) supplementalResearchConversations.set(conversationID, result.conversation);
+      else activeResearchConversation = result.conversation;
+      researchQuestionDraft = "";
+      await refreshProjectSourceConsumers([result.conversation.primaryProjectID], {
+        refreshNotebookFoundation: true
+      });
+      await refreshResearchConversationList();
+      if (supplemental) await openSupplementalResearchConversation(conversationID);
+      else await openResearchConversation(conversationID, { refreshList: true });
+    },
+    onFailure: (error) => {
+      if (error.payload?.conversation) {
+        if (supplemental) supplementalResearchConversations.set(conversationID, error.payload.conversation);
+        else activeResearchConversation = error.payload.conversation;
+      }
+      const controls = composerControls();
+      if (controls.status) controls.status.textContent = "";
+      if (controls.input) controls.input.disabled = false;
+      if (controls.sendButton) controls.sendButton.disabled = controls.input?.value.trim().length < 3;
+    }
+  };
 }
 
 function researchComposerDisclosure() {
@@ -17475,6 +17648,9 @@ function researchFailureMessage(error) {
     "RESEARCH_EVAL_SPEND_CAP",
     "TIMEOUTERROR"
   ]);
+  if (code === "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE") {
+    return "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here.";
+  }
   if (verificationCodes.has(code)) {
     return "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here.";
   }
@@ -19344,8 +19520,17 @@ async function renderResearchConversation(conversationID, options = {}) {
     }
     thread.append(bubble);
   });
-  const pendingProgress = activeResearchProgress.get(conversationID);
+  const pendingProgress = activeResearchProgress.get(conversationID) ||
+    restoreResearchProgressSession(conversation);
   if (pendingProgress) {
+    if (typeof pendingProgress.retry !== "function") {
+      const callbacks = recoveredResearchProgressCallbacks(conversationID, { supplemental });
+      pendingProgress.retry = () => void runResearchProgressSession(
+        pendingProgress,
+        callbacks,
+        { retrying: true }
+      );
+    }
     const pendingQuestion = document.createElement("article");
     pendingQuestion.className = "research-message is-user is-pending";
     const pendingQuestionText = document.createElement("p");
@@ -25248,6 +25433,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   let propertyLookupResult = null;
   let propertyLookupPromise = null;
   let propertyLookupRequestID = 0;
+  const originalProjectAddress = String(identity?.address || "").trim();
   const resetPropertyLookup = () => {
     propertyLookupAddress = "";
     propertyLookupResult = null;
@@ -25256,7 +25442,11 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   };
   const lookupPropertyContext = async () => {
     const address = addressInput.value.trim();
-    if (isEditing || selectedFolderType !== "project" || !address) {
+    if (
+      selectedFolderType !== "project" ||
+      !address ||
+      (isEditing && address === originalProjectAddress)
+    ) {
       resetPropertyLookup();
       return null;
     }
@@ -25336,7 +25526,9 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     if (!nameInput.value.trim()) return;
     saveButton.disabled = true;
     try {
-      const property = !isEditing && selectedFolderType === "project" && addressInput.value.trim()
+      const submittedAddress = addressInput.value.trim();
+      const addressChanged = isEditing && submittedAddress !== originalProjectAddress;
+      const property = selectedFolderType === "project" && submittedAddress && (!isEditing || addressChanged)
         ? await lookupPropertyContext()
         : null;
       const details = {
@@ -25344,9 +25536,13 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         address: selectedFolderType === "reference" ? "" : property?.normalizedAddress || addressInput.value,
         color: selectedColor,
         description: descriptionInput.value,
-        folderType: selectedFolderType,
-        structuredFacts: property?.structuredFacts || []
+        folderType: selectedFolderType
       };
+      if (selectedFolderType === "reference" || !isEditing || addressChanged) {
+        // Facts from the previous address must never survive an address change,
+        // while ordinary name/description edits must preserve them.
+        details.structuredFacts = property?.structuredFacts || [];
+      }
       if (isEditing) {
         await updateProjectFolder(project, details);
       } else {
@@ -29861,6 +30057,7 @@ function renderSettings() {
       }
       try {
         stopForegroundSyncLoop();
+        clearResearchRequestRecoveries(localStorage, { accountUserID: account.userID });
         clearResearchAccountRuntime();
         state.account = null;
         state.localProjects = [];

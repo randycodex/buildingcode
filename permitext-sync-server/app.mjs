@@ -8240,21 +8240,83 @@ export function researchWebSourcesFromProviderPayload(payload) {
   return sources;
 }
 
+export function researchAttributableWebSupportFromProviderPayload(payload, options = {}) {
+  const allowedDomains = options.allowedDomains;
+  const namedOfficialDocuments = Array.isArray(options.namedOfficialDocuments)
+    ? options.namedOfficialDocuments
+    : [];
+  const retrievedAt = options.retrievedAt || new Date().toISOString();
+  let summary = "";
+  try {
+    summary = outputTextFromResponse(payload);
+  } catch {
+    summary = "";
+  }
+  const rawSources = researchWebSourcesFromProviderPayload(payload);
+  const officialSources = normalizeResearchWebSources(rawSources, {
+    officialDomains: allowedDomains
+  }).filter((source) => source.sourceClassification === "official_guidance");
+  const candidateOfficialURLs = officialSources
+    .map((source) => source.url)
+    .slice(0, 5);
+  const sources = officialSources
+    .filter((source) => source.attributedClaims.length > 0)
+    .map((source) => ({
+      ...source,
+      id: `web-source-${createHash("sha256").update(source.url).digest("hex").slice(0, 24)}`,
+      attributedClaims: source.attributedClaims.map((claim) => ({
+        id: `web-claim-${createHash("sha256")
+          .update(`${source.url}\u0000${claim}`)
+          .digest("hex")
+          .slice(0, 24)}`,
+        text: claim
+      })),
+      authorityClass: source.sourceClassification,
+      role: source.sourceRole,
+      retrievedAt
+    }))
+    .map((source) => ({
+      ...source,
+      requiredAttribution: namedOfficialDocuments.some((reference) =>
+        extractResearchOfficialDocumentReferences([
+          source.title,
+          ...source.attributedClaims.map((claim) => claim.text)
+        ].join(" ")).includes(reference)
+      )
+    }));
+  return { summary, sources, candidateOfficialURLs };
+}
+
 export function researchWebSupportRequestBody({
   model,
   userID,
   sanitizedQuery,
   allowedDomains,
-  namedOfficialDocuments = []
+  namedOfficialDocuments = [],
+  candidateOfficialURLs = [],
+  attributionRetry = false
 }) {
-  const webInput = namedOfficialDocuments.length
-    ? [
-        "OFFICIAL DOCUMENTS TO RETRIEVE FIRST",
-        ...namedOfficialDocuments.map((reference) => `- ${reference}`),
-        "QUESTION",
-        sanitizedQuery
-      ].join("\n")
-    : sanitizedQuery;
+  const webInputSections = [];
+  if (attributionRetry) {
+    webInputSections.push(
+      "ATTRIBUTION RETRY",
+      "The prior official-source search did not return a source-bound substantive claim. Open a responsive official page and attach an inline citation from that exact page to every useful bullet. Do not return an uncited summary."
+    );
+  }
+  if (namedOfficialDocuments.length) {
+    webInputSections.push(
+      "OFFICIAL DOCUMENTS TO RETRIEVE FIRST",
+      ...namedOfficialDocuments.map((reference) => `- ${reference}`)
+    );
+  }
+  if (candidateOfficialURLs.length) {
+    webInputSections.push(
+      "CANDIDATE OFFICIAL PAGES FROM THE PRIOR SEARCH",
+      ...candidateOfficialURLs.map((url) => `- ${url}`)
+    );
+  }
+  webInputSections.push("QUESTION", sanitizedQuery);
+  const webInput = webInputSections.join("\n");
   return {
     model,
     store: false,
@@ -8285,8 +8347,8 @@ export function researchWebSupportRequestBody({
   };
 }
 
-async function openAIResearchWebSupport(question, userID, options = {}) {
-  const policyConfiguration = researchSourcePolicyConfiguration();
+export async function openAIResearchWebSupport(question, userID, options = {}) {
+  const policyConfiguration = options.policyConfiguration || researchSourcePolicyConfiguration();
   if (!policyConfiguration.webSupportEnabled) {
     return { summary: "", sources: [], usage: combinedResearchUsage(), searched: false };
   }
@@ -8294,7 +8356,7 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   if (!sanitizedQuery) {
     return { summary: "", sources: [], usage: combinedResearchUsage(), searched: false };
   }
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = options.apiKey || process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return { summary: "", sources: [], usage: combinedResearchUsage(), searched: false };
   }
@@ -8304,81 +8366,64 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   };
   const allowedDomains = policyConfiguration.officialDomains;
   const namedOfficialDocuments = extractResearchOfficialDocumentReferences(sanitizedQuery);
-  const requestBody = researchWebSupportRequestBody({
-    model: configuration.model,
-    userID,
-    sanitizedQuery,
-    allowedDomains,
-    namedOfficialDocuments
-  });
-  let payload;
-  try {
-    ({ payload } = await requestResearchProvider({
-      apiKey,
-      requestBody,
-      signal: options.signal,
-      timeoutMilliseconds: 30_000,
-      failureMessage: "The Research web-support request failed.",
-      reserveEvaluationSpend: reserveResearchEvaluationSpend,
-      reserveProviderSpend: reserveResearchProviderSpend,
-      settleProviderSpend: settleResearchProviderSpend
-    }));
-  } catch (error) {
-    const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
-    if ([
-      "RESEARCH_CANCELLED",
-      "RESEARCH_EVAL_SPEND_CAP",
-      "RESEARCH_SPEND_CAP",
-      "AbortError",
-      "TimeoutError"
-    ].includes(failureCode)) {
-      throw error;
-    }
-    return {
-      summary: "",
-      sources: [],
-      usage: combinedResearchUsage(),
-      searched: true,
-      requestedDocuments: namedOfficialDocuments,
-      unattributedRequestedDocuments: namedOfficialDocuments,
-      limitation: namedOfficialDocuments.length
-        ? `Permitext could not retrieve a source-specific attributable passage for ${namedOfficialDocuments.join(", ")}; that document was not used in this answer.`
-        : "Permitext could not reach the approved supporting web sources for this answer."
-    };
-  }
+  const requireAttributableSources = options.requireAttributableSources === true;
+  const maximumAttributionAttempts = requireAttributableSources ? 2 : 1;
+  let usage = combinedResearchUsage();
   let summary = "";
-  try {
-    summary = outputTextFromResponse(payload);
-  } catch {
-    summary = "";
-  }
-  const sources = normalizeResearchWebSources(researchWebSourcesFromProviderPayload(payload), {
-      officialDomains: allowedDomains
-    }).filter((source) => source.sourceClassification === "official_guidance")
-      .filter((source) => source.attributedClaims.length > 0)
-      .map((source) => ({
-        ...source,
-        id: `web-source-${createHash("sha256").update(source.url).digest("hex").slice(0, 24)}`,
-        attributedClaims: source.attributedClaims.map((claim) => ({
-          id: `web-claim-${createHash("sha256")
-            .update(`${source.url}\u0000${claim}`)
-            .digest("hex")
-            .slice(0, 24)}`,
-          text: claim
-        })),
-        authorityClass: source.sourceClassification,
-        role: source.sourceRole,
-        retrievedAt: new Date().toISOString()
-      }))
-      .map((source) => ({
-        ...source,
-        requiredAttribution: namedOfficialDocuments.some((reference) =>
-          extractResearchOfficialDocumentReferences([
-            source.title,
-            ...source.attributedClaims.map((claim) => claim.text)
-          ].join(" ")).includes(reference)
-        )
+  let sources = [];
+  let candidateOfficialURLs = [];
+  let lastFailure = null;
+  let attemptCount = 0;
+  const requestProvider = options.requestProvider || requestResearchProvider;
+  for (let attempt = 0; attempt < maximumAttributionAttempts; attempt += 1) {
+    attemptCount = attempt + 1;
+    const requestBody = researchWebSupportRequestBody({
+      model: configuration.model,
+      userID,
+      sanitizedQuery,
+      allowedDomains,
+      namedOfficialDocuments,
+      candidateOfficialURLs,
+      attributionRetry: attempt > 0
+    });
+    let payload;
+    try {
+      ({ payload } = await requestProvider({
+        apiKey,
+        requestBody,
+        signal: options.signal,
+        timeoutMilliseconds: 30_000,
+        failureMessage: "The Research web-support request failed.",
+        reserveEvaluationSpend: reserveResearchEvaluationSpend,
+        reserveProviderSpend: reserveResearchProviderSpend,
+        settleProviderSpend: settleResearchProviderSpend
       }));
+      usage = combinedResearchUsage(
+        usage,
+        researchUsageFromProviderPayload(payload, configuration.model)
+      );
+    } catch (error) {
+      const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
+      if ([
+        "RESEARCH_CANCELLED",
+        "RESEARCH_EVAL_SPEND_CAP",
+        "RESEARCH_SPEND_CAP",
+        "AbortError",
+        "TimeoutError"
+      ].includes(failureCode)) {
+        throw error;
+      }
+      lastFailure = error;
+      if (attempt + 1 < maximumAttributionAttempts) continue;
+      break;
+    }
+    ({ summary, sources, candidateOfficialURLs } =
+      researchAttributableWebSupportFromProviderPayload(payload, {
+        allowedDomains,
+        namedOfficialDocuments
+      }));
+    if (sources.length > 0 || !requireAttributableSources) break;
+  }
   const unattributedRequestedDocuments = namedOfficialDocuments.filter((reference) =>
     !sources.some((source) => extractResearchOfficialDocumentReferences([
       source.title,
@@ -8393,11 +8438,16 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   return {
     summary,
     sources,
-    usage: researchUsageFromProviderPayload(payload, configuration.model),
+    usage,
     searched: true,
+    attemptCount,
     sanitizedQuery,
     requestedDocuments: namedOfficialDocuments,
     unattributedRequestedDocuments,
+    candidateOfficialURLs,
+    ...(lastFailure ? {
+      lastFailureCode: String(lastFailure?.code || lastFailure?.name || "RESEARCH_PROVIDER_ERROR")
+    } : {}),
     ...(limitation ? { limitation } : {}),
     sourcePolicyVersion: researchSourcePolicyVersion
   };
@@ -17397,6 +17447,7 @@ async function handleResearchConversationMessage(request, response) {
       ? openAIResearchWebSupport(question, context.userID, {
           retrievalQuery: question,
           model: modelRouting.configuration.webSupportModel,
+          requireAttributableSources: allowOfficialGuidanceOnly,
           signal: progressResponse.signal
         })
       : Promise.resolve(emptyWebSupport);
@@ -17406,6 +17457,19 @@ async function handleResearchConversationMessage(request, response) {
       webSupportPromise,
       evidenceAnalysisPromise
     ]);
+    if (allowOfficialGuidanceOnly && webSupport.sources.length === 0) {
+      const error = new Error(
+        "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."
+      );
+      error.code = "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE";
+      error.webSupport = {
+        searched: webSupport.searched,
+        attemptCount: webSupport.attemptCount || 0,
+        candidateSourceCount: webSupport.candidateOfficialURLs?.length || 0,
+        limitation: webSupport.limitation || ""
+      };
+      throw error;
+    }
     progressResponse.progress("checking_citation_support", "completed");
     progressResponse.progress("preparing_conclusion", "active");
     let answerEscalated = false;
@@ -17976,6 +18040,14 @@ async function handleResearchConversationMessage(request, response) {
       escalationStages: modelEscalationStages,
       verificationAttemptCount: verificationAttempts.length,
       verificationIssueTypes,
+      webSupport: {
+        requested: webSupportRequested,
+        searched: webSupport.searched,
+        attemptCount: webSupport.attemptCount || 0,
+        sourceCount: webSupport.sources.length,
+        candidateSourceCount: webSupport.candidateOfficialURLs?.length || 0,
+        guidanceOnlyAllowed: allowOfficialGuidanceOnly
+      },
       modelUsage: Array.from(new Set(
         (result.usage.modelUsage || []).map((entry) => entry.model).filter(Boolean)
       )),
@@ -18048,6 +18120,7 @@ async function handleResearchConversationMessage(request, response) {
       "RESEARCH_VERIFIER_ERROR",
       "RESEARCH_VERIFICATION_FAILED",
       "RESEARCH_PROVIDER_ERROR",
+      "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE",
       "TimeoutError"
     ].includes(failureCode)) {
       console.warn(JSON.stringify({
@@ -18065,14 +18138,23 @@ async function handleResearchConversationMessage(request, response) {
         bindingIssue: error.bindingIssue || null,
         providerCause: error.providerCause || null,
         providerRequestID: error.providerRequestID || null,
-        providerAttempts: error.providerAttempts || null
+        providerAttempts: error.providerAttempts || null,
+        webSupport: error.webSupport || null
       }));
       progressResponse.failActive("failed");
-      const providerUnavailable = ["RESEARCH_PROVIDER_ERROR", "RESEARCH_VERIFIER_ERROR", "TimeoutError"]
+      const providerUnavailable = [
+        "RESEARCH_PROVIDER_ERROR",
+        "RESEARCH_VERIFIER_ERROR",
+        "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE",
+        "TimeoutError"
+      ]
         .includes(failureCode);
-      progressResponse.error(502, providerUnavailable
-        ? "Permitext Research is temporarily unavailable. Your question is still here."
-        : "The research model could not return a verified, cited answer.", {
+      const failureMessage = failureCode === "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"
+        ? "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."
+        : providerUnavailable
+          ? "Permitext Research is temporarily unavailable. Your question is still here."
+          : "The research model could not return a verified, cited answer.";
+      progressResponse.error(502, failureMessage, {
         code: failureCode
       });
       return;

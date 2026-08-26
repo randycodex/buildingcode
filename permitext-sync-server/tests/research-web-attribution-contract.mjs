@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import {
   accumulatedResearchVerificationIssues,
   finalizeResearchGuidanceOnlyInterpretation,
+  openAIResearchWebSupport,
+  researchAttributableWebSupportFromProviderPayload,
   researchEvidenceAnalysisForResponse,
   researchFollowUpQuestionsForResponse,
   researchInputForEvidence,
@@ -31,6 +33,21 @@ assert.deepEqual(webRequestBody.tools, [{
   filters: { allowed_domains: ["nyc.gov"] }
 }]);
 assert.deepEqual(webRequestBody.include, ["web_search_call.action.sources"]);
+const attributionRetryBody = researchWebSupportRequestBody({
+  model: "gpt-5.6-luna",
+  userID: "web-support-contract-user",
+  sanitizedQuery: "Find current official NYC DOB boiler guidance.",
+  allowedDomains: ["nyc.gov"],
+  candidateOfficialURLs: ["https://www.nyc.gov/site/buildings/safety/boiler-compliance.page"],
+  attributionRetry: true
+});
+assert.match(attributionRetryBody.input, /ATTRIBUTION RETRY/);
+assert.match(attributionRetryBody.input, /CANDIDATE OFFICIAL PAGES FROM THE PRIOR SEARCH/);
+assert.match(
+  attributionRetryBody.input,
+  /https:\/\/www\.nyc\.gov\/site\/buildings\/safety\/boiler-compliance\.page/
+);
+assert.match(attributionRetryBody.input, /Do not return an uncited summary/);
 const attributedClaimTexts = [
   "Buildings Bulletin 2022-013 says a foam-plastic exception requires a flame spread index of 25 or less under ASTM E84 or UL 723.",
   "The bulletin says that exception waives only the floor-level fireblocking requirement.",
@@ -81,6 +98,29 @@ const payloadSources = researchWebSourcesFromProviderPayload({
 const normalizedSources = normalizeResearchWebSources(payloadSources);
 assert.equal(normalizedSources.length, 1);
 assert.deepEqual(normalizedSources[0].attributedClaims, attributedClaimTexts);
+
+const unattributedFirstAttempt = researchAttributableWebSupportFromProviderPayload({
+  output: [{
+    type: "web_search_call",
+    action: {
+      sources: [{
+        url: "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page",
+        title: "Boiler Compliance - Buildings",
+        publisher: "NYC Department of Buildings"
+      }]
+    }
+  }, {
+    type: "message",
+    content: [{ type: "output_text", text: "No source-bound claim was returned.", annotations: [] }]
+  }]
+}, {
+  allowedDomains: ["nyc.gov"],
+  retrievedAt: "2026-08-26T00:00:00.000Z"
+});
+assert.deepEqual(unattributedFirstAttempt.sources, []);
+assert.deepEqual(unattributedFirstAttempt.candidateOfficialURLs, [
+  "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page"
+]);
 
 const directRangeText =
   "DOB states that construction documents must identify the NFPA 285-compliant wall assembly.";
@@ -133,6 +173,83 @@ assert.deepEqual(
   markdownCitationSources[0].attributedClaims,
   ["Annual inspection is required for registered H-stamped and E-stamped low-pressure boilers."],
   "A provider Markdown citation marker must bind the preceding claim, not become the attributed claim."
+);
+
+const zeroUsage = {
+  input_tokens: 0,
+  input_tokens_details: { cached_tokens: 0 },
+  output_tokens: 0,
+  total_tokens: 0
+};
+const semanticRetryRequests = [];
+const semanticRetryPayloads = [{
+  model: "gpt-5.6-luna",
+  usage: zeroUsage,
+  output: [{
+    type: "web_search_call",
+    action: {
+      sources: [{
+        url: "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page",
+        title: "Boiler Compliance - Buildings",
+        publisher: "NYC Department of Buildings"
+      }]
+    }
+  }, {
+    type: "message",
+    content: [{ type: "output_text", text: "No source-bound claim was returned.", annotations: [] }]
+  }]
+}, {
+  model: "gpt-5.6-luna",
+  usage: zeroUsage,
+  output: [{
+    type: "web_search_call",
+    action: {
+      sources: [{
+        url: "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page",
+        title: "Boiler Compliance - Buildings",
+        publisher: "NYC Department of Buildings"
+      }]
+    }
+  }, {
+    type: "message",
+    content: [{
+      type: "output_text",
+      text: markdownCitationText,
+      annotations: [{
+        type: "url_citation",
+        url: "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page",
+        title: "Boiler Compliance - Buildings",
+        start_index: markdownCitationStart,
+        end_index: markdownCitationStart + markdownCitationMarker.length
+      }]
+    }]
+  }]
+}];
+const semanticRetryResult = await openAIResearchWebSupport(
+  "Using current official NYC Department of Buildings guidance, which registered low-pressure boilers require annual inspections?",
+  "web-support-contract-user",
+  {
+    apiKey: "test-only",
+    model: "gpt-5.6-luna",
+    requireAttributableSources: true,
+    policyConfiguration: { webSupportEnabled: true, officialDomains: ["nyc.gov"] },
+    requestProvider: async ({ requestBody }) => {
+      semanticRetryRequests.push(requestBody);
+      return { payload: semanticRetryPayloads.shift() };
+    }
+  }
+);
+assert.equal(semanticRetryRequests.length, 2);
+assert.match(semanticRetryRequests[1].input, /ATTRIBUTION RETRY/);
+assert.match(
+  semanticRetryRequests[1].input,
+  /https:\/\/www\.nyc\.gov\/site\/buildings\/safety\/boiler-compliance\.page/
+);
+assert.equal(semanticRetryResult.attemptCount, 2);
+assert.equal(semanticRetryResult.sources.length, 1);
+assert.equal(
+  semanticRetryResult.sources[0].attributedClaims[0].text,
+  "Annual inspection is required for registered H-stamped and E-stamped low-pressure boilers."
 );
 
 const evidence = [{

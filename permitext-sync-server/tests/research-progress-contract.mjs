@@ -2,11 +2,31 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { assembleResearchEvidence } from "../research-evidence-assembly.mjs";
 import {
+  clearResearchRequestRecoveries,
   createResearchProgressEvent,
+  readResearchRequestRecovery,
+  removeResearchRequestRecovery,
+  researchRequestRecoveryMaxAgeMilliseconds,
+  researchRequestRecoveryStorageKey,
   researchProgressStages,
   researchProgressStates,
-  researchProgressSummary
+  researchProgressSummary,
+  writeResearchRequestRecovery
 } from "../public/research-progress.js";
+
+class MemoryStorage {
+  constructor() {
+    this.values = new Map();
+  }
+
+  getItem(key) {
+    return this.values.get(key) ?? null;
+  }
+
+  setItem(key, value) {
+    this.values.set(key, String(value));
+  }
+}
 
 const expectedStages = [
   ["preparing_question", "Preparing the question"],
@@ -60,6 +80,111 @@ const summary = researchProgressSummary(emitted, {
 assert.equal(summary.status, "completed");
 assert(summary.stages.every((stage) => stage.state === "completed"));
 
+const recoveryStorage = new MemoryStorage();
+const recoveryNow = Date.parse("2026-08-26T16:00:00.000Z");
+const recovery = {
+  accountUserID: "account-a",
+  workspaceID: "workspace-a",
+  conversationID: "conversation-a",
+  requestID: "request-stable",
+  question: "What official guidance applies?",
+  status: "cancelled",
+  startedAt: recoveryNow - 10_000,
+  endedAt: recoveryNow - 1_000,
+  error: "Research was cancelled. Your question is still here.",
+  errorCode: "RESEARCH_CANCELLED",
+  stages: researchProgressStages.map((stage, index) => ({
+    id: stage.id,
+    state: index === 0 ? "completed" : index === 1 ? "cancelled" : "pending"
+  }))
+};
+assert.equal(writeResearchRequestRecovery(recoveryStorage, recovery, recoveryNow), true);
+assert.equal(
+  readResearchRequestRecovery(recoveryStorage, {
+    accountUserID: "account-a",
+    workspaceID: "workspace-a",
+    conversationID: "conversation-a"
+  }, recoveryNow)?.requestID,
+  "request-stable",
+  "A cancelled question did not retain the idempotent request ID needed by Retry."
+);
+assert.equal(
+  readResearchRequestRecovery(recoveryStorage, {
+    accountUserID: "account-b",
+    workspaceID: "workspace-a",
+    conversationID: "conversation-a"
+  }, recoveryNow),
+  null,
+  "A recovered Research question leaked across accounts."
+);
+assert.equal(
+  readResearchRequestRecovery(recoveryStorage, {
+    accountUserID: "account-a",
+    workspaceID: "workspace-b",
+    conversationID: "conversation-a"
+  }, recoveryNow),
+  null,
+  "A recovered Research question leaked across named workspaces."
+);
+
+writeResearchRequestRecovery(recoveryStorage, {
+  ...recovery,
+  conversationID: "conversation-active",
+  requestID: "request-active",
+  status: "active",
+  endedAt: null
+}, recoveryNow + 1);
+assert.equal(
+  readResearchRequestRecovery(recoveryStorage, {
+    accountUserID: "account-a",
+    workspaceID: "workspace-a",
+    conversationID: "conversation-active"
+  }, recoveryNow + 1)?.endedAt,
+  null,
+  "An active recovery incorrectly acquired a completion timestamp."
+);
+removeResearchRequestRecovery(recoveryStorage, {
+  accountUserID: "account-a",
+  conversationID: "conversation-a"
+}, recoveryNow + 2);
+assert.equal(
+  readResearchRequestRecovery(recoveryStorage, {
+    accountUserID: "account-a",
+    workspaceID: "workspace-a",
+    conversationID: "conversation-a"
+  }, recoveryNow + 2),
+  null,
+  "A completed or deleted conversation left its pending recovery behind."
+);
+
+writeResearchRequestRecovery(recoveryStorage, {
+  ...recovery,
+  conversationID: "conversation-expired",
+  requestID: "request-expired"
+}, recoveryNow - researchRequestRecoveryMaxAgeMilliseconds - 1);
+assert.equal(
+  readResearchRequestRecovery(recoveryStorage, {
+    accountUserID: "account-a",
+    workspaceID: "workspace-a",
+    conversationID: "conversation-expired"
+  }, recoveryNow),
+  null,
+  "Expired failed questions were retained beyond the bounded recovery period."
+);
+recoveryStorage.setItem(researchRequestRecoveryStorageKey, "not-json");
+assert.equal(
+  readResearchRequestRecovery(recoveryStorage, {
+    accountUserID: "account-a",
+    workspaceID: "workspace-a",
+    conversationID: "conversation-a"
+  }, recoveryNow),
+  null,
+  "Malformed recovery storage did not fail closed."
+);
+writeResearchRequestRecovery(recoveryStorage, recovery, recoveryNow);
+clearResearchRequestRecoveries(recoveryStorage, { accountUserID: "account-a" }, recoveryNow);
+assert.equal(JSON.parse(recoveryStorage.getItem(researchRequestRecoveryStorageKey)).length, 0);
+
 const assemblyStages = [];
 await assembleResearchEvidence({
   question: "What enacted provisions apply?",
@@ -87,7 +212,12 @@ assert(serverSource.includes("requestResearchProvider({"));
 assert(serverSource.includes("signal: options.signal"));
 assert(providerClientSource.includes("AbortSignal.any([signal, timeoutSignal])"));
 assert(clientSource.includes("new AbortController()"));
-assert(clientSource.includes('progress.retry = () => void execute(true)'));
+assert(clientSource.includes("persistResearchProgressSession(progress)"));
+assert(clientSource.includes("restoreResearchProgressSession(conversation)"));
+assert(clientSource.includes("{ retrying: true }"));
+assert(clientSource.includes("requestID: progress.id"));
+assert(clientSource.includes("removeResearchRequestRecovery("));
+assert(clientSource.includes("Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."));
 assert(clientSource.includes('error.name === "AbortError"'));
 assert(!clientSource.includes('className = "research-progress-details"'), "Research progress cards still expose the internal stage checklist.");
 assert(!clientSource.includes('className = "research-progress-tasks"'), "Research progress task rows are still rendered.");

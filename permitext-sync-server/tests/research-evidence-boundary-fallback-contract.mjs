@@ -204,7 +204,7 @@ assert.ok(
 assert.match(handler, /requestID: researchRequestID/);
 assert.match(
   handler,
-  /const providerUnavailable = \["RESEARCH_PROVIDER_ERROR", "RESEARCH_VERIFIER_ERROR", "TimeoutError"\][\s\S]*?"Permitext Research is temporarily unavailable\. Your question is still here\."[\s\S]*?"The research model could not return a verified, cited answer\."[\s\S]*?code: failureCode/,
+  /const providerUnavailable = \[[\s\S]*?"RESEARCH_PROVIDER_ERROR"[\s\S]*?"RESEARCH_VERIFIER_ERROR"[\s\S]*?"RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"[\s\S]*?"TimeoutError"[\s\S]*?\][\s\S]*?"Permitext could not retrieve attributable official guidance from the approved sources\. Your question is still here\."[\s\S]*?"Permitext Research is temporarily unavailable\. Your question is still here\."[\s\S]*?"The research model could not return a verified, cited answer\."[\s\S]*?code: failureCode/,
   "Research provider outages must be recoverable while verification failures preserve their server code for native clients."
 );
 
