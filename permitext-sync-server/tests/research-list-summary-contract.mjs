@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
+  canonicalResearchBoundedCitationInterpretation,
   deterministicResearchEvidenceAnalysisForBoundedCitation,
   projectResearchConversationForList,
   researchConversationDisplayTitle,
@@ -428,6 +429,17 @@ assert.deepEqual(boundedCitationAnalysis.controllingProvisions, [{
 assert.deepEqual(boundedCitationAnalysis.unresolvedProjectFacts, []);
 assert.deepEqual(boundedCitationAnalysis.highValueFollowUpQuestions, []);
 assert.deepEqual(boundedCitationAnalysis.evidenceLimitations, ["Only the cited enacted section was included."]);
+assert.deepEqual(
+  canonicalResearchBoundedCitationInterpretation({
+    answerText: "Section 101.1 supplies the requested title.",
+    evidenceLimitations: ["The available evidence may omit the requested section."]
+  }, boundedCitationAnalysis),
+  {
+    answerText: "Section 101.1 supplies the requested title.",
+    evidenceLimitations: ["Only the cited enacted section was included."]
+  },
+  "An exact-citation answer must use the deterministic retrieval boundary instead of a model-invented limitation."
+);
 assert.doesNotThrow(
   () => validateResearchEvidenceAnalysis(boundedCitationAnalysis, [{
     sourceID: "bc-101-1",

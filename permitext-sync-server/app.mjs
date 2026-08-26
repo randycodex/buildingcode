@@ -7826,6 +7826,22 @@ export function deterministicResearchEvidenceAnalysisForBoundedCitation(
   };
 }
 
+export function canonicalResearchBoundedCitationInterpretation(
+  interpretation,
+  evidenceAnalysis
+) {
+  if (!interpretation || typeof interpretation !== "object") return interpretation;
+  const evidenceLimitations = (evidenceAnalysis?.evidenceLimitations || [])
+    .map((item) => normalizedResearchText(item, 1_500))
+    .filter(Boolean);
+  return {
+    ...interpretation,
+    evidenceLimitations: evidenceLimitations.length
+      ? evidenceLimitations
+      : ["Permitext limited this answer to the enacted section identified by the user's exact citation."]
+  };
+}
+
 async function openAIResearchEvidenceAnalysis(question, evidence, userID, options = {}) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -17451,6 +17467,15 @@ async function handleResearchConversationMessage(request, response) {
             model: accurateModel
           });
         });
+    if (boundedCitationLookup) {
+      result = {
+        ...result,
+        interpretation: canonicalResearchBoundedCitationInterpretation(
+          result.interpretation,
+          evidenceAnalysisResult.analysis
+        )
+      };
+    }
     let verificationAttempts = [];
     let evidenceBoundaryFallback = false;
     let verifierUsage = combinedResearchUsage();
@@ -17561,7 +17586,15 @@ async function handleResearchConversationMessage(request, response) {
             previousInterpretation
           });
           answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
-          result = revised;
+          result = boundedCitationLookup
+            ? {
+                ...revised,
+                interpretation: canonicalResearchBoundedCitationInterpretation(
+                  revised.interpretation,
+                  evidenceAnalysisResult.analysis
+                )
+              }
+            : revised;
         }
         requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
           requiredClaims,
