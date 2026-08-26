@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260824-hybrid-research-trust-v4";
+} from "./offline-storage.js?v=20260825-research-parity-v7";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260824-hybrid-research-trust-v4";
+} from "./research-intent-state.js?v=20260825-research-parity-v7";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -371,7 +371,7 @@ const savedItemsPageSize = 48;
 const recentViewLimit = 50;
 const recentSearchLimit = 50;
 const recentSearchPopoverLimit = 15;
-const researchChatPlaceholder = "AI-assisted research — not an official interpretation";
+const researchChatPlaceholder = "Ask a Research question…";
 const repeatableUtilityKeys = new Set(["search", "saved"]);
 const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title"]);
 const collapsedSettingsCardIDs = new Set();
@@ -15214,6 +15214,12 @@ function appendResearchSupportedPoints(container, points) {
       researchDisplayText(point.heading)
     ].filter(Boolean).join(" ");
     row.append(title);
+    const explanationText = researchDisplayText(point.explanation);
+    if (explanationText) {
+      const explanation = document.createElement("p");
+      explanation.textContent = explanationText;
+      row.append(explanation);
+    }
     list.append(row);
   });
   container.append(heading, list);
@@ -15441,10 +15447,13 @@ function renderResearchInterpretation(container, result, options = {}) {
     const sourceAsOf = result.sourceAsOf && Number.isFinite(Date.parse(result.sourceAsOf))
       ? new Date(result.sourceAsOf).toLocaleDateString()
       : "";
-    codeDisclosure.textContent = [codeBasisText, sourceAsOf ? `Research basis captured ${sourceAsOf}` : ""]
+    codeDisclosure.textContent = [
+      codeBasisText,
+      String(codeBasis?.limitation || "").trim(),
+      sourceAsOf ? `Research basis captured ${sourceAsOf}` : ""
+    ]
       .filter(Boolean)
       .join(" · ");
-    if (codeBasis?.limitation) codeDisclosure.title = codeBasis.limitation;
     card.append(codeDisclosure);
   }
 
@@ -17375,7 +17384,7 @@ async function runResearchProgressSession(progress, { onSuccess, onFailure, onRe
       progress.status = cancelled ? "cancelled" : "failed";
       progress.error = cancelled
         ? "Research was cancelled before an answer was saved."
-        : error.message || "Permitext could not complete this Research question.";
+        : researchFailureMessage(error);
       progress.errorCode = error.code || error.payload?.code || "";
       if (error.payload?.usage) researchUsage = error.payload.usage;
       progress.endedAt = Date.now();
@@ -17392,7 +17401,7 @@ function researchComposerDisclosure() {
   const disclosure = document.createElement("p");
   disclosure.className = "research-composer-disclosure";
   disclosure.append(document.createTextNode(
-    "Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI for generation. Do not include confidential or unnecessary personal information. "
+    "AI-assisted—not an official interpretation. Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Do not include confidential or unnecessary personal information. "
   ));
   const privacyLink = document.createElement("a");
   privacyLink.href = "/privacy";
@@ -17401,6 +17410,32 @@ function researchComposerDisclosure() {
   privacyLink.textContent = "Privacy";
   disclosure.append(privacyLink);
   return disclosure;
+}
+
+function researchFailureMessage(error) {
+  const code = String(error?.code || error?.payload?.code || "").trim().toUpperCase();
+  const verificationCodes = new Set([
+    "INVALID_RESEARCH_RESPONSE",
+    "INVALID_RESEARCH_CITATION",
+    "INVALID_RESEARCH_WEB_CITATION",
+    "INVALID_RESEARCH_EVIDENCE_ANALYSIS",
+    "INVALID_RESEARCH_VERIFICATION",
+    "RESEARCH_VERIFICATION_FAILED"
+  ]);
+  const providerCodes = new Set([
+    "RESEARCH_NOT_CONFIGURED",
+    "RESEARCH_PROVIDER_ERROR",
+    "RESEARCH_VERIFIER_ERROR",
+    "RESEARCH_EVAL_SPEND_CAP",
+    "TIMEOUTERROR"
+  ]);
+  if (verificationCodes.has(code)) {
+    return "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here.";
+  }
+  if (providerCodes.has(code)) {
+    return "Permitext's Research service is temporarily unavailable. Your question is still here.";
+  }
+  return error?.message || "Permitext could not complete this Research question.";
 }
 
 function renderNewResearchComposer(container, researchEnabled) {

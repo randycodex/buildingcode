@@ -212,6 +212,7 @@ async function main() {
       PERMITEXT_SYNC_GRANT_ADMIN_TOKEN: grantToken,
       PERMITEXT_CODE_QUESTION_WORKSPACE: "1",
       PERMITEXT_TEST_RESEARCH_MOCK: "1",
+      PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE: "bb-2022-013",
       PERMITEXT_TEST_RESEARCH_MOCK_DELAY_MS: "100",
       PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1",
       PERMITEXT_TEST_CONCURRENT_CODE_QUESTION_ANALYSIS: "1"
@@ -665,7 +666,7 @@ async function main() {
     const firstResearchAnswerMessage = researchMessage.conversation.messages.find((item) => item.role === "assistant");
     assert.ok(capturedMessage?.id);
     assert.ok(firstResearchAnswerMessage?.id);
-    assert.ok(firstResearchAnswerMessage.answer.promptVersion.endsWith(":conversational-v3"));
+    assert.ok(firstResearchAnswerMessage.answer.promptVersion.endsWith(":conversational-v4"));
     assert.match(firstResearchAnswerMessage.answer.conclusion, /^(?:Potentially, yes|The assembled enacted provisions provide a conditional answer)/);
     const firstResearchAnswer = await expectStatus(
       await postAs(editor, "/research/answers/get", { answerID: firstResearchAnswerMessage.id }),
@@ -684,6 +685,55 @@ async function main() {
       firstResearchAnswer.answer.answer.promptVersion,
       firstResearchAnswerMessage.answer.promptVersion
     );
+
+    const bbSelectionText = "718.2.6.1 Exterior wall coverings containing plastics, metal composite materials (MCM) or high-pressure decorative exterior-grade compact laminates (HPL) panels.";
+    const bbResearch = await expectStatus(
+      await postAs(editor, "/research/conversations/create", {
+        projectID,
+        selections: [{ sectionID: "1334", selectedText: bbSelectionText }]
+      }),
+      201,
+      "Creating BB 2022-013 route-level provider fixture Research"
+    );
+    const bbQuestion = "How does Buildings Bulletin 2022-013 clarify BC 718.2.6.1?";
+    const bbMessage = await expectStatus(
+      await postAs(editor, "/research/conversations/message", {
+        conversationID: bbResearch.conversation.id,
+        question: bbQuestion
+      }),
+      200,
+      "Answering BB 2022-013 through the ordinary Research message route"
+    );
+    const bbAnswer = bbMessage.conversation.messages.findLast((message) => message.role === "assistant")?.answer;
+    assert.ok(bbAnswer);
+    assert.match(bbAnswer.answerText, /flame spread index of 25 or less/i);
+    assert.match(bbAnswer.answerText, /ASTM E84 or UL 723/i);
+    assert.match(bbAnswer.answerText, /waives only the floor-level fireblocking requirement/i);
+    assert.match(bbAnswer.answerText, /construction documents to identify the NFPA 285-compliant wall assembly/i);
+    assert.deepEqual(
+      bbAnswer.supportingSourceUses.map((use) => use.claimID),
+      [
+        "web-claim-bb-2022-013-flame-spread",
+        "web-claim-bb-2022-013-floor-level",
+        "web-claim-bb-2022-013-construction-documents"
+      ]
+    );
+    assert.deepEqual(
+      bbAnswer.supportingSourceUses.map((use) => use.claim),
+      bbAnswer.supportingSources[0].attributedClaims.map((claim) => claim.text)
+    );
+    const bbSupportedPointText = bbAnswer.supportedPoints
+      .flatMap((point) => [point.heading, point.explanation])
+      .join(" ");
+    assert.doesNotMatch(
+      bbSupportedPointText,
+      /flame spread|ASTM|UL 723|floor-level|NFPA 285|construction documents/i
+    );
+    assert.ok(bbAnswer.citations.every((citation) =>
+      citation.sourceIDs.every((sourceID) => !sourceID.startsWith("web-"))
+    ));
+    assert.equal(bbMessage.usage.mockMode, true);
+
     const decisionAfterOrdinaryResearch = await expectStatus(
       await postAs(editor, "/projects/code-questions/state", { projectID, questionID: question.id }),
       200,

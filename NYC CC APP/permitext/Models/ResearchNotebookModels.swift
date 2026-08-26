@@ -203,21 +203,132 @@ struct ResearchMessage: Codable, Hashable, Identifiable, Sendable {
 }
 
 struct ResearchAnswer: Codable, Hashable, Sendable {
+    var mode: String? = nil
     var answerText: String? = nil
     var conclusion: String = ""
     var explanation: String = ""
     var authorityStatus: String? = nil
     var authorityLabel: String? = nil
     var codeEdition: String? = nil
+    var codeBasis: ResearchCodeBasis? = nil
     var sourceAsOf: String? = nil
+    var sourceSummary: ResearchSourceSummary? = nil
+    var factUsage: ResearchFactUsage? = nil
     var supportedPoints: [ResearchSupportedPoint] = []
     var assumptions: [String] = []
     var missingFacts: [String] = []
     var evidenceLimitations: [String] = []
     var followUpQuestions: [String] = []
     var additionalEvidenceNeeded: [String] = []
+    var supportingSources: [ResearchSupportingSource]? = nil
     var citations: [ResearchCitation] = []
     var disclaimer: String? = nil
+}
+
+struct ResearchCodeBasis: Codable, Hashable, Sendable {
+    var disclosure: String? = nil
+    var limitation: String? = nil
+}
+
+struct ResearchSourceSummary: Codable, Hashable, Sendable {
+    var projectFactCount: Int? = nil
+    var sourcedProjectFactCount: Int? = nil
+    var enactedProvisionCount: Int? = nil
+    var contextualProvisionCount: Int? = nil
+    var citedProvisionCount: Int? = nil
+    var governingCitationCount: Int? = nil
+    var supportingCitationCount: Int? = nil
+    var contextualCitationCount: Int? = nil
+    var reviewedOnlyProvisionCount: Int? = nil
+    var userPinnedCount: Int? = nil
+    var permitextDiscoveredCount: Int? = nil
+    var crossReferenceCount: Int? = nil
+    var supportingWebSourceCount: Int? = nil
+    var unresolvedProjectFactCount: Int? = nil
+}
+
+struct ResearchFactUsage: Codable, Hashable, Sendable {
+    var projectContext: [String]? = nil
+    var conversation: [String]? = nil
+    var other: [String]? = nil
+}
+
+struct ResearchSupportingSource: Codable, Hashable, Sendable {
+    var id: String? = nil
+    var title: String? = nil
+    var publisher: String? = nil
+    var url: String? = nil
+    var authorityClass: String? = nil
+    var role: String? = nil
+    var claim: String? = nil
+
+    var displayTitle: String {
+        [title, publisher]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first(where: { !$0.isEmpty }) ?? "Supporting source"
+    }
+
+    var webURL: URL? {
+        guard
+            let value = url?.trimmingCharacters(in: .whitespacesAndNewlines),
+            !value.isEmpty,
+            let resolved = URL(string: value),
+            ["http", "https"].contains(resolved.scheme?.lowercased() ?? ""),
+            resolved.host != nil
+        else {
+            return nil
+        }
+        return resolved
+    }
+}
+
+extension ResearchAnswer {
+    var researchSourceBoundaryText: String {
+        let summary = sourceSummary
+        let cited = summary?.citedProvisionCount ?? 0
+        let reviewed = summary?.reviewedOnlyProvisionCount ?? 0
+        let supporting = summary?.supportingCitationCount ?? 0
+        let contextual = summary?.contextualProvisionCount ?? 0
+        let unresolved = summary?.unresolvedProjectFactCount ?? missingFacts.count
+        let limits = evidenceLimitations.count
+        var parts: [String] = []
+
+        if mode == "project_context", let projectFacts = summary?.projectFactCount, projectFacts > 0 {
+            parts.append("Based on \(projectFacts) saved Project \(projectFacts == 1 ? "fact" : "facts")")
+        } else if cited > 0 {
+            parts.append("Cited \(cited) enacted \(cited == 1 ? "provision" : "provisions")")
+            if supporting > 0 {
+                parts.append("\(supporting) supporting \(supporting == 1 ? "citation" : "citations")")
+            }
+            if reviewed > 0 {
+                parts.append("\(reviewed) additional \(reviewed == 1 ? "provision" : "provisions") reviewed")
+            }
+        } else if let enacted = summary?.enactedProvisionCount, enacted > 0 {
+            parts.append("Based on \(enacted) enacted \(enacted == 1 ? "provision" : "provisions")")
+            if let pinned = summary?.userPinnedCount, pinned > 0 {
+                parts.append("\(pinned) pinned by you")
+            }
+            if let discovered = summary?.permitextDiscoveredCount, discovered > 0 {
+                parts.append("\(discovered) identified by Permitext")
+            }
+            if let crossReferences = summary?.crossReferenceCount, crossReferences > 0 {
+                parts.append("\(crossReferences) cross-references reviewed")
+            }
+        } else {
+            parts.append("Grounded in the cited Research sources")
+        }
+
+        if contextual > 0, cited == 0 {
+            parts.append("\(contextual) contextual \(contextual == 1 ? "provision" : "provisions") reviewed separately")
+        }
+        parts.append(unresolved == 0
+            ? "No unresolved project facts identified"
+            : "\(unresolved) project \(unresolved == 1 ? "fact remains" : "facts remain") unresolved")
+        parts.append(limits == 0
+            ? "No additional evidence limits identified"
+            : "\(limits) evidence \(limits == 1 ? "limit" : "limits")")
+        return parts.joined(separator: " · ")
+    }
 }
 
 struct ResearchSupportedPoint: Codable, Hashable, Sendable {

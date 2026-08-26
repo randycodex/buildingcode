@@ -5811,6 +5811,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   padding-left: var(--space-1);
 }
 
+.research-supported-points li p {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+}
+
 .research-supported-points li::marker {
   color: var(--code-accent, var(--text-primary));
   font-weight: 700;

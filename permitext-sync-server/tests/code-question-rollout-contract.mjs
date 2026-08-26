@@ -345,7 +345,7 @@ assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Re
 assert.match(researchInterpretationSource, /Based on.*enacted/);
 assert.match(researchInterpretationSource, /evidenceReviewed\.open = Boolean\(options\.detailsOpen\)[\s\S]*?evidenceReviewedBody\.append\(details\);[\s\S]*?card\.append\(evidenceReviewed\);[\s\S]*?container\.append\(card\)/);
 assert.match(workspaceScript, /renderResearchInterpretation\(bubble, message\.answer, \{[\s\S]*?message,[\s\S]*?conversationID,[\s\S]*?conversation,[\s\S]*?anchorPaneID: paneID/);
-assert.doesNotMatch(researchInterpretationSource, /research-disclaimer|result\.disclaimer/);
+assert.doesNotMatch(researchInterpretationSource, /result\.disclaimer/);
 assert.doesNotMatch(researchInterpretationSource, /answerHeading|Practical application/);
 assert.match(workspaceScript, /renderResearchInterpretation\(exactAnswer, answerRecord\.answer, \{ detailsOpen: true \}\)/);
 
@@ -386,7 +386,8 @@ assert.match(workspaceStyles, /workspace-panel:not\(\.reader-panel\) \.research-
 assert.match(workspaceStyles, /\.research-answer-paragraph:first-child \{[\s\S]*?font-weight: 400;/);
 assert.match(workspaceStyles, /\.research-evidence-reviewed > summary::after \{[\s\S]*?content: "›";/);
 assert.doesNotMatch(workspaceScript, /Was this answer useful\?/);
-assert.doesNotMatch(workspaceScript, /explanation\.textContent = researchDisplayText\(point\.explanation\)/);
+assert.match(workspaceScript, /const explanationText = researchDisplayText\(point\.explanation\)/);
+assert.match(workspaceScript, /explanation\.textContent = explanationText/);
 assert.match(workspaceStyles, /\.code-question-index-id \{[\s\S]*?font-weight: 400;/);
 assert.match(workspaceStyles, /\.code-question-index-title \{[\s\S]*?font-weight: 400;/);
 assert.match(workspaceScript, /const displayNumber = Number\(question\.questionNumber\)/);

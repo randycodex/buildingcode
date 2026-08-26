@@ -3799,6 +3799,115 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testResearchAnswerDecodesCrossPlatformTrustAndContextDetails() throws {
+        let data = Data(
+            """
+            {
+              "mode": "openai",
+              "answerText": "The enacted provision controls; DOB guidance is supporting context.",
+              "conclusion": "The enacted provision controls.",
+              "explanation": "DOB guidance is supporting context.",
+              "codeEdition": "2022 NYC Construction Codes",
+              "codeBasis": {
+                "disclosure": "Sources searched: 2022 NYC Construction Codes",
+                "limitation": "Zoning was not searched."
+              },
+              "sourceSummary": {
+                "enactedProvisionCount": 2,
+                "citedProvisionCount": 1,
+                "supportingCitationCount": 1,
+                "reviewedOnlyProvisionCount": 1,
+                "supportingWebSourceCount": 1,
+                "unresolvedProjectFactCount": 0
+              },
+              "factUsage": {
+                "projectContext": ["Exterior wall assembly uses foam plastic."],
+                "conversation": ["The building is fully sprinklered."],
+                "other": []
+              },
+              "supportedPoints": [],
+              "assumptions": [],
+              "missingFacts": [],
+              "evidenceLimitations": ["DOB guidance is noncontrolling."],
+              "followUpQuestions": [],
+              "additionalEvidenceNeeded": [],
+              "supportingSources": [{
+                "id": "web-source-bb-2022-013",
+                "title": "Buildings Bulletin 2022-013",
+                "publisher": "NYC Department of Buildings",
+                "url": "https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2022-013.pdf",
+                "authorityClass": "official_guidance",
+                "role": "supporting",
+                "claim": "The bulletin discusses fireblocking in exterior wall assemblies."
+              }],
+              "citations": []
+            }
+            """.utf8
+        )
+
+        let answer = try JSONDecoder().decode(ResearchAnswer.self, from: data)
+
+        XCTAssertEqual(answer.mode, "openai")
+        XCTAssertEqual(answer.codeBasis?.disclosure, "Sources searched: 2022 NYC Construction Codes")
+        XCTAssertEqual(answer.sourceSummary?.supportingWebSourceCount, 1)
+        XCTAssertEqual(answer.factUsage?.projectContext?.first, "Exterior wall assembly uses foam plastic.")
+        XCTAssertEqual(answer.factUsage?.conversation?.first, "The building is fully sprinklered.")
+        XCTAssertEqual(answer.supportingSources?.first?.title, "Buildings Bulletin 2022-013")
+        XCTAssertEqual(answer.supportingSources?.first?.claim, "The bulletin discusses fireblocking in exterior wall assemblies.")
+        XCTAssertEqual(
+            answer.supportingSources?.first?.webURL?.absoluteString,
+            "https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2022-013.pdf"
+        )
+        XCTAssertEqual(answer.supportingSources?.first?.displayTitle, "Buildings Bulletin 2022-013")
+        XCTAssertEqual(
+            answer.researchSourceBoundaryText,
+            "Cited 1 enacted provision · 1 supporting citation · 1 additional provision reviewed · No unresolved project facts identified · 1 evidence limit"
+        )
+    }
+
+    func testResearchAnswerProjectContextBoundaryAndSupportingSourceFallbacks() throws {
+        let data = Data(
+            """
+            {
+              "mode": "project_context",
+              "conclusion": "The saved Project facts identify the property.",
+              "explanation": "No enacted code conclusion was requested.",
+              "sourceSummary": {
+                "projectFactCount": 3,
+                "sourcedProjectFactCount": 2,
+                "unresolvedProjectFactCount": 0
+              },
+              "supportedPoints": [],
+              "assumptions": [],
+              "missingFacts": [],
+              "evidenceLimitations": [],
+              "followUpQuestions": [],
+              "additionalEvidenceNeeded": [],
+              "citations": []
+            }
+            """.utf8
+        )
+
+        let answer = try JSONDecoder().decode(ResearchAnswer.self, from: data)
+        XCTAssertEqual(answer.sourceSummary?.projectFactCount, 3)
+        XCTAssertEqual(answer.sourceSummary?.sourcedProjectFactCount, 2)
+        XCTAssertEqual(
+            answer.researchSourceBoundaryText,
+            "Based on 3 saved Project facts · No unresolved project facts identified · No additional evidence limits identified"
+        )
+
+        let publisherFallback = ResearchSupportingSource(
+            title: "  ",
+            publisher: "NYC Department of Buildings",
+            url: "ftp://example.com/not-allowed"
+        )
+        XCTAssertEqual(publisherFallback.displayTitle, "NYC Department of Buildings")
+        XCTAssertNil(publisherFallback.webURL)
+
+        let genericFallback = ResearchSupportingSource(title: "", publisher: "")
+        XCTAssertEqual(genericFallback.displayTitle, "Supporting source")
+    }
+
     func testResearchFailureDistinguishesVerificationFromProviderFailure() {
         let verificationError = PermitextBackendHTTPError.serverStatus(
             502,

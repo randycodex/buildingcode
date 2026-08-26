@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260810-supporting-web-v1";
+export const researchSourcePolicyVersion = "20260825-supporting-web-v2";
 
 export const defaultResearchOfficialDomains = Object.freeze([
   "nyc.gov",
@@ -160,21 +160,39 @@ export function normalizeResearchWebSources(sources, options = {}) {
     options.officialDomains === undefined ? defaultResearchOfficialDomains : options.officialDomains
   );
   const normalized = [];
-  const seenURLs = new Set();
+  const sourcesByURL = new Map();
+
+  const normalizedClaims = (source) => [...new Set(
+    (Array.isArray(source?.attributedClaims) ? source.attributedClaims : [])
+      .map((claim) => normalizedText(claim).replace(/\s+/g, " "))
+      .filter(Boolean)
+  )];
 
   for (const rawSource of Array.isArray(sources) ? sources : []) {
     const source = typeof rawSource === "string" ? { url: rawSource } : (rawSource || {});
     const url = normalizedHttpsURL(source.url || source.sourceURL || source.href);
-    if (!url || seenURLs.has(url)) continue;
-    seenURLs.add(url);
-    normalized.push({
+    if (!url) continue;
+    const existing = sourcesByURL.get(url);
+    if (existing) {
+      existing.title ||= normalizedText(source.title);
+      existing.publisher ||= normalizedText(source.publisher);
+      existing.attributedClaims = [...new Set([
+        ...existing.attributedClaims,
+        ...normalizedClaims(source)
+      ])];
+      continue;
+    }
+    const entry = {
       ...source,
       url,
       title: normalizedText(source.title),
       publisher: normalizedText(source.publisher),
+      attributedClaims: normalizedClaims(source),
       ...classifyResearchWebSource({ url }, { officialDomains }),
       sourcePolicyVersion: researchSourcePolicyVersion
-    });
+    };
+    sourcesByURL.set(url, entry);
+    normalized.push(entry);
   }
   return normalized;
 }

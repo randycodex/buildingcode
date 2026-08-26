@@ -486,7 +486,7 @@ struct ResearchView: View {
                         if conversation.projectContextReviewRequired {
                             projectContextWarning(conversation)
                         }
-                        if !conversation.sources.isEmpty {
+                        if conversation.sources.contains(where: { $0.kind == "selection" }) {
                             evidenceSummary(conversation.sources)
                         }
                         ForEach(conversation.messages) { message in
@@ -1362,6 +1362,7 @@ private struct ResearchAnswerView: View {
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
             }
+            projectFactsDisclosure
             if !answer.citations.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
@@ -1383,14 +1384,19 @@ private struct ResearchAnswerView: View {
                 }
             }
             if hasEvidenceDetails {
-                DisclosureGroup("Evidence reviewed") {
+                DisclosureGroup(answer.mode == "project_context" ? "Project facts reviewed" : "Evidence reviewed") {
                     VStack(alignment: .leading, spacing: 14) {
+                        Text(answer.researchSourceBoundaryText)
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                            .accessibilityIdentifier("research-answer-source-boundary")
                         supportedPointsSection(answer.supportedPoints)
                         answerSection("Assumptions used", items: answer.assumptions)
                         answerSection("Project facts to verify", items: answer.missingFacts)
                         answerSection("Limits of this answer", items: answer.evidenceLimitations)
                         answerSection("Questions that would materially advance this answer", items: answer.followUpQuestions)
                         answerSection("Related evidence to add", items: answer.additionalEvidenceNeeded)
+                        supportingSourcesSection
                         if !answer.citations.isEmpty {
                             VStack(alignment: .leading, spacing: 7) {
                                 Text("Cited sources")
@@ -1449,7 +1455,13 @@ private struct ResearchAnswerView: View {
 
     private var basisText: String? {
         let captured = answer.sourceAsOf.map { String($0.prefix(10)) }
-        let parts = [answer.codeEdition, captured.map { "Research basis captured \($0)" }]
+        let disclosedBasis = answer.codeBasis?.disclosure?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let basisLimitation = answer.codeBasis?.limitation?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let parts = [
+            disclosedBasis?.isEmpty == false ? disclosedBasis : answer.codeEdition,
+            basisLimitation?.isEmpty == false ? basisLimitation : nil,
+            captured.map { "Research basis captured \($0)" }
+        ]
             .compactMap { $0 }
             .filter { !$0.isEmpty }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
@@ -1462,7 +1474,61 @@ private struct ResearchAnswerView: View {
             !answer.evidenceLimitations.isEmpty ||
             !answer.followUpQuestions.isEmpty ||
             !answer.additionalEvidenceNeeded.isEmpty ||
+            !(answer.supportingSources ?? []).isEmpty ||
+            hasFactUsage ||
             !answer.citations.isEmpty
+    }
+
+    private var hasFactUsage: Bool {
+        let usage = answer.factUsage
+        return !(usage?.projectContext ?? []).isEmpty ||
+            !(usage?.conversation ?? []).isEmpty ||
+            !(usage?.other ?? []).isEmpty
+    }
+
+    @ViewBuilder
+    private var projectFactsDisclosure: some View {
+        if hasFactUsage {
+            DisclosureGroup("Facts used in this answer") {
+                VStack(alignment: .leading, spacing: 7) {
+                    answerInlineGroup("Project context", items: answer.factUsage?.projectContext ?? [])
+                    answerInlineGroup("Research conversation", items: answer.factUsage?.conversation ?? [])
+                    answerInlineGroup("Other supplied facts", items: answer.factUsage?.other ?? [])
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.top, 8)
+            }
+            .font(.subheadline.weight(.semibold))
+            .accessibilityIdentifier("research-answer-facts-used")
+        }
+    }
+
+    @ViewBuilder
+    private var supportingSourcesSection: some View {
+        let sources = answer.supportingSources ?? []
+        if !sources.isEmpty {
+            VStack(alignment: .leading, spacing: 7) {
+                Text("Supporting context — noncontrolling")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.primary)
+                ForEach(Array(sources.enumerated()), id: \.offset) { _, source in
+                    let claim = source.claim?.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let label = "• " + [source.displayTitle, claim]
+                        .compactMap { $0 }
+                        .filter { !$0.isEmpty }
+                        .joined(separator: ": ")
+                    if let url = source.webURL {
+                        Link(label, destination: url)
+                            .foregroundStyle(Color.accentColor)
+                            .accessibilityLabel("Open \(source.displayTitle)")
+                    } else {
+                        Text(label)
+                    }
+                }
+            }
+            .accessibilityIdentifier("research-answer-supporting-context")
+        }
     }
 
     @ViewBuilder
@@ -1496,6 +1562,13 @@ private struct ResearchAnswerView: View {
                     Text("• \(item)")
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func answerInlineGroup(_ title: String, items: [String]) -> some View {
+        if !items.isEmpty {
+            Text("\(title): \(items.joined(separator: " · "))")
         }
     }
 

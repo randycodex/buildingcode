@@ -239,6 +239,10 @@ import {
   researchAnswerQualityRevisionIssues
 } from "./research-answer-quality.mjs";
 import {
+  evaluateResearchWebAttribution,
+  researchWebAttributionRevisionIssues
+} from "./research-web-attribution.mjs";
+import {
   resolveResearchConversationFacts,
   researchConversationFactPromptContext,
   researchConversationFactsVersion
@@ -518,9 +522,9 @@ const researchInterpretationSchema = {
         additionalProperties: false,
         properties: {
           sourceID: { type: "string" },
-          claim: { type: "string" }
+          claimID: { type: "string" }
         },
-        required: ["sourceID", "claim"]
+        required: ["sourceID", "claimID"]
       }
     },
     citations: {
@@ -564,8 +568,16 @@ function researchInterpretationSchemaForEvidence(evidence, supportingSources = [
   const supportingSourceIDs = supportingSources
     .map((source) => String(source.id || ""))
     .filter(Boolean);
+  const supportingClaimIDs = supportingSources.flatMap((source) =>
+    (Array.isArray(source?.attributedClaims) ? source.attributedClaims : [])
+      .map((claim) => String(claim?.id || ""))
+      .filter(Boolean)
+  );
   if (supportingSourceIDs.length) {
     schema.properties.supportingSourceUses.items.properties.sourceID.enum = supportingSourceIDs;
+  }
+  if (supportingClaimIDs.length) {
+    schema.properties.supportingSourceUses.items.properties.claimID.enum = supportingClaimIDs;
   }
   return schema;
 }
@@ -7230,17 +7242,28 @@ function researchPrompt(question, evidence, options = {}) {
   const unknownConversationFacts = (conversationFacts.unknown || [])
     .map((fact, index) => `${index + 1}. ${fact}`)
     .join("\n");
-  const supportingWebContext = options.webSupport?.sources?.length
+  const supportingWebContext = (
+    options.webSupport?.sources?.length ||
+    options.webSupport?.limitation
+  )
     ? [
         "SUPPORTING WEB CONTEXT — NONCONTROLLING",
         "This material may explain or contextualize the enacted text. It cannot create or override a governing requirement.",
-        options.webSupport.summary || "",
-        ...options.webSupport.sources.map((source) => [
+        options.webSupport.limitation
+          ? `WEB SUPPORT LIMITATION: ${options.webSupport.limitation}`
+          : "",
+        ...(options.webSupport.sources || []).map((source) => [
           `WEB_SOURCE_ID: ${source.id}`,
           `SOURCE_CLASS: ${source.authorityClass}`,
           `TITLE: ${source.title}`,
           `PUBLISHER: ${source.publisher}`,
-          `URL: ${source.url}`
+          `URL: ${source.url}`,
+          "SOURCE-SPECIFIC ATTRIBUTED CLAIMS:",
+          ...(Array.isArray(source.attributedClaims) ? source.attributedClaims : [])
+            .map((claim) => [
+              `WEB_CLAIM_ID: ${claim.id}`,
+              `CLAIM_TEXT: ${claim.text}`
+            ].join("\n"))
         ].join("\n"))
       ].filter(Boolean).join("\n\n")
     : "";
@@ -7252,8 +7275,13 @@ function researchPrompt(question, evidence, options = {}) {
           .join("\n"),
         "REVISION NON-REGRESSION RULES",
         "Resolve all listed feedback together while preserving every supported conclusion and established fact that the feedback does not contradict.",
+        "Use the previous proposed answer below as the revision baseline. Preserve its correct, unchallenged enacted conclusions, qualifications, source-specific supportingSourceUses, and exact mandatory language while correcting every accumulated issue.",
+        "Never move a web-guidance claim into supportedPoints or enacted citations. Web-guidance claims belong only in supportingSourceUses with the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair, and must remain visibly noncontrolling in answerText.",
         "Do not fix one issue by inventing an unsupplied legal requirement, asking the user to reconfirm an established fact, or weakening the strongest conclusion supported by the same evidence.",
-        "For a numeric table comparison, retain the direct result under the strictest directly applicable supplied limit before discussing a more generous conditional allowance or a genuinely unresolved measurement or modification issue."
+        "For a numeric table comparison, retain the direct result under the strictest directly applicable supplied limit before discussing a more generous conditional allowance or a genuinely unresolved measurement or modification issue.",
+        options.previousInterpretation
+          ? `PREVIOUS PROPOSED ANSWER JSON\n${JSON.stringify(options.previousInterpretation)}`
+          : ""
       ].join("\n")
     : "";
   const structuredEvidenceAnalysis = options.structuredEvidenceAnalysis
@@ -7699,6 +7727,62 @@ function mockResearchInterpretation(question, evidence, options = {}) {
   };
 }
 
+function mockResearchWebSupportFixture(question) {
+  if (process.env.PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE !== "bb-2022-013") return null;
+  if (!extractResearchOfficialDocumentReferences(question).includes("Buildings Bulletin 2022-013")) return null;
+  const attributedClaims = [{
+    id: "web-claim-bb-2022-013-flame-spread",
+    text: "Buildings Bulletin 2022-013 says a foam-plastic exception requires a flame spread index of 25 or less under ASTM E84 or UL 723."
+  }, {
+    id: "web-claim-bb-2022-013-floor-level",
+    text: "The bulletin says that exception waives only the floor-level fireblocking requirement."
+  }, {
+    id: "web-claim-bb-2022-013-construction-documents",
+    text: "The bulletin says construction documents must identify the NFPA 285-compliant wall assembly."
+  }];
+  return {
+    summary: attributedClaims.map((claim) => `- ${claim.text}`).join("\n"),
+    sources: [{
+      id: "web-source-bb-2022-013",
+      url: "https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2022-013.pdf",
+      title: "Buildings Bulletin 2022-013",
+      publisher: "NYC Department of Buildings",
+      attributedClaims,
+      authorityClass: "official_guidance",
+      role: "supporting",
+      controlling: false,
+      sourcePolicyVersion: researchSourcePolicyVersion
+    }],
+    usage: combinedResearchUsage(),
+    searched: true,
+    sanitizedQuery: sanitizeResearchWebQuery(question),
+    requestedDocuments: ["Buildings Bulletin 2022-013"],
+    unattributedRequestedDocuments: [],
+    sourcePolicyVersion: researchSourcePolicyVersion
+  };
+}
+
+function mockResearchWebInterpretation(question, evidence, webSupport, options = {}) {
+  const result = mockResearchInterpretation(question, evidence, options);
+  result.answerText = [
+    "BC 718.2.6.1 supplies the enacted fireblocking rule for the cited exterior-wall condition.",
+    "Separately, noncontrolling Buildings Bulletin 2022-013 says the foam-plastic exception requires a flame spread index of 25 or less under ASTM E84 or UL 723, waives only the floor-level fireblocking requirement, and requires construction documents to identify the NFPA 285-compliant wall assembly."
+  ].join("\n\n");
+  result.supportedPoints = result.supportedPoints.map((point) => ({
+    ...point,
+    heading: "Enacted fireblocking rule",
+    explanation: "The cited enacted passage supplies the fireblocking requirement applicable to the exterior-wall condition."
+  }));
+  result.evidenceLimitations = [
+    "Buildings Bulletin 2022-013 is official supporting guidance, not enacted code text, and does not replace the cited Building Code requirements."
+  ];
+  result.supportingSourceUses = webSupport.sources[0].attributedClaims.map((claim) => ({
+    sourceID: webSupport.sources[0].id,
+    claimID: claim.id
+  }));
+  return result;
+}
+
 function outputTextFromResponse(response) {
   for (const item of response?.output || []) {
     for (const content of item?.content || []) {
@@ -7759,7 +7843,40 @@ function combinedResearchUsage(...entries) {
   });
 }
 
-function webSourcesFromProviderPayload(payload) {
+function researchWebCitationClaim(text, citation) {
+  const citationStart = Number(citation?.start_index);
+  const citationEnd = Number(citation?.end_index);
+  const outputText = String(text || "");
+  if (
+    !Number.isInteger(citationStart) ||
+    !Number.isInteger(citationEnd) ||
+    citationStart < 0 ||
+    citationEnd <= citationStart ||
+    citationEnd > outputText.length
+  ) return "";
+  const annotatedSpan = outputText.slice(citationStart, citationEnd)
+    .replace(/^[-*\u2022]\s*/, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 1_000);
+  const annotationLooksLikeCitationMarker =
+    /^\[\d+(?:\s*[,\u2013-]\s*\d+)*\]$/.test(annotatedSpan) ||
+    /^\(\d+(?:\s*[,\u2013-]\s*\d+)*\)$/.test(annotatedSpan) ||
+    /^\uE200cite\uE202/i.test(annotatedSpan) ||
+    /^https?:\/\//i.test(annotatedSpan) ||
+    !/[a-z]{3,}/i.test(annotatedSpan);
+  if (!annotationLooksLikeCitationMarker && annotatedSpan.length >= 12) return annotatedSpan;
+  const lineStart = outputText.lastIndexOf("\n", Math.max(0, citationStart - 1)) + 1;
+  const precedingClaim = outputText.slice(lineStart, citationStart)
+    .replace(/^[-*\u2022]\s*/, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 1_000);
+  if (precedingClaim.length >= 12 && /[a-z]/i.test(precedingClaim)) return precedingClaim;
+  return "";
+}
+
+export function researchWebSourcesFromProviderPayload(payload) {
   const sources = [];
   for (const item of payload?.output || []) {
     for (const source of item?.action?.sources || []) {
@@ -7773,9 +7890,11 @@ function webSourcesFromProviderPayload(payload) {
       for (const annotation of content?.annotations || []) {
         const citation = annotation?.url_citation || annotation;
         if (annotation?.type !== "url_citation" && !annotation?.url_citation) continue;
+        const attributedClaim = researchWebCitationClaim(content?.text, citation);
         sources.push({
           url: citation?.url,
-          title: citation?.title
+          title: citation?.title,
+          attributedClaims: attributedClaim ? [attributedClaim] : []
         });
       }
     }
@@ -7828,6 +7947,7 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
       "Do not make a project compliance determination and do not treat guidance as enacted law.",
       "When the question names an official bulletin or other official document, open that document and summarize the substantive passages relevant to the question; returning only a title or link is not sufficient.",
       "Identify any named official document that could not be opened or read instead of inferring its contents.",
+      "Write each useful source-derived claim as its own short bullet and attach an inline web citation from that exact source to the same bullet. Do not combine facts from multiple sources in one bullet.",
       "Return only useful explanatory, administrative, effective-date, or technical context with inline web citations.",
       "If no official supporting material is useful, say that briefly."
     ].join(" "),
@@ -7861,7 +7981,11 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
       sources: [],
       usage: combinedResearchUsage(),
       searched: true,
-      limitation: "Permitext could not reach the approved supporting web sources for this answer."
+      requestedDocuments: namedOfficialDocuments,
+      unattributedRequestedDocuments: namedOfficialDocuments,
+      limitation: namedOfficialDocuments.length
+        ? `Permitext could not retrieve a source-specific attributable passage for ${namedOfficialDocuments.join(", ")}; that document was not used in this answer.`
+        : "Permitext could not reach the approved supporting web sources for this answer."
     };
   }
   let summary = "";
@@ -7870,21 +7994,51 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   } catch {
     summary = "";
   }
-  return {
-    summary,
-    sources: normalizeResearchWebSources(webSourcesFromProviderPayload(payload), {
+  const sources = normalizeResearchWebSources(researchWebSourcesFromProviderPayload(payload), {
       officialDomains: allowedDomains
     }).filter((source) => source.sourceClassification === "official_guidance")
+      .filter((source) => source.attributedClaims.length > 0)
       .map((source) => ({
         ...source,
         id: `web-source-${createHash("sha256").update(source.url).digest("hex").slice(0, 24)}`,
+        attributedClaims: source.attributedClaims.map((claim) => ({
+          id: `web-claim-${createHash("sha256")
+            .update(`${source.url}\u0000${claim}`)
+            .digest("hex")
+            .slice(0, 24)}`,
+          text: claim
+        })),
         authorityClass: source.sourceClassification,
         role: source.sourceRole,
         retrievedAt: new Date().toISOString()
-      })),
+      }))
+      .map((source) => ({
+        ...source,
+        requiredAttribution: namedOfficialDocuments.some((reference) =>
+          extractResearchOfficialDocumentReferences([
+            source.title,
+            ...source.attributedClaims.map((claim) => claim.text)
+          ].join(" ")).includes(reference)
+        )
+      }));
+  const unattributedRequestedDocuments = namedOfficialDocuments.filter((reference) =>
+    !sources.some((source) => extractResearchOfficialDocumentReferences([
+      source.title,
+      ...source.attributedClaims.map((claim) => claim.text)
+    ].join(" ")).includes(reference))
+  );
+  const limitation = unattributedRequestedDocuments.length
+    ? `Permitext could not retrieve a source-specific attributable passage for ${unattributedRequestedDocuments.join(", ")}; that document was not used in this answer.`
+    : "";
+  return {
+    summary,
+    sources,
     usage: researchUsageFromProviderPayload(payload, configuration.model),
     searched: true,
     sanitizedQuery,
+    requestedDocuments: namedOfficialDocuments,
+    unattributedRequestedDocuments,
+    ...(limitation ? { limitation } : {}),
     sourcePolicyVersion: researchSourcePolicyVersion
   };
 }
@@ -7900,10 +8054,16 @@ function combinedResearchClaimRevisionIssues(...results) {
   });
 }
 
-function combinedResearchAnswerRevisionIssues(requiredClaimCoverage, claimMateriality, answerQuality) {
+function combinedResearchAnswerRevisionIssues(
+  requiredClaimCoverage,
+  claimMateriality,
+  answerQuality,
+  webAttribution
+) {
   const issues = [
     ...combinedResearchClaimRevisionIssues(requiredClaimCoverage, claimMateriality),
-    ...researchAnswerQualityRevisionIssues(answerQuality)
+    ...researchAnswerQualityRevisionIssues(answerQuality),
+    ...researchWebAttributionRevisionIssues(webAttribution)
   ];
   const seen = new Set();
   return issues.filter((issue) => {
@@ -8167,15 +8327,31 @@ export function validateResearchInterpretation(value, evidence, supportingSource
   const allowedSupportingSources = new Map(
     supportingSources.map((source) => [String(source.id || ""), source]).filter(([id]) => id)
   );
+  const seenSupportingClaimBindings = new Set();
   const supportingSourceUses = value.supportingSourceUses.map((use) => {
     const sourceID = String(use?.sourceID || "").trim();
-    const claim = cleanNarrative(use?.claim);
-    if (!sourceID || !claim || !allowedSupportingSources.has(sourceID)) {
+    const claimID = String(use?.claimID || "").trim();
+    const source = allowedSupportingSources.get(sourceID);
+    const attributedClaim = (Array.isArray(source?.attributedClaims) ? source.attributedClaims : [])
+      .find((claim) => String(claim?.id || "").trim() === claimID);
+    const bindingKey = `${sourceID}\u0000${claimID}`;
+    if (
+      !sourceID ||
+      !claimID ||
+      !source ||
+      !attributedClaim ||
+      seenSupportingClaimBindings.has(bindingKey)
+    ) {
       const error = new Error("The model cited supporting material outside the retrieved web sources.");
       error.code = "INVALID_RESEARCH_WEB_CITATION";
       throw error;
     }
-    return { sourceID, claim };
+    seenSupportingClaimBindings.add(bindingKey);
+    return {
+      sourceID,
+      claimID,
+      claim: cleanNarrative(attributedClaim.text)
+    };
   });
   const cleanedCitations = citations.map((citation) => ({
     ...citation,
@@ -8234,7 +8410,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   const configuration = conversational
     ? {
         ...baseConfiguration,
-        promptVersion: `${baseConfiguration.promptVersion}:conversational-v3`,
+        promptVersion: `${baseConfiguration.promptVersion}:conversational-v4`,
         evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
       }
     : baseConfiguration;
@@ -8267,6 +8443,8 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
         "Evidence labeled historical or future-effective is available only because the user explicitly pinned it. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence.",
         "Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic.",
+        "supportedPoints are exclusively for rules established by the assembled enacted evidence. Never put a bulletin, agency-guidance, or other supporting-web claim in supportedPoints, and never attach an enacted SECTION_ID or PASSAGE_ID to such a claim.",
+        "Put every material source-specific web-guidance statement only in supportingSourceUses by selecting the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair. Never write a new claim for that pair. In answerText, identify it as noncontrolling guidance and keep it distinct from the enacted rule.",
         "Write answerText as the complete user-facing answer. Do not target a fixed number of paragraphs or sentences.",
         "Use the shortest answer that fully and reliably resolves the question from the available evidence. Structure must follow the reasoning: a simple answer may be one paragraph; rule-and-application reasoning may use more; multiple provisions, exceptions, applicability paths, competing interpretations, or evidence gaps may use additional paragraphs or a short hyphen-led breakdown.",
         "Lead with the strongest supported conclusion. State a conditional conclusion immediately when a material condition remains. When the evidence is insufficient, identify exactly what cannot be determined.",
@@ -8300,7 +8478,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           "If the question cannot be answered from the assembled enacted evidence, say so directly.",
         "Generate only the minimum high-value followUpQuestions needed to materially advance the answer; do not ask for facts that cannot change the result.",
         "Every major code conclusion and every supportedPoint must be covered by enacted citations using the supplied SECTION_ID and PASSAGE_ID values.",
-        "Return supportingSourceUses only for claims actually supported by a supplied WEB_SOURCE_ID. Keep it empty when no web source materially improves the answer."
+        "Return supportingSourceUses only by selecting an exact WEB_SOURCE_ID and WEB_CLAIM_ID pair from SOURCE-SPECIFIC ATTRIBUTED CLAIMS. Keep it empty when no web source materially improves the answer. If WEB SUPPORT LIMITATION is present, repeat that limitation visibly in evidenceLimitations and do not infer the unavailable document's contents."
       ].join(" "),
       input: researchInputForEvidence(question, passageEvidence, options),
       text: {
@@ -8434,6 +8612,8 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
       "Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs.",
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
+      "Fail with wrong_attribution when a bulletin or other web-derived claim appears in supportedPoints, including a paraphrase that omits the words bulletin or guidance, or is tied only to an enacted citation. Such a claim must instead use supportingSourceUses with the exact WEB_SOURCE_ID and WEB_CLAIM_ID pair whose source-specific attributed claim supports it.",
+      "When the question expressly requests a retrieved named official document, fail with missed_material_conclusion if the answer omits its material source-supported clarification or drops its supportingSourceUse during revision.",
       "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
       "Fail with missed_material_conclusion if cited historical or future-effective evidence is not expressly identified as historical or not yet effective, or if the answer silently presents it as ordinary current law.",
@@ -8474,7 +8654,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
         : "",
       options.webSupport?.sources?.length
         ? `NONCONTROLLING SUPPORTING WEB MATERIAL\n${JSON.stringify({
-            summary: options.webSupport.summary,
+            limitation: options.webSupport.limitation || null,
             sources: options.webSupport.sources
           })}`
         : "",
@@ -16690,6 +16870,7 @@ async function handleResearchConversationMessage(request, response) {
       searched: false,
       sourcePolicyVersion: researchSourcePolicyVersion
     };
+    const mockWebSupport = mockMode ? mockResearchWebSupportFixture(question) : null;
     let evidenceAnalysisEscalated = false;
     const evidenceAnalysisPromise = mockMode
       ? Promise.resolve({
@@ -16710,7 +16891,9 @@ async function handleResearchConversationMessage(request, response) {
           evidenceAnalysisEscalated = true;
           return runEvidenceAnalysis(accurateModel);
         });
-    const webSupportPromise = !mockMode && webSupportRequested
+    const webSupportPromise = mockWebSupport
+      ? Promise.resolve(mockWebSupport)
+      : !mockMode && webSupportRequested
       ? openAIResearchWebSupport(question, context.userID, {
           retrievalQuery: question,
           model: modelRouting.configuration.webSupportModel,
@@ -16740,14 +16923,23 @@ async function handleResearchConversationMessage(request, response) {
     };
     let result = mockMode
       ? {
-          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, assembledEvidence, {
-            responseStyle: "conversational",
-            requiredClaims
-          }), assembledEvidence, webSupport.sources),
+          interpretation: validateResearchInterpretation(
+            mockWebSupport
+              ? mockResearchWebInterpretation(question, assembledEvidence, webSupport, {
+                  responseStyle: "conversational",
+                  requiredClaims
+                })
+              : mockResearchInterpretation(question, assembledEvidence, {
+                  responseStyle: "conversational",
+                  requiredClaims
+                }),
+            assembledEvidence,
+            webSupport.sources
+          ),
           model: "permitext-mock",
           configuration: {
             ...researchModelConfiguration(),
-            promptVersion: `${researchModelConfiguration().promptVersion}:conversational-v3`,
+            promptVersion: `${researchModelConfiguration().promptVersion}:conversational-v4`,
             evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
           },
           usage: combinedResearchUsage()
@@ -16786,6 +16978,12 @@ async function handleResearchConversationMessage(request, response) {
       evidence: assembledEvidence,
       answer: result.interpretation
     });
+    let webAttribution = evaluateResearchWebAttribution({
+      question,
+      answer: result.interpretation,
+      evidence: assembledEvidence,
+      webSupport
+    });
     const applyEvidenceBoundaryFallback = () => {
       if (!researchEvidenceBoundaryFallbackEligibility({
         verificationAttempts,
@@ -16811,21 +17009,37 @@ async function handleResearchConversationMessage(request, response) {
         evidence: assembledEvidence,
         answer: result.interpretation
       });
+      webAttribution = evaluateResearchWebAttribution({
+        question,
+        answer: result.interpretation,
+        evidence: assembledEvidence,
+        webSupport: {
+          ...webSupport,
+          sources: []
+        }
+      });
       evidenceBoundaryFallback = true;
       return true;
     };
     if (mockMode) {
+      const deterministicPass =
+        requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass && webAttribution.pass;
       verificationAttempts = [{
-        pass: requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass,
-        issues: requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass
+        pass: deterministicPass,
+        issues: deterministicPass
           ? []
-          : combinedResearchAnswerRevisionIssues(requiredClaimCoverage, claimMateriality, answerQuality),
-        model: requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass
+          : combinedResearchAnswerRevisionIssues(
+              requiredClaimCoverage,
+              claimMateriality,
+              answerQuality,
+              webAttribution
+            ),
+        model: deterministicPass
           ? "permitext-mock"
           : "permitext-deterministic-answer-quality-gate"
       }];
-      if (!requiredClaimCoverage.pass || !claimMateriality.pass || !answerQuality.pass) {
-        const error = new Error("The mock Research answer failed deterministic materiality or evidence-economy checks.");
+      if (!deterministicPass) {
+        const error = new Error("The mock Research answer failed deterministic materiality, evidence-economy, or source-attribution checks.");
         error.code = "RESEARCH_VERIFICATION_FAILED";
         error.verificationAttempts = verificationAttempts;
         throw error;
@@ -16834,10 +17048,12 @@ async function handleResearchConversationMessage(request, response) {
       for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
         if (attempt > 0) {
           answerEscalated ||= result.requestedModel !== accurateModel;
+          const previousInterpretation = result.interpretation;
           const revised = await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
             ...interpretationOptions,
             model: accurateModel,
             revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts),
+            previousInterpretation
           });
           answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
           result = revised;
@@ -16857,15 +17073,31 @@ async function handleResearchConversationMessage(request, response) {
           evidence: assembledEvidence,
           answer: result.interpretation
         });
-        if (!requiredClaimCoverage.pass || !claimMateriality.pass || !answerQuality.pass) {
+        webAttribution = evaluateResearchWebAttribution({
+          question,
+          answer: result.interpretation,
+          evidence: assembledEvidence,
+          webSupport
+        });
+        if (
+          !requiredClaimCoverage.pass ||
+          !claimMateriality.pass ||
+          !answerQuality.pass ||
+          !webAttribution.pass
+        ) {
           verificationAttempts.push({
             pass: false,
-            issues: combinedResearchAnswerRevisionIssues(requiredClaimCoverage, claimMateriality, answerQuality),
+            issues: combinedResearchAnswerRevisionIssues(
+              requiredClaimCoverage,
+              claimMateriality,
+              answerQuality,
+              webAttribution
+            ),
             model: "permitext-deterministic-answer-quality-gate"
           });
           if (applyEvidenceBoundaryFallback()) break;
           if (attempt === maximumResearchVerificationAttempts - 1) {
-            const error = new Error("The answer failed deterministic materiality or evidence-economy checks after two bounded revisions.");
+            const error = new Error("The answer failed deterministic materiality, evidence-economy, or source-attribution checks after two bounded revisions.");
             error.code = "RESEARCH_VERIFICATION_FAILED";
             error.verificationAttempts = verificationAttempts;
             throw error;

@@ -2253,7 +2253,7 @@ async function main() {
       "Web share controls no longer generate permitext.com section links."
     );
     assert(
-      workspaceScript.text.includes('const researchChatPlaceholder = "AI-assisted research — not an official interpretation"') &&
+      workspaceScript.text.includes('const researchChatPlaceholder = "Ask a Research question…"') &&
         (workspaceScript.text.match(/input\.placeholder = researchChatPlaceholder;/g) || []).length === 2 &&
         !workspaceScript.text.includes('research-trust-notice') &&
         !workspaceScript.text.includes("appendTrustNotice") &&
@@ -4290,7 +4290,7 @@ async function main() {
       conversationMessage.json.conversation.messages.length === 2 &&
         conversationMessage.json.conversation.title === "When must the owner notify the department?" &&
         conversationMessage.json.conversation.messages[1].answer.supportedPoints.length >= 1 &&
-        conversationMessage.json.conversation.messages[1].answer.promptVersion.endsWith(":conversational-v3") &&
+        conversationMessage.json.conversation.messages[1].answer.promptVersion.endsWith(":conversational-v4") &&
         conversationMessage.json.conversation.messages[1].answer.conclusion.startsWith("The assembled enacted provisions provide a conditional answer") &&
         conversationMessage.json.conversation.messages[1].answer.supportedPoints[0].sourceIDs[0] ===
           conversationMessage.json.conversation.messages[1].answer.citations[0].sourceIDs[0] &&

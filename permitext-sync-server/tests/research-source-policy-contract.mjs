@@ -95,12 +95,14 @@ const sources = normalizeResearchWebSources([
     url: "https://WWW.NYC.GOV/site/buildings/bulletin/?utm_source=newsletter&b=2&a=1#section",
     title: "  DOB Bulletin  ",
     publisher: " NYC DOB ",
+    attributedClaims: ["  The bulletin clarifies the applicable condition.  "],
     sourceClassification: "enacted_code",
     controlling: true
   },
   {
     href: "https://www.nyc.gov/site/buildings/bulletin?a=1&b=2",
-    title: "Duplicate"
+    title: "Duplicate",
+    attributedClaims: ["The bulletin clarifies the applicable condition.", "A second cited claim."]
   },
   {
     url: "https://engineering.example.com/open-stairs/",
@@ -116,6 +118,10 @@ assert.equal(sources[0].sourceClassification, "official_guidance");
 assert.equal(sources[0].sourceRole, "supporting");
 assert.equal(sources[0].controlling, false);
 assert.equal(sources[0].sourcePolicyVersion, researchSourcePolicyVersion);
+assert.deepEqual(sources[0].attributedClaims, [
+  "The bulletin clarifies the applicable condition.",
+  "A second cited claim."
+]);
 assert.equal(sources[1].url, "https://engineering.example.com/open-stairs");
 assert.equal(sources[1].sourceClassification, "secondary_source");
 assert.equal(sources[1].sourceRole, "supporting");

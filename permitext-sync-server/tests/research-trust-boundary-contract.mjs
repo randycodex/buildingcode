@@ -20,8 +20,16 @@ assert.match(server, /Verify cited text, source status, and Project facts before
 
 assert.match(web, /function researchComposerDisclosure\(\)/);
 assert.match(web, /current Project facts when assigned to OpenAI/);
+assert.match(web, /AI-assisted—not an official interpretation/);
+assert.match(web, /const researchChatPlaceholder = "Ask a Research question…"/);
+assert.match(web, /A Research model produced a response, but Permitext could not verify it against the enacted evidence\. Your question is still here\./);
 assert.match(web, /result\.authorityLabel/);
 assert.match(web, /Research basis captured/);
+assert.match(
+  web,
+  /String\(codeBasis\?\.limitation \|\| ""\)\.trim\(\)/,
+  "The web answer must render a code-basis limitation visibly instead of relying on hover text."
+);
 
 for (const disclosure of [
   "recent conversation messages",
@@ -38,8 +46,15 @@ for (const disclosure of [
 assert.match(nativeModels, /var authorityStatus: String\?/);
 assert.match(nativeModels, /var authorityLabel: String\?/);
 assert.match(nativeModels, /var sourceAsOf: String\?/);
+assert.match(nativeModels, /var codeBasis: ResearchCodeBasis\?/);
+assert.match(nativeModels, /var sourceSummary: ResearchSourceSummary\?/);
+assert.match(nativeModels, /var factUsage: ResearchFactUsage\?/);
+assert.match(nativeModels, /var supportingSources: \[ResearchSupportingSource\]\?/);
 assert.match(nativeResearch, /research-composer-privacy-disclosure/);
 assert.match(nativeResearch, /research-answer-authority-status/);
+assert.match(nativeResearch, /research-answer-source-boundary/);
+assert.match(nativeResearch, /research-answer-facts-used/);
+assert.match(nativeResearch, /research-answer-supporting-context/);
 assert.match(nativeResearch, /private var primaryNarrative/);
 assert.doesNotMatch(nativeResearch, /Ask Terra|Terra is researching|Terra's research service/);
 
