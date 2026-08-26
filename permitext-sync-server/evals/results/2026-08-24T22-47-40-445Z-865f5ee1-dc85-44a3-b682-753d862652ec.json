@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 3,
+  "status": "running",
+  "createdAt": "2026-08-24T22:47:40.445Z",
+  "updatedAt": "2026-08-24T22:49:54.736Z",
+  "configuration": {
+    "runID": "865f5ee1-dc85-44a3-b682-753d862652ec",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260817-adaptive-answer-v10",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "none-selected-evidence-only",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "scissor-stair-two-exits",
+      "single-stair-six-story-r2",
+      "residential-multipurpose-occupancy",
+      "accessory-assembly-plumbing-fixtures",
+      "building-code-versus-hcr",
+      "nyc-001-mixed-occupancy-fixture-rounding",
+      "nyc-002-stated-occupancy-movable-seats",
+      "nyc-011-legacy-fire-alarm-enlargement",
+      "nyc-013-b-m-co-accessibility-boundary",
+      "nyc-015-sidewalk-cafe-evidence-boundary",
+      "nyc-016-enclosed-garage-intermittent-ventilation",
+      "nyc-017-prior-code-floor-surface-area-110-percent",
+      "nyc-019-buildings-bulletin-policy-boundary",
+      "nyc-020-existing-plumbing-repair-boundary",
+      "nyc-021-prior-code-wind-surface-area-trigger",
+      "nyc-022-reestablished-prior-occupancy-boundary",
+      "nyc-023-mercantile-business-co-exception",
+      "nyc-024-prior-code-roof-recovering-boundary",
+      "nyc-bc-1019-3-exception-attribution",
+      "nyc-025-pre-1938-partial-certificate-of-occupancy"
+    ],
+    "caseStatuses": [
+      "approved",
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260722-exact-rubric-v2",
+    "pricingVersion": "openai-standard-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "25b7b168c5be9127aec1d986191a1d6f80265528",
+    "approvedSpendCapUSD": 15,
+    "conservativeReservedUSD": 1.653797,
+    "paidRequestCount": 8
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "scissor-stair-two-exits",
+        "title": "Scissor stair counted as two exits",
+        "status": "approved",
+        "difficulty": "advanced",
+        "topics": [
+          "means of egress",
+          "scissor stairs",
+          "Group R-2",
+          "fire-resistance"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "occupancy": "Group R-2 stated by the question",
+          "configuration": "Scissor stair with entrance doors 15 feet apart",
+          "unknowns": [
+            "enclosure rating",
+            "separating construction rating",
+            "construction material"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "2197",
+            "reference": "BC 1007.1.1",
+            "codePrefix": "BC",
+            "sectionNumber": "1007.1.1",
+            "exactPassages": [
+              "Stairs sharing any common wall, floor, ceiling, scissor stair assembly, or other enclosure shall be counted as one exit stairway.",
+              "Exceptions:",
+              "3. Group R-2 occupancies. In Group R-2 occupancies, where stairs are enclosed in walls having at least a 2-hour fire resistance rating and constructed of masonry or masonry equivalent in accordance with department rules: 3.1. The exit doors to such stairs shall be placed a distance apart equal to no less than 15 feet (4572 mm); and 3.2. Such stairs shall be permitted to share common walls, floors, ceilings or scissor stairs assemblies or other enclosures provided that the construction separating the stairs is also of at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules."
+            ],
+            "resolvedTitle": "1007.1.1 Two exits or exit access doorways.",
+            "evidenceCharacters": 2374,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+        "expectedConclusion": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. Confirm the occupancy group, enclosure rating, separating construction, and material before concluding that the exception applies.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The answer must state that 15 feet alone is insufficient and make separate-exit treatment conditional on every selected Group R-2 exception condition."
+        },
+        "sourceType": "real project",
+        "sourceReference": "Initial Permitext AI quality-evaluation case set supplied by the Permitext owner.",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-23T21:35:54.092Z",
+        "notes": "Exact enacted passages and the answer key were reviewed in Permitext before approval.",
+        "requiredConcepts": [
+          "State that the 15-foot door separation alone is insufficient.",
+          "Explain the general rule that stairs sharing a scissor-stair assembly count as one exit stairway.",
+          "Explain the Group R-2 exception for separately counted stairs.",
+          "Identify the 2-hour enclosure and separating-construction requirements.",
+          "Identify the masonry or masonry-equivalent requirement.",
+          "Identify the minimum 15-foot exit-door separation."
+        ],
+        "missingFacts": [
+          "Confirm Group R-2 occupancy.",
+          "Confirm the stair-enclosure fire-resistance rating.",
+          "Confirm the construction separating the stairs and its fire-resistance rating.",
+          "Confirm masonry or an accepted masonry equivalent."
+        ],
+        "forbiddenClaims": [
+          "Every scissor stair automatically counts as one exit.",
+          "Fifteen feet of door separation automatically makes the stairs compliant.",
+          "Sprinkler protection by itself satisfies the Group R-2 exception."
+        ],
+        "requiredCitations": [
+          "BC 1007.1.1"
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "error": {
+        "code": null,
+        "name": "SyntaxError",
+        "message": "Unterminated string in JSON at position 6073 (line 1 column 6074)",
+        "timestamp": "2026-08-24T22:48:47.629Z"
+      }
+    },
+    {
+      "testCase": {
+        "id": "single-stair-six-story-r2",
+        "title": "Single stair in a six-story residential building",
+        "status": "approved",
+        "difficulty": "intermediate",
+        "topics": [
+          "means of egress",
+          "single exit",
+          "Group R-2",
+          "construction type"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "stories": 6,
+          "areaPerStorySquareFeet": 1950,
+          "use": "Residential building",
+          "unknowns": [
+            "occupancy classification",
+            "construction type"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "2185",
+            "reference": "BC 1006.3.2",
+            "codePrefix": "BC",
+            "sectionNumber": "1006.3.2",
+            "exactPassages": [
+              "7. Buildings of Occupancy Group R-2 of construction Type I or II not exceeding six stories and not exceeding 2,000 square feet (185.8 m 2 ) per story."
+            ],
+            "resolvedTitle": "1006.3.2 Single exits.",
+            "evidenceCharacters": 4073,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+        "expectedConclusion": "BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II construction, does not exceed six stories, and does not exceed 2,000 square feet per story. The stated height and floor area satisfy two of those conditions, but compliance cannot be confirmed until the occupancy classification and construction type are known. This passage only establishes that the single-exit allowance may be available; other applicable egress, fire-protection, travel-distance, and design requirements must be checked under their respective sections without inventing requirements that are not in the selected evidence.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The answer may say the story and area limits are met, but it must condition eligibility on confirmed Group R-2 occupancy and Type I or II construction."
+        },
+        "sourceType": "real project",
+        "sourceReference": "Initial Permitext AI quality-evaluation case set supplied by the Permitext owner.",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "notes": "Exact enacted passage and the answer key were manually reviewed before approval.",
+        "requiredConcepts": [
+          "Identify Group R-2 as a condition of Item 7.",
+          "Identify Type I or Type II construction as a condition.",
+          "Identify the six-story maximum.",
+          "Identify the 2,000-square-foot-per-story maximum.",
+          "Recognize that six stories and approximately 1,950 square feet satisfy only the stated height and area conditions.",
+          "Limit the conclusion to potential availability of the single-exit allowance."
+        ],
+        "missingFacts": [
+          "Confirm the occupancy classification is Group R-2.",
+          "Confirm the construction type is Type I or Type II.",
+          "Check other applicable requirements under evidence supplied for those requirements."
+        ],
+        "forbiddenClaims": [
+          "Every six-story residential building can have one stair.",
+          "The building qualifies without confirming Group R-2 and Type I or Type II construction.",
+          "Assert specific additional requirements that are not supported by selected passages."
+        ],
+        "requiredCitations": [
+          "BC 1006.3.2"
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "error": {
+        "code": null,
+        "name": "Error",
+        "message": "Judge returned duplicate required concepts IDs.",
+        "timestamp": "2026-08-24T22:49:54.736Z"
+      }
+    }
+  ]
+}
