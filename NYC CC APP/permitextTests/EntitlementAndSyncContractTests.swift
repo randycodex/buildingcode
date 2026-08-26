@@ -3921,7 +3921,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 "enactedProvisionCount": 16,
                 "contextualProvisionCount": 4,
                 "citedProvisionCount": 0,
-                "supportingWebSourceCount": 1,
+                "supportingWebSourceCount": 4,
                 "unresolvedProjectFactCount": 0
               },
               "supportedPoints": [],
@@ -3949,6 +3949,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             answer.researchSourceBoundaryText,
             "Based on 1 approved official supporting source · No enacted provision cited · No unresolved project facts identified · 1 evidence limit"
         )
+        XCTAssertEqual(answer.sourceSummary?.supportingWebSourceCount, 4)
         XCTAssertFalse(answer.researchSourceBoundaryText.contains("Based on 16 enacted provisions"))
 
         let duplicateFallbackData = Data(
@@ -3966,8 +3967,8 @@ final class EntitlementAndSyncContractTests: XCTestCase {
               "followUpQuestions": [],
               "additionalEvidenceNeeded": [],
               "supportingSources": [
-                { "id": "same-source", "claim": "First claim." },
-                { "id": "same-source", "claim": "Second claim." }
+                { "url": "https://www.nyc.gov/same-source", "claim": "First claim." },
+                { "url": "https://www.nyc.gov/same-source", "claim": "Second claim." }
               ],
               "citations": []
             }

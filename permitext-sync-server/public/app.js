@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260826-official-guidance-sources-v8";
+} from "./offline-storage.js?v=20260826-official-guidance-sources-v9";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260826-official-guidance-sources-v8";
+} from "./research-intent-state.js?v=20260826-official-guidance-sources-v9";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15528,7 +15528,12 @@ function renderResearchInterpretation(container, result, options = {}) {
   const supportingCitationCount = Number(sourceSummary.supportingCitationCount || 0);
   const reviewedOnlyProvisionCount = Number(sourceSummary.reviewedOnlyProvisionCount || 0);
   const projectFactCount = Number(sourceSummary.projectFactCount || 0);
-  const supportingWebSourceCount = Number(sourceSummary.supportingWebSourceCount || 0);
+  const distinctSupportingSourceCount = new Set(
+    (result.supportingSources || [])
+      .map((source) => String(source?.id || source?.url || "").trim())
+      .filter(Boolean)
+  ).size;
+  const supportingWebSourceCount = distinctSupportingSourceCount || Number(sourceSummary.supportingWebSourceCount || 0);
   const officialGuidanceOnly = result.authorityStatus === "official_supporting_guidance";
   const sourceScope = officialGuidanceOnly
     ? [

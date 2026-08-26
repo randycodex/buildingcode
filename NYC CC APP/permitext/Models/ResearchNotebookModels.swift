@@ -294,13 +294,19 @@ extension ResearchAnswer {
         var parts: [String] = []
 
         if authorityStatus == "official_supporting_guidance" {
-            let fallbackOfficialSourceIDs = Set(
+            let fallbackOfficialSourceKeys = Set(
                 (supportingSources ?? []).compactMap { source -> String? in
-                    let value = source.id?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                    return value.isEmpty ? nil : value
+                    let sourceID = source.id?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    if !sourceID.isEmpty {
+                        return sourceID
+                    }
+                    let sourceURL = source.url?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    return sourceURL.isEmpty ? nil : sourceURL
                 }
             )
-            let officialSources = summary?.supportingWebSourceCount ?? fallbackOfficialSourceIDs.count
+            let officialSources = fallbackOfficialSourceKeys.isEmpty
+                ? summary?.supportingWebSourceCount ?? 0
+                : fallbackOfficialSourceKeys.count
             if officialSources > 0 {
                 parts.append("Based on \(officialSources) approved official supporting \(officialSources == 1 ? "source" : "sources")")
             } else {

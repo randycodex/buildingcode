@@ -30,6 +30,9 @@ assert.match(web, /const researchChatPlaceholder = "Ask a Research question…"/
 assert.match(web, /A Research model produced a response, but Permitext could not verify it against the enacted evidence\. Your question is still here\./);
 assert.match(web, /result\.authorityLabel/);
 assert.match(web, /officialGuidanceOnly/);
+assert.match(web, /const distinctSupportingSourceCount = new Set/);
+assert.match(web, /source\?\.id \|\| source\?\.url/);
+assert.match(web, /distinctSupportingSourceCount \|\| Number\(sourceSummary\.supportingWebSourceCount \|\| 0\)/);
 assert.match(web, /No enacted provision cited/);
 assert.match(web, /Supporting context — noncontrolling/);
 assert.match(web, /link\.target = "_blank"/);
