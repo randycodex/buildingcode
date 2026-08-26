@@ -293,7 +293,21 @@ extension ResearchAnswer {
         let limits = evidenceLimitations.count
         var parts: [String] = []
 
-        if mode == "project_context", let projectFacts = summary?.projectFactCount, projectFacts > 0 {
+        if authorityStatus == "official_supporting_guidance" {
+            let fallbackOfficialSourceIDs = Set(
+                (supportingSources ?? []).compactMap { source -> String? in
+                    let value = source.id?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                    return value.isEmpty ? nil : value
+                }
+            )
+            let officialSources = summary?.supportingWebSourceCount ?? fallbackOfficialSourceIDs.count
+            if officialSources > 0 {
+                parts.append("Based on \(officialSources) approved official supporting \(officialSources == 1 ? "source" : "sources")")
+            } else {
+                parts.append("Based on approved official supporting guidance")
+            }
+            parts.append("No enacted provision cited")
+        } else if mode == "project_context", let projectFacts = summary?.projectFactCount, projectFacts > 0 {
             parts.append("Based on \(projectFacts) saved Project \(projectFacts == 1 ? "fact" : "facts")")
         } else if cited > 0 {
             parts.append("Cited \(cited) enacted \(cited == 1 ? "provision" : "provisions")")
@@ -318,7 +332,7 @@ extension ResearchAnswer {
             parts.append("Grounded in the cited Research sources")
         }
 
-        if contextual > 0, cited == 0 {
+        if contextual > 0, cited == 0, authorityStatus != "official_supporting_guidance" {
             parts.append("\(contextual) contextual \(contextual == 1 ? "provision" : "provisions") reviewed separately")
         }
         parts.append(unresolved == 0

@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260825-research-parity-v7";
+} from "./offline-storage.js?v=20260826-official-guidance-sources-v8";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260825-research-parity-v7";
+} from "./research-intent-state.js?v=20260826-official-guidance-sources-v8";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15528,7 +15528,16 @@ function renderResearchInterpretation(container, result, options = {}) {
   const supportingCitationCount = Number(sourceSummary.supportingCitationCount || 0);
   const reviewedOnlyProvisionCount = Number(sourceSummary.reviewedOnlyProvisionCount || 0);
   const projectFactCount = Number(sourceSummary.projectFactCount || 0);
-  const sourceScope = result.mode === "project_context" && projectFactCount
+  const supportingWebSourceCount = Number(sourceSummary.supportingWebSourceCount || 0);
+  const officialGuidanceOnly = result.authorityStatus === "official_supporting_guidance";
+  const sourceScope = officialGuidanceOnly
+    ? [
+        supportingWebSourceCount
+          ? `Based on ${supportingWebSourceCount} approved official supporting ${supportingWebSourceCount === 1 ? "source" : "sources"}`
+          : "Based on approved official supporting guidance",
+        "No enacted provision cited"
+      ].join(" · ")
+    : result.mode === "project_context" && projectFactCount
     ? `Based on ${projectFactCount} saved Project ${projectFactCount === 1 ? "fact" : "facts"}`
     : citedProvisionCount
     ? [
@@ -15552,7 +15561,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   boundary.className = "research-answer-boundary";
   boundary.textContent = [
     sourceScope,
-    contextualCount && !citedProvisionCount
+    contextualCount && !citedProvisionCount && !officialGuidanceOnly
       ? `${contextualCount} contextual ${contextualCount === 1 ? "provision" : "provisions"} reviewed separately`
       : "",
     missingFactCount ? `${missingFactCount} project ${missingFactCount === 1 ? "fact remains" : "facts remain"} unresolved` : "No unresolved project facts identified",
@@ -15572,14 +15581,38 @@ function renderResearchInterpretation(container, result, options = {}) {
   appendResearchUnresolved(detailsBody, result);
   appendResearchList(detailsBody, "Questions that would materially advance this answer", result.followUpQuestions);
   appendResearchList(detailsBody, "Related evidence to add", result.additionalEvidenceNeeded);
-  appendResearchList(
-    detailsBody,
-    "Supporting context — noncontrolling",
-    (result.supportingSources || []).map((source) => [
-      source.title || source.publisher || "Supporting source",
-      source.claim
-    ].filter(Boolean).join(": "))
-  );
+  const supportingSources = result.supportingSources || [];
+  if (supportingSources.length) {
+    const supportingHeading = document.createElement("h4");
+    supportingHeading.className = "research-result-subheading";
+    supportingHeading.textContent = "Supporting context — noncontrolling";
+    const supportingList = document.createElement("ul");
+    supportingList.className = "research-result-list";
+    supportingSources.forEach((source) => {
+      const item = document.createElement("li");
+      const title = source.title || source.publisher || "Supporting source";
+      let linked = false;
+      try {
+        const rawURL = String(source.url || "").trim();
+        const url = rawURL ? new URL(rawURL) : null;
+        if (url?.protocol === "https:" && url.hostname) {
+          const link = document.createElement("a");
+          link.href = url.href;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = title;
+          item.append(link);
+          linked = true;
+        }
+      } catch {
+        // Keep the source visible as plain text if its URL is unavailable.
+      }
+      if (!linked) item.append(document.createTextNode(title));
+      if (source.claim) item.append(document.createTextNode(`: ${source.claim}`));
+      supportingList.append(item);
+    });
+    detailsBody.append(supportingHeading, supportingList);
+  }
   if (result.citations?.length) {
     const citationsHeading = document.createElement("h4");
     citationsHeading.className = "research-result-subheading";

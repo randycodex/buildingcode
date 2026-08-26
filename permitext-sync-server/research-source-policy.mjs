@@ -187,7 +187,11 @@ export function normalizeResearchWebSources(sources, options = {}) {
 
   const normalizedClaims = (source) => [...new Set(
     (Array.isArray(source?.attributedClaims) ? source.attributedClaims : [])
-      .map((claim) => normalizedText(claim).replace(/\s+/g, " "))
+      .map((claim) => normalizedText(claim)
+        .replace(/(^|[^\p{L}\p{N}_])\*\*(\S(?:[^*\n]*?\S)?)\*\*(?![\p{L}\p{N}_])/gu, "$1$2")
+        .replace(/(^|[^\p{L}\p{N}_])__(\S(?:[^_\n]*?\S)?)__(?![\p{L}\p{N}_])/gu, "$1$2")
+        .replace(/(^|[^\p{L}\p{N}_])`(\S(?:[^`\n]*?\S)?)`(?![\p{L}\p{N}_])/gu, "$1$2")
+        .replace(/\s+/g, " "))
       .filter(Boolean)
   )];
 

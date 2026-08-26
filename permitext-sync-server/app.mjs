@@ -17437,7 +17437,9 @@ async function handleResearchConversationMessage(request, response) {
           userPinnedCount: materialAssembledEvidence.filter((section) => section.origin === "user_pinned").length,
           permitextDiscoveredCount: materialAssembledEvidence.filter((section) => section.origin === "permitext_discovered").length,
           crossReferenceCount: materialAssembledEvidence.filter((section) => section.origin === "permitext_cross_reference").length,
-          supportingWebSourceCount: result.interpretation.supportingSources?.length || 0,
+          supportingWebSourceCount: new Set(
+            (result.interpretation.supportingSources || []).map((source) => source.id).filter(Boolean)
+          ).size,
           unresolvedProjectFactCount: result.interpretation.missingFacts?.length || 0,
           requiredClaimCount: requiredClaimCoverage.requiredClaimCount,
           searchedCorpusCount: answerCodeBasis.searchedCorpora.length,

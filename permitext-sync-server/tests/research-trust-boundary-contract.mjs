@@ -29,6 +29,15 @@ assert.match(web, /AI-assisted—not an official interpretation/);
 assert.match(web, /const researchChatPlaceholder = "Ask a Research question…"/);
 assert.match(web, /A Research model produced a response, but Permitext could not verify it against the enacted evidence\. Your question is still here\./);
 assert.match(web, /result\.authorityLabel/);
+assert.match(web, /officialGuidanceOnly/);
+assert.match(web, /No enacted provision cited/);
+assert.match(web, /Supporting context — noncontrolling/);
+assert.match(web, /link\.target = "_blank"/);
+assert.match(web, /link\.rel = "noopener noreferrer"/);
+assert.match(web, /const rawURL = String\(source\.url \|\| ""\)\.trim\(\)/);
+assert.match(web, /rawURL \? new URL\(rawURL\) : null/);
+assert.match(web, /url\?\.protocol === "https:" && url\.hostname/);
+assert.doesNotMatch(web, /new URL\(String\(source\.url \|\| ""\), window\.location\.origin\)/);
 assert.match(web, /Research basis captured/);
 assert.match(
   web,
@@ -60,6 +69,8 @@ assert.match(nativeResearch, /research-answer-authority-status/);
 assert.match(nativeResearch, /research-answer-source-boundary/);
 assert.match(nativeResearch, /research-answer-facts-used/);
 assert.match(nativeResearch, /research-answer-supporting-context/);
+assert.match(nativeModels, /authorityStatus == "official_supporting_guidance"/);
+assert.match(nativeModels, /No enacted provision cited/);
 assert.match(nativeResearch, /private var primaryNarrative/);
 assert.doesNotMatch(nativeResearch, /Ask Terra|Terra is researching|Terra's research service/);
 

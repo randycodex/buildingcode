@@ -118,7 +118,10 @@ const sources = normalizeResearchWebSources([
     url: "https://WWW.NYC.GOV/site/buildings/bulletin/?utm_source=newsletter&b=2&a=1#section",
     title: "  DOB Bulletin  ",
     publisher: " NYC DOB ",
-    attributedClaims: ["  The bulletin clarifies the applicable condition.  "],
+    attributedClaims: [
+      "  The bulletin clarifies the **applicable condition**.  ",
+      "A literal 10`-0\" dimension, GRID__A identifier, and 2**3 expression remain unchanged."
+    ],
     sourceClassification: "enacted_code",
     controlling: true
   },
@@ -143,6 +146,7 @@ assert.equal(sources[0].controlling, false);
 assert.equal(sources[0].sourcePolicyVersion, researchSourcePolicyVersion);
 assert.deepEqual(sources[0].attributedClaims, [
   "The bulletin clarifies the applicable condition.",
+  "A literal 10`-0\" dimension, GRID__A identifier, and 2**3 expression remain unchanged.",
   "A second cited claim."
 ]);
 assert.equal(sources[1].url, "https://engineering.example.com/open-stairs");

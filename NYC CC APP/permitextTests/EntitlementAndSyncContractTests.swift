@@ -3908,6 +3908,78 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(genericFallback.displayTitle, "Supporting source")
     }
 
+    func testResearchAnswerOfficialGuidanceBoundaryDoesNotClaimEnactedSupport() throws {
+        let data = Data(
+            """
+            {
+              "mode": "openai",
+              "authorityStatus": "official_supporting_guidance",
+              "authorityLabel": "Official supporting guidance — noncontrolling",
+              "conclusion": "Official supporting guidance — noncontrolling and not an enacted-code conclusion.",
+              "explanation": "- DOB guidance claim.",
+              "sourceSummary": {
+                "enactedProvisionCount": 16,
+                "contextualProvisionCount": 4,
+                "citedProvisionCount": 0,
+                "supportingWebSourceCount": 1,
+                "unresolvedProjectFactCount": 0
+              },
+              "supportedPoints": [],
+              "assumptions": [],
+              "missingFacts": [],
+              "evidenceLimitations": ["The assembled enacted evidence did not establish the requested rule."],
+              "followUpQuestions": [],
+              "additionalEvidenceNeeded": [],
+              "supportingSources": [{
+                "id": "web-source-boiler",
+                "title": "Boiler Compliance",
+                "publisher": "NYC Department of Buildings",
+                "url": "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page",
+                "authorityClass": "official_guidance",
+                "role": "supporting",
+                "claim": "DOB guidance claim."
+              }],
+              "citations": []
+            }
+            """.utf8
+        )
+
+        let answer = try JSONDecoder().decode(ResearchAnswer.self, from: data)
+        XCTAssertEqual(
+            answer.researchSourceBoundaryText,
+            "Based on 1 approved official supporting source · No enacted provision cited · No unresolved project facts identified · 1 evidence limit"
+        )
+        XCTAssertFalse(answer.researchSourceBoundaryText.contains("Based on 16 enacted provisions"))
+
+        let duplicateFallbackData = Data(
+            """
+            {
+              "mode": "openai",
+              "authorityStatus": "official_supporting_guidance",
+              "conclusion": "Official guidance only.",
+              "explanation": "Two claims from one source.",
+              "sourceSummary": {},
+              "supportedPoints": [],
+              "assumptions": [],
+              "missingFacts": [],
+              "evidenceLimitations": [],
+              "followUpQuestions": [],
+              "additionalEvidenceNeeded": [],
+              "supportingSources": [
+                { "id": "same-source", "claim": "First claim." },
+                { "id": "same-source", "claim": "Second claim." }
+              ],
+              "citations": []
+            }
+            """.utf8
+        )
+        let duplicateFallbackAnswer = try JSONDecoder().decode(ResearchAnswer.self, from: duplicateFallbackData)
+        XCTAssertEqual(
+            duplicateFallbackAnswer.researchSourceBoundaryText,
+            "Based on 1 approved official supporting source · No enacted provision cited · No unresolved project facts identified · No additional evidence limits identified"
+        )
+    }
+
     func testResearchFailureDistinguishesVerificationFromProviderFailure() {
         let verificationError = PermitextBackendHTTPError.serverStatus(
             502,
