@@ -404,7 +404,7 @@ assert.equal(researchShouldUseDeterministicOfficialGuidance({
   allowOfficialGuidanceOnly: true,
   webSupport: { sources: boilerSupportingSources },
   evidence
-}), false, "Governing enacted evidence must keep the ordinary enacted-plus-guidance pipeline.");
+}), true, "An explicit official-guidance request must preserve the exact source-bound guidance even when related enacted evidence was retrieved.");
 assert.equal(researchShouldUseDeterministicOfficialGuidance({
   allowOfficialGuidanceOnly: true,
   webSupport: { sources: [] },

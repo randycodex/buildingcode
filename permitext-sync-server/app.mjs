@@ -219,6 +219,7 @@ import {
   extractResearchOfficialDocumentReferences,
   researchWebSupportTrigger
 } from "./research-source-policy.mjs";
+import { bindResearchWebSupportToOfficialHTML } from "./research-official-html-attribution.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import {
   createResearchCorpusRegistry,
@@ -8903,13 +8904,11 @@ export function researchOfficialGuidanceOnlyInterpretation(webSupport = {}) {
 
 export function researchShouldUseDeterministicOfficialGuidance({
   allowOfficialGuidanceOnly = false,
-  webSupport = {},
-  evidence = []
+  webSupport = {}
 } = {}) {
   return allowOfficialGuidanceOnly === true &&
     Array.isArray(webSupport?.sources) &&
-    webSupport.sources.length > 0 &&
-    !researchEvidenceRequiresEnactedBindings(evidence);
+    webSupport.sources.length > 0;
 }
 
 export function researchFollowUpQuestionsForResponse(
@@ -17511,10 +17510,17 @@ async function handleResearchConversationMessage(request, response) {
       : Promise.resolve(emptyWebSupport);
     // Web guidance and enacted-evidence organization are independent. Running
     // them together shortens the turn without removing either quality gate.
-    const [webSupport, evidenceAnalysisResult] = await Promise.all([
+    let [webSupport, evidenceAnalysisResult] = await Promise.all([
       webSupportPromise,
       evidenceAnalysisPromise
     ]);
+    if (!mockMode && allowOfficialGuidanceOnly && webSupport.sources.length > 0) {
+      webSupport = await bindResearchWebSupportToOfficialHTML(webSupport, {
+        question,
+        officialDomains: researchSourcePolicyConfiguration().officialDomains,
+        signal: progressResponse.signal
+      });
+    }
     if (allowOfficialGuidanceOnly && webSupport.sources.length === 0) {
       const error = new Error(
         "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here."
@@ -17544,7 +17550,7 @@ async function handleResearchConversationMessage(request, response) {
       requiredClaims,
       signal: progressResponse.signal
     };
-    const deterministicOfficialGuidanceOnly = researchShouldUseDeterministicOfficialGuidance({
+    const deterministicOfficialGuidanceOnly = !mockMode && researchShouldUseDeterministicOfficialGuidance({
       allowOfficialGuidanceOnly,
       webSupport,
       evidence: assembledEvidence
@@ -17682,7 +17688,29 @@ async function handleResearchConversationMessage(request, response) {
       evidenceBoundaryFallback = true;
       return true;
     };
-    if (mockMode) {
+    if (deterministicOfficialGuidanceOnly) {
+      const sourceFaithfulPass =
+        webAttribution.pass &&
+        result.interpretation.supportingSources?.length > 0 &&
+        result.interpretation.supportingSources.every((source) =>
+          source?.sourceValidation === "official_html" &&
+          source?.sourceContentHash &&
+          source?.claim
+        );
+      verificationAttempts = [{
+        pass: Boolean(sourceFaithfulPass),
+        issues: sourceFaithfulPass
+          ? []
+          : combinedResearchAnswerRevisionIssues(webAttribution),
+        model: "permitext-deterministic-official-html-attribution"
+      }];
+      if (!sourceFaithfulPass) {
+        const error = new Error("The official guidance answer was not bound to the retrieved official HTML.");
+        error.code = "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE";
+        error.verificationAttempts = verificationAttempts;
+        throw error;
+      }
+    } else if (mockMode) {
       const deterministicPass =
         requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass && webAttribution.pass;
       verificationAttempts = [{
@@ -18126,7 +18154,12 @@ async function handleResearchConversationMessage(request, response) {
         attemptCount: webSupport.attemptCount || 0,
         sourceCount: webSupport.sources.length,
         candidateSourceCount: webSupport.candidateOfficialURLs?.length || 0,
-        guidanceOnlyAllowed: allowOfficialGuidanceOnly
+        guidanceOnlyAllowed: allowOfficialGuidanceOnly,
+        sourceValidationMethod: webSupport.sourceValidation?.method || null,
+        validatedSourceCount: webSupport.sourceValidation?.validatedSourceCount || 0,
+        sourceValidationFailureCodes: Array.from(new Set(
+          (webSupport.sourceValidation?.failures || []).map((failure) => failure?.code).filter(Boolean)
+        ))
       },
       modelUsage: Array.from(new Set(
         (result.usage.modelUsage || []).map((entry) => entry.model).filter(Boolean)
