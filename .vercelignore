@@ -1,1 +1,12 @@
 NYC CC APP/
+.DerivedData*/
+New York City/
+NYC CC AUTHOR/
+docs/
+.git/
+.vercel/
+permitext-sync-server/node_modules/
+permitext-sync-server/data/
+permitext-sync-server/tests/
+permitext-sync-server/evals/
+permitext-sync-server/.vercel/
