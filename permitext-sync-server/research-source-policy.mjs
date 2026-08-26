@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260826-supporting-web-v5";
+export const researchSourcePolicyVersion = "20260826-supporting-web-v6";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -105,6 +105,8 @@ export function extractResearchOfficialDocumentReferences(value) {
 
 const guidanceRequestPattern =
   /\b(?:official\s+)?(?:guidance|interpretation|bulletin|service notice|advisory|faq|agency practice|dob guidance|department guidance)\b/i;
+const officialPageRequestPattern =
+  /\bofficial\b[^.?!\n]{0,120}\b(?:page|webpage|website|web page|web source)\b/i;
 const outsideLibraryRequestPattern =
   /\b(?:web|internet|online source|outside (?:the )?(?:library|corpus)|external source|supporting source|manufacturer(?:'s)? (?:instructions|data|documentation)|referenced standard)\b/i;
 
@@ -116,7 +118,11 @@ export function researchWebSupportTrigger(input = {}, environment = process.env)
 
   const question = normalizedText(input.question || input.query);
   const reasons = [];
-  if (input.guidanceRequested === true || guidanceRequestPattern.test(question)) {
+  if (
+    input.guidanceRequested === true ||
+    guidanceRequestPattern.test(question) ||
+    officialPageRequestPattern.test(question)
+  ) {
     reasons.push("official_guidance_requested");
   }
   if (

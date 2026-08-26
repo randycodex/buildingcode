@@ -88,6 +88,13 @@ assert.deepEqual(
   ["official_guidance_requested", "outside_library_support_needed"]
 );
 assert.equal(
+  researchWebSupportTrigger({
+    question: "On the current official NYC Department of Buildings Boiler Compliance page, which registered low-pressure boilers require annual inspections?"
+  }, {}).reasons.includes("official_guidance_requested"),
+  true,
+  "A named official agency page must use source-bound guidance even when the word guidance is omitted."
+);
+assert.equal(
   researchWebSupportTrigger({ question: "Check this referenced standard outside the library." }, {})
     .reasons.includes("official_guidance_requested"),
   false,
