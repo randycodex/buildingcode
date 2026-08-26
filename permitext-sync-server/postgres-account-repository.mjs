@@ -619,6 +619,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
       `,
       sql`UPDATE permitext_research_conversations SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
       sql`UPDATE permitext_research_usage SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
+      sql`UPDATE permitext_research_operations SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
       sql`
         DELETE FROM permitext_research_feedback AS source
         USING permitext_research_feedback AS target
@@ -1083,6 +1084,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
       sql`DELETE FROM permitext_migration_checkpoints WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_research_feedback WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_research_usage WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_research_operations WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_research_conversations WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_user_content_records WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_account_sessions WHERE user_id LIKE 'passkey:%'`,

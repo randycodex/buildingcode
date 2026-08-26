@@ -690,12 +690,18 @@ function renderFeedback() {
 
 function renderResearchSpend() {
   const report = data.researchSpend || { totals: {}, users: [] };
+  const economics = report.economics || {};
+  const sample = economics.sample || {};
+  const cost = economics.economics || {};
+  const latency = economics.latencyMilliseconds || {};
+  const routing = economics.routing || {};
+  const charging = economics.charging || {};
   const section = element("section");
   section.append(
     element("h2", { text: "Research spend" }),
     element("p", {
       className: "meta",
-      text: `Owner-only operational estimate since ${report.periodStart || "the current period"}. The private request guardrail is ${Number(report.internalMonthlyRequestGuardrail || 0).toLocaleString()} per account and is not customer-facing.`
+      text: `Owner-only operational estimate since ${report.periodStart || "the current period"}. No questions, answers, or Project facts are included. The private request guardrail is ${Number(report.internalMonthlyRequestGuardrail || 0).toLocaleString()} per account and is not customer-facing.`
     })
   );
   const totals = element("div", { className: "summary" });
@@ -710,6 +716,81 @@ function renderResearchSpend() {
     totals.append(card);
   });
   section.append(totals);
+  const benchmark = element("div", { className: "summary" });
+  [
+    [
+      "Projected cost per 100 completed turns",
+      cost.projectedCostPer100TurnsUSD == null
+        ? "Unmeasured"
+        : `$${Number(cost.projectedCostPer100TurnsUSD).toFixed(2)}`
+    ],
+    [
+      "Completed benchmark turns",
+      `${Number(sample.completedCharged || 0).toLocaleString()} / ${Number(economics.targets?.minimumCompletedTurns || 25).toLocaleString()}`
+    ],
+    [
+      "Turn cost p50 / p90",
+      cost.completedTurnCostUSD?.p50 == null
+        ? "Unmeasured"
+        : `$${Number(cost.completedTurnCostUSD.p50).toFixed(4)} / $${Number(cost.completedTurnCostUSD.p90).toFixed(4)}`
+    ],
+    [
+      "Latency p50 / p90",
+      latency.p50 == null
+        ? "Unmeasured"
+        : `${Math.round(Number(latency.p50) / 1000)}s / ${Math.round(Number(latency.p90) / 1000)}s`
+    ],
+    [
+      "Terra escalations",
+      routing.escalationRate == null
+        ? "Unmeasured"
+        : `${Number(routing.escalatedTurns || 0).toLocaleString()} (${(Number(routing.escalationRate) * 100).toFixed(1)}%)`
+    ],
+    [
+      "Charging integrity",
+      sample.operations == null
+        ? "Unmeasured"
+        : charging.integrityPass === false ? "Failed" : "Passed"
+    ]
+  ].forEach(([label, value]) => {
+    const card = element("article");
+    card.append(element("strong", { text: value }), element("span", { text: label }));
+    benchmark.append(card);
+  });
+  section.append(
+    element("h2", { text: "Hybrid benchmark" }),
+    element("p", {
+      className: "meta",
+      text: economics.readyForPricingDecision
+        ? "The sample, cost target, and charging-integrity gates currently pass. Quality review remains a separate requirement."
+        : "Pricing remains provisional until at least 25 completed metered turns, the cost target, and charging-integrity gates all pass."
+    }),
+    benchmark
+  );
+  const diagnostics = element("table", { className: "spend-table" });
+  const diagnosticsHead = element("thead");
+  const diagnosticsHeadRow = element("tr");
+  ["Operational signal", "Count"].forEach((label) =>
+    diagnosticsHeadRow.append(element("th", { text: label }))
+  );
+  diagnosticsHead.append(diagnosticsHeadRow);
+  const diagnosticsBody = element("tbody");
+  const diagnosticRows = [
+    ...(routing.models || []).map((item) => [`Model · ${item.key}`, item.count]),
+    ...(routing.escalationStages || []).map((item) => [`Escalation · ${item.key}`, item.count]),
+    ...(economics.failures?.codes || []).map((item) => [`Failure · ${item.key}`, item.count])
+  ];
+  if (!diagnosticRows.length) diagnosticRows.push(["No benchmark operations recorded yet", 0]);
+  diagnosticRows.forEach(([label, count]) => {
+    const row = element("tr");
+    row.append(
+      element("td", { text: label }),
+      element("td", { text: Number(count || 0).toLocaleString() })
+    );
+    diagnosticsBody.append(row);
+  });
+  diagnostics.append(diagnosticsHead, diagnosticsBody);
+  section.append(diagnostics);
   const table = element("table", { className: "spend-table" });
   const head = element("thead");
   const headRow = element("tr");

@@ -186,6 +186,10 @@ import {
   settleResearchProviderSpend,
   researchModelConfiguration
 } from "./research-config.mjs";
+import {
+  createResearchOperationMetric,
+  researchEconomicsReport
+} from "./research-economics.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
 import {
   researchEvidenceForBoundedCitationLookup,
@@ -467,6 +471,7 @@ const emptyStore = () => ({
   migrationCheckpointsByUserID: {},
   researchConversationsByUserID: {},
   researchUsageByUserID: {},
+  researchOperationsByUserID: {},
   researchCreditsByUserID: {},
   researchPurchaseClaimsByID: {},
   researchFeedbackByUserID: {},
@@ -985,6 +990,7 @@ function createFileStoreAdapter() {
       delete store.migrationCheckpointsByUserID[userID];
       delete store.researchConversationsByUserID[userID];
       delete store.researchUsageByUserID[userID];
+      delete store.researchOperationsByUserID[userID];
       delete store.researchCreditsByUserID[userID];
       for (const [claimID, claim] of Object.entries(store.researchPurchaseClaimsByID || {})) {
         if (claim.creditedUserID === userID) {
@@ -1055,6 +1061,10 @@ function createFileStoreAdapter() {
             0
           ),
           researchUsage: Object.values(store.researchUsageByUserID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
+          ),
+          researchOperations: Object.values(store.researchOperationsByUserID || {}).reduce(
             (count, entries) => count + (entries?.length || 0),
             0
           ),
@@ -1879,6 +1889,29 @@ function createFileStoreAdapter() {
       }).filter((item) => item.requests > 0)
         .sort((left, right) => right.estimatedCostUSD - left.estimatedCostUSD);
     },
+    async saveResearchOperationMetric(userID, metric) {
+      return withResearchUsageLock(userID, async () => {
+        const store = await this.read();
+        store.researchOperationsByUserID ||= {};
+        const operations = store.researchOperationsByUserID[userID] || [];
+        const index = operations.findIndex((operation) => operation.id === metric.id);
+        if (index === -1) operations.push(metric);
+        else operations[index] = metric;
+        store.researchOperationsByUserID[userID] = operations;
+        await this.write(store);
+        return metric;
+      });
+    },
+    async researchOperationsSince(since) {
+      const store = await this.read();
+      return Object.entries(store.researchOperationsByUserID || {})
+        .flatMap(([userID, operations]) => (operations || []).map((operation) => ({
+          ...operation,
+          userID
+        })))
+        .filter((operation) => String(operation.createdAt || "") >= since)
+        .sort((left, right) => String(right.createdAt || "").localeCompare(String(left.createdAt || "")));
+    },
     async reserveResearchUsage(userID, reservation) {
       return withResearchUsageLock(userID, async () => this.withMutation((store) =>
         applyResearchUsageReservation(store, userID, reservation)
@@ -1988,6 +2021,7 @@ function storeHasData(store) {
     migrationCheckpointsByUserID: store.migrationCheckpointsByUserID,
     researchConversationsByUserID: store.researchConversationsByUserID,
     researchUsageByUserID: store.researchUsageByUserID,
+    researchOperationsByUserID: store.researchOperationsByUserID,
     researchCreditsByUserID: store.researchCreditsByUserID,
     researchPurchaseClaimsByID: store.researchPurchaseClaimsByID,
     researchFeedbackByUserID: store.researchFeedbackByUserID,
@@ -2518,6 +2552,18 @@ async function createPostgresStoreAdapter() {
       ON permitext_research_usage (user_id, created_at DESC)
     `;
     await sql`
+      CREATE TABLE IF NOT EXISTS permitext_research_operations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        operation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_operations_created_idx
+      ON permitext_research_operations (created_at DESC)
+    `;
+    await sql`
       CREATE TABLE IF NOT EXISTS permitext_research_credits (
         id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
@@ -2944,6 +2990,7 @@ async function createPostgresStoreAdapter() {
         (SELECT count(*) FROM permitext_project_activity)::int AS project_activity,
         (SELECT count(*) FROM permitext_migration_checkpoints)::int AS migration_checkpoints,
         (SELECT count(*) FROM permitext_research_usage)::int AS research_usage,
+        (SELECT count(*) FROM permitext_research_operations)::int AS research_operations,
         (SELECT count(*) FROM permitext_research_credits)::int AS research_credits,
         (SELECT count(*) FROM permitext_research_purchase_claims)::int AS research_purchase_claims,
         (SELECT count(*) FROM permitext_research_feedback)::int AS research_feedback,
@@ -2981,6 +3028,7 @@ async function createPostgresStoreAdapter() {
         activityEvents: Number(row.project_activity || 0),
         migrationCheckpoints: Number(row.migration_checkpoints || 0),
         researchUsage: Number(row.research_usage || 0),
+        researchOperations: Number(row.research_operations || 0),
         researchCredits: Number(row.research_credits || 0),
         researchPurchaseClaims: Number(row.research_purchase_claims || 0),
         researchFeedback: Number(row.research_feedback || 0),
@@ -3519,6 +3567,7 @@ async function createPostgresStoreAdapter() {
         sql`DELETE FROM permitext_migration_checkpoints WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_research_feedback WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_research_usage WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_research_operations WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_research_credits WHERE user_id = ${userID}`,
         sql`
           UPDATE permitext_research_purchase_claims
@@ -4685,6 +4734,35 @@ async function createPostgresStoreAdapter() {
         estimatedCostUSD: Number(Number(row.estimated_cost_usd || 0).toFixed(6))
       }));
     },
+    async saveResearchOperationMetric(userID, metric) {
+      await ensureSchema();
+      await sql`
+        INSERT INTO permitext_research_operations (id, user_id, operation, created_at)
+        VALUES (
+          ${metric.id}, ${userID}, ${JSON.stringify(metric)}::jsonb,
+          ${metric.createdAt}::timestamptz
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          operation = EXCLUDED.operation,
+          created_at = EXCLUDED.created_at
+        WHERE permitext_research_operations.user_id = ${userID}
+      `;
+      return metric;
+    },
+    async researchOperationsSince(since) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT user_id, operation, created_at
+        FROM permitext_research_operations
+        WHERE created_at >= ${since}::timestamptz
+        ORDER BY created_at DESC
+      `;
+      return rows.map((row) => ({
+        ...safeJSON(row.operation, {}),
+        userID: row.user_id,
+        createdAt: dateToISO(row.created_at)
+      }));
+    },
     async reserveResearchUsage(userID, reservation) {
       await ensureSchema();
       for (let attempt = 1; attempt <= 3; attempt += 1) {
@@ -5753,6 +5831,31 @@ async function researchSpendSince(since) {
   const adapter = await storeAdapter();
   return typeof adapter.researchSpendSince === "function"
     ? adapter.researchSpendSince(since)
+    : [];
+}
+
+async function saveResearchOperationMetric(userID, metric) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveResearchOperationMetric !== "function") return null;
+  return adapter.saveResearchOperationMetric(userID, metric);
+}
+
+async function saveResearchOperationMetricBestEffort(userID, metric) {
+  try {
+    return await saveResearchOperationMetric(
+      userID,
+      createResearchOperationMetric(metric)
+    );
+  } catch (error) {
+    console.error("Failed to record private Research operation telemetry.", error);
+    return null;
+  }
+}
+
+async function researchOperationsSince(since) {
+  const adapter = await storeAdapter();
+  return typeof adapter.researchOperationsSince === "function"
+    ? adapter.researchOperationsSince(since)
     : [];
 }
 
@@ -16384,7 +16487,19 @@ async function researchUsageForClient(userID, entitlement, options = {}) {
 
 async function internalResearchSpendReport() {
   const periodStart = currentMonthStart();
-  const users = await researchSpendSince(periodStart);
+  const [users, operations] = await Promise.all([
+    researchSpendSince(periodStart),
+    researchOperationsSince(periodStart)
+  ]);
+  const economics = researchEconomicsReport(operations, {
+    minimumCompletedTurns: 25,
+    targetCostPer100MinimumUSD: Number(
+      process.env.PERMITEXT_RESEARCH_TARGET_100_TURN_COST_MIN_USD || 4
+    ),
+    targetCostPer100MaximumUSD: Number(
+      process.env.PERMITEXT_RESEARCH_TARGET_100_TURN_COST_MAX_USD || 6
+    )
+  });
   return {
     periodStart,
     generatedAt: new Date().toISOString(),
@@ -16400,7 +16515,8 @@ async function internalResearchSpendReport() {
         0
       ).toFixed(6))
     },
-    users
+    users,
+    economics
   };
 }
 
@@ -17146,6 +17262,22 @@ async function handleResearchConversationMessage(request, response) {
     });
     return;
   }
+  const researchOperationStartedAt = performance.now();
+  const researchOperationCreatedAt = new Date().toISOString();
+  const researchOperation = {
+    id: randomUUID(),
+    createdAt: researchOperationCreatedAt,
+    status: "rejected",
+    mode: mockMode ? "mock" : "openai",
+    charged: false,
+    fundingSource: null,
+    modelUsage: [],
+    escalationStages: [],
+    verificationIssueTypes: [],
+    providerRequestCount: 0,
+    pendingProviderRequestCount: 0,
+    durationMilliseconds: 0
+  };
   const requestMessages = researchRequestID
     ? researchMessagesForRequest(conversation, researchRequestID)
     : { user: null, assistant: null };
@@ -17154,6 +17286,13 @@ async function handleResearchConversationMessage(request, response) {
     priorRequestMessage?.role === "user" &&
     normalizedResearchText(priorRequestMessage.question, 2_000) !== question
   ) {
+    researchOperation.failureCode = "RESEARCH_REQUEST_ID_CONFLICT";
+    researchOperation.durationMilliseconds = Math.round(
+      performance.now() - researchOperationStartedAt
+    );
+    if (!mockMode) {
+      await saveResearchOperationMetricBestEffort(context.userID, researchOperation);
+    }
     progressResponse.json(409, {
       error: "That Research request identifier was already used for a different question.",
       code: "RESEARCH_REQUEST_ID_CONFLICT"
@@ -17164,6 +17303,21 @@ async function handleResearchConversationMessage(request, response) {
   if (replayedAnswer) {
     for (const stage of replayedAnswer.researchProgress?.stages || []) {
       if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
+    }
+    Object.assign(researchOperation, {
+      status: "replayed",
+      charged: false,
+      mode: replayedAnswer.answer?.mode || "replay",
+      model: replayedAnswer.answer?.model || null,
+      requestedModel: replayedAnswer.answer?.requestedModel || null,
+      routingVersion: replayedAnswer.answer?.routing?.version || null,
+      routingMode: replayedAnswer.answer?.routing?.mode || null,
+      answerTier: replayedAnswer.answer?.routing?.answerTier || null,
+      escalated: replayedAnswer.answer?.routing?.escalated === true,
+      durationMilliseconds: Math.round(performance.now() - researchOperationStartedAt)
+    });
+    if (!mockMode) {
+      await saveResearchOperationMetricBestEffort(context.userID, researchOperation);
     }
     progressResponse.json(200, {
       conversation: await researchConversationForClient(conversation, { userID: context.userID }),
@@ -17184,6 +17338,7 @@ async function handleResearchConversationMessage(request, response) {
     progressResponse.progress("preparing_question", "active");
     const current = await currentResearchEvidence(conversation);
     if (current.stale) {
+      researchOperation.failureCode = "RESEARCH_SOURCE_CHANGED";
       conversation.sourceStatus = "changed";
       await saveStoredResearchConversation(context.userID, conversation);
       progressResponse.json(409, {
@@ -17197,6 +17352,7 @@ async function handleResearchConversationMessage(request, response) {
     const projectLink = await researchConversationProjectLink(context.userID, conversation);
     const decisionLink = researchCodeDecisionLink(projectLink);
     if (decisionLink && selections.length === 0) {
+      researchOperation.failureCode = "RESEARCH_EVIDENCE_REQUIRED";
       progressResponse.json(422, {
         error: "Add approved enacted evidence before using Research from a Code Decision.",
         code: "RESEARCH_EVIDENCE_REQUIRED"
@@ -17223,6 +17379,15 @@ async function handleResearchConversationMessage(request, response) {
         combinedProjectFacts,
         researchRequestID,
         progressResponse
+      });
+      Object.assign(researchOperation, {
+        status: "completed",
+        mode: "project_context",
+        model: "permitext-project-context",
+        requestedModel: "permitext-project-context",
+        routingMode: "project_context",
+        answerTier: "deterministic",
+        charged: false
       });
       return;
     }
@@ -17270,6 +17435,7 @@ async function handleResearchConversationMessage(request, response) {
       ? researchEvidenceForBoundedCitationLookup(question, evidencePackage.sources || [])
       : [];
     if (boundedCitationCandidate && !boundedCitationEvidence.length) {
+      researchOperation.failureCode = "RESEARCH_EVIDENCE_NOT_FOUND";
       progressResponse.progress("checking_citation_support", "active");
       progressResponse.json(422, {
         error: "Permitext could not locate the exact current enacted Building Code section requested.",
@@ -17289,6 +17455,7 @@ async function handleResearchConversationMessage(request, response) {
       ? boundedCitationEvidence
       : evidencePackage.sources || [];
     if (!assembledEvidence.length) {
+      researchOperation.failureCode = "RESEARCH_EVIDENCE_NOT_FOUND";
       progressResponse.progress("checking_citation_support", "active");
       progressResponse.json(422, {
         error: answerCodeBasis.limitation ||
@@ -17334,6 +17501,7 @@ async function handleResearchConversationMessage(request, response) {
         requestFingerprint: researchRequestQuestionFingerprint(question),
         createdAt: researchReservationCreatedAt
       });
+      researchOperation.fundingSource = reservation.fundingSource || null;
       if (!reservation.reserved) {
         researchReservationID = null;
         if (reservation.reason === "duplicate") {
@@ -17348,6 +17516,7 @@ async function handleResearchConversationMessage(request, response) {
             reservationRequestFingerprint: reservation.requestFingerprint
           });
           if (duplicateDisposition.outcome === "conflict") {
+            researchOperation.failureCode = "RESEARCH_REQUEST_ID_CONFLICT";
             progressResponse.json(409, {
               error: "That Research request identifier was already used for a different question.",
               code: "RESEARCH_REQUEST_ID_CONFLICT"
@@ -17355,6 +17524,13 @@ async function handleResearchConversationMessage(request, response) {
             return;
           }
           if (duplicateDisposition.outcome === "replay") {
+            Object.assign(researchOperation, {
+              status: "replayed",
+              charged: false,
+              mode: duplicateDisposition.answer.answer?.mode || "replay",
+              model: duplicateDisposition.answer.answer?.model || null,
+              requestedModel: duplicateDisposition.answer.answer?.requestedModel || null
+            });
             for (const stage of duplicateDisposition.answer.researchProgress?.stages || []) {
               if (stage.state === "completed") progressResponse.progress(stage.id, "completed");
             }
@@ -17373,6 +17549,7 @@ async function handleResearchConversationMessage(request, response) {
             });
             return;
           }
+          researchOperation.failureCode = "RESEARCH_REQUEST_IN_PROGRESS";
           progressResponse.json(409, {
             error: "This Research question is already being processed. Its reserved turn will not be charged twice.",
             code: "RESEARCH_REQUEST_IN_PROGRESS",
@@ -17380,6 +17557,7 @@ async function handleResearchConversationMessage(request, response) {
           });
           return;
         }
+        researchOperation.failureCode = "TURN_ALLOWANCE_EXHAUSTED";
         const usage = await researchUsageForClient(
           context.userID,
           context.authContext.entitlement
@@ -17436,6 +17614,13 @@ async function handleResearchConversationMessage(request, response) {
       codeBasis: answerCodeBasis,
       webSupportRequested,
       boundedCitationLookup
+    });
+    Object.assign(researchOperation, {
+      routingVersion: researchModelRoutingVersion,
+      routingMode: modelRouting.configuration.mode,
+      answerTier: modelRouting.tier,
+      requestedModel: modelRouting.model,
+      webSupportRequested
     });
     const accurateModel = researchEscalationModel(modelRouting);
     const modelEscalationStages = [];
@@ -17514,6 +17699,7 @@ async function handleResearchConversationMessage(request, response) {
       webSupportPromise,
       evidenceAnalysisPromise
     ]);
+    researchOperation.webSupportSearched = webSupport.searched === true;
     if (!mockMode && allowOfficialGuidanceOnly && webSupport.sources.length > 0) {
       webSupport = await bindResearchWebSupportToOfficialHTML(webSupport, {
         question,
@@ -18125,6 +18311,29 @@ async function handleResearchConversationMessage(request, response) {
       events: activityEvents
     });
     researchReservationCompleted = !mockMode && Boolean(researchReservationID);
+    Object.assign(researchOperation, {
+      status: "completed",
+      mode: assistantMessage.answer.mode,
+      charged: researchReservationCompleted,
+      model: result.model,
+      requestedModel: result.requestedModel || modelRouting.model,
+      modelUsage: Array.from(new Set(
+        (result.usage.modelUsage || []).map((entry) => entry.model).filter(Boolean)
+      )),
+      escalated: evidenceAnalysisEscalated || answerEscalated,
+      escalationStages: modelEscalationStages,
+      verificationAttemptCount: verificationAttempts.length,
+      verificationIssueTypes,
+      providerRequestCount: result.usage.providerRequestCount,
+      inputTokens: result.usage.inputTokens,
+      cachedInputTokens: result.usage.cachedInputTokens,
+      outputTokens: result.usage.outputTokens,
+      totalTokens: result.usage.totalTokens,
+      estimatedCostUSD: estimatedCost.estimatedUSD,
+      pricingVersion: estimatedCost.pricingVersion,
+      webSupportRequested,
+      webSupportSearched: webSupport.searched === true
+    });
     const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
       conversation.primaryProjectID
         ? [{
@@ -18190,6 +18399,21 @@ async function handleResearchConversationMessage(request, response) {
       }
     }
     const failureCode = (typeof error?.code === "string" && error.code) || error?.name;
+    Object.assign(researchOperation, {
+      status: ["RESEARCH_CANCELLED", "AbortError"].includes(failureCode)
+        ? "cancelled"
+        : "failed",
+      charged: false,
+      failureCode: failureCode || "UNKNOWN_RESEARCH_ERROR",
+      verificationAttemptCount: Array.isArray(error.verificationAttempts)
+        ? error.verificationAttempts.length
+        : researchOperation.verificationAttemptCount,
+      verificationIssueTypes: Array.isArray(error.verificationAttempts)
+        ? Array.from(new Set(error.verificationAttempts.flatMap((attempt) =>
+            (attempt.issues || []).map((issue) => issue?.type).filter(Boolean)
+          )))
+        : researchOperation.verificationIssueTypes
+    });
     if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
       progressResponse.failActive("failed");
       progressResponse.error(422, "A cited code section is incomplete and cannot be analyzed yet.", {
@@ -18274,7 +18498,21 @@ async function handleResearchConversationMessage(request, response) {
     }
     throw error;
   } finally {
-    endResearchSpendReservation();
+    const providerSpend = endResearchSpendReservation();
+    Object.assign(researchOperation, {
+      providerRequestCount: Math.max(
+        Number(researchOperation.providerRequestCount || 0),
+        Number(providerSpend?.providerRequestCount || 0)
+      ),
+      pendingProviderRequestCount: Number(providerSpend?.pendingProviderReservationCount || 0),
+      actualProviderCostUSD: providerSpend?.actualUSD ?? null,
+      conservativeProviderCostUSD: providerSpend?.reservedUSD ??
+        researchOperation.estimatedCostUSD ?? null,
+      durationMilliseconds: Math.round(performance.now() - researchOperationStartedAt)
+    });
+    if (!mockMode) {
+      await saveResearchOperationMetricBestEffort(context.userID, researchOperation);
+    }
   }
 }
 
@@ -21529,6 +21767,7 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
   }));
   moveUserEntries("researchConversationsByUserID");
   moveUserEntries("researchUsageByUserID");
+  moveUserEntries("researchOperationsByUserID");
   moveUserEntries("researchCreditsByUserID");
   moveUserEntries("researchFeedbackByUserID");
   for (const [claimID, claim] of Object.entries(store.researchPurchaseClaimsByID || {})) {
