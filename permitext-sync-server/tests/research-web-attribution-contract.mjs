@@ -8,6 +8,8 @@ import {
   researchFollowUpQuestionsForResponse,
   researchInputForEvidence,
   researchInterpretationSchemaForEvidence,
+  researchOfficialGuidanceOnlyInterpretation,
+  researchShouldUseDeterministicOfficialGuidance,
   researchWebSupportRequestBody,
   researchWebSourcesFromProviderPayload,
   validateResearchInterpretation
@@ -381,6 +383,39 @@ assert.deepEqual(finalizedWebOnly.citations, []);
 assert.equal(finalizedWebOnly.supportingSources.length, 1);
 assert.match(finalizedWebOnly.answerText, new RegExp(boilerClaimText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 assert.doesNotMatch(finalizedWebOnly.answerText, /foam-plastic|fireblocking|NFPA 285/i);
+const deterministicWebOnly = researchOfficialGuidanceOnlyInterpretation({
+  sources: boilerSupportingSources
+});
+assert.deepEqual(deterministicWebOnly.supportedPoints, []);
+assert.deepEqual(deterministicWebOnly.citations, []);
+assert.deepEqual(deterministicWebOnly.supportingSourceUses, [{
+  sourceID: "web-boiler-compliance",
+  claimID: "boiler-annual-inspection",
+  claim: boilerClaimText
+}]);
+assert.match(deterministicWebOnly.answerText, /Official supporting guidance — noncontrolling/);
+assert.match(deterministicWebOnly.answerText, new RegExp(boilerClaimText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+assert.equal(researchShouldUseDeterministicOfficialGuidance({
+  allowOfficialGuidanceOnly: true,
+  webSupport: { sources: boilerSupportingSources },
+  evidence: webOnlyEvidence
+}), true);
+assert.equal(researchShouldUseDeterministicOfficialGuidance({
+  allowOfficialGuidanceOnly: true,
+  webSupport: { sources: boilerSupportingSources },
+  evidence
+}), false, "Governing enacted evidence must keep the ordinary enacted-plus-guidance pipeline.");
+assert.equal(researchShouldUseDeterministicOfficialGuidance({
+  allowOfficialGuidanceOnly: true,
+  webSupport: { sources: [] },
+  evidence: webOnlyEvidence
+}), false);
+assert.throws(
+  () => researchOfficialGuidanceOnlyInterpretation({
+    sources: [{ ...boilerSupportingSources[0], attributedClaims: [] }]
+  }),
+  (error) => error?.code === "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE"
+);
 const unsafeGuidanceOnly = finalizeResearchGuidanceOnlyInterpretation({
   ...validatedWebOnly,
   assumptions: ["BC 999 requires an annual filing."],

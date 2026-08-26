@@ -8854,6 +8854,64 @@ export function finalizeResearchGuidanceOnlyInterpretation(
   };
 }
 
+export function researchOfficialGuidanceOnlyInterpretation(webSupport = {}) {
+  const bindings = [];
+  const seen = new Set();
+  for (const source of Array.isArray(webSupport?.sources) ? webSupport.sources : []) {
+    const sourceID = String(source?.id || "").trim();
+    if (!sourceID) continue;
+    for (const claim of Array.isArray(source?.attributedClaims) ? source.attributedClaims : []) {
+      const claimID = String(claim?.id || "").trim();
+      const text = String(claim?.text || "").replace(/\s+/g, " ").trim();
+      const identity = `${sourceID}\u0000${claimID}`;
+      if (!claimID || !text || seen.has(identity)) continue;
+      seen.add(identity);
+      bindings.push({ source, sourceID, claimID, text });
+    }
+  }
+  const narrative = canonicalResearchOfficialGuidanceNarrative(
+    bindings.map((binding) => binding.text)
+  );
+  if (!narrative.claims.length) {
+    const error = new Error("Permitext could not bind the retrieved official guidance to attributable claims.");
+    error.code = "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE";
+    throw error;
+  }
+  return {
+    answerText: narrative.answerText,
+    conclusion: narrative.authorityStatement,
+    supportedPoints: [],
+    explanation: narrative.explanation,
+    assumptions: [],
+    missingFacts: [],
+    followUpQuestions: [],
+    evidenceLimitations: [narrative.enactedBoundary],
+    additionalEvidenceNeeded: [],
+    supportingSourceUses: bindings.map((binding) => ({
+      sourceID: binding.sourceID,
+      claimID: binding.claimID,
+      claim: binding.text
+    })),
+    supportingSources: bindings.map((binding) => ({
+      ...binding.source,
+      attributedClaims: [{ id: binding.claimID, text: binding.text }],
+      claim: binding.text
+    })),
+    citations: []
+  };
+}
+
+export function researchShouldUseDeterministicOfficialGuidance({
+  allowOfficialGuidanceOnly = false,
+  webSupport = {},
+  evidence = []
+} = {}) {
+  return allowOfficialGuidanceOnly === true &&
+    Array.isArray(webSupport?.sources) &&
+    webSupport.sources.length > 0 &&
+    !researchEvidenceRequiresEnactedBindings(evidence);
+}
+
 export function researchFollowUpQuestionsForResponse(
   interpretation,
   evidenceAnalysis,
@@ -17486,6 +17544,11 @@ async function handleResearchConversationMessage(request, response) {
       requiredClaims,
       signal: progressResponse.signal
     };
+    const deterministicOfficialGuidanceOnly = researchShouldUseDeterministicOfficialGuidance({
+      allowOfficialGuidanceOnly,
+      webSupport,
+      evidence: assembledEvidence
+    });
     let result = mockMode
       ? {
           interpretation: validateResearchInterpretation(
@@ -17506,6 +17569,18 @@ async function handleResearchConversationMessage(request, response) {
           configuration: {
             ...researchModelConfiguration(),
             promptVersion: `${researchModelConfiguration().promptVersion}:conversational-v4`,
+            evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
+          },
+          usage: combinedResearchUsage()
+        }
+      : deterministicOfficialGuidanceOnly
+      ? {
+          interpretation: researchOfficialGuidanceOnlyInterpretation(webSupport),
+          requestedModel: modelRouting.model,
+          model: "permitext-deterministic-official-guidance",
+          configuration: {
+            ...researchModelConfiguration(),
+            promptVersion: `${researchModelConfiguration().promptVersion}:official-guidance-v1`,
             evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
           },
           usage: combinedResearchUsage()
@@ -17566,6 +17641,11 @@ async function handleResearchConversationMessage(request, response) {
       webSupport
     });
     const applyEvidenceBoundaryFallback = () => {
+      // Once Permitext has attributable official guidance for an explicit
+      // guidance request, it must never replace that sourced material with a
+      // charged generic enacted-evidence fallback. Revision may repair the
+      // answer; otherwise the turn fails and its reservation is released.
+      if (allowOfficialGuidanceOnly && webSupport.sources.length > 0) return false;
       if (!researchEvidenceBoundaryFallbackEligibility({
         verificationAttempts,
         evidence: assembledEvidence,
