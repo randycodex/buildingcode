@@ -188,6 +188,8 @@ import {
 } from "./research-config.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
 import {
+  researchEvidenceForBoundedCitationLookup,
+  researchEvidenceSupportsBoundedCitationFastPath,
   researchEscalationModel,
   researchModelRoutingConfiguration,
   researchModelRoutingVersion,
@@ -7502,6 +7504,48 @@ function mockResearchEvidenceAnalysis(evidence, projectFacts = [], retrievalLimi
       ? retrievalLimitations.map((item) => item.text || String(item))
       : ["Permitext searched the enacted sources currently available in its authorized library; this is not a universal legal-completeness claim."],
     highValueFollowUpQuestions: ["Which project fact controls whether the cited condition applies?"]
+  };
+}
+
+export function deterministicResearchEvidenceAnalysisForBoundedCitation(
+  evidence,
+  retrievalLimitations = []
+) {
+  const grouped = Array.from((evidence || []).reduce((groups, source) => {
+    const key = `${source.codePrefix || "Code"}:${source.sectionNumber || source.sectionID}`;
+    const existing = groups.get(key);
+    if (existing) {
+      if (!existing.sourceIDs.includes(source.sourceID)) existing.sourceIDs.push(source.sourceID);
+      return groups;
+    }
+    groups.set(key, {
+      label: `${source.codePrefix || "Code"} ${source.sectionNumber || source.sectionID}`.trim(),
+      summary: "The user requested this enacted provision by exact citation.",
+      sourceIDs: [source.sourceID]
+    });
+    return groups;
+  }, new Map()).values());
+  const evidenceLimitations = retrievalLimitations
+    .map((item) => normalizedResearchText(item?.text || item, 1_500))
+    .filter(Boolean);
+  return {
+    schemaVersion: 1,
+    controllingProvisions: grouped,
+    generalRules: [],
+    exceptions: [],
+    conditions: [],
+    limitations: [],
+    definitions: [],
+    crossReferences: [],
+    tables: [],
+    userPinnedEvidence: evidence.filter((source) => source.origin === "user_pinned").map((source) => source.sourceID),
+    permitextDiscoveredEvidence: evidence.filter((source) => source.origin !== "user_pinned").map((source) => source.sourceID),
+    projectFactsUsed: [],
+    unresolvedProjectFacts: [],
+    evidenceLimitations: evidenceLimitations.length
+      ? evidenceLimitations
+      : ["Permitext limited this answer to the enacted section identified by the user's exact citation."],
+    highValueFollowUpQuestions: []
   };
 }
 
@@ -16701,7 +16745,29 @@ async function handleResearchConversationMessage(request, response) {
       ...(evidencePackage.limitations || []),
       ...(answerCodeBasis.limitation ? [{ code: "RESEARCH_CORPUS_LIMITATION", text: answerCodeBasis.limitation }] : [])
     ];
-    const assembledEvidence = evidencePackage.sources || [];
+    const boundedCitationCandidate = researchQuestionIsBoundedCitationLookup(question) && pinnedEvidence.length === 0;
+    const boundedCitationEvidence = boundedCitationCandidate
+      ? researchEvidenceForBoundedCitationLookup(question, evidencePackage.sources || [])
+      : [];
+    if (boundedCitationCandidate && !boundedCitationEvidence.length) {
+      progressResponse.progress("checking_citation_support", "active");
+      progressResponse.json(422, {
+        error: "Permitext could not locate the exact current enacted Building Code section requested.",
+        code: "RESEARCH_EVIDENCE_NOT_FOUND",
+        codeBasis: answerCodeBasis,
+        retrieval: {
+          assemblyVersion: evidencePackage.assemblyVersion,
+          limitations: evidencePackage.limitations,
+          discovery: evidencePackage.discovery
+        }
+      });
+      return;
+    }
+    const boundedCitationLookup = boundedCitationCandidate &&
+      researchEvidenceSupportsBoundedCitationFastPath(boundedCitationEvidence);
+    const assembledEvidence = boundedCitationLookup
+      ? boundedCitationEvidence
+      : evidencePackage.sources || [];
     if (!assembledEvidence.length) {
       progressResponse.progress("checking_citation_support", "active");
       progressResponse.json(422, {
@@ -16834,7 +16900,6 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const boundedCitationLookup = researchQuestionIsBoundedCitationLookup(question);
     const webSupportRequested = !boundedCitationLookup && shouldUseResearchWebSupport({
       question,
       outsideLibraryRequired: Boolean(evidencePackage.discovery?.outsideCurrentLibrary?.length)
@@ -16844,7 +16909,8 @@ async function handleResearchConversationMessage(request, response) {
       evidence: assembledEvidence,
       requiredClaims,
       codeBasis: answerCodeBasis,
-      webSupportRequested
+      webSupportRequested,
+      boundedCitationLookup
     });
     const accurateModel = researchEscalationModel(modelRouting);
     const runEvidenceAnalysis = async (model) => openAIResearchEvidenceAnalysis(
@@ -16880,6 +16946,15 @@ async function handleResearchConversationMessage(request, response) {
             turnRetrievalLimitations
           ),
           model: "permitext-mock",
+          usage: combinedResearchUsage()
+        })
+      : boundedCitationLookup
+      ? Promise.resolve({
+          analysis: deterministicResearchEvidenceAnalysisForBoundedCitation(
+            assembledEvidence,
+            turnRetrievalLimitations
+          ),
+          model: "permitext-deterministic-bounded-citation",
           usage: combinedResearchUsage()
         })
       : runEvidenceAnalysis(modelRouting.configuration.evidenceAnalysisModel).catch(async (error) => {

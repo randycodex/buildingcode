@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
+  deterministicResearchEvidenceAnalysisForBoundedCitation,
   projectResearchConversationForList,
   researchConversationDisplayTitle,
   researchProjectInformation,
@@ -402,6 +403,37 @@ const analysisFixture = {
 assert.doesNotThrow(
   () => validateResearchEvidenceAnalysis(analysisFixture, [], []),
   "Question facts should not be misclassified as invented Project-folder facts."
+);
+const boundedCitationAnalysis = deterministicResearchEvidenceAnalysisForBoundedCitation([
+  {
+    sourceID: "bc-101-1",
+    sectionID: "101",
+    codePrefix: "BC",
+    sectionNumber: "101.1",
+    origin: "permitext_discovered",
+    sourceType: "enacted_text",
+    authorityClass: "enacted",
+    applicabilityStatus: "current-enacted-edition",
+    evidencePriority: { evidenceRole: "governing", topicRouteRelationship: "exact_topic" },
+    canonicalContextResolved: true,
+    canonicalContextComplete: true,
+    truncated: false
+  }
+], [{ code: "BOUNDED", text: "Only the cited enacted section was included." }]);
+assert.deepEqual(boundedCitationAnalysis.controllingProvisions, [{
+  label: "BC 101.1",
+  summary: "The user requested this enacted provision by exact citation.",
+  sourceIDs: ["bc-101-1"]
+}]);
+assert.deepEqual(boundedCitationAnalysis.unresolvedProjectFacts, []);
+assert.deepEqual(boundedCitationAnalysis.highValueFollowUpQuestions, []);
+assert.deepEqual(boundedCitationAnalysis.evidenceLimitations, ["Only the cited enacted section was included."]);
+assert.doesNotThrow(
+  () => validateResearchEvidenceAnalysis(boundedCitationAnalysis, [{
+    sourceID: "bc-101-1",
+    origin: "permitext_discovered"
+  }], []),
+  "The deterministic bounded-citation analysis must satisfy the same evidence-binding contract as model analysis."
 );
 assert.deepEqual(
   researchFactUsageDisclosure({

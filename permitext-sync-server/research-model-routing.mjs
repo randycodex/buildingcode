@@ -1,4 +1,6 @@
-export const researchModelRoutingVersion = "20260824-luna-terra-hybrid-v1";
+import { extractResearchCodeReferences } from "./research-conversation-topic.mjs";
+
+export const researchModelRoutingVersion = "20260825-luna-terra-hybrid-v2";
 
 function normalized(value) {
   return String(value || "").trim();
@@ -33,22 +35,72 @@ const complexQuestionPattern = new RegExp([
   "\\b(?:conflict|contradict|which code|effective date|grandfather)\\b"
 ].join("|"), "i");
 
-const explicitEnactedCitationPattern = /\b(?:BC|Building\s+Code)\s*(?:(?:§|Section)\s*)?\d{3,4}(?:\.\d+)+\b/i;
-const boundedLookupIntentPattern = /^\s*(?:what\s+(?:does|is)|summarize|quote|list|identify|according\s+to|under)\b/i;
+const explicitEnactedCitationPattern = /\b(?:BC|Building\s+Code)\s*(?:(?:§|Section)\s*)?(\d{3,4}(?:\.\d+)+)\b/i;
+const boundedCitationText = String.raw`(?:BC|Building\s+Code)\s*(?:(?:§|Section)\s*)?\d{3,4}(?:\.\d+)+`;
+const boundedCitationLead = String.raw`(?:(?:the\s+)?(?:current\s+)?(?:2022\s+)?(?:(?:NYC|New\s+York\s+City)\s+)?)?`;
+const boundedLookupGrammar = new RegExp([
+  String.raw`^what\s+does\s+${boundedCitationLead}${boundedCitationText}\s+(?:say|state|provide|read|require)(?:\s+about\s+(?:its\s+)?(?:text|language|title|scope|purpose|citation))?[?.]?$`,
+  String.raw`^what\s+is\s+(?:the\s+)?(?:text|language|title|scope)\s+(?:of|in|under)\s+${boundedCitationLead}${boundedCitationText}[?.]?$`,
+  String.raw`^(?:quote|summarize)\s+${boundedCitationLead}${boundedCitationText}(?:\s+(?:text|language|title|scope))?[?.]?$`,
+  String.raw`^according\s+to\s+${boundedCitationLead}${boundedCitationText},?\s+what\s+does\s+(?:it|the\s+section)\s+(?:say|state|provide|require)[?.]?$`
+].join("|"), "i");
+
+export function researchBoundedCitationRequest(question) {
+  const value = normalized(question);
+  const match = value.match(explicitEnactedCitationPattern);
+  if (!match) return null;
+  const references = extractResearchCodeReferences(value)
+    .filter((reference) => reference.referenceKind === "section");
+  if (
+    references.length !== 1 ||
+    references[0].sectionNumber !== match[1] ||
+    (references[0].codePrefix && references[0].codePrefix !== "BC")
+  ) return null;
+  return {
+    codePrefix: "BC",
+    sectionNumber: match[1]
+  };
+}
 
 export function researchQuestionIsBoundedCitationLookup(question) {
   const value = normalized(question);
-  return explicitEnactedCitationPattern.test(value) &&
-    boundedLookupIntentPattern.test(value) &&
-    !complexQuestionPattern.test(value) &&
-    !/\b(?:apply|applicable|allowed|complies?|determine|required\s+for|may\s+(?:we|i|the))\b/i.test(value);
+  return Boolean(researchBoundedCitationRequest(value)) &&
+    boundedLookupGrammar.test(value) &&
+    !complexQuestionPattern.test(value);
+}
+
+export function researchEvidenceForBoundedCitationLookup(question, evidence = []) {
+  if (!researchQuestionIsBoundedCitationLookup(question)) return evidence;
+  const request = researchBoundedCitationRequest(question);
+  if (!request) return evidence;
+  return evidence.filter((source) =>
+    normalized(source?.codePrefix).toUpperCase() === request.codePrefix &&
+    normalized(source?.sectionNumber).replace(/^BC\s*/i, "") === request.sectionNumber
+  );
+}
+
+export function researchEvidenceSupportsBoundedCitationFastPath(evidence = []) {
+  return evidence.length > 0 && evidence.every((source) =>
+    normalized(source?.origin) === "permitext_discovered" &&
+    normalized(source?.sourceType) === "enacted_text" &&
+    normalized(source?.authorityClass) === "enacted" &&
+    normalized(source?.applicabilityStatus) === "current-enacted-edition" &&
+    normalized(source?.evidencePriority?.evidenceRole) === "governing" &&
+    normalized(source?.evidencePriority?.topicRouteRelationship) !== "collateral" &&
+    source?.canonicalContextResolved === true &&
+    source?.canonicalContextComplete === true &&
+    source?.truncated !== true &&
+    !(source?.visualSources || []).length
+  );
 }
 
 function evidenceNeedsAccurateModel(source) {
   if (!source || typeof source !== "object") return false;
   if ((source.visualSources || []).length) return true;
+  if (!["", "governing"].includes(normalized(source.evidencePriority?.evidenceRole))) return true;
   if (source.evidencePriority?.topicRouteRelationship === "collateral") return true;
   if (["historical", "future-effective"].includes(source.applicabilityStatus)) return true;
+  if (source.canonicalContextResolved === false || source.canonicalContextComplete === false || source.truncated === true) return true;
   const text = `${source.title || ""}\n${source.text || ""}`;
   return /\b(?:table|figure|exception|exceptions)\b/i.test(text);
 }
@@ -59,6 +111,7 @@ export function routeResearchAnswerModel({
   requiredClaims = [],
   codeBasis = null,
   webSupportRequested = false,
+  boundedCitationLookup = null,
   environment = process.env
 } = {}) {
   const configuration = researchModelRoutingConfiguration(environment);
@@ -72,14 +125,16 @@ export function routeResearchAnswerModel({
   }
 
   const reasons = [];
-  const boundedCitationLookup = researchQuestionIsBoundedCitationLookup(question);
+  const isBoundedCitationLookup = boundedCitationLookup === null
+    ? researchQuestionIsBoundedCitationLookup(question)
+    : Boolean(boundedCitationLookup);
   if (complexQuestionPattern.test(normalized(question))) reasons.push("complex_question_language");
-  if (webSupportRequested && !boundedCitationLookup) reasons.push("outside_library_support");
-  if (evidence.length > 10 && !boundedCitationLookup) reasons.push("large_evidence_package");
-  if (requiredClaims.length > 4 && !boundedCitationLookup) reasons.push("multiple_required_claims");
-  if (evidence.some(evidenceNeedsAccurateModel) && !boundedCitationLookup) reasons.push("complex_evidence_form");
-  if ((codeBasis?.searchedCorpora || []).length > 1 && !boundedCitationLookup) reasons.push("multiple_corpora");
-  if (boundedCitationLookup && evidence.some((source) =>
+  if (webSupportRequested && !isBoundedCitationLookup) reasons.push("outside_library_support");
+  if (evidence.length > 10 && !isBoundedCitationLookup) reasons.push("large_evidence_package");
+  if (requiredClaims.length > 4 && !isBoundedCitationLookup) reasons.push("multiple_required_claims");
+  if (evidence.some(evidenceNeedsAccurateModel) && !isBoundedCitationLookup) reasons.push("complex_evidence_form");
+  if ((codeBasis?.searchedCorpora || []).length > 1 && !isBoundedCitationLookup) reasons.push("multiple_corpora");
+  if (isBoundedCitationLookup && evidence.some((source) =>
     (source.visualSources || []).length || ["historical", "future-effective"].includes(source.applicabilityStatus)
   )) reasons.push("high_risk_citation_evidence");
   if ([...(codeBasis?.searchedCorpora || []), ...(codeBasis?.pinnedCorpora || [])]
@@ -97,7 +152,7 @@ export function routeResearchAnswerModel({
     : {
         model: configuration.fastModel,
         tier: "fast",
-        reasons: [boundedCitationLookup ? "bounded_enacted_citation_lookup" : "bounded_straightforward_question"],
+        reasons: [isBoundedCitationLookup ? "bounded_enacted_citation_lookup" : "bounded_straightforward_question"],
         configuration
       };
 }
