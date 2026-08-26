@@ -35,6 +35,16 @@ assert.match(
 );
 assert.match(
   messageHandlerSlice,
+  /stage: "evidence_analysis_failure"[\s\S]*stage: "answer_generation_failure"[\s\S]*stage: "answer_verification_revision"/,
+  "Hybrid Research telemetry no longer distinguishes provider/validation fallback from verification-driven repair."
+);
+assert.match(
+  messageHandlerSlice,
+  /escalationStages: modelEscalationStages[\s\S]*verificationAttemptCount: verificationAttempts\.length[\s\S]*verificationIssueTypes/,
+  "Completed Research telemetry does not retain escalation stages and verification issue types."
+);
+assert.match(
+  messageHandlerSlice,
   /catch \(error\) \{[\s\S]*if \(researchReservationID && !researchReservationCompleted\) \{[\s\S]*await releaseResearchUsageReservation\(context\.userID, researchReservationID\)/,
   "Research provider/customer failures no longer release the reserved customer turn."
 );

@@ -17315,6 +17315,7 @@ async function handleResearchConversationMessage(request, response) {
       boundedCitationLookup
     });
     const accurateModel = researchEscalationModel(modelRouting);
+    const modelEscalationStages = [];
     const runEvidenceAnalysis = async (model) => openAIResearchEvidenceAnalysis(
       question,
       assembledEvidence,
@@ -17366,6 +17367,12 @@ async function handleResearchConversationMessage(request, response) {
             ["RESEARCH_CANCELLED", "AbortError", "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP"].includes(error?.code || error?.name)
           ) throw error;
           evidenceAnalysisEscalated = true;
+          modelEscalationStages.push({
+            stage: "evidence_analysis_failure",
+            fromModel: modelRouting.configuration.evidenceAnalysisModel,
+            toModel: accurateModel,
+            reasonCode: String(error?.code || error?.name || "UNKNOWN_RESEARCH_ERROR").slice(0, 120)
+          });
           return runEvidenceAnalysis(accurateModel);
         });
     const webSupportPromise = mockWebSupport
@@ -17433,6 +17440,12 @@ async function handleResearchConversationMessage(request, response) {
             ["RESEARCH_CANCELLED", "AbortError", "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP"].includes(error?.code || error?.name)
           ) throw error;
           answerEscalated = true;
+          modelEscalationStages.push({
+            stage: "answer_generation_failure",
+            fromModel: modelRouting.model,
+            toModel: accurateModel,
+            reasonCode: String(error?.code || error?.name || "UNKNOWN_RESEARCH_ERROR").slice(0, 120)
+          });
           return openAIResearchInterpretation(question, assembledEvidence, context.userID, {
             ...interpretationOptions,
             model: accurateModel
@@ -17526,7 +17539,20 @@ async function handleResearchConversationMessage(request, response) {
     } else {
       for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
         if (attempt > 0) {
-          answerEscalated ||= result.requestedModel !== accurateModel;
+          if (result.requestedModel !== accurateModel) {
+            answerEscalated = true;
+            modelEscalationStages.push({
+              stage: "answer_verification_revision",
+              fromModel: result.requestedModel,
+              toModel: accurateModel,
+              reasonCode: "RESEARCH_VERIFICATION_REVISION",
+              issueTypes: Array.from(new Set(
+                verificationAttempts.flatMap((verification) =>
+                  (verification.issues || []).map((issue) => issue.type).filter(Boolean)
+                )
+              ))
+            });
+          }
           const previousInterpretation = result.interpretation;
           const revised = await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
             ...interpretationOptions,
@@ -17614,6 +17640,11 @@ async function handleResearchConversationMessage(request, response) {
         }
       }
     }
+    const verificationIssueTypes = Array.from(new Set(
+      verificationAttempts.flatMap((verification) =>
+        (verification.issues || []).map((issue) => issue.type).filter(Boolean)
+      )
+    ));
     result.usage = combinedResearchUsage(
       webSupport.usage,
       evidenceAnalysisResult.usage,
@@ -17763,7 +17794,10 @@ async function handleResearchConversationMessage(request, response) {
           requestedAnswerModel: modelRouting.model,
           actualAnswerModel: result.model,
           verificationModel: modelRouting.configuration.verificationModel,
-          escalated: evidenceAnalysisEscalated || answerEscalated
+          escalated: evidenceAnalysisEscalated || answerEscalated,
+          escalationStages: modelEscalationStages,
+          verificationAttemptCount: verificationAttempts.length,
+          verificationIssueTypes
         },
         disclaimer
       }
@@ -17870,6 +17904,9 @@ async function handleResearchConversationMessage(request, response) {
         routingMode: modelRouting.configuration.mode,
         answerTier: modelRouting.tier,
         escalated: evidenceAnalysisEscalated || answerEscalated,
+        escalationStages: modelEscalationStages,
+        verificationAttemptCount: verificationAttempts.length,
+        verificationIssueTypes,
         mode: "openai",
         ...result.usage,
         promptVersion: result.configuration.promptVersion,
@@ -17903,6 +17940,9 @@ async function handleResearchConversationMessage(request, response) {
       evidenceAnalysisModel: evidenceAnalysisResult.model,
       verificationModel: modelRouting.configuration.verificationModel,
       escalated: evidenceAnalysisEscalated || answerEscalated,
+      escalationStages: modelEscalationStages,
+      verificationAttemptCount: verificationAttempts.length,
+      verificationIssueTypes,
       modelUsage: Array.from(new Set(
         (result.usage.modelUsage || []).map((entry) => entry.model).filter(Boolean)
       )),
