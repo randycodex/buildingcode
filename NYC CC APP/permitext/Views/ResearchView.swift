@@ -49,6 +49,19 @@ struct ResearchRequestReconciliation {
     }
 }
 
+struct ResearchAuthoritativeConversationRecovery {
+    static func conversation(
+        from error: Error,
+        matching conversationID: String
+    ) -> ResearchConversation? {
+        guard let backendError = error as? PermitextBackendHTTPError,
+              let conversation = backendError.authoritativeResearchConversation,
+              conversation.id == conversationID
+        else { return nil }
+        return conversation
+    }
+}
+
 struct ResearchRequestFailurePresentation: Equatable {
     let message: String
 
@@ -164,6 +177,7 @@ struct ResearchView: View {
     @State private var isCreatingConversation = false
     @State private var isConsumingPendingSelection = false
     @State private var isSending = false
+    @State private var activeResearchRequestTask: Task<Void, Never>?
     @State private var pendingQuestionAttempt: ResearchQuestionAttempt?
     @State private var failedQuestionAttempt: ResearchQuestionAttempt?
     @State private var errorMessage: String?
@@ -565,26 +579,29 @@ struct ResearchView: View {
                     .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
                     .disabled(isSending || researchSendIsBlocked)
                     .accessibilityIdentifier("research-composer")
-                Button {
-                    Task { await sendQuestion() }
-                } label: {
-                    if isSending {
-                        ProgressView()
-                            .frame(width: 38, height: 38)
-                    } else {
+                if isSending {
+                    Button("Cancel", systemImage: "xmark") {
+                        cancelActiveResearchRequest()
+                    }
+                    .font(.caption.weight(.semibold))
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("research-cancel-request")
+                } else {
+                    Button {
+                        startQuestionRequest()
+                    } label: {
                         Image(systemName: "arrow.up")
                             .font(.body.weight(.bold))
                             .frame(width: 38, height: 38)
                             .foregroundStyle(.white)
                             .background(Color.appChrome, in: Circle())
                     }
+                    .disabled(
+                        question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
+                        researchSendIsBlocked
+                    )
+                    .accessibilityLabel("Send Research question")
                 }
-                .disabled(
-                    question.trimmingCharacters(in: .whitespacesAndNewlines).count < 3 ||
-                    isSending ||
-                    researchSendIsBlocked
-                )
-                .accessibilityLabel("Send Research question")
             }
         }
         .padding(12)
@@ -781,7 +798,7 @@ struct ResearchView: View {
                 .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: 16))
             if library.researchTurnAllowance?.purchaseRequired != true {
                 Button("Try again", systemImage: "arrow.clockwise") {
-                    Task { await sendQuestion(attempt) }
+                    startQuestionRequest(attempt)
                 }
                 .font(.caption.weight(.semibold))
             }
@@ -1050,15 +1067,29 @@ struct ResearchView: View {
         }
     }
 
-    private func sendQuestion() async {
+    private func startQuestionRequest() {
         let normalized = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard normalized.count >= 3 else { return }
         question = ""
-        await sendQuestion(ResearchQuestionAttempt(id: UUID().uuidString, question: normalized))
+        startQuestionRequest(ResearchQuestionAttempt(id: UUID().uuidString, question: normalized))
+    }
+
+    private func startQuestionRequest(_ attempt: ResearchQuestionAttempt) {
+        guard activeResearchRequestTask == nil else { return }
+        activeResearchRequestTask = Task {
+            await sendQuestion(attempt)
+        }
+    }
+
+    private func cancelActiveResearchRequest() {
+        activeResearchRequestTask?.cancel()
     }
 
     private func sendQuestion(_ attempt: ResearchQuestionAttempt) async {
-        guard let id = conversation?.id, !isSending, !researchSendIsBlocked else { return }
+        guard let id = conversation?.id, !isSending, !researchSendIsBlocked else {
+            activeResearchRequestTask = nil
+            return
+        }
         let messageIDsBeforeRequest = Set(conversation?.messages.map(\.id) ?? [])
         isSending = true
         pendingQuestionAttempt = attempt
@@ -1066,8 +1097,11 @@ struct ResearchView: View {
         errorMessage = nil
         questionErrorMessage = nil
         defer {
-            pendingQuestionAttempt = nil
-            isSending = false
+            if pendingQuestionAttempt?.id == attempt.id {
+                pendingQuestionAttempt = nil
+                isSending = false
+                activeResearchRequestTask = nil
+            }
         }
         do {
             let updated = try await library.sendResearchMessage(
@@ -1075,12 +1109,29 @@ struct ResearchView: View {
                 question: attempt.question,
                 requestID: attempt.id
             )
+            try Task.checkCancellation()
             conversation = updated
             cacheConversation(updated)
             await loadHistory(forceNetwork: true)
             errorMessage = nil
             questionErrorMessage = nil
         } catch {
+            if Task.isCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled {
+                failedQuestionAttempt = attempt
+                questionErrorMessage = ResearchRequestFailurePresentation.resolve(URLError(.cancelled)).message
+                return
+            }
+            if let authoritative = ResearchAuthoritativeConversationRecovery.conversation(
+                from: error,
+                matching: id
+            ) {
+                conversation = authoritative
+                cacheConversation(authoritative)
+                await loadHistory(forceNetwork: true)
+                failedQuestionAttempt = attempt
+                questionErrorMessage = ResearchRequestFailurePresentation.resolve(error).message
+                return
+            }
             // A network timeout can arrive after Research has completed on the
             // server. Reconcile before offering a retry; the same request ID
             // makes a retry idempotent if the first response was merely lost.
@@ -1092,6 +1143,7 @@ struct ResearchView: View {
                 conversation = authoritative
                 cacheConversation(authoritative)
                 await loadHistory(forceNetwork: true)
+                await library.refreshResearchTurnAllowance(showsErrors: false)
                 errorMessage = nil
                 questionErrorMessage = nil
             } else {
@@ -1107,8 +1159,15 @@ struct ResearchView: View {
         priorMessageIDs: Set<String>
     ) async -> ResearchConversation? {
         for delay in [0, 2, 4, 6] {
+            guard !Task.isCancelled else { return nil }
             if delay > 0 {
-                try? await Task.sleep(for: .seconds(delay))
+                do {
+                    try await Task.sleep(for: .seconds(delay))
+                } catch is CancellationError {
+                    return nil
+                } catch {
+                    return nil
+                }
             }
             guard let authoritative = try? await library.researchConversation(id: conversationID) else {
                 continue
@@ -1454,7 +1513,7 @@ private struct ResearchAnswerView: View {
     }
 
     private var basisText: String? {
-        let captured = answer.sourceAsOf.map { String($0.prefix(10)) }
+        let captured = answer.researchSourceDateLabel
         let disclosedBasis = answer.codeBasis?.disclosure?.trimmingCharacters(in: .whitespacesAndNewlines)
         let basisLimitation = answer.codeBasis?.limitation?.trimmingCharacters(in: .whitespacesAndNewlines)
         let parts = [

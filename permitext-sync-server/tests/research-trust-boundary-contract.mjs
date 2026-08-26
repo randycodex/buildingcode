@@ -11,6 +11,10 @@ const [server, web, privacy, nativeModels, nativeResearch] = await Promise.all([
   readFile(join(root, "../../NYC CC APP/permitext/Models/ResearchNotebookModels.swift"), "utf8"),
   readFile(join(root, "../../NYC CC APP/permitext/Views/ResearchView.swift"), "utf8")
 ]);
+const webSettings = web.slice(
+  web.indexOf("function renderSettings()"),
+  web.indexOf("function wireChapterSelects")
+);
 
 for (const status of [
   "supported_by_enacted_text",
@@ -34,6 +38,8 @@ assert.match(web, /const distinctSupportingSourceCount = new Set/);
 assert.match(web, /source\?\.id \|\| source\?\.url/);
 assert.match(web, /distinctSupportingSourceCount \|\| Number\(sourceSummary\.supportingWebSourceCount \|\| 0\)/);
 assert.match(web, /No enacted provision cited/);
+assert.match(web, /result\.disclaimer \|\| "AI-generated research assistance, not an official code determination\."/);
+assert.match(web, /parsedSourceAsOf\.toISOString\(\)\.slice\(0, 10\)/);
 assert.match(web, /Supporting context — noncontrolling/);
 assert.match(web, /link\.target = "_blank"/);
 assert.match(web, /link\.rel = "noopener noreferrer"/);
@@ -42,6 +48,16 @@ assert.match(web, /rawURL \? new URL\(rawURL\) : null/);
 assert.match(web, /url\?\.protocol === "https:" && url\.hostname/);
 assert.doesNotMatch(web, /new URL\(String\(source\.url \|\| ""\), window\.location\.origin\)/);
 assert.match(web, /Research basis captured/);
+assert.match(webSettings, /const researchUsageAccount = activeAccount\(\);/);
+assert.match(
+  webSettings,
+  /postJSON\([\s\S]*?"\/research\/usage"[\s\S]*?accountUserID: researchUsageAccount\.userID[\s\S]*?token: researchUsageAccount\.sessionToken/
+);
+assert.match(
+  webSettings,
+  /currentAccount\?\.userID !== researchUsageAccount\.userID \|\|[\s\S]*?currentAccount\?\.sessionToken !== researchUsageAccount\.sessionToken/
+);
+assert.doesNotMatch(webSettings, /hasCapability\("research"\) && !researchUsage/);
 assert.match(
   web,
   /String\(codeBasis\?\.limitation \|\| ""\)\.trim\(\)/,
@@ -74,6 +90,8 @@ assert.match(nativeResearch, /research-answer-facts-used/);
 assert.match(nativeResearch, /research-answer-supporting-context/);
 assert.match(nativeModels, /authorityStatus == "official_supporting_guidance"/);
 assert.match(nativeModels, /No enacted provision cited/);
+assert.match(nativeModels, /resolved\.scheme\?\.lowercased\(\) == "https"/);
+assert.match(nativeModels, /var researchSourceDateLabel: String\?/);
 assert.match(nativeResearch, /private var primaryNarrative/);
 assert.doesNotMatch(nativeResearch, /Ask Terra|Terra is researching|Terra's research service/);
 

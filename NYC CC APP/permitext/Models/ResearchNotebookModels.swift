@@ -273,7 +273,7 @@ struct ResearchSupportingSource: Codable, Hashable, Sendable {
             let value = url?.trimmingCharacters(in: .whitespacesAndNewlines),
             !value.isEmpty,
             let resolved = URL(string: value),
-            ["http", "https"].contains(resolved.scheme?.lowercased() ?? ""),
+            resolved.scheme?.lowercased() == "https",
             resolved.host != nil
         else {
             return nil
@@ -283,6 +283,35 @@ struct ResearchSupportingSource: Codable, Hashable, Sendable {
 }
 
 extension ResearchAnswer {
+    var researchSourceDateLabel: String? {
+        guard
+            let value = sourceAsOf?.trimmingCharacters(in: .whitespacesAndNewlines),
+            !value.isEmpty
+        else {
+            return nil
+        }
+
+        let parsingOptions: [ISO8601DateFormatter.Options] = [
+            [.withInternetDateTime, .withFractionalSeconds],
+            [.withInternetDateTime],
+            [.withFullDate]
+        ]
+        let parsedDate = parsingOptions.lazy.compactMap { options -> Date? in
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = options
+            formatter.timeZone = TimeZone(secondsFromGMT: 0)
+            return formatter.date(from: value)
+        }.first
+        guard let parsedDate else { return nil }
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.calendar = Calendar(identifier: .gregorian)
+        displayFormatter.locale = Locale(identifier: "en_US_POSIX")
+        displayFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        displayFormatter.dateFormat = "yyyy-MM-dd"
+        return displayFormatter.string(from: parsedDate)
+    }
+
     var researchSourceBoundaryText: String {
         let summary = sourceSummary
         let cited = summary?.citedProvisionCount ?? 0

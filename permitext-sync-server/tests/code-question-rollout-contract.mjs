@@ -337,6 +337,8 @@ const researchInterpretationSource = workspaceScript.slice(
   workspaceScript.indexOf("async function renderUtilityInstance")
 );
 assert.match(researchInterpretationSource, /appendResearchAnswerNarrative\(card, result\)/);
+assert.match(researchInterpretationSource, /result\.disclaimer \|\| "AI-generated research assistance, not an official code determination\."/);
+assert.match(researchInterpretationSource, /parsedSourceAsOf\.toISOString\(\)\.slice\(0, 10\)/);
 assert.match(researchInterpretationSource, /Sources, assumptions, and limits/);
 assert.match(researchInterpretationSource, /appendResearchSupportedPoints\(detailsBody/);
 assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Assumptions used"/);
@@ -345,7 +347,6 @@ assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Re
 assert.match(researchInterpretationSource, /Based on.*enacted/);
 assert.match(researchInterpretationSource, /evidenceReviewed\.open = Boolean\(options\.detailsOpen\)[\s\S]*?evidenceReviewedBody\.append\(details\);[\s\S]*?card\.append\(evidenceReviewed\);[\s\S]*?container\.append\(card\)/);
 assert.match(workspaceScript, /renderResearchInterpretation\(bubble, message\.answer, \{[\s\S]*?message,[\s\S]*?conversationID,[\s\S]*?conversation,[\s\S]*?anchorPaneID: paneID/);
-assert.doesNotMatch(researchInterpretationSource, /result\.disclaimer/);
 assert.doesNotMatch(researchInterpretationSource, /answerHeading|Practical application/);
 assert.match(workspaceScript, /renderResearchInterpretation\(exactAnswer, answerRecord\.answer, \{ detailsOpen: true \}\)/);
 

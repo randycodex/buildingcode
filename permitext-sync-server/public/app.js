@@ -53,7 +53,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260826-official-guidance-sources-v9";
+} from "./offline-storage.js?v=20260826-research-parity-v10";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -88,7 +88,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260826-official-guidance-sources-v9";
+} from "./research-intent-state.js?v=20260826-research-parity-v10";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15441,15 +15441,17 @@ function renderResearchInterpretation(container, result, options = {}) {
     codeBasis?.disclosure ||
     (result.codeEdition ? `Code basis: ${result.codeEdition}` : "")
   ).trim();
-  if (codeBasisText) {
+  const basisLimitation = String(codeBasis?.limitation || "").trim();
+  const parsedSourceAsOf = result.sourceAsOf ? new Date(result.sourceAsOf) : null;
+  const sourceAsOf = parsedSourceAsOf && Number.isFinite(parsedSourceAsOf.getTime())
+    ? parsedSourceAsOf.toISOString().slice(0, 10)
+    : "";
+  if (codeBasisText || basisLimitation || sourceAsOf) {
     const codeDisclosure = document.createElement("p");
     codeDisclosure.className = "research-answer-code-basis";
-    const sourceAsOf = result.sourceAsOf && Number.isFinite(Date.parse(result.sourceAsOf))
-      ? new Date(result.sourceAsOf).toLocaleDateString()
-      : "";
     codeDisclosure.textContent = [
       codeBasisText,
-      String(codeBasis?.limitation || "").trim(),
+      basisLimitation,
       sourceAsOf ? `Research basis captured ${sourceAsOf}` : ""
     ]
       .filter(Boolean)
@@ -15647,6 +15649,12 @@ function renderResearchInterpretation(container, result, options = {}) {
   wireResearchDetailsMotion(details, detailsBody);
   evidenceReviewed.append(evidenceReviewedSummary, evidenceReviewedBody);
   card.append(evidenceReviewed);
+  const disclaimer = document.createElement("p");
+  disclaimer.className = "research-answer-disclaimer";
+  disclaimer.textContent = String(
+    result.disclaimer || "AI-generated research assistance, not an official code determination."
+  ).trim();
+  card.append(disclaimer);
   container.append(card);
   wireResearchDetailsMotion(evidenceReviewed, evidenceReviewedBody);
   if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
@@ -29686,9 +29694,19 @@ function renderSettings() {
 
   syncAccountState();
   wireSettingsCardCollapsing(panel);
-  if (activeAccount() && hasCapability("research") && !researchUsage) {
-    void postResearch("/research/usage")
+  const researchUsageAccount = activeAccount();
+  if (researchUsageAccount && hasCapability("research")) {
+    void postJSON(
+      "/research/usage",
+      { auth: { accountUserID: researchUsageAccount.userID } },
+      { token: researchUsageAccount.sessionToken }
+    )
       .then((payload) => {
+        const currentAccount = activeAccount();
+        if (
+          currentAccount?.userID !== researchUsageAccount.userID ||
+          currentAccount?.sessionToken !== researchUsageAccount.sessionToken
+        ) return;
         researchUsage = payload.usage || null;
         if (panel.isConnected) {
           renderPlanUsageRows(planUsage);
@@ -29696,6 +29714,11 @@ function renderSettings() {
         }
       })
       .catch(() => {
+        const currentAccount = activeAccount();
+        if (
+          currentAccount?.userID !== researchUsageAccount.userID ||
+          currentAccount?.sessionToken !== researchUsageAccount.sessionToken
+        ) return;
         if (!panel.isConnected || !planUsage) return;
         const researchRow = Array.from(planUsage.querySelectorAll("p"))
           .find((row) => row.querySelector("span")?.textContent === "Research");

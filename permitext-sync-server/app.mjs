@@ -718,6 +718,80 @@ function activeResearchUsageEntry(entry, now = Date.now()) {
     createdAt > now - researchUsageReservationTTLMilliseconds;
 }
 
+export function researchUsageReservationCanBeReclaimed(
+  existing,
+  requestFingerprint,
+  now = Date.now()
+) {
+  const existingFingerprint = String(existing?.requestFingerprint || "").trim();
+  const nextFingerprint = String(requestFingerprint || "").trim();
+  return existing?.mode === "reservation" &&
+    !activeResearchUsageEntry(existing, now) &&
+    Boolean(existingFingerprint) &&
+    existingFingerprint === nextFingerprint;
+}
+
+export function applyResearchUsageReservation(store, userID, reservation, now = Date.now()) {
+  store.researchUsageByUserID ||= {};
+  store.researchCreditsByUserID ||= {};
+  const existingEntries = store.researchUsageByUserID[userID] || [];
+  const duplicate = existingEntries.find((entry) => entry.id === reservation.id);
+  const reclaiming = researchUsageReservationCanBeReclaimed(
+    duplicate,
+    reservation.requestFingerprint,
+    now
+  );
+  if (duplicate && !reclaiming) {
+    return {
+      reserved: false,
+      reason: "duplicate",
+      mode: duplicate.mode || null,
+      requestFingerprint: duplicate.requestFingerprint || null
+    };
+  }
+
+  const retentionCutoff = new Date(now - 400 * 24 * 60 * 60 * 1000).toISOString();
+  const retainedEntries = existingEntries.filter((entry) => entry.createdAt >= retentionCutoff);
+  const decision = researchTurnFundingDecision({
+    usageEntries: retainedEntries,
+    creditEntries: store.researchCreditsByUserID[userID] || [],
+    periodStart: reservation.since,
+    periodEnd: reservation.periodEnd,
+    includedLimit: reservation.limit,
+    paidContinuationEnabled: reservation.paidContinuationEnabled,
+    now
+  });
+  if (!decision.allowed) {
+    return { reserved: false, reason: "payment_required", state: decision.state };
+  }
+
+  const nextReservation = {
+    id: reservation.id,
+    model: "pending",
+    mode: "reservation",
+    inputTokens: 0,
+    cachedInputTokens: 0,
+    outputTokens: 0,
+    totalTokens: 0,
+    fundingSource: decision.fundingSource,
+    estimatedCostUSD: reservation.maximumRequestUSD,
+    pricingVersion: reservation.pricingVersion,
+    requestFingerprint: reservation.requestFingerprint || null,
+    createdAt: reservation.createdAt
+  };
+  store.researchUsageByUserID[userID] = [
+    ...retainedEntries.filter((entry) => entry.id !== reservation.id),
+    nextReservation
+  ];
+  return {
+    reserved: true,
+    reclaimed: reclaiming,
+    fundingSource: decision.fundingSource,
+    requestFingerprint: reservation.requestFingerprint || null,
+    state: decision.state
+  };
+}
+
 async function withResearchUsageLock(userID, operation) {
   const previous = researchUsageLocks.get(userID) || Promise.resolve();
   let release;
@@ -1805,56 +1879,9 @@ function createFileStoreAdapter() {
         .sort((left, right) => right.estimatedCostUSD - left.estimatedCostUSD);
     },
     async reserveResearchUsage(userID, reservation) {
-      return withResearchUsageLock("__global_research_spend__", async () => {
-        const store = await this.read();
-        const retentionCutoff = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString();
-        const retainedEntries = (store.researchUsageByUserID?.[userID] || [])
-          .filter((entry) => entry.createdAt >= retentionCutoff);
-        const duplicate = retainedEntries.find((entry) => entry.id === reservation.id);
-        if (duplicate) {
-          return {
-            reserved: false,
-            reason: "duplicate",
-            requestFingerprint: duplicate.requestFingerprint || null
-          };
-        }
-        const decision = researchTurnFundingDecision({
-          usageEntries: retainedEntries,
-          creditEntries: store.researchCreditsByUserID?.[userID] || [],
-          periodStart: reservation.since,
-          periodEnd: reservation.periodEnd,
-          includedLimit: reservation.limit,
-          paidContinuationEnabled: reservation.paidContinuationEnabled
-        });
-        if (!decision.allowed) {
-          return { reserved: false, reason: "payment_required", state: decision.state };
-        }
-        store.researchUsageByUserID ||= {};
-        store.researchUsageByUserID[userID] = [
-          ...retainedEntries,
-          {
-            id: reservation.id,
-            model: "pending",
-            mode: "reservation",
-            inputTokens: 0,
-            cachedInputTokens: 0,
-            outputTokens: 0,
-            totalTokens: 0,
-            fundingSource: decision.fundingSource,
-            estimatedCostUSD: reservation.maximumRequestUSD,
-            pricingVersion: reservation.pricingVersion,
-            requestFingerprint: reservation.requestFingerprint || null,
-            createdAt: reservation.createdAt
-          }
-        ];
-        await this.write(store);
-        return {
-          reserved: true,
-          fundingSource: decision.fundingSource,
-          requestFingerprint: reservation.requestFingerprint || null,
-          state: decision.state
-        };
-      });
+      return withResearchUsageLock(userID, async () => this.withMutation((store) =>
+        applyResearchUsageReservation(store, userID, reservation)
+      ));
     },
     async completeResearchUsageReservation(userID, reservationID, entry) {
       return withResearchUsageLock(userID, async () => {
@@ -1892,6 +1919,11 @@ function createFileStoreAdapter() {
     async commitResearchConversationMessage(userID, payload) {
       return withResearchUsageLock(userID, async () => this.withMutation((store) =>
         applyResearchConversationMessageCommit(store, userID, payload)
+      ));
+    },
+    async commitCodeQuestionAnalysisCompletion(actorUserID, storageUserID, payload) {
+      return withResearchUsageLock(actorUserID, async () => this.withMutation((store) =>
+        applyCodeQuestionAnalysisCompletion(store, actorUserID, storageUserID, payload)
       ));
     },
     async releaseResearchUsageReservation(userID, reservationID) {
@@ -4700,7 +4732,23 @@ async function createPostgresStoreAdapter() {
                 ${reservation.createdAt}::timestamptz
               FROM funding
               WHERE funding.source IS NOT NULL
-              ON CONFLICT (id) DO NOTHING
+              ON CONFLICT (id) DO UPDATE SET
+                model = EXCLUDED.model,
+                mode = EXCLUDED.mode,
+                funding_source = EXCLUDED.funding_source,
+                input_tokens = EXCLUDED.input_tokens,
+                cached_input_tokens = EXCLUDED.cached_input_tokens,
+                output_tokens = EXCLUDED.output_tokens,
+                total_tokens = EXCLUDED.total_tokens,
+                estimated_cost_usd = EXCLUDED.estimated_cost_usd,
+                pricing_version = EXCLUDED.pricing_version,
+                request_fingerprint = EXCLUDED.request_fingerprint,
+                created_at = EXCLUDED.created_at
+              WHERE permitext_research_usage.user_id = ${userID}
+                AND permitext_research_usage.mode = 'reservation'
+                AND permitext_research_usage.created_at <= CURRENT_TIMESTAMP - INTERVAL '15 minutes'
+                AND COALESCE(permitext_research_usage.request_fingerprint, '') <> ''
+                AND permitext_research_usage.request_fingerprint = EXCLUDED.request_fingerprint
               RETURNING id, funding_source, request_fingerprint
             `
           ], { isolationLevel: "Serializable" });
@@ -4712,13 +4760,14 @@ async function createPostgresStoreAdapter() {
             };
           }
           const duplicate = await sql`
-            SELECT id, request_fingerprint FROM permitext_research_usage
+            SELECT id, mode, request_fingerprint FROM permitext_research_usage
             WHERE id = ${reservation.id} AND user_id = ${userID}
             LIMIT 1
           `;
           return {
             reserved: false,
             reason: duplicate.length ? "duplicate" : "payment_required",
+            mode: duplicate[0]?.mode || null,
             requestFingerprint: duplicate[0]?.request_fingerprint || null
           };
         } catch (error) {
@@ -4894,6 +4943,118 @@ async function createPostgresStoreAdapter() {
         }
       }
       return { replayed: false, answer, conversation };
+    },
+    async commitCodeQuestionAnalysisCompletion(actorUserID, storageUserID, {
+      reservationID = null,
+      usageEntry = null,
+      answer,
+      artifact
+    }) {
+      await ensureSchema();
+      const queries = [];
+      if (reservationID && usageEntry) {
+        queries.push(sql`
+          WITH committed_usage AS (
+            UPDATE permitext_research_usage
+            SET model = ${usageEntry.model},
+                mode = ${usageEntry.mode},
+                input_tokens = ${usageEntry.inputTokens},
+                cached_input_tokens = ${usageEntry.cachedInputTokens || 0},
+                output_tokens = ${usageEntry.outputTokens},
+                total_tokens = ${usageEntry.totalTokens},
+                prompt_version = ${usageEntry.promptVersion || null},
+                evidence_version = ${usageEntry.evidenceVersion || null},
+                estimated_cost_usd = ${usageEntry.estimatedCostUSD ?? null},
+                pricing_version = ${usageEntry.pricingVersion || null},
+                created_at = ${usageEntry.createdAt}::timestamptz
+            WHERE id = ${reservationID}
+              AND user_id = ${actorUserID}
+              AND mode = 'reservation'
+            RETURNING id
+          ), committed_state AS (
+            SELECT (SELECT id FROM committed_usage LIMIT 1) AS id
+          )
+          SELECT
+            id,
+            1 / CASE WHEN id IS NULL THEN 0 ELSE 1 END AS reservation_assertion
+          FROM committed_state
+        `);
+        queries.push(sql`
+          INSERT INTO permitext_research_credits (
+            id, user_id, units, source, source_id, metadata, created_at
+          )
+          SELECT
+            ${`usage:${reservationID}`}, ${actorUserID}, -1, 'research_turn', ${reservationID},
+            '{}'::jsonb, ${usageEntry.createdAt}::timestamptz
+          FROM permitext_research_usage
+          WHERE id = ${reservationID}
+            AND user_id = ${actorUserID}
+            AND funding_source = 'purchased'
+          ON CONFLICT (id) DO NOTHING
+        `);
+      }
+      for (const snapshot of answer.evidence || []) {
+        queries.push(sql`
+          INSERT INTO permitext_evidence_snapshots (
+            id, user_id, answer_id, source_id, snapshot, approved_at
+          )
+          VALUES (
+            ${snapshot.id}, ${storageUserID}, ${answer.id}, ${snapshot.sourceID},
+            ${JSON.stringify(snapshot)}::jsonb, ${snapshot.approvedAt}::timestamptz
+          )
+          ON CONFLICT (id) DO NOTHING
+        `);
+      }
+      queries.push(sql`
+        WITH committed_answer AS (
+          INSERT INTO permitext_research_answers (
+            id, user_id, conversation_id, project_id, answer, created_at
+          )
+          VALUES (
+            ${answer.id}, ${storageUserID}, ${answer.conversationID}, ${answer.projectID},
+            ${JSON.stringify(answer)}::jsonb, ${answer.createdAt}::timestamptz
+          )
+          ON CONFLICT (id) DO UPDATE SET answer = permitext_research_answers.answer
+          WHERE permitext_research_answers.user_id = ${storageUserID}
+            AND permitext_research_answers.answer = EXCLUDED.answer
+          RETURNING id
+        ), committed_state AS (
+          SELECT (SELECT id FROM committed_answer LIMIT 1) AS id
+        )
+        SELECT
+          id,
+          1 / CASE WHEN id IS NULL THEN 0 ELSE 1 END AS answer_assertion
+        FROM committed_state
+      `);
+      const envelope = artifact.envelope;
+      queries.push(sql`
+        WITH committed_artifact AS (
+          INSERT INTO permitext_foundation_artifacts (
+            id, user_id, artifact_type, envelope, payload,
+            created_at, updated_at, archived_at, deleted_at
+          )
+          VALUES (
+            ${envelope.id}, ${storageUserID}, ${envelope.type},
+            ${JSON.stringify(envelope)}::jsonb, ${JSON.stringify(artifact.payload || {})}::jsonb,
+            ${envelope.createdAt}::timestamptz, ${envelope.updatedAt}::timestamptz,
+            ${envelope.archivedAt}::timestamptz, ${envelope.deletedAt}::timestamptz
+          )
+          ON CONFLICT (id) DO UPDATE SET envelope = permitext_foundation_artifacts.envelope
+          WHERE permitext_foundation_artifacts.user_id = ${storageUserID}
+            AND permitext_foundation_artifacts.envelope = EXCLUDED.envelope
+            AND permitext_foundation_artifacts.payload = EXCLUDED.payload
+          RETURNING id
+        ), committed_state AS (
+          SELECT (SELECT id FROM committed_artifact LIMIT 1) AS id
+        )
+        SELECT
+          id,
+          1 / CASE WHEN id IS NULL THEN 0 ELSE 1 END AS artifact_assertion
+        FROM committed_state
+      `);
+
+      await sql.transaction(queries, { isolationLevel: "Serializable" });
+      return { replayed: false, answer, artifact };
     },
     async releaseResearchUsageReservation(userID, reservationID) {
       await ensureSchema();
@@ -5704,6 +5865,93 @@ export function applyResearchConversationMessageCommit(store, userID, {
   return { replayed: false, answer, conversation };
 }
 
+/**
+ * In-memory file-store mutation for a Code Question analysis completion.
+ * The file adapter runs this under one withMutation call, coupling the one-turn
+ * debit to both immutable records that make the answer replayable.
+ */
+export function applyCodeQuestionAnalysisCompletion(store, actorUserID, storageUserID, {
+  reservationID = null,
+  usageEntry = null,
+  answer,
+  artifact,
+  testThrowAfterUsage = false
+}) {
+  store.researchAnswersByUserID ||= {};
+  store.foundationArtifactsByUserID ||= {};
+  store.researchUsageByUserID ||= {};
+  store.researchCreditsByUserID ||= {};
+
+  const answers = store.researchAnswersByUserID[storageUserID] || [];
+  const existingAnswer = answers.find((item) => item.id === answer.id);
+  if (existingAnswer && canonicalJSONString(existingAnswer) !== canonicalJSONString(answer)) {
+    throw new Error("Immutable Research answer cannot be changed.");
+  }
+  const artifacts = store.foundationArtifactsByUserID[storageUserID] || [];
+  const artifactIndex = artifacts.findIndex((item) => item.envelope?.id === artifact.envelope?.id);
+  const existingArtifact = artifactIndex === -1 ? null : artifacts[artifactIndex];
+  const committedArtifact = compareAndSwapFoundationArtifact(
+    existingArtifact,
+    artifact,
+    existingArtifact ? existingArtifact.envelope.version : 0
+  );
+
+  if (reservationID && usageEntry) {
+    const usageEntries = store.researchUsageByUserID[actorUserID] || [];
+    const usageIndex = usageEntries.findIndex((item) =>
+      item.id === reservationID && item.mode === "reservation"
+    );
+    if (usageIndex === -1) {
+      const completed = usageEntries.find((item) =>
+        item.id === reservationID && item.mode !== "reservation"
+      );
+      if (completed && existingAnswer && existingArtifact) {
+        return { replayed: true, answer: existingAnswer, artifact: existingArtifact };
+      }
+      throw new Error("Research usage reservation was not found.");
+    }
+    const fundingSource = usageEntries[usageIndex].fundingSource || "included";
+    const requestFingerprint = usageEntries[usageIndex].requestFingerprint || null;
+    usageEntries[usageIndex] = {
+      ...usageEntry,
+      id: reservationID,
+      fundingSource,
+      requestFingerprint
+    };
+    store.researchUsageByUserID[actorUserID] = usageEntries;
+    if (fundingSource === "purchased") {
+      store.researchCreditsByUserID[actorUserID] ||= [];
+      const debitID = `usage:${reservationID}`;
+      if (!store.researchCreditsByUserID[actorUserID].some((item) => item.id === debitID)) {
+        store.researchCreditsByUserID[actorUserID].push({
+          id: debitID,
+          units: -1,
+          source: "research_turn",
+          sourceID: reservationID,
+          packID: null,
+          providerPaymentID: null,
+          metadata: {},
+          createdAt: usageEntry.createdAt
+        });
+      }
+    }
+  }
+
+  if (testThrowAfterUsage) {
+    throw new Error("TEST_THROW_AFTER_USAGE");
+  }
+  if (!existingAnswer) answers.push(answer);
+  store.researchAnswersByUserID[storageUserID] = answers;
+  if (artifactIndex === -1) artifacts.push(committedArtifact);
+  else artifacts[artifactIndex] = committedArtifact;
+  store.foundationArtifactsByUserID[storageUserID] = artifacts;
+  return {
+    replayed: Boolean(existingAnswer && existingArtifact),
+    answer: existingAnswer || answer,
+    artifact: committedArtifact
+  };
+}
+
 async function commitResearchConversationMessage(userID, payload) {
   const adapter = await storeAdapter();
   if (typeof adapter.commitResearchConversationMessage === "function") {
@@ -5720,6 +5968,14 @@ async function commitResearchConversationMessage(userID, payload) {
     await completeResearchUsageReservation(userID, payload.reservationID, payload.usageEntry);
   }
   return { replayed: false, answer: payload.answer, conversation: payload.conversation };
+}
+
+async function commitCodeQuestionAnalysisCompletion(actorUserID, storageUserID, payload) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.commitCodeQuestionAnalysisCompletion !== "function") {
+    throw new Error("Atomic Code Question Research completion is unavailable.");
+  }
+  return adapter.commitCodeQuestionAnalysisCompletion(actorUserID, storageUserID, payload);
 }
 
 async function releaseResearchUsageReservation(userID, reservationID) {
@@ -26556,6 +26812,86 @@ function codeQuestionAnalysisBindingHash(binding) {
   return codeQuestionContentHash(codeQuestionAnalysisBindingIntent(binding));
 }
 
+export function codeQuestionAnalysisSecondaryRecords(context, question, artifact, answer) {
+  const projectID = String(question?.payload?.projectID || "").trim();
+  const analysisID = String(artifact?.envelope?.id || "").trim();
+  const requestedByUserID = String(
+    artifact?.payload?.requestedBy || context?.actorUserID || ""
+  ).trim();
+  const createdAt = artifact?.envelope?.createdAt;
+  const researchAnswerID = String(
+    answer?.id || artifact?.payload?.researchAnswerID || ""
+  ).trim();
+  const link = codeQuestionLinkForAccess(context, {
+    projectID,
+    targetKind: "questionAnalysis",
+    targetID: analysisID,
+    createdAt
+  });
+  const eventID = `code-question-analysis-${createHash("sha256")
+    .update([
+      context.storageOwnerUserID,
+      projectID,
+      analysisID,
+      requestedByUserID,
+      "generated"
+    ].join(":"))
+    .digest("hex")}`;
+  const event = activityEvent({
+    id: eventID,
+    owner: context.owner,
+    actorUserID: requestedByUserID,
+    projectID,
+    action: "code-question.analysis.generated",
+    objectKind: "questionAnalysis",
+    objectID: analysisID,
+    newStatus: "generated",
+    createdAt,
+    metadata: {
+      researchAnswerID,
+      dependencyHash: artifact?.payload?.dependencyHash || null
+    }
+  });
+  return { link, event };
+}
+
+export function codeQuestionAnalysisSecondaryRepairPlan(records, existingLinks, existingEvents) {
+  const linkExists = (Array.isArray(existingLinks) ? existingLinks : []).some((link) =>
+    !link?.deletedAt &&
+    link.projectID === records.link.projectID &&
+    link.targetKind === records.link.targetKind &&
+    link.targetID === records.link.targetID
+  );
+  const eventExists = (Array.isArray(existingEvents) ? existingEvents : []).some((event) =>
+    event.projectID === records.event.projectID &&
+    event.action === records.event.action &&
+    event.objectKind === records.event.objectKind &&
+    event.objectID === records.event.objectID
+  );
+  return { saveLink: !linkExists, saveEvent: !eventExists };
+}
+
+async function repairCodeQuestionAnalysisSecondaryRecords(context, question, artifact, answer) {
+  const records = codeQuestionAnalysisSecondaryRecords(context, question, artifact, answer);
+  const [existingLinks, existingEvents] = await Promise.all([
+    listStoredProjectLinks(context.storageOwnerUserID, {
+      projectID: records.link.projectID,
+      targetKind: records.link.targetKind
+    }),
+    listStoredActivityEvents(context.storageOwnerUserID, {
+      projectID: records.event.projectID
+    })
+  ]);
+  const plan = codeQuestionAnalysisSecondaryRepairPlan(records, existingLinks, existingEvents);
+  if (plan.saveLink) {
+    await saveStoredProjectLink(context.storageOwnerUserID, records.link);
+  }
+  if (plan.saveEvent) {
+    await saveStoredActivityEvent(context.storageOwnerUserID, records.event);
+  }
+  return { ...records, ...plan };
+}
+
 function codeQuestionResearchEvidence(snapshotArtifact, entry) {
   const snapshot = snapshotArtifact.payload;
   const sectionID = String(snapshot.sourceIdentity || snapshot.passageLocator || snapshot.id);
@@ -26699,6 +27035,10 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
     }
     const answer = (await listStoredResearchAnswers(storageUserID))
       .find((item) => item.id === replay.payload.researchAnswerID) || null;
+    if (!answer) {
+      throw new Error("Research answer missing after Code Question analysis commit.");
+    }
+    await repairCodeQuestionAnalysisSecondaryRecords(context, question, replay, answer);
     return { analysis: { id: replay.envelope.id, ...replay.payload }, answer, replayed: true };
   }
   const mockMode = researchMockMode();
@@ -26713,6 +27053,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
   const reservationID = `cq-analysis-${createHash("sha256")
     .update(`${actorUserID}:${questionID}:${requestID}`)
     .digest("hex")}`;
+  const requestFingerprint = codeQuestionAnalysisBindingHash(binding);
   let reserved = false;
   let completedReservation = false;
   try {
@@ -26731,6 +27072,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
         paidContinuationEnabled: paidResearchTurnsEnabled(process.env),
         maximumRequestUSD: spendGuardrails.maximumRequestUSD || 0,
         pricingVersion: spendGuardrails.pricingVersion,
+        requestFingerprint,
         createdAt: new Date().toISOString()
       });
       reserved = reservation.reserved;
@@ -26738,6 +27080,17 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
         throw new CodeQuestionCommandError(
           "You have used this month's included Research turns. Buy more turns to continue.",
           { code: "RESEARCH_TURNS_REQUIRED", status: 402 }
+        );
+      }
+      if (
+        !reserved &&
+        reservation.reason === "duplicate" &&
+        reservation.requestFingerprint &&
+        reservation.requestFingerprint !== requestFingerprint
+      ) {
+        codeQuestionIdempotencyConflict(
+          "This analysis request ID was already used with a different dependency binding.",
+          { requestID }
         );
       }
       if (!reserved) {
@@ -26799,7 +27152,6 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
       researchSystemVersion: [answerPayload.promptVersion, answerPayload.evidenceVersion].filter(Boolean).join(":"),
       createdAt
     });
-    await saveStoredResearchAnswer(storageUserID, answer);
     const analysisID = `qa-${createHash("sha256").update(`${questionID}:${requestID}`).digest("hex")}`;
     const artifact = codeQuestionArtifactForAccess(context, createAnalysisArtifact({
       userID: actorUserID,
@@ -26821,9 +27173,9 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
       promptTemplateVersion: result.configuration.promptVersion,
       citationValidation: "approved-evidence-only"
     }));
-    await saveStoredFoundationArtifactCompareAndSwap(storageUserID, artifact, 0);
-    if (!mockMode) {
-      await completeResearchUsageReservation(actorUserID, reservationID, {
+    const usageEntry = mockMode
+      ? null
+      : {
         model: result.model,
         requestedModel: result.requestedModel || result.model,
         mode: "openai-code-question",
@@ -26833,22 +27185,17 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
         estimatedCostUSD: estimatedCost.estimatedUSD,
         pricingVersion: estimatedCost.pricingVersion,
         createdAt
-      });
+      };
+    await commitCodeQuestionAnalysisCompletion(actorUserID, storageUserID, {
+      reservationID: mockMode ? null : reservationID,
+      usageEntry,
+      answer,
+      artifact
+    });
+    if (!mockMode) {
       completedReservation = true;
     }
-    await saveStoredProjectLink(storageUserID, codeQuestionLinkForAccess(context, {
-      projectID: question.payload.projectID,
-      targetKind: "questionAnalysis",
-      targetID: artifact.envelope.id
-    }));
-    await saveStoredActivityEvent(storageUserID, codeQuestionActivityForAccess(context, {
-      projectID: question.payload.projectID,
-      action: "code-question.analysis.generated",
-      objectKind: "questionAnalysis",
-      objectID: artifact.envelope.id,
-      newStatus: "generated",
-      metadata: { researchAnswerID: answer.id, dependencyHash: binding.dependencyHash }
-    }));
+    await repairCodeQuestionAnalysisSecondaryRecords(context, question, artifact, answer);
     return { analysis: { id: artifact.envelope.id, ...artifact.payload }, answer, replayed: false };
   } catch (error) {
     if (reserved && !completedReservation) await releaseResearchUsageReservation(actorUserID, reservationID);

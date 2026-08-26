@@ -2407,6 +2407,7 @@ struct BackendProjectReportFileReadRequest: Codable, Hashable, Sendable {
 private struct BackendErrorResponse: Codable, Hashable, Sendable {
     let error: String?
     let code: String?
+    let conversation: ResearchConversation?
 }
 
 struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
@@ -2609,21 +2610,31 @@ enum PermitextBackendFactory {
 
 enum PermitextBackendHTTPError: LocalizedError {
     case invalidResponse
-    case serverStatus(Int, String?, code: String? = nil)
+    case serverStatus(
+        Int,
+        String?,
+        code: String? = nil,
+        conversation: ResearchConversation? = nil
+    )
 
     var statusCode: Int? {
-        guard case .serverStatus(let statusCode, _, _) = self else { return nil }
+        guard case .serverStatus(let statusCode, _, _, _) = self else { return nil }
         return statusCode
     }
 
     var serverCode: String? {
-        guard case .serverStatus(_, _, let code) = self else { return nil }
+        guard case .serverStatus(_, _, let code, _) = self else { return nil }
         return code
     }
 
     var serverMessage: String? {
-        guard case .serverStatus(_, let message, _) = self else { return nil }
+        guard case .serverStatus(_, let message, _, _) = self else { return nil }
         return message
+    }
+
+    var authoritativeResearchConversation: ResearchConversation? {
+        guard case .serverStatus(_, _, _, let conversation) = self else { return nil }
+        return conversation
     }
 
     var isAuthenticationFailure: Bool {
@@ -2634,7 +2645,7 @@ enum PermitextBackendHTTPError: LocalizedError {
         switch self {
         case .invalidResponse:
             return "The backend returned an invalid response."
-        case .serverStatus(let statusCode, let message, _):
+        case .serverStatus(let statusCode, let message, _, _):
             if let message, !message.isEmpty {
                 return message
             }
@@ -2852,7 +2863,8 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
             throw PermitextBackendHTTPError.serverStatus(
                 httpResponse.statusCode,
                 backendError?.error,
-                code: backendError?.code
+                code: backendError?.code,
+                conversation: backendError?.conversation
             )
         }
         return data
@@ -2972,7 +2984,8 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
             throw PermitextBackendHTTPError.serverStatus(
                 httpResponse.statusCode,
                 backendError?.error,
-                code: backendError?.code
+                code: backendError?.code,
+                conversation: backendError?.conversation
             )
         }
         return try decoder.decode(ResponseBody.self, from: data)

@@ -3,7 +3,10 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
+  applyCodeQuestionAnalysisCompletion,
   applyResearchConversationMessageCommit,
+  codeQuestionAnalysisSecondaryRepairPlan,
+  codeQuestionAnalysisSecondaryRecords,
   researchAnswerRecordForClient
 } from "../app.mjs";
 
@@ -74,6 +77,41 @@ assert.match(
   codeQuestionSlice,
   /catch \(error\) \{[\s\S]*if \(reserved && !completedReservation\) await releaseResearchUsageReservation\(actorUserID, reservationID\)/,
   "Code Question provider/customer failures no longer release the reserved customer turn."
+);
+assert.match(
+  codeQuestionSlice,
+  /requestFingerprint: codeQuestionAnalysisBindingHash\(binding\)|const requestFingerprint = codeQuestionAnalysisBindingHash\(binding\)/,
+  "Code Question reservations are not bound to their immutable dependency intent."
+);
+assert.match(
+  codeQuestionSlice,
+  /reservation\.requestFingerprint !== requestFingerprint[\s\S]*codeQuestionIdempotencyConflict\(/,
+  "A reused Code Question request ID with a different dependency binding is not rejected as a conflict."
+);
+assert.match(
+  codeQuestionSlice,
+  /await commitCodeQuestionAnalysisCompletion\(actorUserID, storageUserID/,
+  "Code Question Research does not use the atomic completion boundary."
+);
+assert.match(
+  codeQuestionSlice,
+  /if \(!answer\)[\s\S]*await repairCodeQuestionAnalysisSecondaryRecords\(context, question, replay, answer\)[\s\S]*replayed: true/,
+  "An idempotent Code Question replay does not repair its secondary Project records."
+);
+assert.doesNotMatch(
+  codeQuestionSlice,
+  /await saveStoredResearchAnswer\(|await saveStoredFoundationArtifactCompareAndSwap\(|await completeResearchUsageReservation\(/,
+  "Code Question Research still persists replayable output separately from turn completion."
+);
+assert.match(
+  appSource,
+  /async commitCodeQuestionAnalysisCompletion\(actorUserID, storageUserID/,
+  "File/Postgres adapters are missing atomic Code Question Research completion."
+);
+assert.match(
+  appSource,
+  /WITH committed_usage AS \([\s\S]*UPDATE permitext_research_usage[\s\S]*WITH committed_answer AS \([\s\S]*WITH committed_artifact AS \([\s\S]*await sql\.transaction\(queries, \{ isolationLevel: "Serializable" \}\)/,
+  "PostgreSQL Code Question completion does not couple usage, answer, and artifact in one transaction."
 );
 
 const reservationID = "reservation-1";
@@ -249,6 +287,197 @@ const replay = applyResearchConversationMessageCommit(successStore, userID, {
 });
 assert.equal(replay.replayed, true);
 assert.equal(successStore.researchAnswersByUserID[userID].length, 1);
+
+const codeQuestionActorUserID = "apple:code-question-actor";
+const codeQuestionStorageUserID = "organization:code-question-owner";
+const codeQuestionReservationID = "cq-analysis-reservation-1";
+const codeQuestionAnswer = {
+  id: "cq-answer-1",
+  conversationID: "code-question:cq-1",
+  projectID: "project-1",
+  question: "What does the approved evidence require?",
+  answer: { answerText: "The approved evidence requires notice." },
+  evidence: [],
+  createdAt: "2026-08-26T12:01:00.000Z"
+};
+const codeQuestionArtifact = {
+  envelope: {
+    id: "qa-1",
+    type: "questionAnalysis",
+    version: 1,
+    createdAt: "2026-08-26T12:01:00.000Z",
+    updatedAt: "2026-08-26T12:01:00.000Z"
+  },
+  payload: {
+    id: "qa-1",
+    questionID: "cq-1",
+    requestID: "request-1",
+    researchAnswerID: codeQuestionAnswer.id,
+    requestedBy: codeQuestionActorUserID,
+    dependencyHash: "dependency-hash-1"
+  }
+};
+const codeQuestionUsage = {
+  model: "gpt-test",
+  mode: "openai-code-question",
+  inputTokens: 12,
+  outputTokens: 8,
+  totalTokens: 20,
+  createdAt: "2026-08-26T12:01:00.000Z"
+};
+const codeQuestionStore = () => ({
+  researchUsageByUserID: {
+    [codeQuestionActorUserID]: [{
+      id: codeQuestionReservationID,
+      mode: "reservation",
+      fundingSource: "purchased",
+      requestFingerprint: "binding-fingerprint-1",
+      createdAt: "2026-08-26T12:00:00.000Z"
+    }]
+  },
+  researchCreditsByUserID: {
+    [codeQuestionActorUserID]: [{
+      id: "purchase:cq-test",
+      units: 25,
+      source: "test_purchase",
+      sourceID: "cq-test",
+      createdAt: "2026-08-26T12:00:00.000Z"
+    }]
+  },
+  researchAnswersByUserID: {},
+  foundationArtifactsByUserID: {}
+});
+const codeQuestionCommit = {
+  reservationID: codeQuestionReservationID,
+  usageEntry: codeQuestionUsage,
+  answer: codeQuestionAnswer,
+  artifact: codeQuestionArtifact
+};
+const committedCodeQuestionStore = codeQuestionStore();
+const committedCodeQuestion = applyCodeQuestionAnalysisCompletion(
+  committedCodeQuestionStore,
+  codeQuestionActorUserID,
+  codeQuestionStorageUserID,
+  codeQuestionCommit
+);
+assert.equal(committedCodeQuestion.replayed, false);
+assert.equal(
+  committedCodeQuestionStore.researchUsageByUserID[codeQuestionActorUserID][0].mode,
+  "openai-code-question"
+);
+assert.equal(
+  committedCodeQuestionStore.researchUsageByUserID[codeQuestionActorUserID][0].requestFingerprint,
+  "binding-fingerprint-1"
+);
+assert.equal(
+  committedCodeQuestionStore.researchAnswersByUserID[codeQuestionStorageUserID][0].id,
+  codeQuestionAnswer.id
+);
+assert.equal(
+  committedCodeQuestionStore.foundationArtifactsByUserID[codeQuestionStorageUserID][0].envelope.id,
+  codeQuestionArtifact.envelope.id
+);
+assert.equal(
+  committedCodeQuestionStore.researchCreditsByUserID[codeQuestionActorUserID]
+    .filter((entry) => entry.id === `usage:${codeQuestionReservationID}`).length,
+  1,
+  "Atomic Code Question completion did not debit one purchased turn."
+);
+assert.equal(
+  applyCodeQuestionAnalysisCompletion(
+    committedCodeQuestionStore,
+    codeQuestionActorUserID,
+    codeQuestionStorageUserID,
+    codeQuestionCommit
+  ).replayed,
+  true,
+  "A completed Code Question retry was not idempotent."
+);
+assert.equal(
+  committedCodeQuestionStore.researchCreditsByUserID[codeQuestionActorUserID]
+    .filter((entry) => entry.id === `usage:${codeQuestionReservationID}`).length,
+  1,
+  "A completed Code Question retry double-debited the purchased turn."
+);
+
+const failedCodeQuestionStore = codeQuestionStore();
+const failedCodeQuestionSnapshot = JSON.stringify(failedCodeQuestionStore);
+assert.throws(
+  () => applyCodeQuestionAnalysisCompletion(
+    failedCodeQuestionStore,
+    codeQuestionActorUserID,
+    codeQuestionStorageUserID,
+    { ...codeQuestionCommit, testThrowAfterUsage: true }
+  ),
+  /TEST_THROW_AFTER_USAGE/
+);
+const durableCodeQuestionStore = JSON.parse(failedCodeQuestionSnapshot);
+assert.equal(
+  durableCodeQuestionStore.researchUsageByUserID[codeQuestionActorUserID][0].mode,
+  "reservation",
+  "A failed atomic Code Question mutation must leave the durable turn reserved for release/retry."
+);
+assert.equal(
+  (durableCodeQuestionStore.researchAnswersByUserID[codeQuestionStorageUserID] || []).length,
+  0
+);
+assert.equal(
+  (durableCodeQuestionStore.foundationArtifactsByUserID[codeQuestionStorageUserID] || []).length,
+  0
+);
+
+const secondaryContext = {
+  actorUserID: codeQuestionActorUserID,
+  storageOwnerUserID: codeQuestionStorageUserID,
+  owner: { kind: "organization", id: "code-question-owner", organizationID: "code-question-owner" }
+};
+const secondaryQuestion = {
+  payload: { projectID: codeQuestionAnswer.projectID }
+};
+const firstSecondaryRecords = codeQuestionAnalysisSecondaryRecords(
+  secondaryContext,
+  secondaryQuestion,
+  codeQuestionArtifact,
+  codeQuestionAnswer
+);
+const retriedSecondaryRecords = codeQuestionAnalysisSecondaryRecords(
+  { ...secondaryContext, actorUserID: "apple:different-retrying-collaborator" },
+  secondaryQuestion,
+  codeQuestionArtifact,
+  codeQuestionAnswer
+);
+assert.deepEqual(
+  retriedSecondaryRecords,
+  firstSecondaryRecords,
+  "Secondary repair records must remain deterministic when another authorized collaborator retries."
+);
+assert.equal(firstSecondaryRecords.link.targetID, codeQuestionArtifact.envelope.id);
+assert.equal(firstSecondaryRecords.event.objectID, codeQuestionArtifact.envelope.id);
+assert.equal(firstSecondaryRecords.event.actorUserID, codeQuestionActorUserID);
+assert.equal(firstSecondaryRecords.event.createdAt, codeQuestionArtifact.envelope.createdAt);
+assert.equal(firstSecondaryRecords.event.metadata.researchAnswerID, codeQuestionAnswer.id);
+assert.deepEqual(
+  codeQuestionAnalysisSecondaryRepairPlan(firstSecondaryRecords, [], []),
+  { saveLink: true, saveEvent: true }
+);
+assert.deepEqual(
+  codeQuestionAnalysisSecondaryRepairPlan(
+    firstSecondaryRecords,
+    [firstSecondaryRecords.link],
+    []
+  ),
+  { saveLink: false, saveEvent: true },
+  "Retry must repair a missing activity after the link write succeeded."
+);
+assert.deepEqual(
+  codeQuestionAnalysisSecondaryRepairPlan(
+    firstSecondaryRecords,
+    [firstSecondaryRecords.link],
+    [{ ...firstSecondaryRecords.event, id: "legacy-random-activity-id" }]
+  ),
+  { saveLink: false, saveEvent: false },
+  "Retry must not duplicate a semantically identical legacy activity event."
+);
 
 const customerRecord = researchAnswerRecordForClient({
   ...answer,

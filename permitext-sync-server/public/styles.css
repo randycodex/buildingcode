@@ -5594,6 +5594,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   line-height: 1.35;
 }
 
+.research-answer-disclaimer {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .research-answer-paragraph:first-child {
   font-size: 1.02rem;
   font-weight: 400;

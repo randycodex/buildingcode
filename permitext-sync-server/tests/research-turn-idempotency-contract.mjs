@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  applyResearchUsageReservation,
   applyResearchConversationMessageCommit,
   researchDuplicateReservationDisposition,
   researchRequestMessageIdentity,
@@ -117,7 +118,88 @@ assert.doesNotMatch(
 
 assert.match(appSource, /request_fingerprint TEXT/);
 assert.match(appSource, /requestFingerprint: duplicate\.requestFingerprint \|\| null/);
-assert.match(appSource, /SELECT id, request_fingerprint FROM permitext_research_usage/);
+assert.match(appSource, /SELECT id, mode, request_fingerprint FROM permitext_research_usage/);
+assert.match(
+  appSource,
+  /ON CONFLICT \(id\) DO UPDATE SET[\s\S]*permitext_research_usage\.mode = 'reservation'[\s\S]*created_at <= CURRENT_TIMESTAMP - INTERVAL '15 minutes'[\s\S]*request_fingerprint = EXCLUDED\.request_fingerprint/,
+  "PostgreSQL reservations do not atomically reclaim only expired, same-fingerprint reservations."
+);
+
+const reclaimNow = Date.parse("2026-08-26T12:00:00.000Z");
+const reclaimUserID = "apple:reservation-reclaim";
+const reservationInput = {
+  id: "reservation-reclaim-1",
+  since: "2026-08-01T00:00:00.000Z",
+  periodEnd: "2026-09-01T00:00:00.000Z",
+  limit: 100,
+  paidContinuationEnabled: true,
+  maximumRequestUSD: 0.5,
+  pricingVersion: "test-pricing-v1",
+  requestFingerprint: "fingerprint-a",
+  createdAt: "2026-08-26T12:00:00.000Z"
+};
+const reservationStore = (entry) => ({
+  researchUsageByUserID: { [reclaimUserID]: [entry] },
+  researchCreditsByUserID: {}
+});
+const expiredReservation = {
+  id: reservationInput.id,
+  mode: "reservation",
+  fundingSource: "included",
+  requestFingerprint: reservationInput.requestFingerprint,
+  createdAt: "2026-08-26T11:44:59.000Z"
+};
+const expiredStore = reservationStore(expiredReservation);
+const reclaimed = applyResearchUsageReservation(
+  expiredStore,
+  reclaimUserID,
+  reservationInput,
+  reclaimNow
+);
+assert.equal(reclaimed.reserved, true);
+assert.equal(reclaimed.reclaimed, true);
+assert.equal(expiredStore.researchUsageByUserID[reclaimUserID].length, 1);
+assert.equal(
+  expiredStore.researchUsageByUserID[reclaimUserID][0].createdAt,
+  reservationInput.createdAt,
+  "An expired same-fingerprint reservation was not replaced by the Retry reservation."
+);
+
+const activeStore = reservationStore({
+  ...expiredReservation,
+  createdAt: "2026-08-26T11:45:01.000Z"
+});
+assert.deepEqual(
+  applyResearchUsageReservation(activeStore, reclaimUserID, reservationInput, reclaimNow),
+  {
+    reserved: false,
+    reason: "duplicate",
+    mode: "reservation",
+    requestFingerprint: reservationInput.requestFingerprint
+  },
+  "An active same-fingerprint reservation must remain protected as in progress."
+);
+
+for (const protectedEntry of [
+  { ...expiredReservation, requestFingerprint: "fingerprint-b" },
+  { ...expiredReservation, requestFingerprint: null },
+  { ...expiredReservation, mode: "openai" }
+]) {
+  const protectedStore = reservationStore(protectedEntry);
+  const result = applyResearchUsageReservation(
+    protectedStore,
+    reclaimUserID,
+    reservationInput,
+    reclaimNow
+  );
+  assert.equal(result.reserved, false);
+  assert.equal(result.reason, "duplicate");
+  assert.deepEqual(
+    protectedStore.researchUsageByUserID[reclaimUserID],
+    [protectedEntry],
+    "Conflicting, legacy, or completed usage must never be reclaimed."
+  );
+}
 
 const paidUserID = "apple:paid-idempotency";
 const paidReservationID = researchRequestReservationID(

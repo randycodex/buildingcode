@@ -52,6 +52,14 @@ enum ProjectHubLoadError: LocalizedError {
     }
 }
 
+enum ResearchProjectSyncError: LocalizedError {
+    case projectNotSynced
+
+    var errorDescription: String? {
+        "Permitext could not sync this Project before starting Research. Check your connection and try again."
+    }
+}
+
 enum SectionDetailLoadResult {
     case loaded(ReaderSectionDetail)
     case missing
@@ -2370,11 +2378,36 @@ final class CodeLibraryViewModel: ObservableObject {
         projectID: String?
     ) async throws -> ResearchConversation {
         guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        try await ensureAssignedProjectIsSyncedForResearch(projectID)
         return try await accountBackendClient.createResearchConversation(
             account: signedInAccount,
             projectID: projectID,
             selections: selections
         )
+    }
+
+    private func ensureAssignedProjectIsSyncedForResearch(_ projectID: String?) async throws {
+        guard let projectID,
+              let localProject = folder(forBackendProjectID: projectID),
+              localProject.syncState != .synced
+        else { return }
+
+        // A newly created Project is queued locally before the delayed account
+        // sync runs. Cancel that delay and make the Project durable on the
+        // server before Research submits a conversation that references it.
+        userContentAutoSyncTask?.cancel()
+        userContentAutoSyncTask = nil
+
+        for _ in 0..<80 where isAccountBusy {
+            try await Task.sleep(for: .milliseconds(250))
+        }
+        guard !isAccountBusy else { throw ResearchProjectSyncError.projectNotSynced }
+
+        _ = await syncPendingUserContentIfPossible()
+        refreshFolders()
+        guard folder(forBackendProjectID: projectID)?.syncState == .synced else {
+            throw ResearchProjectSyncError.projectNotSynced
+        }
     }
 
     func addResearchEvidence(

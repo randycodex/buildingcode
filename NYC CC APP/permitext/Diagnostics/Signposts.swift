@@ -358,7 +358,7 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             )
         } catch let error as PermitextBackendHTTPError {
             switch error {
-            case .serverStatus(404, _, _), .serverStatus(405, _, _):
+            case .serverStatus(404, _, _, _), .serverStatus(405, _, _, _):
                 break
             default:
                 throw error

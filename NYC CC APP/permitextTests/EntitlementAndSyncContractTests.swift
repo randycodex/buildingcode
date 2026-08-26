@@ -4,6 +4,119 @@ import UIKit
 import CryptoKit
 @testable import permitext
 
+private final class ScopedPermitextURLProtocol: URLProtocol {
+    typealias Handler = (URLRequest) throws -> (statusCode: Int, data: Data)
+
+    private final class HandlerStore: @unchecked Sendable {
+        private let lock = NSLock()
+        private var handlers: [String: Handler] = [:]
+
+        func install(_ handler: @escaping Handler, for host: String) {
+            lock.lock()
+            handlers[host] = handler
+            lock.unlock()
+        }
+
+        func remove(for host: String) {
+            lock.lock()
+            handlers.removeValue(forKey: host)
+            lock.unlock()
+        }
+
+        func handler(for host: String) -> Handler? {
+            lock.lock()
+            defer { lock.unlock() }
+            return handlers[host]
+        }
+    }
+
+    private static let handlerStore = HandlerStore()
+
+    static func install(_ handler: @escaping Handler, for host: String) {
+        handlerStore.install(handler, for: host)
+    }
+
+    static func removeHandler(for host: String) {
+        handlerStore.remove(for: host)
+    }
+
+    override class func canInit(with request: URLRequest) -> Bool {
+        guard let host = request.url?.host else { return false }
+        return handlerStore.handler(for: host) != nil
+    }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {
+        guard let url = request.url,
+              let host = url.host,
+              let handler = Self.handlerStore.handler(for: host)
+        else {
+            client?.urlProtocol(self, didFailWithError: URLError(.unsupportedURL))
+            return
+        }
+
+        do {
+            let result = try handler(request)
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: result.statusCode,
+                httpVersion: "HTTP/1.1",
+                headerFields: ["Content-Type": "application/json"]
+            )!
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: result.data)
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() {}
+}
+
+private final class ResearchRequestPathRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var paths: [String] = []
+
+    func record(_ path: String) {
+        lock.lock()
+        paths.append(path)
+        lock.unlock()
+    }
+
+    func contains(_ path: String) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return paths.contains(path)
+    }
+
+    func snapshot() -> [String] {
+        lock.lock()
+        defer { lock.unlock() }
+        return paths
+    }
+}
+
+private func permitextRequestBody(_ request: URLRequest) throws -> Data {
+    if let body = request.httpBody { return body }
+    guard let stream = request.httpBodyStream else { throw URLError(.cannotDecodeContentData) }
+
+    stream.open()
+    defer { stream.close() }
+    var data = Data()
+    var buffer = [UInt8](repeating: 0, count: 4096)
+    while stream.hasBytesAvailable {
+        let count = stream.read(&buffer, maxLength: buffer.count)
+        if count < 0 { throw stream.streamError ?? URLError(.cannotDecodeContentData) }
+        if count == 0 { break }
+        data.append(buffer, count: count)
+    }
+    return data
+}
+
 private actor StoreKitFinishBarrierProbe {
     private var callerStartCount = 0
     private var operationStartCount = 0
@@ -3799,6 +3912,224 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testResearch409RetainsAuthoritativeConversationForRecovery() async throws {
+        let host = "research-recovery-\(UUID().uuidString.lowercased()).test"
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer {
+            ScopedPermitextURLProtocol.removeHandler(for: host)
+            session.invalidateAndCancel()
+        }
+
+        ScopedPermitextURLProtocol.install({ request in
+            let body = try permitextRequestBody(request)
+            let object = try XCTUnwrap(
+                JSONSerialization.jsonObject(with: body) as? [String: Any]
+            )
+            let conversationID = try XCTUnwrap(object["conversationID"] as? String)
+            let isProjectReview = conversationID == "conversation-project-review"
+            let conversation = ResearchConversation(
+                id: conversationID,
+                title: "Recovery contract",
+                createdAt: "2026-08-26T12:00:00.000Z",
+                updatedAt: "2026-08-26T12:01:00.000Z",
+                primaryProjectID: isProjectReview ? "project-1" : nil,
+                projectContext: isProjectReview
+                    ? ResearchProjectContext(
+                        projectID: "project-1",
+                        facts: ["Occupancy is Group B."],
+                        source: "user-provided",
+                        updatedAt: "2026-08-26T12:01:00.000Z"
+                    )
+                    : nil,
+                projectContextReviewRequired: isProjectReview,
+                sourceStatus: isProjectReview ? "current" : "changed"
+            )
+            let conversationData = try JSONEncoder().encode(conversation)
+            let conversationObject = try XCTUnwrap(
+                JSONSerialization.jsonObject(with: conversationData) as? [String: Any]
+            )
+            let payload: [String: Any] = [
+                "error": isProjectReview
+                    ? "Confirm the updated Project facts before continuing."
+                    : "Refresh the changed enacted source before continuing.",
+                "code": isProjectReview
+                    ? "RESEARCH_PROJECT_REVIEW_REQUIRED"
+                    : "RESEARCH_SOURCE_CHANGED",
+                "conversation": conversationObject
+            ]
+            return (409, try JSONSerialization.data(withJSONObject: payload))
+        }, for: host)
+
+        let transport = PermitextBackendHTTPTransport(
+            baseURL: try XCTUnwrap(URL(string: "https://\(host)/")),
+            session: session
+        )
+        let client = PermitextBackendClient(transport: transport)
+        let account = SignedInAccount(
+            appUserID: "clerk:research-recovery",
+            authProvider: .clerk,
+            authProviderUserID: "research-recovery",
+            appleUserID: "",
+            displayName: "Research Recovery",
+            signedInAt: Date(),
+            backendSessionToken: "test-token"
+        )
+
+        for conversationID in ["conversation-source-changed", "conversation-project-review"] {
+            do {
+                _ = try await client.sendResearchMessage(
+                    account: account,
+                    conversationID: conversationID,
+                    question: "What changed?",
+                    requestID: "request-\(conversationID)"
+                )
+                XCTFail("Expected the backend recovery response to remain a 409.")
+            } catch let error as PermitextBackendHTTPError {
+                let authoritative = try XCTUnwrap(
+                    ResearchAuthoritativeConversationRecovery.conversation(
+                        from: error,
+                        matching: conversationID
+                    )
+                )
+                XCTAssertEqual(authoritative.id, conversationID)
+                if conversationID == "conversation-source-changed" {
+                    XCTAssertEqual(authoritative.sourceStatus, "changed")
+                    XCTAssertFalse(authoritative.projectContextReviewRequired)
+                } else {
+                    XCTAssertEqual(authoritative.sourceStatus, "current")
+                    XCTAssertTrue(authoritative.projectContextReviewRequired)
+                    XCTAssertEqual(authoritative.projectContext?.facts, ["Occupancy is Group B."])
+                }
+                XCTAssertNil(
+                    ResearchAuthoritativeConversationRecovery.conversation(
+                        from: error,
+                        matching: "different-conversation"
+                    )
+                )
+            }
+        }
+    }
+
+    @MainActor
+    func testNewAssignedProjectSyncsBeforeResearchConversationCreation() async throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-research-project-sync-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        let host = "research-project-sync-\(UUID().uuidString.lowercased()).test"
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer {
+            ScopedPermitextURLProtocol.removeHandler(for: host)
+            session.invalidateAndCancel()
+        }
+
+        let recorder = ResearchRequestPathRecorder()
+        ScopedPermitextURLProtocol.install({ request in
+            let path = request.url?.path ?? ""
+            let body = try permitextRequestBody(request)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+
+            switch path {
+            case "/sync/push":
+                recorder.record(path)
+                let push = try decoder.decode(BackendUserContentPushRequest.self, from: body)
+                let response = BackendUserContentPushResponse(
+                    acceptedMutationIDs: push.batch.mutations.map(\.recordID),
+                    rejectedMutationIDs: [],
+                    rejectionReasons: [:],
+                    serverTime: Date(timeIntervalSince1970: 1_777_377_600)
+                )
+                return (200, try encoder.encode(response))
+
+            case "/research/conversations/create":
+                recorder.record(path)
+                guard recorder.contains("/sync/push") else {
+                    return (404, Data(#"{"error":"Project was not synced first."}"#.utf8))
+                }
+                let create = try decoder.decode(ResearchConversationCreateRequest.self, from: body)
+                let response = ResearchConversationResponse(
+                    conversation: ResearchConversation(
+                        id: "research-after-project-sync",
+                        title: "New Project Research",
+                        createdAt: "2026-08-26T12:00:00.000Z",
+                        updatedAt: "2026-08-26T12:00:00.000Z",
+                        primaryProjectID: create.projectID
+                    )
+                )
+                return (200, try encoder.encode(response))
+
+            default:
+                return (404, Data(#"{"error":"Unexpected test route."}"#.utf8))
+            }
+        }, for: host)
+
+        let defaults = isolatedEntitlementDefaults()
+        LocalEntitlementService.setDebugPlan(.pro, defaults: defaults)
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let account = SignedInAccount(
+            appUserID: "clerk:new-project-research",
+            authProvider: .clerk,
+            authProviderUserID: "new-project-research",
+            appleUserID: "",
+            displayName: "New Project Research",
+            signedInAt: Date(),
+            backendSessionToken: "test-token"
+        )
+        let transport = PermitextBackendHTTPTransport(
+            baseURL: try XCTUnwrap(URL(string: "https://\(host)/")),
+            session: session
+        )
+        let client = PermitextBackendClient(transport: transport)
+        let model = CodeLibraryViewModel(
+            userContentRepository: store,
+            continuityStore: ContinuityStore(defaults: defaults),
+            readerThemeStore: ReaderThemeStore(defaults: defaults),
+            preferencesDefaults: defaults,
+            entitlementService: LocalEntitlementService(defaults: defaults),
+            accountBackendClient: client,
+            syncBackend: client,
+            loadsInitialContent: true,
+            loadsPersistedAccount: false,
+            initialSignedInAccount: account,
+            ownsAccountSync: false
+        )
+
+        for _ in 0..<200 where !model.isInitialContentLoaded {
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        XCTAssertTrue(model.isInitialContentLoaded)
+        let folder = try XCTUnwrap(
+            model.createFolder(name: "Immediate Research Project", address: "1760 Jerome Ave, Bronx")
+        )
+        XCTAssertNotEqual(folder.syncState, .synced)
+        let projectID = try XCTUnwrap(model.backendProjectID(for: folder.id))
+
+        let conversation = try await model.createResearchConversation(
+            selections: [],
+            projectID: projectID
+        )
+
+        XCTAssertEqual(conversation.primaryProjectID, projectID)
+        XCTAssertEqual(model.folder(id: folder.id)?.syncState, .synced)
+        XCTAssertEqual(
+            recorder.snapshot().filter {
+                $0 == "/sync/push" || $0 == "/research/conversations/create"
+            },
+            ["/sync/push", "/research/conversations/create"]
+        )
+    }
+
     func testResearchAnswerDecodesCrossPlatformTrustAndContextDetails() throws {
         let data = Data(
             """
@@ -3906,6 +4237,39 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         let genericFallback = ResearchSupportingSource(title: "", publisher: "")
         XCTAssertEqual(genericFallback.displayTitle, "Supporting source")
+
+        XCTAssertNil(ResearchSupportingSource(url: "http://www.nyc.gov/not-secure").webURL)
+        XCTAssertEqual(
+            ResearchSupportingSource(url: "https://www.nyc.gov/official").webURL?.absoluteString,
+            "https://www.nyc.gov/official"
+        )
+    }
+
+    func testResearchSourceDateUsesValidatedUTCDateAcrossPlatforms() {
+        var answer = ResearchAnswer(
+            mode: "openai",
+            conclusion: "",
+            explanation: "",
+            supportedPoints: [],
+            assumptions: [],
+            missingFacts: [],
+            evidenceLimitations: [],
+            followUpQuestions: [],
+            additionalEvidenceNeeded: [],
+            citations: []
+        )
+
+        answer.sourceAsOf = "2026-08-25T23:30:00-04:00"
+        XCTAssertEqual(answer.researchSourceDateLabel, "2026-08-26")
+
+        answer.sourceAsOf = "2026-08-25T03:04:05.678Z"
+        XCTAssertEqual(answer.researchSourceDateLabel, "2026-08-25")
+
+        answer.sourceAsOf = "2026-08-25"
+        XCTAssertEqual(answer.researchSourceDateLabel, "2026-08-25")
+
+        answer.sourceAsOf = "not-a-date"
+        XCTAssertNil(answer.researchSourceDateLabel)
     }
 
     func testResearchAnswerOfficialGuidanceBoundaryDoesNotClaimEnactedSupport() throws {
@@ -4017,6 +4381,41 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             ResearchRequestFailurePresentation.resolve(URLError(.timedOut)).message,
             "Research is taking longer than expected. Permitext checked for a completed answer but did not find one yet. Your question is still here."
         )
+        XCTAssertEqual(
+            ResearchRequestFailurePresentation.resolve(URLError(.cancelled)).message,
+            "Research was cancelled. Your question is still here."
+        )
+    }
+
+    func testResearchRequestCanCancelAndReconciledCompletionRefreshesAllowance() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let researchSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/ResearchView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(researchSource.contains("@State private var activeResearchRequestTask: Task<Void, Never>?"))
+        XCTAssertTrue(researchSource.contains("Button(\"Cancel\", systemImage: \"xmark\")"))
+        XCTAssertTrue(researchSource.contains(".accessibilityIdentifier(\"research-cancel-request\")"))
+        XCTAssertTrue(researchSource.contains("activeResearchRequestTask?.cancel()"))
+        XCTAssertTrue(researchSource.contains("try Task.checkCancellation()"))
+        XCTAssertTrue(researchSource.contains("failedQuestionAttempt = attempt"))
+
+        let reconciliationStart = try XCTUnwrap(
+            researchSource.range(of: "if let authoritative = await completedConversationAfterLostResponse(")
+        )
+        let reconciliationEnd = try XCTUnwrap(
+            researchSource.range(
+                of: "} else {",
+                range: reconciliationStart.upperBound..<researchSource.endIndex
+            )
+        )
+        let reconciliationSource = String(
+            researchSource[reconciliationStart.lowerBound..<reconciliationEnd.lowerBound]
+        )
+        XCTAssertTrue(reconciliationSource.contains("await library.refreshResearchTurnAllowance(showsErrors: false)"))
     }
 
     func testResearchRequestReconciliationRequiresMatchingRequestPair() {
