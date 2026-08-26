@@ -143,6 +143,20 @@ export function evaluateResearchWebAttribution({
       unavailableDocumentPattern.test(limitation)
     )
   );
+  const requiredGenericLimitation =
+    webSupport?.searched === true &&
+    sources.size === 0 &&
+    compactText(webSupport?.limitation);
+  const undisclosedGenericLimitation = Boolean(
+    requiredGenericLimitation &&
+    !limitationText.some((limitation) =>
+      limitation === requiredGenericLimitation ||
+      (
+        unavailableDocumentPattern.test(limitation) &&
+        /(?:official|web|guidance|supporting source)/i.test(limitation)
+      )
+    )
+  );
 
   const guidanceSupportedPointIndexes = webDerivedSupportedPointIndexes(answer, sources, evidence);
 
@@ -150,6 +164,7 @@ export function evaluateResearchWebAttribution({
     pass:
       missingRequiredDocumentReferences.length === 0 &&
       undisclosedUnavailableDocumentReferences.length === 0 &&
+      !undisclosedGenericLimitation &&
       guidanceSupportedPointIndexes.length === 0 &&
       invalidSourceUseBindings.length === 0,
     requiredSourceIDs,
@@ -160,6 +175,8 @@ export function evaluateResearchWebAttribution({
     missingRequiredSourceIDs,
     unavailableRequestedDocumentReferences,
     undisclosedUnavailableDocumentReferences,
+    requiredGenericLimitation,
+    undisclosedGenericLimitation,
     guidanceSupportedPointIndexes,
     invalidSourceUseBindings
   };
@@ -184,6 +201,12 @@ export function researchWebAttributionRevisionIssues(result) {
     issues.push({
       type: "false_evidence_limitation",
       detail: `Add a visible evidenceLimitations item stating that Permitext could not retrieve a source-specific attributable passage for ${result.undisclosedUnavailableDocumentReferences.join(", ")} and did not use that document. Do not infer its contents.`
+    });
+  }
+  if (result.undisclosedGenericLimitation) {
+    issues.push({
+      type: "false_evidence_limitation",
+      detail: `Add a visible evidenceLimitations item stating: ${result.requiredGenericLimitation} Do not infer or use unavailable web guidance.`
     });
   }
   if (result.invalidSourceUseBindings?.length) {

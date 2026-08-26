@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {
   accumulatedResearchVerificationIssues,
   researchInputForEvidence,
+  researchWebSupportRequestBody,
   researchWebSourcesFromProviderPayload,
   validateResearchInterpretation
 } from "../app.mjs";
@@ -12,6 +13,20 @@ import {
 } from "../research-web-attribution.mjs";
 
 const bulletinURL = "https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2022-013.pdf";
+const webRequestBody = researchWebSupportRequestBody({
+  model: "gpt-5.6-luna",
+  userID: "web-support-contract-user",
+  sanitizedQuery: "Find current official NYC DOB boiler guidance.",
+  allowedDomains: ["nyc.gov"],
+  namedOfficialDocuments: []
+});
+assert.equal(webRequestBody.tool_choice, "required");
+assert.equal(webRequestBody.max_tool_calls, 3);
+assert.deepEqual(webRequestBody.tools, [{
+  type: "web_search",
+  filters: { allowed_domains: ["nyc.gov"] }
+}]);
+assert.deepEqual(webRequestBody.include, ["web_search_call.action.sources"]);
 const attributedClaimTexts = [
   "Buildings Bulletin 2022-013 says a foam-plastic exception requires a flame spread index of 25 or less under ASTM E84 or UL 723.",
   "The bulletin says that exception waives only the floor-level fireblocking requirement.",
@@ -87,6 +102,33 @@ assert.deepEqual(
   directRangeSources[0].attributedClaims,
   [directRangeClaim],
   "A provider range that directly covers cited prose must return that exact prose, not the text before it."
+);
+
+const markdownCitationMarker =
+  "([nyc.gov](https://www.nyc.gov/site/buildings/safety/boiler-compliance.page?utm_source=openai))";
+const markdownCitationText =
+  `- Annual inspection is required for registered H-stamped and E-stamped low-pressure boilers. ${markdownCitationMarker}`;
+const markdownCitationStart = markdownCitationText.indexOf(markdownCitationMarker);
+const markdownCitationSources = researchWebSourcesFromProviderPayload({
+  output: [{
+    type: "message",
+    content: [{
+      type: "output_text",
+      text: markdownCitationText,
+      annotations: [{
+        type: "url_citation",
+        url: "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page?utm_source=openai",
+        title: "Boiler Compliance - Buildings",
+        start_index: markdownCitationStart,
+        end_index: markdownCitationStart + markdownCitationMarker.length
+      }]
+    }]
+  }]
+});
+assert.deepEqual(
+  markdownCitationSources[0].attributedClaims,
+  ["Annual inspection is required for registered H-stamped and E-stamped low-pressure boilers."],
+  "A provider Markdown citation marker must bind the preceding claim, not become the attributed claim."
 );
 
 const evidence = [{
@@ -239,6 +281,34 @@ assert.match(
   researchWebAttributionRevisionIssues(unavailableResult)[0].detail,
   /could not retrieve a source-specific attributable passage/
 );
+
+const genericUnavailableWebSupport = {
+  searched: true,
+  sources: [],
+  limitation: "Permitext searched the approved official supporting web sources but could not retrieve an attributable passage; web guidance was not used in this answer."
+};
+const genericUndisclosed = structuredClone(answer);
+genericUndisclosed.supportingSourceUses = [];
+genericUndisclosed.evidenceLimitations = ["Only enacted BC 718 was evaluated."];
+const genericUnavailableResult = evaluateResearchWebAttribution({
+  question: "Use current official NYC DOB guidance to explain the filing process.",
+  answer: genericUndisclosed,
+  evidence,
+  webSupport: genericUnavailableWebSupport
+});
+assert.equal(genericUnavailableResult.pass, false);
+assert.equal(genericUnavailableResult.undisclosedGenericLimitation, true);
+assert.match(
+  researchWebAttributionRevisionIssues(genericUnavailableResult)[0].detail,
+  /searched the approved official supporting web sources/
+);
+genericUndisclosed.evidenceLimitations = [genericUnavailableWebSupport.limitation];
+assert.equal(evaluateResearchWebAttribution({
+  question: "Use current official NYC DOB guidance to explain the filing process.",
+  answer: genericUndisclosed,
+  evidence,
+  webSupport: genericUnavailableWebSupport
+}).pass, true);
 undisclosedUnavailable.evidenceLimitations = [unavailableWebSupport.limitation];
 assert.equal(evaluateResearchWebAttribution({
   question: "How does Buildings Bulletin 2022-013 clarify BC 718.2.6.1?",

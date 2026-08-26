@@ -7906,6 +7906,7 @@ function researchWebCitationClaim(text, citation) {
   const annotationLooksLikeCitationMarker =
     /^\[\d+(?:\s*[,\u2013-]\s*\d+)*\]$/.test(annotatedSpan) ||
     /^\(\d+(?:\s*[,\u2013-]\s*\d+)*\)$/.test(annotatedSpan) ||
+    /^\(?\[[^\]]+\]\(https?:\/\/[^)]+\)\)?$/i.test(annotatedSpan) ||
     /^\uE200cite\uE202/i.test(annotatedSpan) ||
     /^https?:\/\//i.test(annotatedSpan) ||
     !/[a-z]{3,}/i.test(annotatedSpan);
@@ -7946,6 +7947,51 @@ export function researchWebSourcesFromProviderPayload(payload) {
   return sources;
 }
 
+export function researchWebSupportRequestBody({
+  model,
+  userID,
+  sanitizedQuery,
+  allowedDomains,
+  namedOfficialDocuments = []
+}) {
+  const webInput = namedOfficialDocuments.length
+    ? [
+        "OFFICIAL DOCUMENTS TO RETRIEVE FIRST",
+        ...namedOfficialDocuments.map((reference) => `- ${reference}`),
+        "QUESTION",
+        sanitizedQuery
+      ].join("\n")
+    : sanitizedQuery;
+  return {
+    model,
+    store: false,
+    reasoning: { effort: "low" },
+    max_output_tokens: 1_000,
+    max_tool_calls: 3,
+    safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
+    tools: [{
+      type: "web_search",
+      filters: { allowed_domains: allowedDomains }
+    }],
+    // This request is constructed only after Permitext's source policy has
+    // decided that official web support is required. Do not let the provider
+    // skip the sole available tool and answer from model memory instead.
+    tool_choice: "required",
+    include: ["web_search_call.action.sources"],
+    instructions: [
+      "Find concise supporting information from the allowed official websites for a building-code research answer.",
+      "The enacted Permitext corpus remains the primary legal authority.",
+      "Do not make a project compliance determination and do not treat guidance as enacted law.",
+      "When the question names an official bulletin or other official document, open that document and summarize the substantive passages relevant to the question; returning only a title or link is not sufficient.",
+      "Identify any named official document that could not be opened or read instead of inferring its contents.",
+      "Write each useful source-derived claim as its own short bullet and attach an inline web citation from that exact source to the same bullet. Do not combine facts from multiple sources in one bullet.",
+      "Return only useful explanatory, administrative, effective-date, or technical context with inline web citations.",
+      "If no official supporting material is useful, say that briefly."
+    ].join(" "),
+    input: webInput
+  };
+}
+
 async function openAIResearchWebSupport(question, userID, options = {}) {
   const policyConfiguration = researchSourcePolicyConfiguration();
   if (!policyConfiguration.webSupportEnabled) {
@@ -7965,38 +8011,13 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   };
   const allowedDomains = policyConfiguration.officialDomains;
   const namedOfficialDocuments = extractResearchOfficialDocumentReferences(sanitizedQuery);
-  const webInput = namedOfficialDocuments.length
-    ? [
-        "OFFICIAL DOCUMENTS TO RETRIEVE FIRST",
-        ...namedOfficialDocuments.map((reference) => `- ${reference}`),
-        "QUESTION",
-        sanitizedQuery
-      ].join("\n")
-    : sanitizedQuery;
-  const requestBody = {
+  const requestBody = researchWebSupportRequestBody({
     model: configuration.model,
-    store: false,
-    reasoning: { effort: "low" },
-    max_output_tokens: 1_000,
-    safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
-    tools: [{
-      type: "web_search",
-      filters: { allowed_domains: allowedDomains }
-    }],
-    tool_choice: "auto",
-    include: ["web_search_call.action.sources"],
-    instructions: [
-      "Find concise supporting information from the allowed official websites for a building-code research answer.",
-      "The enacted Permitext corpus remains the primary legal authority.",
-      "Do not make a project compliance determination and do not treat guidance as enacted law.",
-      "When the question names an official bulletin or other official document, open that document and summarize the substantive passages relevant to the question; returning only a title or link is not sufficient.",
-      "Identify any named official document that could not be opened or read instead of inferring its contents.",
-      "Write each useful source-derived claim as its own short bullet and attach an inline web citation from that exact source to the same bullet. Do not combine facts from multiple sources in one bullet.",
-      "Return only useful explanatory, administrative, effective-date, or technical context with inline web citations.",
-      "If no official supporting material is useful, say that briefly."
-    ].join(" "),
-    input: webInput
-  };
+    userID,
+    sanitizedQuery,
+    allowedDomains,
+    namedOfficialDocuments
+  });
   let payload;
   try {
     ({ payload } = await requestResearchProvider({
@@ -8073,7 +8094,9 @@ async function openAIResearchWebSupport(question, userID, options = {}) {
   );
   const limitation = unattributedRequestedDocuments.length
     ? `Permitext could not retrieve a source-specific attributable passage for ${unattributedRequestedDocuments.join(", ")}; that document was not used in this answer.`
-    : "";
+    : sources.length === 0
+      ? "Permitext searched the approved official supporting web sources but could not retrieve an attributable passage; web guidance was not used in this answer."
+      : "";
   return {
     summary,
     sources,
@@ -8696,10 +8719,10 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       options.requiredClaims?.length
         ? `DETERMINISTIC REQUIRED CLAIM CHECKLIST\n${JSON.stringify(options.requiredClaims)}`
         : "",
-      options.webSupport?.sources?.length
+      options.webSupport?.sources?.length || options.webSupport?.limitation
         ? `NONCONTROLLING SUPPORTING WEB MATERIAL\n${JSON.stringify({
             limitation: options.webSupport.limitation || null,
-            sources: options.webSupport.sources
+            sources: options.webSupport.sources || []
           })}`
         : "",
       `PROPOSED ANSWER JSON\n${JSON.stringify(interpretation)}`
