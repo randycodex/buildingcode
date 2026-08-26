@@ -62,3 +62,22 @@ Start a new thread when:
 - New task: new thread
 - New task: new branch
 - Stable code: merge to `main`
+
+## Storage-safe iOS workflow
+
+- Use `./Tools/permitext_xcode.sh` for routine simulator builds and tests.
+- Keep DerivedData outside this iCloud-synced checkout. Never add a new
+  `.DerivedData-*` folder under the repository.
+- Keep Permitext unit tests nonparallel. The shared scheme and wrapper both
+  enforce this so XCTest does not leave multi-gigabyte simulator clones.
+- Use the physical iPhone only for behavior that requires a device. Routine
+  contract and unit tests belong on the simulator.
+- Run `./Tools/permitext_storage_guard.sh --audit` to inspect storage. Its
+  `--clean` mode is fail-closed and removes only validated, reproducible caches
+  while Xcode and device operations are idle. It never removes archives,
+  simulator runtimes, DeviceSupport, source, Git data, or Permitext app data.
+  Stale project-local DerivedData is removed only after its structure is
+  validated and no process has a file open inside it.
+- Create one archive per build and reuse it for upload retries. After the newer
+  build is confirmed live and working, remove that local archive and older
+  superseded archives.

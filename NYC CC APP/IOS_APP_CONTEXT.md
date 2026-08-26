@@ -31,11 +31,26 @@ is a separate add-on that requires Pro.
 Representative simulator command:
 
 ```sh
-xcodebuild test \
-  -project 'NYC CC APP/NYC CC APP.xcodeproj' \
-  -scheme permitext \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
-  CODE_SIGNING_ALLOWED=NO
+./Tools/permitext_xcode.sh test-simulator
+```
+
+The wrapper uses one shared DerivedData location outside the iCloud-synced
+checkout and forces a single nonparallel test worker. Do not create
+project-local `.DerivedData-*` folders. If a direct `xcodebuild test` command is
+unavoidable, include both `-parallel-testing-enabled NO` and
+`-maximum-parallel-testing-workers 1`.
+
+For a physical-device test, use:
+
+```sh
+./Tools/permitext_xcode.sh test-physical <device-identifier>
+```
+
+For read-only storage inspection or guarded cleanup, use:
+
+```sh
+./Tools/permitext_storage_guard.sh --audit
+./Tools/permitext_storage_guard.sh --clean
 ```
 
 A successful build is not visual or runtime proof. Use the simulator or a
