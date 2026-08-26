@@ -70,6 +70,18 @@ assert.deepEqual(
   researchWebSupportTrigger({ corpusCoverage: "incomplete" }, {}).reasons,
   ["outside_library_support_needed"]
 );
+assert.deepEqual(
+  researchWebSupportTrigger({
+    question: "Using current official NYC Department of Buildings web guidance, summarize the boiler inspection exemptions."
+  }, {}).reasons,
+  ["official_guidance_requested", "outside_library_support_needed"]
+);
+assert.equal(
+  researchWebSupportTrigger({ question: "Check this referenced standard outside the library." }, {})
+    .reasons.includes("official_guidance_requested"),
+  false,
+  "An automatic outside-library lookup must not authorize a guidance-only answer."
+);
 
 assert.deepEqual(
   classifyResearchWebSource(

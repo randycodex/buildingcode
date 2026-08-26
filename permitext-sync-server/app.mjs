@@ -216,7 +216,7 @@ import {
   researchSourcePolicyConfiguration,
   sanitizeResearchWebQuery,
   extractResearchOfficialDocumentReferences,
-  shouldUseResearchWebSupport
+  researchWebSupportTrigger
 } from "./research-source-policy.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import {
@@ -491,6 +491,13 @@ const allowedCodeVersionClearScopes = new Set(["bookmarks", "notes", "tags", "fo
 
 const maximumResearchSupportedPoints = 12;
 
+function researchEvidenceRequiresEnactedBindings(evidence = []) {
+  return (Array.isArray(evidence) ? evidence : []).some((source) =>
+    source?.evidencePriority?.evidenceRole === "governing" ||
+    source?.evidencePriority?.claimCoverageRequired === true
+  );
+}
+
 const researchInterpretationSchema = {
   type: "object",
   additionalProperties: false,
@@ -557,7 +564,7 @@ const researchInterpretationSchema = {
   ]
 };
 
-function researchInterpretationSchemaForEvidence(evidence, supportingSources = []) {
+export function researchInterpretationSchemaForEvidence(evidence, supportingSources = [], options = {}) {
   const schema = structuredClone(researchInterpretationSchema);
   const sectionIDs = Array.from(new Set(evidence.map((item) => String(item.sectionID))));
   const sourceIDs = Array.from(new Set(
@@ -575,6 +582,19 @@ function researchInterpretationSchemaForEvidence(evidence, supportingSources = [
       .map((claim) => String(claim?.id || ""))
       .filter(Boolean)
   );
+  if (
+    supportingSourceIDs.length &&
+    supportingClaimIDs.length &&
+    options.allowOfficialGuidanceOnly === true &&
+    !researchEvidenceRequiresEnactedBindings(evidence)
+  ) {
+    // A question may expressly ask for current official agency guidance even
+    // when the assembled enacted evidence does not establish a responsive
+    // rule. In that case the answer must be able to keep enacted bindings
+    // empty instead of manufacturing a code citation for the web guidance.
+    schema.properties.supportedPoints.minItems = 0;
+    schema.properties.citations.minItems = 0;
+  }
   if (supportingSourceIDs.length) {
     schema.properties.supportingSourceUses.items.properties.sourceID.enum = supportingSourceIDs;
   }
@@ -8208,7 +8228,7 @@ export function researchEvidenceBoundaryInterpretation() {
   };
 }
 
-export function validateResearchInterpretation(value, evidence, supportingSources = []) {
+export function validateResearchInterpretation(value, evidence, supportingSources = [], options = {}) {
   const allowedSections = new Map();
   const allowedSources = new Map();
   for (const section of evidence) {
@@ -8218,10 +8238,19 @@ export function validateResearchInterpretation(value, evidence, supportingSource
   const hasAdaptiveAnswer = typeof value?.answerText === "string" && Boolean(value.answerText.trim());
   const hasLegacyAnswer = typeof value?.conclusion === "string" && Boolean(value.conclusion.trim()) &&
     typeof value?.explanation === "string" && Boolean(value.explanation.trim());
+  const hasEnactedBindings =
+    Array.isArray(value?.supportedPoints) && value.supportedPoints.length > 0 &&
+    Array.isArray(value?.citations) && value.citations.length > 0;
+  const hasSupportingOnlyBindings =
+    Array.isArray(value?.supportedPoints) && value.supportedPoints.length === 0 &&
+    Array.isArray(value?.citations) && value.citations.length === 0 &&
+    Array.isArray(value?.supportingSourceUses) && value.supportingSourceUses.length > 0 &&
+    Array.isArray(supportingSources) && supportingSources.length > 0 &&
+    options.allowOfficialGuidanceOnly === true &&
+    !researchEvidenceRequiresEnactedBindings(evidence);
   if (!value || typeof value !== "object" ||
       (!hasAdaptiveAnswer && !hasLegacyAnswer) ||
       !Array.isArray(value.supportedPoints) ||
-      value.supportedPoints.length === 0 ||
       value.supportedPoints.length > maximumResearchSupportedPoints ||
       !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
       !Array.isArray(value.missingFacts) || !value.missingFacts.every((item) => typeof item === "string") ||
@@ -8229,7 +8258,8 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       !Array.isArray(value.evidenceLimitations) || !value.evidenceLimitations.every((item) => typeof item === "string") ||
       !Array.isArray(value.additionalEvidenceNeeded) || !value.additionalEvidenceNeeded.every((item) => typeof item === "string") ||
       !Array.isArray(value.supportingSourceUses) ||
-      !Array.isArray(value.citations) || value.citations.length === 0) {
+      !Array.isArray(value.citations) ||
+      (!hasEnactedBindings && !hasSupportingOnlyBindings)) {
     const error = new Error("The model returned an invalid interpretation.");
     error.code = "INVALID_RESEARCH_RESPONSE";
     throw error;
@@ -8349,7 +8379,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       relevance
     });
   }
-  if (!citations.length) {
+  if (!citations.length && !hasSupportingOnlyBindings) {
     const error = new Error("The model returned no valid citations.");
     error.code = "INVALID_RESEARCH_CITATION";
     throw error;
@@ -8462,6 +8492,50 @@ export function validateResearchInterpretation(value, evidence, supportingSource
   };
 }
 
+export function finalizeResearchGuidanceOnlyInterpretation(
+  interpretation,
+  { allowOfficialGuidanceOnly = false } = {}
+) {
+  if (
+    !allowOfficialGuidanceOnly ||
+    !interpretation ||
+    interpretation.supportedPoints?.length ||
+    interpretation.citations?.length ||
+    !interpretation.supportingSources?.length
+  ) return interpretation;
+  const sourceClaims = Array.from(new Set(interpretation.supportingSources
+    .map((source) => String(source?.claim || "").replace(/\s+/g, " ").trim())
+    .filter(Boolean)));
+  if (!sourceClaims.length) return interpretation;
+  const authorityStatement =
+    "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
+  const enactedBoundary =
+    "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below.";
+  const explanation = sourceClaims.map((claim) => `- ${claim}`).join("\n");
+  return {
+    ...interpretation,
+    answerText: `${authorityStatement}\n\n${explanation}`,
+    conclusion: authorityStatement,
+    explanation,
+    assumptions: [],
+    missingFacts: [],
+    followUpQuestions: [],
+    evidenceLimitations: [enactedBoundary],
+    additionalEvidenceNeeded: []
+  };
+}
+
+export function researchFollowUpQuestionsForResponse(
+  interpretation,
+  evidenceAnalysis,
+  { supportingGuidanceOnly = false } = {}
+) {
+  if (supportingGuidanceOnly) return [];
+  return interpretation?.followUpQuestions?.length
+    ? interpretation.followUpQuestions
+    : evidenceAnalysis?.highValueFollowUpQuestions || [];
+}
+
 async function openAIResearchInterpretation(question, evidence, userID, options = {}) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -8512,6 +8586,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic.",
         "supportedPoints are exclusively for rules established by the assembled enacted evidence. Never put a bulletin, agency-guidance, or other supporting-web claim in supportedPoints, and never attach an enacted SECTION_ID or PASSAGE_ID to such a claim.",
         "Put every material source-specific web-guidance statement only in supportingSourceUses by selecting the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair. Never write a new claim for that pair. In answerText, identify it as noncontrolling guidance and keep it distinct from the enacted rule.",
+        options.allowOfficialGuidanceOnly
+          ? "Because the user expressly requested official guidance, when that guidance is responsive but the assembled enacted evidence does not establish a responsive rule, do not manufacture an enacted point or citation: return supportedPoints and citations as empty arrays and select the exact supportingSourceUses. Permitext will render the immutable selected claims with the noncontrolling authority boundary."
+          : "Do not return a guidance-only answer without enacted bindings. Supporting web material may supplement an enacted answer but cannot replace its required supportedPoints and citations.",
         "Write answerText as the complete user-facing answer. Do not target a fixed number of paragraphs or sentences.",
         "Use the shortest answer that fully and reliably resolves the question from the available evidence. Structure must follow the reasoning: a simple answer may be one paragraph; rule-and-application reasoning may use more; multiple provisions, exceptions, applicability paths, competing interpretations, or evidence gaps may use additional paragraphs or a short hyphen-led breakdown.",
         "Lead with the strongest supported conclusion. State a conditional conclusion immediately when a material condition remains. When the evidence is insufficient, identify exactly what cannot be determined.",
@@ -8553,7 +8630,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           type: "json_schema",
           name: "permitext_code_interpretation",
           strict: true,
-          schema: researchInterpretationSchemaForEvidence(passageEvidence, supportingSources)
+          schema: researchInterpretationSchemaForEvidence(passageEvidence, supportingSources, {
+            allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true
+          })
         }
       }
   };
@@ -8576,12 +8655,17 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     invalidResponse.code = "INVALID_RESEARCH_RESPONSE";
     throw invalidResponse;
   }
-  return {
-    interpretation: validateResearchInterpretation(
+  const interpretation = finalizeResearchGuidanceOnlyInterpretation(
+    validateResearchInterpretation(
       normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
       passageEvidence,
-      supportingSources
+      supportingSources,
+      { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     ),
+    { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
+  );
+  return {
+    interpretation,
     requestedModel: model,
     model: payload.model || model,
     configuration,
@@ -8679,6 +8763,9 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
       "Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs.",
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
+      options.allowOfficialGuidanceOnly
+        ? "Because the user expressly requested official guidance, an official-guidance-only answer may correctly have no supportedPoints or enacted citations when the assembled enacted evidence does not establish a responsive rule, provided the server-rendered answer is visibly noncontrolling and supportingSourceUses contain the exact supplied web source and claim bindings. Do not demand an enacted citation for a guidance-only claim."
+        : "Do not accept a guidance-only answer without enacted supportedPoints and citations; the user did not expressly request official guidance.",
       "Fail with wrong_attribution when a bulletin or other web-derived claim appears in supportedPoints, including a paraphrase that omits the words bulletin or guidance, or is tied only to an enacted citation. Such a claim must instead use supportingSourceUses with the exact WEB_SOURCE_ID and WEB_CLAIM_ID pair whose source-specific attributed claim supports it.",
       "When the question expressly requests a retrieved named official document, fail with missed_material_conclusion if the answer omits its material source-supported clarification or drops its supportingSourceUse during revision.",
       "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
@@ -16923,10 +17010,15 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const webSupportRequested = !boundedCitationLookup && shouldUseResearchWebSupport({
-      question,
-      outsideLibraryRequired: Boolean(evidencePackage.discovery?.outsideCurrentLibrary?.length)
-    });
+    const webSupportPolicyDecision = boundedCitationLookup
+      ? { useWeb: false, reasons: [] }
+      : researchWebSupportTrigger({
+          question,
+          outsideLibraryRequired: Boolean(evidencePackage.discovery?.outsideCurrentLibrary?.length)
+        });
+    const webSupportRequested = webSupportPolicyDecision.useWeb;
+    const allowOfficialGuidanceOnly =
+      webSupportPolicyDecision.reasons.includes("official_guidance_requested");
     const modelRouting = routeResearchAnswerModel({
       question,
       evidence: assembledEvidence,
@@ -17015,6 +17107,7 @@ async function handleResearchConversationMessage(request, response) {
       responseStyle: "conversational",
       structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
       webSupport,
+      allowOfficialGuidanceOnly,
       codeBasis: answerCodeBasis,
       requiredClaims,
       signal: progressResponse.signal
@@ -17032,7 +17125,8 @@ async function handleResearchConversationMessage(request, response) {
                   requiredClaims
                 }),
             assembledEvidence,
-            webSupport.sources
+            webSupport.sources,
+            { allowOfficialGuidanceOnly }
           ),
           model: "permitext-mock",
           configuration: {
@@ -17211,6 +17305,7 @@ async function handleResearchConversationMessage(request, response) {
             projectContextFacts: combinedProjectFacts,
             conversationFactContext,
             webSupport,
+            allowOfficialGuidanceOnly,
             codeBasis: answerCodeBasis,
             requiredClaims,
             model: modelRouting.configuration.verificationModel,
@@ -17241,13 +17336,21 @@ async function handleResearchConversationMessage(request, response) {
     const estimatedCost = estimatedResearchCostWithProviderAllowance(result.usage);
     const now = new Date().toISOString();
     progressResponse.progress("preparing_conclusion", "completed");
+    const supportingGuidanceOnly =
+      !evidenceBoundaryFallback &&
+      !result.interpretation.citations?.length &&
+      Boolean(result.interpretation.supportingSources?.length);
     const authorityStatus = evidenceBoundaryFallback
       ? "insufficient_evidence"
-      : result.interpretation.missingFacts?.length
-        ? "conditional"
-        : "supported_by_enacted_text";
+      : supportingGuidanceOnly
+        ? "official_supporting_guidance"
+        : result.interpretation.missingFacts?.length
+          ? "conditional"
+          : "supported_by_enacted_text";
     const authorityLabel = authorityStatus === "insufficient_evidence"
       ? "Insufficient enacted evidence"
+      : authorityStatus === "official_supporting_guidance"
+        ? "Official supporting guidance — noncontrolling"
       : authorityStatus === "conditional"
         ? "Conditional on Project facts"
         : "Supported by enacted text";
@@ -17285,9 +17388,11 @@ async function handleResearchConversationMessage(request, response) {
         codeVersion: answerCodeBasis.codeVersion,
         codeBasis: answerCodeBasis,
         ...result.interpretation,
-        followUpQuestions: result.interpretation.followUpQuestions?.length
-          ? result.interpretation.followUpQuestions
-          : evidenceAnalysisResult.analysis.highValueFollowUpQuestions,
+        followUpQuestions: researchFollowUpQuestionsForResponse(
+          result.interpretation,
+          evidenceAnalysisResult.analysis,
+          { supportingGuidanceOnly }
+        ),
         evidenceSectionIDs: Array.from(new Set(assembledEvidence.map((section) => section.sectionID))),
         evidenceSourceIDs: assembledEvidence.map((section) => section.sourceID),
         sourceSummary: {
@@ -17338,6 +17443,8 @@ async function handleResearchConversationMessage(request, response) {
           sourcePolicyVersion: researchSourcePolicyVersion,
           codeBasis: answerCodeBasis,
           webSupportRequested,
+          webSupportReasons: webSupportPolicyDecision.reasons,
+          allowOfficialGuidanceOnly,
           webSupportSearched: Boolean(webSupport.searched),
           webQuery: webSupport.sanitizedQuery || null,
           webLimitation: webSupport.limitation || null

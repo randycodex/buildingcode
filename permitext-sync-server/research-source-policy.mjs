@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260825-supporting-web-v3";
+export const researchSourcePolicyVersion = "20260825-supporting-web-v4";
 
 export const defaultResearchOfficialDomains = Object.freeze([
   "nyc.gov",

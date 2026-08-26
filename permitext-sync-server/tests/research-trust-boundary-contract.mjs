@@ -12,7 +12,12 @@ const [server, web, privacy, nativeModels, nativeResearch] = await Promise.all([
   readFile(join(root, "../../NYC CC APP/permitext/Views/ResearchView.swift"), "utf8")
 ]);
 
-for (const status of ["supported_by_enacted_text", "conditional", "insufficient_evidence"]) {
+for (const status of [
+  "supported_by_enacted_text",
+  "official_supporting_guidance",
+  "conditional",
+  "insufficient_evidence"
+]) {
   assert.match(server, new RegExp(`"${status}"`));
 }
 assert.match(server, /sourceAsOf: answerCodeBasis\.resolvedAt/);

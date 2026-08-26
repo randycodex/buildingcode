@@ -159,12 +159,37 @@ export function evaluateResearchWebAttribution({
   );
 
   const guidanceSupportedPointIndexes = webDerivedSupportedPointIndexes(answer, sources, evidence);
+  const guidanceOnly =
+    sources.size > 0 &&
+    validUsedBindings.length > 0 &&
+    (Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : []).length === 0 &&
+    (Array.isArray(answer?.citations) ? answer.citations : []).length === 0;
+  const answerText = compactText(
+    answer?.answerText || [answer?.conclusion, answer?.explanation].filter(Boolean).join(" ")
+  );
+  const guidanceOnlyBoundaryText = compactText([answerText, ...limitationText].join(" "));
+  const undisclosedGuidanceOnlyNoncontrolling = Boolean(
+    guidanceOnly && !/\b(?:non[- ]?controlling|not controlling)\b/i.test(answerText)
+  );
+  const undisclosedGuidanceOnlyEnactedBoundary = Boolean(
+    guidanceOnly &&
+    !/\b(?:no|not|does not|did not|cannot|without)\b[^.]{0,140}\b(?:enacted(?:[- ]code)?|code (?:conclusion|requirement|rule))\b/i
+      .test(guidanceOnlyBoundaryText)
+  );
+  const guidanceOnlyClaimsControllingAuthority = Boolean(
+    guidanceOnly &&
+    /\b(?:it|this (?:guidance|source)|the (?:guidance|source)|guidance)\s+(?:is|constitutes|establishes)\s+(?!not\b)[^.]{0,60}\b(?:enacted(?:[- ]code)?|controlling|a code requirement|an official code determination)\b/i
+      .test(answerText)
+  );
 
   return {
     pass:
       missingRequiredDocumentReferences.length === 0 &&
       undisclosedUnavailableDocumentReferences.length === 0 &&
       !undisclosedGenericLimitation &&
+      !undisclosedGuidanceOnlyNoncontrolling &&
+      !undisclosedGuidanceOnlyEnactedBoundary &&
+      !guidanceOnlyClaimsControllingAuthority &&
       guidanceSupportedPointIndexes.length === 0 &&
       invalidSourceUseBindings.length === 0,
     requiredSourceIDs,
@@ -177,6 +202,10 @@ export function evaluateResearchWebAttribution({
     undisclosedUnavailableDocumentReferences,
     requiredGenericLimitation,
     undisclosedGenericLimitation,
+    guidanceOnly,
+    undisclosedGuidanceOnlyNoncontrolling,
+    undisclosedGuidanceOnlyEnactedBoundary,
+    guidanceOnlyClaimsControllingAuthority,
     guidanceSupportedPointIndexes,
     invalidSourceUseBindings
   };
@@ -207,6 +236,24 @@ export function researchWebAttributionRevisionIssues(result) {
     issues.push({
       type: "false_evidence_limitation",
       detail: `Add a visible evidenceLimitations item stating: ${result.requiredGenericLimitation} Do not infer or use unavailable web guidance.`
+    });
+  }
+  if (result.undisclosedGuidanceOnlyNoncontrolling) {
+    issues.push({
+      type: "wrong_attribution",
+      detail: "State visibly in answerText that this official supporting guidance is noncontrolling. Do not present it as enacted code or an official code determination."
+    });
+  }
+  if (result.undisclosedGuidanceOnlyEnactedBoundary) {
+    issues.push({
+      type: "false_evidence_limitation",
+      detail: "Add a visible evidenceLimitations item stating that the assembled enacted evidence did not establish the requested rule and that no enacted-code conclusion is being made."
+    });
+  }
+  if (result.guidanceOnlyClaimsControllingAuthority) {
+    issues.push({
+      type: "wrong_attribution",
+      detail: "Remove the statement that supporting guidance is enacted, controlling, a code requirement, or an official code determination. Supporting web material is noncontrolling and cannot create or replace enacted law."
     });
   }
   if (result.invalidSourceUseBindings?.length) {

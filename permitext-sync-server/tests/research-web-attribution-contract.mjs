@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import {
   accumulatedResearchVerificationIssues,
+  finalizeResearchGuidanceOnlyInterpretation,
+  researchFollowUpQuestionsForResponse,
   researchInputForEvidence,
+  researchInterpretationSchemaForEvidence,
   researchWebSupportRequestBody,
   researchWebSourcesFromProviderPayload,
   validateResearchInterpretation
@@ -151,6 +154,47 @@ const supportingSources = [{
   role: "supporting",
   requiredAttribution: true
 }];
+const boilerClaimText =
+  "Registered H-stamped and E-stamped low-pressure boilers in residential buildings with six or more families, commercial buildings, mixed-use buildings, and single-room occupancies require annual inspections.";
+const boilerSupportingSources = [{
+  id: "web-boiler-compliance",
+  url: "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page",
+  title: "Boiler Compliance",
+  publisher: "NYC Department of Buildings",
+  attributedClaims: [{ id: "boiler-annual-inspection", text: boilerClaimText }],
+  authorityClass: "official_guidance",
+  role: "supporting",
+  controlling: false,
+  requiredAttribution: true
+}];
+const webOnlyEvidence = [{
+  ...evidence[0],
+  evidencePriority: { evidenceRole: "contextual", primaryFunction: "background" }
+}];
+assert.equal(
+  researchInterpretationSchemaForEvidence(evidence).properties.supportedPoints.minItems,
+  1,
+  "Enacted-only answers must retain at least one enacted supported point."
+);
+assert.equal(
+  researchInterpretationSchemaForEvidence(webOnlyEvidence, boilerSupportingSources).properties.supportedPoints.minItems,
+  1,
+  "The guidance-only output shape must remain unavailable without an express user-guidance gate."
+);
+assert.equal(
+  researchInterpretationSchemaForEvidence(webOnlyEvidence, boilerSupportingSources, {
+    allowOfficialGuidanceOnly: true
+  }).properties.supportedPoints.minItems,
+  0,
+  "A source-attributed official-guidance answer must be able to omit unrelated enacted points."
+);
+assert.equal(
+  researchInterpretationSchemaForEvidence(webOnlyEvidence, boilerSupportingSources, {
+    allowOfficialGuidanceOnly: true
+  }).properties.citations.minItems,
+  0,
+  "A source-attributed official-guidance answer must not be forced to invent an enacted citation."
+);
 const answer = {
   answerText: "BC 718.2.6.1 requires an effective fireblocking barrier. Separately, noncontrolling Buildings Bulletin 2022-013 says the foam-plastic exception requires a flame spread index of 25 or less under ASTM E84 or UL 723, waives only floor-level fireblocking, and requires the construction documents to identify the NFPA 285-compliant wall assembly.",
   supportedPoints: [{
@@ -190,6 +234,120 @@ assert.deepEqual(
   "Server validation must derive immutable claim text from the exact claim IDs."
 );
 assert.equal(validated.supportingSources[0].authorityClass, "official_guidance");
+
+const webOnlyAnswer = {
+  answerText: "Official NYC Department of Buildings guidance, which is noncontrolling and is not an enacted-code conclusion, says annual inspection is required for registered H-stamped and E-stamped low-pressure boilers.",
+  supportedPoints: [],
+  assumptions: [],
+  missingFacts: [],
+  followUpQuestions: [],
+  evidenceLimitations: ["The assembled enacted evidence did not establish the requested boiler-inspection rule; this answer uses separately labeled official DOB guidance."],
+  additionalEvidenceNeeded: [],
+  supportingSourceUses: [{
+    sourceID: "web-boiler-compliance",
+    claimID: "boiler-annual-inspection"
+  }],
+  citations: []
+};
+const validatedWebOnly = validateResearchInterpretation(
+  webOnlyAnswer,
+  webOnlyEvidence,
+  boilerSupportingSources,
+  { allowOfficialGuidanceOnly: true }
+);
+const finalizedWebOnly = finalizeResearchGuidanceOnlyInterpretation(validatedWebOnly, {
+  allowOfficialGuidanceOnly: true
+});
+assert.deepEqual(finalizedWebOnly.supportedPoints, []);
+assert.deepEqual(finalizedWebOnly.citations, []);
+assert.equal(finalizedWebOnly.supportingSources.length, 1);
+assert.match(finalizedWebOnly.answerText, new RegExp(boilerClaimText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+assert.doesNotMatch(finalizedWebOnly.answerText, /foam-plastic|fireblocking|NFPA 285/i);
+const unsafeGuidanceOnly = finalizeResearchGuidanceOnlyInterpretation({
+  ...validatedWebOnly,
+  assumptions: ["BC 999 requires an annual filing."],
+  missingFacts: ["Prove compliance with an invented rule."],
+  followUpQuestions: ["Did an invented authority approve this?"],
+  evidenceLimitations: ["An invented enacted requirement controls."],
+  additionalEvidenceNeeded: ["Add an invented document."]
+}, { allowOfficialGuidanceOnly: true });
+assert.deepEqual(unsafeGuidanceOnly.assumptions, []);
+assert.deepEqual(unsafeGuidanceOnly.missingFacts, []);
+assert.deepEqual(unsafeGuidanceOnly.followUpQuestions, []);
+assert.deepEqual(unsafeGuidanceOnly.additionalEvidenceNeeded, []);
+assert.deepEqual(unsafeGuidanceOnly.evidenceLimitations, [
+  "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below."
+]);
+assert.deepEqual(
+  researchFollowUpQuestionsForResponse(
+    unsafeGuidanceOnly,
+    { highValueFollowUpQuestions: ["Did an invented authority approve this?"] },
+    { supportingGuidanceOnly: true }
+  ),
+  [],
+  "Response assembly must not reintroduce model-generated follow-ups after guidance-only finalization."
+);
+assert.equal(evaluateResearchWebAttribution({
+  question: "What does current official NYC DOB guidance say about annual boiler inspections?",
+  answer: finalizedWebOnly,
+  evidence: webOnlyEvidence,
+  supportingSources: boilerSupportingSources
+}).pass, true);
+assert.throws(
+  () => validateResearchInterpretation({
+    ...webOnlyAnswer,
+    supportingSourceUses: []
+  }, webOnlyEvidence, boilerSupportingSources, { allowOfficialGuidanceOnly: true }),
+  (error) => error?.code === "INVALID_RESEARCH_RESPONSE",
+  "An answer with neither enacted bindings nor exact supporting-source uses must remain invalid."
+);
+assert.throws(
+  () => validateResearchInterpretation(
+    webOnlyAnswer,
+    evidence,
+    boilerSupportingSources,
+    { allowOfficialGuidanceOnly: true }
+  ),
+  (error) => error?.code === "INVALID_RESEARCH_RESPONSE",
+  "A guidance-only shape must remain unavailable when governing enacted evidence is present."
+);
+const unlabeledWebOnly = {
+  ...finalizedWebOnly,
+  answerText: "Official NYC Department of Buildings guidance says annual inspection is required for registered low-pressure boilers."
+};
+const unlabeledWebOnlyResult = evaluateResearchWebAttribution({
+  question: "What does current official NYC DOB guidance say about annual boiler inspections?",
+  answer: unlabeledWebOnly,
+  evidence: webOnlyEvidence,
+  supportingSources: boilerSupportingSources
+});
+assert.equal(unlabeledWebOnlyResult.pass, false);
+assert.equal(unlabeledWebOnlyResult.undisclosedGuidanceOnlyNoncontrolling, true);
+const noEnactedBoundaryWebOnly = {
+  ...finalizedWebOnly,
+  answerText: "Official NYC Department of Buildings noncontrolling guidance says annual inspection is required for registered low-pressure boilers.",
+  evidenceLimitations: ["This answer is limited to the retrieved official DOB guidance."]
+};
+const noEnactedBoundaryResult = evaluateResearchWebAttribution({
+  question: "What does current official NYC DOB guidance say about annual boiler inspections?",
+  answer: noEnactedBoundaryWebOnly,
+  evidence: webOnlyEvidence,
+  supportingSources: boilerSupportingSources
+});
+assert.equal(noEnactedBoundaryResult.pass, false);
+assert.equal(noEnactedBoundaryResult.undisclosedGuidanceOnlyEnactedBoundary, true);
+const contradictoryWebOnly = {
+  ...finalizedWebOnly,
+  answerText: "This guidance is noncontrolling. It is not merely guidance; it is enacted code."
+};
+const contradictoryWebOnlyResult = evaluateResearchWebAttribution({
+  question: "What does current official NYC DOB guidance say about annual boiler inspections?",
+  answer: contradictoryWebOnly,
+  evidence: webOnlyEvidence,
+  supportingSources: boilerSupportingSources
+});
+assert.equal(contradictoryWebOnlyResult.pass, false);
+assert.equal(contradictoryWebOnlyResult.guidanceOnlyClaimsControllingAuthority, true);
 assert.equal(evaluateResearchWebAttribution({
   question: "How does Buildings Bulletin 2022-013 clarify BC 718.2.6.1?",
   answer: validated,
