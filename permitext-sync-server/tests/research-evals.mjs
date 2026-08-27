@@ -237,8 +237,8 @@ async function terminalEvaluationOperation(baseURL, account, seenOperationIDs) {
 
 async function completedEvaluationOperation(baseURL, account, seenOperationIDs) {
   const operation = await terminalEvaluationOperation(baseURL, account, seenOperationIDs);
-  assert.equal(operation.status, "completed", "The successful Research response did not record a completed operation.");
-  assert.equal(operation.charged, true, "The successful paid Research response did not record its single charged turn.");
+  assert(operation.status === "completed", "The successful Research response did not record a completed operation.");
+  assert(operation.charged === true, "The successful paid Research response did not record its single charged turn.");
   return operation;
 }
 

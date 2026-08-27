@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-authority-term-boundary-v16";
+  "20260827-authority-term-boundary-v17";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -192,10 +192,19 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
   const preservesTypeBNYCApplicabilityAsConditional =
     /\b(?:if|whether|assuming|provided|confirm|applicab(?:le|ility)|subject to)\b[^.]{0,100}\bType B\+NYC\b/i.test(applicabilityText) ||
     /\bType B\+NYC\b[^.]{0,100}\b(?:applies|applicable|applicability|subject to|must be confirmed|remains unknown)\b/i.test(applicabilityText);
+  const missingFactsText = compactText(
+    Array.isArray(answer?.missingFacts) ? answer.missingFacts.join(" ") : ""
+  );
+  const listsTypeBNYCApplicabilityAsMissingFact =
+    /\bType B\+NYC\b/i.test(missingFactsText) &&
+    /\b(?:appl(?:y|ies|icable|icability)|subject to|within|scope|qualif(?:y|ies))\b/i.test(missingFactsText);
   const missingTypeBNYCContextSourceIDs =
     hcrVanitySourceIDs.length && (
       !/\bType B\+NYC\b/i.test(applicabilityText) ||
-      (!userStatesTypeBNYCApplicability && !preservesTypeBNYCApplicabilityAsConditional)
+      (!userStatesTypeBNYCApplicability && (
+        !preservesTypeBNYCApplicabilityAsConditional ||
+        !listsTypeBNYCApplicabilityAsMissingFact
+      ))
     )
       ? hcrVanitySourceIDs
       : [];

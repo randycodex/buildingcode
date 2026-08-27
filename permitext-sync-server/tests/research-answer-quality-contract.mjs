@@ -506,7 +506,24 @@ const contextualVanityAnswer = evaluateResearchAnswerQuality({
     citations: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }]
   }
 });
-assert.equal(contextualVanityAnswer.pass, true);
+assert.equal(contextualVanityAnswer.pass, false);
+assert.deepEqual(
+  contextualVanityAnswer.missingTypeBNYCContextSourceIDs,
+  ["bc-type-b-nyc-toilet-room"],
+  "Conditional prose alone must not hide unresolved Type B+NYC applicability from the Missing facts list."
+);
+
+const contextualVanityAnswerWithMissingFact = evaluateResearchAnswerQuality({
+  question: vanityQuestion,
+  evidence: vanityEvidence,
+  answer: {
+    answerText: "No. If the subject unit and bathroom are within the Type B+NYC scope, the provision permits a compliant lavatory location and does not establish an HCR vanity requirement; that applicability must be confirmed.",
+    missingFacts: ["Whether the subject unit and bathroom are within the Type B+NYC scope."],
+    supportedPoints: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }],
+    citations: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }]
+  }
+});
+assert.equal(contextualVanityAnswerWithMissingFact.pass, true);
 
 const conflatedVanityAnswer = evaluateResearchAnswerQuality({
   question: vanityQuestion,
