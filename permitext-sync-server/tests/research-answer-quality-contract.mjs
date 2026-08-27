@@ -215,6 +215,10 @@ const diningSurfaceEvidence = [{
   ...source("bc-dining-surfaces", "1108.2.9.1", "governing", "aligned"),
   text: "At least 10 percent of the total number of seating and standing spaces, but not less than one, of each type of dining surfaces shall be accessible."
 }];
+const chapter11IncorporationEvidence = {
+  ...source("bc-sidewalk-cafe-accessibility", "3111.6", "governing", "aligned"),
+  text: "Sidewalk cafes and access thereto shall comply with Chapter 11."
+};
 const misstatedDiningPercentage = evaluateResearchAnswerQuality({
   question: "How many dining surfaces must be accessible?",
   evidence: diningSurfaceEvidence,
@@ -243,6 +247,49 @@ const correctDiningPercentage = evaluateResearchAnswerQuality({
   }
 });
 assert.equal(correctDiningPercentage.pass, true);
+
+const misstatedDiningPercentageInSupportedPoint = evaluateResearchAnswerQuality({
+  question: "How many dining surfaces must be accessible?",
+  evidence: diningSurfaceEvidence,
+  answer: {
+    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible space of each dining-surface type.",
+    supportedPoints: [{
+      explanation: "The rule establishes a minimum accessible share of the total seating and standing spaces for each type of dining surface.",
+      sourceIDs: ["bc-dining-surfaces"]
+    }],
+    citations: [{ sourceIDs: ["bc-dining-surfaces"] }]
+  }
+});
+assert.equal(misstatedDiningPercentageInSupportedPoint.pass, false);
+assert.deepEqual(
+  misstatedDiningPercentageInSupportedPoint.misstatedAccessibleDiningSurfacePercentageSourceIDs,
+  ["bc-dining-surfaces"]
+);
+
+const misboundDiningCalculation = evaluateResearchAnswerQuality({
+  question: "How many dining surfaces must be accessible?",
+  evidence: [chapter11IncorporationEvidence, ...diningSurfaceEvidence],
+  answer: {
+    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible space of each dining-surface type.",
+    supportedPoints: [{
+      explanation: "Sidewalk cafés and their access must comply with Chapter 11, including the 10 percent total dining-surface rule.",
+      sourceIDs: ["bc-sidewalk-cafe-accessibility"]
+    }, {
+      explanation: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible space of each dining-surface type.",
+      sourceIDs: ["bc-dining-surfaces"]
+    }],
+    citations: [{ sourceIDs: ["bc-sidewalk-cafe-accessibility"] }, { sourceIDs: ["bc-dining-surfaces"] }]
+  }
+});
+assert.equal(misboundDiningCalculation.pass, false);
+assert.deepEqual(
+  misboundDiningCalculation.misboundAccessibleDiningSurfaceRuleSourceIDs,
+  ["bc-sidewalk-cafe-accessibility"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(misboundDiningCalculation).at(-1).type,
+  "incorrect_citation"
+);
 
 const vanityEvidence = [{
   ...source("bc-type-b-nyc-toilet-room", "1107.2.2.7.2.2", "governing", "aligned"),

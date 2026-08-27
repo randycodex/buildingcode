@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 3,
+  "status": "failed",
+  "createdAt": "2026-08-27T02:08:39.353Z",
+  "updatedAt": "2026-08-27T02:08:39.959Z",
+  "configuration": {
+    "runID": "30e6d974-5aa3-4721-a776-1714e9e17a9b",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-natural-selected-boundary-v21",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-015-sidewalk-cafe-evidence-boundary"
+    ],
+    "caseStatuses": [
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "9a863775fcff1dfe6b9532f459b0d5735b4364cd",
+    "approvedSpendCapUSD": null,
+    "conservativeReservedUSD": 0,
+    "actualUSD": 0,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 0
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T02:08:39.692Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 0,
+      "completedCharged": 0,
+      "completedUncharged": 0,
+      "failed": 1,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 0,
+        "mean": null,
+        "p50": null,
+        "p90": null,
+        "maximum": null
+      },
+      "amortizedCostPerCompletedTurnUSD": null,
+      "projectedCostPer100TurnsUSD": null,
+      "targetReady": false,
+      "targetBand": "unmeasured"
+    },
+    "latencyMilliseconds": {
+      "count": 0,
+      "mean": null,
+      "p50": null,
+      "p90": null,
+      "maximum": null
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": null,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": null,
+      "providerRequests": {
+        "count": 0,
+        "mean": null,
+        "p50": null,
+        "p90": null,
+        "maximum": null
+      },
+      "models": [
+        {
+          "key": "unknown",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "unknown",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 1,
+      "rate": 1,
+      "codes": [
+        {
+          "key": "RESEARCH_SPEND_CAP",
+          "count": 1
+        }
+      ]
+    },
+    "charging": {
+      "chargedCompletedTurns": 0,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-015-sidewalk-cafe-evidence-boundary",
+        "title": "Sidewalk café egress, accessibility, seating, and agency boundaries",
+        "status": "draft",
+        "difficulty": "advanced",
+        "topics": [
+          "sidewalk cafés",
+          "means of egress",
+          "accessibility",
+          "place of assembly",
+          "agency requirements"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "project": "Restaurant proposing sidewalk-café seating and equipment",
+          "conditions": "Furniture is proposed near a building exit and cellar hatch",
+          "ownerClaim": "Outdoor-dining authorization permits separate exterior seating and eliminates further accessibility review",
+          "unknowns": [
+            "exact building and property lines",
+            "whether the café is enclosed",
+            "interior and exterior seating",
+            "whether a Section 713 fire partition separates the seating",
+            "exit and cellar-hatch geometry",
+            "accessible dining-surface distribution",
+            "current agency authorizations"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "5678",
+            "reference": "BC 3111.1",
+            "codePrefix": "BC",
+            "sectionNumber": "3111.1",
+            "exactPassages": [
+              "Sidewalk cafes provided beyond the building line shall comply with the requirements of this section, the New York City Zoning Resolution, the Commissioners of the Department of Consumer and Worker Protection and Department of Transportation, and with the projection limitations of Chapter 32 of this code."
+            ],
+            "resolvedTitle": "3111.1 General.",
+            "evidenceCharacters": 440,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "5681",
+            "reference": "BC 3111.4",
+            "codePrefix": "BC",
+            "sectionNumber": "3111.4",
+            "exactPassages": [
+              "No part of any awning, enclosure, fixture, equipment or removable platform of a sidewalk cafe shall be located:",
+              "2. So as to obstruct any exit from a building;",
+              "3. So as to obstruct any cellar access hatch or areaway;",
+              "Exception: Upon special application, the commissioner may permit an easily removable, prominently designated platform, designed in accordance with Section 3111.5, to cover a cellar entrance or areaway that is not used as a required means of egress."
+            ],
+            "resolvedTitle": "3111.4 Obstructions prohibited.",
+            "evidenceCharacters": 817,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "5685",
+            "reference": "BC 3111.6",
+            "codePrefix": "BC",
+            "sectionNumber": "3111.6",
+            "exactPassages": [
+              "Sidewalk cafes and access thereto shall comply with Chapter 11."
+            ],
+            "resolvedTitle": "3111.6 Accessibility.",
+            "evidenceCharacters": 64,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "2792",
+            "reference": "BC 1108.2.9.1",
+            "codePrefix": "BC",
+            "sectionNumber": "1108.2.9.1",
+            "exactPassages": [
+              "Where dining surfaces for the consumption of food or drink are provided, at least 10 percent of the total number of seating and standing spaces, but not less than one, of each type of dining surfaces shall be accessible and be distributed throughout the facility and located on a level accessed by an accessible route."
+            ],
+            "resolvedTitle": "1108.2.9.1 Dining surfaces.",
+            "evidenceCharacters": 318,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "5686",
+            "reference": "BC 3111.7",
+            "codePrefix": "BC",
+            "sectionNumber": "3111.7",
+            "exactPassages": [
+              "Unless separated from seating inside the building by fire partitions complying with Section 713 , the seating for enclosed sidewalk cafes shall be added to that inside the building in order to determine whether a place of assembly certificate of operation is required."
+            ],
+            "resolvedTitle": "3111.7 Assembly seating.",
+            "evidenceCharacters": 268,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "A restaurant proposes a sidewalk café with furniture near a building exit and cellar hatch. The owner says outdoor-dining authorization allows the exterior seats to be counted separately from the interior PACO and eliminates further accessibility review. The documents do not say whether the café is beyond the building line, enclosed, or separated from the interior seating by a Section 713 fire partition. What can be concluded from the selected Building Code passages, and what remains unresolved?",
+        "expectedConclusion": "The proposal cannot be approved from the selected evidence. If it is a sidewalk café beyond the building line, BC 3111.1 requires compliance not only with Section 3111 but also with Chapter 32 and separate zoning and agency requirements; the selected evidence does not provide those outside rules. BC 3111.4 prohibits café components from obstructing a building exit or cellar hatch. Its cellar-entrance exception is not automatic: it requires a special application, an easily removable and prominently designated platform designed under Section 3111.5, and a cellar entrance or areaway that is not required egress. BC 3111.6 makes Chapter 11 applicable to the café and its access. BC 1108.2.9.1 requires accessible seating and standing spaces equal to at least 10 percent of the total, with not less than one accessible space at each type of dining surface; those spaces must be distributed and located on a level served by an accessible route. BC 3111.7 supplies only a conditional rule for an enclosed sidewalk café: unless a Section 713 fire partition separates it from inside seating, its seating is added to the inside seating solely to determine whether a PACO is required. These passages do not establish the approved interior capacity, the treatment of every open exterior seating arrangement, property-line or operational jurisdiction, DOT authorization, electrical permitting, or overall approval.",
+        "expectedUncertainty": {
+          "level": "insufficient evidence",
+          "description": "The selected passages establish several conditional Building Code constraints, but they do not establish overall approval, current agency jurisdiction, lawful seating capacity, or electrical and operational requirements."
+        },
+        "sourceType": "Buildings Bulletin",
+        "sourceReference": "Scenario derived from NYC Department of Buildings Bulletin 2024-005, July 9, 2024: https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2024-005.pdf. The bulletin and unselected agency rules remain scenario provenance only.",
+        "reviewer": null,
+        "reviewedAt": null,
+        "notes": "Draft candidate NYC-015. Exact enacted passages were copied from Permitext canonical content. Agency, property-line, electrical, seating, and accessibility conclusions require knowledgeable review before approval.",
+        "requiredConcepts": [
+          "Make BC 3111 applicability conditional on the café being beyond the building line.",
+          "Recognize that BC 3111.1 cross-references separate zoning and agency authority without supplying those authorities' substantive rules.",
+          "State that café components cannot obstruct a building exit or cellar hatch.",
+          "Explain every selected condition of the narrow cellar-hatch platform exception.",
+          "State that sidewalk cafés and their access must comply with Chapter 11.",
+          "Apply 10 percent to the total seating and standing spaces, require at least one accessible space at each dining-surface type, and identify the distribution and accessible-route requirements.",
+          "Limit BC 3111.7 to enclosed sidewalk cafés and PACO determination.",
+          "Make seating aggregation conditional on the absence of a compliant Section 713 separating fire partition.",
+          "State that selected evidence is insufficient to determine current agency approval, property-line jurisdiction, electrical requirements, or lawful interior capacity."
+        ],
+        "missingFacts": [
+          "Exact property line and whether the café is beyond the building line.",
+          "Whether the café is a sidewalk café within BC 3111's scope.",
+          "Whether the café is enclosed.",
+          "Whether a Section 713 fire partition separates exterior and interior seating.",
+          "Current Certificate of Occupancy, PACO, and approved interior seating.",
+          "Interior and exterior seat counts and each type of dining surface.",
+          "Exit, cellar-hatch, areaway, and required-egress locations.",
+          "Whether any proposed platform has special approval and complies with Section 3111.5.",
+          "Accessible route and dining-surface distribution.",
+          "Applicable Chapter 32 evidence.",
+          "Current zoning and agency rules and authorizations.",
+          "Heater, lighting, and electrical details and applicable separate authority."
+        ],
+        "forbiddenClaims": [
+          "Outdoor-dining or DOT authorization constitutes Building Code approval.",
+          "The selected Building Code passages establish the current substantive DOT, DCWP, or Zoning Resolution requirements.",
+          "Exterior seating never counts with interior seating.",
+          "Every outdoor café seat must always be added to the interior occupant capacity.",
+          "BC 3111.7 applies to an open café without determining whether it is enclosed.",
+          "A platform may cover a cellar hatch automatically.",
+          "A cellar-hatch exception is available when the hatch is required means of egress.",
+          "Only 5 percent of the dining surfaces must be accessible.",
+          "Ten percent must be calculated separately for every dining-surface type.",
+          "One accessible table always satisfies BC 1108.2.9.1 regardless of dining-surface types, distribution, and accessible route.",
+          "The selected evidence determines heater, lighting, or electrical-permit requirements.",
+          "The selected evidence establishes the restaurant's approved interior occupant capacity or PACO status."
+        ],
+        "requiredCitations": [
+          "BC 3111.1",
+          "BC 3111.4",
+          "BC 3111.6",
+          "BC 1108.2.9.1",
+          "BC 3111.7"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "BC 3111.1",
+            "requiredClaim": "Conditional scope for sidewalk cafes beyond the building line and need for separate zoning, agency, and Chapter 32 compliance; it does not establish those outside rules."
+          },
+          {
+            "reference": "BC 3111.4",
+            "requiredClaim": "Exit and cellar-hatch obstruction prohibitions and the expressly conditional special-application exception."
+          },
+          {
+            "reference": "BC 3111.6",
+            "requiredClaim": "Application of Chapter 11 to sidewalk cafes and their access."
+          },
+          {
+            "reference": "BC 1108.2.9.1",
+            "requiredClaim": "Accessible seating and standing spaces equal to at least 10 percent of the total, at least one at each dining-surface type, distribution, and accessible-route requirements."
+          },
+          {
+            "reference": "BC 3111.7",
+            "requiredClaim": "Conditional enclosed-sidewalk-cafe seating aggregation rule used only to determine whether a PACO is required."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "error": {
+        "code": null,
+        "name": "Error",
+        "message": "POST /research/conversations/message failed (503): Research is temporarily unavailable. Your question is still here.",
+        "timestamp": "2026-08-27T02:08:39.672Z"
+      }
+    }
+  ]
+}

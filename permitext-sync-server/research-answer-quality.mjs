@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-dining-percentage-fidelity-v9";
+  "20260827-dining-surface-binding-v10";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -164,9 +164,21 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       availableEvidence.get(sourceID)?.text
     )
   );
+  const accessibleDiningSurfaceSourceIDSet = new Set(accessibleDiningSurfaceSourceIDs);
+  const diningSurfaceCalculationPattern =
+    /\b10\s*percent\b|\bminimum\s+accessible\s+share\b/i;
+  const misboundAccessibleDiningSurfaceRuleSourceIDs = unique(
+    (Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : []).flatMap((point) => {
+      const pointText = compactText([point?.heading, point?.explanation].filter(Boolean).join(" "));
+      if (!diningSurfaceCalculationPattern.test(pointText)) return [];
+      const pointSourceIDs = unique(point?.sourceIDs).filter((sourceID) => availableEvidence.has(sourceID));
+      if (pointSourceIDs.some((sourceID) => accessibleDiningSurfaceSourceIDSet.has(sourceID))) return [];
+      return pointSourceIDs;
+    })
+  );
   const misstatedAccessibleDiningSurfacePercentageSourceIDs =
     accessibleDiningSurfaceSourceIDs.length &&
-    /10\s*percent\s+of\s+(?:the\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+of\s+each\s+(?:dining[- ]surface\s+)?type|10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)/i.test(applicabilityText)
+    /10\s*percent\s+of\s+(?:the\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+of\s+each\s+(?:dining[- ]surface\s+)?type|10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i.test(applicabilityText)
       ? accessibleDiningSurfaceSourceIDs
       : [];
   const citationSourceIDsByRole = {
@@ -200,6 +212,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       missingTypeBNYCContextSourceIDs.length === 0 &&
       misstatedCumulativeConditionSourceIDs.length === 0 &&
       unsupportedExitAccessExpansionSourceIDs.length === 0 &&
+      misboundAccessibleDiningSurfaceRuleSourceIDs.length === 0 &&
       misstatedAccessibleDiningSurfacePercentageSourceIDs.length === 0,
     unknownAnswerSourceIDs,
     orphanCitationSourceIDs,
@@ -213,6 +226,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     missingTypeBNYCContextSourceIDs,
     misstatedCumulativeConditionSourceIDs,
     unsupportedExitAccessExpansionSourceIDs,
+    misboundAccessibleDiningSurfaceRuleSourceIDs,
     misstatedAccessibleDiningSurfacePercentageSourceIDs,
     citedSourceIDs: knownCitedSourceIDs,
     reviewedOnlySourceIDs,
@@ -251,6 +265,12 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "misstated_provision",
       detail: `State the dining-surface calculation as at least 10 percent of the total seating and standing spaces, with not less than one accessible space of each dining-surface type; do not apply 10 percent separately to each type. Bind it to: ${references(result.misstatedAccessibleDiningSurfacePercentageSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.misboundAccessibleDiningSurfaceRuleSourceIDs?.length) {
+    issues.push({
+      type: "incorrect_citation",
+      detail: `Do not attribute the detailed dining-surface percentage to evidence that only incorporates Chapter 11 generally: ${references(result.misboundAccessibleDiningSurfaceRuleSourceIDs, result.sources)}. Bind the 10-percent total calculation, the one-per-type minimum, distribution, and accessible-route requirements only to the supplied BC 1108.2.9.1 evidence.`
     });
   }
   if (result.unknownAnswerSourceIDs?.length) {
