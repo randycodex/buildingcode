@@ -99,6 +99,37 @@ export function validateResearchCommercializationBenchmark() {
   return profile;
 }
 
+export async function verifyResearchCommercializationProviderAccess({
+  environment = process.env,
+  fetchImplementation = fetch
+} = {}) {
+  const apiKey = String(environment.OPENAI_API_KEY || "").trim();
+  assert(apiKey, "Set OPENAI_API_KEY before running the paid benchmark.");
+  const model = researchCommercializationBenchmark.fastModel;
+  const response = await fetchImplementation("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${apiKey}`,
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      input: "Reply with only OK.",
+      max_output_tokens: 16,
+      store: false
+    })
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const code = String(payload?.error?.code || payload?.error?.type || `HTTP_${response.status}`);
+    throw new Error(
+      `Paid Research benchmark provider preflight failed (${code}). ` +
+      "Verify the server-only OpenAI key, project access, and available API credits before retrying."
+    );
+  }
+  return { model: String(payload?.model || model), responseID: String(payload?.id || "") || null };
+}
+
 function runEvaluation(environment) {
   return new Promise((resolveRun, rejectRun) => {
     const child = spawn(process.execPath, [
@@ -138,6 +169,7 @@ async function main() {
     assert.equal(status.status, 0, "Commit tracked changes before running the benchmark.");
   }
   const environment = researchCommercializationBenchmarkEnvironment();
+  await verifyResearchCommercializationProviderAccess({ environment });
   console.log(
     `Running ${profile.id}: ${profile.targetQuestionCount} distinct Research questions ` +
     `with a $${environment.PERMITEXT_RESEARCH_EVAL_MAX_USD} maximum paid-evaluation budget.`

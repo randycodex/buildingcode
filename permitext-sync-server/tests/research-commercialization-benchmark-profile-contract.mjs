@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import {
   researchCommercializationBenchmark,
   researchCommercializationBenchmarkEnvironment,
-  validateResearchCommercializationBenchmark
+  validateResearchCommercializationBenchmark,
+  verifyResearchCommercializationProviderAccess
 } from "../scripts/run-research-commercialization-benchmark.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -45,6 +46,37 @@ assert.equal(environment.PERMITEXT_RESEARCH_PAID_TURNS_ENABLED, "0");
 assert.equal(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD, "12.00");
 assert.match(readme, /which runs 20 distinct/);
 assert.match(readme, /map-only fire-district case remains in the safety suite/);
+let preflightRequest = null;
+const preflight = await verifyResearchCommercializationProviderAccess({
+  environment,
+  fetchImplementation: async (url, options) => {
+    preflightRequest = { url, options };
+    return {
+      ok: true,
+      status: 200,
+      async json() {
+        return { id: "resp_preflight", model: "gpt-5.6-luna-2026-08-24" };
+      }
+    };
+  }
+});
+assert.equal(preflight.responseID, "resp_preflight");
+assert.equal(preflightRequest.url, "https://api.openai.com/v1/responses");
+assert.equal(JSON.parse(preflightRequest.options.body).max_output_tokens, 16);
+assert.equal(JSON.parse(preflightRequest.options.body).store, false);
+await assert.rejects(
+  verifyResearchCommercializationProviderAccess({
+    environment,
+    fetchImplementation: async () => ({
+      ok: false,
+      status: 429,
+      async json() {
+        return { error: { code: "credit_balance_exhausted" } };
+      }
+    })
+  }),
+  /provider preflight failed \(credit_balance_exhausted\).*available API credits/
+);
 assert.match(
   evaluationSource,
   /terminalEvaluationOperationStatuses[\s\S]*terminalEvaluationOperation\([\s\S]*awaitingOperationTelemetry[\s\S]*result\.operationMetric = operationMetric/,
