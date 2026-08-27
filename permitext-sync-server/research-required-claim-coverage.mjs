@@ -1,5 +1,5 @@
 export const researchRequiredClaimCoverageVersion =
-  "20260811-exact-passage-required-claims-v1";
+  "20260827-citation-coverage-v2";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -150,7 +150,7 @@ export function researchRequiredClaimRevisionIssues(coverage, maximumIssues = 12
       return {
         type: "missed_material_conclusion",
         detail: [
-          `Address the material enacted provision ${claim?.label || claimID} in a supported point.`,
+          `Cite the material enacted provision ${claim?.label || claimID} in the answer.`,
           requiredSourceIDs.length
             ? `Bind that point to the exact supplied passage ${requiredSourceIDs.join(", ")}.`
             : "Bind that point to its exact supplied passage."
@@ -161,7 +161,8 @@ export function researchRequiredClaimRevisionIssues(coverage, maximumIssues = 12
 
 /**
  * Evaluates whether explicitly declared material claims are represented by the
- * answer's exact supported-point bindings and citations.
+ * answer's exact citations. Supported-point bindings remain diagnostic while
+ * semantic support is judged once by the verifier.
  *
  * Each evidence option is an all-of set. A claim is covered when any one option
  * is fully cited. Evidence that is not assigned to a required claim is not
@@ -190,13 +191,10 @@ export function evaluateResearchRequiredClaimCoverage({
       return {
         optionIndex,
         sourceIDs: option.sourceIDs,
-        missingSourceIDs: Array.from(new Set([
-          ...missingSupportedPointSourceIDs,
-          ...missingCitationSourceIDs
-        ])),
+        missingSourceIDs: [...missingCitationSourceIDs],
         missingSupportedPointSourceIDs,
         missingCitationSourceIDs,
-        covered: missingSupportedPointSourceIDs.length === 0 && missingCitationSourceIDs.length === 0
+        covered: missingCitationSourceIDs.length === 0
       };
     });
     const matchedOption = optionResults.find((option) => option.covered) || null;

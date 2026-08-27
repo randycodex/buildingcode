@@ -74,7 +74,11 @@ const orphan = evaluateResearchAnswerQuality({
     citations: [{ sourceIDs: ["travel-limit"] }, { sourceIDs: ["reviewed-cross-reference"] }]
   }
 });
-assert.equal(orphan.pass, false);
+assert.equal(
+  orphan.pass,
+  true,
+  "A valid citation may support answerText or an evidence limitation without duplicating the passage in supportedPoints."
+);
 assert.deepEqual(orphan.orphanCitationSourceIDs, ["reviewed-cross-reference"]);
 
 const futureEvidence = [{

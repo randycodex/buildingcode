@@ -88,7 +88,7 @@ assert.deepEqual(
 );
 assert.deepEqual(researchRequiredClaimRevisionIssues(omitted), [{
   type: "missed_material_conclusion",
-  detail: "Address the material enacted provision R-2 Type B requirement when no Type B+NYC units are required in a supported point. Bind that point to the exact supplied passage passage-r2-type-b."
+  detail: "Cite the material enacted provision R-2 Type B requirement when no Type B+NYC units are required in the answer. Bind that point to the exact supplied passage passage-r2-type-b."
 }]);
 
 let omissionRejected = false;
@@ -195,11 +195,11 @@ const orphanCitation = evaluateResearchRequiredClaimCoverage({
     citations: [{ sourceIDs: ["passage-r2-type-b"] }]
   }
 });
-assert.equal(orphanCitation.pass, false);
+assert.equal(orphanCitation.pass, true);
 assert.deepEqual(
   orphanCitation.claims[0].evidenceOptions[0].missingSupportedPointSourceIDs,
   ["passage-r2-type-b"],
-  "An orphan citation must not substitute for explaining the material rule in a supported point."
+  "Citation coverage should retain supported-point diagnostics without duplicating the semantic verifier gate."
 );
 
 console.log("Research exact-passage required-claim coverage contract passed.");

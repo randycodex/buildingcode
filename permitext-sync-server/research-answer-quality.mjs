@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260826-answer-pinned-condition-fidelity-v7";
+  "20260827-answer-binding-consolidation-v8";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -179,7 +179,6 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     qualityVersion: researchAnswerQualityVersion,
     pass:
       unknownAnswerSourceIDs.length === 0 &&
-      orphanCitationSourceIDs.length === 0 &&
       uncitedSupportedPointSourceIDs.length === 0 &&
       irrelevantCitationSourceIDs.length === 0 &&
       collateralCitationSourceIDs.length === 0 &&
@@ -227,12 +226,6 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "irrelevant_citation",
       detail: `Remove evidence classified as irrelevant: ${references(result.irrelevantCitationSourceIDs, result.sources)}.`
-    });
-  }
-  if (result.orphanCitationSourceIDs?.length) {
-    issues.push({
-      type: "incorrect_citation",
-      detail: `Remove citations that do not support any answer point: ${references(result.orphanCitationSourceIDs, result.sources)}.`
     });
   }
   if (result.uncitedSupportedPointSourceIDs?.length) {

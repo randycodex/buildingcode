@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 
 export const supportedResearchPromptVersions = [
+  "20260827-consolidated-citation-gates-v19",
   "20260827-unresolved-project-facts-v18",
   "20260827-pinned-answer-scope-v17",
   "20260827-simplified-hybrid-answer-v16",
