@@ -211,6 +211,39 @@ const correctedAccessoryRelationship = evaluateResearchAnswerQuality({
 });
 assert.equal(correctedAccessoryRelationship.pass, true);
 
+const diningSurfaceEvidence = [{
+  ...source("bc-dining-surfaces", "1108.2.9.1", "governing", "aligned"),
+  text: "At least 10 percent of the total number of seating and standing spaces, but not less than one, of each type of dining surfaces shall be accessible."
+}];
+const misstatedDiningPercentage = evaluateResearchAnswerQuality({
+  question: "How many dining surfaces must be accessible?",
+  evidence: diningSurfaceEvidence,
+  answer: {
+    answerText: "At least 10 percent of the seating and standing spaces of each dining-surface type must be accessible.",
+    supportedPoints: [{ sourceIDs: ["bc-dining-surfaces"] }],
+    citations: [{ sourceIDs: ["bc-dining-surfaces"] }]
+  }
+});
+assert.equal(misstatedDiningPercentage.pass, false);
+assert.deepEqual(
+  misstatedDiningPercentage.misstatedAccessibleDiningSurfacePercentageSourceIDs,
+  ["bc-dining-surfaces"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(misstatedDiningPercentage).at(-1).type,
+  "misstated_provision"
+);
+const correctDiningPercentage = evaluateResearchAnswerQuality({
+  question: "How many dining surfaces must be accessible?",
+  evidence: diningSurfaceEvidence,
+  answer: {
+    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible space of each dining-surface type.",
+    supportedPoints: [{ sourceIDs: ["bc-dining-surfaces"] }],
+    citations: [{ sourceIDs: ["bc-dining-surfaces"] }]
+  }
+});
+assert.equal(correctDiningPercentage.pass, true);
+
 const vanityEvidence = [{
   ...source("bc-type-b-nyc-toilet-room", "1107.2.2.7.2.2", "governing", "aligned"),
   text: "Type B+NYC toilet and bathing rooms. A lavatory is permitted on the rear wall under the stated clearance condition."

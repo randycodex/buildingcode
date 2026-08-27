@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260827-pinned-answer-scope-v17";
+export const researchEvidenceAssemblyVersion = "20260827-strict-selected-boundary-v18";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -34,6 +34,7 @@ export const researchEvidenceStrategies = Object.freeze({
 });
 
 const selectedEvidenceCuePattern = /\b(?:selected|pinned)\s+(?:code\s+)?(?:passage|passages|evidence|text)|\b(?:both|this|these|the)\s+(?:selected\s+)?(?:passage|passages|provision|provisions|text)\b/i;
+const strictSelectedEvidenceBoundaryPattern = /\b(?:based|using|relying)\s+only\s+on\s+(?:the\s+)?selected\s+(?:code\s+)?(?:passage|passages|evidence|text)\b|\bbased\s+only\s+on\s+(?:the\s+)?selected\b/i;
 const broaderEvidenceCuePattern = /\b(?:applicab(?:le|ility)|comply|compliance|exception|exceptions|definition|definitions|defined|table|tables|calculate|calculation|other provisions?|additional provisions?|related provisions?|cross[- ]references?|project[- ]specific|verify|verification)\b/i;
 
 function explicitCodeReferences(value) {
@@ -49,10 +50,19 @@ export function researchEvidenceStrategyForTurn({
 } = {}) {
   const normalizedOriginSurface = String(originSurface || "").trim().toLowerCase();
   const readerOrigin = normalizedOriginSurface === "reader" || normalizedOriginSurface.endsWith("-reader");
-  if (!readerOrigin || !pinnedEvidence.length) {
+  if (!pinnedEvidence.length) {
     return { mode: researchEvidenceStrategies.broad, reason: "default_authorized_retrieval" };
   }
   const normalizedQuestion = compactText(question);
+  if (strictSelectedEvidenceBoundaryPattern.test(normalizedQuestion)) {
+    return {
+      mode: researchEvidenceStrategies.pinnedFirst,
+      reason: "question_explicitly_bounded_to_selected_evidence"
+    };
+  }
+  if (!readerOrigin) {
+    return { mode: researchEvidenceStrategies.broad, reason: "default_authorized_retrieval" };
+  }
   if (!selectedEvidenceCuePattern.test(normalizedQuestion)) {
     return { mode: researchEvidenceStrategies.broad, reason: "question_not_bounded_to_selected_evidence" };
   }
@@ -624,6 +634,9 @@ export async function assembleResearchEvidence({
         mode: researchEvidenceStrategies.broad,
         reason: compactText(strategy?.reason) || "default_authorized_retrieval"
       };
+  const strictPinnedEvidenceBoundary =
+    appliedStrategy.mode === researchEvidenceStrategies.pinnedFirst &&
+    appliedStrategy.reason === "question_explicitly_bounded_to_selected_evidence";
   await onStage?.("searching_authorized_library", "active");
   const discovery = appliedStrategy.mode === researchEvidenceStrategies.pinnedFirst
     ? {
@@ -916,32 +929,34 @@ export async function assembleResearchEvidence({
 
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
-  for (const entry of resolvedPins) {
-    if (!entry.resolved) continue;
-    const ancestorReferences = canonicalAncestorReferences(entry.value);
-    for (const reference of ancestorReferences) {
-      const identity = sectionIdentity(reference);
-      if (
-        !identity ||
-        includedSectionIdentities.has(identity) ||
-        queuedCrossReferenceIdentities.has(identity)
-      ) continue;
-      queuedCrossReferenceIdentities.add(identity);
-      crossReferenceQueue.push(reference);
+  if (!strictPinnedEvidenceBoundary) {
+    for (const entry of resolvedPins) {
+      if (!entry.resolved) continue;
+      const ancestorReferences = canonicalAncestorReferences(entry.value);
+      for (const reference of ancestorReferences) {
+        const identity = sectionIdentity(reference);
+        if (
+          !identity ||
+          includedSectionIdentities.has(identity) ||
+          queuedCrossReferenceIdentities.has(identity)
+        ) continue;
+        queuedCrossReferenceIdentities.add(identity);
+        crossReferenceQueue.push(reference);
+      }
     }
-  }
-  for (const source of canonicalForExpansion) {
-    for (const reference of normalizedCrossReferences(source, {
-      inlineOnly: query.relevanceComparison
-    })) {
-      const identity = sectionIdentity(reference);
-      if (
-        !identity ||
-        includedSectionIdentities.has(identity) ||
-        queuedCrossReferenceIdentities.has(identity)
-      ) continue;
-      queuedCrossReferenceIdentities.add(identity);
-      crossReferenceQueue.push(reference);
+    for (const source of canonicalForExpansion) {
+      for (const reference of normalizedCrossReferences(source, {
+        inlineOnly: query.relevanceComparison
+      })) {
+        const identity = sectionIdentity(reference);
+        if (
+          !identity ||
+          includedSectionIdentities.has(identity) ||
+          queuedCrossReferenceIdentities.has(identity)
+        ) continue;
+        queuedCrossReferenceIdentities.add(identity);
+        crossReferenceQueue.push(reference);
+      }
     }
   }
   const crossReferencePriority = (reference) => {

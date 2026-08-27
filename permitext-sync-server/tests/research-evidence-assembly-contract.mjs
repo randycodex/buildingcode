@@ -522,6 +522,18 @@ assert.equal(
   researchEvidenceStrategies.broad,
   "Only explicitly Reader-started Research should use the Reader adaptive path."
 );
+assert.deepEqual(
+  researchEvidenceStrategyForTurn({
+    question: "Based only on the selected Building Code passages, what can be concluded?",
+    pinnedEvidence: twoReaderPins,
+    originSurface: "evidenceDiscovery"
+  }),
+  {
+    mode: researchEvidenceStrategies.pinnedFirst,
+    reason: "question_explicitly_bounded_to_selected_evidence"
+  },
+  "An explicit selected-evidence boundary must be honored from every Research surface."
+);
 
 let adaptiveDiscoveryCalls = 0;
 const adaptivePinnedOnly = await assembleResearchEvidence({
@@ -552,6 +564,36 @@ assert(adaptivePinnedOnly.sources.some((source) => source.origin === "user_pinne
 assert(
   adaptivePinnedOnly.sources.every((source) => source.origin !== "permitext_discovered"),
   "Pinned-first assembly unexpectedly included broad discovered evidence."
+);
+
+let strictBoundaryDiscoveryCalls = 0;
+const strictPinnedOnly = await assembleResearchEvidence({
+  question: "Based only on the selected Building Code passages, what is established?",
+  pinnedEvidence: [{
+    id: "pin-strict-1",
+    sectionID: "pinned",
+    codePrefix: "BC",
+    sectionNumber: "1019.3",
+    selectedText: "Interior exit access stairways shall be enclosed."
+  }],
+  strategy: {
+    mode: researchEvidenceStrategies.pinnedFirst,
+    reason: "question_explicitly_bounded_to_selected_evidence"
+  },
+  discover: async () => {
+    strictBoundaryDiscoveryCalls += 1;
+    return { candidates: [{ sectionID: "candidate-1" }] };
+  },
+  resolveSection,
+  limits: { maximumCrossReferences: 3, maximumCharacters: 2_000 }
+});
+assert.equal(strictBoundaryDiscoveryCalls, 0);
+assert.equal(strictPinnedOnly.usage.discoveredCount, 0);
+assert.equal(strictPinnedOnly.usage.crossReferenceCount, 0);
+assert.deepEqual(
+  strictPinnedOnly.sources.map((source) => source.origin),
+  ["user_pinned"],
+  "A strict selected-evidence question must not silently add discovery or cross-references."
 );
 
 const pinnedAncestorContext = await assembleResearchEvidence({
