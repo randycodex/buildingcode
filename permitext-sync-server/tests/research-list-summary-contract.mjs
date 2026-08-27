@@ -494,6 +494,42 @@ assert.doesNotThrow(
   ]),
   "The deterministic ordinary-turn evidence map must satisfy the same binding contract as model analysis."
 );
+
+const representedProjectFactAnalysis = deterministicResearchEvidenceAnalysisForTurn(
+  [{
+    sourceID: "represented-fact-governing",
+    sectionID: "28-118-3",
+    codePrefix: "AC",
+    sectionNumber: "28-118.3",
+    origin: "permitext_discovered",
+    applicabilityStatus: "current-enacted-edition",
+    evidencePriority: {
+      evidenceRole: "governing",
+      primaryFunction: "controlling_rule",
+      functions: ["controlling_rule"],
+      topicRouteRelationship: "aligned"
+    }
+  }],
+  [
+    "Building: Existing building represented by the applicant as a prior-code building",
+    "Applicant Assertions: the alteration does not change the required exits",
+    "Owner Position: the former occupancy may resume automatically"
+  ]
+);
+assert.deepEqual(
+  representedProjectFactAnalysis.projectFactsUsed,
+  [
+    "Building: Existing building represented by the applicant as a prior-code building",
+    "Applicant Assertions: the alteration does not change the required exits",
+    "Owner Position: the former occupancy may resume automatically"
+  ],
+  "Representations remain available as the user's stated premises for a conditional discussion."
+);
+assert.deepEqual(
+  representedProjectFactAnalysis.unresolvedProjectFacts,
+  representedProjectFactAnalysis.projectFactsUsed,
+  "Representations must also remain unresolved until independently verified."
+);
 assert.deepEqual(
   canonicalResearchBoundedCitationInterpretation({
     answerText: "Section 101.1 supplies the requested title.",

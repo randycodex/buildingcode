@@ -248,6 +248,11 @@ import {
   researchAnswerQualityRevisionIssues
 } from "./research-answer-quality.mjs";
 import {
+  applyResearchProjectFactCoverage,
+  researchProjectFactIsExplicitlyUnresolved,
+  researchUnresolvedProjectFacts
+} from "./research-project-fact-coverage.mjs";
+import {
   evaluateResearchWebAttribution,
   researchVerificationResultForWebContext,
   researchWebAttributionRevisionIssues
@@ -8217,12 +8222,6 @@ function deterministicResearchEvidenceMapItem(source) {
   };
 }
 
-function researchProjectFactIsExplicitlyUnresolved(fact) {
-  return /^(?:unknowns?|missing facts?|unresolved(?: project)? facts?|facts? to confirm)\s*:/i.test(
-    String(fact || "").trim()
-  );
-}
-
 /**
  * Builds the internal evidence index from retrieval metadata instead of asking
  * a second model to summarize text that the answer model receives verbatim.
@@ -8240,9 +8239,7 @@ export function deterministicResearchEvidenceAnalysisForTurn(
       .map((fact) => String(fact || "").trim())
       .filter(Boolean)
   ));
-  const unresolvedProjectFacts = normalizedProjectFacts.filter(
-    researchProjectFactIsExplicitlyUnresolved
-  );
+  const unresolvedProjectFacts = researchUnresolvedProjectFacts(normalizedProjectFacts);
   const itemsFor = (predicate) => sources.filter(predicate).map(deterministicResearchEvidenceMapItem);
   const hasFunction = (source, value) =>
     (source?.evidencePriority?.functions || []).includes(value);
@@ -9526,6 +9523,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Do not use pretrained or uncited outside knowledge as legal authority and do not invent requirements.",
         "Treat user-provided Project facts and established active-topic conversation facts as factual context for this discussion, never as code authority or cited evidence.",
         "Treat facts explicitly stated in the current question as established premises for the scoped answer. Do not list them in missingFacts or ask the user to reconfirm them. If professional reliance requires later document verification, distinguish that verification from whether the fact is already established for this discussion.",
+        "Project facts labeled as an owner claim, owner position, applicant assertion, or representation are not independently verified facts. Use them as the stated premise for discussion, but preserve professional verification of each material representation in missingFacts and keep any conclusion that depends on it conditional.",
         "Do not ask the user to reconfirm an established active-topic fact merely because it was supplied in an earlier turn. Do not list such a fact in missingFacts. If final professional reliance requires independent verification, distinguish that later verification from whether the fact is already established in this conversation.",
         "Preserve the factual content of an established user shorthand such as fully sprinklered. If a code benefit separately depends on compliance with a named installation standard, request records establishing that standard without asking again whether the building is fully sprinklered or the system is installed throughout.",
         "Apply current-turn hypothetical facts only to the current hypothetical. They do not replace established facts. User-stated unknowns remain unknown. Never promote an earlier assistant conclusion into a user-established fact.",
@@ -9557,6 +9555,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Keep the answer within the scope of the current question. Do not introduce or cite a collateral code analysis merely to observe that a supplied fact might matter elsewhere; mention another code topic only when it materially qualifies the requested conclusion or the user asks for it.",
         "Use answerText to apply the supported rules to the question and user-provided Project facts. Do not merely repeat the structured supportedPoints.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
+        "For every required selected passage, preserve each material qualifier contained in that exact passage—including a proviso, exception, deeming rule, definition, second-sentence clarification, or stated limit. Merely citing the passage or summarizing a broader rule is not enough.",
+        "When the question asks whether a design, control sequence, installation, or project complies with a selected provision, distinguish what that provision establishes from material quantities, rates, capacities, locations, assemblies, approvals, or other compliance inputs it does not establish. Identify the unresolved inputs precisely instead of using a generic full-design phrase.",
+        "Do not infer the legal function of a room solely from its furniture arrangement or users. When an occupant-load, occupancy, or classification rule depends on actual use, preserve the intended activities or function as unresolved unless the user supplied them.",
         "For a numeric limit or table comparison, compare the stated project value with every directly applicable supplied limit. If the value complies with a stricter baseline limit, state that direct conclusion and do not make it conditional on qualifying for a more generous allowance.",
         "When enacted text states a percentage of an overall total and separately requires a minimum for each type, preserve those as two distinct rules in answerText and supportedPoints. In particular, never restate 10 percent of the total seating and standing spaces plus at least one of each dining-surface type as 10 percent of each type.",
         "Preserve cumulative and alternative conditions exactly. When enacted text requires A and B, never restate it as A or B; when it permits alternatives, do not turn or into and.",
@@ -9802,7 +9803,10 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "For an HCR vanity question, fail with misstated_provision if the answer joins lavatory and vanity with a slash, parentheses, or other shorthand implying interchangeability. The answer must state separately what the enacted Building Code text establishes about a lavatory and what it does not establish about a vanity.",
       "Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement, or says unsupplied law requires verification or could change the result without enacted support.",
       "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",
+      "For each exact passage in the deterministic required-claim checklist, verify substantive coverage—not only the presence of its source ID. Fail with missed_material_conclusion when the answer omits a material proviso, exception, deeming rule, definition, second-sentence clarification, or limit stated in that passage.",
+      "For a selected-provision compliance question, fail with weakest_supported_conclusion when the answer does not clearly distinguish what the selected text establishes from material quantities, rates, capacities, locations, assemblies, approvals, or other compliance inputs it cannot establish.",
       "Treat established active-topic facts as supplied user facts. Fail an answer that calls one of them missing, makes the conclusion conditional solely because it came from an earlier turn, or asks the user to reconfirm it without a contradiction. Do not treat prior assistant conclusions as established facts.",
+      "Treat every item in STRUCTURED UNRESOLVED PROJECT FACTS as unresolved. Fail with missed_material_conclusion if a material item is omitted from missingFacts, and fail with overstated_compliance if the answer relies on an owner/applicant claim, position, assertion, or representation as independently proven.",
       "Apply current-turn hypothetical facts only to the current question, and keep user-stated unknowns unresolved.",
       "Do not demand a final yes-or-no result when project facts genuinely remain unresolved.",
       "Return a compact structured result."
@@ -9823,6 +9827,9 @@ async function openAIResearchVerification(question, evidence, interpretation, us
         : "",
       options.conversationFactContext?.unknown?.length
         ? `USER-STATED UNKNOWNS\n${options.conversationFactContext.unknown.join("\n")}`
+        : "",
+      options.structuredEvidenceAnalysis?.unresolvedProjectFacts?.length
+        ? `STRUCTURED UNRESOLVED PROJECT FACTS\n${options.structuredEvidenceAnalysis.unresolvedProjectFacts.join("\n")}`
         : "",
       `AUTHORIZED ENACTED EVIDENCE\n${evidenceText}`,
       options.requiredClaims?.length
@@ -18393,6 +18400,17 @@ async function handleResearchConversationMessage(request, response) {
         )
       };
     }
+    const preserveDeclaredProjectFactUncertainty = (candidate) =>
+      deterministicOfficialGuidanceOnly
+        ? candidate
+        : {
+            ...candidate,
+            interpretation: applyResearchProjectFactCoverage(
+              candidate.interpretation,
+              evidenceAnalysisResult.analysis.unresolvedProjectFacts
+            )
+          };
+    result = preserveDeclaredProjectFactUncertainty(result);
     let verificationAttempts = [];
     let evidenceBoundaryFallback = false;
     let verifierUsage = combinedResearchUsage();
@@ -18433,6 +18451,7 @@ async function handleResearchConversationMessage(request, response) {
         ...result,
         interpretation: researchEvidenceBoundaryInterpretation()
       };
+      result = preserveDeclaredProjectFactUncertainty(result);
       requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
         requiredClaims,
         evidence: assembledEvidence,
@@ -18546,6 +18565,7 @@ async function handleResearchConversationMessage(request, response) {
                 )
               }
             : revised;
+          result = preserveDeclaredProjectFactUncertainty(result);
         }
         requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
           requiredClaims,
@@ -18616,6 +18636,7 @@ async function handleResearchConversationMessage(request, response) {
             allowOfficialGuidanceOnly,
             codeBasis: answerCodeBasis,
             requiredClaims,
+            structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
             model: modelRouting.configuration.verificationModel,
             signal: progressResponse.signal
           }
