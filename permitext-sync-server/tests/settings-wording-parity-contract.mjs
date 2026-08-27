@@ -3,7 +3,8 @@ import { readFile } from "node:fs/promises";
 import {
   settingsAccountSummary,
   settingsCopy,
-  settingsPlanCopy
+  settingsPlanCopy,
+  settingsResearchAllowanceSummary
 } from "../public/settings-copy.js";
 
 const iosSettings = await readFile(
@@ -54,6 +55,32 @@ assert.equal(lifetimePro.title, "Lifetime Pro");
 assert.equal(lifetimePro.summary, settingsCopy.lifetimePlanSummary);
 assert.equal(lifetimePro.details, null);
 
+assert.equal(settingsResearchAllowanceSummary(null), "100 turns included monthly");
+assert.equal(
+  settingsResearchAllowanceSummary({
+    includedRemaining: 100,
+    purchasedRemaining: 0,
+    totalRemaining: 100
+  }),
+  "100 included turns remain this month."
+);
+assert.equal(
+  settingsResearchAllowanceSummary({
+    includedRemaining: 0,
+    purchasedRemaining: 25,
+    totalRemaining: 25
+  }),
+  "0 included + 25 additional"
+);
+assert.equal(
+  settingsResearchAllowanceSummary({
+    includedRemaining: 12,
+    purchasedRemaining: 0,
+    totalRemaining: null
+  }),
+  "12 included turns remain this month. Continued access is available."
+);
+
 for (const copy of [
   settingsCopy.freePlanSummary,
   settingsCopy.proPlanSummary,
@@ -84,6 +111,9 @@ assert(iosSettings.includes("if !library.availableResearchTurnPacks.isEmpty"));
 assert(iosResearch.includes("if library.availableResearchTurnPacks.isEmpty"));
 assert(iosResearch.includes("Additional Research turns are temporarily unavailable. Your question is still here. Try again later."));
 assert(iosViewModel.includes("included turns remain this month."));
+assert(iosViewModel.includes("included + \\(purchased) additional"));
+assert(iosViewModel.includes("Continued access is available."));
+assert(webApp.includes("settingsResearchAllowanceSummary(researchUsage)"));
 assert(webApp.includes("function hasAvailableWebResearchTurnPack"));
 assert(webApp.includes("hasAvailableWebResearchTurnPack(researchUsage)"));
 

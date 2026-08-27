@@ -38,3 +38,16 @@ export function settingsAccountSummary(account) {
   const provider = String(account.authProvider || "Permitext").trim() || "Permitext";
   return `Signed in with ${provider}. ${settingsCopy.signedInAccountSuffix}`;
 }
+
+export function settingsResearchAllowanceSummary(usage) {
+  if (!usage) return "100 turns included monthly";
+  const included = Math.max(0, Number(usage.includedRemaining) || 0);
+  const purchased = Math.max(0, Number(usage.purchasedRemaining) || 0);
+  if (usage.totalRemaining === null) {
+    return `${included.toLocaleString()} included turns remain this month. Continued access is available.`;
+  }
+  if (purchased > 0) {
+    return `${included.toLocaleString()} included + ${purchased.toLocaleString()} additional`;
+  }
+  return `${included.toLocaleString()} included turns remain this month.`;
+}

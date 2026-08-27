@@ -5,8 +5,9 @@ import {
 } from "./code-references.js?v=20260720-code-reference-links-v18";
 import {
   settingsAccountSummary,
-  settingsPlanCopy
-} from "./settings-copy.js?v=20260824-project-context-research-v2";
+  settingsPlanCopy,
+  settingsResearchAllowanceSummary
+} from "./settings-copy.js?v=20260827-account-allowance-parity-v3";
 import {
   clearResearchRequestRecoveries,
   readResearchRequestRecovery,
@@ -57,7 +58,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260826-research-recovery-v11";
+} from "./offline-storage.js?v=20260827-account-allowance-parity-v12";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -92,7 +93,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260826-research-recovery-v11";
+} from "./research-intent-state.js?v=20260827-account-allowance-parity-v12";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -7392,14 +7393,11 @@ function planUsageRows() {
         }
       ];
   if (hasCapability("research")) {
-    const researchValue = researchUsage
-      ? researchUsage.totalRemaining === null
-        ? `${researchUsage.includedRemaining} included remaining · continued access available`
-        : `${researchUsage.includedRemaining} included + ${researchUsage.purchasedRemaining} additional`
-      : "100 turns included monthly";
     rows.push({
       label: "Research",
-      value: isProAccount() ? researchValue : "Available with Pro"
+      value: isProAccount()
+        ? settingsResearchAllowanceSummary(researchUsage)
+        : "Available with Pro"
     });
   } else if (isProAccount()) {
     rows.push({ label: "Research", value: "100 turns included monthly" });
