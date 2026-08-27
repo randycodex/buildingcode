@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260827-collateral-scope-v16";
+export const researchEvidenceAssemblyVersion = "20260827-pinned-answer-scope-v17";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -645,7 +645,11 @@ export async function assembleResearchEvidence({
         }
       });
   const prioritizedCandidates = prioritizeResearchEvidence(candidateValues(discovery), {
-    limit: limits.maximumCandidates
+    limit: limits.maximumCandidates,
+    // Selected enacted passages define the primary answer scope. Discovery is
+    // still assembled for review, but it must not become mandatory coverage
+    // before the pins and candidates are merged into one package.
+    pinnedScopeActive: pinnedEvidence.length > 0
   });
   const routedTopicPresent = prioritizedCandidates.some((candidate) =>
     candidate?.signals?.exactTopicRouteTarget === true

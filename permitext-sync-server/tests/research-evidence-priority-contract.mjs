@@ -182,4 +182,32 @@ assert.equal(
   "Pinning a collateral passage must preserve it for review without forcing it into the answer."
 );
 
+const alignedPinnedScope = prioritizeResearchEvidence([
+  {
+    ...candidate("403.1.1", "Fractions for multiple occupancies shall first be summed and then rounded up.", {
+      exactTopicRouteTarget: true,
+      topicRoutes: ["plumbing fixture calculations"]
+    }),
+    origin: "user_pinned"
+  },
+  candidate("1004.1", "Occupant load shall be determined by this section.", {
+    exactTopicRouteTarget: true,
+    topicRoutes: ["plumbing fixture calculations"]
+  }),
+  candidate("1004.1.1.2", "Group R-2 accessory occupant loads may be calculated individually.", {
+    topicRoutes: ["plumbing fixture calculations"]
+  })
+]);
+assert.equal(alignedPinnedScope[0].evidencePriority.evidenceRole, "governing");
+assert.equal(alignedPinnedScope[0].evidencePriority.claimCoverageRequired, true);
+for (const discoveredContext of alignedPinnedScope.slice(1)) {
+  assert.equal(discoveredContext.evidencePriority.pinnedScopeActive, true);
+  assert.equal(discoveredContext.evidencePriority.evidenceRole, "supporting");
+  assert.equal(
+    discoveredContext.evidencePriority.claimCoverageRequired,
+    false,
+    "Automatically discovered descendants must remain optional when aligned user-selected enacted text already bounds the answer."
+  );
+}
+
 console.log("Permitext deterministic Research evidence priority contract passed.");

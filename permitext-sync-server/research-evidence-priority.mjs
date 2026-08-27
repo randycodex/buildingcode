@@ -1,4 +1,4 @@
-export const researchEvidencePriorityVersion = "20260811-deterministic-legal-function-v3";
+export const researchEvidencePriorityVersion = "20260827-pinned-scope-v4";
 
 export const researchEvidenceFunctions = Object.freeze({
   controllingRule: "controlling_rule",
@@ -185,13 +185,14 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
   const definition = isDefinition(value, text);
   const exception = isException(value, text);
   const calculationTable = isCalculationOrTable(value, text);
+  const pinnedScopeActive = options.pinnedScopeActive === true;
   // User-pinned evidence must remain in the model-visible package, but pinning
   // is not itself a legal-materiality decision. A passage on a collateral
   // topic route is reviewed context, not a mandatory conclusion or citation.
   // Keeping that distinction here prevents the required-claim gate from
   // demanding the same passage that the answer-quality gate must reject.
   const controlling =
-    (pinned || exactReference || Boolean(controllingRoot)) &&
+    (pinned || exactReference || (!pinnedScopeActive && Boolean(controllingRoot))) &&
     topicRouteRelationship !== "collateral";
   const claimCoverageRequired = controlling && !crossReference;
   const roles = [];
@@ -230,6 +231,7 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
     controllingTopicRoutes,
     topicRoutes: routes,
     topicRouteRelationship,
+    pinnedScopeActive,
     hierarchyDepth: rootDepth,
     claimCoverageRequired,
     claimCoverageReason: claimCoverageRequired
@@ -270,6 +272,9 @@ export function prioritizeResearchEvidence(values, options = {}) {
     ...(Array.isArray(options.controllingRoots) ? options.controllingRoots : []),
     ...inferredControllingRoots(items, controllingTopicRoutes)
   ]);
+  const pinnedScopeActive = options.pinnedScopeActive === true || items.some((item) =>
+    isPinned(item) && routeAligned(item, controllingTopicRoutes)
+  );
   const requestedLimit = Number.parseInt(String(options.limit ?? items.length), 10);
   const limit = Number.isSafeInteger(requestedLimit) && requestedLimit >= 0
     ? Math.min(requestedLimit, items.length)
@@ -279,7 +284,8 @@ export function prioritizeResearchEvidence(values, options = {}) {
     originalIndex,
     priority: researchEvidencePriorityMetadata(value, {
       controllingRoots,
-      controllingTopicRoutes
+      controllingTopicRoutes,
+      pinnedScopeActive
     })
   })).sort((left, right) =>
     left.priority.materialityRank - right.priority.materialityRank ||

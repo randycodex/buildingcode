@@ -244,7 +244,11 @@ const discovered = assembled.sources.filter((source) => source.origin === "permi
 assert.equal(discovered.length, 2, "Automatically discovered enacted sources must be bounded.");
 assert.deepEqual(discovered.map((source) => source.sectionID), ["candidate-1", "candidate-2"]);
 assert.match(discovered[0].text, /complete canonical section context/);
-assert.equal(discovered[0].evidencePriority.claimCoverageRequired, true);
+assert.equal(
+  discovered[0].evidencePriority.claimCoverageRequired,
+  false,
+  "Discovery should supplement an aligned user-pinned passage without becoming mandatory answer coverage."
+);
 assert.doesNotMatch(discovered[0].text, /narrow discovered passage/);
 assert(!assembled.sources.some((source) => source.sectionID === "candidate-3"));
 assert.equal(
