@@ -8958,6 +8958,8 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
     .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
     .replace(/[【】：「」『』。“”]+(?=\s*[A-Za-z0-9])/g, " ")
+    .replace(/[^\S\r\n]+/g, " ")
+    .replace(/ *\n */g, "\n")
     .replace(/\s+([,.;:!?])/g, "$1")
     .replace(/[;,]\s*$/, "")
     .trim();

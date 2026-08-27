@@ -40,4 +40,30 @@ assert.equal(
 );
 assert.doesNotMatch(answer.additionalEvidenceNeeded[0], /[【】：「」『』]/);
 
+const whitespaceAnswer = validateResearchInterpretation({
+  conclusion: "The selected text does not say whether furniture is a  fixture  or  equipment.",
+  supportedPoints: [{
+    heading: "Covered elements",
+    explanation: "Fixtures  and  equipment are listed.",
+    sectionID: "2401",
+    sourceIDs: ["bc-1017-2"]
+  }],
+  explanation: "That classification  remains unresolved.",
+  assumptions: [],
+  missingFacts: [],
+  followUpQuestions: [],
+  evidenceLimitations: ["Only  the selected text was reviewed."],
+  additionalEvidenceNeeded: [],
+  supportingSourceUses: [],
+  citations: [{
+    sectionID: "2401",
+    sourceIDs: ["bc-1017-2"],
+    relevance: "Supplies  the listed elements."
+  }]
+}, evidence);
+assert.doesNotMatch(whitespaceAnswer.answerText, / {2,}/);
+assert.doesNotMatch(whitespaceAnswer.supportedPoints[0].explanation, / {2,}/);
+assert.doesNotMatch(whitespaceAnswer.evidenceLimitations[0], / {2,}/);
+assert.doesNotMatch(whitespaceAnswer.citations[0].relevance, / {2,}/);
+
 console.log("Permitext Research answer punctuation sanitization contract passed; paid model calls: no.");

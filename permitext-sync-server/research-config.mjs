@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 
 export const supportedResearchPromptVersions = [
+  "20260827-user-facing-whitespace-v24",
   "20260827-dining-surface-grammar-v23",
   "20260827-dining-surface-binding-v22",
   "20260827-natural-selected-boundary-v21",
