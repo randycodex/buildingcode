@@ -394,14 +394,21 @@ function packPriceScenario({
  * ready for a pricing decision.
  */
 export function researchPackPricingReport(benchmarkReport = {}, assumptions = {}) {
-  const economics = benchmarkReport?.economics || {};
+  const hasRunSnapshot = Boolean(
+    benchmarkReport &&
+    typeof benchmarkReport === "object" &&
+    benchmarkReport.configuration &&
+    Array.isArray(benchmarkReport.results)
+  );
+  const economicsReport = hasRunSnapshot ? benchmarkReport.economics || {} : benchmarkReport;
+  const economics = economicsReport?.economics || {};
   const completedTurnCost = economics.completedTurnCostUSD || {};
   const p50ProviderCostPerTurnUSD = nonnegativeNumber(completedTurnCost.p50, NaN);
   const p90ProviderCostPerTurnUSD = nonnegativeNumber(completedTurnCost.p90, NaN);
   if (!Number.isFinite(p50ProviderCostPerTurnUSD) || !Number.isFinite(p90ProviderCostPerTurnUSD)) {
     throw new TypeError("Research pack pricing requires benchmark p50 and p90 completed-turn costs.");
   }
-  const completedCharged = nonnegativeInteger(benchmarkReport?.sample?.completedCharged);
+  const completedCharged = nonnegativeInteger(economicsReport?.sample?.completedCharged);
   const failedOperationAllowancePerTurnUSD = completedCharged > 0
     ? nonnegativeNumber(economics.failedOperatingCostUSD) / completedCharged
     : 0;
@@ -437,7 +444,39 @@ export function researchPackPricingReport(benchmarkReport = {}, assumptions = {}
   if (new Set(channels.map((channel) => channel.id)).size !== channels.length) {
     throw new TypeError("Research pack pricing channel IDs must be unique.");
   }
-  const pricingDecisionReady = benchmarkReport?.readyForPricingDecision === true;
+  const configuredCaseIDs = hasRunSnapshot
+    ? (Array.isArray(benchmarkReport.configuration?.caseIDs)
+        ? benchmarkReport.configuration.caseIDs.map((value) => String(value || "").trim()).filter(Boolean)
+        : [])
+    : [];
+  const resultCaseIDs = hasRunSnapshot
+    ? benchmarkReport.results.map((result) => String(result?.testCase?.id || "").trim())
+    : [];
+  const configuredCaseIDSet = new Set(configuredCaseIDs);
+  const resultCaseIDSet = new Set(resultCaseIDs);
+  const runIntegrity = {
+    snapshotProvided: hasRunSnapshot,
+    completed: hasRunSnapshot && benchmarkReport.status === "completed",
+    gitCommitRecorded: hasRunSnapshot && /^[a-f0-9]{40}$/.test(
+      String(benchmarkReport.configuration?.gitCommit || "")
+    ),
+    noPendingProviderRequests: hasRunSnapshot &&
+      nonnegativeInteger(benchmarkReport.configuration?.pendingPaidRequestCount) === 0,
+    exactCaseSet: hasRunSnapshot &&
+      configuredCaseIDs.length > 0 &&
+      configuredCaseIDs.length === configuredCaseIDSet.size &&
+      resultCaseIDs.length === configuredCaseIDs.length &&
+      resultCaseIDs.length === resultCaseIDSet.size &&
+      resultCaseIDs.every((caseID) => configuredCaseIDSet.has(caseID)),
+    allResultsComplete: hasRunSnapshot && benchmarkReport.results.every((result) =>
+      !result?.error && result?.operationMetric && result?.scoring
+    ),
+    allQualityCasesPassed: hasRunSnapshot && benchmarkReport.results.every((result) =>
+      result?.scoring?.passed === true
+    )
+  };
+  const runIntegrityPass = Object.values(runIntegrity).every(Boolean);
+  const pricingDecisionReady = economicsReport?.readyForPricingDecision === true && runIntegrityPass;
   return {
     generatedAt: new Date().toISOString(),
     pricingDecisionReady,
@@ -446,10 +485,14 @@ export function researchPackPricingReport(benchmarkReport = {}, assumptions = {}
       : "illustrative-only-benchmark-not-ready",
     benchmark: {
       completedCharged,
-      sampleReady: benchmarkReport?.sample?.sampleReady === true,
+      sampleReady: economicsReport?.sample?.sampleReady === true,
       targetReady: economics.targetReady === true,
-      chargeIntegrityPass: benchmarkReport?.charging?.integrityPass === true,
-      failedOperationAllowancePerTurnUSD: fixed(failedOperationAllowancePerTurnUSD)
+      chargeIntegrityPass: economicsReport?.charging?.integrityPass === true,
+      failedOperationAllowancePerTurnUSD: fixed(failedOperationAllowancePerTurnUSD),
+      runIntegrity: {
+        ...runIntegrity,
+        pass: runIntegrityPass
+      }
     },
     assumptions: {
       infrastructureCostPerTurnUSD: fixed(infrastructureCostPerTurnUSD),

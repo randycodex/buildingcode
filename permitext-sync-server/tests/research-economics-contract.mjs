@@ -103,7 +103,22 @@ assert.equal(unsafeCharging.charging.failedCharged, 1);
 assert.equal(unsafeCharging.charging.integrityPass, false);
 assert.equal(unsafeCharging.readyForPricingDecision, false);
 
-const pricing = researchPackPricingReport(report, {
+const pricingRun = {
+  schemaVersion: 3,
+  status: "completed",
+  configuration: {
+    gitCommit: "a".repeat(40),
+    caseIDs: completed.map((operation) => operation.id),
+    pendingPaidRequestCount: 0
+  },
+  economics: report,
+  results: completed.map((operation) => ({
+    testCase: { id: operation.id },
+    operationMetric: operation,
+    scoring: { passed: true }
+  }))
+};
+const pricing = researchPackPricingReport(pricingRun, {
   infrastructureCostPerTurnUSD: 0.005,
   supportReserveRate: 0.04,
   refundReserveRate: 0.02,
@@ -115,6 +130,7 @@ const pricing = researchPackPricingReport(report, {
 });
 assert.equal(pricing.pricingDecisionReady, true);
 assert.equal(pricing.decisionStatus, "benchmark-ready");
+assert.equal(pricing.benchmark.runIntegrity.pass, true);
 assert.equal(pricing.packs.length, 2);
 assert.equal(pricing.packs[0].turns, 25);
 assert.equal(pricing.packs[1].turns, 100);
@@ -138,9 +154,43 @@ const illustrativePricing = researchPackPricingReport(unsafeCharging, {
 });
 assert.equal(illustrativePricing.pricingDecisionReady, false);
 assert.equal(illustrativePricing.decisionStatus, "illustrative-only-benchmark-not-ready");
+assert.equal(illustrativePricing.benchmark.runIntegrity.snapshotProvided, false);
+assert.equal(illustrativePricing.benchmark.runIntegrity.pass, false);
+
+const partialPricing = researchPackPricingReport({
+  ...pricingRun,
+  status: "partial",
+  results: pricingRun.results.slice(0, -1)
+}, {
+  infrastructureCostPerTurnUSD: 0,
+  supportReserveRate: 0,
+  refundReserveRate: 0,
+  targetGrossMarginRate: 0.5,
+  packTurnCounts: [25],
+  channels: [{ id: "web", percentageFeeRate: 0, fixedFeeUSD: 0 }]
+});
+assert.equal(partialPricing.pricingDecisionReady, false);
+assert.equal(partialPricing.benchmark.runIntegrity.completed, false);
+assert.equal(partialPricing.benchmark.runIntegrity.exactCaseSet, false);
+
+const failedQualityPricing = researchPackPricingReport({
+  ...pricingRun,
+  results: pricingRun.results.map((result, index) => index === 0
+    ? { ...result, scoring: { passed: false } }
+    : result)
+}, {
+  infrastructureCostPerTurnUSD: 0,
+  supportReserveRate: 0,
+  refundReserveRate: 0,
+  targetGrossMarginRate: 0.5,
+  packTurnCounts: [25],
+  channels: [{ id: "web", percentageFeeRate: 0, fixedFeeUSD: 0 }]
+});
+assert.equal(failedQualityPricing.pricingDecisionReady, false);
+assert.equal(failedQualityPricing.benchmark.runIntegrity.allQualityCasesPassed, false);
 
 assert.throws(
-  () => researchPackPricingReport(report, {
+  () => researchPackPricingReport(pricingRun, {
     infrastructureCostPerTurnUSD: 0,
     supportReserveRate: 0.5,
     refundReserveRate: 0.5,
