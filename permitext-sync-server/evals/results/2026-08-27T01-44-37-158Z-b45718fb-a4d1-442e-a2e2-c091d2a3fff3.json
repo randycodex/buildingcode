@@ -1,0 +1,2159 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T01:44:37.158Z",
+  "updatedAt": "2026-08-27T01:45:28.711Z",
+  "configuration": {
+    "runID": "b45718fb-a4d1-442e-a2e2-c091d2a3fff3",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-pinned-answer-scope-v17",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-013-b-m-co-accessibility-boundary"
+    ],
+    "caseStatuses": [
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "a0b16c1338b68a512efe99cb071ba56ee777b1d4",
+    "approvedSpendCapUSD": 2,
+    "conservativeReservedUSD": 0.098253,
+    "actualUSD": 0.098253,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 4
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T01:45:28.632Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.062827,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.062827,
+        "p50": 0.062827,
+        "p90": 0.062827,
+        "maximum": 0.062827
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.062827,
+      "projectedCostPer100TurnsUSD": 6.28,
+      "targetReady": false,
+      "targetBand": "above"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 30681,
+      "p50": 30681,
+      "p90": 30681,
+      "maximum": 30681
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 1,
+      "verificationRevisionRate": 1,
+      "providerRequests": {
+        "count": 1,
+        "mean": 3,
+        "p50": 3,
+        "p90": 3,
+        "maximum": 3
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": [
+        {
+          "key": "wrong_attribution",
+          "count": 1
+        }
+      ]
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-013-b-m-co-accessibility-boundary",
+        "title": "B-to-M or M-to-B alteration after zoning Use Group renumbering",
+        "status": "draft",
+        "difficulty": "advanced",
+        "topics": [
+          "accessibility",
+          "Certificate of Occupancy",
+          "occupancy classification",
+          "zoning use groups",
+          "evidence limits"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "building": "Prior-code building asserted but not confirmed",
+          "project": "Small existing establishment changing between Group B and Group M",
+          "zoningContext": "Proposed after the 2024 zoning Use Group renumbering",
+          "unknowns": [
+            "existing Certificate of Occupancy wording",
+            "former and current zoning uses",
+            "actual Building Code classifications",
+            "whether the work is an alteration or ordinary repair",
+            "applicable Administrative Code exception and official guidance"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "2625",
+            "reference": "BC 1101.3",
+            "codePrefix": "BC",
+            "sectionNumber": "1101.3",
+            "exactPassages": [
+              "The provisions of this chapter shall apply to alterations, including minor alterations but excluding ordinary repairs, and changes of use or occupancy to prior code buildings, portions of such buildings, and spaces within such buildings in accordance with Sections 1101.3.1 through 1101.3.5."
+            ],
+            "resolvedTitle": "1101.3 Special provisions for prior code buildings.",
+            "evidenceCharacters": 957,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "2626",
+            "reference": "BC 1101.3.1",
+            "codePrefix": "BC",
+            "sectionNumber": "1101.3.1",
+            "exactPassages": [
+              "Accessible features and construction governed by this chapter shall be provided:",
+              "2. Throughout a space, including the immediate entrance(s) thereto, where an alteration is made that is considered either: (i) a change in occupancy classification of such space in accordance with this code, or (ii) a change in the zoning use group of such space in accordance with the New York City Zoning Resolution."
+            ],
+            "resolvedTitle": "1101.3.1 Requirements based on change of occupancy or how a space is used.",
+            "evidenceCharacters": 1154,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "A small existing establishment proposes an alteration described as a change between Group B and Group M after the 2024 zoning Use Group renumbering. Based only on the selected Building Code passages, can we conclude that the work qualifies for an exception to amending the Certificate of Occupancy, and what accessibility consequence can be stated?",
+        "expectedConclusion": "No Certificate of Occupancy exception can be established from the selected evidence. BC 1101.3 addresses accessibility in alterations and changes of use or occupancy in prior-code buildings; it is not the authority for a Certificate of Occupancy amendment exception. If the project is an alteration in a prior-code building and is considered a change in the space's Building Code occupancy classification or zoning use group, BC 1101.3.1 conditionally requires the Chapter 11 accessible features and construction throughout the space, including its immediate entrances. The existing Certificate of Occupancy, the actual former and current zoning uses under the applicable transition rule, the Building Code classifications, and the governing Administrative Code and official agency material must be reviewed before deciding either the Certificate of Occupancy issue or whether this accessibility trigger applies.",
+        "expectedUncertainty": {
+          "level": "outside selected authority",
+          "description": "The selected evidence supports only a conditional Building Code accessibility conclusion. It cannot resolve the Certificate of Occupancy exception or the zoning transition without additional enacted and official authority."
+        },
+        "sourceType": "Buildings Bulletin",
+        "sourceReference": "Scenario derived from NYC Department of Buildings Bulletin 2025-002, April 1, 2025: https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2025-002.pdf. The bulletin and unselected Administrative Code and Zoning Resolution material are not part of the production evidence.",
+        "reviewer": null,
+        "reviewedAt": null,
+        "notes": "Draft candidate NYC-013. Exact Building Code passages were copied from Permitext canonical content. The Certificate of Occupancy and zoning parts deliberately test recognition that the selected evidence is insufficient.",
+        "requiredConcepts": [
+          "Distinguish the selected accessibility provisions from the unselected Certificate of Occupancy exception authority.",
+          "State that BC 1101.3 applies in the selected text to prior-code buildings and excludes ordinary repairs.",
+          "Make BC 1101.3.1's accessibility result conditional on an alteration considered a change in occupancy classification or zoning use group.",
+          "Identify the selected consequence as accessibility throughout the space, including immediate entrances.",
+          "State that old and new zoning labels alone do not establish eligibility for the Certificate of Occupancy exception.",
+          "Request the unselected Administrative Code, current Zoning Resolution transition material, official interpretation, and actual Certificate of Occupancy rather than inventing their content."
+        ],
+        "missingFacts": [
+          "Whether the building is a prior-code building.",
+          "Exact existing Certificate of Occupancy wording and former zoning Use Group.",
+          "Current zoning use and applicable transition rule.",
+          "Existing and proposed Building Code occupancy classifications.",
+          "Whether the work is an alteration rather than an ordinary repair.",
+          "Exact accessibility scope and conditions.",
+          "Applicable enacted Administrative Code provision and current official agency guidance."
+        ],
+        "forbiddenClaims": [
+          "BC 1101.3 or BC 1101.3.1 grants an exception from amending the Certificate of Occupancy.",
+          "Every small B-to-M or M-to-B alteration automatically qualifies for the exception.",
+          "Renumbering from an old numeric Use Group to a new Roman-numeral group by itself proves that no relevant use change occurred.",
+          "Avoiding an amended Certificate of Occupancy eliminates accessibility obligations.",
+          "The selected evidence establishes compliance with Administrative Code Section 28-118.3 or the current Zoning Resolution.",
+          "The selected evidence proves that the entire project is approved or compliant."
+        ],
+        "requiredCitations": [
+          "BC 1101.3",
+          "BC 1101.3.1"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "BC 1101.3",
+            "requiredClaim": "Prior-code-building accessibility applicability context for alterations and changes of use or occupancy; it does not support a Certificate of Occupancy exception."
+          },
+          {
+            "reference": "BC 1101.3.1",
+            "requiredClaim": "Conditional accessibility trigger throughout the space and immediate entrances when the alteration is considered a qualifying occupancy-classification or zoning-use-group change."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "2178ee8d-bcbf-4a50-a965-650d2366c232",
+      "answeredAt": "2026-08-27T01:45:08.159Z",
+      "answerTimeMilliseconds": 30687,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-pinned-answer-scope-v17:conversational-v4",
+        "evidenceVersion": "20260827-pinned-answer-scope-v17:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-b00f912d-3aed-4b93-9d14-9a4b4c1c7f21",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T01:44:37.479Z"
+        },
+        "answerText": "No. The selected enacted Building Code passages do not address when a Certificate of Occupancy must be amended or establish an exception to that requirement. They cannot support a conclusion that the proposed B/M work qualifies for a Certificate-of-Occupancy exception. The controlling Administrative Code provision governing the amendment and its exception is needed to decide that issue.\n\nThe accessibility result is conditional. For a prior-code building, Chapter 11 applies to alterations, including minor alterations but excluding ordinary repairs, and to changes of use or occupancy. Where an alteration is considered either a Building Code occupancy-classification change or a Zoning Resolution use-group change, accessible features and construction governed by Chapter 11 must be provided throughout the space, including its immediate entrance(s). The supplied enacted evidence does not establish that the B/M description is either qualifying change, that the building is a prior-code building, or that the scope is an alteration rather than an ordinary repair.\n\nNoncontrolling NYC Buildings guidance supplied with the question states that a Certificate-of-Occupancy exception may apply only if all applicable Administrative Code conditions are met, including remaining within the same zoning Use Group, and that the 2024 renumbering alone does not establish a zoning-use change. That guidance does not replace the missing enacted Administrative Code or Zoning Resolution text.",
+        "conclusion": "No. The selected enacted Building Code passages do not address when a Certificate of Occupancy must be amended or establish an exception to that requirement. They cannot support a conclusion that the proposed B/M work qualifies for a Certificate-of-Occupancy exception. The controlling Administrative Code provision governing the amendment and its exception is needed to decide that issue.",
+        "supportedPoints": [
+          {
+            "heading": "Chapter 11 applies to specified work in prior-code buildings",
+            "explanation": "For prior-code buildings, portions, and spaces, Chapter 11 applies to alterations, including minor alterations but excluding ordinary repairs, and to changes of use or occupancy. The supplied facts do not establish prior-code status or whether the work is an alteration rather than an ordinary repair.",
+            "sectionID": "2625",
+            "sourceIDs": [
+              "d708765d-7424-43ca-97b9-73d31538077e"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "A qualifying classification or zoning-use-group change requires accessibility throughout the space",
+            "explanation": "Accessible features and construction governed by Chapter 11 must be provided throughout the space, including its immediate entrance or entrances, where an alteration is considered either a change in occupancy classification under the Building Code or a change in zoning use group under the Zoning Resolution. The assembled enacted evidence does not establish that the stated B/M change meets either trigger.",
+            "sectionID": "2626",
+            "sourceIDs": [
+              "6a71a034-baef-40b6-91c2-718da684b493",
+              "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "The accessibility result is conditional. For a prior-code building, Chapter 11 applies to alterations, including minor alterations but excluding ordinary repairs, and to changes of use or occupancy. Where an alteration is considered either a Building Code occupancy-classification change or a Zoning Resolution use-group change, accessible features and construction governed by Chapter 11 must be provided throughout the space, including its immediate entrance(s). The supplied enacted evidence does not establish that the B/M description is either qualifying change, that the building is a prior-code building, or that the scope is an alteration rather than an ordinary repair.\n\nNoncontrolling NYC Buildings guidance supplied with the question states that a Certificate-of-Occupancy exception may apply only if all applicable Administrative Code conditions are met, including remaining within the same zoning Use Group, and that the 2024 renumbering alone does not establish a zoning-use change. That guidance does not replace the missing enacted Administrative Code or Zoning Resolution text.",
+        "assumptions": [],
+        "missingFacts": [
+          "The enacted Administrative Code provision governing Certificate-of-Occupancy amendment and the text of any applicable exception.",
+          "The actual existing and proposed Building Code occupancy classifications.",
+          "The actual former and current Zoning Resolution use-group classifications for the specific existing and proposed uses.",
+          "Whether the building is a prior-code building.",
+          "Whether the proposed scope is an alteration, including a minor alteration, rather than an ordinary repair."
+        ],
+        "followUpQuestions": [
+          "Can you provide the applicable Administrative Code Certificate-of-Occupancy amendment/exception text and the controlling Zoning Resolution provisions or official classifications for the specific existing and proposed uses?"
+        ],
+        "evidenceLimitations": [
+          "The supplied enacted evidence is limited to 2022 NYC Building Code Chapter 11 accessibility provisions. It does not include enacted Administrative Code text on Certificate-of-Occupancy amendment or exceptions, or enacted Zoning Resolution text classifying the uses or addressing the 2024 renumbering."
+        ],
+        "additionalEvidenceNeeded": [
+          "The controlling Administrative Code text governing Certificate-of-Occupancy amendments and the asserted exception.",
+          "The controlling Zoning Resolution text and project-specific former and current use-group classifications.",
+          "Project records establishing Building Code occupancy classifications, prior-code-building status, and the scope of work."
+        ],
+        "supportingSourceUses": [
+          {
+            "sourceID": "web-source-e4ca765c9fa0346b79876562",
+            "claimID": "web-claim-04874ee844d06b92fb835c6f",
+            "claim": "The 2025 Buildings Bulletin is guidance, not enacted law; it explains that the Certificate-of-Occupancy exception in Administrative Code § 28-118.3 may apply to a small existing business/mercantile establishment only if all listed conditions are satisfied, including that the alteration remain within the same zoning Use Group."
+          },
+          {
+            "sourceID": "web-source-e4ca765c9fa0346b79876562",
+            "claimID": "web-claim-1124ef7c067be394cb679166",
+            "claim": "The 2024 renumbering alone does not establish a change of zoning use: Zoning Resolution § 11-24 provides that uses existing before June 6, 2024 that were recategorized into another Use Group are not considered a change of use for purposes of the Zoning Resolution."
+          },
+          {
+            "sourceID": "web-source-e4ca765c9fa0346b79876562",
+            "claimID": "web-claim-1a4708d84b461a8ee7b61999",
+            "claim": "Therefore, based only on the described B/M change and the selected passages, no definitive conclusion can be made that the work qualifies for the Certificate-of-Occupancy exception. The applicable pre- and post-June 6, 2024 zoning classifications must be matched, and the remaining § 28-118.3 conditions must also be satisfied."
+          }
+        ],
+        "supportingSources": [
+          {
+            "url": "https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2025-002.pdf",
+            "title": "NYC Buildings",
+            "publisher": "",
+            "attributedClaims": [
+              {
+                "id": "web-claim-04874ee844d06b92fb835c6f",
+                "text": "The 2025 Buildings Bulletin is guidance, not enacted law; it explains that the Certificate-of-Occupancy exception in Administrative Code § 28-118.3 may apply to a small existing business/mercantile establishment only if all listed conditions are satisfied, including that the alteration remain within the same zoning Use Group."
+              },
+              {
+                "id": "web-claim-1124ef7c067be394cb679166",
+                "text": "The 2024 renumbering alone does not establish a change of zoning use: Zoning Resolution § 11-24 provides that uses existing before June 6, 2024 that were recategorized into another Use Group are not considered a change of use for purposes of the Zoning Resolution."
+              },
+              {
+                "id": "web-claim-1a4708d84b461a8ee7b61999",
+                "text": "Therefore, based only on the described B/M change and the selected passages, no definitive conclusion can be made that the work qualifies for the Certificate-of-Occupancy exception. The applicable pre- and post-June 6, 2024 zoning classifications must be matched, and the remaining § 28-118.3 conditions must also be satisfied."
+              }
+            ],
+            "sourceClassification": "official_guidance",
+            "sourceRole": "supporting",
+            "controlling": false,
+            "sourcePolicyVersion": "20260826-supporting-web-v7",
+            "id": "web-source-e4ca765c9fa0346b79876562",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "retrievedAt": "2026-08-27T01:44:50.287Z",
+            "requiredAttribution": false,
+            "claim": "The 2025 Buildings Bulletin is guidance, not enacted law; it explains that the Certificate-of-Occupancy exception in Administrative Code § 28-118.3 may apply to a small existing business/mercantile establishment only if all listed conditions are satisfied, including that the alteration remain within the same zoning Use Group."
+          },
+          {
+            "url": "https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2025-002.pdf",
+            "title": "NYC Buildings",
+            "publisher": "",
+            "attributedClaims": [
+              {
+                "id": "web-claim-04874ee844d06b92fb835c6f",
+                "text": "The 2025 Buildings Bulletin is guidance, not enacted law; it explains that the Certificate-of-Occupancy exception in Administrative Code § 28-118.3 may apply to a small existing business/mercantile establishment only if all listed conditions are satisfied, including that the alteration remain within the same zoning Use Group."
+              },
+              {
+                "id": "web-claim-1124ef7c067be394cb679166",
+                "text": "The 2024 renumbering alone does not establish a change of zoning use: Zoning Resolution § 11-24 provides that uses existing before June 6, 2024 that were recategorized into another Use Group are not considered a change of use for purposes of the Zoning Resolution."
+              },
+              {
+                "id": "web-claim-1a4708d84b461a8ee7b61999",
+                "text": "Therefore, based only on the described B/M change and the selected passages, no definitive conclusion can be made that the work qualifies for the Certificate-of-Occupancy exception. The applicable pre- and post-June 6, 2024 zoning classifications must be matched, and the remaining § 28-118.3 conditions must also be satisfied."
+              }
+            ],
+            "sourceClassification": "official_guidance",
+            "sourceRole": "supporting",
+            "controlling": false,
+            "sourcePolicyVersion": "20260826-supporting-web-v7",
+            "id": "web-source-e4ca765c9fa0346b79876562",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "retrievedAt": "2026-08-27T01:44:50.287Z",
+            "requiredAttribution": false,
+            "claim": "The 2024 renumbering alone does not establish a change of zoning use: Zoning Resolution § 11-24 provides that uses existing before June 6, 2024 that were recategorized into another Use Group are not considered a change of use for purposes of the Zoning Resolution."
+          },
+          {
+            "url": "https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2025-002.pdf",
+            "title": "NYC Buildings",
+            "publisher": "",
+            "attributedClaims": [
+              {
+                "id": "web-claim-04874ee844d06b92fb835c6f",
+                "text": "The 2025 Buildings Bulletin is guidance, not enacted law; it explains that the Certificate-of-Occupancy exception in Administrative Code § 28-118.3 may apply to a small existing business/mercantile establishment only if all listed conditions are satisfied, including that the alteration remain within the same zoning Use Group."
+              },
+              {
+                "id": "web-claim-1124ef7c067be394cb679166",
+                "text": "The 2024 renumbering alone does not establish a change of zoning use: Zoning Resolution § 11-24 provides that uses existing before June 6, 2024 that were recategorized into another Use Group are not considered a change of use for purposes of the Zoning Resolution."
+              },
+              {
+                "id": "web-claim-1a4708d84b461a8ee7b61999",
+                "text": "Therefore, based only on the described B/M change and the selected passages, no definitive conclusion can be made that the work qualifies for the Certificate-of-Occupancy exception. The applicable pre- and post-June 6, 2024 zoning classifications must be matched, and the remaining § 28-118.3 conditions must also be satisfied."
+              }
+            ],
+            "sourceClassification": "official_guidance",
+            "sourceRole": "supporting",
+            "controlling": false,
+            "sourcePolicyVersion": "20260826-supporting-web-v7",
+            "id": "web-source-e4ca765c9fa0346b79876562",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "retrievedAt": "2026-08-27T01:44:50.287Z",
+            "requiredAttribution": false,
+            "claim": "Therefore, based only on the described B/M change and the selected passages, no definitive conclusion can be made that the work qualifies for the Certificate-of-Occupancy exception. The applicable pre- and post-June 6, 2024 zoning classifications must be matched, and the remaining § 28-118.3 conditions must also be satisfied."
+          }
+        ],
+        "citations": [
+          {
+            "sectionID": "2625",
+            "sectionNumber": "1101.3",
+            "title": "1101.3 Special provisions for prior code buildings.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "d708765d-7424-43ca-97b9-73d31538077e"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "d708765d-7424-43ca-97b9-73d31538077e",
+                "selectedText": "The provisions of this chapter shall apply to alterations, including minor alterations but excluding ordinary repairs, and changes of use or occupancy to prior code buildings, portions of such buildings, and spaces within such buildings in accordance with Sections 1101.3.1 through 1101.3.5.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes Chapter 11 applicability to alterations and changes of use or occupancy in prior-code buildings, while excluding ordinary repairs."
+          },
+          {
+            "sectionID": "2626",
+            "sectionNumber": "1101.3.1",
+            "title": "1101.3.1 Requirements based on change of occupancy or how a space is used.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "6a71a034-baef-40b6-91c2-718da684b493",
+              "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "6a71a034-baef-40b6-91c2-718da684b493",
+                "selectedText": "Accessible features and construction governed by this chapter shall be provided:",
+                "visualSources": []
+              },
+              {
+                "sourceID": "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213",
+                "selectedText": "2. Throughout a space, including the immediate entrance(s) thereto, where an alteration is made that is considered either: (i) a change in occupancy classification of such space in accordance with this code, or (ii) a change in the zoning use group of such space in accordance with the New York City Zoning Resolution.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the accessibility consequence for an alteration that is a Building Code occupancy-classification change or a Zoning Resolution use-group change."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2625",
+          "2626",
+          "2632",
+          "2635",
+          "2629",
+          "2630",
+          "2631"
+        ],
+        "evidenceSourceIDs": [
+          "d708765d-7424-43ca-97b9-73d31538077e",
+          "6a71a034-baef-40b6-91c2-718da684b493",
+          "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213",
+          "research-permitext_cross_reference-id:2632-1",
+          "research-permitext_cross_reference-id:2635-2",
+          "research-permitext_cross_reference-id:2629-4",
+          "research-permitext_cross_reference-id:2630-5",
+          "research-permitext_cross_reference-id:2631-6"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 7,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 2,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 5,
+          "userPinnedCount": 3,
+          "permitextDiscoveredCount": 0,
+          "crossReferenceCount": 5,
+          "supportingWebSourceCount": 1,
+          "unresolvedProjectFactCount": 5,
+          "requiredClaimCount": 3,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 1101.3",
+              "summary": "BC 1101.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "d708765d-7424-43ca-97b9-73d31538077e"
+              ]
+            },
+            {
+              "label": "BC 1101.3.1",
+              "summary": "BC 1101.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "6a71a034-baef-40b6-91c2-718da684b493"
+              ]
+            },
+            {
+              "label": "BC 1101.3.1",
+              "summary": "BC 1101.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "BC 1101.3.1",
+              "summary": "BC 1101.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "6a71a034-baef-40b6-91c2-718da684b493"
+              ]
+            },
+            {
+              "label": "BC 1101.3.1",
+              "summary": "BC 1101.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "BC 1101.3",
+              "summary": "BC 1101.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "d708765d-7424-43ca-97b9-73d31538077e"
+              ]
+            },
+            {
+              "label": "BC 1101.4",
+              "summary": "BC 1101.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2635-2"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [
+            {
+              "label": "BC 1101.3.5",
+              "summary": "BC 1101.3.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2632-1"
+              ]
+            },
+            {
+              "label": "BC 1101.4",
+              "summary": "BC 1101.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2635-2"
+              ]
+            },
+            {
+              "label": "BC 1101.3.2",
+              "summary": "BC 1101.3.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2629-4"
+              ]
+            },
+            {
+              "label": "BC 1101.3.3",
+              "summary": "BC 1101.3.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2630-5"
+              ]
+            },
+            {
+              "label": "BC 1101.3.4",
+              "summary": "BC 1101.3.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2631-6"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [
+            "d708765d-7424-43ca-97b9-73d31538077e",
+            "6a71a034-baef-40b6-91c2-718da684b493",
+            "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_cross_reference-id:2632-1",
+            "research-permitext_cross_reference-id:2635-2",
+            "research-permitext_cross_reference-id:2629-4",
+            "research-permitext_cross_reference-id:2630-5",
+            "research-permitext_cross_reference-id:2631-6"
+          ],
+          "projectFactsUsed": [
+            "Building: Prior-code building asserted but not confirmed",
+            "Project: Small existing establishment changing between Group B and Group M",
+            "Zoning Context: Proposed after the 2024 zoning Use Group renumbering",
+            "Unknowns: existing Certificate of Occupancy wording, former and current zoning uses, actual Building Code classifications, whether the work is an alteration or ordinary repair, applicable Administrative Code exception and official guidance"
+          ],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Building: Prior-code building asserted but not confirmed",
+            "Project: Small existing establishment changing between Group B and Group M",
+            "Zoning Context: Proposed after the 2024 zoning Use Group renumbering",
+            "Unknowns: existing Certificate of Occupancy wording, former and current zoning uses, actual Building Code classifications, whether the work is an alteration or ordinary repair, applicable Administrative Code exception and official guidance"
+          ],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "A small existing establishment proposes an alteration described as a change between Group B and Group M after the 2024 zoning Use Group renumbering. Based only on the selected Building Code passages, can we conclude that the work qualifies for an exception to amending the Certificate of Occupancy, and what accessibility consequence can be stated?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A small existing establishment proposes an alteration described as a change between Group B and Group M after the 2024 zoning Use Group renumbering. Based only on the selected Building Code passages, can we conclude that the work qualifies for an exception to amending the Certificate of Occupancy, and what accessibility consequence can be stated?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260811-exact-passage-required-claims-v1",
+          "pass": true,
+          "requiredClaimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "d708765d-7424-43ca-97b9-73d31538077e",
+            "6a71a034-baef-40b6-91c2-718da684b493",
+            "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "d708765d-7424-43ca-97b9-73d31538077e",
+            "6a71a034-baef-40b6-91c2-718da684b493",
+            "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+          ],
+          "citedEvidenceSourceIDs": [
+            "d708765d-7424-43ca-97b9-73d31538077e",
+            "6a71a034-baef-40b6-91c2-718da684b493",
+            "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_cross_reference-id:2632-1",
+            "research-permitext_cross_reference-id:2635-2",
+            "research-permitext_cross_reference-id:2629-4",
+            "research-permitext_cross_reference-id:2630-5",
+            "research-permitext_cross_reference-id:2631-6"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:d708765d-7424-43ca-97b9-73d31538077e",
+              "label": "BC 1101.3 — 1101.3 Special provisions for prior code buildings.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "d708765d-7424-43ca-97b9-73d31538077e"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:6a71a034-baef-40b6-91c2-718da684b493",
+              "label": "BC 1101.3.1 — 1101.3.1 Requirements based on change of occupancy or how a space is used.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "6a71a034-baef-40b6-91c2-718da684b493"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213",
+              "label": "BC 1101.3.1 — 1101.3.1 Requirements based on change of occupancy or how a space is used.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "d708765d-7424-43ca-97b9-73d31538077e",
+            "6a71a034-baef-40b6-91c2-718da684b493",
+            "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:d708765d-7424-43ca-97b9-73d31538077e",
+              "label": "BC 1101.3 — 1101.3 Special provisions for prior code buildings.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "d708765d-7424-43ca-97b9-73d31538077e"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "d708765d-7424-43ca-97b9-73d31538077e"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "d708765d-7424-43ca-97b9-73d31538077e"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "6a71a034-baef-40b6-91c2-718da684b493",
+                        "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "d708765d-7424-43ca-97b9-73d31538077e"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:6a71a034-baef-40b6-91c2-718da684b493",
+              "label": "BC 1101.3.1 — 1101.3.1 Requirements based on change of occupancy or how a space is used.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "6a71a034-baef-40b6-91c2-718da684b493"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "6a71a034-baef-40b6-91c2-718da684b493"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "d708765d-7424-43ca-97b9-73d31538077e"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "6a71a034-baef-40b6-91c2-718da684b493"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "6a71a034-baef-40b6-91c2-718da684b493",
+                        "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213",
+              "label": "BC 1101.3.1 — 1101.3.1 Requirements based on change of occupancy or how a space is used.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "d708765d-7424-43ca-97b9-73d31538077e"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "6a71a034-baef-40b6-91c2-718da684b493",
+                        "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260826-answer-pinned-condition-fidelity-v7",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "citedSourceIDs": [
+            "d708765d-7424-43ca-97b9-73d31538077e",
+            "6a71a034-baef-40b6-91c2-718da684b493",
+            "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_cross_reference-id:2632-1",
+            "research-permitext_cross_reference-id:2635-2",
+            "research-permitext_cross_reference-id:2629-4",
+            "research-permitext_cross_reference-id:2630-5",
+            "research-permitext_cross_reference-id:2631-6"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 3,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 2,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 5,
+            "reviewedOnlyProvisionCount": 5,
+            "assembledSourceCount": 8,
+            "assembledProvisionCount": 7
+          },
+          "sources": [
+            {
+              "sourceID": "d708765d-7424-43ca-97b9-73d31538077e",
+              "sectionID": "2625",
+              "reference": "BC 1101.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "The provisions of this chapter shall apply to alterations, including minor alterations but excluding ordinary repairs, and changes of use or occupancy to prior code buildings, portions of such buildings, and spaces within such buildings in accordance with Sections 1101.3.1 through 1101.3.5."
+            },
+            {
+              "sourceID": "6a71a034-baef-40b6-91c2-718da684b493",
+              "sectionID": "2626",
+              "reference": "BC 1101.3.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Accessible features and construction governed by this chapter shall be provided:"
+            },
+            {
+              "sourceID": "0ce9ac28-f1e2-4e39-b6c9-aad5bbf52213",
+              "sectionID": "2626",
+              "reference": "BC 1101.3.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "2. Throughout a space, including the immediate entrance(s) thereto, where an alteration is made that is considered either: (i) a change in occupancy classification of such space in accordance with this code, or (ii) a change in the zoning use group of such space in accordance with the New York City Zoning Resolution."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2632-1",
+              "sectionID": "2632",
+              "reference": "BC 1101.3.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1101.3.5 1101.3.5 Waiver of requirements. The commissioner may waive the requirements of this chapter for the alteration of prior code buildings, provided that such waiver would not significantly adversely affect provisions for health, safety and security and that equally safe and proper alternatives are prescribed and, that such waiver is based upon a specific finding that strict compliance with the requirement: 1. Would create an undue economic burden; 2. Would not achieve its intended objective; 3. Would be physically or legally impossible; 4. Would be unnecessary in light of alternatives which ensure the achievement of the intended objective or which, without a loss in the level of safety, achieve the intended objective more efficiently, effectively or economically; or 5. Would entail a change so slight as to produce a negligible additional benefit consonant with the purposes of this chapter."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2635-2",
+              "sectionID": "2635",
+              "reference": "BC 1101.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1101.4 1101.4 Alterations affecting an area containing a primary function. Where an alteration affects the accessibility to, or contains an area of primary function, the route to the primary function area shall be accessible. The costs of providing the accessible route are not required to exceed 20 percent of the value of the alterations affecting the area of primary function. The accessible route to the primary function area shall include toilet facilities and drinking fountains serving the area of primary function. Exceptions: 1. This provision does not apply to alterations limited solely to windows, hardware, operating controls, electrical outlets and signs. 2. This provision does not apply to alterations limited solely to mechanical systems, electrical systems, installation or alteration of fire protection systems and abatement of hazardous materials. 3. This provision does not apply to alterations undertaken for the primary purpose of increasing the accessibility of a facility. 4. This provision does not apply to altered areas limited within a Type B or Type B+NYC dwelling unit. Section BC 1102: Definitions"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2629-4",
+              "sectionID": "2629",
+              "reference": "BC 1101.3.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1101.3.2 1101.3.2 Requirements based on value of alterations. Accessible features and construction governed by this chapter shall be provided: 1. To the entire building undergoing alterations, as if the building were hereafter erected, where the value of alterations exceeds 50 percent of the value of the existing building. 2. To the portion of the building being altered, to the extent of the alteration, including minor alterations but excluding ordinary repairs, where the value of the alteration does not exceed 50 percent of the value of the existing building. 2.1. Within buildings with first occupancies on or before March 13, 1991, bathrooms and powder rooms located in dwelling units in such portion being altered shall comply with this chapter or with prototype layouts established by rule."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2630-5",
+              "sectionID": "2630",
+              "reference": "BC 1101.3.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1101.3.3 1101.3.3 Directional accessibility signage. Directional signage shall be provided in accordance with Section 1111.2 at or in close proximity to inaccessible building entrances, inaccessible public toilets and bathing facilities, and elevators not serving an accessible route, indicating the route to the nearest like accessible element where such accessible element is provided, such that an individual with disabilities will not be required to retrace the approach route from the inaccessible element."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2631-6",
+              "sectionID": "2631",
+              "reference": "BC 1101.3.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1101.3.4 1101.3.4 Identifying accessibility signage. Identifying accessibility signage shall be provided in accordance with item 5 of Section 1111.1 at accessible building entrances where not all entrances are accessible."
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-answer-scope-v17",
+          "retrievalQuery": "A small existing establishment proposes an alteration described as a change between Group B and Group M after the 2024 zoning Use Group renumbering. Based only on the selected Building Code passages, can we conclude that the work qualifies for an exception to amending the Certificate of Occupancy, and what accessibility consequence can be stated?\nProject facts: Unknowns: existing Certificate of Occupancy wording, former and current zoning uses, actual Building Code classifications, whether the work is an alteration or ordinary repair, applicable Administrative Code exception and official guidance; Zoning Context: Proposed after the 2024 zoning Use Group renumbering; Project: Small existing establishment changing between Group B and Group M; Building: Prior-code building asserted but not confirmed",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A small existing establishment proposes an alteration described as a change between Group B and Group M after the 2024 zoning Use Group renumbering. Based only on the selected Building Code passages, can we conclude that the work qualifies for an exception to amending the Certificate of Occupancy, and what accessibility consequence can be stated?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A small existing establishment proposes an alteration described as a change between Group B and Group M after the 2024 zoning Use Group renumbering. Based only on the selected Building Code passages, can we conclude that the work qualifies for an exception to amending the Certificate of Occupancy, and what accessibility consequence can be stated?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "A small existing establishment proposes an alteration described as a change between Group B and Group M after the 2024 zoning Use Group renumbering. Based only on the selected Building Code passages, can we conclude that the work qualifies for an exception to amending the Certificate of Occupancy, and what accessibility consequence can be stated?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 3,
+            "candidateCount": 2,
+            "discoveredCount": 0,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 5,
+            "characterCount": 7752,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 10
+          },
+          "limitations": [
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "outside-current-library",
+              "text": "The current candidate set does not establish requirements controlled by the outside authorities identified below."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [
+              {
+                "kind": "outside-current-library",
+                "label": "NYC Zoning Resolution Research",
+                "sourceName": "NYC Zoning Resolution",
+                "sourceURL": "https://zr.planning.nyc.gov/",
+                "text": "NYC Zoning Resolution Research may require authoritative material outside the corpora routed for this Research turn."
+              }
+            ],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260826-supporting-web-v7",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-b00f912d-3aed-4b93-9d14-9a4b4c1c7f21",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T01:44:37.479Z"
+          },
+          "webSupportRequested": true,
+          "webSupportReasons": [
+            "outside_library_support_needed"
+          ],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": true,
+          "webQuery": "A small existing establishment proposes an alteration described as a change between Group B and Group M after the 2024 zoning Use Group renumbering. Based only on the selected Building Code passages, can we conclude that the work qualifies for an exception to amending the Certificate of Occupancy, and what accessibility consequence can be stated?",
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 2,
+          "regenerated": true,
+          "history": [
+            {
+              "pass": false,
+              "issues": [
+                {
+                  "type": "wrong_attribution",
+                  "detail": "Move every web-derived statement out of supportedPoints, including paraphrases that omit the words bulletin, guidance, or BB. supportedPoints and enacted citations may state only rules established by assembled enacted text. Select each noncontrolling web statement in supportingSourceUses using its exact WEB_SOURCE_ID and WEB_CLAIM_ID pair, and label it as guidance in answerText."
+                }
+              ],
+              "model": "permitext-deterministic-answer-quality-gate"
+            },
+            {
+              "pass": true,
+              "issues": [],
+              "model": "permitext-deterministic-post-repair-acceptance"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T01:44:37.479Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v3",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "complex_question_language",
+            "outside_library_support",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 2,
+          "verificationIssueTypes": [
+            "wrong_attribution"
+          ]
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 32344,
+          "cachedInputTokens": 2908,
+          "outputTokens": 2742,
+          "totalTokens": 35086
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.062827,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "9755fcc0-1b74-4382-863a-b91b7e30d9bb",
+        "createdAt": "2026-08-27T01:44:37.476Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-luna",
+          "gpt-5.6-terra"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v3",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 2,
+        "verificationIssueTypes": [
+          "wrong_attribution"
+        ],
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 32344,
+        "cachedInputTokens": 2908,
+        "outputTokens": 2742,
+        "totalTokens": 35086,
+        "estimatedCostUSD": 0.062827,
+        "actualProviderCostUSD": 0.062827,
+        "conservativeProviderCostUSD": 0.062827,
+        "durationMilliseconds": 30681,
+        "failureCode": null,
+        "webSupportRequested": true,
+        "webSupportSearched": true,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T01:45:28.606Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 20006,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 4387,
+              "cachedInputTokens": 0,
+              "outputTokens": 2221,
+              "totalTokens": 6608
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 4387,
+          "cachedInputTokens": 0,
+          "outputTokens": 2221,
+          "totalTokens": 6608
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "Both required citations are present and accurately tied to the propositions they support. BC 1101.3 is used for prior-code-building Chapter 11 applicability and the ordinary-repair exclusion; BC 1101.3.1 is used for the conditional accessibility trigger and space/immediate-entrance scope. The answer does not attribute any Certificate-of-Occupancy exception to either provision.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent an Administrative Code exception or a zoning-transition rule. Its statements about the supplied NYC Buildings material are consistent with the supplied noncontrolling guidance, and it expressly preserves the distinction between that guidance and missing enacted text.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer clearly limits its conclusion to the selected evidence, identifies that the Certificate-of-Occupancy issue needs the governing Administrative Code authority, and makes the accessibility consequence contingent on the statutory predicates that the facts do not establish.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It directly states that the selected passages cannot establish a Certificate-of-Occupancy exception and cannot establish whether the described B/M change triggers the accessibility rule. It also separately identifies the absent Administrative Code and Zoning Resolution text.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer gives a usable no-conclusion answer on the Certificate-of-Occupancy issue, states the operative conditional accessibility consequence, distinguishes enacted text from guidance, and identifies concrete additional evidence needed.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers that no Certificate-of-Occupancy exception can be concluded from the selected passages and then states the conditional accessibility consequence, including its scope.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly distinguishes the selected Chapter 11 accessibility provisions from unprovided Certificate-of-Occupancy exception authority.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It accurately states the prior-code-building context, applicability to alterations including minor alterations, and exclusion of ordinary repairs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It makes the accessibility result conditional on an alteration being considered either a Building Code occupancy-classification change or a Zoning Resolution use-group change.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It identifies the consequence as Chapter 11 accessible features and construction throughout the space, including immediate entrances.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It explains that the renumbering alone does not establish a zoning-use change and that no exception conclusion follows without the applicable conditions and authority.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "The answer requests the Administrative Code and Zoning Resolution material, official guidance, and project classification records, but it does not specifically request review of the actual existing Certificate of Occupancy or its wording.",
+              "failureExcerpt": "\"Project records establishing Building Code occupancy classifications, prior-code-building status, and the scope of work.\"",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly says the selected Building Code passages do not establish a Certificate-of-Occupancy exception.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It rejects any automatic qualification conclusion for the described B/M work.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It says renumbering alone does not establish a zoning-use change; it does not treat renumbering as dispositive.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It does not state or imply that a Certificate-of-Occupancy exception would eliminate accessibility obligations; instead, it separately explains the conditional accessibility rule.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It expressly states that the supplied evidence lacks enacted Administrative Code and Zoning Resolution text and does not establish the relevant conclusions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It does not claim project approval or overall compliance and instead identifies unresolved predicates and needed evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer specifically identifies prior-code-building status as unestablished and lists it among needed project records.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer identifies the former zoning classification as needed, but it does not identify the exact existing Certificate of Occupancy wording or request the actual Certificate of Occupancy.",
+              "failureExcerpt": "\"The actual former and current Zoning Resolution use-group classifications for the specific existing and proposed uses.\"",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It identifies the actual former and current zoning classifications and calls for controlling Zoning Resolution text addressing the renumbering/transition issue.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It specifically requests actual existing and proposed Building Code occupancy classifications.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It expressly states that the evidence does not establish whether the work is an alteration rather than an ordinary repair.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It states the selected scope and conditions—qualifying alteration, classification/use-group predicate, throughout the space and immediate entrances—and explains that the facts do not establish whether the trigger is met.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "It calls for the controlling Administrative Code text and Zoning Resolution text, while accurately characterizing the supplied NYC Buildings material as noncontrolling guidance.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.035426,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 2,
+            "canonicalCount": 2,
+            "selectedEvidenceCount": 2,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 30687,
+            "inputTokens": 32344,
+            "cachedInputTokens": 2908,
+            "outputTokens": 2742,
+            "totalTokens": 35086,
+            "estimatedCostUSD": 0.062827,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "Both required citations are present and accurately tied to the propositions they support. BC 1101.3 is used for prior-code-building Chapter 11 applicability and the ordinary-repair exclusion; BC 1101.3.1 is used for the conditional accessibility trigger and space/immediate-entrance scope. The answer does not attribute any Certificate-of-Occupancy exception to either provision.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 3.33,
+              "rationale": "5/6 required concepts were covered.",
+              "failureExcerpt": "\"Project records establishing Building Code occupancy classifications, prior-code-building status, and the scope of work.\"",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer does not invent an Administrative Code exception or a zoning-transition rule. Its statements about the supplied NYC Buildings material are consistent with the supplied noncontrolling guidance, and it expressly preserves the distinction between that guidance and missing enacted text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/6 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer clearly limits its conclusion to the selected evidence, identifies that the Certificate-of-Occupancy issue needs the governing Administrative Code authority, and makes the accessibility consequence contingent on the statutory predicates that the facts do not establish.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 3.43,
+              "rationale": "6/7 required missing-fact conditions were recognized.",
+              "failureExcerpt": "\"The actual former and current Zoning Resolution use-group classifications for the specific existing and proposed uses.\"",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "It directly states that the selected passages cannot establish a Certificate-of-Occupancy exception and cannot establish whether the described B/M change triggers the accessibility rule. It also separately identifies the absent Administrative Code and Zoning Resolution text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "The answer gives a usable no-conclusion answer on the Certificate-of-Occupancy issue, states the operative conditional accessibility consequence, distinguishes enacted text from guidance, and identifies concrete additional evidence needed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "It directly answers that no Certificate-of-Occupancy exception can be concluded from the selected passages and then states the conditional accessibility consequence, including its scope.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer expressly distinguishes the selected Chapter 11 accessibility provisions from unprovided Certificate-of-Occupancy exception authority.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "It accurately states the prior-code-building context, applicability to alterations including minor alterations, and exclusion of ordinary repairs.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "It makes the accessibility result conditional on an alteration being considered either a Building Code occupancy-classification change or a Zoning Resolution use-group change.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "It identifies the consequence as Chapter 11 accessible features and construction throughout the space, including immediate entrances.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "It explains that the renumbering alone does not establish a zoning-use change and that no exception conclusion follows without the applicable conditions and authority.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "The answer requests the Administrative Code and Zoning Resolution material, official guidance, and project classification records, but it does not specifically request review of the actual existing Certificate of Occupancy or its wording.",
+                "failureExcerpt": "\"Project records establishing Building Code occupancy classifications, prior-code-building status, and the scope of work.\"",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": false
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer expressly says the selected Building Code passages do not establish a Certificate-of-Occupancy exception.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "It rejects any automatic qualification conclusion for the described B/M work.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "It says renumbering alone does not establish a zoning-use change; it does not treat renumbering as dispositive.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "It does not state or imply that a Certificate-of-Occupancy exception would eliminate accessibility obligations; instead, it separately explains the conditional accessibility rule.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-5",
+                "rationale": "It expressly states that the supplied evidence lacks enacted Administrative Code and Zoning Resolution text and does not establish the relevant conclusions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-6",
+                "rationale": "It does not claim project approval or overall compliance and instead identifies unresolved predicates and needed evidence.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The answer specifically identifies prior-code-building status as unestablished and lists it among needed project records.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The answer identifies the former zoning classification as needed, but it does not identify the exact existing Certificate of Occupancy wording or request the actual Certificate of Occupancy.",
+                "failureExcerpt": "\"The actual former and current Zoning Resolution use-group classifications for the specific existing and proposed uses.\"",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": false
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "It identifies the actual former and current zoning classifications and calls for controlling Zoning Resolution text addressing the renumbering/transition issue.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "It specifically requests actual existing and proposed Building Code occupancy classifications.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-5",
+                "rationale": "It expressly states that the evidence does not establish whether the work is an alteration rather than an ordinary repair.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-6",
+                "rationale": "It states the selected scope and conditions—qualifying alteration, classification/use-group predicate, throughout the space and immediate entrances—and explains that the facts do not establish whether the trigger is met.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-7",
+                "rationale": "It calls for the controlling Administrative Code text and Zoning Resolution text, while accurately characterizing the supplied NYC Buildings material as noncontrolling guidance.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "2/2 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. Both required citations are present and accurately tied to the propositions they support. BC 1101.3 is used for prior-code-building Chapter 11 applicability and the ordinary-repair exclusion; BC 1101.3.1 is used for the conditional accessibility trigger and space/immediate-entrance scope. The answer does not attribute any Certificate-of-Occupancy exception to either provision.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 2 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 3.33,
+            "rationale": "5/6 required concepts were covered.",
+            "failureExcerpt": "\"Project records establishing Building Code occupancy classifications, prior-code-building status, and the scope of work.\"",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent an Administrative Code exception or a zoning-transition rule. Its statements about the supplied NYC Buildings material are consistent with the supplied noncontrolling guidance, and it expressly preserves the distinction between that guidance and missing enacted text.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer clearly limits its conclusion to the selected evidence, identifies that the Certificate-of-Occupancy issue needs the governing Administrative Code authority, and makes the accessibility consequence contingent on the statutory predicates that the facts do not establish.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 3.43,
+            "rationale": "6/7 required missing-fact conditions were recognized.",
+            "failureExcerpt": "\"The actual former and current Zoning Resolution use-group classifications for the specific existing and proposed uses.\"",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It directly states that the selected passages cannot establish a Certificate-of-Occupancy exception and cannot establish whether the described B/M change triggers the accessibility rule. It also separately identifies the absent Administrative Code and Zoning Resolution text.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer gives a usable no-conclusion answer on the Certificate-of-Occupancy issue, states the operative conditional accessibility consequence, distinguishes enacted text from guidance, and identifies concrete additional evidence needed.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers that no Certificate-of-Occupancy exception can be concluded from the selected passages and then states the conditional accessibility consequence, including its scope.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 3.85,
+        "passed": false,
+        "criticalFailures": [
+          "required concept missing",
+          "missing project fact not recognized"
+        ],
+        "requiredRubricsSatisfied": false,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly distinguishes the selected Chapter 11 accessibility provisions from unprovided Certificate-of-Occupancy exception authority.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It accurately states the prior-code-building context, applicability to alterations including minor alterations, and exclusion of ordinary repairs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It makes the accessibility result conditional on an alteration being considered either a Building Code occupancy-classification change or a Zoning Resolution use-group change.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It identifies the consequence as Chapter 11 accessible features and construction throughout the space, including immediate entrances.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It explains that the renumbering alone does not establish a zoning-use change and that no exception conclusion follows without the applicable conditions and authority.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "The answer requests the Administrative Code and Zoning Resolution material, official guidance, and project classification records, but it does not specifically request review of the actual existing Certificate of Occupancy or its wording.",
+              "failureExcerpt": "\"Project records establishing Building Code occupancy classifications, prior-code-building status, and the scope of work.\"",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly says the selected Building Code passages do not establish a Certificate-of-Occupancy exception.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It rejects any automatic qualification conclusion for the described B/M work.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It says renumbering alone does not establish a zoning-use change; it does not treat renumbering as dispositive.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It does not state or imply that a Certificate-of-Occupancy exception would eliminate accessibility obligations; instead, it separately explains the conditional accessibility rule.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It expressly states that the supplied evidence lacks enacted Administrative Code and Zoning Resolution text and does not establish the relevant conclusions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It does not claim project approval or overall compliance and instead identifies unresolved predicates and needed evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer specifically identifies prior-code-building status as unestablished and lists it among needed project records.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer identifies the former zoning classification as needed, but it does not identify the exact existing Certificate of Occupancy wording or request the actual Certificate of Occupancy.",
+              "failureExcerpt": "\"The actual former and current Zoning Resolution use-group classifications for the specific existing and proposed uses.\"",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It identifies the actual former and current zoning classifications and calls for controlling Zoning Resolution text addressing the renumbering/transition issue.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It specifically requests actual existing and proposed Building Code occupancy classifications.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It expressly states that the evidence does not establish whether the work is an alteration rather than an ordinary repair.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It states the selected scope and conditions—qualifying alteration, classification/use-group predicate, throughout the space and immediate entrances—and explains that the facts do not establish whether the trigger is met.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "It calls for the controlling Administrative Code text and Zoning Resolution text, while accurately characterizing the supplied NYC Buildings material as noncontrolling guidance.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

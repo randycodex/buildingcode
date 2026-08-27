@@ -459,7 +459,10 @@ const deterministicTurnAnalysis = deterministicResearchEvidenceAnalysisForTurn([
       topicRouteRelationship: "collateral"
     }
   }
-], ["The building has six stories."], [{ text: "Only the current enacted edition was searched." }]);
+], [
+  "The building has six stories.",
+  "Unknowns: existing Certificate of Occupancy wording, whether the work is an alteration"
+], [{ text: "Only the current enacted edition was searched." }]);
 assert.deepEqual(
   deterministicTurnAnalysis.controllingProvisions.flatMap((item) => item.sourceIDs),
   ["governing"]
@@ -470,6 +473,9 @@ assert.deepEqual(
   "The deterministic evidence map must review pinned collateral evidence without promoting it to a governing conclusion."
 );
 assert.deepEqual(deterministicTurnAnalysis.projectFactsUsed, ["The building has six stories."]);
+assert.deepEqual(deterministicTurnAnalysis.unresolvedProjectFacts, [
+  "Unknowns: existing Certificate of Occupancy wording, whether the work is an alteration"
+]);
 assert.deepEqual(
   deterministicTurnAnalysis.evidenceLimitations,
   ["Permitext limited this answer to the enacted evidence assembled for the current question."],
@@ -482,7 +488,10 @@ assert.doesNotThrow(
   }, {
     sourceID: "pinned-collateral",
     origin: "user_pinned"
-  }], ["The building has six stories."]),
+  }], [
+    "The building has six stories.",
+    "Unknowns: existing Certificate of Occupancy wording, whether the work is an alteration"
+  ]),
   "The deterministic ordinary-turn evidence map must satisfy the same binding contract as model analysis."
 );
 assert.deepEqual(
