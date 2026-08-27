@@ -93,7 +93,7 @@ const duplicatePartialRefund = researchCreditClaimReconciliation({
   claim: partialRefund.nextClaim,
   targetRevokedUnits: 13,
   eventID: "evt_partial",
-  signedDate: 100,
+  signedDate: 101,
   refundedAmount: 500,
   reason: "stripe_partial_refund"
 });

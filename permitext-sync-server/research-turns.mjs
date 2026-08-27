@@ -130,6 +130,16 @@ export function researchCreditClaimReconciliation({
   if (normalizedSignedDate < 0) {
     throw new TypeError("Research credit reconciliation signed date is invalid.");
   }
+  if (claim?.lastReversalEventID === normalizedEventID) {
+    return {
+      applied: false,
+      reason: "duplicate",
+      creditUnits: 0,
+      previousRevokedUnits,
+      targetRevokedUnits: previousRevokedUnits,
+      nextClaim: claim
+    };
+  }
   if (normalizedSignedDate > 0 && previousSignedDate > normalizedSignedDate) {
     return {
       applied: false,
