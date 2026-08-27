@@ -657,7 +657,7 @@
         "State that a lower actual-occupancy basis must be established by the commissioner under the selected passage.",
         "State that the selected evidence does not establish a nonsimultaneous-use exception.",
         "Request the room areas, functions, furniture layouts, simultaneous-use conditions, existing records, and official approval before providing a final load.",
-        "Keep filing type, PACO, posted occupancy, and egress conclusions outside the selected evidence."
+        "Keep filing type, posted occupancy, and egress conclusions outside the selected evidence."
       ],
       "missingFacts": [
         "Room-by-room net and gross floor areas.",
@@ -666,7 +666,7 @@
         "Existing Certificate of Occupancy and approved occupant loads.",
         "Whether the commissioner has established a lower basis.",
         "Exit number, capacity, widths, travel distance, and common path.",
-        "Applicable PACO, posted-occupancy, and filing authority."
+        "Applicable posted-occupancy and filing authority."
       ],
       "forbiddenClaims": [
         "Movable seats may be counted as fixed seats under BC 1004.3.",
@@ -674,7 +674,7 @@
         "Lounge and break areas may automatically be omitted as nonsimultaneous.",
         "The design team may establish a lower basis without commissioner action.",
         "Professional certification makes an unsupported occupant-load method compliant.",
-        "The selected evidence resolves the filing type, PACO requirement, posted occupancy, or egress compliance."
+        "The selected evidence resolves the filing type, posted occupancy, or egress compliance."
       ],
       "requiredCitations": [
         "BC 1004.1.2",

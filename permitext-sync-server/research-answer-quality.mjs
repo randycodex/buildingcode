@@ -1,5 +1,14 @@
 export const researchAnswerQualityVersion =
-  "20260827-authority-term-boundary-v17";
+  "20260827-source-bound-dining-repair-v18";
+
+const accessibleDiningSurfaceMisstatementPattern =
+  /10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
+
+const accessibleDiningSurfaceCanonicalPhrase =
+  "at least 10 percent of the total seating and standing spaces, with not less than one accessible space of each dining-surface type";
+
+const diningSurfaceCalculationPattern =
+  /\b10\s*percent\b|\bminimum\s+accessible\s+share\b/i;
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -238,8 +247,6 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     )
   );
   const accessibleDiningSurfaceSourceIDSet = new Set(accessibleDiningSurfaceSourceIDs);
-  const diningSurfaceCalculationPattern =
-    /\b10\s*percent\b|\bminimum\s+accessible\s+share\b/i;
   const misboundAccessibleDiningSurfaceRuleSourceIDs = unique(
     (Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : []).flatMap((point) => {
       const pointText = compactText([point?.heading, point?.explanation].filter(Boolean).join(" "));
@@ -251,7 +258,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
   );
   const misstatedAccessibleDiningSurfacePercentageSourceIDs =
     accessibleDiningSurfaceSourceIDs.length &&
-    /10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i.test(applicabilityText)
+    accessibleDiningSurfaceMisstatementPattern.test(applicabilityText)
       ? accessibleDiningSurfaceSourceIDs
       : [];
   const citationSourceIDsByRole = {
@@ -316,6 +323,71 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     evidenceEconomy,
     sources: Array.from(availableEvidence.values())
   };
+}
+
+/**
+ * Repairs one objectively detectable paraphrase error only when the answer is
+ * already cited to the exact enacted BC 1108.2.9.1 passage. The replacement is
+ * source-bound and cannot add an outside requirement. It also adds that exact
+ * passage binding to any supported point that states the calculation.
+ */
+export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
+  if (!answer || typeof answer !== "object") return answer;
+  const sourceIDs = (Array.isArray(evidence) ? evidence : [])
+    .filter((source) =>
+      compactText(source?.codePrefix).toUpperCase() === "BC" &&
+      compactText(source?.sectionNumber) === "1108.2.9.1" &&
+      /10 percent of the total number of seating and standing spaces/i.test(compactText(source?.text))
+    )
+    .map((source) => compactText(source?.sourceID))
+    .filter(Boolean);
+  if (!sourceIDs.length) return answer;
+  const citedSourceIDs = new Set(
+    (Array.isArray(answer.citations) ? answer.citations : [])
+      .flatMap((citation) => Array.isArray(citation?.sourceIDs) ? citation.sourceIDs : [])
+      .map(compactText)
+      .filter(Boolean)
+  );
+  const boundSourceIDs = sourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
+  if (!boundSourceIDs.length) return answer;
+
+  const replacementPattern = new RegExp(accessibleDiningSurfaceMisstatementPattern.source, "ig");
+  const repairText = (value) => {
+    const text = String(value || "");
+    return accessibleDiningSurfaceMisstatementPattern.test(text)
+      ? text.replace(replacementPattern, accessibleDiningSurfaceCanonicalPhrase)
+      : text;
+  };
+  let changed = false;
+  const repairedTextField = (value) => {
+    const repaired = repairText(value);
+    if (repaired !== value) changed = true;
+    return repaired;
+  };
+  const supportedPoints = (Array.isArray(answer.supportedPoints) ? answer.supportedPoints : []).map((point) => {
+    const pointText = compactText([point?.heading, point?.explanation].filter(Boolean).join(" "));
+    const statesCalculation = diningSurfaceCalculationPattern.test(pointText);
+    const explanation = repairedTextField(point?.explanation);
+    if (!statesCalculation) return { ...point, explanation };
+    const nextSourceIDs = Array.from(new Set([
+      ...(Array.isArray(point?.sourceIDs) ? point.sourceIDs : []),
+      ...boundSourceIDs
+    ]));
+    if (nextSourceIDs.length !== (point?.sourceIDs || []).length) changed = true;
+    return { ...point, explanation, sourceIDs: nextSourceIDs };
+  });
+  const result = {
+    ...answer,
+    answerText: repairedTextField(answer.answerText),
+    ...(typeof answer.conclusion === "string"
+      ? { conclusion: repairedTextField(answer.conclusion) }
+      : {}),
+    ...(typeof answer.explanation === "string"
+      ? { explanation: repairedTextField(answer.explanation) }
+      : {}),
+    supportedPoints
+  };
+  return changed ? result : answer;
 }
 
 function references(sourceIDs, sources) {

@@ -130,6 +130,10 @@ for (const candidate of [
   {
     question: "What is required?",
     evidence: [{ sectionID: "visual", title: "Diagram", text: "See figure", visualSources: [{ id: "figure-1" }] }]
+  },
+  {
+    question: "Based only on this provision, is the proposed control sequence compliant, and what can and cannot be concluded?",
+    evidence: [{ sectionID: "mc-404-1", title: "Enclosed parking garages", text: "Automatic detector controls." }]
   }
 ]) {
   const routed = routeResearchAnswerModel({ ...candidate, environment });

@@ -245,6 +245,7 @@ import {
   researchClaimMaterialityVersion
 } from "./research-claim-materiality.mjs";
 import {
+  applyResearchDeterministicAnswerRepairs,
   evaluateResearchAnswerQuality,
   researchAnswerQualityRevisionIssues
 } from "./research-answer-quality.mjs";
@@ -18417,6 +18418,17 @@ async function handleResearchConversationMessage(request, response) {
               evidenceAnalysisResult.analysis.unresolvedProjectFacts
             )
           };
+    const applyDeterministicAnswerRepairs = (candidate) =>
+      deterministicOfficialGuidanceOnly
+        ? candidate
+        : {
+            ...candidate,
+            interpretation: applyResearchDeterministicAnswerRepairs(
+              candidate.interpretation,
+              assembledEvidence
+            )
+          };
+    result = applyDeterministicAnswerRepairs(result);
     result = preserveDeclaredProjectFactUncertainty(result);
     let verificationAttempts = [];
     let evidenceBoundaryFallback = false;
@@ -18572,6 +18584,7 @@ async function handleResearchConversationMessage(request, response) {
                 )
               }
             : revised;
+          result = applyDeterministicAnswerRepairs(result);
           result = preserveDeclaredProjectFactUncertainty(result);
         }
         requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({

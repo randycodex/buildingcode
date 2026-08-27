@@ -74,6 +74,14 @@ The review separated actual answer gaps from evaluator overreach. A conceptual o
 
 Prompt v31 adds a material-completeness review that names distinct approved records, quantities, rates, capacities, dimensions, system-design inputs, and expressly implicated technical or agency conditions instead of collapsing them into phrases such as “full design” or “other requirements.” It also prohibits irrelevant permit or agency checklist padding.
 
+The first v31 diagnostic reran the three conceptual failures and showed that prompt wording alone was insufficient. Movable seating completed at 3.82, sidewalk café failed closed before charging because both the initial answer and its bounded revision misstated the dining-surface percentage, and the Luna garage answer completed at 3.64. Total provider and grader spend was $0.186111; only the two completed Research operations reached the charged-completion state. No further paid retry was made on the same implementation.
+
+The resulting engineering changes are intentionally narrow and source-governed:
+
+- the draft movable-seat rubric no longer requires Permitext to guess or name PACO authority that is outside the selected evidence;
+- an objectively detected per-dining-surface percentage error is repaired only when the answer already cites the exact enacted BC 1108.2.9.1 passage, and the corrected point is bound to that passage;
+- questions expressly asking what can and cannot be concluded route to Terra because they require material evidence-boundary judgment rather than a simple Luna lookup.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -101,4 +109,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Pass the repository-wide no-cost gate for prompt v31, then rerun only the three remaining conceptual failures under a capped paid diagnostic. Run a new immutable full cohort only if those three improve without a material regression.
+Pass the repository-wide no-cost gate for the source-bound repair and routing adjustment, commit and push it, then rerun only the three remaining cases under a capped paid diagnostic. Run a new immutable full cohort only if all three complete without a material regression.

@@ -1,6 +1,6 @@
 import { extractResearchCodeReferences } from "./research-conversation-topic.mjs";
 
-export const researchModelRoutingVersion = "20260827-luna-terra-hybrid-v3";
+export const researchModelRoutingVersion = "20260827-luna-terra-hybrid-v4";
 
 function normalized(value) {
   return String(value || "").trim();
@@ -38,6 +38,9 @@ const complexQuestionPattern = new RegExp([
   "\\b(?:special district|zoning map|variance|waiver|appeal)\\b",
   "\\b(?:conflict|contradict|which code|effective date|grandfather)\\b"
 ].join("|"), "i");
+
+const materialBoundaryQuestionPattern =
+  /\bwhat\s+can\s+and\s+cannot\s+be\s+concluded\b|\bwhat\s+(?:the\s+selected\s+evidence|this\s+provision)\s+(?:does|can)\s+and\s+(?:does|can)\s+not\s+establish\b/i;
 
 const explicitEnactedCitationPattern = /\b(?:BC|Building\s+Code)\s*(?:(?:§|Section)\s*)?(\d{3,4}(?:\.\d+)+)\b/i;
 const boundedCitationText = String.raw`(?:BC|Building\s+Code)\s*(?:(?:§|Section)\s*)?\d{3,4}(?:\.\d+)+`;
@@ -133,6 +136,7 @@ export function routeResearchAnswerModel({
     ? researchQuestionIsBoundedCitationLookup(question)
     : Boolean(boundedCitationLookup);
   if (complexQuestionPattern.test(normalized(question))) reasons.push("complex_question_language");
+  if (materialBoundaryQuestionPattern.test(normalized(question))) reasons.push("material_evidence_boundary");
   if (webSupportRequested && !isBoundedCitationLookup) reasons.push("outside_library_support");
   if (evidence.length > 10 && !isBoundedCitationLookup) reasons.push("large_evidence_package");
   if (requiredClaims.length > 4 && !isBoundedCitationLookup) reasons.push("multiple_required_claims");

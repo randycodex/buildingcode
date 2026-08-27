@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  applyResearchDeterministicAnswerRepairs,
   evaluateResearchAnswerQuality,
   researchAnswerQualityRevisionIssues,
   researchAnswerQualityVersion
@@ -464,6 +465,33 @@ assert.equal(
   researchAnswerQualityRevisionIssues(misboundDiningCalculation).at(-1).type,
   "incorrect_citation"
 );
+
+const repairedDiningCalculation = applyResearchDeterministicAnswerRepairs({
+  answerText: "At least 10 percent of the seating and standing spaces of each dining-surface type must be accessible.",
+  supportedPoints: [{
+    explanation: "Chapter 11 applies, including 10 percent of each dining-surface type.",
+    sectionID: "3111.6",
+    sourceIDs: ["bc-sidewalk-cafe-accessibility"]
+  }],
+  citations: [
+    { sourceIDs: ["bc-sidewalk-cafe-accessibility"] },
+    { sourceIDs: ["bc-dining-surfaces"] }
+  ]
+}, [chapter11IncorporationEvidence, ...diningSurfaceEvidence]);
+assert.match(
+  repairedDiningCalculation.answerText,
+  /10 percent of the total seating and standing spaces, with not less than one accessible space of each dining-surface type/i
+);
+assert.deepEqual(
+  repairedDiningCalculation.supportedPoints[0].sourceIDs,
+  ["bc-sidewalk-cafe-accessibility", "bc-dining-surfaces"],
+  "A deterministic correction must bind the calculation point to the exact enacted dining-surface passage."
+);
+assert.equal(evaluateResearchAnswerQuality({
+  question: "How many dining surfaces must be accessible?",
+  evidence: [chapter11IncorporationEvidence, ...diningSurfaceEvidence],
+  answer: repairedDiningCalculation
+}).pass, true);
 
 const vanityEvidence = [{
   ...source("bc-type-b-nyc-toilet-room", "1107.2.2.7.2.2", "governing", "aligned"),

@@ -1,0 +1,2457 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T22:52:59.647Z",
+  "updatedAt": "2026-08-27T22:53:47.077Z",
+  "configuration": {
+    "runID": "ce344aab-9da0-48fb-ae1d-b8314e173d77",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-material-completeness-v31",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-002-stated-occupancy-movable-seats"
+    ],
+    "caseStatuses": [
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "f2240a6c2ee149e8bf2aebc93643deaf4beef7fc",
+    "approvedSpendCapUSD": 0.75,
+    "conservativeReservedUSD": 0.070858,
+    "actualUSD": 0.070858,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 3
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T22:53:46.936Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.039883,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.039883,
+        "p50": 0.039883,
+        "p90": 0.039883,
+        "maximum": 0.039883
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.039883,
+      "projectedCostPer100TurnsUSD": 3.99,
+      "targetReady": true,
+      "targetBand": "below"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 23372,
+      "p50": 23372,
+      "p90": 23372,
+      "maximum": 23372
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 2,
+        "p50": 2,
+        "p90": 2,
+        "maximum": 2
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-002-stated-occupancy-movable-seats",
+        "title": "Movable seating and a proposed lower stated occupant load",
+        "status": "draft",
+        "difficulty": "advanced",
+        "topics": [
+          "occupant load",
+          "multiple functions",
+          "movable seating",
+          "commissioner approval",
+          "missing project facts"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "floorAreaSquareFeet": 8000,
+          "existingDocumentation": "Group B floor documented at 1 occupant per 100 square feet",
+          "proposedFunctions": [
+            "conference rooms",
+            "soft seating",
+            "coffee-break and lounge areas"
+          ],
+          "seating": "Movable, not fixed",
+          "reportedCalculatedLoad": "More than 200 occupants overall, with no individual room at 75 or more",
+          "proposedReduction": "Count selected seats and treat some functions as nonsimultaneous",
+          "unknowns": [
+            "room-by-room net and gross areas",
+            "actual functions and furniture layouts",
+            "simultaneous-use conditions",
+            "commissioner-approved lower basis",
+            "egress capacity",
+            "filing and posted-occupancy requirements"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "2151",
+            "reference": "BC 1004.1.2",
+            "codePrefix": "BC",
+            "sectionNumber": "1004.1.2",
+            "exactPassages": [
+              "Where an area under consideration contains multiple functions having different occupant load factors, the design occupant load for such area shall be based on the floor area of each function calculated independently."
+            ],
+            "resolvedTitle": "1004.1.2 Multiple function occupant load.",
+            "evidenceCharacters": 216,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "2152",
+            "reference": "BC 1004.1.3",
+            "codePrefix": "BC",
+            "sectionNumber": "1004.1.3",
+            "exactPassages": [
+              "For areas without fixed seating, the occupant load shall be not less than that number determined by dividing the floor area under consideration by the occupant load factor assigned to the function of the space as set forth in Table 1004.1.3."
+            ],
+            "resolvedTitle": "1004.1.3 Areas without fixed seating.",
+            "evidenceCharacters": 3565,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "2153",
+            "reference": "BC 1004.1.3.1",
+            "codePrefix": "BC",
+            "sectionNumber": "1004.1.3.1",
+            "exactPassages": [
+              "Where the actual number of occupants of any space will be significantly lower than listed in Table 1004.1.3 , the commissioner may establish a lower basis for the determination of the number of occupants."
+            ],
+            "resolvedTitle": "1004.1.3.1 Modifications.",
+            "evidenceCharacters": 204,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "2156",
+            "reference": "BC 1004.3",
+            "codePrefix": "BC",
+            "sectionNumber": "1004.3",
+            "exactPassages": [
+              "For areas having fixed seats and aisles, the occupant load shall be determined by the number of fixed seats installed therein. The occupant load for areas in which fixed seating is not installed, such as waiting spaces, shall be determined in accordance with Section 1004.1.3 and added to the number of fixed seats."
+            ],
+            "resolvedTitle": "1004.3 Fixed seating.",
+            "evidenceCharacters": 889,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "For this 2022-code evaluation scenario, may the conference floor's occupant load be documented by counting selected movable seats, omitting lounge and break functions as nonsimultaneous, and retaining the existing 1:100 load without a commissioner-established lower basis?",
+        "expectedConclusion": "No. BC 1004.3 uses the number of installed seats for fixed seating, while areas without fixed seating must be determined under BC 1004.1.3. BC 1004.1.2 requires the floor area of each function with a different occupant-load factor to be calculated independently. A lower actual-occupancy basis is not automatic: BC 1004.1.3.1 states that the commissioner may establish it when actual occupancy will be significantly lower. The selected evidence does not establish that the lounge and break areas may be omitted as nonsimultaneous, nor does it resolve filing type, place-of-assembly status, posted occupancy, or egress capacity. Those conclusions require the actual plans, functions, use assumptions, existing records, and applicable official authority.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The selected passages reject automatic movable-seat counting and require independent functional calculations, but a final occupant load and any approved lower basis depend on missing plans, facts, and commissioner action."
+        },
+        "sourceType": "professional code forum",
+        "sourceReference": "Scenario adapted and anonymized from the Reddit r/Architects thread “NYC - is stated occupancy a thing?”, April 8, 2025: https://www.reddit.com/r/Architects/comments/1jueo7n/nyc_is_stated_occupancy_a_thing/. Replies are not part of the answer key.",
+        "reviewer": null,
+        "reviewedAt": null,
+        "notes": "Draft candidate NYC-002. The source project had not selected a governing code edition; this case is deliberately framed as a 2022-code evaluation variation and does not claim that the source project elected the 2022 Code.",
+        "requiredConcepts": [
+          "Distinguish fixed seating from movable seating.",
+          "State that movable-seat areas remain subject to the area-and-function method in BC 1004.1.3.",
+          "Calculate different functions independently under BC 1004.1.2.",
+          "State that a lower actual-occupancy basis must be established by the commissioner under the selected passage.",
+          "State that the selected evidence does not establish a nonsimultaneous-use exception.",
+          "Request the room areas, functions, furniture layouts, simultaneous-use conditions, existing records, and official approval before providing a final load.",
+          "Keep filing type, PACO, posted occupancy, and egress conclusions outside the selected evidence."
+        ],
+        "missingFacts": [
+          "Room-by-room net and gross floor areas.",
+          "Actual function and furniture layout of each room and open area.",
+          "Whether uses can occur simultaneously.",
+          "Existing Certificate of Occupancy and approved occupant loads.",
+          "Whether the commissioner has established a lower basis.",
+          "Exit number, capacity, widths, travel distance, and common path.",
+          "Applicable PACO, posted-occupancy, and filing authority."
+        ],
+        "forbiddenClaims": [
+          "Movable seats may be counted as fixed seats under BC 1004.3.",
+          "The existing 1:100 documentation automatically controls the altered conference-floor occupant load.",
+          "Lounge and break areas may automatically be omitted as nonsimultaneous.",
+          "The design team may establish a lower basis without commissioner action.",
+          "Professional certification makes an unsupported occupant-load method compliant.",
+          "The selected evidence resolves the filing type, PACO requirement, posted occupancy, or egress compliance."
+        ],
+        "requiredCitations": [
+          "BC 1004.1.2",
+          "BC 1004.1.3",
+          "BC 1004.1.3.1",
+          "BC 1004.3"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "BC 1004.1.2",
+            "requiredClaim": "Independent floor-area calculations for multiple functions having different occupant-load factors."
+          },
+          {
+            "reference": "BC 1004.1.3",
+            "requiredClaim": "Minimum area-and-function occupant-load calculation for areas without fixed seating."
+          },
+          {
+            "reference": "BC 1004.1.3.1",
+            "requiredClaim": "Commissioner authority to establish a lower basis when actual occupancy will be significantly lower."
+          },
+          {
+            "reference": "BC 1004.3",
+            "requiredClaim": "Fixed-seat counting applies to installed fixed seats; areas without fixed seating remain subject to BC 1004.1.3."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "4d3df6a8-e35f-451e-b1e2-145cd9f182c1",
+      "answeredAt": "2026-08-27T22:53:23.407Z",
+      "answerTimeMilliseconds": 23375,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-e23f59e8-62af-4129-b1cf-aa7247e7cb77",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "Project configured code basis",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T22:53:00.038Z"
+        },
+        "answerText": "No—not on the stated basis. Because the seats are movable rather than fixed, the fixed-seat method does not apply. Each area without fixed seating must have an occupant load no lower than its floor area divided by the Table 1004.1.3 factor for that area’s actual function. Counting only selected movable seats therefore does not establish the required design occupant load.\n\nThe conference, soft-seating, and coffee-break/lounge functions cannot simply be omitted as nonsimultaneous. Where an area contains functions with different occupant-load factors, each function’s floor area must be calculated independently. The supplied provisions contain no nonsimultaneous-use reduction. A lower basis is available only if the commissioner establishes one where actual occupancy will be significantly below the table result. Since no such commissioner-established basis is identified, the existing 1:100 documentation cannot be retained merely by proposal or by seat counting.\n\nA final revised load cannot be calculated from the supplied evidence because the applicable Table 1004.1.3 factors are not included, and the room-by-room areas, actual functions, layouts, and simultaneous-use conditions remain unresolved. The supplied evidence also does not establish whether the existing 1:100 basis matches the factor for every proposed function or whether the resulting load is supportable by the available egress capacity.",
+        "conclusion": "No—not on the stated basis. Because the seats are movable rather than fixed, the fixed-seat method does not apply. Each area without fixed seating must have an occupant load no lower than its floor area divided by the Table 1004.1.3 factor for that area’s actual function. Counting only selected movable seats therefore does not establish the required design occupant load.",
+        "supportedPoints": [
+          {
+            "heading": "Multiple functions require separate area calculations",
+            "explanation": "When an area under consideration contains multiple functions with different occupant-load factors, the design occupant load must be based on the floor area of each function calculated independently. Thus, the conference, soft-seating, and coffee-break/lounge areas must be evaluated by their actual functions when their applicable factors differ; the provision does not supply a nonsimultaneous-use exclusion.",
+            "sectionID": "2151",
+            "sourceIDs": [
+              "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Movable-seat areas use the applicable floor-area factor",
+            "explanation": "For an area without fixed seating, occupant load must be not less than the result of dividing the floor area under consideration by the Table 1004.1.3 factor assigned to the function of that space. The stated movable seating does not meet the supplied fixed-seating rule, so counting selected movable seats is not a substitute for this minimum calculation.",
+            "sectionID": "2152",
+            "sourceIDs": [
+              "4c59938c-9967-46c3-93d2-269081b2644e"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "A lower basis requires commissioner action",
+            "explanation": "Where the actual number of occupants will be significantly lower than the Table 1004.1.3 result, the commissioner may establish a lower basis. The stated scenario identifies no commissioner-established lower basis, so this provision does not support retaining a lower load by applicant documentation alone.",
+            "sectionID": "2153",
+            "sourceIDs": [
+              "706224d0-b194-4881-bdc2-8da1f049af25"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "The seat-count method is confined to fixed seats",
+            "explanation": "For areas having fixed seats and aisles, occupant load is determined by the number of fixed seats installed. Areas without fixed seating, including waiting spaces, are instead determined under Section 1004.1.3 and added to the fixed-seat count. Because the stated seats are movable, this fixed-seat method does not authorize the proposed selected-seat count.",
+            "sectionID": "2156",
+            "sourceIDs": [
+              "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "The conference, soft-seating, and coffee-break/lounge functions cannot simply be omitted as nonsimultaneous. Where an area contains functions with different occupant-load factors, each function’s floor area must be calculated independently. The supplied provisions contain no nonsimultaneous-use reduction. A lower basis is available only if the commissioner establishes one where actual occupancy will be significantly below the table result. Since no such commissioner-established basis is identified, the existing 1:100 documentation cannot be retained merely by proposal or by seat counting.\n\nA final revised load cannot be calculated from the supplied evidence because the applicable Table 1004.1.3 factors are not included, and the room-by-room areas, actual functions, layouts, and simultaneous-use conditions remain unresolved. The supplied evidence also does not establish whether the existing 1:100 basis matches the factor for every proposed function or whether the resulting load is supportable by the available egress capacity.",
+        "assumptions": [],
+        "missingFacts": [
+          "The room-by-room floor area assigned to each conference, soft-seating, coffee-break, and lounge function.",
+          "The actual function and furniture layout of each area, needed to identify its applicable Table 1004.1.3 factor.",
+          "Whether any functions or areas will actually be used simultaneously; this is relevant to the proposed factual premise but the supplied provisions do not establish a nonsimultaneous-use reduction.",
+          "Whether the commissioner has established a lower occupant-load basis for any affected space.",
+          "The applicable Table 1004.1.3 occupant-load factors, which are not included in the supplied enacted evidence.",
+          "Available egress capacity for the final calculated design occupant load.",
+          "The approved-record basis for the existing 1:100 documentation and whether it covers the proposed configuration.",
+          "Any filing or posted-occupancy requirement applicable to the revised use or calculated load.",
+          "Room-by-room net and gross areas.",
+          "Actual functions and furniture layouts.",
+          "Simultaneous-use conditions.",
+          "Commissioner-approved lower basis.",
+          "Filing and posted-occupancy requirements."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied enacted evidence establishes the calculation framework but does not include Table 1004.1.3 or its function-specific occupant-load factors.",
+          "The supplied evidence does not establish a rule allowing different floor functions to be omitted from the design occupant load because they are represented as nonsimultaneous.",
+          "The supplied evidence does not establish the approved scope or legal effect of the existing 1:100 documentation, egress-capacity compliance, or filing and posted-occupancy obligations."
+        ],
+        "additionalEvidenceNeeded": [
+          "The applicable Table 1004.1.3 entries for the actual proposed functions.",
+          "A room-by-room plan or area schedule identifying the floor area devoted to each function and its furniture layout.",
+          "Any commissioner determination establishing a lower occupant-load basis.",
+          "The existing approved occupancy records or approved plans supporting the 1:100 documentation, and the proposed filing records if any.",
+          "Egress-capacity information sufficient to evaluate the calculated design occupant load."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "2151",
+            "sectionNumber": "1004.1.2",
+            "title": "1004.1.2 Multiple function occupant load.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+                "selectedText": "Where an area under consideration contains multiple functions having different occupant load factors, the design occupant load for such area shall be based on the floor area of each function calculated independently.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes that multiple functions with different occupant-load factors are calculated independently by function area."
+          },
+          {
+            "sectionID": "2152",
+            "sectionNumber": "1004.1.3",
+            "title": "1004.1.3 Areas without fixed seating.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "4c59938c-9967-46c3-93d2-269081b2644e"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "4c59938c-9967-46c3-93d2-269081b2644e",
+                "selectedText": "For areas without fixed seating, the occupant load shall be not less than that number determined by dividing the floor area under consideration by the occupant load factor assigned to the function of the space as set forth in Table 1004.1.3.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the minimum floor-area/table-factor calculation for areas without fixed seating."
+          },
+          {
+            "sectionID": "2153",
+            "sectionNumber": "1004.1.3.1",
+            "title": "1004.1.3.1 Modifications.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "706224d0-b194-4881-bdc2-8da1f049af25"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "706224d0-b194-4881-bdc2-8da1f049af25",
+                "selectedText": "Where the actual number of occupants of any space will be significantly lower than listed in Table 1004.1.3 , the commissioner may establish a lower basis for the determination of the number of occupants.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes that a lower basis may be established by the commissioner when actual occupancy is significantly lower than the table result."
+          },
+          {
+            "sectionID": "2156",
+            "sectionNumber": "1004.3",
+            "title": "1004.3 Fixed seating.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "320f0275-84f8-49e2-b0e3-e90adb116e4d",
+                "selectedText": "For areas having fixed seats and aisles, the occupant load shall be determined by the number of fixed seats installed therein. The occupant load for areas in which fixed seating is not installed, such as waiting spaces, shall be determined in accordance with Section 1004.1.3 and added to the number of fixed seats.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Limits seat-count calculation to fixed seats and directs non-fixed-seat areas to the floor-area method."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2151",
+          "2152",
+          "2153",
+          "2156",
+          "2137",
+          "2154",
+          "2146",
+          "2143",
+          "113",
+          "232",
+          "138",
+          "2780"
+        ],
+        "evidenceSourceIDs": [
+          "796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+          "4c59938c-9967-46c3-93d2-269081b2644e",
+          "706224d0-b194-4881-bdc2-8da1f049af25",
+          "320f0275-84f8-49e2-b0e3-e90adb116e4d",
+          "research-permitext_discovered-id:2137-2",
+          "research-permitext_discovered-id:2154-5",
+          "research-permitext_discovered-id:2146-6",
+          "research-permitext_discovered-id:2143-7",
+          "research-permitext_discovered-id:113-9",
+          "research-permitext_cross_reference-id:232-3",
+          "research-permitext_cross_reference-id:138-5",
+          "research-permitext_cross_reference-id:2780-9"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 12,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 4,
+          "governingCitationCount": 4,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 8,
+          "userPinnedCount": 4,
+          "permitextDiscoveredCount": 5,
+          "crossReferenceCount": 3,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 13,
+          "requiredClaimCount": 4,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 1004.1.2",
+              "summary": "BC 1004.1.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "4c59938c-9967-46c3-93d2-269081b2644e"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3.1",
+              "summary": "BC 1004.1.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "706224d0-b194-4881-bdc2-8da1f049af25"
+              ]
+            },
+            {
+              "label": "BC 1004.3",
+              "summary": "BC 1004.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "BC 1004.1.2",
+              "summary": "BC 1004.1.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "4c59938c-9967-46c3-93d2-269081b2644e"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3.1",
+              "summary": "BC 1004.1.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "706224d0-b194-4881-bdc2-8da1f049af25"
+              ]
+            },
+            {
+              "label": "BC 1004.3",
+              "summary": "BC 1004.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-9"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "BC 402.8.2",
+              "summary": "BC 402.8.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:232-3"
+              ]
+            },
+            {
+              "label": "BC 303.7",
+              "summary": "BC 303.7 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:138-5"
+              ]
+            },
+            {
+              "label": "BC 1108.2.3",
+              "summary": "BC 1108.2.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2780-9"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "4c59938c-9967-46c3-93d2-269081b2644e"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3.1",
+              "summary": "BC 1004.1.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "706224d0-b194-4881-bdc2-8da1f049af25"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3.2",
+              "summary": "BC 1004.1.3.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2154-5"
+              ]
+            },
+            {
+              "label": "BC 1004.1.1.2.3",
+              "summary": "BC 1004.1.1.2.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2146-6"
+              ]
+            },
+            {
+              "label": "BC 402.8.2",
+              "summary": "BC 402.8.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:232-3"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [
+            "796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+            "4c59938c-9967-46c3-93d2-269081b2644e",
+            "706224d0-b194-4881-bdc2-8da1f049af25",
+            "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:2137-2",
+            "research-permitext_discovered-id:2154-5",
+            "research-permitext_discovered-id:2146-6",
+            "research-permitext_discovered-id:2143-7",
+            "research-permitext_discovered-id:113-9",
+            "research-permitext_cross_reference-id:232-3",
+            "research-permitext_cross_reference-id:138-5",
+            "research-permitext_cross_reference-id:2780-9"
+          ],
+          "projectFactsUsed": [
+            "Floor Area Square Feet: 8000",
+            "Existing Documentation: Group B floor documented at 1 occupant per 100 square feet",
+            "Proposed Functions: conference rooms",
+            "Proposed Functions: soft seating",
+            "Proposed Functions: coffee-break and lounge areas",
+            "Seating: Movable, not fixed",
+            "Reported Calculated Load: More than 200 occupants overall, with no individual room at 75 or more",
+            "Proposed Reduction: Count selected seats and treat some functions as nonsimultaneous"
+          ],
+          "unresolvedProjectFacts": [
+            "Unknowns: room-by-room net and gross areas",
+            "Unknowns: actual functions and furniture layouts",
+            "Unknowns: simultaneous-use conditions",
+            "Unknowns: commissioner-approved lower basis",
+            "Unknowns: egress capacity",
+            "Unknowns: filing and posted-occupancy requirements"
+          ],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Floor Area Square Feet: 8000",
+            "Existing Documentation: Group B floor documented at 1 occupant per 100 square feet",
+            "Proposed Functions: conference rooms",
+            "Proposed Functions: soft seating",
+            "Proposed Functions: coffee-break and lounge areas",
+            "Seating: Movable, not fixed",
+            "Reported Calculated Load: More than 200 occupants overall, with no individual room at 75 or more",
+            "Proposed Reduction: Count selected seats and treat some functions as nonsimultaneous"
+          ],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "For this 2022-code evaluation scenario, may the conference floor's occupant load be documented by counting selected movable seats, omitting lounge and break functions as nonsimultaneous, and retaining the existing 1:100 load without a commissioner-established lower basis?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "For this 2022-code evaluation scenario, may the conference floor's occupant load be documented by counting selected movable seats, omitting lounge and break functions as nonsimultaneous, and retaining the existing 1:100 load without a commissioner-established lower basis?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 4,
+          "coveredClaimCount": 4,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+            "4c59938c-9967-46c3-93d2-269081b2644e",
+            "706224d0-b194-4881-bdc2-8da1f049af25",
+            "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+            "4c59938c-9967-46c3-93d2-269081b2644e",
+            "706224d0-b194-4881-bdc2-8da1f049af25",
+            "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+          ],
+          "citedEvidenceSourceIDs": [
+            "796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+            "4c59938c-9967-46c3-93d2-269081b2644e",
+            "706224d0-b194-4881-bdc2-8da1f049af25",
+            "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2137-2",
+            "research-permitext_discovered-id:2154-5",
+            "research-permitext_discovered-id:2146-6",
+            "research-permitext_discovered-id:2143-7",
+            "research-permitext_discovered-id:113-9",
+            "research-permitext_cross_reference-id:232-3",
+            "research-permitext_cross_reference-id:138-5",
+            "research-permitext_cross_reference-id:2780-9"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+              "label": "BC 1004.1.2 — 1004.1.2 Multiple function occupant load.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:4c59938c-9967-46c3-93d2-269081b2644e",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "4c59938c-9967-46c3-93d2-269081b2644e"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:706224d0-b194-4881-bdc2-8da1f049af25",
+              "label": "BC 1004.1.3.1 — 1004.1.3.1 Modifications.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "706224d0-b194-4881-bdc2-8da1f049af25"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:320f0275-84f8-49e2-b0e3-e90adb116e4d",
+              "label": "BC 1004.3 — 1004.3 Fixed seating.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 4,
+          "coveredClaimCount": 4,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+            "4c59938c-9967-46c3-93d2-269081b2644e",
+            "706224d0-b194-4881-bdc2-8da1f049af25",
+            "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+              "label": "BC 1004.1.2 — 1004.1.2 Multiple function occupant load.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "4c59938c-9967-46c3-93d2-269081b2644e"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "706224d0-b194-4881-bdc2-8da1f049af25"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:4c59938c-9967-46c3-93d2-269081b2644e",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "4c59938c-9967-46c3-93d2-269081b2644e"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "4c59938c-9967-46c3-93d2-269081b2644e"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "4c59938c-9967-46c3-93d2-269081b2644e"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "4c59938c-9967-46c3-93d2-269081b2644e"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "706224d0-b194-4881-bdc2-8da1f049af25"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "4c59938c-9967-46c3-93d2-269081b2644e"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "4c59938c-9967-46c3-93d2-269081b2644e"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:706224d0-b194-4881-bdc2-8da1f049af25",
+              "label": "BC 1004.1.3.1 — 1004.1.3.1 Modifications.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "706224d0-b194-4881-bdc2-8da1f049af25"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "706224d0-b194-4881-bdc2-8da1f049af25"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "706224d0-b194-4881-bdc2-8da1f049af25"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "4c59938c-9967-46c3-93d2-269081b2644e"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "706224d0-b194-4881-bdc2-8da1f049af25"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "706224d0-b194-4881-bdc2-8da1f049af25"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "706224d0-b194-4881-bdc2-8da1f049af25"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:320f0275-84f8-49e2-b0e3-e90adb116e4d",
+              "label": "BC 1004.3 — 1004.3 Fixed seating.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 3,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 3,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "796da8f1-c028-48bd-a2a5-0380ca8d8c3a"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "4c59938c-9967-46c3-93d2-269081b2644e"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "706224d0-b194-4881-bdc2-8da1f049af25"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260827-authority-term-boundary-v17",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "citedSourceIDs": [
+            "796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+            "4c59938c-9967-46c3-93d2-269081b2644e",
+            "706224d0-b194-4881-bdc2-8da1f049af25",
+            "320f0275-84f8-49e2-b0e3-e90adb116e4d"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:2137-2",
+            "research-permitext_discovered-id:2154-5",
+            "research-permitext_discovered-id:2146-6",
+            "research-permitext_discovered-id:2143-7",
+            "research-permitext_discovered-id:113-9",
+            "research-permitext_cross_reference-id:232-3",
+            "research-permitext_cross_reference-id:138-5",
+            "research-permitext_cross_reference-id:2780-9"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 4,
+            "citedProvisionCount": 4,
+            "governingCitationCount": 4,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 8,
+            "reviewedOnlyProvisionCount": 8,
+            "assembledSourceCount": 12,
+            "assembledProvisionCount": 12
+          },
+          "sources": [
+            {
+              "sourceID": "796da8f1-c028-48bd-a2a5-0380ca8d8c3a",
+              "sectionID": "2151",
+              "reference": "BC 1004.1.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Where an area under consideration contains multiple functions having different occupant load factors, the design occupant load for such area shall be based on the floor area of each function calculated independently."
+            },
+            {
+              "sourceID": "4c59938c-9967-46c3-93d2-269081b2644e",
+              "sectionID": "2152",
+              "reference": "BC 1004.1.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "For areas without fixed seating, the occupant load shall be not less than that number determined by dividing the floor area under consideration by the occupant load factor assigned to the function of the space as set forth in Table 1004.1.3."
+            },
+            {
+              "sourceID": "706224d0-b194-4881-bdc2-8da1f049af25",
+              "sectionID": "2153",
+              "reference": "BC 1004.1.3.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Where the actual number of occupants of any space will be significantly lower than listed in Table 1004.1.3 , the commissioner may establish a lower basis for the determination of the number of occupants."
+            },
+            {
+              "sourceID": "320f0275-84f8-49e2-b0e3-e90adb116e4d",
+              "sectionID": "2156",
+              "reference": "BC 1004.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "For areas having fixed seats and aisles, the occupant load shall be determined by the number of fixed seats installed therein. The occupant load for areas in which fixed seating is not installed, such as waiting spaces, shall be determined in accordance with Section 1004.1.3 and added to the number of fixed seats."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2137-2",
+              "sectionID": "2137",
+              "reference": "BC 1004.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.1 1004.1 Design occupant load. Design occupant load. In determining means of egress requirements, the number of occupants for whom means of egress facilities shall be provided shall be established by the largest number computed in accordance with Section 1004.1.3, unless otherwise permitted by Section 1004.1.3.1, 1004.1.3.2 or 1004.2."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2154-5",
+              "sectionID": "2154",
+              "reference": "BC 1004.1.3.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.1.3.2 1004.1.3.2 Unlisted functions. Where data regarding the square feet area per person for a function is not listed in Table 1004.1.3 , the occupant load shall be established by a registered design professional, subject to the approval of the commissioner."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2146-6",
+              "sectionID": "2146",
+              "reference": "BC 1004.1.1.2.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.1.1.2.3 1004.1.1.2.3 Group R-2 accessory spaces as primary function on a story. Where the aggregate Group R-2 occupancy accessory area of all rooms, areas or spaces, including outdoor spaces that are not provided with independent means of egress and that do not converge into interior means of egress, exceed 50 percent of the building area of the story in which they are located, and the total number of occupants on such story exceeds 150 persons, the following conditions shall apply: 1. The interior corridors or portions thereof serving such accessory spaces shall be constructed as public corridors in accordance with Table 1020.1.2 with 1-hour fire-resistance-rated fire barriers, and 2-hour fire-resistance-rated fire barriers where a dead-end corridor exceeds 40 feet (12 192 mm) in length; 2. Access to the corridors shall be limited to those necessary for exit access through the corridor from normally occupied spaces. Direct openings from the mechanical, electrical and other storage spaces shall not be permitted, except that access to the corridor may be provided through a vestibule constructed with fire barriers, with a minimum fire-resistance rating consistent with the required hourly rating for the corridor; 3. Corridors or portions thereof serving such accessory spaces shall be sufficient to accommodate a total occupant load on the basis of 3 square feet (0.28 m 2 ) per person; 4. The minimum dimension of such corridors shall be sufficient to accommodate the total occupant load discharging into such corridors, but shall in no case be less than 5 feet (1524 mm) in minimum dimension; and 5. In addition to Conditions 1 through 4 above, one of the following conditions shall be met: 5.1. Each of the interior exit stairways and ramps serving such story shall be protected by a smokeproof enclosure in accordance with Section 909.20; 5.2. The corridor or portions of the corridor serving the rooms, areas or spaces that are accessory to the Group R-2 occupancy shall be pressurized in accordance with requirements that are applicable to interior exit stairways. Connecting interior exit stairways need not be pressurized unless otherwise required by this code; 5.3. All passenger elevators serving the rooms, areas, or spaces that are accessory to the Group R-2 occupancy shall comply with occupant self-evacuation elevator requirements in Section 3008.1 through 3008.11; or 5.4. One additional exit stairway meeting the requirements of Sections 1009 and 1023 shall be provided in addition to the minimum number of exits required by Section 1006 . The total width of any combination of remaining exit stairways with one exit stairway removed shall not be less than the total width required by Section 1005.3. Rooms, areas or spaces that do not comply with the conditions in Sections 1004.1.1.2.1 and 1004.1.1.2.2, or Section 1004.1.1.2.3 where applicable, shall have occupant loads calculated cumulatively per story and be classified as Occupancy Group A."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2143-7",
+              "sectionID": "2143",
+              "reference": "BC 1004.1.1.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.1.1.2 1004.1.1.2 Cumulative occupant loads in Group R-2 occupancies. Rooms, areas or spaces that are accessory to a Group R-2 occupancy and that comply with the conditions below may have occupant loads calculated individually per room, area, or space, and be classified as Occupancy Group R-2."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-9",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "CERTIFICATE OF OPERATION. A certificate issued by the department upon satisfactory inspection of a specific piece of hoisting equipment to ensure that the equipment is in compliance with this code. DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling. EXIT ACCESS. That portion of a means of egress system that leads from any occupied portion of a building or structure to an exit. FIXED SEATING. Furniture or fixture designed and installed for the use of sitting and secured in place including bench-type seats and seats with or without backs or arm rests. INTERIOR EXIT STAIRWAY. An exit component that serves to meet one or more means of egress design requirements, such as required number of exits or exit access travel distance, and provides for a protected path of egress travel to the exit discharge or public way. OCCUPANT LOAD . The number of persons for which the means of egress of a building or portion thereof is designed . PARKING GARAGE. A structure or portion of a structure, other than a private garage or carport, used for the parking or storage of motor vehicles. WHEELCHAIR SPACE . A space for a single wheelchair and its occupant ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:232-3",
+              "sectionID": "232",
+              "reference": "BC 402.8.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "402.8.2 402.8.2 Occupant load. The calculated occupant load used to determine the required number of means of egress shall be in accordance with this section."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:138-5",
+              "sectionID": "138",
+              "reference": "BC 303.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.7 303.7 Certificate of Operation. A Certificate of Operation shall be required, as per Section 28-117.1 , for the following assembly occupancies: 1. Indoor assembly occupancies used or intended for use by 75 persons or more, including open spaces at 20 feet (6096 mm) or more above or below grade plane, such as roofs or roof terraces. 2. Outdoor assembly occupancies used and intended for use by 200 persons or more. Section BC 304: Business Group B"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2780-9",
+              "sectionID": "2780",
+              "reference": "BC 1108.2.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1108.2.3 1108.2.3 Companion seats. At least one companion seat complying with ICC A117.1, including Section 802.7 (Companion Seat), shall be provided for each wheelchair space required by Sections 1108.2.2.1 through 1108.2.2.3 of this code."
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "For this 2022-code evaluation scenario, may the conference floor's occupant load be documented by counting selected movable seats, omitting lounge and break functions as nonsimultaneous, and retaining the existing 1:100 load without a commissioner-established lower basis?\nProject facts: Existing Documentation: Group B floor documented at 1 occupant per 100 square feet; Proposed Reduction: Count selected seats and treat some functions as nonsimultaneous; Proposed Functions: coffee-break and lounge areas; Proposed Functions: conference rooms; Reported Calculated Load: More than 200 occupants overall, with no individual room at 75 or more; Unknowns: actual functions and furniture layouts; Unknowns: commissioner-approved lower basis; Floor Area Square Feet: 8000; Proposed Functions: soft seating; Seating: Movable, not fixed; Unknowns: room-by-room net and gross areas; Unknowns: filing and posted-occupancy requirements; Unknowns: simultaneous-use conditions; Unknowns: egress capacity",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "For this 2022-code evaluation scenario, may the conference floor's occupant load be documented by counting selected movable seats, omitting lounge and break functions as nonsimultaneous, and retaining the existing 1:100 load without a commissioner-established lower basis?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "For this 2022-code evaluation scenario, may the conference floor's occupant load be documented by counting selected movable seats, omitting lounge and break functions as nonsimultaneous, and retaining the existing 1:100 load without a commissioner-established lower basis?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "For this 2022-code evaluation scenario, may the conference floor's occupant load be documented by counting selected movable seats, omitting lounge and break functions as nonsimultaneous, and retaining the existing 1:100 load without a commissioner-established lower basis?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 4,
+            "candidateCount": 12,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 3,
+            "characterCount": 12030,
+            "resolverFailureCount": 1,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 1,
+              "text": "1 enacted section was not available from the canonical resolver."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "referenced-table-review-required",
+              "text": "At least one candidate refers to a table whose complete structured values are not in the proposed passage. That candidate cannot be prepared until the table itself can be reviewed as evidence."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "Project configured code basis"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260827-supporting-web-v9",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-e23f59e8-62af-4129-b1cf-aa7247e7cb77",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "Project configured code basis",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T22:53:00.038Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T22:53:00.038Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v3",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 19110,
+          "cachedInputTokens": 0,
+          "outputTokens": 1893,
+          "totalTokens": 21003
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.039883,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "8bd8746f-ed0d-45e9-a91a-93c019394f02",
+        "createdAt": "2026-08-27T22:53:00.034Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra",
+          "gpt-5.6-luna"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v3",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 2,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 19110,
+        "cachedInputTokens": 0,
+        "outputTokens": 1893,
+        "totalTokens": 21003,
+        "estimatedCostUSD": 0.039883,
+        "actualProviderCostUSD": 0.039883,
+        "conservativeProviderCostUSD": 0.039883,
+        "durationMilliseconds": 23372,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T22:53:46.913Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 22957,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 4864,
+              "cachedInputTokens": 2143,
+              "outputTokens": 2092,
+              "totalTokens": 6956
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 4864,
+          "cachedInputTokens": 2143,
+          "outputTokens": 2092,
+          "totalTokens": 6956
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "Each required citation is used for the claim it supports. BC 1004.1.2 supports independent functional-area calculations; BC 1004.1.3 supports the minimum area/table-factor method for areas without fixed seating; BC 1004.1.3.1 supports commissioner establishment of a lower basis; and BC 1004.3 confines seat-counting to installed fixed seats and directs areas without fixed seating to BC 1004.1.3.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent a movable-seat exception, automatic nonsimultaneous-use exception, or applicant-created lower basis. Its statements concerning what the supplied evidence does not establish are appropriately framed as evidentiary limits.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer gives the conditional conclusion supported by the passages while expressly recognizing that a final load cannot be calculated and that the lower-basis, function, area, table-factor, and egress facts remain unresolved.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It directly states that the supplied evidence cannot calculate a final revised load and does not establish a nonsimultaneous-use reduction, the status of the existing 1:100 basis, egress-capacity compliance, or filing and posted-occupancy obligations.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 3,
+            "rationale": "The answer provides a clear no-answer, applies all selected provisions, and identifies the key additional plans, table entries, records, commissioner action, and egress information needed. It is slightly less complete because it does not specifically flag PACO/place-of-assembly status or applicable authority as unresolved.",
+            "failureExcerpt": "\"The supplied evidence also does not establish whether the existing 1:100 basis matches the factor for every proposed function or whether the resulting load is supportable by the available egress capacity.\"",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers no and separately addresses movable-seat counting, omission of allegedly nonsimultaneous functions, and retention of the 1:100 documentation without a commissioner-established lower basis.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly distinguishes the stated movable seats from fixed seats and states that the fixed-seat method does not apply.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It states that each area without fixed seating must be calculated by floor area divided by the applicable Table 1004.1.3 factor for its actual function.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It states that each function's floor area must be calculated independently where functions have different occupant-load factors.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It correctly explains that a lower basis is available only if the commissioner establishes it and notes none is identified.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It says the functions cannot simply be omitted as nonsimultaneous and that the supplied provisions contain no nonsimultaneous-use reduction.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It requests or identifies as unresolved room-by-room areas, functions, layouts, simultaneous-use conditions, approved records supporting the 1:100 basis, and commissioner action before a final load can be provided.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "Although it appropriately leaves filing, posted-occupancy, and egress matters outside the supplied evidence, it does not specifically address PACO/place-of-assembly status or the applicable filing authority.",
+              "failureExcerpt": "\"The supplied evidence does not establish the approved scope or legal effect of the existing 1:100 documentation, egress-capacity compliance, or filing and posted-occupancy obligations.\"",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer rejects counting movable seats under the fixed-seat method.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It rejects retaining the existing 1:100 documentation merely through proposal or selected-seat counting.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It expressly says the lounge and break functions cannot simply be omitted as nonsimultaneous.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It states that only the commissioner may establish a lower basis under the selected provision.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "The answer makes no claim that professional certification validates an unsupported method.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It says the supplied evidence does not establish egress compliance or filing and posted-occupancy obligations. It does not improperly claim that these matters are resolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies room-by-room floor areas and separately lists room-by-room net and gross areas as missing.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "It identifies actual functions and furniture layouts as unresolved and needed to select applicable factors.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It identifies simultaneous-use conditions as unresolved and explains that the supplied provisions do not establish a reduction from the proposed factual premise.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It requests the approved-record basis for the existing 1:100 documentation and whether it covers the proposed configuration.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It identifies whether the commissioner has established a lower basis as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It identifies available egress capacity as needed for the final calculated design occupant load, while appropriately not asserting compliance from the selected evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "The answer identifies filing and posted-occupancy requirements as unresolved, but does not identify PACO/place-of-assembly status or applicable filing authority specifically.",
+              "failureExcerpt": "\"Any filing or posted-occupancy requirement applicable to the revised use or calculated load.\"",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.030975,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 4,
+            "canonicalCount": 4,
+            "selectedEvidenceCount": 4,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 23375,
+            "inputTokens": 19110,
+            "cachedInputTokens": 0,
+            "outputTokens": 1893,
+            "totalTokens": 21003,
+            "estimatedCostUSD": 0.039883,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "Each required citation is used for the claim it supports. BC 1004.1.2 supports independent functional-area calculations; BC 1004.1.3 supports the minimum area/table-factor method for areas without fixed seating; BC 1004.1.3.1 supports commissioner establishment of a lower basis; and BC 1004.3 confines seat-counting to installed fixed seats and directs areas without fixed seating to BC 1004.1.3.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 3.43,
+              "rationale": "6/7 required concepts were covered.",
+              "failureExcerpt": "\"The supplied evidence does not establish the approved scope or legal effect of the existing 1:100 documentation, egress-capacity compliance, or filing and posted-occupancy obligations.\"",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer does not invent a movable-seat exception, automatic nonsimultaneous-use exception, or applicant-created lower basis. Its statements concerning what the supplied evidence does not establish are appropriately framed as evidentiary limits.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/6 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer gives the conditional conclusion supported by the passages while expressly recognizing that a final load cannot be calculated and that the lower-basis, function, area, table-factor, and egress facts remain unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 3.43,
+              "rationale": "6/7 required missing-fact conditions were recognized.",
+              "failureExcerpt": "\"Any filing or posted-occupancy requirement applicable to the revised use or calculated load.\"",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "It directly states that the supplied evidence cannot calculate a final revised load and does not establish a nonsimultaneous-use reduction, the status of the existing 1:100 basis, egress-capacity compliance, or filing and posted-occupancy obligations.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 3,
+              "rationale": "The answer provides a clear no-answer, applies all selected provisions, and identifies the key additional plans, table entries, records, commissioner action, and egress information needed. It is slightly less complete because it does not specifically flag PACO/place-of-assembly status or applicable authority as unresolved.",
+              "failureExcerpt": "\"The supplied evidence also does not establish whether the existing 1:100 basis matches the factor for every proposed function or whether the resulting load is supportable by the available egress capacity.\"",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "It directly answers no and separately addresses movable-seat counting, omission of allegedly nonsimultaneous functions, and retention of the 1:100 documentation without a commissioner-established lower basis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer expressly distinguishes the stated movable seats from fixed seats and states that the fixed-seat method does not apply.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "It states that each area without fixed seating must be calculated by floor area divided by the applicable Table 1004.1.3 factor for its actual function.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "It states that each function's floor area must be calculated independently where functions have different occupant-load factors.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "It correctly explains that a lower basis is available only if the commissioner establishes it and notes none is identified.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "It says the functions cannot simply be omitted as nonsimultaneous and that the supplied provisions contain no nonsimultaneous-use reduction.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "It requests or identifies as unresolved room-by-room areas, functions, layouts, simultaneous-use conditions, approved records supporting the 1:100 basis, and commissioner action before a final load can be provided.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-7",
+                "rationale": "Although it appropriately leaves filing, posted-occupancy, and egress matters outside the supplied evidence, it does not specifically address PACO/place-of-assembly status or the applicable filing authority.",
+                "failureExcerpt": "\"The supplied evidence does not establish the approved scope or legal effect of the existing 1:100 documentation, egress-capacity compliance, or filing and posted-occupancy obligations.\"",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": false
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer rejects counting movable seats under the fixed-seat method.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "It rejects retaining the existing 1:100 documentation merely through proposal or selected-seat counting.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "It expressly says the lounge and break functions cannot simply be omitted as nonsimultaneous.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "It states that only the commissioner may establish a lower basis under the selected provision.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-5",
+                "rationale": "The answer makes no claim that professional certification validates an unsupported method.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-6",
+                "rationale": "It says the supplied evidence does not establish egress compliance or filing and posted-occupancy obligations. It does not improperly claim that these matters are resolved.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The answer identifies room-by-room floor areas and separately lists room-by-room net and gross areas as missing.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "It identifies actual functions and furniture layouts as unresolved and needed to select applicable factors.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "It identifies simultaneous-use conditions as unresolved and explains that the supplied provisions do not establish a reduction from the proposed factual premise.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "It requests the approved-record basis for the existing 1:100 documentation and whether it covers the proposed configuration.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-5",
+                "rationale": "It identifies whether the commissioner has established a lower basis as unresolved.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-6",
+                "rationale": "It identifies available egress capacity as needed for the final calculated design occupant load, while appropriately not asserting compliance from the selected evidence.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-7",
+                "rationale": "The answer identifies filing and posted-occupancy requirements as unresolved, but does not identify PACO/place-of-assembly status or applicable filing authority specifically.",
+                "failureExcerpt": "\"Any filing or posted-occupancy requirement applicable to the revised use or calculated load.\"",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": false
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "4/4 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. Each required citation is used for the claim it supports. BC 1004.1.2 supports independent functional-area calculations; BC 1004.1.3 supports the minimum area/table-factor method for areas without fixed seating; BC 1004.1.3.1 supports commissioner establishment of a lower basis; and BC 1004.3 confines seat-counting to installed fixed seats and directs areas without fixed seating to BC 1004.1.3.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 4 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 3.43,
+            "rationale": "6/7 required concepts were covered.",
+            "failureExcerpt": "\"The supplied evidence does not establish the approved scope or legal effect of the existing 1:100 documentation, egress-capacity compliance, or filing and posted-occupancy obligations.\"",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent a movable-seat exception, automatic nonsimultaneous-use exception, or applicant-created lower basis. Its statements concerning what the supplied evidence does not establish are appropriately framed as evidentiary limits.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer gives the conditional conclusion supported by the passages while expressly recognizing that a final load cannot be calculated and that the lower-basis, function, area, table-factor, and egress facts remain unresolved.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 3.43,
+            "rationale": "6/7 required missing-fact conditions were recognized.",
+            "failureExcerpt": "\"Any filing or posted-occupancy requirement applicable to the revised use or calculated load.\"",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It directly states that the supplied evidence cannot calculate a final revised load and does not establish a nonsimultaneous-use reduction, the status of the existing 1:100 basis, egress-capacity compliance, or filing and posted-occupancy obligations.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 3,
+            "rationale": "The answer provides a clear no-answer, applies all selected provisions, and identifies the key additional plans, table entries, records, commissioner action, and egress information needed. It is slightly less complete because it does not specifically flag PACO/place-of-assembly status or applicable authority as unresolved.",
+            "failureExcerpt": "\"The supplied evidence also does not establish whether the existing 1:100 basis matches the factor for every proposed function or whether the resulting load is supportable by the available egress capacity.\"",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers no and separately addresses movable-seat counting, omission of allegedly nonsimultaneous functions, and retention of the 1:100 documentation without a commissioner-established lower basis.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 3.82,
+        "passed": false,
+        "criticalFailures": [
+          "required concept missing"
+        ],
+        "requiredRubricsSatisfied": false,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly distinguishes the stated movable seats from fixed seats and states that the fixed-seat method does not apply.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It states that each area without fixed seating must be calculated by floor area divided by the applicable Table 1004.1.3 factor for its actual function.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It states that each function's floor area must be calculated independently where functions have different occupant-load factors.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It correctly explains that a lower basis is available only if the commissioner establishes it and notes none is identified.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It says the functions cannot simply be omitted as nonsimultaneous and that the supplied provisions contain no nonsimultaneous-use reduction.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It requests or identifies as unresolved room-by-room areas, functions, layouts, simultaneous-use conditions, approved records supporting the 1:100 basis, and commissioner action before a final load can be provided.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "Although it appropriately leaves filing, posted-occupancy, and egress matters outside the supplied evidence, it does not specifically address PACO/place-of-assembly status or the applicable filing authority.",
+              "failureExcerpt": "\"The supplied evidence does not establish the approved scope or legal effect of the existing 1:100 documentation, egress-capacity compliance, or filing and posted-occupancy obligations.\"",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer rejects counting movable seats under the fixed-seat method.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It rejects retaining the existing 1:100 documentation merely through proposal or selected-seat counting.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It expressly says the lounge and break functions cannot simply be omitted as nonsimultaneous.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It states that only the commissioner may establish a lower basis under the selected provision.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "The answer makes no claim that professional certification validates an unsupported method.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It says the supplied evidence does not establish egress compliance or filing and posted-occupancy obligations. It does not improperly claim that these matters are resolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies room-by-room floor areas and separately lists room-by-room net and gross areas as missing.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "It identifies actual functions and furniture layouts as unresolved and needed to select applicable factors.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It identifies simultaneous-use conditions as unresolved and explains that the supplied provisions do not establish a reduction from the proposed factual premise.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It requests the approved-record basis for the existing 1:100 documentation and whether it covers the proposed configuration.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It identifies whether the commissioner has established a lower basis as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It identifies available egress capacity as needed for the final calculated design occupant load, while appropriately not asserting compliance from the selected evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "The answer identifies filing and posted-occupancy requirements as unresolved, but does not identify PACO/place-of-assembly status or applicable filing authority specifically.",
+              "failureExcerpt": "\"Any filing or posted-occupancy requirement applicable to the revised use or calculated load.\"",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
