@@ -248,6 +248,7 @@ import {
 } from "./research-answer-quality.mjs";
 import {
   evaluateResearchWebAttribution,
+  researchVerificationResultForWebContext,
   researchWebAttributionRevisionIssues
 } from "./research-web-attribution.mjs";
 import {
@@ -5431,6 +5432,30 @@ async function bumpResearchArtifactRevisions(userID, projects = []) {
   };
 }
 
+async function bumpCommittedResearchArtifactRevisions(userID, projects = []) {
+  try {
+    return await bumpResearchArtifactRevisions(userID, projects);
+  } catch (error) {
+    // The answer, conversation, and charge have already committed atomically.
+    // Artifact revision metadata is a downstream synchronization hint and must
+    // never convert that durable success into a failed, retryable user turn.
+    console.error(JSON.stringify({
+      event: "research_artifact_revision_deferred",
+      user: createHash("sha256").update(String(userID)).digest("hex").slice(0, 16),
+      code: String(error?.code || error?.name || "RESEARCH_ARTIFACT_REVISION_FAILED"),
+      message: String(error?.message || "Research artifact revisions could not be recorded."),
+      projectIDs: normalizedArtifactProjectChanges(projects).map((project) => project.projectID)
+    }));
+    return {
+      schemaVersion: 1,
+      account: null,
+      projects: [],
+      deferred: true,
+      reason: String(error?.code || error?.name || "RESEARCH_ARTIFACT_REVISION_FAILED")
+    };
+  }
+}
+
 async function mutationsAfterSyncEventID(userID, sinceEventID) {
   const adapter = await storeAdapter();
   if (typeof adapter.mutationsAfterEventID !== "function") {
@@ -7934,6 +7959,87 @@ export function deterministicResearchEvidenceAnalysisForBoundedCitation(
   };
 }
 
+function deterministicResearchEvidenceMapItem(source) {
+  const reference = [source?.codePrefix || "Code", source?.sectionNumber || source?.sectionID]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+  const role = normalizedResearchText(source?.evidencePriority?.evidenceRole || "supporting", 80);
+  const relationship = normalizedResearchText(
+    source?.evidencePriority?.topicRouteRelationship || "unrestricted",
+    80
+  );
+  return {
+    label: reference,
+    summary: `${reference} is ${role} enacted evidence on the ${relationship} topic route; apply only its exact supplied text.`,
+    sourceIDs: [source.sourceID]
+  };
+}
+
+/**
+ * Builds the internal evidence index from retrieval metadata instead of asking
+ * a second model to summarize text that the answer model receives verbatim.
+ * This map makes no legal conclusion and therefore cannot override the raw
+ * enacted evidence.
+ */
+export function deterministicResearchEvidenceAnalysisForTurn(
+  evidence,
+  projectFacts = [],
+  retrievalLimitations = []
+) {
+  const sources = Array.isArray(evidence) ? evidence : [];
+  const itemsFor = (predicate) => sources.filter(predicate).map(deterministicResearchEvidenceMapItem);
+  const hasFunction = (source, value) =>
+    (source?.evidencePriority?.functions || []).includes(value);
+  const isMaterial = (source) =>
+    !["contextual", "irrelevant"].includes(source?.evidencePriority?.evidenceRole) &&
+    source?.evidencePriority?.topicRouteRelationship !== "collateral";
+  const evidenceLimitations = retrievalLimitations
+    .map((item) => normalizedResearchText(item?.text || item, 1_500))
+    .filter(Boolean);
+  return {
+    schemaVersion: 1,
+    controllingProvisions: itemsFor((source) =>
+      source?.evidencePriority?.evidenceRole === "governing" && isMaterial(source)
+    ),
+    generalRules: itemsFor((source) =>
+      isMaterial(source) &&
+      source?.evidencePriority?.primaryFunction === "controlling_rule" &&
+      !hasFunction(source, "exception")
+    ),
+    exceptions: itemsFor((source) => isMaterial(source) && hasFunction(source, "exception")),
+    conditions: [],
+    limitations: itemsFor((source) =>
+      ["historical", "future-effective"].includes(source?.applicabilityStatus) ||
+      ["contextual", "irrelevant"].includes(source?.evidencePriority?.evidenceRole) ||
+      source?.evidencePriority?.topicRouteRelationship === "collateral"
+    ),
+    definitions: itemsFor((source) => isMaterial(source) && hasFunction(source, "definition")),
+    crossReferences: itemsFor((source) =>
+      isMaterial(source) && hasFunction(source, "supporting_cross_reference")
+    ),
+    tables: itemsFor((source) => isMaterial(source) && hasFunction(source, "calculation_table")),
+    userPinnedEvidence: sources
+      .filter((source) => source.origin === "user_pinned")
+      .map((source) => source.sourceID),
+    permitextDiscoveredEvidence: sources
+      .filter((source) => source.origin !== "user_pinned")
+      .map((source) => source.sourceID),
+    // These are the facts sent to the answer model. The answer's own missing
+    // facts remain the authority for what is unresolved in the final result.
+    projectFactsUsed: Array.from(new Set(
+      (Array.isArray(projectFacts) ? projectFacts : [])
+        .map((fact) => String(fact || "").trim())
+        .filter(Boolean)
+    )),
+    unresolvedProjectFacts: [],
+    evidenceLimitations: evidenceLimitations.length
+      ? evidenceLimitations
+      : ["Permitext limited this answer to the enacted evidence assembled for the current question."],
+    highValueFollowUpQuestions: []
+  };
+}
+
 export function canonicalResearchBoundedCitationInterpretation(
   interpretation,
   evidenceAnalysis
@@ -8586,14 +8692,13 @@ function combinedResearchClaimRevisionIssues(...results) {
   });
 }
 
-function combinedResearchAnswerRevisionIssues(
-  requiredClaimCoverage,
-  claimMateriality,
-  answerQuality,
-  webAttribution
-) {
+function combinedResearchAnswerRevisionIssues({
+  requiredClaimCoverage = null,
+  answerQuality = null,
+  webAttribution = null
+} = {}) {
   const issues = [
-    ...combinedResearchClaimRevisionIssues(requiredClaimCoverage, claimMateriality),
+    ...combinedResearchClaimRevisionIssues(requiredClaimCoverage),
     ...researchAnswerQualityRevisionIssues(answerQuality),
     ...researchWebAttributionRevisionIssues(webAttribution)
   ];
@@ -9101,6 +9206,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
       safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
       instructions: [
         "You are a building-code research assistant, not an authority having jurisdiction.",
+        options.structuredResponseRetry
+          ? "A prior response could not be parsed or bound to the supplied evidence. Return one complete schema-valid answer using only the exact supplied identifiers; do not add commentary outside the JSON object."
+          : "",
         "Make governing code conclusions only from the authorized enacted evidence supplied in the request.",
         "Evidence marked user_pinned must be considered, but Permitext-discovered enacted evidence may identify a different controlling provision.",
         "Supporting web context may explain or contextualize an answer but is noncontrolling and must never create or override an enacted requirement.",
@@ -9189,17 +9297,26 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     if (error.code === "RESEARCH_REFUSAL") throw error;
     const invalidResponse = new Error("The model returned invalid structured output.");
     invalidResponse.code = "INVALID_RESEARCH_RESPONSE";
+    invalidResponse.providerUsage = researchUsageFromProviderPayload(payload, model);
     throw invalidResponse;
   }
-  const interpretation = finalizeResearchGuidanceOnlyInterpretation(
-    validateResearchInterpretation(
-      normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
-      passageEvidence,
-      supportingSources,
+  let interpretation;
+  try {
+    interpretation = finalizeResearchGuidanceOnlyInterpretation(
+      validateResearchInterpretation(
+        normalizeResearchInterpretationEvidenceBindings(value, passageEvidence),
+        passageEvidence,
+        supportingSources,
+        { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
+      ),
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
-    ),
-    { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
-  );
+    );
+  } catch (error) {
+    if (!error.providerUsage) {
+      error.providerUsage = researchUsageFromProviderPayload(payload, model);
+    }
+    throw error;
+  }
   return {
     interpretation,
     requestedModel: model,
@@ -9207,6 +9324,40 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     configuration,
     usage: researchUsageFromProviderPayload(payload, model)
   };
+}
+
+const retryableResearchInterpretationCodes = new Set([
+  "INVALID_RESEARCH_RESPONSE",
+  "INVALID_RESEARCH_CITATION",
+  "INVALID_RESEARCH_WEB_CITATION"
+]);
+
+async function openAIResearchInterpretationWithStructuredRetry(
+  question,
+  evidence,
+  userID,
+  options = {}
+) {
+  try {
+    return await openAIResearchInterpretation(question, evidence, userID, options);
+  } catch (error) {
+    if (!retryableResearchInterpretationCodes.has(error?.code)) throw error;
+    const firstUsage = error.providerUsage || combinedResearchUsage();
+    try {
+      const retried = await openAIResearchInterpretation(question, evidence, userID, {
+        ...options,
+        structuredResponseRetry: true
+      });
+      return {
+        ...retried,
+        usage: combinedResearchUsage(firstUsage, retried.usage),
+        structuredResponseRetryCount: 1
+      };
+    } catch (retryError) {
+      retryError.providerUsage = combinedResearchUsage(firstUsage, retryError.providerUsage);
+      throw retryError;
+    }
+  }
 }
 
 const researchVerificationIssueTypes = new Set([
@@ -9224,7 +9375,7 @@ const researchVerificationIssueTypes = new Set([
   "unnecessary_qualification",
   "repeated_established_fact"
 ]);
-const maximumResearchVerificationAttempts = 3;
+const maximumResearchVerificationAttempts = 2;
 
 const researchVerificationSchema = {
   type: "object",
@@ -17237,7 +17388,7 @@ async function commitProjectContextOnlyResearchMessage({
     conversation,
     events: activityEvents
   });
-  const artifactRevisions = await bumpResearchArtifactRevisions(
+  const artifactRevisions = await bumpCommittedResearchArtifactRevisions(
     context.userID,
     conversation.primaryProjectID
       ? [{ projectID: conversation.primaryProjectID, domains: ["activity", "foundation", "research"] }]
@@ -17683,6 +17834,8 @@ async function handleResearchConversationMessage(request, response) {
     };
     const mockWebSupport = mockMode ? mockResearchWebSupportFixture(question) : null;
     let evidenceAnalysisEscalated = false;
+    const useModelEvidenceAnalysis =
+      String(process.env.PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS || "").trim() === "1";
     const evidenceAnalysisPromise = mockMode
       ? Promise.resolve({
           analysis: mockResearchEvidenceAnalysis(
@@ -17700,6 +17853,16 @@ async function handleResearchConversationMessage(request, response) {
             turnRetrievalLimitations
           ),
           model: "permitext-deterministic-bounded-citation",
+          usage: combinedResearchUsage()
+        })
+      : !useModelEvidenceAnalysis
+      ? Promise.resolve({
+          analysis: deterministicResearchEvidenceAnalysisForTurn(
+            assembledEvidence,
+            validUserFacts,
+            turnRetrievalLimitations
+          ),
+          model: "permitext-deterministic-evidence-map",
           usage: combinedResearchUsage()
         })
       : runEvidenceAnalysis(modelRouting.configuration.evidenceAnalysisModel).catch(async (error) => {
@@ -17775,6 +17938,20 @@ async function handleResearchConversationMessage(request, response) {
       webSupport,
       evidence: assembledEvidence
     });
+    const requestInterpretation = (model, options) =>
+      model === accurateModel
+        ? openAIResearchInterpretationWithStructuredRetry(
+            question,
+            assembledEvidence,
+            context.userID,
+            { ...options, model }
+          )
+        : openAIResearchInterpretation(
+            question,
+            assembledEvidence,
+            context.userID,
+            { ...options, model }
+          );
     let result = mockMode
       ? {
           interpretation: validateResearchInterpretation(
@@ -17811,10 +17988,7 @@ async function handleResearchConversationMessage(request, response) {
           },
           usage: combinedResearchUsage()
         }
-      : await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
-          ...interpretationOptions,
-          model: modelRouting.model
-        }).catch(async (error) => {
+      : await requestInterpretation(modelRouting.model, interpretationOptions).catch(async (error) => {
           if (
             modelRouting.tier !== "fast" ||
             modelRouting.model === accurateModel ||
@@ -17827,11 +18001,16 @@ async function handleResearchConversationMessage(request, response) {
             toModel: accurateModel,
             reasonCode: String(error?.code || error?.name || "UNKNOWN_RESEARCH_ERROR").slice(0, 120)
           });
-          return openAIResearchInterpretation(question, assembledEvidence, context.userID, {
-            ...interpretationOptions,
-            model: accurateModel
-          });
+          return requestInterpretation(accurateModel, interpretationOptions);
         });
+    if (result.structuredResponseRetryCount) {
+      modelEscalationStages.push({
+        stage: "structured_response_retry",
+        fromModel: result.requestedModel || modelRouting.model,
+        toModel: result.requestedModel || modelRouting.model,
+        reasonCode: "INVALID_RESEARCH_STRUCTURED_RESPONSE"
+      });
+    }
     if (boundedCitationLookup) {
       result = {
         ...result,
@@ -17921,7 +18100,7 @@ async function handleResearchConversationMessage(request, response) {
         pass: Boolean(sourceFaithfulPass),
         issues: sourceFaithfulPass
           ? []
-          : combinedResearchAnswerRevisionIssues(webAttribution),
+          : combinedResearchAnswerRevisionIssues({ webAttribution }),
         model: "permitext-deterministic-official-html-attribution"
       }];
       if (!sourceFaithfulPass) {
@@ -17932,17 +18111,16 @@ async function handleResearchConversationMessage(request, response) {
       }
     } else if (mockMode) {
       const deterministicPass =
-        requiredClaimCoverage.pass && claimMateriality.pass && answerQuality.pass && webAttribution.pass;
+        requiredClaimCoverage.pass && answerQuality.pass && webAttribution.pass;
       verificationAttempts = [{
         pass: deterministicPass,
         issues: deterministicPass
           ? []
-          : combinedResearchAnswerRevisionIssues(
+          : combinedResearchAnswerRevisionIssues({
               requiredClaimCoverage,
-              claimMateriality,
               answerQuality,
               webAttribution
-            ),
+            }),
         model: deterministicPass
           ? "permitext-mock"
           : "permitext-deterministic-answer-quality-gate"
@@ -17971,12 +18149,20 @@ async function handleResearchConversationMessage(request, response) {
             });
           }
           const previousInterpretation = result.interpretation;
-          const revised = await openAIResearchInterpretation(question, assembledEvidence, context.userID, {
+          const revised = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID, {
             ...interpretationOptions,
             model: accurateModel,
             revisionFeedback: accumulatedResearchVerificationIssues(verificationAttempts),
             previousInterpretation
           });
+          if (revised.structuredResponseRetryCount) {
+            modelEscalationStages.push({
+              stage: "structured_response_retry",
+              fromModel: accurateModel,
+              toModel: accurateModel,
+              reasonCode: "INVALID_RESEARCH_STRUCTURED_RESPONSE"
+            });
+          }
           answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, revised.usage);
           result = boundedCitationLookup
             ? {
@@ -18011,23 +18197,21 @@ async function handleResearchConversationMessage(request, response) {
         });
         if (
           !requiredClaimCoverage.pass ||
-          !claimMateriality.pass ||
           !answerQuality.pass ||
           !webAttribution.pass
         ) {
           verificationAttempts.push({
             pass: false,
-            issues: combinedResearchAnswerRevisionIssues(
+            issues: combinedResearchAnswerRevisionIssues({
               requiredClaimCoverage,
-              claimMateriality,
               answerQuality,
               webAttribution
-            ),
+            }),
             model: "permitext-deterministic-answer-quality-gate"
           });
           if (applyEvidenceBoundaryFallback()) break;
           if (attempt === maximumResearchVerificationAttempts - 1) {
-            const error = new Error("The answer failed deterministic materiality, evidence-economy, or source-attribution checks after two bounded revisions.");
+            const error = new Error("The answer failed deterministic evidence or source-attribution checks after one bounded revision.");
             error.code = "RESEARCH_VERIFICATION_FAILED";
             error.verificationAttempts = verificationAttempts;
             throw error;
@@ -18051,14 +18235,18 @@ async function handleResearchConversationMessage(request, response) {
           }
         );
         verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
+        const contextualVerification = researchVerificationResultForWebContext(
+          verification.result,
+          { webSupport, webAttribution }
+        );
         verificationAttempts.push({
-          ...verification.result,
+          ...contextualVerification,
           model: verification.model
         });
-        if (verification.result.pass) break;
+        if (contextualVerification.pass) break;
         if (applyEvidenceBoundaryFallback()) break;
         if (attempt === maximumResearchVerificationAttempts - 1) {
-          const error = new Error("The answer did not pass verification after two bounded revisions.");
+          const error = new Error("The answer did not pass verification after one bounded revision.");
           error.code = "RESEARCH_VERIFICATION_FAILED";
           error.verificationAttempts = verificationAttempts;
           throw error;
@@ -18368,7 +18556,7 @@ async function handleResearchConversationMessage(request, response) {
       webSupportRequested,
       webSupportSearched: webSupport.searched === true
     });
-    const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
+    const artifactRevisions = await bumpCommittedResearchArtifactRevisions(context.userID,
       conversation.primaryProjectID
         ? [{
             projectID: conversation.primaryProjectID,
@@ -27655,7 +27843,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
           configuration: researchModelConfiguration(),
           usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
         }
-      : await openAIResearchInterpretation(question.payload.questionText, evidence, actorUserID, {
+      : await openAIResearchInterpretationWithStructuredRetry(question.payload.questionText, evidence, actorUserID, {
           projectContextFacts: projectFacts,
           messages: []
         });

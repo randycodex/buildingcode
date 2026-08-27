@@ -49,7 +49,15 @@ function sourceReferences(source) {
 }
 
 function webDerivedSupportedPointIndexes(answer, sources, evidence) {
-  if (!sources.size) return [];
+  if (!sources.size) {
+    return (Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : [])
+      .map((point, index) => ({
+        index,
+        text: compactText([point?.heading, point?.explanation].filter(Boolean).join(" "))
+      }))
+      .filter(({ text }) => webGuidanceClaimPattern.test(text))
+      .map(({ index }) => index);
+  }
   const enactedTokens = materialTokens((Array.isArray(evidence) ? evidence : [])
     .flatMap((item) => [item?.title, item?.text])
     .filter(Boolean)
@@ -263,4 +271,35 @@ export function researchWebAttributionRevisionIssues(result) {
     });
   }
   return issues;
+}
+
+const genericWebAttributionVerifierIssuePattern =
+  /\bweb[- ]derived\b|\bWEB_SOURCE_ID\b|\bWEB_CLAIM_ID\b|\bsupportingSourceUses\b|\bbulletin or other web\b/i;
+
+/**
+ * Removes a verifier-only web-attribution false positive when no web source
+ * was supplied and the deterministic attribution check found no web-derived
+ * supported point. Actual unsourced bulletin or guidance points continue to
+ * fail the deterministic check and are never suppressed here.
+ */
+export function researchVerificationResultForWebContext(
+  result,
+  { webSupport = null, webAttribution = null } = {}
+) {
+  const issues = Array.isArray(result?.issues) ? result.issues : [];
+  const hasSuppliedWebSource = Array.isArray(webSupport?.sources) && webSupport.sources.length > 0;
+  if (hasSuppliedWebSource || webAttribution?.pass !== true) return result;
+  const retainedIssues = issues.filter((issue) => !(
+    compactText(issue?.type) === "wrong_attribution" &&
+    genericWebAttributionVerifierIssuePattern.test(compactText(issue?.detail))
+  ));
+  if (retainedIssues.length === issues.length) return result;
+  return {
+    ...result,
+    pass: retainedIssues.length === 0,
+    issues: retainedIssues,
+    ignoredIssueTypes: [
+      ...new Set([...(result?.ignoredIssueTypes || []), "unsupported_web_attribution_verifier_issue"])
+    ]
+  };
 }

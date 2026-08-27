@@ -2,12 +2,6 @@ import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
-import {
-  researchEvidenceVersion,
-  researchPromptVersion
-} from "../research-config.mjs";
-import { researchEvidenceAssemblyVersion } from "../research-evidence-assembly.mjs";
-import { researchModelRoutingVersion } from "../research-model-routing.mjs";
 
 export const frozenResearchHybridBenchmark = Object.freeze({
   id: "20260826-hybrid-economics-baseline-v1",
@@ -22,6 +16,12 @@ export const frozenResearchHybridBenchmark = Object.freeze({
   answerModel: "gpt-5.6-terra",
   fastModel: "gpt-5.6-luna",
   routingMode: "hybrid",
+  gitCommit: "ecc20bb0616719e29a0f70f50e3126217bf4b8d9",
+  completedAt: "2026-08-27T00:58:14.866Z",
+  resultFiles: Object.freeze({
+    diagnostic: "2026-08-27T00-30-43-437Z-6d2193f1-3f44-4583-914b-0efd4a2d08a7.json",
+    approved: "2026-08-27T00-52-32-938Z-fe1f9e36-23eb-4d39-8f24-47be864d110e.json"
+  }),
   answerPricing: Object.freeze({
     inputUSDPerMillionTokens: "2.00",
     cachedInputUSDPerMillionTokens: "0.20",
@@ -75,14 +75,10 @@ export function frozenResearchHybridBenchmarkEnvironment(environment = process.e
 
 export function validateFrozenResearchHybridBenchmark() {
   const profile = frozenResearchHybridBenchmark;
-  assert.equal(researchPromptVersion, profile.promptVersion, "Frozen benchmark prompt version drifted.");
-  assert.equal(researchEvidenceVersion, profile.evidenceVersion, "Frozen benchmark evidence version drifted.");
-  assert.equal(
-    researchEvidenceAssemblyVersion,
-    profile.evidenceAssemblyVersion,
-    "Frozen benchmark evidence-assembly version drifted."
-  );
-  assert.equal(researchModelRoutingVersion, profile.routingVersion, "Frozen benchmark routing version drifted.");
+  assert.match(profile.gitCommit, /^[a-f0-9]{40}$/);
+  assert.ok(Number.isFinite(Date.parse(profile.completedAt)));
+  assert.ok(profile.resultFiles.diagnostic.endsWith(".json"));
+  assert.ok(profile.resultFiles.approved.endsWith(".json"));
   assert.equal(
     profile.targetCompletedTurns,
     profile.diagnosticCaseCount + profile.approvedCaseCount,
@@ -105,6 +101,12 @@ function runEvaluation(arguments_, environment) {
 
 async function main() {
   const profile = validateFrozenResearchHybridBenchmark();
+  if (profile.completedAt) {
+    throw new Error(
+      `The frozen baseline already completed at ${profile.completedAt}. ` +
+      `Its immutable results are tied to ${profile.gitCommit}; create a new benchmark profile for another paid run.`
+    );
+  }
   assert(process.env.OPENAI_API_KEY, "Set OPENAI_API_KEY before running the paid benchmark.");
   const repositoryRoot = resolve(fileURLToPath(new URL("../..", import.meta.url)));
   for (const args of [["diff", "--quiet"], ["diff", "--cached", "--quiet"]]) {

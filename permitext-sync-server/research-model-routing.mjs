@@ -1,6 +1,6 @@
 import { extractResearchCodeReferences } from "./research-conversation-topic.mjs";
 
-export const researchModelRoutingVersion = "20260825-luna-terra-hybrid-v2";
+export const researchModelRoutingVersion = "20260827-luna-terra-hybrid-v3";
 
 function normalized(value) {
   return String(value || "").trim();
@@ -21,7 +21,11 @@ export function researchModelRoutingConfiguration(environment = process.env) {
     accurateModel,
     evidenceAnalysisModel: hybrid ? fastModel : accurateModel,
     webSupportModel: hybrid ? fastModel : accurateModel,
-    verificationModel: accurateModel,
+    // In hybrid mode, Luna performs the bounded critique and objective server
+    // checks remain authoritative. Terra writes or repairs complex answers.
+    // This avoids paying Terra once to answer and again merely to restate the
+    // same evidence during verification.
+    verificationModel: hybrid ? fastModel : accurateModel,
     version: researchModelRoutingVersion
   };
 }

@@ -17,6 +17,7 @@ import {
 import { normalizeResearchWebSources } from "../research-source-policy.mjs";
 import {
   evaluateResearchWebAttribution,
+  researchVerificationResultForWebContext,
   researchWebAttributionRevisionIssues
 } from "../research-web-attribution.mjs";
 
@@ -684,5 +685,61 @@ for (const attempt of attempts) {
     attempt.issues[0].detail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
   ));
 }
+
+const noWebSupport = { searched: false, sources: [] };
+const noWebAttribution = evaluateResearchWebAttribution({
+  question: "Does this enacted provision apply?",
+  answer: {
+    ...answer,
+    supportingSourceUses: [],
+    evidenceLimitations: ["Only the supplied enacted evidence was reviewed."]
+  },
+  evidence,
+  webSupport: noWebSupport
+});
+assert.equal(noWebAttribution.pass, true);
+assert.deepEqual(researchVerificationResultForWebContext({
+  pass: false,
+  issues: [{
+    type: "wrong_attribution",
+    detail: "Move every web-derived statement out of supportedPoints and use WEB_SOURCE_ID bindings."
+  }]
+}, {
+  webSupport: noWebSupport,
+  webAttribution: noWebAttribution
+}), {
+  pass: true,
+  issues: [],
+  ignoredIssueTypes: ["unsupported_web_attribution_verifier_issue"]
+});
+
+const unsourcedBulletinAnswer = {
+  ...answer,
+  supportedPoints: [{
+    heading: "Buildings Bulletin rule",
+    explanation: "Buildings Bulletin 2022-013 establishes an additional requirement.",
+    sectionID: "718-2-6-1",
+    sourceIDs: ["bc-718-2-6-1"]
+  }],
+  supportingSourceUses: []
+};
+const unsourcedBulletinAttribution = evaluateResearchWebAttribution({
+  question: "Does this enacted provision apply?",
+  answer: unsourcedBulletinAnswer,
+  evidence,
+  webSupport: noWebSupport
+});
+assert.equal(unsourcedBulletinAttribution.pass, false);
+assert.deepEqual(
+  researchVerificationResultForWebContext({
+    pass: false,
+    issues: [{ type: "wrong_attribution", detail: "Remove the unsourced bulletin claim." }]
+  }, {
+    webSupport: noWebSupport,
+    webAttribution: unsourcedBulletinAttribution
+  }).pass,
+  false,
+  "A real unsourced guidance claim must not be hidden as a verifier false positive."
+);
 
 console.log("Permitext source-specific web-attribution and revision non-regression contract passed; paid model calls: no.");

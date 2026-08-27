@@ -23,6 +23,16 @@ assert.match(
   /await commitResearchConversationMessage\(/,
   "Research message handler does not use the durable commit helper."
 );
+assert.match(
+  messageHandlerSlice,
+  /await commitResearchConversationMessage\([\s\S]*?await bumpCommittedResearchArtifactRevisions\(/,
+  "Post-commit artifact revision bookkeeping can still replace a durable Research success with a visible failure."
+);
+assert.match(
+  appSource,
+  /async function bumpCommittedResearchArtifactRevisions\([\s\S]*?event: "research_artifact_revision_deferred"[\s\S]*?deferred: true/,
+  "Research does not preserve a durable answer when downstream artifact revision metadata is temporarily unavailable."
+);
 assert.equal(
   /completeResearchUsageReservation\(/.test(messageHandlerSlice),
   false,
@@ -37,6 +47,16 @@ assert.match(
   messageHandlerSlice,
   /stage: "evidence_analysis_failure"[\s\S]*stage: "answer_generation_failure"[\s\S]*stage: "answer_verification_revision"/,
   "Hybrid Research telemetry no longer distinguishes provider/validation fallback from verification-driven repair."
+);
+assert.match(
+  appSource,
+  /async function openAIResearchInterpretationWithStructuredRetry\([\s\S]*retryableResearchInterpretationCodes\.has\(error\?\.code\)[\s\S]*structuredResponseRetry: true[\s\S]*structuredResponseRetryCount: 1/,
+  "A malformed model response does not receive one bounded schema retry with combined provider usage."
+);
+assert.match(
+  appSource,
+  /invalidResponse\.providerUsage = researchUsageFromProviderPayload\(payload, model\)/,
+  "Malformed Research output can still disappear from provider-cost telemetry."
 );
 assert.match(
   messageHandlerSlice,

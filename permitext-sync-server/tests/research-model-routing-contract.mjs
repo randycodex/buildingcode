@@ -18,6 +18,11 @@ const environment = {
 
 assert.equal(researchModelRoutingConfiguration(environment).mode, "hybrid");
 assert.match(researchModelRoutingVersion, /luna-terra-hybrid/);
+assert.equal(
+  researchModelRoutingConfiguration(environment).verificationModel,
+  "gpt-5.6-luna",
+  "Hybrid verification should use Luna while Terra remains the accurate answer and repair model."
+);
 
 const direct = routeResearchAnswerModel({
   question: "What does BC 101.2 require?",
@@ -137,6 +142,11 @@ assert.equal(
   researchModelRoutingConfiguration({ PERMITEXT_RESEARCH_MODEL: "gpt-5.6-terra" }).mode,
   "single",
   "Production must remain single-model until hybrid routing is explicitly enabled."
+);
+assert.equal(
+  researchModelRoutingConfiguration({ PERMITEXT_RESEARCH_MODEL: "gpt-5.6-terra" }).verificationModel,
+  "gpt-5.6-terra",
+  "Single-model deployments must continue using the configured accurate model for verification."
 );
 
 console.log("Permitext Research model-routing contract passed; paid model calls: no.");

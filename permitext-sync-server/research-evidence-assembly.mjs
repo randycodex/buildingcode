@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260826-pinned-prose-context-v15";
+export const researchEvidenceAssemblyVersion = "20260827-collateral-scope-v16";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,

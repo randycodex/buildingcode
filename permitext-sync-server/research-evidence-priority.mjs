@@ -185,7 +185,14 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
   const definition = isDefinition(value, text);
   const exception = isException(value, text);
   const calculationTable = isCalculationOrTable(value, text);
-  const controlling = pinned || exactReference || Boolean(controllingRoot);
+  // User-pinned evidence must remain in the model-visible package, but pinning
+  // is not itself a legal-materiality decision. A passage on a collateral
+  // topic route is reviewed context, not a mandatory conclusion or citation.
+  // Keeping that distinction here prevents the required-claim gate from
+  // demanding the same passage that the answer-quality gate must reject.
+  const controlling =
+    (pinned || exactReference || Boolean(controllingRoot)) &&
+    topicRouteRelationship !== "collateral";
   const claimCoverageRequired = controlling && !crossReference;
   const roles = [];
   if (controlling) roles.push(researchEvidenceFunctions.controllingRule);

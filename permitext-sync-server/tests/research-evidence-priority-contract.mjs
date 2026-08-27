@@ -160,4 +160,26 @@ for (const collateral of explicitTravelDistanceTopic.slice(2)) {
   assert.equal(collateral.evidencePriority.claimCoverageRequired, false);
 }
 
+const pinnedCollateralTopic = prioritizeResearchEvidence([
+  candidate("1017.2", "Exit access travel distance shall not exceed Table 1017.2.", {
+    exactReference: true,
+    exactTopicRouteTarget: true,
+    topicRoutes: ["exit-access travel-distance limits and measurement"]
+  }),
+  {
+    ...candidate("1004.1", "Occupant load shall be determined by this section.", {
+      exactTopicRouteTarget: true,
+      topicRoutes: ["occupant-load calculation provisions"]
+    }),
+    origin: "user_pinned"
+  }
+]);
+assert.equal(pinnedCollateralTopic[1].evidencePriority.topicRouteRelationship, "collateral");
+assert.equal(pinnedCollateralTopic[1].evidencePriority.evidenceRole, "supporting");
+assert.equal(
+  pinnedCollateralTopic[1].evidencePriority.claimCoverageRequired,
+  false,
+  "Pinning a collateral passage must preserve it for review without forcing it into the answer."
+);
+
 console.log("Permitext deterministic Research evidence priority contract passed.");

@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import {
   canonicalResearchBoundedCitationInterpretation,
   deterministicResearchEvidenceAnalysisForBoundedCitation,
+  deterministicResearchEvidenceAnalysisForTurn,
   projectResearchConversationForList,
   researchConversationDisplayTitle,
   researchProjectInformation,
@@ -429,6 +430,57 @@ assert.deepEqual(boundedCitationAnalysis.controllingProvisions, [{
 assert.deepEqual(boundedCitationAnalysis.unresolvedProjectFacts, []);
 assert.deepEqual(boundedCitationAnalysis.highValueFollowUpQuestions, []);
 assert.deepEqual(boundedCitationAnalysis.evidenceLimitations, ["Only the cited enacted section was included."]);
+const deterministicTurnAnalysis = deterministicResearchEvidenceAnalysisForTurn([
+  {
+    sourceID: "governing",
+    sectionID: "101-1",
+    codePrefix: "BC",
+    sectionNumber: "101.1",
+    origin: "permitext_discovered",
+    applicabilityStatus: "current-enacted-edition",
+    evidencePriority: {
+      evidenceRole: "governing",
+      primaryFunction: "controlling_rule",
+      functions: ["controlling_rule"],
+      topicRouteRelationship: "aligned"
+    }
+  },
+  {
+    sourceID: "pinned-collateral",
+    sectionID: "1004-1",
+    codePrefix: "BC",
+    sectionNumber: "1004.1",
+    origin: "user_pinned",
+    applicabilityStatus: "current-enacted-edition",
+    evidencePriority: {
+      evidenceRole: "supporting",
+      primaryFunction: "calculation_table",
+      functions: ["calculation_table"],
+      topicRouteRelationship: "collateral"
+    }
+  }
+], ["The building has six stories."], [{ text: "Only the current enacted edition was searched." }]);
+assert.deepEqual(
+  deterministicTurnAnalysis.controllingProvisions.flatMap((item) => item.sourceIDs),
+  ["governing"]
+);
+assert.deepEqual(
+  deterministicTurnAnalysis.limitations.flatMap((item) => item.sourceIDs),
+  ["pinned-collateral"],
+  "The deterministic evidence map must review pinned collateral evidence without promoting it to a governing conclusion."
+);
+assert.deepEqual(deterministicTurnAnalysis.projectFactsUsed, ["The building has six stories."]);
+assert.deepEqual(deterministicTurnAnalysis.evidenceLimitations, ["Only the current enacted edition was searched."]);
+assert.doesNotThrow(
+  () => validateResearchEvidenceAnalysis(deterministicTurnAnalysis, [{
+    sourceID: "governing",
+    origin: "permitext_discovered"
+  }, {
+    sourceID: "pinned-collateral",
+    origin: "user_pinned"
+  }], ["The building has six stories."]),
+  "The deterministic ordinary-turn evidence map must satisfy the same binding contract as model analysis."
+);
 assert.deepEqual(
   canonicalResearchBoundedCitationInterpretation({
     answerText: "Section 101.1 supplies the requested title.",
@@ -465,7 +517,7 @@ assert.match(appSource, /projectFactsUsed\.maxItems = 0/, "The evidence-analysis
 assert.match(appSource, /max_output_tokens: 6_000,/, "The evidence-analysis model can still be cut off before returning its structured legal-research map.");
 assert.match(appSource, /max_output_tokens: 4_000,/, "The Research verifier can still be cut off before returning its structured result.");
 assert.match(appSource, /timeoutMilliseconds: 45_000,[\s\S]*?failureMessage: "The Research verifier request failed\."/, "The Research verifier timeout is too short for a complex evidence package.");
-assert.match(appSource, /maximumResearchVerificationAttempts = 3/, "Research does not preserve two bounded correction opportunities behind the verifier gate.");
+assert.match(appSource, /maximumResearchVerificationAttempts = 2/, "Research must allow at most one bounded correction behind the verifier gate.");
 assert.match(clientSource, /function wireResearchDetailsMotion\(details, body\)/, "Research disclosures do not share the standard collapsible motion helper.");
 assert.match(clientSource, /wireResearchDetailsMotion\(evidenceReviewed, evidenceReviewedBody\)/, "Evidence reviewed does not use the shared disclosure motion.");
 assert.match(clientSource, /wireResearchDetailsMotion\(details, detailsBody\)/, "The nested evidence details do not use the shared disclosure motion.");
