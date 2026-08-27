@@ -66,4 +66,38 @@ assert.doesNotMatch(whitespaceAnswer.supportedPoints[0].explanation, / {2,}/);
 assert.doesNotMatch(whitespaceAnswer.evidenceLimitations[0], / {2,}/);
 assert.doesNotMatch(whitespaceAnswer.citations[0].relevance, / {2,}/);
 
+const exceptionAttributionAnswer = validateResearchInterpretation({
+  conclusion: "The referenced sprinkler standard must be confirmed.",
+  supportedPoints: [{
+    heading: "Referenced sprinkler standard",
+    explanation: "The referenced provision establishes the NFPA 13 sprinkler-system standard.",
+    sectionID: "1630",
+    sourceIDs: ["bc-903-3-1-1"]
+  }],
+  explanation: "The separate exception conditions come from their governing provision.",
+  assumptions: [],
+  missingFacts: [],
+  followUpQuestions: [],
+  evidenceLimitations: ["The exception text was not supplied in this fixture."],
+  additionalEvidenceNeeded: [],
+  supportingSourceUses: [],
+  citations: [{
+    sectionID: "1630",
+    sourceIDs: ["bc-903-3-1-1"],
+    relevance: "Establishes the distinct conditions for Exception 2 and the NFPA 13 standard."
+  }]
+}, [{
+  sectionID: "1630",
+  sourceID: "bc-903-3-1-1",
+  codePrefix: "BC",
+  sectionNumber: "903.3.1.1",
+  title: "903.3.1.1 NFPA 13 sprinkler systems.",
+  text: "Sprinklers shall be installed throughout in accordance with NFPA 13."
+}]);
+assert.equal(
+  exceptionAttributionAnswer.citations[0].relevance,
+  "Provides the referenced enacted requirements in BC 903.3.1.1 (NFPA 13 sprinkler systems)."
+);
+assert.doesNotMatch(exceptionAttributionAnswer.citations[0].relevance, /Exception 2/i);
+
 console.log("Permitext Research answer punctuation sanitization contract passed; paid model calls: no.");

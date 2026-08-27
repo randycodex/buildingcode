@@ -9027,10 +9027,28 @@ export function validateResearchInterpretation(value, evidence, supportingSource
       claim: cleanNarrative(attributedClaim.text)
     };
   });
-  const cleanedCitations = citations.map((citation) => ({
-    ...citation,
-    relevance: cleanNarrative(citation.relevance)
-  }));
+  const cleanedCitations = citations.map((citation) => {
+    const relevance = cleanNarrative(citation.relevance);
+    const sourceText = citation.supportingPassages
+      .map((passage) => cleanNarrative(passage.selectedText))
+      .join(" ");
+    const exceptionReferences = Array.from(new Set(
+      relevance.match(/\bException\s+\d+\b/gi) || []
+    ));
+    const claimsUnsuppliedException = exceptionReferences.some((reference) =>
+      !sourceText.toLowerCase().includes(reference.toLowerCase())
+    );
+    if (!claimsUnsuppliedException) return { ...citation, relevance };
+    const reference = [citation.codePrefix, citation.sectionNumber].filter(Boolean).join(" ");
+    const rawTitle = cleanNarrative(citation.title).replace(/[.\s]+$/, "");
+    const title = rawTitle.startsWith(citation.sectionNumber)
+      ? rawTitle.slice(String(citation.sectionNumber).length).trim()
+      : rawTitle;
+    return {
+      ...citation,
+      relevance: `Provides the referenced enacted requirements in ${reference}${title ? ` (${title})` : ""}.`
+    };
+  });
   if (
     !answerText ||
     !conclusion ||
