@@ -43,7 +43,7 @@ assert.equal(environment.PERMITEXT_RESEARCH_TARGET_100_TURN_COST_MIN_USD, "4.00"
 assert.equal(environment.PERMITEXT_RESEARCH_TARGET_100_TURN_COST_MAX_USD, "6.00");
 assert.equal(environment.PERMITEXT_RESEARCH_KILL_SWITCH, "0");
 assert.equal(environment.PERMITEXT_RESEARCH_PAID_TURNS_ENABLED, "0");
-assert.equal(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD, "12.00");
+assert.equal(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD, "4.00");
 assert.match(readme, /which runs 20 distinct/);
 assert.match(readme, /map-only fire-district case remains in the safety suite/);
 let preflightRequest = null;

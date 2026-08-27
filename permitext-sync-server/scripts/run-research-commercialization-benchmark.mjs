@@ -48,7 +48,7 @@ export function researchCommercializationBenchmarkEnvironment(environment = proc
     ...environment,
     PERMITEXT_RUN_PAID_RESEARCH_EVALS: "1",
     PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS: "1",
-    PERMITEXT_RESEARCH_EVAL_MAX_USD: "12.00",
+    PERMITEXT_RESEARCH_EVAL_MAX_USD: "4.00",
     PERMITEXT_RESEARCH_MODEL: profile.accurateModel,
     PERMITEXT_RESEARCH_ACCURATE_MODEL: profile.accurateModel,
     PERMITEXT_RESEARCH_FAST_MODEL: profile.fastModel,
