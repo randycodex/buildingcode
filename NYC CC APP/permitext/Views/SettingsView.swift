@@ -559,7 +559,8 @@ struct SettingsView: View {
                         arrowEdge: .bottom
                     ) {
                         accountDeletePopover
-                            .presentationCompactAdaptation(.popover)
+                            .presentationCompactAdaptation(.sheet)
+                            .presentationDetents([.large])
                     }
                 }
             }
