@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-project-condition-coverage-v14";
+  "20260827-dependent-condition-coverage-v15";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -118,19 +118,21 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     /\bGroup B\b/i.test(question) &&
     /\b(?:fewer than|under|less than)\s+75\b/i.test(question);
   const accessoryAssemblySourceIDs = accessoryAssemblyPlumbingQuestion
-    ? knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.reference === "BC 303.1.3")
+    ? Array.from(availableEvidence.values())
+      .filter((source) => source.reference === "BC 303.1.3")
+      .map((source) => source.sourceID)
     : [];
-  const citedAccessoryClassificationSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
-    availableEvidence.get(sourceID)?.reference === "BC 303.1.3"
-  );
+  const accessoryClassificationSourceIDs = Array.from(availableEvidence.values())
+    .filter((source) => source.reference === "BC 303.1.3")
+    .map((source) => source.sourceID);
   const userStatesAccessoryRelationship = /\baccessory\b/i.test(question);
   const assertsAccessoryRelationshipAsFact =
     /\b(?:because|since)\s+(?:the\s+)?(?:room|space|it)\s+is\s+accessory\b/i.test(applicabilityText);
   const unestablishedAccessoryRelationshipSourceIDs =
-    citedAccessoryClassificationSourceIDs.length &&
+    accessoryClassificationSourceIDs.length &&
     !userStatesAccessoryRelationship &&
     assertsAccessoryRelationshipAsFact
-      ? citedAccessoryClassificationSourceIDs
+      ? accessoryClassificationSourceIDs
       : [];
   const userStatesGroupBPrincipalOccupancy =
     /\baccessory to (?:an?|the)\s+Group B occupancy\b/i.test(question);
@@ -141,10 +143,12 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       ? accessoryAssemblySourceIDs
       : [];
   const restrictedPC403AccessorySourceIDs = accessoryAssemblyPlumbingQuestion
-    ? knownCitedSourceIDs.filter((sourceID) =>
-      availableEvidence.get(sourceID)?.reference === "PC 403.1" &&
-      /\bbuilding or nonaccessory tenant space\b/i.test(availableEvidence.get(sourceID)?.text)
-    )
+    ? Array.from(availableEvidence.values())
+      .filter((source) =>
+        source.reference === "PC 403.1" &&
+        /\bbuilding or nonaccessory tenant space\b/i.test(source.text)
+      )
+      .map((source) => source.sourceID)
     : [];
   const disclosesPC403NonaccessoryScope =
     /\bbuilding or nonaccessory tenant(?: assembly)? space\b/i.test(applicabilityText) &&
@@ -160,12 +164,14 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       ? accessoryAssemblySourceIDs
       : [];
   const multipleOccupancyFractionSourceIDs = accessoryAssemblyPlumbingQuestion
-    ? knownCitedSourceIDs.filter((sourceID) =>
-      availableEvidence.get(sourceID)?.reference === "PC 403.1.1" &&
-      /\bmultiple occupancies\b[\s\S]*\bfractional numbers?\b[\s\S]*\b(?:added|summed|combined)\b[\s\S]*\bround/i.test(
-        availableEvidence.get(sourceID)?.text
+    ? Array.from(availableEvidence.values())
+      .filter((source) =>
+        source.reference === "PC 403.1.1" &&
+        /\bmultiple occupancies\b[\s\S]*\bfractional numbers?\b[\s\S]*\b(?:added|summed|combined)\b[\s\S]*\bround/i.test(
+          source.text
+        )
       )
-    )
+      .map((source) => source.sourceID)
     : [];
   const statesMultipleOccupancyFractionSequence =
     /\b(?:add|added|sum|summed|combine|combined)\b[^.]{0,100}\bfraction(?:s|al\s+(?:numbers?|(?:fixture\s+)?requirements?))\b[^.]{0,100}\b(?:before|then|prior to)\b[^.]{0,60}\bround/i.test(applicabilityText) ||
@@ -178,9 +184,9 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     /\bHCR\b/i.test(question) &&
     /\bvanity\b/i.test(question);
   const hcrVanitySourceIDs = hcrVanityQuestion
-    ? knownCitedSourceIDs.filter((sourceID) =>
-      availableEvidence.get(sourceID)?.reference === "BC 1107.2.2.7.2.2"
-    )
+    ? Array.from(availableEvidence.values())
+      .filter((source) => source.reference === "BC 1107.2.2.7.2.2")
+      .map((source) => source.sourceID)
     : [];
   const userStatesTypeBNYCApplicability = /\bType B\+NYC\b/i.test(question);
   const preservesTypeBNYCApplicabilityAsConditional =

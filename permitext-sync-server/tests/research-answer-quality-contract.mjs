@@ -338,6 +338,21 @@ assert.equal(
   "missed_material_conclusion"
 );
 
+const initiallyUncitedFractionSequence = evaluateResearchAnswerQuality({
+  question: accessoryAssemblyQuestion,
+  evidence: [...accessoryAssemblyEvidence, pc403MultipleOccupancyEvidence],
+  answer: {
+    answerText: "Not automatically. BC 303.1.3 supplies the Assembly-calculation option.",
+    supportedPoints: [{ sourceIDs: ["bc-accessory-assembly"] }],
+    citations: [{ sourceIDs: ["bc-accessory-assembly"] }]
+  }
+});
+assert.deepEqual(
+  initiallyUncitedFractionSequence.missingMultipleOccupancyFractionSequenceSourceIDs,
+  ["pc-multiple-occupancy-fractions"],
+  "Material dependent conditions must be reported in the first repair even when their source was initially omitted."
+);
+
 const completeFractionSequence = evaluateResearchAnswerQuality({
   question: accessoryAssemblyQuestion,
   evidence: [...accessoryAssemblyEvidence, pc403MultipleOccupancyEvidence],
@@ -466,6 +481,21 @@ const contextlessVanityAnswer = evaluateResearchAnswerQuality({
 });
 assert.equal(contextlessVanityAnswer.pass, false);
 assert.deepEqual(contextlessVanityAnswer.missingTypeBNYCContextSourceIDs, ["bc-type-b-nyc-toilet-room"]);
+
+const initiallyUncitedVanityScope = evaluateResearchAnswerQuality({
+  question: vanityQuestion,
+  evidence: vanityEvidence,
+  answer: {
+    answerText: "No. The evidence does not establish an HCR vanity requirement.",
+    supportedPoints: [],
+    citations: []
+  }
+});
+assert.deepEqual(
+  initiallyUncitedVanityScope.missingTypeBNYCContextSourceIDs,
+  ["bc-type-b-nyc-toilet-room"],
+  "A first repair must receive the material Type B+NYC applicability condition even when the source was initially omitted."
+);
 
 const contextualVanityAnswer = evaluateResearchAnswerQuality({
   question: vanityQuestion,

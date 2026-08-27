@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 3,
+  "status": "failed",
+  "createdAt": "2026-08-27T03:07:21.894Z",
+  "updatedAt": "2026-08-27T03:07:46.271Z",
+  "configuration": {
+    "runID": "d784506a-edf9-485a-aa15-578d5c555069",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-project-condition-coverage-v27",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "targeted",
+    "repeat": 1,
+    "caseIDs": [
+      "accessory-assembly-plumbing-fixtures"
+    ],
+    "caseStatuses": [
+      "approved"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "13680e9afed16be1b98e2d5488697a12a6b89e08",
+    "approvedSpendCapUSD": 2,
+    "conservativeReservedUSD": 0.078887,
+    "actualUSD": 0.078887,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 2
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T03:07:45.950Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 0,
+      "completedCharged": 0,
+      "completedUncharged": 0,
+      "failed": 1,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.078887,
+      "failedOperatingCostUSD": 0.078887,
+      "completedTurnCostUSD": {
+        "count": 0,
+        "mean": null,
+        "p50": null,
+        "p90": null,
+        "maximum": null
+      },
+      "amortizedCostPerCompletedTurnUSD": null,
+      "projectedCostPer100TurnsUSD": null,
+      "targetReady": false,
+      "targetBand": "unmeasured"
+    },
+    "latencyMilliseconds": {
+      "count": 0,
+      "mean": null,
+      "p50": null,
+      "p90": null,
+      "maximum": null
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": null,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": null,
+      "providerRequests": {
+        "count": 0,
+        "mean": null,
+        "p50": null,
+        "p90": null,
+        "maximum": null
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": [
+        {
+          "key": "missed_material_conclusion",
+          "count": 1
+        }
+      ]
+    },
+    "failures": {
+      "count": 1,
+      "rate": 1,
+      "codes": [
+        {
+          "key": "RESEARCH_VERIFICATION_FAILED",
+          "count": 1
+        }
+      ]
+    },
+    "charging": {
+      "chargedCompletedTurns": 0,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "accessory-assembly-plumbing-fixtures",
+        "title": "Plumbing fixtures for an accessory assembly space",
+        "status": "approved",
+        "difficulty": "advanced",
+        "topics": [
+          "plumbing fixtures",
+          "accessory assembly",
+          "occupant load",
+          "fixture calculation"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "space": "Residential multipurpose room",
+          "potentialClassification": "Group B under the accessory assembly provision",
+          "unknowns": [
+            "assembly use category",
+            "occupant load",
+            "shared facilities",
+            "sex distribution"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "132",
+            "reference": "BC 303.1.3",
+            "codePrefix": "BC",
+            "sectionNumber": "303.1.3",
+            "exactPassages": [
+              "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+            ],
+            "resolvedTitle": "303.1.3 Accessory assembly spaces.",
+            "evidenceCharacters": 408,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "11909",
+            "reference": "PC 403.1",
+            "codePrefix": "PC",
+            "sectionNumber": "403.1",
+            "exactPassages": [
+              "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code.",
+              "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies."
+            ],
+            "resolvedTitle": "403.1 Minimum number of fixtures.",
+            "evidenceCharacters": 7906,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "11910",
+            "reference": "PC 403.1.1",
+            "codePrefix": "PC",
+            "sectionNumber": "403.1.1",
+            "exactPassages": [
+              "To determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor.",
+              "Exception: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex."
+            ],
+            "resolvedTitle": "403.1.1 Fixture calculations.",
+            "evidenceCharacters": 912,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+        "expectedConclusion": "Not automatically. BC 303.1.3 directly permits the plumbing fixtures for a qualifying accessory assembly room with fewer than 75 occupants to be calculated using the applicable Assembly fixture requirements even when the room is classified as Group B or as part of the occupancy it serves. The selected PC 403.1 passage supplies the general Table 403.1 framework, but its separate fewer-than-75 permission is expressly limited to a building or nonaccessory tenant assembly space and does not independently extend that permission to this accessory room. The appropriate assembly category must first be identified from the room's actual use. PC 403.1.1 supplies the selected calculation mechanics: divide the occupant load equally between the sexes unless approved statistical information supports another distribution, apply the fixture ratios, combine fractions as required for multiple occupancies, and round up. A final fixture count requires the calculated occupant load, applicable assembly use, existing shared facilities, and other relevant project conditions.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The answer must reject an automatic Group B fixture conclusion and state that a final count is unavailable until the assembly category, occupant load, shared-facility conditions, and other calculation inputs are confirmed."
+        },
+        "sourceType": "real project",
+        "sourceReference": "Initial Permitext AI quality-evaluation case set supplied by the Permitext owner.",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "notes": "Exact enacted passages, calculation rules, and answer key were manually reviewed before approval.",
+        "requiredConcepts": [
+          "State that Group B classification does not automatically control the fixture calculation.",
+          "Attribute permission to use applicable Assembly fixture requirements for the qualifying accessory assembly room directly to BC 303.1.3.",
+          "Explain that the selected PC 403.1 fewer-than-75 passage applies to a building or nonaccessory tenant assembly space and does not independently extend that permission to the accessory room.",
+          "Use PC 403.1 only for the general Table 403.1, occupant-load, and occupancy-classification framework supported by its selected text.",
+          "Require identification of the appropriate assembly category based on actual use.",
+          "Explain the general equal division between the sexes and the statistical-data exception.",
+          "Explain application of fixture ratios, combination of fractions for multiple occupancies, and rounding up.",
+          "Avoid providing a final fixture count without the required project facts."
+        ],
+        "missingFacts": [
+          "Confirm the calculated occupant load.",
+          "Confirm the applicable assembly use category.",
+          "Confirm existing shared facilities and relevant project conditions.",
+          "Confirm whether approved statistical information supports a different distribution between the sexes."
+        ],
+        "forbiddenClaims": [
+          "Group B classification always controls the plumbing fixture calculation.",
+          "State that the selected PC 403.1 fewer-than-75 provision independently applies its building or nonaccessory tenant-space rule to this accessory assembly room.",
+          "Residential unit fixtures automatically satisfy the multipurpose-room requirement.",
+          "Provide a final fixture count without the occupant load, assembly use, shared facilities, and project conditions."
+        ],
+        "requiredCitations": [
+          "BC 303.1.3",
+          "PC 403.1",
+          "PC 403.1.1"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "BC 303.1.3",
+            "requiredClaim": "Direct authority for using Assembly fixture requirements for a qualifying accessory assembly room."
+          },
+          {
+            "reference": "PC 403.1",
+            "requiredClaim": "General Table 403.1 framework and Building Code control of occupant load and occupancy classification; its selected special permission is limited to building or nonaccessory tenant assembly space."
+          },
+          {
+            "reference": "PC 403.1.1",
+            "requiredClaim": "Sex allocation, fixture-ratio application, multiple-occupancy fraction handling, rounding, and the approved-statistical-data exception."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "error": {
+        "code": null,
+        "name": "Error",
+        "message": "POST /research/conversations/message failed (502): The research model could not return a verified, cited answer.",
+        "timestamp": "2026-08-27T03:07:45.913Z"
+      }
+    }
+  ]
+}
