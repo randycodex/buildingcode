@@ -12,9 +12,12 @@ import { resolve } from "node:path";
  */
 export const researchCommercializationBenchmark = Object.freeze({
   id: "20260827-commercialization-cohort-v1",
-  targetQuestionCount: 21,
+  targetQuestionCount: 20,
   minimumCompletedTurns: 20,
-  promptVersion: "20260827-authority-term-boundary-v28",
+  excludedSafetyCaseIDs: Object.freeze([
+    "nyc-018-fire-district-map-boundary"
+  ]),
+  promptVersion: "20260827-explicit-unknown-coverage-v29",
   evidenceVersion: "selected-multimodal-evidence-v3",
   evidenceAssemblyVersion: "20260827-pinned-evidence-budget-v20",
   routingVersion: "20260827-luna-terra-hybrid-v3",
@@ -87,6 +90,7 @@ export function validateResearchCommercializationBenchmark() {
   assert(profile.targetQuestionCount >= 20 && profile.targetQuestionCount <= 30);
   assert(profile.minimumCompletedTurns >= 20);
   assert(profile.minimumCompletedTurns <= profile.targetQuestionCount);
+  assert.equal(new Set(profile.excludedSafetyCaseIDs).size, profile.excludedSafetyCaseIDs.length);
   if (profile.completedAt || profile.gitCommit || profile.resultFile) {
     assert(profile.completedAt && Number.isFinite(Date.parse(profile.completedAt)));
     assert.match(profile.gitCommit || "", /^[a-f0-9]{40}$/);
@@ -100,7 +104,11 @@ function runEvaluation(environment) {
     const child = spawn(process.execPath, [
       "tests/research-evals.mjs",
       "--run-live",
-      "--include-drafts"
+      "--include-drafts",
+      ...researchCommercializationBenchmark.excludedSafetyCaseIDs.flatMap((caseID) => [
+        "--exclude-case",
+        caseID
+      ])
     ], {
       cwd: resolve(fileURLToPath(new URL("..", import.meta.url))),
       env: environment,

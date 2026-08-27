@@ -78,6 +78,25 @@ assert.equal(
   true
 );
 assert.equal(shouldUseResearchWebSupport({ question: "What does BC 1019.3 require?" }, {}), false);
+assert.deepEqual(
+  researchWebSupportTrigger({
+    question: "Does the current Permitext Construction Code evidence prove that this cellar bathroom is permitted under Buildings Bulletin 2011-010?",
+    outsideLibraryRequired: true
+  }, {}),
+  {
+    useWeb: false,
+    reasons: ["selected_evidence_boundary"],
+    configuration: researchSourcePolicyConfiguration({})
+  },
+  "A question about the limits of selected evidence must not fail merely because an outside authority named in the question cannot be retrieved."
+);
+assert.equal(
+  researchWebSupportTrigger({
+    question: "Find and summarize Buildings Bulletin 2011-010 from the official DOB website."
+  }, {}).useWeb,
+  true,
+  "An explicit request to retrieve a named outside authority must still use attributable official web support."
+);
 assert.equal(
   shouldUseResearchWebSupport(
     { question: "Find official guidance." },

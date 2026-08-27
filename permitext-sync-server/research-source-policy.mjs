@@ -118,6 +118,10 @@ const officialPageRequestPattern =
   /\bofficial\b[^.?!\n]{0,120}\b(?:page|webpage|website|web page|web source)\b/i;
 const outsideLibraryRequestPattern =
   /\b(?:web|internet|online source|outside (?:the )?(?:library|corpus)|external source|supporting source|manufacturer(?:'s)? (?:instructions|data|documentation)|referenced standard)\b/i;
+const selectedEvidenceBoundaryPattern =
+  /(?:\b(?:current|selected|supplied|assembled|available)\b[^?\n]{0,120}\b(?:evidence|text|passages?|provisions?|library|corpus)\b[^?\n]{0,180}\b(?:prove|establish|confirm|support|show|demonstrate|sufficient|enough)\b|\bbased only on (?:the )?(?:current|selected|supplied|assembled|available)\b)/i;
+const explicitExternalLookupPattern =
+  /\b(?:find|retrieve|locate|search|look up|open|quote|summarize|review|analy[sz]e|what does|according to|using)\b[^?\n]{0,140}\b(?:guidance|interpretation|bulletin|service notice|advisory|faq|agency practice|web|internet|online source|outside (?:the )?(?:library|corpus)|external source)\b/i;
 const knownResearchAcronyms = new Set([
   "AC", "ADA", "BC", "DOB", "DOT", "FDNY", "FGC", "HPD", "IBC", "ICC",
   "IEBC", "IFGC", "IMC", "IPC", "MC", "MTA", "NFPA", "NYC", "PC", "ZR"
@@ -140,18 +144,26 @@ export function researchWebSupportTrigger(input = {}, environment = process.env)
 
   const question = normalizedText(input.question || input.query);
   const reasons = [];
+  const selectedEvidenceBoundaryOnly =
+    selectedEvidenceBoundaryPattern.test(question) &&
+    !explicitExternalLookupPattern.test(question);
+  if (selectedEvidenceBoundaryOnly) reasons.push("selected_evidence_boundary");
   if (
-    input.guidanceRequested === true ||
-    guidanceRequestPattern.test(question) ||
-    officialPageRequestPattern.test(question)
+    !selectedEvidenceBoundaryOnly && (
+      input.guidanceRequested === true ||
+      guidanceRequestPattern.test(question) ||
+      officialPageRequestPattern.test(question)
+    )
   ) {
     reasons.push("official_guidance_requested");
   }
   if (
-    input.outsideLibraryRequired === true ||
-    input.referencedStandardUnavailable === true ||
-    ["incomplete", "unavailable", "outside_library"].includes(input.corpusCoverage) ||
-    outsideLibraryRequestPattern.test(question)
+    !selectedEvidenceBoundaryOnly && (
+      input.outsideLibraryRequired === true ||
+      input.referencedStandardUnavailable === true ||
+      ["incomplete", "unavailable", "outside_library"].includes(input.corpusCoverage) ||
+      outsideLibraryRequestPattern.test(question)
+    )
   ) {
     const unresolvedAcronyms = unresolvedResearchAuthorityAcronyms(question);
     if (

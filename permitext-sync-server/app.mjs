@@ -8550,7 +8550,7 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     supportedPoints: answerEvidenceGroups.slice(0, maximumResearchSupportedPoints).map(({ section, sourceIDs }) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
-        ? `This provision supplies one of the rules that controls the answer to “${question}”.`
+        ? "This provision supplies one of the enacted rules that controls the answer."
         : `The enacted text from ${section.sectionNumber || section.title} is part of the evidence authorized for this Research.`,
       sectionID: section.sectionID,
       sourceIDs
@@ -9527,6 +9527,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Apply current-turn hypothetical facts only to the current hypothetical. They do not replace established facts. User-stated unknowns remain unknown. Never promote an earlier assistant conclusion into a user-established fact.",
         "Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence.",
         "Treat unresolvedProjectFacts in the structured evidence analysis as user-declared unknowns, not assumptions or established facts. Carry each one into missingFacts only when it can materially affect the requested conclusion.",
+        "When Project facts explicitly list multiple unknowns that can affect the requested conclusion, name each material unresolved item separately in missingFacts. Do not collapse distinct approvals, records, capacity or dimension inputs, and technical inputs into a generic phrase.",
         "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
         "When the user supplied enacted passages, automatically discovered evidence labeled supporting is optional review context. Do not cite or discuss it unless it is materially necessary to answer the exact question or qualify a conclusion supported by the selected passages.",
         "Evidence labeled historical or future-effective is available only because the user explicitly pinned it. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence.",
@@ -18198,7 +18199,9 @@ async function handleResearchConversationMessage(request, response) {
       searched: false,
       sourcePolicyVersion: researchSourcePolicyVersion
     };
-    const mockWebSupport = mockMode ? mockResearchWebSupportFixture(question) : null;
+    const mockWebSupport = mockMode && webSupportRequested
+      ? mockResearchWebSupportFixture(question)
+      : null;
     let evidenceAnalysisEscalated = false;
     const useModelEvidenceAnalysis =
       String(process.env.PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS || "").trim() === "1";

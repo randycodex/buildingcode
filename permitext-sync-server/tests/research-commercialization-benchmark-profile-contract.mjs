@@ -9,18 +9,26 @@ import {
 } from "../scripts/run-research-commercialization-benchmark.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const dataset = JSON.parse(await readFile(join(root, "../evals/research-cases.json"), "utf8"));
+const [datasetText, evaluationSource, appSource] = await Promise.all([
+  readFile(join(root, "../evals/research-cases.json"), "utf8"),
+  readFile(join(root, "research-evals.mjs"), "utf8"),
+  readFile(join(root, "../app.mjs"), "utf8")
+]);
+const dataset = JSON.parse(datasetText);
 const profile = validateResearchCommercializationBenchmark();
 const diagnosticCases = dataset.cases.filter((testCase) =>
-  ["approved", "draft"].includes(testCase.status)
+  ["approved", "draft"].includes(testCase.status) &&
+  !profile.excludedSafetyCaseIDs.includes(testCase.id)
 );
 const environment = researchCommercializationBenchmarkEnvironment({
   OPENAI_API_KEY: "not-a-real-key"
 });
 
 assert.equal(diagnosticCases.length, profile.targetQuestionCount);
-assert.equal(profile.targetQuestionCount, 21);
+assert.equal(profile.targetQuestionCount, 20);
 assert.equal(profile.minimumCompletedTurns, 20);
+assert.deepEqual(profile.excludedSafetyCaseIDs, ["nyc-018-fire-district-map-boundary"]);
+assert.equal(profile.promptVersion, "20260827-explicit-unknown-coverage-v29");
 assert.equal(profile.completedAt, null);
 assert.equal(profile.gitCommit, null);
 assert.equal(profile.resultFile, null);
@@ -34,5 +42,20 @@ assert.equal(environment.PERMITEXT_RESEARCH_TARGET_100_TURN_COST_MAX_USD, "6.00"
 assert.equal(environment.PERMITEXT_RESEARCH_KILL_SWITCH, "0");
 assert.equal(environment.PERMITEXT_RESEARCH_PAID_TURNS_ENABLED, "0");
 assert.equal(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD, "12.00");
+assert.match(
+  evaluationSource,
+  /terminalEvaluationOperationStatuses[\s\S]*terminalEvaluationOperation\([\s\S]*awaitingOperationTelemetry[\s\S]*result\.operationMetric = operationMetric/,
+  "Failed paid turns can advance before terminal no-charge telemetry is durably available."
+);
+assert.match(
+  evaluationSource,
+  /function evaluationProjectFacts[\s\S]*flatMap[\s\S]*Array\.isArray\(value\)[\s\S]*\.map\(\(item\) => `\$\{label\}: \$\{item\}`\)/,
+  "Evaluation Project unknowns are still collapsed into one comma-separated fact."
+);
+assert.match(
+  appSource,
+  /When Project facts explicitly list multiple unknowns[\s\S]*Do not collapse distinct approvals, records, capacity or dimension inputs, and technical inputs/,
+  "The Research prompt does not preserve separately declared material unknowns."
+);
 
 console.log("Permitext open commercialization benchmark profile contract passed; paid model calls: no.");

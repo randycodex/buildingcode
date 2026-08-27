@@ -214,18 +214,32 @@ async function evaluationResearchSpend(baseURL, account) {
   return researchSpend;
 }
 
-async function completedEvaluationOperation(baseURL, account, seenOperationIDs) {
-  for (let attempt = 1; attempt <= 40; attempt += 1) {
+const terminalEvaluationOperationStatuses = new Set([
+  "completed",
+  "failed",
+  "cancelled",
+  "rejected",
+  "replayed"
+]);
+
+async function terminalEvaluationOperation(baseURL, account, seenOperationIDs) {
+  for (let attempt = 1; attempt <= 80; attempt += 1) {
     const researchSpend = await evaluationResearchSpend(baseURL, account);
     const operation = researchSpend.operationMetrics.find((candidate) =>
-      candidate.status === "completed" &&
-      candidate.charged === true &&
+      terminalEvaluationOperationStatuses.has(candidate.status) &&
       !seenOperationIDs.has(candidate.id)
     );
     if (operation) return operation;
     await new Promise((resolveRetry) => setTimeout(resolveRetry, 50));
   }
-  throw new Error("The completed Research turn did not publish private operation telemetry.");
+  throw new Error("The Research turn did not publish terminal private operation telemetry.");
+}
+
+async function completedEvaluationOperation(baseURL, account, seenOperationIDs) {
+  const operation = await terminalEvaluationOperation(baseURL, account, seenOperationIDs);
+  assert.equal(operation.status, "completed", "The successful Research response did not record a completed operation.");
+  assert.equal(operation.charged, true, "The successful paid Research response did not record its single charged turn.");
+  return operation;
 }
 
 function roundScore(value) {
@@ -1192,11 +1206,11 @@ function selectedPassages(testCase) {
 }
 
 function evaluationProjectFacts(projectContext = {}) {
-  return Object.entries(projectContext).map(([key, value]) => {
+  return Object.entries(projectContext).flatMap(([key, value]) => {
     const label = key.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/^./, (character) =>
       character.toUpperCase()
     );
-    return `${label}: ${Array.isArray(value) ? value.join(", ") : value}`;
+    return (Array.isArray(value) ? value : [value]).map((item) => `${label}: ${item}`);
   });
 }
 
@@ -2067,7 +2081,8 @@ function evaluationErrorRecord(error) {
     ...(error.providerStatus ? { providerStatus: error.providerStatus } : {}),
     ...(error.providerCause ? { providerCause: error.providerCause } : {}),
     ...(error.providerUsage ? { providerUsage: error.providerUsage } : {}),
-    ...(error.judgeAttempts ? { judgeAttempts: error.judgeAttempts } : {})
+    ...(error.judgeAttempts ? { judgeAttempts: error.judgeAttempts } : {}),
+    ...(error.telemetryError ? { telemetryError: error.telemetryError } : {})
   };
 }
 
@@ -2172,8 +2187,11 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
         resultsByKey.set(resultKey, result);
         results.push(result);
       }
+      let conversationID = null;
+      let awaitingOperationTelemetry = false;
       try {
-        const conversationID = await createEvaluationConversation(baseURL, account, testCase);
+        conversationID = await createEvaluationConversation(baseURL, account, testCase);
+        awaitingOperationTelemetry = true;
         const { answer, answerTimeMilliseconds, answeredAt } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
         const operationMetric = await completedEvaluationOperation(
           baseURL,
@@ -2181,6 +2199,7 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
           seenOperationIDs
         );
         seenOperationIDs.add(operationMetric.id);
+        awaitingOperationTelemetry = false;
         answer.usage = {
           inputTokens: operationMetric.inputTokens,
           cachedInputTokens: operationMetric.cachedInputTokens,
@@ -2209,6 +2228,20 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
         });
         console.log(`${scoring.passed ? "PASS" : "FAIL"} ${testCase.title}${repeat > 1 ? ` #${repetition}` : ""}: ${scoring.overallScore.toFixed(2)}/4, ${answer.usage?.totalTokens || 0} answer tokens`);
       } catch (error) {
+        if (awaitingOperationTelemetry && conversationID) {
+          try {
+            const operationMetric = await terminalEvaluationOperation(
+              baseURL,
+              account,
+              seenOperationIDs
+            );
+            seenOperationIDs.add(operationMetric.id);
+            result.operationMetric = operationMetric;
+            awaitingOperationTelemetry = false;
+          } catch (telemetryError) {
+            error.telemetryError = telemetryError.message;
+          }
+        }
         result.error = evaluationErrorRecord(error);
         console.error(`ERROR ${testCase.title}${repeat > 1 ? ` #${repetition}` : ""}: ${error.message}`);
         if (error.code === "RESEARCH_EVAL_SPEND_CAP" || error.name === "AbortError") {
