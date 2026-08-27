@@ -1,0 +1,2030 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T00:19:20.054Z",
+  "updatedAt": "2026-08-27T00:19:54.074Z",
+  "configuration": {
+    "runID": "2ead2fbe-a719-40d1-9241-7870ba937b1e",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260826-current-facts-answer-v15",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "targeted",
+    "repeat": 1,
+    "caseIDs": [
+      "scissor-stair-two-exits"
+    ],
+    "caseStatuses": [
+      "approved"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "4d785ccd99824209940322763a186c3e2df192f2",
+    "approvedSpendCapUSD": 2,
+    "conservativeReservedUSD": 0.106755,
+    "actualUSD": 0.106755,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 4
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T00:19:54.032Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.086495,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.086495,
+        "p50": 0.086495,
+        "p90": 0.086495,
+        "maximum": 0.086495
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.086495,
+      "projectedCostPer100TurnsUSD": 8.65,
+      "targetReady": false,
+      "targetBand": "above"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 24410,
+      "p50": 24410,
+      "p90": 24410,
+      "maximum": 24410
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 3,
+        "p50": 3,
+        "p90": 3,
+        "maximum": 3
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "scissor-stair-two-exits",
+        "title": "Scissor stair counted as two exits",
+        "status": "approved",
+        "difficulty": "advanced",
+        "topics": [
+          "means of egress",
+          "scissor stairs",
+          "Group R-2",
+          "fire-resistance"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "occupancy": "Group R-2 stated by the question",
+          "configuration": "Scissor stair with entrance doors 15 feet apart",
+          "unknowns": [
+            "enclosure rating",
+            "separating construction rating",
+            "construction material"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "2197",
+            "reference": "BC 1007.1.1",
+            "codePrefix": "BC",
+            "sectionNumber": "1007.1.1",
+            "exactPassages": [
+              "Stairs sharing any common wall, floor, ceiling, scissor stair assembly, or other enclosure shall be counted as one exit stairway.",
+              "Exceptions:",
+              "3. Group R-2 occupancies. In Group R-2 occupancies, where stairs are enclosed in walls having at least a 2-hour fire resistance rating and constructed of masonry or masonry equivalent in accordance with department rules: 3.1. The exit doors to such stairs shall be placed a distance apart equal to no less than 15 feet (4572 mm); and 3.2. Such stairs shall be permitted to share common walls, floors, ceilings or scissor stairs assemblies or other enclosures provided that the construction separating the stairs is also of at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules."
+            ],
+            "resolvedTitle": "1007.1.1 Two exits or exit access doorways.",
+            "evidenceCharacters": 2374,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+        "expectedConclusion": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. Confirm the occupancy group, enclosure rating, separating construction, and material before concluding that the exception applies.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The answer must state that 15 feet alone is insufficient and make separate-exit treatment conditional on every selected Group R-2 exception condition."
+        },
+        "sourceType": "real project",
+        "sourceReference": "Initial Permitext AI quality-evaluation case set supplied by the Permitext owner.",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-23T21:35:54.092Z",
+        "notes": "Exact enacted passages and the answer key were reviewed in Permitext before approval.",
+        "requiredConcepts": [
+          "State that the 15-foot door separation alone is insufficient.",
+          "Explain the general rule that stairs sharing a scissor-stair assembly count as one exit stairway.",
+          "Explain the Group R-2 exception for separately counted stairs.",
+          "Identify the 2-hour enclosure and separating-construction requirements.",
+          "Identify the masonry or masonry-equivalent requirement.",
+          "Identify the minimum 15-foot exit-door separation."
+        ],
+        "missingFacts": [
+          "Confirm Group R-2 occupancy.",
+          "Confirm the stair-enclosure fire-resistance rating.",
+          "Confirm the construction separating the stairs and its fire-resistance rating.",
+          "Confirm masonry or an accepted masonry equivalent."
+        ],
+        "forbiddenClaims": [
+          "Every scissor stair automatically counts as one exit.",
+          "Fifteen feet of door separation automatically makes the stairs compliant.",
+          "Sprinkler protection by itself satisfies the Group R-2 exception."
+        ],
+        "requiredCitations": [
+          "BC 1007.1.1"
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "edb72f5b-e6b0-4b9f-b6f7-c0c58cdcfa83",
+      "answeredAt": "2026-08-27T00:19:44.816Z",
+      "answerTimeMilliseconds": 24415,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260826-current-facts-answer-v15:conversational-v4",
+        "evidenceVersion": "20260826-pinned-prose-context-v15:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-efd3b206-6619-45ae-86d7-ef7c8a929e6f",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "Project configured code basis",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T00:19:20.406Z"
+        },
+        "answerText": "Yes—potentially, but not based on the 15-foot door spacing alone. The general rule counts stairs that share a scissor-stair assembly or other enclosure as one exit stairway. For Group R-2, however, the exception permits them to be counted separately when all of these conditions are met: the stair enclosure walls are at least 2-hour fire-resistance-rated and constructed of masonry or masonry equivalent in accordance with department rules; the exit doors are at least 15 feet apart; and the construction separating the two stairs is also at least 2-hour fire-resistance-rated masonry or masonry equivalent.\n\nYour stated 15-foot door separation meets the minimum spacing condition exactly. Whether the two stairs can be counted as separate exits remains conditional on documenting the required 2-hour ratings and masonry-or-equivalent construction for both the stair enclosures and the separation between the stairs.",
+        "conclusion": "Yes—potentially, but not based on the 15-foot door spacing alone. The general rule counts stairs that share a scissor-stair assembly or other enclosure as one exit stairway. For Group R-2, however, the exception permits them to be counted separately when all of these conditions are met: the stair enclosure walls are at least 2-hour fire-resistance-rated and constructed of masonry or masonry equivalent in accordance with department rules; the exit doors are at least 15 feet apart; and the construction separating the two stairs is also at least 2-hour fire-resistance-rated masonry or masonry equivalent.",
+        "supportedPoints": [
+          {
+            "heading": "Baseline: a scissor stair counts as one exit stairway",
+            "explanation": "The general rule provides that stairs sharing a common wall, floor, ceiling, scissor stair assembly, or other enclosure are counted as one exit stairway.",
+            "sectionID": "2197",
+            "sourceIDs": [
+              "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Group R-2 exception permits separate counting under stated conditions",
+            "explanation": "For Group R-2, stairs may share common walls, floors, ceilings, a scissor stair assembly, or another enclosure if the stair enclosure walls have at least a 2-hour fire-resistance rating and are masonry or masonry equivalent in accordance with department rules; the exit doors are at least 15 feet apart; and the construction separating the stairs also has at least a 2-hour fire-resistance rating and is masonry or masonry equivalent in accordance with department rules.",
+            "sectionID": "2197",
+            "sourceIDs": [
+              "c8a4b04a-d154-4c58-94dc-f40835150859",
+              "5e777ca9-5032-4aae-820c-d19dada1b98c"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "Your stated 15-foot door separation meets the minimum spacing condition exactly. Whether the two stairs can be counted as separate exits remains conditional on documenting the required 2-hour ratings and masonry-or-equivalent construction for both the stair enclosures and the separation between the stairs.",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the stair-enclosure walls have at least a 2-hour fire-resistance rating.",
+          "Whether the stair-enclosure walls are constructed of masonry or masonry equivalent in accordance with department rules.",
+          "Whether the construction separating the two stairs has at least a 2-hour fire-resistance rating and is masonry or masonry equivalent in accordance with department rules."
+        ],
+        "followUpQuestions": [
+          "Are the stair-enclosure walls documented as at least 2-hour fire-resistance-rated masonry or masonry-equivalent construction?",
+          "Is the construction separating the two stairs documented as at least 2-hour fire-resistance-rated masonry or masonry-equivalent construction?"
+        ],
+        "evidenceLimitations": [
+          "This answer is limited to the supplied current-enacted 2022 New York City Construction Codes evidence package. It addresses the counting rule in BC 1007.1.1, not other potentially applicable means-of-egress requirements."
+        ],
+        "additionalEvidenceNeeded": [
+          "Rated-assembly documentation and construction information for the stair enclosure walls and the construction separating the two stairs, including confirmation of masonry or masonry-equivalent compliance under applicable department rules."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "2197",
+            "sectionNumber": "1007.1.1",
+            "title": "1007.1.1 Two exits or exit access doorways.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+                "selectedText": "Stairs sharing any common wall, floor, ceiling, scissor stair assembly, or other enclosure shall be counted as one exit stairway.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the general rule that a scissor stair assembly is counted as one exit stairway."
+          },
+          {
+            "sectionID": "2197",
+            "sectionNumber": "1007.1.1",
+            "title": "1007.1.1 Two exits or exit access doorways.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "c8a4b04a-d154-4c58-94dc-f40835150859",
+              "5e777ca9-5032-4aae-820c-d19dada1b98c"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "c8a4b04a-d154-4c58-94dc-f40835150859",
+                "selectedText": "Exceptions:",
+                "visualSources": []
+              },
+              {
+                "sourceID": "5e777ca9-5032-4aae-820c-d19dada1b98c",
+                "selectedText": "3. Group R-2 occupancies. In Group R-2 occupancies, where stairs are enclosed in walls having at least a 2-hour fire resistance rating and constructed of masonry or masonry equivalent in accordance with department rules: 3.1. The exit doors to such stairs shall be placed a distance apart equal to no less than 15 feet (4572 mm); and 3.2. Such stairs shall be permitted to share common walls, floors, ceilings or scissor stairs assemblies or other enclosures provided that the construction separating the stairs is also of at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the Group R-2 exception, including the 15-foot door separation and 2-hour masonry-or-equivalent enclosure and separation conditions."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2197",
+          "113",
+          "7826",
+          "7828",
+          "10280",
+          "289",
+          "290",
+          "2331",
+          "7823",
+          "2146",
+          "940",
+          "4253",
+          "3558",
+          "10372",
+          "10421"
+        ],
+        "evidenceSourceIDs": [
+          "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+          "c8a4b04a-d154-4c58-94dc-f40835150859",
+          "5e777ca9-5032-4aae-820c-d19dada1b98c",
+          "research-permitext_discovered-id:113-2",
+          "research-permitext_discovered-id:7826-3",
+          "research-permitext_discovered-id:7828-4",
+          "research-permitext_discovered-id:10280-5",
+          "research-permitext_discovered-id:289-6",
+          "research-permitext_discovered-id:290-7",
+          "research-permitext_discovered-id:2331-8",
+          "research-permitext_discovered-id:7823-9",
+          "research-permitext_discovered-id:2146-10",
+          "research-permitext_discovered-id:940-11",
+          "research-permitext_cross_reference-id:4253-3",
+          "research-permitext_cross_reference-id:3558-5",
+          "research-permitext_cross_reference-id:10372-8",
+          "research-permitext_cross_reference-id:10421-9"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 15,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 14,
+          "userPinnedCount": 3,
+          "permitextDiscoveredCount": 10,
+          "crossReferenceCount": 4,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 3,
+          "requiredClaimCount": 3,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 1007.1.1 — baseline counting rule",
+              "summary": "Stairs sharing any common wall, floor, ceiling, scissor-stair assembly, or other enclosure are counted as one exit stairway.",
+              "sourceIDs": [
+                "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+              ]
+            },
+            {
+              "label": "BC 1007.1.1 — Group R-2 exception",
+              "summary": "The supplied exception permits shared or scissor stair assemblies in Group R-2 only where the stairs are enclosed by walls having at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules. The exit doors must be at least 15 feet apart, and the construction separating the stairs must also have at least a 2-hour fire-resistance rating and be masonry or masonry equivalent.",
+              "sourceIDs": [
+                "c8a4b04a-d154-4c58-94dc-f40835150859",
+                "5e777ca9-5032-4aae-820c-d19dada1b98c"
+              ]
+            }
+          ],
+          "generalRules": [],
+          "exceptions": [
+            {
+              "label": "Group R-2 exception to shared-stair counting",
+              "summary": "Although the baseline rule counts a scissor stair assembly as one exit stairway, the supplied Group R-2 exception permits the stairs to share a scissor assembly or other enclosure if all stated enclosure and separating-construction requirements are satisfied.",
+              "sourceIDs": [
+                "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+                "5e777ca9-5032-4aae-820c-d19dada1b98c"
+              ]
+            },
+            {
+              "label": "BC 403.5.1 exception",
+              "summary": "BC 403.5.1 contains a separate remoteness requirement for interior exit stairways and expressly excepts Group R-2 occupancies. It does not itself establish that a scissor stair counts as two exits under BC 1007.1.1.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:289-6"
+              ]
+            }
+          ],
+          "conditions": [
+            {
+              "label": "Minimum door separation",
+              "summary": "The exit doors to the two stairs must be at least 15 feet apart. The stated 15-foot spacing satisfies this numerical condition, subject to the other requirements.",
+              "sourceIDs": [
+                "5e777ca9-5032-4aae-820c-d19dada1b98c"
+              ]
+            },
+            {
+              "label": "Enclosure rating and construction",
+              "summary": "The stairs must be enclosed in walls having at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules.",
+              "sourceIDs": [
+                "5e777ca9-5032-4aae-820c-d19dada1b98c"
+              ]
+            },
+            {
+              "label": "Separating construction",
+              "summary": "Because the stairs share a scissor assembly or other enclosure, the construction separating them must also have at least a 2-hour fire-resistance rating and be masonry or masonry equivalent in accordance with department rules.",
+              "sourceIDs": [
+                "5e777ca9-5032-4aae-820c-d19dada1b98c"
+              ]
+            }
+          ],
+          "limitations": [
+            {
+              "label": "Conclusion is conditional, not established by 15 feet alone",
+              "summary": "The supplied facts establish Group R-2 occupancy and 15-foot door spacing, but do not establish the required 2-hour enclosure rating, masonry or masonry-equivalent construction, or 2-hour separating construction. Therefore, the evidence does not support an unconditional conclusion that the two stairs may be counted separately.",
+              "sourceIDs": [
+                "5e777ca9-5032-4aae-820c-d19dada1b98c"
+              ]
+            },
+            {
+              "label": "Bounded-corpus limitation",
+              "summary": "This map is limited to the supplied 2022 NYC Construction Codes evidence package. Five enacted sections were unavailable from the canonical resolver; at least one enacted section was shortened; one large definition section was represented by a targeted excerpt; additional direct cross-references were not included; lexical retrieval may miss differently worded requirements; and at least one candidate required a complete table review that was not available.",
+              "sourceIDs": [
+                "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+              ]
+            },
+            {
+              "label": "Nonresponsive or collateral retrieved material",
+              "summary": "The supplied standpipe, fire-alarm, sprinkler, mechanical-ventilation, structural, construction-type, roof-access, and accessory-space passages do not govern the current question on counting scissor stairs as separate exits. They are not used as answer support.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:7826-3",
+                "research-permitext_discovered-id:7828-4",
+                "research-permitext_discovered-id:10280-5",
+                "research-permitext_discovered-id:2331-8",
+                "research-permitext_discovered-id:2146-10",
+                "research-permitext_discovered-id:940-11",
+                "research-permitext_cross_reference-id:4253-3",
+                "research-permitext_cross_reference-id:3558-5",
+                "research-permitext_cross_reference-id:10372-8",
+                "research-permitext_cross_reference-id:10421-9"
+              ]
+            }
+          ],
+          "definitions": [
+            {
+              "label": "Interior exit stairway",
+              "summary": "An exit component serving one or more means-of-egress design requirements and providing a protected path of egress travel to the exit discharge or public way.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-2"
+              ]
+            },
+            {
+              "label": "Exit access doorway",
+              "summary": "A door or access point along the path of egress travel where the path enters an intervening room, corridor, unenclosed exit access stair, or unenclosed exit access ramp.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-2"
+              ]
+            }
+          ],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+            "c8a4b04a-d154-4c58-94dc-f40835150859",
+            "5e777ca9-5032-4aae-820c-d19dada1b98c"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:7826-3",
+            "research-permitext_discovered-id:7828-4",
+            "research-permitext_discovered-id:10280-5",
+            "research-permitext_discovered-id:289-6",
+            "research-permitext_discovered-id:290-7",
+            "research-permitext_discovered-id:2331-8",
+            "research-permitext_discovered-id:7823-9",
+            "research-permitext_discovered-id:2146-10",
+            "research-permitext_discovered-id:940-11"
+          ],
+          "projectFactsUsed": [
+            "Occupancy: Group R-2 stated by the question",
+            "Configuration: Scissor stair with entrance doors 15 feet apart",
+            "Unknowns: enclosure rating, separating construction rating, construction material",
+            "The active-topic building is Group R-2."
+          ],
+          "unresolvedProjectFacts": [
+            "Whether the stair enclosure walls are rated at least 2 hours",
+            "Whether the enclosure and separating construction are masonry or masonry equivalent in accordance with department rules",
+            "Whether the construction separating the stairs is rated at least 2 hours"
+          ],
+          "evidenceLimitations": [
+            "The analysis uses only the supplied 2022 New York City Construction Codes corpus and evidence package.",
+            "Five enacted sections were unavailable from the canonical resolver.",
+            "At least one enacted section was shortened, one large definition section was represented by a targeted excerpt, additional direct cross-references were not included, and lexical retrieval may miss differently worded requirements.",
+            "At least one candidate refers to a table whose complete structured values were not available for review."
+          ],
+          "highValueFollowUpQuestions": [
+            "Are the stair-enclosure walls documented as at least 2-hour fire-resistance-rated masonry or masonry-equivalent construction?",
+            "Is the construction separating the two stairs documented as at least 2-hour fire-resistance-rated masonry or masonry-equivalent construction?"
+          ]
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Occupancy: Group R-2 stated by the question",
+            "Configuration: Scissor stair with entrance doors 15 feet apart",
+            "Unknowns: enclosure rating, separating construction rating, construction material"
+          ],
+          "conversation": [
+            "The active-topic building is Group R-2."
+          ],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+          "turnKind": "established",
+          "establishedFacts": [
+            {
+              "id": "occupancy_group",
+              "key": "occupancy_group",
+              "value": "R-2",
+              "statement": "The active-topic building is Group R-2.",
+              "kind": "established",
+              "sourceText": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+              "source": "user"
+            }
+          ],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [
+            "occupancy_group"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+              "establishedFacts": [
+                {
+                  "id": "occupancy_group",
+                  "key": "occupancy_group",
+                  "value": "R-2",
+                  "statement": "The active-topic building is Group R-2.",
+                  "kind": "established",
+                  "sourceText": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+                  "source": "user"
+                }
+              ],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260811-exact-passage-required-claims-v1",
+          "pass": true,
+          "requiredClaimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+            "c8a4b04a-d154-4c58-94dc-f40835150859",
+            "5e777ca9-5032-4aae-820c-d19dada1b98c"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+            "c8a4b04a-d154-4c58-94dc-f40835150859",
+            "5e777ca9-5032-4aae-820c-d19dada1b98c"
+          ],
+          "citedEvidenceSourceIDs": [
+            "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+            "c8a4b04a-d154-4c58-94dc-f40835150859",
+            "5e777ca9-5032-4aae-820c-d19dada1b98c"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:7826-3",
+            "research-permitext_discovered-id:7828-4",
+            "research-permitext_discovered-id:10280-5",
+            "research-permitext_discovered-id:289-6",
+            "research-permitext_discovered-id:290-7",
+            "research-permitext_discovered-id:2331-8",
+            "research-permitext_discovered-id:7823-9",
+            "research-permitext_discovered-id:2146-10",
+            "research-permitext_discovered-id:940-11",
+            "research-permitext_cross_reference-id:4253-3",
+            "research-permitext_cross_reference-id:3558-5",
+            "research-permitext_cross_reference-id:10372-8",
+            "research-permitext_cross_reference-id:10421-9"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+              "label": "BC 1007.1.1 — 1007.1.1 Two exits or exit access doorways.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:c8a4b04a-d154-4c58-94dc-f40835150859",
+              "label": "BC 1007.1.1 — 1007.1.1 Two exits or exit access doorways.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "c8a4b04a-d154-4c58-94dc-f40835150859"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:5e777ca9-5032-4aae-820c-d19dada1b98c",
+              "label": "BC 1007.1.1 — 1007.1.1 Two exits or exit access doorways.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "5e777ca9-5032-4aae-820c-d19dada1b98c"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+            "c8a4b04a-d154-4c58-94dc-f40835150859",
+            "5e777ca9-5032-4aae-820c-d19dada1b98c"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+              "label": "BC 1007.1.1 — 1007.1.1 Two exits or exit access doorways.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c8a4b04a-d154-4c58-94dc-f40835150859",
+                        "5e777ca9-5032-4aae-820c-d19dada1b98c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:c8a4b04a-d154-4c58-94dc-f40835150859",
+              "label": "BC 1007.1.1 — 1007.1.1 Two exits or exit access doorways.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "c8a4b04a-d154-4c58-94dc-f40835150859"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "c8a4b04a-d154-4c58-94dc-f40835150859"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "c8a4b04a-d154-4c58-94dc-f40835150859"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c8a4b04a-d154-4c58-94dc-f40835150859",
+                        "5e777ca9-5032-4aae-820c-d19dada1b98c"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:5e777ca9-5032-4aae-820c-d19dada1b98c",
+              "label": "BC 1007.1.1 — 1007.1.1 Two exits or exit access doorways.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "5e777ca9-5032-4aae-820c-d19dada1b98c"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "5e777ca9-5032-4aae-820c-d19dada1b98c"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "5e777ca9-5032-4aae-820c-d19dada1b98c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c8a4b04a-d154-4c58-94dc-f40835150859",
+                        "5e777ca9-5032-4aae-820c-d19dada1b98c"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260826-answer-pinned-condition-fidelity-v7",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "citedSourceIDs": [
+            "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+            "c8a4b04a-d154-4c58-94dc-f40835150859",
+            "5e777ca9-5032-4aae-820c-d19dada1b98c"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:7826-3",
+            "research-permitext_discovered-id:7828-4",
+            "research-permitext_discovered-id:10280-5",
+            "research-permitext_discovered-id:289-6",
+            "research-permitext_discovered-id:290-7",
+            "research-permitext_discovered-id:2331-8",
+            "research-permitext_discovered-id:7823-9",
+            "research-permitext_discovered-id:2146-10",
+            "research-permitext_discovered-id:940-11",
+            "research-permitext_cross_reference-id:4253-3",
+            "research-permitext_cross_reference-id:3558-5",
+            "research-permitext_cross_reference-id:10372-8",
+            "research-permitext_cross_reference-id:10421-9"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 3,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 14,
+            "reviewedOnlyProvisionCount": 14,
+            "assembledSourceCount": 17,
+            "assembledProvisionCount": 15
+          },
+          "sources": [
+            {
+              "sourceID": "dfdd5bcb-c8b6-42d5-986e-0dad426d7d59",
+              "sectionID": "2197",
+              "reference": "BC 1007.1.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Stairs sharing any common wall, floor, ceiling, scissor stair assembly, or other enclosure shall be counted as one exit stairway."
+            },
+            {
+              "sourceID": "c8a4b04a-d154-4c58-94dc-f40835150859",
+              "sectionID": "2197",
+              "reference": "BC 1007.1.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Exceptions:"
+            },
+            {
+              "sourceID": "5e777ca9-5032-4aae-820c-d19dada1b98c",
+              "sectionID": "2197",
+              "reference": "BC 1007.1.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "3. Group R-2 occupancies. In Group R-2 occupancies, where stairs are enclosed in walls having at least a 2-hour fire resistance rating and constructed of masonry or masonry equivalent in accordance with department rules: 3.1. The exit doors to such stairs shall be placed a distance apart equal to no less than 15 feet (4572 mm); and 3.2. Such stairs shall be permitted to share common walls, floors, ceilings or scissor stairs assemblies or other enclosures provided that the construction separating the stairs is also of at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-2",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "AUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is heated to its thermal rating or above, allowing water to discharge over a specified area. EXIT ACCESS. That portion of a means of egress system that leads from any occupied portion of a building or structure to an exit. EXIT ACCESS DOORWAY. A door or access point along the path of egress travel from an occupied room, area or space where the path of egress enters an intervening room, corridor, unenclosed exit access stair or unenclosed exit access ramp. EXIT ACCESS STAIRWAY. A stairway within the exit access portion of the means of egress system. FIRE RESISTANCE. That property of materials or their assemblies that prevents or retards the passage of excessive heat, hot gases or flames under conditions of use. FIRE-RESISTANCE RATING. The period of time a building element, component or assembly maintains the ability to withstand fire exposure, continues to perform a given structural function, or both, as determined by the tests, or the methods based on tests, prescribed in Section 703 . INTERIOR EXIT STAIRWAY. An exit component that serves to meet one or more means of egress design requirements, such as required number of exits or exit access travel distance, and provides for a protected path of egress travel to the exit discharge or public way. STAIR. A change in elevation, consisting of two or more risers."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7826-3",
+              "sectionID": "7826",
+              "reference": "BC Q105.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q105.1 Q105.1 General. Standpipe and hose systems, where required by this code, shall be installed in accordance with NFPA 14, Standard for the Installation of Standpipe and Hose Systems , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions 3.3.3.1 Delete and replace with the following: \"Fire Department Connection (FDC).\" 3.3.3.1.1 Delete and replace with the following: \"Standpipe System Fire Department Connection (Standpipe FDC). A connection through which the fire department can pump water to a standpipe system at the required system demand. Supplemental water can also be provided into the sprinkler system or other system furnishing water for fire extinguishment to supplement existing water supplies. Unless otherwise allowed in the New York City Building Code , FDCs shall be 2-way connections.\" 3.3.3.1.2 Delete. 3.3.5.1 Delete the words 'NFPA 101' and replace with 'the New York City Building Code '. 3.3.6 Delete and replace with the following: \"Fire Department. The New York City Fire Department (FDNY).\" 3.3.7 Add at end the following: \"For the purposes of this section, a penthouse of any area with an occupant load greater than 10 shall be considered a story.\" 3.3.8 Delete the words \"or reel\". 3.3.9.1.1 Delete. 3.3.18 Delete. 3.3.19.2 Delete the words \"trained personnel\" and replace with \"building occupants\". 3.3.19.3 Delete the words \"trained personnel\" and replace with '\"building occupants\". Add at end the following: \"The hose stations shall be attached to the hose connections by a reducing coupling.\" 3.3.21 Delete the words 'and exclusive of pressure from the fire department connection'. Add 3.3.24 to read as follows: \"3.3.24 Zones\" Add 3.3.24.1 to read as follows: \"Standpipe System Zone. A vertical subdivision of a standpipe system limited or determined by the pressure limitations of the system components. Standpipe System Zones shall not exceed 300 feet (91.4 m) in height.\" Add 3.3.24.2 to read as follows: \"Fire Department Connection (FDC) Zone. A vertical subdivision of a standpipe system in buildings with more than two standpipe system zones arranged so that the Fire Department will pump through express FDC risers to upper zones.\" Chapter 4 System Components and Hardware 4.2.2 Delete and replace with the following: \"Pipe for buried portions of the standpipe system, whether inside or outside of the building, shall be red brass, ductile iron, hard tempered type \"K\" copper tubing, galvanized steel or other approved corrosion resistant material. All such pipe, other than ductile iron, shall be adequately wrapped or otherwise protected against corrosion.\" Add 4.2.2.1 as follows: \"Where ductile iron pipe is installed in accordance with Table 4.2.1, it shall be lined in accordance with AWWA C 104, Cement-Mortar Lining for Ductile-Iron Pipe and Fittings .\" 4.2.3 Add at end the following: \"Piping conforming to the specifications contained in this section may only be used in buildings with floor heights not exceeding 300 feet (91.4 m) above grade plane or in the highest 300 feet (91.4 m) portion of other buildings. Otherwise, piping conforming to the wall thicknesses specified in 4.2.4 shall be used.\" 4.4.1.2 Delete. 4.4.2.2.2 Replace \"NFPA 51B\" with \"the New York City Fire Code \". 4.4.2.2.3 Replace \"NFPA 51B\" with \"the New York City Fire Code \". 4.5.1 Add at end the following: \"6 inch (152 mm) and larger sectional and riser control valves shall have a minimum 3/4 inch (197 mm) valve"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7828-4",
+              "sectionID": "7828",
+              "reference": "BC Q107.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q107.1 Q107.1 General. Fire alarm system design, installation, testing, and maintenance, where required by this code, shall be conducted and documented in accordance with NFPA 72, National Fire Alarm and Signaling Code , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions No changes. Chapter 4 Reserved Chapter 5 Reserved Chapter 6 Reserved Chapter 7 Documentation No changes. Chapter 8 Reserved Chapter 9 Reserved Chapter 10 Fundamentals 10.5.1.1 Delete and replace with the following: \"Fire alarm system and emergency communication system plans and specifications shall be developed in accordance with the New York City Building Code by persons licensed and registered to practice the profession of engineering under the Education Law of the State of New York, who are also experienced in the proper design, application, installation, and testing of the system.\" 10.5.1.2 Delete. 10.5.2.1 Add at beginning the following: \"Fire alarm installations shall be performed by a New York City licensed electrical contractor.\" 10.5.3.1 Add at beginning the following: \"Fire alarm inspection, testing and maintenance shall be performed by a New York City licensed electrical contractor holding a New York State registration for 'Business of Installing, Servicing or Maintaining Security or Fire Alarm Systems' or those fire alarm companies holding a New York State registration for 'Business of Installing, Servicing or Maintaining Security or Fire Alarm Systems,' and in accordance with rules and regulations promulgated by the Fire Commissioner.\" 10.6.3.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.4 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.4 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.6.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.6.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.7.2.1 Delete and replace with the following: \"The secondary power supply for fire alarm systems and supervising station facilities shall have sufficient capacity to operate the system in accordance with the New York City Electrical Code . The secondary power supply for other systems shall have sufficient capacity to operate the system under quiescent load (system operating in a nonalarm condition) for a minimum of 24 hours and, at the end of that per"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10280-5",
+              "sectionID": "10280",
+              "reference": "MC 201.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "201.4 201.4 Terms not defined. Where terms are not defined through the methods authorized by this section, such terms shall have ordinarily accepted meanings such as the context implies. Section MC 202: General Definitions ABRASIVE MATERIALS. Moderately abrasive particulate in high concentrations, and highly abrasive particulate in moderate and high concentrations, such as alumina, bauxite, iron silicate, sand and slag. ABSORPTION SYSTEM. A refrigerating system in which refrigerant is pressurized by pumping a chemical solution of refrigerant in absorbent, and then separated by the addition of heat in a generator, condensed (to reject heat), expanded, evaporated (to provide refrigeration), and reabsorbed in an absorber to repeat the cycle; the system may be single or multiple effect, the latter using multiple stages or internally cascaded use of heat to improve efficiency. ACCESS (TO). That which enables a device, fixture, appliance or equipment to be reached by ready access or by a means that first requires the removal or movement of a panel, door or similar obstruction (see also \"Ready access (to)\"). AIR. All air supplied to mechanical equipment and appliances for combustion, ventilation, cooling, and similar purposes. Standard air is air at standard temperature and pressure, namely, 70°F (21.1°C) and 29.92 inches of mercury (101.3 kPa). AIR CONDITIONING. The treatment of air so as to control simultaneously the temperature, humidity, cleanness and distribution of the air to meet the requirements of a conditioned space. AIR-CONDITIONING SYSTEM. A system that consists of heat exchangers, blowers, filters, supply, exhaust and return ducts, and shall include any apparatus installed in connection therewith. AIR DISPERSION SYSTEM. Any diffuser system designed to both convey air within a room, space or area and diffuse air into that space while operating under positive pressure. Systems are commonly constructed of, but not limited to, fabric or plastic film. AIR DISTRIBUTION SYSTEM. Any system of ducts, plenums and air-handling equipment that circulates air within a space or spaces and includes systems made up of one or more air-handling units. AIR, EXHAUST. Air being removed from any space, appliance or piece of equipment and conveyed directly to the atmosphere by means of openings or ducts. AIR-HANDLING UNIT. A blower or fan used for the purpose of distributing supply air to a room, space or area. AIR, INTAKE. Air supplied from the outdoors to any space, appliance or piece of equipment. AIR, MAKEUP. Any combination of outdoor and transfer air intended to replace exhaust air and exfiltration. AIR, OUTDOOR. Ambient air that enters a building through a ventilation system, through intentional openings for natural ventilation, or by infiltration. AIR, RELIEF. Air removed from any space, appliance or piece of equipment that serves to balance building pressurization due to introduction of outdoor air. Exhaust air shall not be considered relief air. AIR, RETURN. Air removed from a conditioned space or location and recirculated or relieved to the outdoors. AIR, TRANSFER. Air moved from one indoor space to another. AIR TRANSFER OPENING. An opening designed to allow the movement of environmental air between two contiguous spaces. APPLIANCE. A device or apparatus that is manufactured and designed to utilize energy and for which this code provides specific requirements. APPLIANCE, EXISTING . Any appliance regulated by this code that was legally installed prior to the effective date of this code, or for which a permit to install has been issued. APPLIANCE, FUEL-FIRED. An appliance that burns solid, liquid and/or gaseous fuel, including but not limited to wood stoves, household cooking ranges, furnaces, boilers, water heaters, clothes dryers and gas-fired refrigerators. APPLIANCE, GAS (EQUIPMENT). Any apparatus or equipment that uses gas as a fuel or raw material to produce light, heat, power, refrigeration or air conditioning. APPLIANCE TYPE. High-heat appliance. Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature greater than 2,000°F (1093.3°C). Low-heat appliance (residential appliance). Any appliance in which the products o"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:289-6",
+              "sectionID": "289",
+              "reference": "BC 403.5.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "403.5.1 403.5.1 Remoteness of interior exit stairways. Required interior exit stairways shall be separated by a distance not less than 30 feet (9144 mm) or not less than 1/4 of the length of the maximum overall diagonal dimension of the building or area to be served, whichever is less. The distance shall be measured in a straight line between the nearest points of the enclosure surrounding the interior exit stairways. In buildings with three or more interior exit stairways, no fewer than two of the interior exit stairways shall comply with this section. Stairs sharing any common wall, floors, ceilings, scissor stair assemblies, or other enclosures shall be counted as one interior exit stairway. Exception: Group R-2 occupancies."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:290-7",
+              "sectionID": "290",
+              "reference": "BC 403.5.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "403.5.2 403.5.2 Additional exit stairway. For buildings other than Group R-2 that are more than 420 feet (128 m) in building height, one additional exit stairway meeting the requirements of Sections 1011 and 1023 shall be provided in addition to the minimum number of exits required by Section 1006.3. The total width of any combination of remaining exit stairways with one exit stairway removed shall not be less than the total width required by Section 1005.1. Stairs sharing any common wall, floors, ceilings, scissor stair assemblies, or other enclosures shall not be considered the additional exit stairway required by this section. Exceptions: An additional exit stairway shall not be required to be installed in any of the following instances: 1. In buildings where all passenger elevators for general public use and all other elevators used for occupant self-evacuation comply with Sections 3008.1 through 3008.11; 2. In buildings where all of the following conditions are met: 2.1. The commissioner has approved a timed egress analysis establishing the egress time it would take for a full building evacuation, utilizing the stairs required by Section 1006 and the additional stair that would have been required pursuant to Section 403.5.2; 2.2. The commissioner has approved a timed egress analysis establishing the egress time it would take for a full building evacuation, utilizing the combination of the stairs required by Section 1006 and elevators used for occupant self-evacuation as follows: 2.2.1. Such analysis need only utilize a number of designated elevators designed for occupant self-evacuation necessary to demonstrate an evacuation time that is less than the time established in Exception 2.1; and 2.2.2. Every bank of passenger elevators for general public use shall be served by at least one such designated elevator; 2.3. All elevators in the building that either are passenger elevators for general public use or are used for occupant self-evacuation shall comply with Sections 3008.1 through 3008.11. However, the standby power generating equipment required by Section 3008.9 need only be sized to satisfy the loads required to simultaneously operate those elevators identified in the timed egress analysis described in Exception 2.2. The minimum number of exits required by Section 1006 are all at least 25 percent wider than the exit width required by Chapter 10 . The increase in the stair width shall not be utilized in the timed egress analyses required by Exceptions 2.1 and 2.2."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2331-8",
+              "sectionID": "2331",
+              "reference": "BC 1011.12.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1011.12.1 1011.12.1 Occupancy Groups I-1, R-1 and R-2. In buildings in Occupancy Groups I-1, R-1 and R-2 two stories or more in height, with roofs having a slope of 15 degrees (0.26 rad) or less, all interior exit stairways, except those terminating at the level of a setback roof, shall extend to the roof surface. Exceptions: 1. In buildings in Occupancy Groups R-1 and R-2 that are two stories in height and in Occupancy Group R-2 that are three stories in height with not more than one dwelling unit per story, access to the roof shall be permitted to be a noncombustible roof hatch or trap door not less than 21 inches (533.4 mm) in width and 28 inches (711.2 mm) in length. Such hatches shall be located within the interior exit stairway enclosure and be provided with a stationary, noncombustible access ladder or alternating tread device. 2. In buildings in Occupancy Group R-2 complying with Item 6 of Section 1006.3.2, roof access shall be governed by Item 6.6 of such section. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7823-9",
+              "sectionID": "7823",
+              "reference": "BC Q102.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q102.1 Q102.1 General. Sprinkler systems, where required by this code, shall be installed in accordance with NFPA 13, Standard for the Installation of Sprinkler Systems , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions No changes. Chapter 4 General Requirements No changes. Chapter 5 Classification of Occupancies and Commodities No changes. Chapter 6 System Components and Hardware 6.3.1.1.1 Delete after the word wall and replace with the following: \"in accordance with the New York City Plumbing Code .\" Add the following at the end of section 6.3.9.1.1 : \"The use of pipe or tube other than that described above must involve consideration of many factors, including but not limited to the following: 1. Pressure rating. 2. Beam strength (hangers). 3. Corrosion (chemical and electrolytic). 4. Resistance to failure when exposed to elevated temperatures. 5. Methods of joining (strength, permanence, fire hazard). 6. Availability of fittings (for sprinkler outlets and proper routings). 7. Physical characteristics relating to integrity during earthquakes. 8. Toxicity. 9. Combustibility. 10. Movement during sprinkler operation (water distribution).\" Add Section 6.3.9.9 Non-metallic piping and fittings are permitted to be used only in Group R occupancies 6 stories or less in height. 6.7.1.3 Delete. 6.7.3 Delete. Add Section 6.8.2.2.3 The alarm apparatus for a dry-pipe system shall also consist of approved low and high air pressure alarm attachments to the dry-pipe valve. 6.8.5 Change \"8.16.2.6\" to \"8.17.1.9\". Chapter 7 System Requirements 7.1.5 Delete. 7.1.5.1 Delete. Add 7.2.6.3.4 to read as follows: \"High / Low air pressure in the system shall be monitored so that either condition sends a supervisory signal. Such signal shall trigger an audible notification signal and shall report to a supervising station if the system is required otherwise to do so.\" 7.2.6.8.3 Delete and replace with the following: \"High / Low air pressure in the system shall be monitored so that either condition sends a supervisory signal. Such signal shall trigger an audible notification signal and shall report to a supervising station if the system is required otherwise to do so.\" 7.6.3.1 Delete. Figure 7.6.3.1 Delete. 7.6.3.2 Add the following sentence at the end: \"Backflow prevention device relief discharge shall be piped to a safe location. 7.9 Delete entire section, including subsections. Chapter 8 Installation Requirements 8.2.1 Delete the first sentence and replace with the following: \"The maximum floor area on any one floor to be protected by a single riser from a control and alarm device shall be as follows:\" 8.15.3.2.1 Delete the words after \"is\" and replace with the following: \"permanently blocked off so that storage cannot occur.\" 8.15.4.1* Delete the reference to 8.15.4.4 and add the following at the end: \"when required by other sections of this standard or the New York City Building Code .\" 8.15.4.4 Delete. 8.15.5.3 Delete the words \"in NFPA 101, or the applicable building code\" and replace with the following: \"in accordance with the New York City Building Code .\" 8.15.5.4* Delete the words \"in elevator machine rooms or\". 8.15.7.4 Delete. 8.15.7.5 Delete. 8.15.8.1.2 Delete all words after and including \"as defined\". 8.15.8.2* Delete and replace with the following: \"Closets and Pantries. Sprinklers are not required in clothes closets, linen closets, and pantries within: (1) Dwelling units in hotels and motels where the area of the closet or pantry does not exceed 24 square feet (2.2 m), the least dimension does not exceed 3 feet (0.9 m), and the walls and ceilings are surfaced with noncombustible or limited-combustible materials; and (2) Dwelling units in Group R occupancies other than hotels and motels where the area of the closet or pantry does not exceed 12 square feet (1.1 m), the room or space upon which the closet or pantry opens is equipped with sprinklers designed to afford protection to the opening of the closet or pantry, and the walls and ceilings of the closet or pantry are surfaced with noncombustible or limited-combustible materials.\" 8.15.9 Add the following after the word \"closets\": \"without solid doors\". 8.15.16 Delete. 8.15.20.4.4 Delete and replace with the following: \"In altering existing sprinkler systems which contain 3/4-inch (19 mm) pipe, the existing 3/4-inch (19 mm) pipe shall be removed and replaced with pipe having a minimum diameter of 1-inch (25 mm) except as provided for in 8.15.20.4.1, 8.15.20.4.2, 8.15.20.4.3 and 8.15.20.4.5.\" Add 8.15.20.4.5 \"Where nipples used are less than 1 in. (25 mm) diameter, nipples shall be schedule 80 and no longer than shoulder length.\" 8.15.20.5.4 Delete and replace with the following: \"Where nipples used are less than 1 in. (25 mm) diameter, nipples shall be schedule 80 and no longer than shoulder length.\" 8.15.23.3 Delete. 8.15.26 Delete and replace with the following: \"Sprinkler Interior Protected Glazing. Where sprinklers are used in combination with glazing as an alternative to a required fire-rated wall or window assembly, the sprinkler-protected assembly shall be approved by the commissioner and shall comply with the following: \"(1) Sprinklers shall be listed as specific application window sprinklers unless standard spray sprinklers are specifically permitted by the commissioner.\" \"(2) Sprinklers shall be supplied by a wet-pipe system.\" \"(3) Where the assembly is required to be protected from both sides, sprinklers shall be installed on both sides of the glazing.\" \"(4) The use of sprinkler protected glazing shall be limited to non-load-bearing walls.\" \"(5) The water supply duration for the design area that includes the window sprinklers shall not be less than the required rating of the assembly.\" Add 8.16.1.1.1.4 to read as follows: \"An approved indicating shutoff valve may be used in lieu of an O.S.&Y. gate valve wherever referred to in these modifications except such valve shall not be part of the pressure reducing valve. The indicator shall be readily visible from the floor.\" Add 8.16.1.1.1.5 to read as follows: \"A connection from public water system shall not extend into or through a building unless such connection is under the control of an outside indicator post or O.S.&Y. gate or under the cont"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2146-10",
+              "sectionID": "2146",
+              "reference": "BC 1004.1.1.2.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.1.1.2.3 1004.1.1.2.3 Group R-2 accessory spaces as primary function on a story. Where the aggregate Group R-2 occupancy accessory area of all rooms, areas or spaces, including outdoor spaces that are not provided with independent means of egress and that do not converge into interior means of egress, exceed 50 percent of the building area of the story in which they are located, and the total number of occupants on such story exceeds 150 persons, the following conditions shall apply: 1. The interior corridors or portions thereof serving such accessory spaces shall be constructed as public corridors in accordance with Table 1020.1.2 with 1-hour fire-resistance-rated fire barriers, and 2-hour fire-resistance-rated fire barriers where a dead-end corridor exceeds 40 feet (12 192 mm) in length; 2. Access to the corridors shall be limited to those necessary for exit access through the corridor from normally occupied spaces. Direct openings from the mechanical, electrical and other storage spaces shall not be permitted, except that access to the corridor may be provided through a vestibule constructed with fire barriers, with a minimum fire-resistance rating consistent with the required hourly rating for the corridor; 3. Corridors or portions thereof serving such accessory spaces shall be sufficient to accommodate a total occupant load on the basis of 3 square feet (0.28 m 2 ) per person; 4. The minimum dimension of such corridors shall be sufficient to accommodate the total occupant load discharging into such corridors, but shall in no case be less than 5 feet (1524 mm) in minimum dimension; and 5. In addition to Conditions 1 through 4 above, one of the following conditions shall be met: 5.1. Each of the interior exit stairways and ramps serving such story shall be protected by a smokeproof enclosure in accordance with Section 909.20; 5.2. The corridor or portions of the corridor serving the rooms, areas or spaces that are accessory to the Group R-2 occupancy shall be pressurized in accordance with requirements that are applicable to interior exit stairways. Connecting interior exit stairways need not be pressurized unless otherwise required by this code; 5.3. All passenger elevators serving the rooms, areas, or spaces that are accessory to the Group R-2 occupancy shall comply with occupant self-evacuation elevator requirements in Section 3008.1 through 3008.11; or 5.4. One additional exit stairway meeting the requirements of Sections 1009 and 1023 shall be provided in addition to the minimum number of exits required by Section 1006 . The total width of any combination of remaining exit stairways with one exit stairway removed shall not be less than the total width required by Section 1005.3. Rooms, areas or spaces that do not comply with the conditions in Sections 1004.1.1.2.1 and 1004.1.1.2.2, or Section 1004.1.1.2.3 where applicable, shall have occupant loads calculated cumulatively per story and be classified as Occupancy Group A."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:940-11",
+              "sectionID": "940",
+              "reference": "BC 510.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "510.6 510.6 Group R-2 buildings of Type IIA construction. The height limitation for buildings of Type IIA construction in Group R-2 shall be increased to nine stories and 100 feet (30 480 mm) where the building is separated by not less than 50 feet (15 240 mm) from any other building on the lot and from lot lines, the exits are segregated in an area enclosed by a 2-hour fire-resistance-rated fire wall and the first floor assembly has a fire-resistance rating of not less than 1 1/2 hours. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:4253-3",
+              "sectionID": "4253",
+              "reference": "BC 1816.2.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1816.2.1 1816.2.1 Peak ground acceleration. Peak ground acceleration shall be determined based on either (i) a site-specific study taking into account soil amplification effects as specified in Section 11.4.8 of ASCE 7 or (ii) the Maximum Considered Geometric Mean peak ground acceleration adjusted for site class effects PGA M as provided in Table 1816.2.1 without adjustment for targeted risk. Table 1816.2.1 Values of Maximum Considered Earthquake Geometric Mean (MCE G ) Peak Ground Accelerations Adjusted for Site Class Effects, PGA M Site Class PGA M(g) A 0.15 B (m) 0.17 B (un-m) 0.18 C 0.22 D 0.26 E 0.36"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:3558-5",
+              "sectionID": "3558",
+              "reference": "BC 1609.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1609.3 1609.3 Basic design wind speed. The basic design wind speed, V, in mph, for determining wind speed shall be that of Table 1609.3 . Table 1609.3 Basic Design Wind Speed Risk Category Basic Design Wind Speed, mph (3-sec gust, 33 ft. for Exposure Category C) Mean Recurrence Interval, years Probability of Exceedance in 50 years, % I 110 300 15 II 117 700 7 III 127 1,700 3 IV 132 3,000 1.6 Note: Values are ultimate design 3-second gust wind speeds in miles per hour at 33 feet (10 058 mm) above ground for Exposure Category C."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10372-8",
+              "sectionID": "10372",
+              "reference": "MC 308.4.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Table 308.4.2 Clearance Reduction Methods b Type of Protective Assembly a Reduced Clearance With Protection (inches) a Horizontal combustible assemblies located above the heat source Horizontal combustible assemblies located beneath the heat source and all vertical combustible assemblies Required clearance to combustibles without protection (inches) a Required clearance to combustible without protection (inches) a 36 18 9 6 36 18 9 6 Type of Protective Assembly a Reduced Clearance With Protection (inches) a Horizontal combustible assemblies located above the heat source Horizontal combustible assemblies located beneath the heat source and all vertical combustible assemblies Required clearance to combustibles without protection (inches) a Required clearance to combustible without protection (inches) a 36 18 9 6 36 18 9 6 Galvanized sheet metal, minimum nominal thickness of .0296 inch (No. 22 Gage), mounted on 1-inch glass fiber or mineral wool batt reinforced with wire on the back, 1 inch off the combustible assembly 18 9 5 3 12 6 3 3 Two layers of galvanized sheet metal, minimum nominal thickness of 0.024 inch (No. 24 Gage), having a 1-inch airspace between layers, spaced 1 inch off the combustible assembly 18 9 5 3 12 6 3 3 Two layers of galvanized sheet metal,minimum nominal thickness of 0.024 inch (No. 24 Gage), having 1 inch of fiberglass insulation between layers, spaced 1 inch off the combustible assembly 18 9 5 3 12 6 3 3 0.5-inch inorganic insulating board, over 1 inch of fiberglass or mineral wool batt, against the combustible assembly 24 12 6 4 18 9 5 3 3 1/2-inch brick wall, spaced 1 inch off the combustible wall - - - - 12 6 6 6 3 1/2-inch brick wall, against the combustible wall - - - - 24 12 6 5 For SI: 1 inch = 25.4 mm, °C = ((°F)-32)/1.8, 1 pound per cubic foot = 16.02 kg/m 3 , 1.0 Btu &#8729; in/(ft 2 &#8729; h &#8729; °F) = 0.144 W/m 2 &#8729; K. a. Mineral wool and glass fiber batts (blanket or board) shall have a minimum density of 8 pounds per cubic foot and a minimum melting point of 1,500°F. Insulation material utilized as part of a clearance reduction system shall have a thermal conductivity of 1.0 Btu &#8729; in./(ft 2 &#8729; h &#8729; °F) or less. Insulation board shall be formed of noncombustible material. b. For limitations on clearance reduction for solid fuel-burning appliances, masonry chimneys, connector pass-throughs, masonry fireplaces and kitchen ducts, see Sections 308.4.2.1 through 308.4.2.5."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10421-9",
+              "sectionID": "10421",
+              "reference": "MC 403.3.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "403.3.1.1 403.3.1.1 Outdoor airflow rate. Ventilation systems shall be designed to have the capacity to supply the minimum outdoor airflow rate determined in accordance with this section. In each occupiable space and, where required, each habitable space, the ventilation system shall be designed to deliver the required rate of outdoor airflow to the breathing zone. The occupant load utilized for design of the ventilation system shall be not less than the number determined from the estimated maximum occupant load rate indicated in Table 403.3.1.1 . Ventilation rates for occupancies not represented in Table 403.3.1.1 shall be those for a listed occupancy classification that is most similar in terms of occupant density, activities and building construction; or shall be determined by an approved engineering analysis. The ventilation system shall be designed to supply the required rate of ventilation air continuously during the period the building is occupied, except as otherwise stated in other provisions of the code. With the exception of non-tobacco hookah establishments, the ventilation rates in Table 403.3.1.1 are based on the absence of smoking in occupiable spaces. Where smoking is anticipated in a space other than a non-tobacco hookah establishment, the ventilation system serving the space shall be designed to provide ventilation over and above that required by Table 403.3.1.1 in accordance with accepted engineering practice. Exceptions: 1. The occupant load is not required to be determined based on the estimated maximum occupant load rate indicated in Table 403.3.1.1 where approved statistical data documents the accuracy of an alternate anticipated occupant load. 2. The occupant load used in computing the required ventilation shall be the maximum number who will occupy the room or space simultaneously during any 2-hour period. 3. Dynamic reset (Demand Controlled Ventilation). The system may be designed to reset the design outdoor air intake airflow and/or space or zone airflow as operating conditions change. Dynamic reset shall be designed in accordance with ASHRAE 62.1 and comply with footnote k of Table 403.3.1.1 . These conditions include, but are not limited to: 3.1. Variations in occupancy or ventilation airflow in one or more individual zones for which ventilation airflow requirements will be reset. Note: Examples of measures for estimating such variations include: occupancy scheduled by time of day, a direct count of occupants, or an estimate of occupancy or ventilation rate per person using occupancy sensors such as those based on indoor CO 2 concentrations. 3.2. Variations in the efficiency with which outdoor air is distributed to the occupants under different ventilation system airflows and temperatures. 3.3. A higher fraction of outdoor air in the air supply due to intake of additional outdoor air for free cooling or exhaust air makeup. Table 403.3.1.1 Minimum Ventilation Rates Occupancy Classification Occupant Density #/1,000 ft 2 a People Outdoor Airflow Rate in Breathing Zone, R p cfm/person Area Outdoor Airflow Rate in Breathing Zone, R a cfm/ft 2 a Exhaust Airflow Rate cfm/ft 2 a Occupancy Classification Occupant Density #/1,000 ft 2 a People Outdoor Airflow Rate in Breathing Zone, R p cfm/person Area Outdoor Airflow Rate in Breathing Zone, R a cfm/ft 2 a Exhaust Airflow Rate cfm/ft 2 a Correctional facilities Booking/waiting 50 7.5 0.06 — Cells without plumbing fixtures 25 5 0.12 — with plumbing fixtures g 25 5 0.12 1.0 Day room 30 5 0.06 — Dining halls (see food and beverage service) — — — — Guard stations 15 5 0.06 — Dry cleaners, laundries Coin-operated dry cleaner 20 15 — — Coin-operated laundries 20 7.5 0.06 — Commercial dry cleaner l 30 30 — — Commercial laundry 10 25 — — Storage, pick up 30 7.5 0.12 — Education Art classroom g 20 10 0.18 0.7 Auditoriums 150 5 0.06 — Classrooms (ages 5-8) 25 10 0.12 — Classrooms (age 9 plus) 35 10 0.12 — Computer lab 25 10 0.12 — Corridors (see public spaces) — — — — Day care (through age 4) 25 10 0.18 — Lecture classroom 65 7.5 0.06 — Lecture hall (fixed seats) 150 7.5 0.06 — Locker/dressing rooms g — — — 0.25 Media center 25 10 0.12 — Multiuse assembly 100 7.5 0.06 — Music/theater/dance 35 10 0.06 — Science laboratories g, k 25 10 0.18 1.0 Sports locker rooms g — — — 0.5 Wood/metal shops g 20 10 0.18 0.5 Food and beverage service Bars, cocktail lounges 100 7.5 0.18 — Cafeteria, fast food 100 7.5 0.18 — Dining rooms 70 7.5 0.18 — Kitchens (cooking) b — — — 0.7 Non-tobacco smoking establishments b 70 60 — — Hotels, motels, resorts and dormitories Bathrooms/toilet – private g — — — 25/50 f Bedroom/living room 10 5 0.06 — Conference/meeting 50 5 0.06 — Dormitory sleeping areas 20 5 0.06 — Gambling casinos 120 7.5 0.18 — Lobbies / prefunction 30 7.5 0.06 — Multipurpose assembly 120 5 0.06 — Laboratories j Biological — — 1.0 1.0 Chemical — — 1.0 1.0 Industrial and nonteaching — — 1.0 1.0 Nonproduction chemical labs — — 1.0 1.0 Offices Conference rooms 50 5 0.06 — Main entry lobbies 10 5 0.06 — Office spaces 5 5 0.06 — Reception areas 30 5 0.06 — Telephone/data entry 60 5 0.06 — Private dwellings, single and multiple Garages, common for multiple units b — — — 0.75 Kitchens and Kitchenettes b, m — — — 25/100 f Living areas c, i Based upon number of bedrooms. First bedroom, 2; each additional 0.35 ACH but not less than 15 cfm/person — — Toilet rooms and bathrooms g — — — 20/50 f Public spaces Corridors — — 0.06 — Courtrooms 70 5 0.06 — Elevator car — — — 1.0 Legislative chambers 50 5 0.06 — Libraries 10 5 0.12 — Museums (children's) 40 7.5 0.12 — Museums/galleries 40 7.5 0.06 — Places of religious worship 120 5 0.06 — Shower room (per shower head) g — — — 50/20 f Toilet rooms – public g — — — 50/70 e Retail stores, sales floors and showroom floors Dressing rooms — — — 0.25 Mall common areas 40 7.5 0.06 — Sales 15 7.5 0.12 — Shipping and receiving — — 0.12 — Smoking lounges and non-tobacco smoking establishments b 70 60 — — Storage rooms — — 0.12 — Warehouses (see storage) — — — — Specialty shops Automotive motor-fuel dispensing stations b — — — 1.5 Barber 25 7.5 0.06 0.5 Beauty salons (without nail salon services) b 25 20 0.12 0.6 Embalming room b — — — 2.0 Nail salons b, h 25 20 0.12 0.6 Pet shops (animal areas) b 10 7.5 0.18 0.9 Supermarkets 8 7.5 0.06 — Sports and amusement Bowling alleys (seating areas) 40 10 0.12 — Disco/dance floors 100 20 0.06 — Game arcades 20 7.5 0.18 — Gym, stadium, arena (play area) — — 0.30 — Heath club/aerobics room 40 20 0.06 — Health club/weight room 10 20 0.06 — Ice arenas without combustion engines — — 0.30 0.5 Spectator areas 150 7.5 0.06 — Swimming pools (pool and deck area) — — 0.48 — Storage Repair garages, enclosed parking garages b,d — — — 0.75 Warehouses — — 0.06 — Theaters Auditoriums (see education) — — — — Lobbies 150 5 0.06 — Stages, studios 70 10 0.06 — Ticket booths 60 5 0.06 — Transportation Platforms 100 7.5 0.06 — Tran"
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260826-pinned-prose-context-v15",
+          "retrievalQuery": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?\nProject facts: Configuration: Scissor stair with entrance doors 15 feet apart; Occupancy: Group R-2 stated by the question; Unknowns: enclosure rating, separating construction rating, construction material",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": true,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 3,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 4,
+            "characterCount": 48000,
+            "resolverFailureCount": 5,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 5,
+              "text": "5 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "referenced-table-review-required",
+              "text": "At least one candidate refers to a table whose complete structured values are not in the proposed passage. That candidate cannot be prepared until the table itself can be reviewed as evidence."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "Project configured code basis"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260826-supporting-web-v7",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-efd3b206-6619-45ae-86d7-ef7c8a929e6f",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "Project configured code basis",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T00:19:20.406Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-terra"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T00:19:20.406Z",
+        "routing": {
+          "version": "20260825-luna-terra-hybrid-v2",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "gpt-5.6-luna",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-terra",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 55822,
+          "cachedInputTokens": 1122,
+          "outputTokens": 2624,
+          "totalTokens": 58446
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.086495,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "596ab998-a4d9-44e0-9af2-1a234904addf",
+        "createdAt": "2026-08-27T00:19:20.403Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-luna",
+          "gpt-5.6-terra"
+        ],
+        "routingVersion": "20260825-luna-terra-hybrid-v2",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 55822,
+        "cachedInputTokens": 1122,
+        "outputTokens": 2624,
+        "totalTokens": 58446,
+        "estimatedCostUSD": 0.086495,
+        "actualProviderCostUSD": 0.086495,
+        "conservativeProviderCostUSD": 0.086495,
+        "durationMilliseconds": 24410,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T00:19:54.006Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 8907,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 3182,
+              "cachedInputTokens": 0,
+              "outputTokens": 1158,
+              "totalTokens": 4340
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 3182,
+          "cachedInputTokens": 0,
+          "outputTokens": 1158,
+          "totalTokens": 4340
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "Both citations identify BC 1007.1.1, and the attributed general scissor-stair counting rule and the stated Group R-2 exception conditions are supported by the supplied enacted passage.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent additional code conditions or draw an unsupported unconditional conclusion. Its statements about the 2-hour ratings, masonry-or-equivalent construction, and 15-foot door separation track the supplied text.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer correctly makes separate-exit treatment conditional on satisfying all exception conditions and states that the 15-foot spacing alone is not dispositive.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly recognizes that the available facts cannot establish separate-exit treatment without documentation of the enclosure and separating-construction ratings and materials. It also limits its scope to BC 1007.1.1 and the supplied evidence package.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a clear conditional answer, identifies each remaining factual item to document, and distinguishes the baseline rule from the applicable R-2 exception.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers whether the stairs may be counted separately: potentially yes, but only if every Group R-2 exception condition is met.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "Expressly states that the result is not based on the 15-foot door spacing alone.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "States that stairs sharing a scissor-stair assembly or other enclosure count as one exit stairway under the general rule.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "Explains that the Group R-2 exception permits separate counting when all listed conditions are met.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "Identifies the at-least-2-hour fire-resistance requirements for both the stair enclosure walls and the construction separating the stairs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "Identifies masonry or masonry-equivalent construction, in accordance with department rules, for both relevant constructions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "States that exit doors must be at least 15 feet apart and correctly notes that the stated 15-foot spacing meets that minimum exactly.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer states the general one-exit rule but expressly explains the Group R-2 exception; it does not claim every scissor stair always counts as one exit.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer expressly rejects automatic compliance based on 15-foot door spacing alone.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer does not claim that sprinkler protection satisfies the exception.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The question expressly states Group R-2 occupancy, and the answer consistently applies the Group R-2 exception. Reconfirmation was not necessary.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer identifies the unresolved need to document that the stair-enclosure walls have at least a 2-hour fire-resistance rating.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer identifies the unresolved rating and construction of the separation between the two stairs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer identifies the unresolved need to confirm masonry or masonry-equivalent construction under department rules for the enclosure walls and separating construction.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.02026,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 2,
+            "canonicalCount": 2,
+            "selectedEvidenceCount": 2,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 24415,
+            "inputTokens": 55822,
+            "cachedInputTokens": 1122,
+            "outputTokens": 2624,
+            "totalTokens": 58446,
+            "estimatedCostUSD": 0.086495,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "Both citations identify BC 1007.1.1, and the attributed general scissor-stair counting rule and the stated Group R-2 exception conditions are supported by the supplied enacted passage.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "6/6 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer does not invent additional code conditions or draw an unsupported unconditional conclusion. Its statements about the 2-hour ratings, masonry-or-equivalent construction, and 15-foot door separation track the supplied text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/3 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer correctly makes separate-exit treatment conditional on satisfying all exception conditions and states that the 15-foot spacing alone is not dispositive.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "4/4 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "The answer directly recognizes that the available facts cannot establish separate-exit treatment without documentation of the enclosure and separating-construction ratings and materials. It also limits its scope to BC 1007.1.1 and the supplied evidence package.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "It gives a clear conditional answer, identifies each remaining factual item to document, and distinguishes the baseline rule from the applicable R-2 exception.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "It directly answers whether the stairs may be counted separately: potentially yes, but only if every Group R-2 exception condition is met.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "Expressly states that the result is not based on the 15-foot door spacing alone.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "States that stairs sharing a scissor-stair assembly or other enclosure count as one exit stairway under the general rule.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "Explains that the Group R-2 exception permits separate counting when all listed conditions are met.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "Identifies the at-least-2-hour fire-resistance requirements for both the stair enclosure walls and the construction separating the stairs.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "Identifies masonry or masonry-equivalent construction, in accordance with department rules, for both relevant constructions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "States that exit doors must be at least 15 feet apart and correctly notes that the stated 15-foot spacing meets that minimum exactly.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer states the general one-exit rule but expressly explains the Group R-2 exception; it does not claim every scissor stair always counts as one exit.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "The answer expressly rejects automatic compliance based on 15-foot door spacing alone.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "The answer does not claim that sprinkler protection satisfies the exception.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The question expressly states Group R-2 occupancy, and the answer consistently applies the Group R-2 exception. Reconfirmation was not necessary.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The answer identifies the unresolved need to document that the stair-enclosure walls have at least a 2-hour fire-resistance rating.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "The answer identifies the unresolved rating and construction of the separation between the two stairs.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "The answer identifies the unresolved need to confirm masonry or masonry-equivalent construction under department rules for the enclosure walls and separating construction.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "2/2 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. Both citations identify BC 1007.1.1, and the attributed general scissor-stair counting rule and the stated Group R-2 exception conditions are supported by the supplied enacted passage.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 1 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "6/6 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent additional code conditions or draw an unsupported unconditional conclusion. Its statements about the 2-hour ratings, masonry-or-equivalent construction, and 15-foot door separation track the supplied text.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer correctly makes separate-exit treatment conditional on satisfying all exception conditions and states that the 15-foot spacing alone is not dispositive.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "4/4 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly recognizes that the available facts cannot establish separate-exit treatment without documentation of the enclosure and separating-construction ratings and materials. It also limits its scope to BC 1007.1.1 and the supplied evidence package.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a clear conditional answer, identifies each remaining factual item to document, and distinguishes the baseline rule from the applicable R-2 exception.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers whether the stairs may be counted separately: potentially yes, but only if every Group R-2 exception condition is met.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "Expressly states that the result is not based on the 15-foot door spacing alone.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "States that stairs sharing a scissor-stair assembly or other enclosure count as one exit stairway under the general rule.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "Explains that the Group R-2 exception permits separate counting when all listed conditions are met.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "Identifies the at-least-2-hour fire-resistance requirements for both the stair enclosure walls and the construction separating the stairs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "Identifies masonry or masonry-equivalent construction, in accordance with department rules, for both relevant constructions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "States that exit doors must be at least 15 feet apart and correctly notes that the stated 15-foot spacing meets that minimum exactly.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer states the general one-exit rule but expressly explains the Group R-2 exception; it does not claim every scissor stair always counts as one exit.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer expressly rejects automatic compliance based on 15-foot door spacing alone.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer does not claim that sprinkler protection satisfies the exception.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The question expressly states Group R-2 occupancy, and the answer consistently applies the Group R-2 exception. Reconfirmation was not necessary.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer identifies the unresolved need to document that the stair-enclosure walls have at least a 2-hour fire-resistance rating.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer identifies the unresolved rating and construction of the separation between the two stairs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer identifies the unresolved need to confirm masonry or masonry-equivalent construction under department rules for the enclosure walls and separating construction.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

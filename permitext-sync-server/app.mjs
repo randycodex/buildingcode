@@ -7686,9 +7686,8 @@ function researchPrompt(question, evidence, options = {}) {
         `SEARCHED_CORPORA: ${JSON.stringify(options.codeBasis.searchedCorpora || [])}`,
         `EXPLICITLY_PINNED_CORPORA: ${JSON.stringify(options.codeBasis.pinnedCorpora || [])}`,
         `UNAVAILABLE_CORPORA: ${JSON.stringify(options.codeBasis.unavailableCorpora || [])}`,
-        `EXCLUDED_CORPORA: ${JSON.stringify(options.codeBasis.excludedCorpora || [])}`,
         options.codeBasis.limitation ? `LIMITATION: ${options.codeBasis.limitation}` : "",
-        "Treat each evidence record's corpus and edition as its source boundary. Do not imply that an unavailable, excluded, or unsearched corpus was retrieved."
+        "Treat each evidence record's corpus and edition as its source boundary. Do not imply that an unavailable or unsearched corpus was retrieved. Ordinary internal corpus exclusions are not user-facing evidence limitations; mention another corpus only when the question requested it and LIMITATION explains why it was unavailable."
       ].filter(Boolean).join("\n")
     : "";
   return [
@@ -9110,6 +9109,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Treat maps and figures as evidence that can be misread. State any illegible label, uncertain boundary, missing lot location, or other visual ambiguity explicitly instead of guessing.",
         "Do not use pretrained or uncited outside knowledge as legal authority and do not invent requirements.",
         "Treat user-provided Project facts and established active-topic conversation facts as factual context for this discussion, never as code authority or cited evidence.",
+        "Treat facts explicitly stated in the current question as established premises for the scoped answer. Do not list them in missingFacts or ask the user to reconfirm them. If professional reliance requires later document verification, distinguish that verification from whether the fact is already established for this discussion.",
         "Do not ask the user to reconfirm an established active-topic fact merely because it was supplied in an earlier turn. Do not list such a fact in missingFacts. If final professional reliance requires independent verification, distinguish that later verification from whether the fact is already established in this conversation.",
         "Preserve the factual content of an established user shorthand such as fully sprinklered. If a code benefit separately depends on compliance with a named installation standard, request records establishing that standard without asking again whether the building is fully sprinklered or the system is installed throughout.",
         "Apply current-turn hypothetical facts only to the current hypothetical. They do not replace established facts. User-stated unknowns remain unknown. Never promote an earlier assistant conclusion into a user-established fact.",

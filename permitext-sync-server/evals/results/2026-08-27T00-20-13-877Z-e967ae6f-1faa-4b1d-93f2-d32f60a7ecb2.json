@@ -1,0 +1,1895 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T00:20:13.877Z",
+  "updatedAt": "2026-08-27T00:21:09.958Z",
+  "configuration": {
+    "runID": "e967ae6f-1faa-4b1d-93f2-d32f60a7ecb2",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260826-current-facts-answer-v15",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "targeted",
+    "repeat": 1,
+    "caseIDs": [
+      "building-code-versus-hcr"
+    ],
+    "caseStatuses": [
+      "approved"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "4d785ccd99824209940322763a186c3e2df192f2",
+    "approvedSpendCapUSD": 2,
+    "conservativeReservedUSD": 0.176883,
+    "actualUSD": 0.176883,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 5
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T00:21:09.918Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.152033,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.152033,
+        "p50": 0.152033,
+        "p90": 0.152033,
+        "maximum": 0.152033
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.152033,
+      "projectedCostPer100TurnsUSD": 15.2,
+      "targetReady": false,
+      "targetBand": "above"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 44473,
+      "p50": 44473,
+      "p90": 44473,
+      "maximum": 44473
+    },
+    "routing": {
+      "escalatedTurns": 1,
+      "escalationRate": 1,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 4,
+        "p50": 4,
+        "p90": 4,
+        "maximum": 4
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [
+        {
+          "key": "evidence_analysis_failure",
+          "count": 1
+        }
+      ],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "building-code-versus-hcr",
+        "title": "Building Code evidence versus an agency requirement",
+        "status": "approved",
+        "difficulty": "basic",
+        "topics": [
+          "accessibility",
+          "agency requirements",
+          "scope of authority",
+          "evidence limits"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "questionedAuthority": "New York State Homes and Community Renewal (HCR)",
+          "selectedAuthority": "New York City Building Code only",
+          "unknowns": [
+            "applicable HCR standard",
+            "funding requirements",
+            "agency guidance"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "2713",
+            "reference": "BC 1107.2.2.7.2.2",
+            "codePrefix": "BC",
+            "sectionNumber": "1107.2.2.7.2.2",
+            "exactPassages": [
+              "Where only a forward approach is provided to the water closet, the clearance shall be 66 inches (1676 mm) minimum, measured perpendicular from the rear wall, and 48 inches (1220 mm) minimum, measured perpendicular from the side wall. A lavatory complying with Section 1107.2.2.5 shall be permitted on the rear wall, 18 inches (457.2 mm) minimum from the water closet centerline."
+            ],
+            "resolvedTitle": "- 1107.2.2.7.2.2 Forward approach.",
+            "evidenceCharacters": 378,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "Does this section prove that HCR requires a vanity in the bathroom?",
+        "expectedConclusion": "No. In its Type B+NYC unit toilet-and-bathing-room context, the selected Building Code subsection establishes the required water-closet clearance when only a forward approach is provided and permits a compliant lavatory at the specified rear-wall location. A lavatory and a vanity must remain distinct: this subsection does not establish an HCR vanity requirement, and its permissive lavatory-location language does not prove that no other Building Code provision requires a lavatory. Confirm whether the unit and bathroom are subject to the Type B+NYC provisions and provide the applicable HCR design standard, program or funding requirement, or official agency guidance before stating what HCR requires.",
+        "expectedUncertainty": {
+          "level": "outside selected authority",
+          "description": "The answer must state directly that the selected Building Code passage cannot establish an HCR requirement and request applicable HCR authority."
+        },
+        "sourceType": "real project",
+        "sourceReference": "Initial Permitext AI quality-evaluation case set supplied by the Permitext owner.",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "notes": "Exact enacted passage, authority boundary, and answer key were manually reviewed before approval.",
+        "requiredConcepts": [
+          "Answer no.",
+          "Place the subsection in its Building Code Type B+NYC unit toilet-and-bathing-room applicability context.",
+          "Explain that the passage regulates water-closet clearances for a forward approach.",
+          "Explain that the passage permits a compliant lavatory on the rear wall under the stated placement condition.",
+          "Keep a lavatory distinct from a vanity and do not present the terms as interchangeable requirements.",
+          "State that the selected evidence does not establish an HCR vanity requirement.",
+          "Do not imply that no other Building Code provision requires a lavatory merely because this subsection contains permissive location language.",
+          "Request the applicable HCR material before stating what HCR requires."
+        ],
+        "missingFacts": [
+          "Confirm whether the unit and bathroom are subject to the Building Code Type B+NYC provisions applicable to this subsection.",
+          "Provide the applicable HCR design standard, project funding requirement, or agency guidance."
+        ],
+        "forbiddenClaims": [
+          "A vanity is required by this Building Code passage.",
+          "Treat a vanity and a lavatory as interchangeable requirements.",
+          "State what HCR requires without HCR material in the evidence.",
+          "State or imply that no other Building Code provision requires a lavatory merely because this subsection permits a particular lavatory location."
+        ],
+        "forbiddenPhrases": [
+          "vanity (lavatory)",
+          "lavatory (vanity)",
+          "lavatory/vanity",
+          "vanity/lavatory"
+        ],
+        "requiredCitations": [
+          "BC 1107.2.2.7.2.2"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "BC 1107.2.2.7.2.2",
+            "requiredClaim": "Forward-approach water-closet clearance and permission for a compliant lavatory at the stated rear-wall location, not a vanity or HCR requirement."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "28d73cfb-ddab-4dcd-950c-5e6a7bfe62f3",
+      "answeredAt": "2026-08-27T00:20:58.672Z",
+      "answerTimeMilliseconds": 44478,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260826-current-facts-answer-v15:conversational-v4",
+        "evidenceVersion": "20260826-pinned-prose-context-v15:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-24a2f6be-a903-4ab9-bd3d-efc576b086aa",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "Project configured code basis",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T00:20:14.199Z"
+        },
+        "answerText": "No. This NYC Building Code section does not prove that HCR requires a bathroom vanity.\n\nThe cited forward-approach provision applies only where a water closet has only a forward approach. It requires specified water-closet clearances and says that a lavatory complying with another section is **permitted** on the rear wall at a stated distance from the water-closet centerline.  Permitted  allows that location; it does not require a lavatory, and it does not require a vanity, cabinet, countertop, or storage.\n\nSeparately, within the stated scope of a Type B+NYC dwelling or sleeping unit, the NYC Building Code requires at least one compliant lavatory in each provided toilet or bathing room. That is a NYC Building Code lavatory requirement—not an HCR requirement—and the supplied text does not equate a lavatory with a vanity. The Type B+NYC scope and the forward-approach layout have not been established here.\n\nTo determine whether HCR itself requires a vanity, the applicable HCR regulation, program design standard, funding or regulatory agreement, or official agency directive is needed.",
+        "conclusion": "No. This NYC Building Code section does not prove that HCR requires a bathroom vanity.",
+        "supportedPoints": [
+          {
+            "heading": "Forward-approach rule permits, but does not require, a lavatory location",
+            "explanation": "Where only a forward approach is provided to a water closet, the provision requires 66 inches of clearance measured from the rear wall and 48 inches measured from the side wall. It then states that a lavatory complying with Section 1107.2.2.5 is permitted on the rear wall, at least 18 inches from the water-closet centerline. This is placement permission, not a mandate to install a lavatory or a vanity.",
+            "sectionID": "2713",
+            "sourceIDs": [
+              "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "The broader NYC rule requires a lavatory only within its Type B+NYC-unit scope",
+            "explanation": "Where toilet or bathing rooms are provided in a Type B+NYC dwelling unit or sleeping unit, the provision requires at least one compliant lavatory and water closet in each toilet room; in each bathing room, it requires at least one compliant lavatory, water closet, and either a bathtub or shower. It does not use or define a vanity requirement. This scope is not established by the supplied project facts.",
+            "sectionID": "2702",
+            "sourceIDs": [
+              "research-permitext_cross_reference-id:2702-3"
+            ],
+            "evidenceRole": "supporting"
+          }
+        ],
+        "explanation": "The cited forward-approach provision applies only where a water closet has only a forward approach. It requires specified water-closet clearances and says that a lavatory complying with another section is **permitted** on the rear wall at a stated distance from the water-closet centerline.  Permitted  allows that location; it does not require a lavatory, and it does not require a vanity, cabinet, countertop, or storage.\n\nSeparately, within the stated scope of a Type B+NYC dwelling or sleeping unit, the NYC Building Code requires at least one compliant lavatory in each provided toilet or bathing room. That is a NYC Building Code lavatory requirement—not an HCR requirement—and the supplied text does not equate a lavatory with a vanity. The Type B+NYC scope and the forward-approach layout have not been established here.\n\nTo determine whether HCR itself requires a vanity, the applicable HCR regulation, program design standard, funding or regulatory agreement, or official agency directive is needed.",
+        "assumptions": [],
+        "missingFacts": [
+          "The HCR regulation, program standard, funding agreement, regulatory agreement, agency directive, or other HCR authority asserted to require a vanity.",
+          "Whether the room is in a Type B+NYC dwelling unit or sleeping unit.",
+          "Whether the water closet layout provides only a forward approach."
+        ],
+        "followUpQuestions": [
+          "What HCR regulation, program design standard, funding or regulatory agreement, or official agency guidance is asserted as the source of the vanity requirement?"
+        ],
+        "evidenceLimitations": [
+          "The supplied evidence is limited to the current 2022 NYC Construction Codes. It does not include HCR regulations, program requirements, funding terms, regulatory agreements, or agency guidance, so it cannot establish an HCR vanity mandate.",
+          "The pinned provision cross-references Section 1107.2.2.5 for lavatory compliance, but that section's substantive requirements were not supplied. This does not change that the pinned text uses permissive—not mandatory—lavatory-placement language."
+        ],
+        "additionalEvidenceNeeded": [
+          "The exact HCR authority that allegedly requires a vanity, including the applicable program and version/effective date.",
+          "If NYC Building Code compliance is also being evaluated, the applicable unit classification and the actual water-closet approach layout."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "2713",
+            "sectionNumber": "1107.2.2.7.2.2",
+            "title": "- 1107.2.2.7.2.2 Forward approach.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "461e5c67-1d87-4045-9400-d9951c0e3ff3",
+                "selectedText": "Where only a forward approach is provided to the water closet, the clearance shall be 66 inches (1676 mm) minimum, measured perpendicular from the rear wall, and 48 inches (1220 mm) minimum, measured perpendicular from the side wall. A lavatory complying with Section 1107.2.2.5 shall be permitted on the rear wall, 18 inches (457.2 mm) minimum from the water closet centerline.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "The user-pinned enacted provision establishes the forward-approach clearances and permits, rather than requires, a compliant lavatory on the rear wall."
+          },
+          {
+            "sectionID": "2702",
+            "sectionNumber": "1107.2.2",
+            "title": "1107.2.2 Type B+NYC unit toilet and bathing rooms.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_cross_reference-id:2702-3"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_cross_reference-id:2702-3",
+                "selectedText": "1107.2.2 1107.2.2 Type B+NYC unit toilet and bathing rooms. Where toilet and bathing rooms are provided in a Type B+NYC dwelling unit or sleeping unit, all such toilet and bathing rooms shall comply with Sections 1107.2.2.1 through 1107.2.2.9. Within each such toilet room, at least one lavatory, and one water closet shall comply with Sections 1107.2.2.1 through 1107.2.2.7. Within each bathing room, at least one lavatory, one water closet, and either a bathtub or shower shall comply with Sections 1107.2.2.1 through 1107.2.2.8. Toilet and bathing fixtures shall be in a single room, such that travel between fixtures does not require travel beyond the room in which the fixtures of such toilet or bathing room is located. Additional fixtures shall comply with Section 1107.2.2.9. Exception for Type A toilet and bathing room: Where at least one toilet and bathing room complying with Sections 1003.11 (Toilet and Bathing Facility) and 1003.3.2 (Turning Space) of ICC A117.1 is provided within a Type B+NYC dwelling unit or sleeping unit in accordance with Items 1 through 3 of this exception, other toilet and bathing rooms in the same unit shall be required to comply only with Sections 1004.3 (Accessible Route), 1004.4 (Walking Surfaces), 1004.5.2 (User Passage Doorways), 1004.9 (Operable Parts) and 1004.11.1 (Grab Bar and Shower Seat Reinforcement) of ICC A117.1. In addition, a vertical grab bar 18 inches (457.2 mm) minimum in length shall be mounted with the bottom of the bar located between 39 inches (990.6 mm) and 41 inches (1041.4 mm) above the floor, and with the center of the bar located at 30 inches (762 mm) from the rear wall. Doors and doorways to such toilet and bathing rooms shall be subject to Section 1107.2.1, Exception 5. 1. At least one lavatory, one water closet and either a bathtub or shower within such toilet or bathing facility shall comply with Section 1003.11 of ICC A117.1. Such toilet and bathing fixtures shall be in a single toilet or bathing area, such that travel between fixtures does not require travel beyond the area in which the fixtures of such toilet or bathing room are located. 2. Toilet paper dispensers within such rooms shall comply with Section 604.7 (Dispensers) of ICC A117.1. 3. Medicine cabinets, if provided, must include a storage shelf no higher than 44 inches (1117.6 mm) above the floor. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "The governing ancestor scope establishes the limited Type B+NYC-unit circumstances in which the NYC Building Code requires compliant lavatories; it does not establish an HCR or vanity requirement."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2713",
+          "9812",
+          "8796",
+          "113",
+          "10280",
+          "11811",
+          "8961",
+          "7828",
+          "8946",
+          "7826",
+          "8971",
+          "2711",
+          "2709",
+          "2702",
+          "4253",
+          "3558",
+          "10372"
+        ],
+        "evidenceSourceIDs": [
+          "461e5c67-1d87-4045-9400-d9951c0e3ff3",
+          "research-permitext_discovered-id:9812-1",
+          "research-permitext_discovered-id:8796-2",
+          "research-permitext_discovered-id:113-3",
+          "research-permitext_discovered-id:10280-4",
+          "research-permitext_discovered-id:11811-5",
+          "research-permitext_discovered-id:8961-6",
+          "research-permitext_discovered-id:7828-7",
+          "research-permitext_discovered-id:8946-8",
+          "research-permitext_discovered-id:7826-9",
+          "research-permitext_discovered-id:8971-10",
+          "research-permitext_cross_reference-id:2711-1",
+          "research-permitext_cross_reference-id:2709-2",
+          "research-permitext_cross_reference-id:2702-3",
+          "research-permitext_cross_reference-id:4253-6",
+          "research-permitext_cross_reference-id:3558-8",
+          "research-permitext_cross_reference-id:10372-9"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 17,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 1,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 15,
+          "userPinnedCount": 1,
+          "permitextDiscoveredCount": 10,
+          "crossReferenceCount": 6,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 3,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "NYC Building Code § 1107.2.2.7.2.2 — Forward approach",
+              "summary": "For a water closet with only a forward approach, this provision requires specified water-closet clearances (66 inches from the rear wall and 48 inches from the side wall). It says that a compliant lavatory is “permitted” on the rear wall at least 18 inches from the water-closet centerline. “Permitted” authorizes that placement; it does not require either a lavatory or a vanity. The provision is part of the Type B+NYC-unit toilet/bathing-room requirements, so it applies only if that parent scope applies.",
+              "sourceIDs": [
+                "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "NYC Building Code § 1107.2.2 — Type B+NYC unit toilet and bathing rooms",
+              "summary": "Where toilet or bathing rooms are provided in a Type B+NYC dwelling or sleeping unit, the section generally requires at least one compliant lavatory and water closet in each toilet room, and at least one compliant lavatory, water closet, and bathtub or shower in each bathing room. This is a lavatory requirement within the stated accessible-unit scope—not a requirement for a “vanity,” and not an HCR requirement.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2702-3"
+              ]
+            },
+            {
+              "label": "NYC Building Code §§ 1107.2.2.7 and 1107.2.2.7.2 — Water-closet clearance scope",
+              "summary": "The water-closet provisions require compliance with the enumerated water-closet and clearance subsections, including the pinned forward-approach provision where its facts are met.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2709-2",
+                "research-permitext_cross_reference-id:2711-1"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "Type A toilet-and-bathing-room exception within § 1107.2.2",
+              "summary": "If the detailed Type A-compliant facility described in the exception is provided within a Type B+NYC unit and all listed conditions are met, other toilet and bathing rooms in that unit have reduced compliance obligations. The supplied record does not establish that this exception applies to the project.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2702-3"
+              ]
+            }
+          ],
+          "conditions": [
+            {
+              "label": "Forward-approach condition",
+              "summary": "The 66-inch by 48-inch clearance rule applies where only a forward approach is provided to the water closet. The lavatory placement language applies only as a permission within that layout condition.",
+              "sourceIDs": [
+                "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+              ]
+            },
+            {
+              "label": "Type B+NYC unit condition",
+              "summary": "The parent toilet/bathing-room fixture rules apply where the room is provided in a Type B+NYC dwelling unit or sleeping unit.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2702-3"
+              ]
+            }
+          ],
+          "limitations": [
+            {
+              "label": "Authority mismatch: NYC Building Code does not establish an HCR mandate",
+              "summary": "The selected and searched authority is the 2022 NYC Construction Codes, not HCR standards, HCR funding terms, or HCR agency guidance. Accordingly, this evidence cannot prove that HCR requires a bathroom vanity. At most, it establishes limited NYC Building Code rules and permissions if their scope and project facts are satisfied.",
+              "sourceIDs": [
+                "461e5c67-1d87-4045-9400-d9951c0e3ff3",
+                "research-permitext_cross_reference-id:2702-3"
+              ]
+            },
+            {
+              "label": "No vanity requirement in the supplied operative text",
+              "summary": "The supplied text refers to a “lavatory,” not a vanity. The pinned provision makes a compliant lavatory placement permissible; it does not mandate a lavatory or specify cabinetry, countertop, storage, or another feature commonly called a vanity.",
+              "sourceIDs": [
+                "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+              ]
+            },
+            {
+              "label": "HCR regulations are separately referenced, not supplied",
+              "summary": "The Administrative Code provision concerning owner statements recognizes that certain applications may involve compliance with requirements imposed by HCR regulations. It neither states those requirements nor supplies an HCR vanity requirement.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8961-6"
+              ]
+            }
+          ],
+          "definitions": [],
+          "crossReferences": [
+            {
+              "label": "§ 1107.2.2.5 — Lavatory compliance standard",
+              "summary": "The pinned provision permits a lavatory only if it complies with § 1107.2.2.5, but that section was not supplied. Its substantive lavatory criteria therefore cannot be determined from this package.",
+              "sourceIDs": [
+                "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+              ]
+            },
+            {
+              "label": "ICC A117.1 provisions in the Type A exception",
+              "summary": "The Type A exception incorporates several ICC A117.1 provisions, but their texts were not supplied. The exception cannot be fully evaluated from this package.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2702-3"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [
+            "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:8961-6",
+            "research-permitext_cross_reference-id:2711-1",
+            "research-permitext_cross_reference-id:2709-2",
+            "research-permitext_cross_reference-id:2702-3"
+          ],
+          "projectFactsUsed": [
+            "Questioned Authority: New York State Homes and Community Renewal (HCR)",
+            "Selected Authority: New York City Building Code only",
+            "Unknowns: applicable HCR standard, funding requirements, agency guidance"
+          ],
+          "unresolvedProjectFacts": [
+            "The HCR program, regulation, funding agreement, regulatory agreement, agency directive, or other HCR source claimed to require a vanity.",
+            "Whether the subject room is in a Type B+NYC dwelling unit or sleeping unit.",
+            "Whether the water closet has only a forward approach."
+          ],
+          "evidenceLimitations": [
+            "Bounded-corpus limitation: the supplied package is limited to the 2022 NYC Construction Codes and does not include HCR authorities; it cannot establish requirements controlled by HCR or other outside authorities.",
+            "The question refers to “this section” without a citation; the analysis treats the user-pinned BC § 1107.2.2.7.2.2 as the intended section.",
+            "Three enacted sections were unavailable from the canonical resolver.",
+            "At least one enacted section was shortened for the evidence character limit; two large definition sections were supplied only as query-targeted excerpts.",
+            "Additional direct cross-references were identified but not added to the bounded package.",
+            "Lexical retrieval can miss differently worded requirements, exceptions, definitions, tables, or cross-references."
+          ],
+          "highValueFollowUpQuestions": [
+            "What HCR regulation, funding agreement, design standard, or agency guidance is asserted as the source of the vanity requirement?"
+          ]
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Questioned Authority: New York State Homes and Community Renewal (HCR)",
+            "Selected Authority: New York City Building Code only",
+            "Unknowns: applicable HCR standard, funding requirements, agency guidance"
+          ],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "Does this section prove that HCR requires a vanity in the bathroom?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Does this section prove that HCR requires a vanity in the bathroom?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260811-exact-passage-required-claims-v1",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "461e5c67-1d87-4045-9400-d9951c0e3ff3",
+            "research-permitext_cross_reference-id:2702-3"
+          ],
+          "citedEvidenceSourceIDs": [
+            "461e5c67-1d87-4045-9400-d9951c0e3ff3",
+            "research-permitext_cross_reference-id:2702-3"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9812-1",
+            "research-permitext_discovered-id:8796-2",
+            "research-permitext_discovered-id:113-3",
+            "research-permitext_discovered-id:10280-4",
+            "research-permitext_discovered-id:11811-5",
+            "research-permitext_discovered-id:8961-6",
+            "research-permitext_discovered-id:7828-7",
+            "research-permitext_discovered-id:8946-8",
+            "research-permitext_discovered-id:7826-9",
+            "research-permitext_discovered-id:8971-10",
+            "research-permitext_cross_reference-id:2711-1",
+            "research-permitext_cross_reference-id:2709-2",
+            "research-permitext_cross_reference-id:2702-3",
+            "research-permitext_cross_reference-id:4253-6",
+            "research-permitext_cross_reference-id:3558-8",
+            "research-permitext_cross_reference-id:10372-9"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:461e5c67-1d87-4045-9400-d9951c0e3ff3",
+              "label": "BC 1107.2.2.7.2.2 — - 1107.2.2.7.2.2 Forward approach.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "461e5c67-1d87-4045-9400-d9951c0e3ff3",
+            "research-permitext_cross_reference-id:2702-3"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:461e5c67-1d87-4045-9400-d9951c0e3ff3",
+              "label": "BC 1107.2.2.7.2.2 — - 1107.2.2.7.2.2 Forward approach.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_cross_reference-id:2702-3"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "461e5c67-1d87-4045-9400-d9951c0e3ff3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260826-answer-pinned-condition-fidelity-v7",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "citedSourceIDs": [
+            "461e5c67-1d87-4045-9400-d9951c0e3ff3",
+            "research-permitext_cross_reference-id:2702-3"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:9812-1",
+            "research-permitext_discovered-id:8796-2",
+            "research-permitext_discovered-id:113-3",
+            "research-permitext_discovered-id:10280-4",
+            "research-permitext_discovered-id:11811-5",
+            "research-permitext_discovered-id:8961-6",
+            "research-permitext_discovered-id:7828-7",
+            "research-permitext_discovered-id:8946-8",
+            "research-permitext_discovered-id:7826-9",
+            "research-permitext_discovered-id:8971-10",
+            "research-permitext_cross_reference-id:2711-1",
+            "research-permitext_cross_reference-id:2709-2",
+            "research-permitext_cross_reference-id:4253-6",
+            "research-permitext_cross_reference-id:3558-8",
+            "research-permitext_cross_reference-id:10372-9"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 2,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 1,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 15,
+            "reviewedOnlyProvisionCount": 15,
+            "assembledSourceCount": 17,
+            "assembledProvisionCount": 17
+          },
+          "sources": [
+            {
+              "sourceID": "461e5c67-1d87-4045-9400-d9951c0e3ff3",
+              "sectionID": "2713",
+              "reference": "BC 1107.2.2.7.2.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Where only a forward approach is provided to the water closet, the clearance shall be 66 inches (1676 mm) minimum, measured perpendicular from the rear wall, and 48 inches (1220 mm) minimum, measured perpendicular from the side wall. A lavatory complying with Section 1107.2.2.5 shall be permitted on the rear wall, 18 inches (457.2 mm) minimum from the water closet centerline."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9812-1",
+              "sectionID": "9812",
+              "reference": "AC 28-401.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-401.3 § 28-401.3 Definitions. As used in this chapter the following terms shall have the following meanings unless the context or subject matter requires otherwise. BOILER, HIGH-PRESSURE. An appliance for supplying steam or hot water that, for a steam boiler, operates at a pressure of more than 15 psig (103 kPa gauge), and for a hot water boiler, operates at a pressure exceeding 160 psig (1103 kPa gauge) or at a temperature exceeding 250°F (121°C). CERTIFICATE OF COMPETENCE. A certificate issued by the department to an individual representing that such individual has completed all requirements for the master plumber or master fire suppression piping contractor license but has not obtained a seal and that such certificate of competence has been renewed as required and is currently in effect. The certificate of competence shall bear the name of the holder and the certificate number. The holder of a certificate of competence is not a licensed master plumber or licensed master fire suppression piping contractor and may practice the trade for which the certificate is issued only under the direct and continuing supervision of a licensed master plumber or licensed master fire suppression piping contractor or, with respect to a city employee under the direct and continuing supervision of a supervising licensed master plumber or licensed master fire suppression piping contractor. CITY AGENCY. A city, county, borough, or other office, position, administration, department, division, bureau, board or commission, or a corporation, institution or agency of government, the expenses of which are paid, in whole or in part, from the city treasury. COMBINED STANDPIPE SYSTEM. A standpipe to which a sprinkler system is connected or is being connected. DIRECT AND CONTINUING SUPERVISION. Responsible control exercised by a licensed individual, either personally or through one or more, but no more than three, levels of competent supervision over individuals performing the actual work of the licensee's trade who are (i) in the direct employ of an individual who is a licensee, or (ii) in the direct employ of the city agency employing the licensee or (iii) in the direct employ of a business employing the licensee, as allowed by the department, or (iv) where the licensee uses his or her license on behalf of a business, in the direct employ of such business provided that such business is disclosed to the department pursuant to this chapter. Such control shall be evidenced by such licensee's signature, and seal where applicable, upon any required statements, applications and/or permits and by demonstrating involvement of the licensee in the operations of the business, including hiring of employees, responsibility for financial matters, and oversight of work performance. Direct and continuing supervision includes field inspection, supervision of job sites, and the maintenance of records of such supervision and such other requirements as the commissioner may prescribe by rule for a particular license type. DIRECT EMPLOY. An individual is in the direct employ of a licensee or business or a city agency when such individual is on the payroll of such licensee or business or city agency and under the usual common law rules applicable in determining the employer-employee relationship has the status of an employee. The work performed by such employee shall not exceed the class of license held by the licensee. Direct employment shall be evidenced by payroll records, such as social security payments, income tax withholding or the disbursement of other funds as required by law for the benefit of such employee, timekeeping records, such as time cards and sign-in sheets, work orders, and assignment or route logs. DIRECT SUPERVISION. Responsible control exercised by a licensed individual over individuals performing the actual work of the licensee's trade. Such control shall be evidenced by such licensee's signature, and seal where applicable, upon any required statements, applications and/or permits. Direct supervision includes field inspection, supervision of job sites, and the maintenance of records of such supervision and such other requirements as the commissioner may prescribe by rule for a particular license type. All work shall be performed under the guidance and direction of the licensed individual, or, for gas work, a person who holds a gas work qualification pursuant to article 423 , who shall be present at all times such trade work is conducted. ELECTRICAL WORK. The installation, alteration, maintenance, repair, or demolition of electric wires and wiring apparatus and other appliances used or to be used for the transmission of electricity for electric light, heat"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8796-2",
+              "sectionID": "8796",
+              "reference": "AC 28-101.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "BUILDING CODE. Chapter 1 of title 27 of the administrative code as hereafter in effect. 1968 BUILDING. Any structure used or intended for supporting or sheltering any use or occupancy. The term shall be construed as if followed by the phrase \"structure, premises, lot or part thereof\" unless otherwise indicated by the text. CITY. The city of New York. COMMISSIONER. The commissioner of buildings of the city of New York, or his or her duly authorized representative. DEPARTMENT. The department of buildings of the city of New York. PERMIT. An official document or certificate issued by the commissioner that authorizes performance of specified work or activity. PROJECT. A design and construction undertaking comprised of work related to one or more buildings or structures and the site improvements. A project is represented by one or more plan/work applications, including construction documents compiled in accordance with article 104 of this chapter, that relate either to the construction of new buildings or structures or to the demolition or alteration of existing buildings or structures. Applications for a project may have different registered design professionals and different application numbers, and may result in the issuance of one or more permits. REQUIRED. Shall mean required by the provisions of this code."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-3",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "DIRECT AND CONTINUING SUPERVISION. See Section 28-401.3 of the Administrative Code . DIRECT EMPLOY. See Section 28-401.3 of the Administrative Code . LOT. A portion or parcel of land considered as a unit. II. Organic peroxides that burn very rapidly and that pose a moderate reactivity hazard. Class III. Organic peroxides that burn rapidly and that pose a moderate reactivity hazard. Class QUALIFIED PERSON. A person who, by possession of a recognized degree, certificate, or professional standing, or who by extensive knowledge, training, and experience, has successfully demonstrated his or her ability to solve or resolve problems related to the subject matter, the work, or the project. ROOFTOP STRUCTURE . An enclosed or unenclosed structure on or above the roof of any part of a building . STANDPIPE SYSTEM. Piping, installed in a building or structure, that serves to supply water to hose connections at one or more locations in a building or structure, for firefighting purposes."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10280-4",
+              "sectionID": "10280",
+              "reference": "MC 201.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "201.4 201.4 Terms not defined. Where terms are not defined through the methods authorized by this section, such terms shall have ordinarily accepted meanings such as the context implies. Section MC 202: General Definitions ABRASIVE MATERIALS. Moderately abrasive particulate in high concentrations, and highly abrasive particulate in moderate and high concentrations, such as alumina, bauxite, iron silicate, sand and slag. ABSORPTION SYSTEM. A refrigerating system in which refrigerant is pressurized by pumping a chemical solution of refrigerant in absorbent, and then separated by the addition of heat in a generator, condensed (to reject heat), expanded, evaporated (to provide refrigeration), and reabsorbed in an absorber to repeat the cycle; the system may be single or multiple effect, the latter using multiple stages or internally cascaded use of heat to improve efficiency. ACCESS (TO). That which enables a device, fixture, appliance or equipment to be reached by ready access or by a means that first requires the removal or movement of a panel, door or similar obstruction (see also \"Ready access (to)\"). AIR. All air supplied to mechanical equipment and appliances for combustion, ventilation, cooling, and similar purposes. Standard air is air at standard temperature and pressure, namely, 70°F (21.1°C) and 29.92 inches of mercury (101.3 kPa). AIR CONDITIONING. The treatment of air so as to control simultaneously the temperature, humidity, cleanness and distribution of the air to meet the requirements of a conditioned space. AIR-CONDITIONING SYSTEM. A system that consists of heat exchangers, blowers, filters, supply, exhaust and return ducts, and shall include any apparatus installed in connection therewith. AIR DISPERSION SYSTEM. Any diffuser system designed to both convey air within a room, space or area and diffuse air into that space while operating under positive pressure. Systems are commonly constructed of, but not limited to, fabric or plastic film. AIR DISTRIBUTION SYSTEM. Any system of ducts, plenums and air-handling equipment that circulates air within a space or spaces and includes systems made up of one or more air-handling units. AIR, EXHAUST. Air being removed from any space, appliance or piece of equipment and conveyed directly to the atmosphere by means of openings or ducts. AIR-HANDLING UNIT. A blower or fan used for the purpose of distributing supply air to a room, space or area. AIR, INTAKE. Air supplied from the outdoors to any space, appliance or piece of equipment. AIR, MAKEUP. Any combination of outdoor and transfer air intended to replace exhaust air and exfiltration. AIR, OUTDOOR. Ambient air that enters a building through a ventilation system, through intentional openings for natural ventilation, or by infiltration. AIR, RELIEF. Air removed from any space, appliance or piece of equipment that serves to balance building pressurization due to introduction of outdoor air. Exhaust air shall not be considered relief air. AIR, RETURN. Air removed from a conditioned space or location and recirculated or relieved to the outdoors. AIR, TRANSFER. Air moved from one indoor space to another. AIR TRANSFER OPENING. An opening designed to allow the movement of environmental air between two contiguous spaces. APPLIANCE. A device or apparatus that is manufactured and designed to utilize energy and for which this code provides specific requirements. APPLIANCE, EXISTING . Any appliance regulated by this code that was legally installed prior to the effective date of this code, or for which a permit to install has been issued. APPLIANCE, FUEL-FIRED. An appliance that burns solid, liquid and/or gaseous fuel, including but not limited to wood stoves, household cooking ranges, furnaces, boilers, water heaters, clothes dryers and gas-fired refrigerators. APPLIANCE, GAS (EQUIPMENT). Any apparatus or equipment that uses gas as a fuel or raw material to produce light, heat, power, refrigeration or air conditioning. APPLIANCE TYPE. High-heat appliance. Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature greater than 2,000°F (1093.3°C). Low-heat appliance (residential appliance). Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature of 1,000°F (537.8°C) or less. Medium-heat appliance. Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature of more than 1,000°F (537.8°C), but not greater than 2,000°F (1093.3°C). APPLIANCE, VENTED. An appliance designed and installed in such a manner that all of the products of combustion are conveyed directly from the appliance to the outdoor atmosphere through an approved chimney or vent system. AUTOMATIC BOILER. Any class of boiler that is equipped with the controls and limit devices specified in Chapter 10 . BATHROOM. A room containing a bathtub, shower, spa or similar bathing fixture. BOILER, HIGH-PRESSURE. An appliance for supplying steam or hot water that, for a steam boiler, operates at a pressure of more than 15 psig (103.4 kPa gauge), and for a hot water boiler, operates at a pressure exceeding 160 psig (1103.2 kPa gauge) or at a temperature exceeding 250°F (121.1°C). BOILER, LOW-PRESSURE. A self-contained appliance for supplying steam or hot water as follows: Hot water heating boiler. A boiler in which no steam is generated, from which hot water is circulated for heating purposes and then returned to the boiler, and that operates at water pressures not exceeding 160 pounds per square inch gauge (psig) (1103.2 kPa gauge) and at water tempera"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11811-5",
+              "sectionID": "11811",
+              "reference": "PC 201.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "201.4 201.4 Terms not defined. Where terms are not defined through the methods authorized by this section, such terms shall have ordinarily accepted meanings such as the context implies. Section PC 202: General Definitions ACCEPTED ENGINEERING PRACTICE. That which conforms to accepted principles, tests or standards of nationally recognized technical or scientific authorities. ACCESS (TO). That which enables a device, fixture, appliance or equipment to be reached by ready access or by a means that first requires the removal or movement of a panel, door or similar obstruction (see \"Ready access (to)\"). ACCESS COVER. A removable plate, usually secured by bolts or screws, to permit access to a pipe or pipe fitting for the purposes of inspection, repair or cleaning. ADAPTER FITTING. An approved connecting device that suitably and properly joins or adjusts pipes and fittings that do not otherwise fit together . AIR BREAK (Drainage System). A piping arrangement in which a drain from a fixture, appliance or device discharges indirectly into another fixture, receptacle or interceptor at a point below the flood level rim and above the trap seal. AIR GAP (Drainage System). The unobstructed vertical distance through the free atmosphere between the outlet of the waste pipe and the flood level rim of the receptacle into which the waste pipe is discharging. AIR GAP (Water Distribution System). The unobstructed vertical distance through the free atmosphere between the lowest opening from any pipe or faucet supplying water to a tank, plumbing fixture or other device and the flood level rim of the receptacle. ALTERNATIVE ENGINEERED DESIGN. A plumbing system that performs in accordance with the intent of this code and provides an equivalent level of performance for the protection of public health, safety and welfare. The system design is not specifically regulated by this code. ANCHORS. See \"Supports.\" ANTISIPHON. A term applied to valves or mechanical devices that eliminate siphonage. AREA DRAIN. A receptacle designed to collect surface or storm water from an open area. ASPIRATOR. A fitting or device supplied with water or other fluid under positive pressure that passes through an integral orifice or constriction, causing a vacuum. Aspirators are also referred to as suction apparatus, and are similar in operation to an ejector. BACKFLOW. The undesirable reversal of flow of water or mixtures of water and other liquids, gases or other substances into the distribution pipes of the potable supply of water from any source or sources or the undesirable reversal of flow from the intended direction of flow in the drainage system due to a system stoppage, system overload or a higher pressure on the drainage pipe side of the house trap. Backpressure, low head. A pressure less than or equal to 4.33 psi (29.88 kPa) or the pressure exerted by a 10-foot (3048 mm) column of water. Backsiphonage. The backflow of potentially contaminated water into the potable water system as a result of the pressure in the potable water system falling below atmospheric pressure of the plumbing fixtures, pools, tanks or vats connected to the potable water distribution piping. Drainage. A reversal of flow in the drainage system. Water supply system. The flow of water or other liquids, mixtures or substances into the distribution pipes of a potable water supply from any source except the intended source. BACKFLOW CONNECTION. Any arrangement whereby backflow is possible. BACKFLOW PREVENTER. A backflow prevention assembly, a backflow prevention device or other means or method to prevent backflow into the potable water supply. BACKWATER VALVE. A device or valve installed in the building drain, sewer or any branch line where such drain or branch is subject to backflow, and which prevents drainage or waste from backing up into a lower level or fixtures and causing a flooding condition. BALL COCK. See \"Fill Valve.\" BASE FLOOD ELEVATION. Refer to Section G201.2 of Appendix G of the New York City Building Code . BATHROOM GROUP. A group of fixtures consisting of a water closet, lavatory, bathtub or shower, including or excluding a bidet, an emergency floor drain or both. Such fixtures are located together in the same room. BEDPAN STEAMER OR BOILER. A fixture utilized for scalding bedpans or urinals by direct application of steam or boiling water. BEDPAN WASHER AND STERILIZER. A fixture designed to wash bedpans and to flush the contents into the sanitary drainage system. Included are fixtures of this type that provide for disinfecting utensils by scalding with steam or hot water. BEDPAN WASHER HOSE. A device supplied with hot and cold water and located adjacent to a water closet or clinical sink to be utilized for cleansing bedpans. BRANCH. Any part of the piping system that extends to fixtures on two or less consecutive floors except a riser, main or stack. BRANCH INTERVAL. A vertical measurement of distance, 8 feet (2438 mm) or more in developed length, between the connections of horizontal branches to a drainage stack. Measurements are taken down the stack from the highest horizontal branch connection. BRANCH VENT. A vent connecting one or more individual vents with a vent stack or stack vent. BUILDING DRAIN. That part of the lowest piping of a drainage system that receives the discharge from soil, waste and other drainage pipes inside and that extends to the exterior face of the exterior building wall, or the outlet of the most downstream trap, private manhole, catch basin, detention tank, or similar fixture or equipment, and conveys the drainage directly to the building sewer or, in the absence of building sewer, to an approved place of disposal. Combined. A building drain that conveys"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8961-6",
+              "sectionID": "8961",
+              "reference": "AC 28-104.8.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.8.2 § 28-104.8.2 Owner statements. The application shall contain a signed statement by the owner, and, in the case of cooperative or condominium forms of ownership, the application shall also contain a statement by the cooperative or condominium board, affirming that the applicant is authorized to make the application and, if applicable, acknowledging that construction and related documents will be accepted with less than full examination by the department based on the professional certification of the applicant. Such statement shall list the owner's full name and address, as well as the names of the principal officers, partners or other principals if a corporation, partnership or other entity. Principal officers of a corporation shall be deemed to include the president, vice presidents, secretary and treasurer. Where a current deed holder with a valid property interest or a court appointed entity or equivalent in charge of the property, or in the case of a cooperative or condominium unit, the cooperative or condominium board, notifies the department in writing that the applicant does not have authority to make the application, the department is authorized pursuant to section 28-104.2.10 to revoke approval of construction documents. In addition, the application shall contain the following: 1. A signed statement certifying whether the building to be altered, constructed or demolished contains one or more occupied dwelling units; 2. A signed statement indicating whether the building to be altered, constructed or demolished contains housing accommodations subject to rent control or rent stabilization under chapters 3 and 4 of title 26 of the administrative code or rent regulation under article 7-C of the New York state multiple dwelling law; and 3. If the building to be altered, constructed or demolished contains occupied housing accommodations subject to rent control under chapter 3 of title 26 of the administrative code, the application shall contain a signed statement indicating that the owner has notified the New York state division of homes and community renewal that the owner has complied with all requirements imposed by the regulations of such agency as preconditions for such filing; or that the owner has not notified such agency because the nature and scope of the work proposed, pursuant to such regulations, does not require notification; or, if the building is subject to article 7-C of the New York state multiple dwelling law, the application shall contain a signed statement indicating that the owner will notify the loft board of the filing of the construction documents and will comply with all requirements imposed by New York state multiple dwelling law article 7-C and the loft board's rules. (Am. L.L. 2019/106, 6/8/2019, eff. 3/8/2020; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7828-7",
+              "sectionID": "7828",
+              "reference": "BC Q107.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q107.1 Q107.1 General. Fire alarm system design, installation, testing, and maintenance, where required by this code, shall be conducted and documented in accordance with NFPA 72, National Fire Alarm and Signaling Code , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions No changes. Chapter 4 Reserved Chapter 5 Reserved Chapter 6 Reserved Chapter 7 Documentation No changes. Chapter 8 Reserved Chapter 9 Reserved Chapter 10 Fundamentals 10.5.1.1 Delete and replace with the following: \"Fire alarm system and emergency communication system plans and specifications shall be developed in accordance with the New York City Building Code by persons licensed and registered to practice the profession of engineering under the Education Law of the State of New York, who are also experienced in the proper design, application, installation, and testing of the system.\" 10.5.1.2 Delete. 10.5.2.1 Add at beginning the following: \"Fire alarm installations shall be performed by a New York City licensed electrical contractor.\" 10.5.3.1 Add at beginning the following: \"Fire alarm inspection, testing and maintenance shall be performed by a New York City licensed electrical contractor holding a New York State registration for 'Business of Installing, Servicing or Maintaining Security or Fire Alarm Systems' or those fire alarm companies holding a New York State registration for 'Business of Installing, Servicing or Maintaining Security or Fire Alarm Systems,' and in accordance with rules and regulations promulgated by the Fire Commissioner.\" 10.6.3.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.4 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.4 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.6.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.6.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.7.2.1 Delete and replace with the following: \"The secondary power supply for fire alarm systems and supervising station facilities shall have sufficient capacity to operate the system in accordance with the New York City Electrical Code . The secondary power supply for other systems shall have sufficient capacity to operate the system under quiescent load (system operating in a nonalarm condition) for a minimum of 24 hours and, at the end of that period, shall be capable of operating all alarm notification appliances used for evacuation or to direct aid to the location of an emergency for 5 minutes, unless otherwise permitted or required by 10.6.7.2.1.1 through 10.6.7.2.2. 10.6.7.2.1.2 Reserved. 10.6.7.2.1.3 Reserved. 10.6.7.2.1.4 Delete and replace with the following: \"The secondary power supply for high-power speaker arrays used for wide-area mass notification systems shall be in accordance with 24.6.5.2.\" Add 1 0.6.7.2.1.8 to read as follows: \"The secondary power supply for two-way voice radio communication enhancement system shall be in accordance with 24.9.5.3.1.\" Chapter 11 Reserved Chapter 12 Circuits and Pathways Add 12.3.6.1 to read as follows: \"Class-N circuits shall not be installed unless approved by the Fire Department.\" Chapter 13 Reserved Chapter 14 Inspection, Testing, and Maintenance 14.1.1 Delete and replace with the following: \"The inspection, testing and maintenance of systems, their initiating devices, and notification appliances shall comply with the requirements of this chapter and the New York City Fire Code .\" 14.1.2 Delete and replace with the following: \"The inspection, testing and maintenance of single- and multiple-station smoke and heat alarms and household fire alarm systems shall comply with the requirements of this chapter and the New York City Fire Code .\" 14.4.9 Delete and replace with the following: \"In-building auxiliary radio communication systems (ARCS) shall be inspected and operationally tested in accordance with the requirements of the New York City Fire Code and rules promulgated by the Fire Department.\" 14.6.3 Delete and replace with the following: \"Supervising Station Records. For supervising station alarm systems, records pertaining to signals received at the supervising station that result from maintenance, inspection, and testing shall be maintained in accordance with the New York City Fire Code .\" 14.6.3.1 Delete. 14.6.3.2 Delete. 14.6.4 Delete. Chapter 15 Reserved Chapter 16 Reserved Chapter 17 Initiating Devices Add 17.5.3.2.1 to read as follows: \"Partial coverage smoke detection shall be located in common areas and wo"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8946-8",
+              "sectionID": "8946",
+              "reference": "AC 28-104.7.14",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.7.14 § 28-104.7.14 Identification of certain I-1 and I-2 occupancies and of certain adult homes, enriched housing, community residences and intermediate care facilities as exempt from temporary external generator connection requirements. The title sheet of construction documents for the following buildings shall list whether the building is exempt from the requirement to provide connections for temporary external generators pursuant to any exception contained in sections G304.5.1 or G304.5.2 of appendix G of the New York city building code, as applicable: 1. A new or substantially improved building, as such term is defined in appendix G of the New York city building code, that contains space classified in occupancy group I-1 or I-2 or space that is an adult home, enriched housing, community residence or intermediate care facility classified as occupancy group R pursuant to an exception to section 308.3.1 or 308.3.2 of the New York city building code, and that is located in a special flood hazard area, as such term is defined in appendix G of the New York city building code; and 2. A new or substantially improved building that contains space classified as an occupancy group I-2 hospital and that is located in a shaded X-Zone, as such terms are defined in appendix G of the New York city building code. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7826-9",
+              "sectionID": "7826",
+              "reference": "BC Q105.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q105.1 Q105.1 General. Standpipe and hose systems, where required by this code, shall be installed in accordance with NFPA 14, Standard for the Installation of Standpipe and Hose Systems , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions 3.3.3.1 Delete and replace with the following: \"Fire Department Connection (FDC).\" 3.3.3.1.1 Delete and replace with the following: \"Standpipe System Fire Department Connection (Standpipe FDC). A connection through which the fire department can pump water to a standpipe system at the required system demand. Supplemental water can also be provided into the sprinkler system or other system furnishing water for fire extinguishment to supplement existing water supplies. Unless otherwise allowed in the New York City Building Code , FDCs shall be 2-way connections.\" 3.3.3.1.2 Delete. 3.3.5.1 Delete the words 'NFPA 101' and replace with 'the New York City Building Code '. 3.3.6 Delete and replace with the following: \"Fire Department. The New York City Fire Department (FDNY).\" 3.3.7 Add at end the following: \"For the purposes of this section, a penthouse of any area with an occupant load greater than 10 shall be considered a story.\" 3.3.8 Delete the words \"or reel\". 3.3.9.1.1 Delete. 3.3.18 Delete. 3.3.19.2 Delete the words \"trained personnel\" and replace with \"building occupants\". 3.3.19.3 Delete the words \"trained personnel\" and replace with '\"building occupants\". Add at end the following: \"The hose stations shall be attached to the hose connections by a reducing coupling.\" 3.3.21 Delete the words 'and exclusive of pressure from the fire department connection'. Add 3.3.24 to read as follows: \"3.3.24 Zones\" Add 3.3.24.1 to read as follows: \"Standpipe System Zone. A vertical subdivision of a standpipe system limited or determined by the pressure limitations of the system components. Standpipe System Zones shall not exceed 300 feet (91.4 m) in height.\" Add 3.3.24.2 to read as follows: \"Fire Department Connection (FDC) Zone. A vertical subdivision of a standpipe system in buildings with more than two standpipe system zones arranged so that the Fire Department will pump through express FDC risers to upper zones.\" Chapter 4 System Components and Hardware 4.2.2 Delete and replace with the following: \"Pipe for buried portions of the standpipe system, whether inside or outside of the building, shall be red brass, ductile iron, hard tempered type \"K\" copper tubing, galvanized steel or other approved corrosion resistant material. All such pipe, other than ductile iron, shall be adequately wrapped or otherwise protected against corrosion.\" Add 4.2.2.1 as follows: \"Where ductile iron pipe is installed in accordance with Table 4.2.1, it shall be lined in accordance with AWWA C 104, Cement-Mortar Lining for Ductile-Iron Pipe and Fittings .\" 4.2.3 Add at end the following: \"Piping conforming to the specifications contained in this section may only be used in buildings with floor heights not exceeding 300 feet (91.4 m) above grade plane or in the highest 300 feet (91.4 m) portion of other buildings. Otherwise, piping conforming to the wall thicknesses specified in 4.2.4 shall be used.\" 4.4.1.2 Delete. 4.4.2.2.2 Replace \"NFPA 51B\" with \"the New York City Fire Code \". 4.4.2.2.3 Replace \"NFPA 51B\" with \"the New York City Fire Code \". 4.5.1 Add at end the following: \"6 inch (152 mm) and larger sectional and riser control valves shall have a minimum 3/4 inch (197 mm) valved bypass.\" 4.6.2.1 Delete and replace with the following: \"Class III Standpipe Hose Stations. Class III standpipe systems shall have 2 1/2 in. (64 mm) hose connections located as required for Class I standpipes. At each hose connection there shall be a hose station. The hose stations shall be equipped with a minimum of 125 feet (38.1 m), or a maximum of 150 feet (45.7 m), of 1 1/2 in. (38 mm) fire hose, connected to an adjustable fog nozzle. The hose shall be attached to the hose connection by a 2 1/2 in. x 1 1/2 in. (64 mm x 38 mm) non-swivel reducing coupling. A pressure restricting device shall be installed on the 2 1/2 in. hose connection when required by Appendix Q of the New York City Building Code . The hose shall be mounted on a rack and may be located in a cabinet, in accordance with Section 905.7 of the New York City Building Code . The hose, pressure restricting device (when required) and reducing coupling shall be installed in such a manner that they can be readily removable by the Fire Department.\" 4.6.2.2 Delete. 4.6.3.2 Delete. 4.6.4 Delete \"for Class II service\". 4.6.5 Delete and replace with the following: \"Label. Each rack or storage facility for 1 1/2-in. (40 mm) hose shall be provided with a label that shall include operating instructions.\" 4.7.2 Delete and replace with the following: \"Hose connections shall have nominal 2 1/2 inch (64 mm) threads conforming to FDNY standards.\" 4.7.3 Add at end the following: \"Caps are not required to be listed and shall be brass upon completion of construction and are permitted to be impact-resistant plastic during construction.\" 4.7.4 Delete. Add 4.7.6 to read as follows: \"Pressure-reducing valves shall not be installed as hose valves or installed downstream of hose valves.\" 4.8 Delete entire section, including all subsections and replace with the following: \"Fire Department Connections (FDCs). (See Figure A.6.4.)\" Add 4.8.1 to read as follows: \"FDCs shall be listed or approved for a working pressure equal to or greater than the pressure requirement of the system demand.\" Add 4.8.2 to read as follows: \"Each FDC shall have at least two 3-inch (76 mm) internally threaded swivel fittings having threads conforming to FDNY standards and be of a minimum size of 5 inches (127 mm) except where supplying a single 4-inch (102 mm) standpipe riser, in which case the minimum size shall be 4 inches (102 mm).\" Add 4.8.2.1 to read as follows: \"FDCs shall be provided as follows:\" \"(a) One FDC shall be provided for each 300 feet (91.4 m) of exterior building wall or fraction thereof facing upon each street or public space.\" \"(b) Where buildings face upon two parallel streets or public spaces without an intersecting street or public space, one FDC shall be provided for each 300 feet (91.4 m) of exterior building wall or fraction thereof facing upon each such parallel street or public space.\" \"(c) Where a building faces upon two intersecting streets or public spaces and the total length of the exterior building walls facing upon such streets or public spaces does not exceed 300 feet (91.4 m) only one FDC need be installed provided the FDC is located within 15 feet (4.6 m) of the corner and on the street with the longest building frontage.\" \"(d) Where a building faces on three streets or public spaces, one FDC shall be provided for each 300 feet (91.4 m) of building wall or fraction thereof facing upon such streets or public spaces provided that at least one FDC is installed on each of the parallel streets or public spaces, and further provided that the FDCs shall be located so that the distance between them does not exceed 300 feet (91.4 m).\" \"(e) Where a building faces upon four streets or public spaces, at least one FDC shall be provided on each street front or public space; however, only one FDC need be provided at the corner of two intersecting streets or public spaces if the FDC is located within 15 feet (4.6 m) of the corner and on the street with the longest building frontage or public space, and if the distances between FDCs, in all cases, do not exceed 300 feet (91.4 m).\" \"(f) In any case where the exterior building walls of a building facing a street or public space are obstructed in part by another building, one FDC shall be provided for each clear three hundred feet of exterior building wall or fraction thereof facing upon such street or public space.\" \"(g) High-rise buildings shall have at least two remotely located fire department connections. In high-rise buildings with multiple FDC zones, each FDC zone shall have two remotely located fire department connections.\" \"(h) Location.\" \"(1) FDCs shall be placed betwee"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8971-10",
+              "sectionID": "8971",
+              "reference": "AC 28-104.10",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.10 § 28-104.10 Notification to the New York city transit authority, the Metropolitan Transportation Authority and the Port Authority of New York and New Jersey. Construction documents shall not be approved unless all applicable agency approvals from the New York city transit authority, the Metropolitan Transportation Authority or the Port Authority of New York and New Jersey, as provided for in section 3304.3.5 of the New York city building code have been submitted to the department. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2711-1",
+              "sectionID": "2711",
+              "reference": "BC 1107.2.2.7.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1107.2.2.7.2 1107.2.2.7.2 Clearance. Clearance around the water closet shall comply with Sections 1107.2.2.7.2.1 through 1107.2.2.7.2.3."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2709-2",
+              "sectionID": "2709",
+              "reference": "BC 1107.2.2.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1107.2.2.7 1107.2.2.7 Water closet. Water closets shall comply with Sections 1107.2.2.7.1 through 1107.2.2.7.6."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2702-3",
+              "sectionID": "2702",
+              "reference": "BC 1107.2.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1107.2.2 1107.2.2 Type B+NYC unit toilet and bathing rooms. Where toilet and bathing rooms are provided in a Type B+NYC dwelling unit or sleeping unit, all such toilet and bathing rooms shall comply with Sections 1107.2.2.1 through 1107.2.2.9. Within each such toilet room, at least one lavatory, and one water closet shall comply with Sections 1107.2.2.1 through 1107.2.2.7. Within each bathing room, at least one lavatory, one water closet, and either a bathtub or shower shall comply with Sections 1107.2.2.1 through 1107.2.2.8. Toilet and bathing fixtures shall be in a single room, such that travel between fixtures does not require travel beyond the room in which the fixtures of such toilet or bathing room is located. Additional fixtures shall comply with Section 1107.2.2.9. Exception for Type A toilet and bathing room: Where at least one toilet and bathing room complying with Sections 1003.11 (Toilet and Bathing Facility) and 1003.3.2 (Turning Space) of ICC A117.1 is provided within a Type B+NYC dwelling unit or sleeping unit in accordance with Items 1 through 3 of this exception, other toilet and bathing rooms in the same unit shall be required to comply only with Sections 1004.3 (Accessible Route), 1004.4 (Walking Surfaces), 1004.5.2 (User Passage Doorways), 1004.9 (Operable Parts) and 1004.11.1 (Grab Bar and Shower Seat Reinforcement) of ICC A117.1. In addition, a vertical grab bar 18 inches (457.2 mm) minimum in length shall be mounted with the bottom of the bar located between 39 inches (990.6 mm) and 41 inches (1041.4 mm) above the floor, and with the center of the bar located at 30 inches (762 mm) from the rear wall. Doors and doorways to such toilet and bathing rooms shall be subject to Section 1107.2.1, Exception 5. 1. At least one lavatory, one water closet and either a bathtub or shower within such toilet or bathing facility shall comply with Section 1003.11 of ICC A117.1. Such toilet and bathing fixtures shall be in a single toilet or bathing area, such that travel between fixtures does not require travel beyond the area in which the fixtures of such toilet or bathing room are located. 2. Toilet paper dispensers within such rooms shall comply with Section 604.7 (Dispensers) of ICC A117.1. 3. Medicine cabinets, if provided, must include a storage shelf no higher than 44 inches (1117.6 mm) above the floor. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:4253-6",
+              "sectionID": "4253",
+              "reference": "BC 1816.2.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1816.2.1 1816.2.1 Peak ground acceleration. Peak ground acceleration shall be determined based on either (i) a site-specific study taking into account soil amplification effects as specified in Section 11.4.8 of ASCE 7 or (ii) the Maximum Considered Geometric Mean peak ground acceleration adjusted for site class effects PGA M as provided in Table 1816.2.1 without adjustment for targeted risk. Table 1816.2.1 Values of Maximum Considered Earthquake Geometric Mean (MCE G ) Peak Ground Accelerations Adjusted for Site Class Effects, PGA M Site Class PGA M(g) A 0.15 B (m) 0.17 B (un-m) 0.18 C 0.22 D 0.26 E 0.36"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:3558-8",
+              "sectionID": "3558",
+              "reference": "BC 1609.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1609.3 1609.3 Basic design wind speed. The basic design wind speed, V, in mph, for determining wind speed shall be that of Table 1609.3 . Table 1609.3 Basic Design Wind Speed Risk Category Basic Design Wind Speed, mph (3-sec gust, 33 ft. for Exposure Category C) Mean Recurrence Interval, years Probability of Exceedance in 50 years, % I 110 300 15 II 117 700 7 III 127 1,700 3 IV 132 3,000 1.6 Note: Values are ultimate design 3-second gust wind speeds in miles per hour at 33 feet (10 058 mm) above ground for Exposure Category C."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10372-9",
+              "sectionID": "10372",
+              "reference": "MC 308.4.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Table 308.4.2 Clearance Reduction Methods b Type of Protective Assembly a Reduced Clearance With Protection (inches) a Horizontal combustible assemblies located above the heat source Horizontal combustible assemblies located beneath the heat source and all vertical combustible assemblies Required clearance to combustibles without protection (inches) a Required clearance to combustible without protection (inches) a 36 18 9 6 36 18 9 6 Type of Protective Assembly a Reduced Clearance With Protection (inches) a Horizontal combustible assemblies located above the heat source Horizontal combustible assemblies located beneath the heat source and all vertical combustible assemblies Required clearance to combustibles without protection (inches) a Required clearance to combustible without protection (inches) a 36 18 9 6 36 18 9 6 Galvanized sheet metal, minimum nominal thickness of .0296 inch (No. 22 Gage), mounted on 1-inch glass fiber or mineral wool batt reinforced with wire on the back, 1 inch off the combustible assembly 18 9 5 3 12 6 3 3 Two layers of galvanized sheet metal, minimum nominal thickness of 0.024 inch (No. 24 Gage), having a 1-inch airspace between layers, spaced 1 inch off the combustible assembly 18 9 5 3 12 6 3 3 Two layers of galvanized sheet metal,minimum nominal thickness of 0.024 inch (No. 24 Gage), having 1 inch of fiberglass insulation between layers, spaced 1 inch off the combustible assembly 18 9 5 3 12 6 3 3 0.5-inch inorganic insulating board, over 1 inch of fiberglass or mineral wool batt, against the combustible assembly 24 12 6 4 18 9 5 3 3 1/2-inch brick wall, spaced 1 inch off the combustible wall - - - - 12 6 6 6 3 1/2-inch brick wall, against the combustible wall - - - - 24 12 6 5 For SI: 1 inch = 25.4 mm, °C = ((°F)-32)/1.8, 1 pound per cubic foot = 16.02 kg/m 3 , 1.0 Btu &#8729; in/(ft 2 &#8729; h &#8729; °F) = 0.144 W/m 2 &#8729; K. a. Mineral wool and glass fiber batts (blanket or board) shall have a minimum density of 8 pounds per cubic foot and a minimum melting point of 1,500°F. Insulation material utilized as part of a clearance reduction system shall have a thermal conductivity of 1.0 Btu &#8729; in./(ft 2 &#8729; h &#8729; °F) or less. Insulation board shall be formed of noncombustible material. b. For limitations on clearance reduction for solid fuel-burning appliances, masonry chimneys, connector pass-throughs, masonry fireplaces and kitchen ducts, see Sections 308.4.2.1 through 308.4.2.5."
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260826-pinned-prose-context-v15",
+          "retrievalQuery": "Does this section prove that HCR requires a vanity in the bathroom?\nProject facts: Questioned Authority: New York State Homes and Community Renewal (HCR); Unknowns: applicable HCR standard, funding requirements, agency guidance; Selected Authority: New York City Building Code only",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Does this section prove that HCR requires a vanity in the bathroom?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Does this section prove that HCR requires a vanity in the bathroom?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "Does this section prove that HCR requires a vanity in the bathroom?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 1,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 2,
+            "crossReferenceCount": 6,
+            "characterCount": 46062,
+            "resolverFailureCount": 3,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 3,
+              "text": "3 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 2,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "query-context-required",
+              "text": "The question refers to a section without identifying it. Add the code citation or open the section and select its enacted text."
+            },
+            {
+              "kind": "outside-current-library",
+              "text": "The current candidate set does not establish requirements controlled by the outside authorities identified below."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [
+              {
+                "kind": "outside-current-library",
+                "label": "HCR requirements",
+                "sourceName": "New York State Homes and Community Renewal",
+                "sourceURL": "https://hcr.ny.gov/",
+                "text": "HCR requirements may require authoritative material outside the corpora routed for this Research turn."
+              }
+            ],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "Project configured code basis"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260826-supporting-web-v7",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-24a2f6be-a903-4ab9-bd3d-efc576b086aa",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "Project configured code basis",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T00:20:14.199Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [
+            "outside_authority_identity_required"
+          ],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-terra"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T00:20:14.199Z",
+        "routing": {
+          "version": "20260825-luna-terra-hybrid-v2",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "gpt-5.6-terra",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-terra",
+          "escalated": true,
+          "escalationStages": [
+            {
+              "stage": "evidence_analysis_failure",
+              "fromModel": "gpt-5.6-luna",
+              "toModel": "gpt-5.6-terra",
+              "reasonCode": "INVALID_RESEARCH_EVIDENCE_ANALYSIS"
+            }
+          ],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 56588,
+          "cachedInputTokens": 1122,
+          "outputTokens": 2891,
+          "totalTokens": 59479
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.145848,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "39e91b52-67ba-4730-bf06-58babbacf0a5",
+        "createdAt": "2026-08-27T00:20:14.197Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra"
+        ],
+        "routingVersion": "20260825-luna-terra-hybrid-v2",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": true,
+        "escalationStages": [
+          {
+            "stage": "evidence_analysis_failure",
+            "fromModel": "gpt-5.6-luna",
+            "toModel": "gpt-5.6-terra",
+            "reasonCode": "INVALID_RESEARCH_EVIDENCE_ANALYSIS",
+            "issueTypes": []
+          }
+        ],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 4,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 56588,
+        "cachedInputTokens": 1122,
+        "outputTokens": 2891,
+        "totalTokens": 59479,
+        "estimatedCostUSD": 0.145848,
+        "actualProviderCostUSD": 0.152033,
+        "conservativeProviderCostUSD": 0.152033,
+        "durationMilliseconds": 44473,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T00:21:09.895Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 10851,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 4157,
+              "cachedInputTokens": 0,
+              "outputTokens": 1378,
+              "totalTokens": 5535
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 4157,
+          "cachedInputTokens": 0,
+          "outputTokens": 1378,
+          "totalTokens": 5535
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "BC 1107.2.2.7.2.2 supports the stated forward-approach water-closet clearances and the permission for a compliant lavatory on the rear wall. BC 1107.2.2 supports the separate, qualified statement that Type B+NYC toilet and bathing rooms require compliant lavatories. Neither citation is used to establish an HCR or vanity requirement.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer confines its conclusions to the supplied NYC Building Code text, distinguishes the broader Type B+NYC lavatory requirement from the selected subsection's permissive placement language, and does not invent an HCR rule or vanity requirement.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer appropriately limits its conclusion: it says the Type B+NYC scope and forward-approach layout have not been established and that applicable HCR authority is needed to determine an HCR requirement.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It directly states that the supplied NYC Building Code evidence cannot establish an HCR vanity mandate because no HCR regulations, program requirements, funding terms, agreements, or agency guidance were supplied.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer gives a clear conclusion, explains the significance of the selected provision and broader scope provision, identifies unresolved applicability facts, and specifies the HCR materials needed for a definitive agency-requirement conclusion.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It begins with an unambiguous answer: \"No. This NYC Building Code section does not prove that HCR requires a bathroom vanity.\"",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly answers no.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It places the broader lavatory rule within the Type B+NYC dwelling-unit or sleeping-unit scope and notes that scope is unestablished on the supplied facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It explains that the cited provision applies to a water closet with only a forward approach and sets specified water-closet clearances.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It explains that a compliant lavatory is permitted on the rear wall at a stated distance from the water-closet centerline.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It expressly says the supplied text does not equate a lavatory with a vanity and does not treat the terms as interchangeable.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It expressly states that the NYC Building Code lavatory rule is not an HCR requirement and that the cited section does not prove an HCR vanity requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "Although it correctly characterizes the selected subsection's placement language as permissive, it separately explains that the broader Type B+NYC rule can require a compliant lavatory within its stated scope.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "It requests the applicable HCR regulation, program design standard, funding or regulatory agreement, or official agency directive before determining what HCR requires.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects a vanity requirement under the cited Building Code passage.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer expressly distinguishes a lavatory from a vanity.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer does not state an HCR requirement; it explains that HCR authority is missing.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "The answer does not infer that no other Building Code provision requires a lavatory. It identifies BC 1107.2.2 as a separate, scope-limited lavatory requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies that whether the room is within a Type B+NYC dwelling unit or sleeping unit is unresolved, and notes that the Type B+NYC scope has not been established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer requests the applicable HCR regulation, program standard, funding or regulatory agreement, agency directive, or other HCR authority.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.02485,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 2,
+            "canonicalCount": 2,
+            "selectedEvidenceCount": 2,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 44478,
+            "inputTokens": 56588,
+            "cachedInputTokens": 1122,
+            "outputTokens": 2891,
+            "totalTokens": 59479,
+            "estimatedCostUSD": 0.145848,
+            "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "BC 1107.2.2.7.2.2 supports the stated forward-approach water-closet clearances and the permission for a compliant lavatory on the rear wall. BC 1107.2.2 supports the separate, qualified statement that Type B+NYC toilet and bathing rooms require compliant lavatories. Neither citation is used to establish an HCR or vanity requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "8/8 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer confines its conclusions to the supplied NYC Building Code text, distinguishes the broader Type B+NYC lavatory requirement from the selected subsection's permissive placement language, and does not invent an HCR rule or vanity requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/4 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer appropriately limits its conclusion: it says the Type B+NYC scope and forward-approach layout have not been established and that applicable HCR authority is needed to determine an HCR requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "2/2 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "It directly states that the supplied NYC Building Code evidence cannot establish an HCR vanity mandate because no HCR regulations, program requirements, funding terms, agreements, or agency guidance were supplied.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "The answer gives a clear conclusion, explains the significance of the selected provision and broader scope provision, identifies unresolved applicability facts, and specifies the HCR materials needed for a definitive agency-requirement conclusion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "It begins with an unambiguous answer: \"No. This NYC Building Code section does not prove that HCR requires a bathroom vanity.\"",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer expressly answers no.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "It places the broader lavatory rule within the Type B+NYC dwelling-unit or sleeping-unit scope and notes that scope is unestablished on the supplied facts.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "It explains that the cited provision applies to a water closet with only a forward approach and sets specified water-closet clearances.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "It explains that a compliant lavatory is permitted on the rear wall at a stated distance from the water-closet centerline.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "It expressly says the supplied text does not equate a lavatory with a vanity and does not treat the terms as interchangeable.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "It expressly states that the NYC Building Code lavatory rule is not an HCR requirement and that the cited section does not prove an HCR vanity requirement.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-7",
+                "rationale": "Although it correctly characterizes the selected subsection's placement language as permissive, it separately explains that the broader Type B+NYC rule can require a compliant lavatory within its stated scope.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-8",
+                "rationale": "It requests the applicable HCR regulation, program design standard, funding or regulatory agreement, or official agency directive before determining what HCR requires.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer expressly rejects a vanity requirement under the cited Building Code passage.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "The answer expressly distinguishes a lavatory from a vanity.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "The answer does not state an HCR requirement; it explains that HCR authority is missing.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "The answer does not infer that no other Building Code provision requires a lavatory. It identifies BC 1107.2.2 as a separate, scope-limited lavatory requirement.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The answer identifies that whether the room is within a Type B+NYC dwelling unit or sleeping unit is unresolved, and notes that the Type B+NYC scope has not been established.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The answer requests the applicable HCR regulation, program standard, funding or regulatory agreement, agency directive, or other HCR authority.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "2/2 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. BC 1107.2.2.7.2.2 supports the stated forward-approach water-closet clearances and the permission for a compliant lavatory on the rear wall. BC 1107.2.2 supports the separate, qualified statement that Type B+NYC toilet and bathing rooms require compliant lavatories. Neither citation is used to establish an HCR or vanity requirement.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 1 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "8/8 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer confines its conclusions to the supplied NYC Building Code text, distinguishes the broader Type B+NYC lavatory requirement from the selected subsection's permissive placement language, and does not invent an HCR rule or vanity requirement.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer appropriately limits its conclusion: it says the Type B+NYC scope and forward-approach layout have not been established and that applicable HCR authority is needed to determine an HCR requirement.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "2/2 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It directly states that the supplied NYC Building Code evidence cannot establish an HCR vanity mandate because no HCR regulations, program requirements, funding terms, agreements, or agency guidance were supplied.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer gives a clear conclusion, explains the significance of the selected provision and broader scope provision, identifies unresolved applicability facts, and specifies the HCR materials needed for a definitive agency-requirement conclusion.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It begins with an unambiguous answer: \"No. This NYC Building Code section does not prove that HCR requires a bathroom vanity.\"",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly answers no.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It places the broader lavatory rule within the Type B+NYC dwelling-unit or sleeping-unit scope and notes that scope is unestablished on the supplied facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It explains that the cited provision applies to a water closet with only a forward approach and sets specified water-closet clearances.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It explains that a compliant lavatory is permitted on the rear wall at a stated distance from the water-closet centerline.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It expressly says the supplied text does not equate a lavatory with a vanity and does not treat the terms as interchangeable.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It expressly states that the NYC Building Code lavatory rule is not an HCR requirement and that the cited section does not prove an HCR vanity requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "Although it correctly characterizes the selected subsection's placement language as permissive, it separately explains that the broader Type B+NYC rule can require a compliant lavatory within its stated scope.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "It requests the applicable HCR regulation, program design standard, funding or regulatory agreement, or official agency directive before determining what HCR requires.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects a vanity requirement under the cited Building Code passage.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer expressly distinguishes a lavatory from a vanity.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer does not state an HCR requirement; it explains that HCR authority is missing.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "The answer does not infer that no other Building Code provision requires a lavatory. It identifies BC 1107.2.2 as a separate, scope-limited lavatory requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies that whether the room is within a Type B+NYC dwelling unit or sleeping unit is unresolved, and notes that the Type B+NYC scope has not been established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer requests the applicable HCR regulation, program standard, funding or regulatory agreement, agency directive, or other HCR authority.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

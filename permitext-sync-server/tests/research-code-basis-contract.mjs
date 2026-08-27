@@ -150,7 +150,9 @@ const appSource = await readFile(join(root, "../app.mjs"), "utf8");
 const uiSource = await readFile(join(root, "../public/app.js"), "utf8");
 const styles = await readFile(join(root, "../public/styles.css"), "utf8");
 assert.match(appSource, /codeBasis: answerCodeBasis/);
-assert.match(appSource, /Do not imply that an unavailable, excluded, or unsearched corpus was retrieved/);
+assert.match(appSource, /Do not imply that an unavailable or unsearched corpus was retrieved/);
+assert.match(appSource, /Ordinary internal corpus exclusions are not user-facing evidence limitations/);
+assert.doesNotMatch(appSource, /`EXCLUDED_CORPORA:/);
 assert.match(uiSource, /research-answer-code-basis/);
 assert.match(styles, /workspace-panel:not\(\.reader-panel\) \.research-answer-code-basis\s*\{[\s\S]*?font-size: 10px !important;/);
 

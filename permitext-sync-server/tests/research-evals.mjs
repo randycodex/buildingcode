@@ -39,7 +39,7 @@ const liveMode = process.argv.includes("--run-live");
 const selfTestMode = process.argv.includes("--self-test");
 const execFileAsync = promisify(execFile);
 const judgePromptVersion =
-  process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION || "20260722-exact-rubric-v2";
+  process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION || "20260826-established-facts-v3";
 
 function argumentValue(name) {
   const index = process.argv.indexOf(name);
@@ -497,6 +497,7 @@ async function judgeAnswer(testCase, answer, options = {}) {
       "For unsupported or invented claims, a score of 4 means no invented requirement or unsupported conclusion.",
       "For every criterion and rubric decision, return confidence, whether the judgment is objective or subjective, and the shortest relevant candidate-answer excerpt when a failure exists. Use an empty failureExcerpt when there is no failure.",
       "Return requiredConcepts, forbiddenClaims, and missingFacts as objects keyed by the supplied rubric IDs; each exact supplied ID must appear once as an object property.",
+      "A missing-fact rubric item is satisfied when the candidate identifies the fact as unresolved, or when the question or Project context already explicitly supplies that fact and the candidate consistently applies it. Do not penalize the candidate for declining to ask the user to reconfirm an explicitly supplied fact.",
       "Score evidence-insufficiency recognition separately: the answer must directly say when the selected evidence cannot establish the requested conclusion.",
       "Score directness separately from practical usefulness."
     ].join(" "),
