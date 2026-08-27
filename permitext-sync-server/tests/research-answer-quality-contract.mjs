@@ -379,6 +379,10 @@ const chapter11IncorporationEvidence = {
   ...source("bc-sidewalk-cafe-accessibility", "3111.6", "governing", "aligned"),
   text: "Sidewalk cafes and access thereto shall comply with Chapter 11."
 };
+const sidewalkCafeObstructionEvidence = {
+  ...source("bc-sidewalk-cafe-obstruction", "3111.4", "governing", "aligned"),
+  text: "No part of any awning, enclosure, fixture, equipment or removable platform of a sidewalk cafe shall be located so as to obstruct any exit from a building, cellar access hatch or areaway."
+};
 const misstatedDiningPercentage = evaluateResearchAnswerQuality({
   question: "How many dining surfaces must be accessible?",
   evidence: diningSurfaceEvidence,
@@ -401,7 +405,7 @@ const correctDiningPercentage = evaluateResearchAnswerQuality({
   question: "How many dining surfaces must be accessible?",
   evidence: diningSurfaceEvidence,
   answer: {
-    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible space of each dining-surface type.",
+    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible seating or standing space at each type of dining surface.",
     supportedPoints: [{ sourceIDs: ["bc-dining-surfaces"] }],
     citations: [{ sourceIDs: ["bc-dining-surfaces"] }]
   }
@@ -412,7 +416,7 @@ const misstatedDiningPercentageInSupportedPoint = evaluateResearchAnswerQuality(
   question: "How many dining surfaces must be accessible?",
   evidence: diningSurfaceEvidence,
   answer: {
-    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible space of each dining-surface type.",
+    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible seating or standing space at each type of dining surface.",
     supportedPoints: [{
       explanation: "The rule establishes a minimum accessible share of the total seating and standing spaces for each type of dining surface.",
       sourceIDs: ["bc-dining-surfaces"]
@@ -445,12 +449,12 @@ const misboundDiningCalculation = evaluateResearchAnswerQuality({
   question: "How many dining surfaces must be accessible?",
   evidence: [chapter11IncorporationEvidence, ...diningSurfaceEvidence],
   answer: {
-    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible space of each dining-surface type.",
+    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible seating or standing space at each type of dining surface.",
     supportedPoints: [{
       explanation: "Sidewalk cafés and their access must comply with Chapter 11, including the 10 percent total dining-surface rule.",
       sourceIDs: ["bc-sidewalk-cafe-accessibility"]
     }, {
-      explanation: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible space of each dining-surface type.",
+      explanation: "At least 10 percent of the total seating and standing spaces must be accessible, with not less than one accessible seating or standing space at each type of dining surface.",
       sourceIDs: ["bc-dining-surfaces"]
     }],
     citations: [{ sourceIDs: ["bc-sidewalk-cafe-accessibility"] }, { sourceIDs: ["bc-dining-surfaces"] }]
@@ -480,7 +484,7 @@ const repairedDiningCalculation = applyResearchDeterministicAnswerRepairs({
 }, [chapter11IncorporationEvidence, ...diningSurfaceEvidence]);
 assert.match(
   repairedDiningCalculation.answerText,
-  /10 percent of the total seating and standing spaces, with not less than one accessible space of each dining-surface type/i
+  /10 percent of the total seating and standing spaces, with not less than one accessible seating or standing space at each type of dining surface/i
 );
 assert.deepEqual(
   repairedDiningCalculation.supportedPoints[0].sourceIDs,
@@ -492,6 +496,49 @@ assert.equal(evaluateResearchAnswerQuality({
   evidence: [chapter11IncorporationEvidence, ...diningSurfaceEvidence],
   answer: repairedDiningCalculation
 }).pass, true);
+
+const repairedDiningTypeAndObstruction = applyResearchDeterministicAnswerRepairs({
+  answerText: "The proposed furniture or equipment cannot obstruct the building exit, cellar access hatch, or areaway. At least 10 percent of the total seating and standing spaces must be accessible, with at least one accessible dining surface of each type. Accessible dining surfaces must be distributed throughout the facility.",
+  supportedPoints: [{
+    explanation: "At least 10 percent of the total seating and standing spaces must be accessible, with at least one accessible dining surface of each type. Accessible dining surfaces must be distributed throughout the facility.",
+    sourceIDs: ["bc-dining-surfaces"]
+  }],
+  missingFacts: ["The accessible dining-surface count and distribution are unknown."],
+  citations: [
+    { sourceIDs: ["bc-sidewalk-cafe-obstruction"] },
+    { sourceIDs: ["bc-dining-surfaces"] }
+  ]
+}, [sidewalkCafeObstructionEvidence, ...diningSurfaceEvidence]);
+assert.match(
+  repairedDiningTypeAndObstruction.answerText,
+  /No part of an awning, enclosure, fixture, equipment, or removable platform may obstruct a building exit, cellar access hatch, or areaway/i
+);
+assert.doesNotMatch(repairedDiningTypeAndObstruction.answerText, /furniture or equipment cannot obstruct/i);
+assert.match(
+  repairedDiningTypeAndObstruction.answerText,
+  /at least one accessible seating or standing space at each type of dining surface/i
+);
+assert.match(
+  repairedDiningTypeAndObstruction.answerText,
+  /the accessible seating and standing spaces must be distributed throughout the facility/i
+);
+assert.match(
+  repairedDiningTypeAndObstruction.supportedPoints[0].explanation,
+  /at least one accessible seating or standing space at each type of dining surface/i
+);
+assert.match(
+  repairedDiningTypeAndObstruction.missingFacts[0],
+  /accessible seating and standing-space count/i
+);
+assert.equal(evaluateResearchAnswerQuality({
+  question: "How many dining surfaces must be accessible?",
+  evidence: diningSurfaceEvidence,
+  answer: {
+    answerText: "At least 10 percent of the total seating and standing spaces must be accessible, with at least one accessible dining surface of each type.",
+    supportedPoints: [{ sourceIDs: ["bc-dining-surfaces"] }],
+    citations: [{ sourceIDs: ["bc-dining-surfaces"] }]
+  }
+}).pass, false, "The quality gate must reject the type-specific dining-surface paraphrase if repair is bypassed.");
 
 const vanityEvidence = [{
   ...source("bc-type-b-nyc-toilet-room", "1107.2.2.7.2.2", "governing", "aligned"),

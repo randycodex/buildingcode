@@ -84,6 +84,10 @@ The resulting engineering changes are intentionally narrow and source-governed:
 
 The next capped rerun passed movable seating at 3.79/4 and garage ventilation at 4.00/4. The sidewalk-café answer completed without a verification failure and scored 3.83/4; direct review found that it correctly covered every supplied provision and safety boundary. Its only fatal draft rubric combined those material requirements with heater, lighting, and electrical topics absent from both the question and selected evidence. That unreviewed draft rubric is being narrowed to the actual bounded question rather than forcing unrelated checklist content into user answers.
 
+After the draft rubric was narrowed, the final sidewalk-only diagnostic completed and charged normally but scored 3.62/4. This exposed a real product defect rather than another evaluation-scope problem: the internal verifier accepted two source paraphrases that were not precise enough. The answer substituted an accessible “dining surface” for the enacted requirement governing accessible seating and standing spaces, and it broadened BC 3111.4 from the enumerated awning, enclosure, fixture, equipment, and removable-platform components to “furniture or equipment.” Operating and grader spend for this diagnostic was $0.079986.
+
+The new source-bound paraphrase repair corrects those two statements only when the answer already cites the exact enacted BC 1108.2.9.1 or BC 3111.4 evidence. It also corrects the associated structured missing-fact text and makes the internal quality gate reject the dining-surface substitution if the repair is ever bypassed. The retained paid answer now passes the deterministic answer-quality gate after repair, and the complete repository-wide `npm run check` gate passes without paid model calls.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -111,4 +115,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Pass the repository-wide no-cost gate for the source-bound repair and routing adjustment, commit and push it, then rerun only the three remaining cases under a capped paid diagnostic. Run a new immutable full cohort only if all three complete without a material regression.
+Commit and push the source-bound paraphrase repair and retained sidewalk diagnostic, then run one capped sidewalk-only confirmation. If that answer completes without a material regression and passes the frozen evaluation, run a new immutable 20-case cohort and compare quality, cost, latency, and escalation with the first cohort.

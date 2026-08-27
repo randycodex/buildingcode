@@ -17,7 +17,7 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The active work is the final targeted Research quality and economics validation: the first full cohort and the first remediation cohort completed without provider failures, and three conceptual coverage cases remain before a new frozen cohort. After that, the remaining legal, provider, operations, production, and TestFlight gates must be closed.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The active work is the final targeted Research quality and economics validation: the first full cohort and remediation cohort completed without provider failures, the movable-seating and garage-ventilation blockers now pass, and one source-bound sidewalk-café confirmation remains before a new frozen cohort. After that, the remaining legal, provider, operations, production, and TestFlight gates must be closed.
 
 Current development branch: `codex/research-commercialization`
 
@@ -39,7 +39,8 @@ Current development branch: `codex/research-commercialization`
 - [x] Identified 9 exact passes and 11 completed answers needing qualification, missing-fact, or evidence-boundary improvement.
 - [x] Finish the generic safeguard for declared unknowns and unverified owner/applicant representations.
 - [x] Complete the repository-wide no-cost test gate.
-- [ ] Rerun only the 11 subthreshold cases under a spend cap.
+- [x] Rerun the 11 subthreshold cases and subsequent three-case diagnostics under explicit spend caps.
+- [ ] Confirm the final source-bound sidewalk-café repair with one capped paid case.
 - [ ] Run a new frozen full cohort only if the targeted cases improve without material regressions.
 - [ ] Confirm that p50/p90 full-service cost supports the $20 plan and 100 included turns.
 
