@@ -21,8 +21,15 @@ const schemaSourceFiles = [
 const sourceByFile = await Promise.all(
   schemaSourceFiles.map((file) => readFile(new URL(`../${file}`, import.meta.url), "utf8"))
 );
-const schemaSource = sourceByFile.join("\n");
 const appSource = sourceByFile[0];
+const coreInitializerStart = appSource.indexOf("const initializeSchema = async () => {");
+const coreInitializerEnd = appSource.indexOf(
+  "const ensureSchema = createSingleFlightInitializer",
+  coreInitializerStart
+);
+assert.ok(coreInitializerStart >= 0 && coreInitializerEnd > coreInitializerStart);
+const coreInitializerSource = appSource.slice(coreInitializerStart, coreInitializerEnd);
+const schemaSource = [coreInitializerSource, ...sourceByFile.slice(1)].join("\n");
 
 function uniqueSorted(values) {
   return [...new Set(values)].sort();
