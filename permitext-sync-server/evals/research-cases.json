@@ -1014,16 +1014,16 @@
         }
       ],
       "question": "A restaurant proposes a sidewalk café with furniture near a building exit and cellar hatch. The owner says outdoor-dining authorization allows the exterior seats to be counted separately from the interior PACO and eliminates further accessibility review. The documents do not say whether the café is beyond the building line, enclosed, or separated from the interior seating by a Section 713 fire partition. What can be concluded from the selected Building Code passages, and what remains unresolved?",
-      "expectedConclusion": "The proposal cannot be approved from the selected evidence. If it is a sidewalk café beyond the building line, BC 3111.1 requires compliance not only with Section 3111 but also with Chapter 32 and separate zoning and agency requirements; the selected evidence does not provide those outside rules. BC 3111.4 prohibits café components from obstructing a building exit or cellar hatch. Its cellar-entrance exception is not automatic: it requires a special application, an easily removable and prominently designated platform designed under Section 3111.5, and a cellar entrance or areaway that is not required egress. BC 3111.6 makes Chapter 11 applicable to the café and its access. BC 1108.2.9.1 requires accessible seating and standing spaces equal to at least 10 percent of the total, with not less than one accessible space at each type of dining surface; those spaces must be distributed and located on a level served by an accessible route. BC 3111.7 supplies only a conditional rule for an enclosed sidewalk café: unless a Section 713 fire partition separates it from inside seating, its seating is added to the inside seating solely to determine whether a PACO is required. These passages do not establish the approved interior capacity, the treatment of every open exterior seating arrangement, property-line or operational jurisdiction, DOT authorization, electrical permitting, or overall approval.",
+      "expectedConclusion": "The proposal cannot be approved from the selected evidence. If it is a sidewalk café beyond the building line, BC 3111.1 requires compliance not only with Section 3111 but also with Chapter 32 and separate zoning and agency requirements; the selected evidence does not provide those outside rules. BC 3111.4 prohibits café components from obstructing a building exit or cellar hatch. Its cellar-entrance exception is not automatic: it requires a special application, an easily removable and prominently designated platform designed under Section 3111.5, and a cellar entrance or areaway that is not required egress. BC 3111.6 makes Chapter 11 applicable to the café and its access. BC 1108.2.9.1 requires accessible seating and standing spaces equal to at least 10 percent of the total, with not less than one accessible space at each type of dining surface; those spaces must be distributed and located on a level served by an accessible route. BC 3111.7 supplies only a conditional rule for an enclosed sidewalk café: unless a Section 713 fire partition separates it from inside seating, its seating is added to the inside seating solely to determine whether a PACO is required. These passages do not establish the approved interior capacity, the treatment of every open exterior seating arrangement, property-line or operational jurisdiction, current agency authorization, or overall approval.",
       "expectedUncertainty": {
         "level": "insufficient evidence",
-        "description": "The selected passages establish several conditional Building Code constraints, but they do not establish overall approval, current agency jurisdiction, lawful seating capacity, or electrical and operational requirements."
+        "description": "The selected passages establish several conditional Building Code constraints, but they do not establish overall approval, current agency jurisdiction, or lawful seating capacity."
       },
       "sourceType": "Buildings Bulletin",
       "sourceReference": "Scenario derived from NYC Department of Buildings Bulletin 2024-005, July 9, 2024: https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2024-005.pdf. The bulletin and unselected agency rules remain scenario provenance only.",
       "reviewer": null,
       "reviewedAt": null,
-      "notes": "Draft candidate NYC-015. Exact enacted passages were copied from Permitext canonical content. Agency, property-line, electrical, seating, and accessibility conclusions require knowledgeable review before approval.",
+      "notes": "Draft candidate NYC-015. Exact enacted passages were copied from Permitext canonical content. Agency, property-line, seating, and accessibility conclusions require knowledgeable review before approval.",
       "requiredConcepts": [
         "Make BC 3111 applicability conditional on the café being beyond the building line.",
         "Recognize that BC 3111.1 cross-references separate zoning and agency authority without supplying those authorities' substantive rules.",
@@ -1033,21 +1033,20 @@
         "Apply 10 percent to the total seating and standing spaces, require at least one accessible space at each dining-surface type, and identify the distribution and accessible-route requirements.",
         "Limit BC 3111.7 to enclosed sidewalk cafés and PACO determination.",
         "Make seating aggregation conditional on the absence of a compliant Section 713 separating fire partition.",
-        "State that selected evidence is insufficient to determine current agency approval, property-line jurisdiction, electrical requirements, or lawful interior capacity."
+        "State that selected evidence is insufficient to determine current agency approval, property-line jurisdiction, or the final PACO and lawful seating-capacity result."
       ],
       "missingFacts": [
         "Exact property line and whether the café is beyond the building line.",
         "Whether the café is a sidewalk café within BC 3111's scope.",
         "Whether the café is enclosed.",
         "Whether a Section 713 fire partition separates exterior and interior seating.",
-        "Current Certificate of Occupancy, PACO, and approved interior seating.",
+        "Interior and exterior seating counts and any current approved seating or PACO record material to the aggregation determination.",
         "Interior and exterior seat counts and each type of dining surface.",
         "Exit, cellar-hatch, areaway, and required-egress locations.",
         "Whether any proposed platform has special approval and complies with Section 3111.5.",
         "Accessible route and dining-surface distribution.",
         "Applicable Chapter 32 evidence.",
-        "Current zoning and agency rules and authorizations.",
-        "Heater, lighting, and electrical details and applicable separate authority."
+        "Current zoning and agency rules and authorizations."
       ],
       "forbiddenClaims": [
         "Outdoor-dining or DOT authorization constitutes Building Code approval.",

@@ -1,0 +1,3382 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T23:03:26.342Z",
+  "updatedAt": "2026-08-27T23:04:20.889Z",
+  "configuration": {
+    "runID": "66c8fd5f-7e6f-4ed9-a0c1-07993a7dfd25",
+    "datasetSHA256": "58a3b0fc0b0a9c571fe88a53e746d8da679329238bce8d7d1e67f8fedd2aedef",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-material-completeness-v31",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-015-sidewalk-cafe-evidence-boundary"
+    ],
+    "caseStatuses": [
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "c69c4c5e33329170563bc1839521624dab4e3838",
+    "approvedSpendCapUSD": 0.75,
+    "conservativeReservedUSD": 0.08479,
+    "actualUSD": 0.08479,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 3
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T23:04:20.749Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.043367,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.043367,
+        "p50": 0.043367,
+        "p90": 0.043367,
+        "maximum": 0.043367
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.043367,
+      "projectedCostPer100TurnsUSD": 4.34,
+      "targetReady": true,
+      "targetBand": "within"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 24922,
+      "p50": 24922,
+      "p90": 24922,
+      "maximum": 24922
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 2,
+        "p50": 2,
+        "p90": 2,
+        "maximum": 2
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-015-sidewalk-cafe-evidence-boundary",
+        "title": "Sidewalk café egress, accessibility, seating, and agency boundaries",
+        "status": "draft",
+        "difficulty": "advanced",
+        "topics": [
+          "sidewalk cafés",
+          "means of egress",
+          "accessibility",
+          "place of assembly",
+          "agency requirements"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "project": "Restaurant proposing sidewalk-café seating and equipment",
+          "conditions": "Furniture is proposed near a building exit and cellar hatch",
+          "ownerClaim": "Outdoor-dining authorization permits separate exterior seating and eliminates further accessibility review",
+          "unknowns": [
+            "exact building and property lines",
+            "whether the café is enclosed",
+            "interior and exterior seating",
+            "whether a Section 713 fire partition separates the seating",
+            "exit and cellar-hatch geometry",
+            "accessible dining-surface distribution",
+            "current agency authorizations"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "5678",
+            "reference": "BC 3111.1",
+            "codePrefix": "BC",
+            "sectionNumber": "3111.1",
+            "exactPassages": [
+              "Sidewalk cafes provided beyond the building line shall comply with the requirements of this section, the New York City Zoning Resolution, the Commissioners of the Department of Consumer and Worker Protection and Department of Transportation, and with the projection limitations of Chapter 32 of this code."
+            ],
+            "resolvedTitle": "3111.1 General.",
+            "evidenceCharacters": 440,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "5681",
+            "reference": "BC 3111.4",
+            "codePrefix": "BC",
+            "sectionNumber": "3111.4",
+            "exactPassages": [
+              "No part of any awning, enclosure, fixture, equipment or removable platform of a sidewalk cafe shall be located:",
+              "2. So as to obstruct any exit from a building;",
+              "3. So as to obstruct any cellar access hatch or areaway;",
+              "Exception: Upon special application, the commissioner may permit an easily removable, prominently designated platform, designed in accordance with Section 3111.5, to cover a cellar entrance or areaway that is not used as a required means of egress."
+            ],
+            "resolvedTitle": "3111.4 Obstructions prohibited.",
+            "evidenceCharacters": 817,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "5685",
+            "reference": "BC 3111.6",
+            "codePrefix": "BC",
+            "sectionNumber": "3111.6",
+            "exactPassages": [
+              "Sidewalk cafes and access thereto shall comply with Chapter 11."
+            ],
+            "resolvedTitle": "3111.6 Accessibility.",
+            "evidenceCharacters": 64,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "2792",
+            "reference": "BC 1108.2.9.1",
+            "codePrefix": "BC",
+            "sectionNumber": "1108.2.9.1",
+            "exactPassages": [
+              "Where dining surfaces for the consumption of food or drink are provided, at least 10 percent of the total number of seating and standing spaces, but not less than one, of each type of dining surfaces shall be accessible and be distributed throughout the facility and located on a level accessed by an accessible route."
+            ],
+            "resolvedTitle": "1108.2.9.1 Dining surfaces.",
+            "evidenceCharacters": 318,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "5686",
+            "reference": "BC 3111.7",
+            "codePrefix": "BC",
+            "sectionNumber": "3111.7",
+            "exactPassages": [
+              "Unless separated from seating inside the building by fire partitions complying with Section 713 , the seating for enclosed sidewalk cafes shall be added to that inside the building in order to determine whether a place of assembly certificate of operation is required."
+            ],
+            "resolvedTitle": "3111.7 Assembly seating.",
+            "evidenceCharacters": 268,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "A restaurant proposes a sidewalk café with furniture near a building exit and cellar hatch. The owner says outdoor-dining authorization allows the exterior seats to be counted separately from the interior PACO and eliminates further accessibility review. The documents do not say whether the café is beyond the building line, enclosed, or separated from the interior seating by a Section 713 fire partition. What can be concluded from the selected Building Code passages, and what remains unresolved?",
+        "expectedConclusion": "The proposal cannot be approved from the selected evidence. If it is a sidewalk café beyond the building line, BC 3111.1 requires compliance not only with Section 3111 but also with Chapter 32 and separate zoning and agency requirements; the selected evidence does not provide those outside rules. BC 3111.4 prohibits café components from obstructing a building exit or cellar hatch. Its cellar-entrance exception is not automatic: it requires a special application, an easily removable and prominently designated platform designed under Section 3111.5, and a cellar entrance or areaway that is not required egress. BC 3111.6 makes Chapter 11 applicable to the café and its access. BC 1108.2.9.1 requires accessible seating and standing spaces equal to at least 10 percent of the total, with not less than one accessible space at each type of dining surface; those spaces must be distributed and located on a level served by an accessible route. BC 3111.7 supplies only a conditional rule for an enclosed sidewalk café: unless a Section 713 fire partition separates it from inside seating, its seating is added to the inside seating solely to determine whether a PACO is required. These passages do not establish the approved interior capacity, the treatment of every open exterior seating arrangement, property-line or operational jurisdiction, DOT authorization, electrical permitting, or overall approval.",
+        "expectedUncertainty": {
+          "level": "insufficient evidence",
+          "description": "The selected passages establish several conditional Building Code constraints, but they do not establish overall approval, current agency jurisdiction, lawful seating capacity, or electrical and operational requirements."
+        },
+        "sourceType": "Buildings Bulletin",
+        "sourceReference": "Scenario derived from NYC Department of Buildings Bulletin 2024-005, July 9, 2024: https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2024-005.pdf. The bulletin and unselected agency rules remain scenario provenance only.",
+        "reviewer": null,
+        "reviewedAt": null,
+        "notes": "Draft candidate NYC-015. Exact enacted passages were copied from Permitext canonical content. Agency, property-line, electrical, seating, and accessibility conclusions require knowledgeable review before approval.",
+        "requiredConcepts": [
+          "Make BC 3111 applicability conditional on the café being beyond the building line.",
+          "Recognize that BC 3111.1 cross-references separate zoning and agency authority without supplying those authorities' substantive rules.",
+          "State that café components cannot obstruct a building exit or cellar hatch.",
+          "Explain every selected condition of the narrow cellar-hatch platform exception.",
+          "State that sidewalk cafés and their access must comply with Chapter 11.",
+          "Apply 10 percent to the total seating and standing spaces, require at least one accessible space at each dining-surface type, and identify the distribution and accessible-route requirements.",
+          "Limit BC 3111.7 to enclosed sidewalk cafés and PACO determination.",
+          "Make seating aggregation conditional on the absence of a compliant Section 713 separating fire partition.",
+          "State that selected evidence is insufficient to determine current agency approval, property-line jurisdiction, electrical requirements, or lawful interior capacity."
+        ],
+        "missingFacts": [
+          "Exact property line and whether the café is beyond the building line.",
+          "Whether the café is a sidewalk café within BC 3111's scope.",
+          "Whether the café is enclosed.",
+          "Whether a Section 713 fire partition separates exterior and interior seating.",
+          "Current Certificate of Occupancy, PACO, and approved interior seating.",
+          "Interior and exterior seat counts and each type of dining surface.",
+          "Exit, cellar-hatch, areaway, and required-egress locations.",
+          "Whether any proposed platform has special approval and complies with Section 3111.5.",
+          "Accessible route and dining-surface distribution.",
+          "Applicable Chapter 32 evidence.",
+          "Current zoning and agency rules and authorizations.",
+          "Heater, lighting, and electrical details and applicable separate authority."
+        ],
+        "forbiddenClaims": [
+          "Outdoor-dining or DOT authorization constitutes Building Code approval.",
+          "The selected Building Code passages establish the current substantive DOT, DCWP, or Zoning Resolution requirements.",
+          "Exterior seating never counts with interior seating.",
+          "Every outdoor café seat must always be added to the interior occupant capacity.",
+          "BC 3111.7 applies to an open café without determining whether it is enclosed.",
+          "A platform may cover a cellar hatch automatically.",
+          "A cellar-hatch exception is available when the hatch is required means of egress.",
+          "Only 5 percent of the dining surfaces must be accessible.",
+          "Ten percent must be calculated separately for every dining-surface type.",
+          "One accessible table always satisfies BC 1108.2.9.1 regardless of dining-surface types, distribution, and accessible route.",
+          "The selected evidence determines heater, lighting, or electrical-permit requirements.",
+          "The selected evidence establishes the restaurant's approved interior occupant capacity or PACO status."
+        ],
+        "requiredCitations": [
+          "BC 3111.1",
+          "BC 3111.4",
+          "BC 3111.6",
+          "BC 1108.2.9.1",
+          "BC 3111.7"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "BC 3111.1",
+            "requiredClaim": "Conditional scope for sidewalk cafes beyond the building line and need for separate zoning, agency, and Chapter 32 compliance; it does not establish those outside rules."
+          },
+          {
+            "reference": "BC 3111.4",
+            "requiredClaim": "Exit and cellar-hatch obstruction prohibitions and the expressly conditional special-application exception."
+          },
+          {
+            "reference": "BC 3111.6",
+            "requiredClaim": "Application of Chapter 11 to sidewalk cafes and their access."
+          },
+          {
+            "reference": "BC 1108.2.9.1",
+            "requiredClaim": "Accessible seating and standing spaces equal to at least 10 percent of the total, at least one at each dining-surface type, distribution, and accessible-route requirements."
+          },
+          {
+            "reference": "BC 3111.7",
+            "requiredClaim": "Conditional enclosed-sidewalk-cafe seating aggregation rule used only to determine whether a PACO is required."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "548c3a58-fcd2-47d8-a4c6-ab3ac3a35b30",
+      "answeredAt": "2026-08-27T23:03:51.564Z",
+      "answerTimeMilliseconds": 24927,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-d5edd948-d704-4a7d-b319-adc053bf1ca4",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T23:03:26.645Z"
+        },
+        "answerText": "The owner’s position is not supported by these selected Building Code passages. If the proposed café is beyond the building line, it must comply not only with BC 3111 but also with the Zoning Resolution, applicable Department of Consumer and Worker Protection and Department of Transportation commissioner requirements, and Chapter 32 projection limitations. The stated outdoor-dining authorization does not, on this evidence, eliminate those requirements or the separate accessibility requirement.\n\nFurniture, equipment, enclosures, removable platforms, and awnings for a sidewalk café may not obstruct a building exit or a cellar access hatch/areaway. The supplied evidence does not establish compliance because the exit and hatch geometry and the placement dimensions are unknown. A platform may cover a cellar entrance or areaway only if the commissioner permits it upon special application, it is easily removable and prominently designated, it complies with BC 3111.5, and the entrance/areaway is not used as a required means of egress. The selected evidence does not establish any of those exception conditions.\n\nAccessibility review remains required: the sidewalk café and its access must comply with Chapter 11. Where dining surfaces are provided, at least 10 percent of the total seating and standing spaces—and at least one of each dining-surface type—must be accessible, distributed throughout the facility, and located on a level reached by an accessible route. The accessible dining-surface distribution, the dining-surface types, total seating/standing spaces, and accessible-route conditions are not provided, so compliance cannot be determined.\n\nExterior seats are not automatically counted separately for the place-of-assembly certificate-of-operation question. For an enclosed sidewalk café, its seating must be added to inside seating unless the café is separated from that seating by fire partitions complying with Section 713. Because enclosure status, the interior and exterior seat counts, and the existence and Section 713 compliance of any separating fire partition are unknown, the selected evidence does not resolve whether combined seating triggers a place-of-assembly certificate of operation. The selected passages also do not provide the threshold for when that certificate is required.\n\nThe building and property-line locations must be established before determining whether the specific beyond-building-line rule applies. Current agency authorizations should also be verified; the supplied Building Code text identifies other agency and zoning requirements but does not establish what authorization has been issued or whether it satisfies them.",
+        "conclusion": "The owner’s position is not supported by these selected Building Code passages. If the proposed café is beyond the building line, it must comply not only with BC 3111 but also with the Zoning Resolution, applicable Department of Consumer and Worker Protection and Department of Transportation commissioner requirements, and Chapter 32 projection limitations. The stated outdoor-dining authorization does not, on this evidence, eliminate those requirements or the separate accessibility requirement.",
+        "supportedPoints": [
+          {
+            "heading": "Beyond-building-line cafés have multiple compliance obligations",
+            "explanation": "A sidewalk café provided beyond the building line must comply with this section, the New York City Zoning Resolution, the commissioners of the Department of Consumer and Worker Protection and Department of Transportation, and Chapter 32 projection limitations.",
+            "sectionID": "5678",
+            "sourceIDs": [
+              "5581f2dd-de2c-4bd2-ad53-672767994df1"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Café components cannot obstruct exits or cellar access",
+            "explanation": "No awning, enclosure, fixture, equipment, or removable platform of a sidewalk café may be located so as to obstruct a building exit or a cellar access hatch or areaway.",
+            "sectionID": "5681",
+            "sourceIDs": [
+              "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+              "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+              "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Limited exception for a platform over a cellar entrance or areaway",
+            "explanation": "Upon special application, the commissioner may permit an easily removable, prominently designated platform designed under Section 3111.5 to cover a cellar entrance or areaway only where it is not used as a required means of egress.",
+            "sectionID": "5681",
+            "sourceIDs": [
+              "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Accessibility remains applicable",
+            "explanation": "Sidewalk cafés and access to them must comply with Chapter 11. Where dining surfaces are provided, at least 10 percent of the total seating and standing spaces, but not less than one of each dining-surface type, must be accessible; those surfaces must be distributed throughout the facility and located on a level accessed by an accessible route.",
+            "sectionID": "5685",
+            "sourceIDs": [
+              "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+              "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Enclosed café seating may be combined with interior seating",
+            "explanation": "For an enclosed sidewalk café, seating must be added to inside seating to determine whether a place-of-assembly certificate of operation is required, unless it is separated from inside seating by fire partitions complying with Section 713.",
+            "sectionID": "5686",
+            "sourceIDs": [
+              "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Accessible dining-surface quantity and distribution",
+            "explanation": "The dining-surface rule requires accessible seating and standing spaces equal to at least 10 percent of the total, with a minimum of one of each dining-surface type; accessible dining surfaces must also be distributed throughout the facility and be on a level accessed by an accessible route.",
+            "sectionID": "2792",
+            "sourceIDs": [
+              "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "Furniture, equipment, enclosures, removable platforms, and awnings for a sidewalk café may not obstruct a building exit or a cellar access hatch/areaway. The supplied evidence does not establish compliance because the exit and hatch geometry and the placement dimensions are unknown. A platform may cover a cellar entrance or areaway only if the commissioner permits it upon special application, it is easily removable and prominently designated, it complies with BC 3111.5, and the entrance/areaway is not used as a required means of egress. The selected evidence does not establish any of those exception conditions.\n\nAccessibility review remains required: the sidewalk café and its access must comply with Chapter 11. Where dining surfaces are provided, at least 10 percent of the total seating and standing spaces—and at least one of each dining-surface type—must be accessible, distributed throughout the facility, and located on a level reached by an accessible route. The accessible dining-surface distribution, the dining-surface types, total seating/standing spaces, and accessible-route conditions are not provided, so compliance cannot be determined.\n\nExterior seats are not automatically counted separately for the place-of-assembly certificate-of-operation question. For an enclosed sidewalk café, its seating must be added to inside seating unless the café is separated from that seating by fire partitions complying with Section 713. Because enclosure status, the interior and exterior seat counts, and the existence and Section 713 compliance of any separating fire partition are unknown, the selected evidence does not resolve whether combined seating triggers a place-of-assembly certificate of operation. The selected passages also do not provide the threshold for when that certificate is required.\n\nThe building and property-line locations must be established before determining whether the specific beyond-building-line rule applies. Current agency authorizations should also be verified; the supplied Building Code text identifies other agency and zoning requirements but does not establish what authorization has been issued or whether it satisfies them.",
+        "assumptions": [],
+        "missingFacts": [
+          "Exact building-line and property-line locations, to determine whether the proposed café is beyond the building line.",
+          "Whether the café is enclosed.",
+          "Interior and exterior seating counts, to evaluate the combined seating determination for an enclosed café.",
+          "Whether a fire partition separates the café from interior seating and, if so, whether it complies with Section 713.",
+          "Exit geometry and the dimensions and placement of all proposed café furniture, equipment, enclosure, platforms, and awnings relative to the exit.",
+          "Cellar-hatch or areaway geometry and the dimensions and placement of all proposed café furniture, equipment, enclosure, platforms, and awnings relative to it.",
+          "Whether the cellar entrance or areaway is used as a required means of egress.",
+          "If a platform is proposed over the cellar entrance or areaway: whether a special application and commissioner permission have been obtained; whether the platform is easily removable and prominently designated; and whether it is designed in accordance with Section 3111.5.",
+          "Total dining seating and standing spaces, each type of dining surface, the quantity and location of accessible dining surfaces, and the accessible-route conditions to the café and dining surfaces.",
+          "Current Department of Consumer and Worker Protection and Department of Transportation authorizations, and the applicable Zoning Resolution and Chapter 32 requirements identified by BC 3111.1.",
+          "Verify the owner's claim: Outdoor-dining authorization permits separate exterior seating and eliminates further accessibility review.",
+          "Exact building and property lines.",
+          "Exit and cellar-hatch geometry.",
+          "Accessible dining-surface distribution.",
+          "Current agency authorizations."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied evidence is limited to the listed 2022 NYC Building Code passages. It does not include Chapter 11 accessibility criteria, Section 713 fire-partition criteria, Section 3111.5 platform-design criteria, Chapter 32 projection limits, Zoning Resolution provisions, commissioner requirements, or the place-of-assembly certificate-of-operation threshold."
+        ],
+        "additionalEvidenceNeeded": [
+          "A dimensioned site, sidewalk-café, exit, and cellar-hatch/areaway plan showing the building line, property line, all proposed components, and clearances.",
+          "Documentation of the café enclosure condition, interior and exterior seating counts, and any Section 713 fire-partition design.",
+          "An accessibility layout identifying dining-surface types, total seating and standing spaces, accessible dining-surface locations, and accessible routes.",
+          "If a platform covers the hatch or areaway, the special application, commissioner determination, platform-design documents, and confirmation whether the hatch/areaway is a required means of egress.",
+          "The applicable Chapter 11, Section 713, Section 3111.5, Chapter 32, Zoning Resolution, Department of Consumer and Worker Protection, Department of Transportation, and place-of-assembly certificate-of-operation requirements or approvals."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "5678",
+            "sectionNumber": "3111.1",
+            "title": "3111.1 General.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "5581f2dd-de2c-4bd2-ad53-672767994df1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "5581f2dd-de2c-4bd2-ad53-672767994df1",
+                "selectedText": "Sidewalk cafes provided beyond the building line shall comply with the requirements of this section, the New York City Zoning Resolution, the Commissioners of the Department of Consumer and Worker Protection and Department of Transportation, and with the projection limitations of Chapter 32 of this code.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the compliance obligations for a sidewalk café provided beyond the building line."
+          },
+          {
+            "sectionID": "5681",
+            "sectionNumber": "3111.4",
+            "title": "3111.4 Obstructions prohibited.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+              "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+              "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+              "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+                "selectedText": "No part of any awning, enclosure, fixture, equipment or removable platform of a sidewalk cafe shall be located:",
+                "visualSources": []
+              },
+              {
+                "sourceID": "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+                "selectedText": "2. So as to obstruct any exit from a building;",
+                "visualSources": []
+              },
+              {
+                "sourceID": "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+                "selectedText": "3. So as to obstruct any cellar access hatch or areaway;",
+                "visualSources": []
+              },
+              {
+                "sourceID": "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+                "selectedText": "Exception: Upon special application, the commissioner may permit an easily removable, prominently designated platform, designed in accordance with Section 3111.5, to cover a cellar entrance or areaway that is not used as a required means of egress.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the exit and cellar-access obstruction prohibitions and the conditional cellar-platform exception."
+          },
+          {
+            "sectionID": "5685",
+            "sectionNumber": "3111.6",
+            "title": "3111.6 Accessibility.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+                "selectedText": "Sidewalk cafes and access thereto shall comply with Chapter 11.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes that sidewalk cafés and access to them must comply with Chapter 11."
+          },
+          {
+            "sectionID": "2792",
+            "sectionNumber": "1108.2.9.1",
+            "title": "1108.2.9.1 Dining surfaces.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "48901303-ec4a-47a0-ae0b-29da2dedeb37",
+                "selectedText": "Where dining surfaces for the consumption of food or drink are provided, at least 10 percent of the total number of seating and standing spaces, but not less than one, of each type of dining surfaces shall be accessible and be distributed throughout the facility and located on a level accessed by an accessible route.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the accessible dining-surface percentage, minimum, distribution, and accessible-route requirements."
+          },
+          {
+            "sectionID": "5686",
+            "sectionNumber": "3111.7",
+            "title": "3111.7 Assembly seating.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b",
+                "selectedText": "Unless separated from seating inside the building by fire partitions complying with Section 713 , the seating for enclosed sidewalk cafes shall be added to that inside the building in order to determine whether a place of assembly certificate of operation is required.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the conditional aggregation of enclosed sidewalk-café seating with interior seating for the place-of-assembly certificate-of-operation determination."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "5678",
+          "5681",
+          "5685",
+          "2792",
+          "5686"
+        ],
+        "evidenceSourceIDs": [
+          "5581f2dd-de2c-4bd2-ad53-672767994df1",
+          "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+          "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+          "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+          "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+          "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+          "48901303-ec4a-47a0-ae0b-29da2dedeb37",
+          "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 5,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 5,
+          "governingCitationCount": 5,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 0,
+          "userPinnedCount": 8,
+          "permitextDiscoveredCount": 0,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 15,
+          "requiredClaimCount": 8,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 3111.1",
+              "summary": "BC 3111.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "5581f2dd-de2c-4bd2-ad53-672767994df1"
+              ]
+            },
+            {
+              "label": "BC 3111.4",
+              "summary": "BC 3111.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+              ]
+            },
+            {
+              "label": "BC 3111.4",
+              "summary": "BC 3111.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+              ]
+            },
+            {
+              "label": "BC 3111.4",
+              "summary": "BC 3111.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+              ]
+            },
+            {
+              "label": "BC 3111.4",
+              "summary": "BC 3111.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+              ]
+            },
+            {
+              "label": "BC 3111.6",
+              "summary": "BC 3111.6 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+              ]
+            },
+            {
+              "label": "BC 1108.2.9.1",
+              "summary": "BC 1108.2.9.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+              ]
+            },
+            {
+              "label": "BC 3111.7",
+              "summary": "BC 3111.7 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "BC 3111.1",
+              "summary": "BC 3111.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "5581f2dd-de2c-4bd2-ad53-672767994df1"
+              ]
+            },
+            {
+              "label": "BC 3111.6",
+              "summary": "BC 3111.6 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+              ]
+            },
+            {
+              "label": "BC 1108.2.9.1",
+              "summary": "BC 1108.2.9.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+              ]
+            },
+            {
+              "label": "BC 3111.7",
+              "summary": "BC 3111.7 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "BC 3111.4",
+              "summary": "BC 3111.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+              ]
+            },
+            {
+              "label": "BC 3111.4",
+              "summary": "BC 3111.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+              ]
+            },
+            {
+              "label": "BC 3111.4",
+              "summary": "BC 3111.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+              ]
+            },
+            {
+              "label": "BC 3111.4",
+              "summary": "BC 3111.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "5581f2dd-de2c-4bd2-ad53-672767994df1",
+            "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+            "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+            "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+            "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+            "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+            "48901303-ec4a-47a0-ae0b-29da2dedeb37",
+            "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+          ],
+          "permitextDiscoveredEvidence": [],
+          "projectFactsUsed": [
+            "Project: Restaurant proposing sidewalk-café seating and equipment",
+            "Conditions: Furniture is proposed near a building exit and cellar hatch",
+            "Owner Claim: Outdoor-dining authorization permits separate exterior seating and eliminates further accessibility review"
+          ],
+          "unresolvedProjectFacts": [
+            "Owner Claim: Outdoor-dining authorization permits separate exterior seating and eliminates further accessibility review",
+            "Unknowns: exact building and property lines",
+            "Unknowns: whether the café is enclosed",
+            "Unknowns: interior and exterior seating",
+            "Unknowns: whether a Section 713 fire partition separates the seating",
+            "Unknowns: exit and cellar-hatch geometry",
+            "Unknowns: accessible dining-surface distribution",
+            "Unknowns: current agency authorizations"
+          ],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Project: Restaurant proposing sidewalk-café seating and equipment",
+            "Conditions: Furniture is proposed near a building exit and cellar hatch",
+            "Owner Claim: Outdoor-dining authorization permits separate exterior seating and eliminates further accessibility review"
+          ],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "A restaurant proposes a sidewalk café with furniture near a building exit and cellar hatch. The owner says outdoor-dining authorization allows the exterior seats to be counted separately from the interior PACO and eliminates further accessibility review. The documents do not say whether the café is beyond the building line, enclosed, or separated from the interior seating by a Section 713 fire partition. What can be concluded from the selected Building Code passages, and what remains unresolved?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A restaurant proposes a sidewalk café with furniture near a building exit and cellar hatch. The owner says outdoor-dining authorization allows the exterior seats to be counted separately from the interior PACO and eliminates further accessibility review. The documents do not say whether the café is beyond the building line, enclosed, or separated from the interior seating by a Section 713 fire partition. What can be concluded from the selected Building Code passages, and what remains unresolved?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 8,
+          "coveredClaimCount": 8,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "5581f2dd-de2c-4bd2-ad53-672767994df1",
+            "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+            "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+            "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+            "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+            "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+            "48901303-ec4a-47a0-ae0b-29da2dedeb37",
+            "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "5581f2dd-de2c-4bd2-ad53-672767994df1",
+            "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+            "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+            "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+            "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+            "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+            "48901303-ec4a-47a0-ae0b-29da2dedeb37",
+            "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+          ],
+          "citedEvidenceSourceIDs": [
+            "5581f2dd-de2c-4bd2-ad53-672767994df1",
+            "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+            "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+            "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+            "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+            "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+            "48901303-ec4a-47a0-ae0b-29da2dedeb37",
+            "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+          ],
+          "nonRequiredEvidenceSourceIDs": [],
+          "claims": [
+            {
+              "id": "required-passage:5581f2dd-de2c-4bd2-ad53-672767994df1",
+              "label": "BC 3111.1 — 3111.1 General.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:827b70f2-e019-4c50-ad4f-ec561e1914a3",
+              "label": "BC 3111.4 — 3111.4 Obstructions prohibited.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:a6c59f84-df0c-4ba8-b396-ef162a07497b",
+              "label": "BC 3111.4 — 3111.4 Obstructions prohibited.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+              "label": "BC 3111.4 — 3111.4 Obstructions prohibited.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+              "label": "BC 3111.4 — 3111.4 Obstructions prohibited.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:39ae7fe5-a804-4b26-a05d-55671f0c5838",
+              "label": "BC 3111.6 — 3111.6 Accessibility.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:48901303-ec4a-47a0-ae0b-29da2dedeb37",
+              "label": "BC 1108.2.9.1 — 1108.2.9.1 Dining surfaces.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:ce32b822-c47d-49ea-87ba-7f3e33d3aa9b",
+              "label": "BC 3111.7 — 3111.7 Assembly seating.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 8,
+          "coveredClaimCount": 8,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "5581f2dd-de2c-4bd2-ad53-672767994df1",
+            "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+            "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+            "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+            "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+            "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+            "48901303-ec4a-47a0-ae0b-29da2dedeb37",
+            "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:5581f2dd-de2c-4bd2-ad53-672767994df1",
+              "label": "BC 3111.1 — 3111.1 General.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:827b70f2-e019-4c50-ad4f-ec561e1914a3",
+              "label": "BC 3111.4 — 3111.4 Obstructions prohibited.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:a6c59f84-df0c-4ba8-b396-ef162a07497b",
+              "label": "BC 3111.4 — 3111.4 Obstructions prohibited.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+              "label": "BC 3111.4 — 3111.4 Obstructions prohibited.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+              "label": "BC 3111.4 — 3111.4 Obstructions prohibited.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:39ae7fe5-a804-4b26-a05d-55671f0c5838",
+              "label": "BC 3111.6 — 3111.6 Accessibility.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 3,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 3,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:48901303-ec4a-47a0-ae0b-29da2dedeb37",
+              "label": "BC 1108.2.9.1 — 1108.2.9.1 Dining surfaces.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 3,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 3,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:ce32b822-c47d-49ea-87ba-7f3e33d3aa9b",
+              "label": "BC 3111.7 — 3111.7 Assembly seating.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 4,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 4,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "5581f2dd-de2c-4bd2-ad53-672767994df1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+                        "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+                        "22125ac6-ed5f-4c80-9cfc-b01432ceb473"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "48901303-ec4a-47a0-ae0b-29da2dedeb37"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260827-source-bound-dining-repair-v18",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "citedSourceIDs": [
+            "5581f2dd-de2c-4bd2-ad53-672767994df1",
+            "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+            "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+            "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+            "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+            "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+            "48901303-ec4a-47a0-ae0b-29da2dedeb37",
+            "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b"
+          ],
+          "reviewedOnlySourceIDs": [],
+          "evidenceEconomy": {
+            "citedSourceCount": 8,
+            "citedProvisionCount": 5,
+            "governingCitationCount": 5,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 0,
+            "reviewedOnlyProvisionCount": 0,
+            "assembledSourceCount": 8,
+            "assembledProvisionCount": 5
+          },
+          "sources": [
+            {
+              "sourceID": "5581f2dd-de2c-4bd2-ad53-672767994df1",
+              "sectionID": "5678",
+              "reference": "BC 3111.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Sidewalk cafes provided beyond the building line shall comply with the requirements of this section, the New York City Zoning Resolution, the Commissioners of the Department of Consumer and Worker Protection and Department of Transportation, and with the projection limitations of Chapter 32 of this code."
+            },
+            {
+              "sourceID": "827b70f2-e019-4c50-ad4f-ec561e1914a3",
+              "sectionID": "5681",
+              "reference": "BC 3111.4",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "No part of any awning, enclosure, fixture, equipment or removable platform of a sidewalk cafe shall be located:"
+            },
+            {
+              "sourceID": "a6c59f84-df0c-4ba8-b396-ef162a07497b",
+              "sectionID": "5681",
+              "reference": "BC 3111.4",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "2. So as to obstruct any exit from a building;"
+            },
+            {
+              "sourceID": "22125ac6-ed5f-4c80-9cfc-b01432ceb473",
+              "sectionID": "5681",
+              "reference": "BC 3111.4",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "3. So as to obstruct any cellar access hatch or areaway;"
+            },
+            {
+              "sourceID": "a9b1c7a6-8bbf-49a7-bd12-0f95f5a36b2f",
+              "sectionID": "5681",
+              "reference": "BC 3111.4",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Exception: Upon special application, the commissioner may permit an easily removable, prominently designated platform, designed in accordance with Section 3111.5, to cover a cellar entrance or areaway that is not used as a required means of egress."
+            },
+            {
+              "sourceID": "39ae7fe5-a804-4b26-a05d-55671f0c5838",
+              "sectionID": "5685",
+              "reference": "BC 3111.6",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Sidewalk cafes and access thereto shall comply with Chapter 11."
+            },
+            {
+              "sourceID": "48901303-ec4a-47a0-ae0b-29da2dedeb37",
+              "sectionID": "2792",
+              "reference": "BC 1108.2.9.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Where dining surfaces for the consumption of food or drink are provided, at least 10 percent of the total number of seating and standing spaces, but not less than one, of each type of dining surfaces shall be accessible and be distributed throughout the facility and located on a level accessed by an accessible route."
+            },
+            {
+              "sourceID": "ce32b822-c47d-49ea-87ba-7f3e33d3aa9b",
+              "sectionID": "5686",
+              "reference": "BC 3111.7",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Unless separated from seating inside the building by fire partitions complying with Section 713 , the seating for enclosed sidewalk cafes shall be added to that inside the building in order to determine whether a place of assembly certificate of operation is required."
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "A restaurant proposes a sidewalk café with furniture near a building exit and cellar hatch. The owner says outdoor-dining authorization allows the exterior seats to be counted separately from the interior PACO and eliminates further accessibility review. The documents do not say whether the café is beyond the building line, enclosed, or separated from the interior seating by a Section 713 fire partition. What can be concluded from the selected Building Code passages, and what remains unresolved?\nProject facts: Owner Claim: Outdoor-dining authorization permits separate exterior seating and eliminates further accessibility review; Conditions: Furniture is proposed near a building exit and cellar hatch; Unknowns: whether a Section 713 fire partition separates the seating; Project: Restaurant proposing sidewalk-café seating and equipment; Unknowns: whether the café is enclosed; Unknowns: interior and exterior seating; Unknowns: exit and cellar-hatch geometry; Unknowns: exact building and property lines; Unknowns: current agency authorizations; Unknowns: accessible dining-surface distribution",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A restaurant proposes a sidewalk café with furniture near a building exit and cellar hatch. The owner says outdoor-dining authorization allows the exterior seats to be counted separately from the interior PACO and eliminates further accessibility review. The documents do not say whether the café is beyond the building line, enclosed, or separated from the interior seating by a Section 713 fire partition. What can be concluded from the selected Building Code passages, and what remains unresolved?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "713",
+                  "referenceKind": "section",
+                  "reference": "§ 713"
+                }
+              ]
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A restaurant proposes a sidewalk café with furniture near a building exit and cellar hatch. The owner says outdoor-dining authorization allows the exterior seats to be counted separately from the interior PACO and eliminates further accessibility review. The documents do not say whether the café is beyond the building line, enclosed, or separated from the interior seating by a Section 713 fire partition. What can be concluded from the selected Building Code passages, and what remains unresolved?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "713",
+                  "referenceKind": "section",
+                  "reference": "§ 713"
+                }
+              ]
+            },
+            "nextCurrentTopic": {
+              "text": "A restaurant proposes a sidewalk café with furniture near a building exit and cellar hatch. The owner says outdoor-dining authorization allows the exterior seats to be counted separately from the interior PACO and eliminates further accessibility review. The documents do not say whether the café is beyond the building line, enclosed, or separated from the interior seating by a Section 713 fire partition. What can be concluded from the selected Building Code passages, and what remains unresolved?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "713",
+                  "referenceKind": "section",
+                  "reference": "§ 713"
+                }
+              ]
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "pinned_first",
+            "reason": "question_explicitly_bounded_to_selected_evidence"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 8,
+            "candidateCount": 0,
+            "discoveredCount": 0,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 0,
+            "characterCount": 6052,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [],
+          "discovery": {
+            "retrievalVersion": "20260827-pinned-evidence-budget-v20",
+            "searchedSectionCount": 0,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260827-supporting-web-v9",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-d5edd948-d704-4a7d-b319-adc053bf1ca4",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T23:03:26.645Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T23:03:26.645Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v4",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "complex_question_language",
+            "multiple_required_claims",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 16976,
+          "cachedInputTokens": 1829,
+          "outputTokens": 2443,
+          "totalTokens": 19419
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.043367,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "b68b4ce4-f2eb-4834-bf0b-19eb8ed538e7",
+        "createdAt": "2026-08-27T23:03:26.640Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra",
+          "gpt-5.6-luna"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v4",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 2,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 16976,
+        "cachedInputTokens": 1829,
+        "outputTokens": 2443,
+        "totalTokens": 19419,
+        "estimatedCostUSD": 0.043367,
+        "actualProviderCostUSD": 0.043367,
+        "conservativeProviderCostUSD": 0.043367,
+        "durationMilliseconds": 24922,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T23:04:20.727Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 28622,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 6939,
+              "cachedInputTokens": 2997,
+              "outputTokens": 2745,
+              "totalTokens": 9684
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 6939,
+          "cachedInputTokens": 2997,
+          "outputTokens": 2745,
+          "totalTokens": 9684
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "All five required citations are present and accurately support the propositions attributed to them. The answer correctly treats the cross-referenced zoning, agency, Chapter 32, Chapter 11, Section 713, and Section 3111.5 material as not supplied by the selected evidence.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent substantive requirements. Its conclusions are appropriately limited to the selected passages and identified unknown facts.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer consistently frames building-line applicability, obstruction compliance, platform-exception availability, accessibility compliance, and PACO aggregation as unresolved where necessary facts or incorporated provisions are absent.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly states that compliance and overall conclusions cannot be determined from the supplied evidence and identifies missing incorporated rules and factual inputs.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 3,
+            "rationale": "The answer gives a clear, actionable explanation of the exit, hatch, accessibility, and enclosed-café issues and identifies useful additional documentation. It is somewhat incomplete because it does not expressly identify electrical/heater/lighting requirements as unresolved, and it does not clearly state that the selected evidence cannot establish the approved interior capacity or current PACO status.",
+            "failureExcerpt": "“The selected passages also do not provide the threshold for when that certificate is required.”",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The answer directly rejects the owner's claimed consequences, explains the applicable conditional rules, and distinguishes conclusions from unresolved issues.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly limits BC 3111.1's rule to the condition that the café is beyond the building line.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It correctly identifies zoning, DCWP, DOT, and Chapter 32 as additional requirements while explaining that the supplied text does not establish their contents or approvals.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It states that the specified sidewalk-café components may not obstruct either a building exit or cellar hatch/areaway.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It includes every selected condition: special application, commissioner permission, easily removable and prominently designated platform, Section 3111.5 design, and no use as required egress.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It expressly states that the sidewalk café and its access must comply with Chapter 11.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It accurately applies the 10-percent rule to total seating and standing spaces, includes the minimum of one for each dining-surface type, and states distribution and accessible-route conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It limits the seating-addition rule to an enclosed sidewalk café and to determining whether a PACO is required.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "It correctly makes aggregation conditional on the absence of a Section 713-compliant separating fire partition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-9",
+              "rationale": "The answer identifies unresolved agency authorization and building/property-line facts, but it does not state that electrical, heater, or lighting requirements are unresolved. It also does not clearly state that approved lawful interior capacity or current PACO status cannot be established from the selected evidence.",
+              "failureExcerpt": "“The supplied evidence is limited to the listed 2022 NYC Building Code passages.”",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer rejects the proposition that outdoor-dining authorization eliminates Building Code obligations.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer expressly says the selected code text does not establish the substantive zoning or agency rules.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer says exterior seats are not automatically counted separately and gives the conditional enclosed-café aggregation rule.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It does not state that every exterior seat is always added; it confines addition to the specified enclosed-café condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It expressly conditions BC 3111.7 analysis on the café being enclosed and identifies enclosure as unknown.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It explains that covering the hatch requires several conditions and is not automatic.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "It correctly states that the exception is unavailable when the entrance or areaway is used as a required means of egress.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-8",
+              "rationale": "The answer uses 10 percent, not 5 percent.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-9",
+              "rationale": "It applies 10 percent to total seating and standing spaces, while treating dining-surface type as relevant to the minimum-one requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-10",
+              "rationale": "It includes distribution, dining-surface-type, total-space, and accessible-route requirements; it does not suggest one table invariably suffices.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-11",
+              "rationale": "The answer makes no claim that the selected evidence establishes heater, lighting, or electrical-permit requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-12",
+              "rationale": "The answer does not claim to establish approved interior occupant capacity or current PACO status.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "It identifies exact building/property-line locations as necessary to determine whether the beyond-building-line rule applies.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The project context expressly describes the proposal as a sidewalk café, and the answer consistently treats it as such while recognizing the separate beyond-building-line uncertainty.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It expressly identifies enclosure status as unknown and material to the PACO analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It identifies the existence and Section 713 compliance of any separating fire partition as unknown.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "The answer requests interior seating counts and notes that the PACO threshold is not supplied, but it does not expressly identify the current Certificate of Occupancy, approved interior seating, or existing PACO status as unresolved.",
+              "failureExcerpt": "“Because enclosure status, the interior and exterior seat counts ... are unknown...”",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It identifies total seating and standing spaces, interior/exterior seating counts, and dining-surface types as needed facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "It identifies exit and hatch/areaway geometry, placement, and whether the entrance/areaway is required egress as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-8",
+              "rationale": "It identifies special application, commissioner permission, platform characteristics, Section 3111.5 design, and egress status as unestablished conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-9",
+              "rationale": "It identifies accessible dining-surface distribution, dining-surface types, totals, and accessible-route conditions as missing.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-10",
+              "rationale": "It identifies the applicable Chapter 32 requirements as not provided by the selected evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-11",
+              "rationale": "It calls for verification of current DCWP and DOT authorizations and applicable zoning and agency requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-12",
+              "rationale": "The answer does not identify heater, lighting, electrical details, or separate electrical authority as unresolved or needed evidence.",
+              "failureExcerpt": "“It does not include Chapter 11 accessibility criteria, Section 713 fire-partition criteria, Section 3111.5 platform-design criteria, Chapter 32 projection limits, Zoning Resolution provisions, commissioner requirements...”",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.041423,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 5,
+            "canonicalCount": 5,
+            "selectedEvidenceCount": 5,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 24927,
+            "inputTokens": 16976,
+            "cachedInputTokens": 1829,
+            "outputTokens": 2443,
+            "totalTokens": 19419,
+            "estimatedCostUSD": 0.043367,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "All five required citations are present and accurately support the propositions attributed to them. The answer correctly treats the cross-referenced zoning, agency, Chapter 32, Chapter 11, Section 713, and Section 3111.5 material as not supplied by the selected evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 3.56,
+              "rationale": "8/9 required concepts were covered.",
+              "failureExcerpt": "“The supplied evidence is limited to the listed 2022 NYC Building Code passages.”",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer does not invent substantive requirements. Its conclusions are appropriately limited to the selected passages and identified unknown facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/12 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer consistently frames building-line applicability, obstruction compliance, platform-exception availability, accessibility compliance, and PACO aggregation as unresolved where necessary facts or incorporated provisions are absent.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 3.33,
+              "rationale": "10/12 required missing-fact conditions were recognized.",
+              "failureExcerpt": "“Because enclosure status, the interior and exterior seat counts ... are unknown...”",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "The answer directly states that compliance and overall conclusions cannot be determined from the supplied evidence and identifies missing incorporated rules and factual inputs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 3,
+              "rationale": "The answer gives a clear, actionable explanation of the exit, hatch, accessibility, and enclosed-café issues and identifies useful additional documentation. It is somewhat incomplete because it does not expressly identify electrical/heater/lighting requirements as unresolved, and it does not clearly state that the selected evidence cannot establish the approved interior capacity or current PACO status.",
+              "failureExcerpt": "“The selected passages also do not provide the threshold for when that certificate is required.”",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "The answer directly rejects the owner's claimed consequences, explains the applicable conditional rules, and distinguishes conclusions from unresolved issues.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer expressly limits BC 3111.1's rule to the condition that the café is beyond the building line.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "It correctly identifies zoning, DCWP, DOT, and Chapter 32 as additional requirements while explaining that the supplied text does not establish their contents or approvals.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "It states that the specified sidewalk-café components may not obstruct either a building exit or cellar hatch/areaway.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "It includes every selected condition: special application, commissioner permission, easily removable and prominently designated platform, Section 3111.5 design, and no use as required egress.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "It expressly states that the sidewalk café and its access must comply with Chapter 11.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "It accurately applies the 10-percent rule to total seating and standing spaces, includes the minimum of one for each dining-surface type, and states distribution and accessible-route conditions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-7",
+                "rationale": "It limits the seating-addition rule to an enclosed sidewalk café and to determining whether a PACO is required.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-8",
+                "rationale": "It correctly makes aggregation conditional on the absence of a Section 713-compliant separating fire partition.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-9",
+                "rationale": "The answer identifies unresolved agency authorization and building/property-line facts, but it does not state that electrical, heater, or lighting requirements are unresolved. It also does not clearly state that approved lawful interior capacity or current PACO status cannot be established from the selected evidence.",
+                "failureExcerpt": "“The supplied evidence is limited to the listed 2022 NYC Building Code passages.”",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": false
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer rejects the proposition that outdoor-dining authorization eliminates Building Code obligations.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "The answer expressly says the selected code text does not establish the substantive zoning or agency rules.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "The answer says exterior seats are not automatically counted separately and gives the conditional enclosed-café aggregation rule.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "It does not state that every exterior seat is always added; it confines addition to the specified enclosed-café condition.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-5",
+                "rationale": "It expressly conditions BC 3111.7 analysis on the café being enclosed and identifies enclosure as unknown.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-6",
+                "rationale": "It explains that covering the hatch requires several conditions and is not automatic.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-7",
+                "rationale": "It correctly states that the exception is unavailable when the entrance or areaway is used as a required means of egress.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-8",
+                "rationale": "The answer uses 10 percent, not 5 percent.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-9",
+                "rationale": "It applies 10 percent to total seating and standing spaces, while treating dining-surface type as relevant to the minimum-one requirement.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-10",
+                "rationale": "It includes distribution, dining-surface-type, total-space, and accessible-route requirements; it does not suggest one table invariably suffices.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-11",
+                "rationale": "The answer makes no claim that the selected evidence establishes heater, lighting, or electrical-permit requirements.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-12",
+                "rationale": "The answer does not claim to establish approved interior occupant capacity or current PACO status.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "It identifies exact building/property-line locations as necessary to determine whether the beyond-building-line rule applies.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The project context expressly describes the proposal as a sidewalk café, and the answer consistently treats it as such while recognizing the separate beyond-building-line uncertainty.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "It expressly identifies enclosure status as unknown and material to the PACO analysis.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "It identifies the existence and Section 713 compliance of any separating fire partition as unknown.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-5",
+                "rationale": "The answer requests interior seating counts and notes that the PACO threshold is not supplied, but it does not expressly identify the current Certificate of Occupancy, approved interior seating, or existing PACO status as unresolved.",
+                "failureExcerpt": "“Because enclosure status, the interior and exterior seat counts ... are unknown...”",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": false
+              },
+              {
+                "id": "missing-fact-6",
+                "rationale": "It identifies total seating and standing spaces, interior/exterior seating counts, and dining-surface types as needed facts.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-7",
+                "rationale": "It identifies exit and hatch/areaway geometry, placement, and whether the entrance/areaway is required egress as unresolved.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-8",
+                "rationale": "It identifies special application, commissioner permission, platform characteristics, Section 3111.5 design, and egress status as unestablished conditions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-9",
+                "rationale": "It identifies accessible dining-surface distribution, dining-surface types, totals, and accessible-route conditions as missing.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-10",
+                "rationale": "It identifies the applicable Chapter 32 requirements as not provided by the selected evidence.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-11",
+                "rationale": "It calls for verification of current DCWP and DOT authorizations and applicable zoning and agency requirements.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-12",
+                "rationale": "The answer does not identify heater, lighting, electrical details, or separate electrical authority as unresolved or needed evidence.",
+                "failureExcerpt": "“It does not include Chapter 11 accessibility criteria, Section 713 fire-partition criteria, Section 3111.5 platform-design criteria, Chapter 32 projection limits, Zoning Resolution provisions, commissioner requirements...”",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": false
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "5/5 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. All five required citations are present and accurately support the propositions attributed to them. The answer correctly treats the cross-referenced zoning, agency, Chapter 32, Chapter 11, Section 713, and Section 3111.5 material as not supplied by the selected evidence.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 5 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 3.56,
+            "rationale": "8/9 required concepts were covered.",
+            "failureExcerpt": "“The supplied evidence is limited to the listed 2022 NYC Building Code passages.”",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent substantive requirements. Its conclusions are appropriately limited to the selected passages and identified unknown facts.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer consistently frames building-line applicability, obstruction compliance, platform-exception availability, accessibility compliance, and PACO aggregation as unresolved where necessary facts or incorporated provisions are absent.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 3.33,
+            "rationale": "10/12 required missing-fact conditions were recognized.",
+            "failureExcerpt": "“Because enclosure status, the interior and exterior seat counts ... are unknown...”",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly states that compliance and overall conclusions cannot be determined from the supplied evidence and identifies missing incorporated rules and factual inputs.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 3,
+            "rationale": "The answer gives a clear, actionable explanation of the exit, hatch, accessibility, and enclosed-café issues and identifies useful additional documentation. It is somewhat incomplete because it does not expressly identify electrical/heater/lighting requirements as unresolved, and it does not clearly state that the selected evidence cannot establish the approved interior capacity or current PACO status.",
+            "failureExcerpt": "“The selected passages also do not provide the threshold for when that certificate is required.”",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The answer directly rejects the owner's claimed consequences, explains the applicable conditional rules, and distinguishes conclusions from unresolved issues.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          }
+        },
+        "overallScore": 3.83,
+        "passed": false,
+        "criticalFailures": [
+          "required concept missing"
+        ],
+        "requiredRubricsSatisfied": false,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly limits BC 3111.1's rule to the condition that the café is beyond the building line.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It correctly identifies zoning, DCWP, DOT, and Chapter 32 as additional requirements while explaining that the supplied text does not establish their contents or approvals.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It states that the specified sidewalk-café components may not obstruct either a building exit or cellar hatch/areaway.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It includes every selected condition: special application, commissioner permission, easily removable and prominently designated platform, Section 3111.5 design, and no use as required egress.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It expressly states that the sidewalk café and its access must comply with Chapter 11.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It accurately applies the 10-percent rule to total seating and standing spaces, includes the minimum of one for each dining-surface type, and states distribution and accessible-route conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It limits the seating-addition rule to an enclosed sidewalk café and to determining whether a PACO is required.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "It correctly makes aggregation conditional on the absence of a Section 713-compliant separating fire partition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-9",
+              "rationale": "The answer identifies unresolved agency authorization and building/property-line facts, but it does not state that electrical, heater, or lighting requirements are unresolved. It also does not clearly state that approved lawful interior capacity or current PACO status cannot be established from the selected evidence.",
+              "failureExcerpt": "“The supplied evidence is limited to the listed 2022 NYC Building Code passages.”",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer rejects the proposition that outdoor-dining authorization eliminates Building Code obligations.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer expressly says the selected code text does not establish the substantive zoning or agency rules.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer says exterior seats are not automatically counted separately and gives the conditional enclosed-café aggregation rule.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It does not state that every exterior seat is always added; it confines addition to the specified enclosed-café condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It expressly conditions BC 3111.7 analysis on the café being enclosed and identifies enclosure as unknown.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It explains that covering the hatch requires several conditions and is not automatic.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "It correctly states that the exception is unavailable when the entrance or areaway is used as a required means of egress.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-8",
+              "rationale": "The answer uses 10 percent, not 5 percent.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-9",
+              "rationale": "It applies 10 percent to total seating and standing spaces, while treating dining-surface type as relevant to the minimum-one requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-10",
+              "rationale": "It includes distribution, dining-surface-type, total-space, and accessible-route requirements; it does not suggest one table invariably suffices.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-11",
+              "rationale": "The answer makes no claim that the selected evidence establishes heater, lighting, or electrical-permit requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-12",
+              "rationale": "The answer does not claim to establish approved interior occupant capacity or current PACO status.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "It identifies exact building/property-line locations as necessary to determine whether the beyond-building-line rule applies.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The project context expressly describes the proposal as a sidewalk café, and the answer consistently treats it as such while recognizing the separate beyond-building-line uncertainty.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It expressly identifies enclosure status as unknown and material to the PACO analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It identifies the existence and Section 713 compliance of any separating fire partition as unknown.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "The answer requests interior seating counts and notes that the PACO threshold is not supplied, but it does not expressly identify the current Certificate of Occupancy, approved interior seating, or existing PACO status as unresolved.",
+              "failureExcerpt": "“Because enclosure status, the interior and exterior seat counts ... are unknown...”",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It identifies total seating and standing spaces, interior/exterior seating counts, and dining-surface types as needed facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "It identifies exit and hatch/areaway geometry, placement, and whether the entrance/areaway is required egress as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-8",
+              "rationale": "It identifies special application, commissioner permission, platform characteristics, Section 3111.5 design, and egress status as unestablished conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-9",
+              "rationale": "It identifies accessible dining-surface distribution, dining-surface types, totals, and accessible-route conditions as missing.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-10",
+              "rationale": "It identifies the applicable Chapter 32 requirements as not provided by the selected evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-11",
+              "rationale": "It calls for verification of current DCWP and DOT authorizations and applicable zoning and agency requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-12",
+              "rationale": "The answer does not identify heater, lighting, electrical details, or separate electrical authority as unresolved or needed evidence.",
+              "failureExcerpt": "“It does not include Chapter 11 accessibility criteria, Section 713 fire-partition criteria, Section 3111.5 platform-design criteria, Chapter 32 projection limits, Zoning Resolution provisions, commissioner requirements...”",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": false
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
