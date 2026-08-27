@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-accessory-assembly-scope-v12";
+  "20260827-accessory-group-b-boundary-v13";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -141,6 +141,12 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     restrictedPC403AccessorySourceIDs.length && !disclosesPC403NonaccessoryScope
       ? restrictedPC403AccessorySourceIDs
       : [];
+  const assertsNormalGroupBFixturePermission =
+    /\bnormal\s+Group B\s+(?:fixture\s+)?(?:calculation|requirements?)\s+(?:remain|remains|is|are)?\s*permitted\b|\bnormal\s+starting\s+point\s+is\s+(?:therefore\s+)?(?:the\s+)?Group B\s+fixture\s+requirements\b|\bGroup B\s+classification\s+(?:therefore\s+)?supports\s+use\s+of\s+(?:the\s+)?normal\s+Group B\s+fixture\s+requirements\b/i.test(applicabilityText);
+  const unsupportedNormalGroupBFixturePermissionSourceIDs =
+    accessoryAssemblySourceIDs.length && assertsNormalGroupBFixturePermission
+      ? accessoryAssemblySourceIDs
+      : [];
   const hcrVanityQuestion =
     /\bHCR\b/i.test(question) &&
     /\bvanity\b/i.test(question);
@@ -223,6 +229,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       missingZoningModificationPathDisclosureSourceIDs.length === 0 &&
       misattributedAccessoryAssemblyRelationshipSourceIDs.length === 0 &&
       missingPC403NonaccessoryScopeDisclosureSourceIDs.length === 0 &&
+      unsupportedNormalGroupBFixturePermissionSourceIDs.length === 0 &&
       missingTypeBNYCContextSourceIDs.length === 0 &&
       misstatedCumulativeConditionSourceIDs.length === 0 &&
       unsupportedExitAccessExpansionSourceIDs.length === 0 &&
@@ -238,6 +245,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     missingZoningModificationPathDisclosureSourceIDs,
     misattributedAccessoryAssemblyRelationshipSourceIDs,
     missingPC403NonaccessoryScopeDisclosureSourceIDs,
+    unsupportedNormalGroupBFixturePermissionSourceIDs,
     missingTypeBNYCContextSourceIDs,
     misstatedCumulativeConditionSourceIDs,
     unsupportedExitAccessExpansionSourceIDs,
@@ -322,6 +330,12 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "wrong_attribution",
       detail: `For an accessory assembly-room question, do not use PC 403.1's separate fewer-than-75 permission as authority for the accessory room without its express scope. State that the selected PC permission is limited to a building or nonaccessory tenant assembly space and does not independently extend to the accessory room; use BC 303.1.3 as the direct authority for the accessory-room Assembly fixture option. Bind the PC limitation to: ${references(result.missingPC403NonaccessoryScopeDisclosureSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.unsupportedNormalGroupBFixturePermissionSourceIDs?.length) {
+    issues.push({
+      type: "overstated_compliance",
+      detail: `Do not conclude that the normal Group B fixture calculation remains permitted merely because the accessory assembly room is classified as Group B. Lead with Not automatically: the supplied BC 303.1.3 establishes the Assembly-calculation option, while the absent Table 403.1 prevents this evidence package from establishing that normal Group B ratios may also be used. Bind the limited conclusion to: ${references(result.unsupportedNormalGroupBFixturePermissionSourceIDs, result.sources)}.`
     });
   }
   if (result.missingTypeBNYCContextSourceIDs?.length) {

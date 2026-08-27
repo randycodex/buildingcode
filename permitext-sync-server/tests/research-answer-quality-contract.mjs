@@ -246,6 +246,36 @@ const boundedPC403AccessoryAnswer = evaluateResearchAnswerQuality({
 });
 assert.equal(boundedPC403AccessoryAnswer.pass, true);
 
+const overbroadNormalGroupBFixtureAnswer = evaluateResearchAnswerQuality({
+  question: accessoryAssemblyQuestion,
+  evidence: accessoryAssemblyEvidence,
+  answer: {
+    answerText: "Yes. The normal starting point is therefore the Group B fixture requirements, and the normal Group B calculation remains permitted.",
+    supportedPoints: [{ sourceIDs: ["bc-accessory-assembly"] }],
+    citations: [{ sourceIDs: ["bc-accessory-assembly"] }]
+  }
+});
+assert.equal(overbroadNormalGroupBFixtureAnswer.pass, false);
+assert.deepEqual(
+  overbroadNormalGroupBFixtureAnswer.unsupportedNormalGroupBFixturePermissionSourceIDs,
+  ["bc-accessory-assembly"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(overbroadNormalGroupBFixtureAnswer).at(-1).type,
+  "overstated_compliance"
+);
+
+const boundedNormalGroupBFixtureAnswer = evaluateResearchAnswerQuality({
+  question: accessoryAssemblyQuestion,
+  evidence: accessoryAssemblyEvidence,
+  answer: {
+    answerText: "Not automatically. BC 303.1.3 establishes that the accessory assembly room may use the Assembly fixture calculation, while the absent Table 403.1 prevents the selected evidence from establishing whether normal Group B ratios may also be used.",
+    supportedPoints: [{ sourceIDs: ["bc-accessory-assembly"] }],
+    citations: [{ sourceIDs: ["bc-accessory-assembly"] }]
+  }
+});
+assert.equal(boundedNormalGroupBFixtureAnswer.pass, true);
+
 const diningSurfaceEvidence = [{
   ...source("bc-dining-surfaces", "1108.2.9.1", "governing", "aligned"),
   text: "At least 10 percent of the total number of seating and standing spaces, but not less than one, of each type of dining surfaces shall be accessible."
