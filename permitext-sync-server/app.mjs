@@ -44,6 +44,7 @@ import {
 import { createPostgresOrganizationRepository } from "./postgres-organization-repository.mjs";
 import { createPostgresRateLimitRepository } from "./postgres-rate-limit-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
+import { ensurePostgresNormalizedSchema } from "./postgres-schema-readiness.mjs";
 import {
   intersectCandidateIDsWithPosting,
   normalizedSortedPostingList,
@@ -2088,7 +2089,7 @@ async function createPostgresStoreAdapter() {
   });
   const syncRepository = createPostgresSyncRepository(sql);
 
-  const ensureSchema = createSingleFlightInitializer(async () => {
+  const initializeSchema = async () => {
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_sync_state (
         id TEXT PRIMARY KEY,
@@ -2662,7 +2663,10 @@ async function createPostgresStoreAdapter() {
     `;
     await organizationRepository.initialize();
     await rateLimitRepository.initialize();
-  });
+  };
+  const ensureSchema = createSingleFlightInitializer(() =>
+    ensurePostgresNormalizedSchema(sql, initializeSchema)
+  );
 
   async function readLegacyStore() {
     const rows = await sql`

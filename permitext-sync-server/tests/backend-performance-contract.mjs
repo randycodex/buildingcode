@@ -252,13 +252,15 @@ assert(
   "PDF generation is not routed through one cached on-demand loader."
 );
 assert(
-  postgresAdapterSource.includes("const ensureSchema = createSingleFlightInitializer(async () => {") &&
+  postgresAdapterSource.includes("const initializeSchema = async () => {") &&
+    postgresAdapterSource.includes("const ensureSchema = createSingleFlightInitializer(() =>") &&
+    postgresAdapterSource.includes("ensurePostgresNormalizedSchema(sql, initializeSchema)") &&
     postgresAdapterSource.includes(
       "const migrateLegacyStateIfNeeded = createSingleFlightInitializer(async () => {"
     ) &&
     !postgresAdapterSource.includes("let initialized = false;") &&
     !postgresAdapterSource.includes("let migrated = false;"),
-  "PostgreSQL schema or legacy migration initialization is not protected by retryable single-flight."
+  "PostgreSQL schema or legacy migration initialization is not protected by retryable single-flight and cross-isolate readiness coordination."
 );
 assert(
   !appSource.includes(
