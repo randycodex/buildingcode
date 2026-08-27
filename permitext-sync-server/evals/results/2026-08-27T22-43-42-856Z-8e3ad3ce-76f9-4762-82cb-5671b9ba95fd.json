@@ -1,0 +1,2860 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T22:43:42.856Z",
+  "updatedAt": "2026-08-27T22:44:41.119Z",
+  "configuration": {
+    "runID": "8e3ad3ce-76f9-4762-82cb-5671b9ba95fd",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-project-fact-verification-v30",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-022-reestablished-prior-occupancy-boundary"
+    ],
+    "caseStatuses": [
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "5439fcf1dca83265954186a0f47bd6ec173d94a3",
+    "approvedSpendCapUSD": 0.75,
+    "conservativeReservedUSD": 0.149249,
+    "actualUSD": 0.149249,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 4
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T22:44:40.976Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.118085,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.118085,
+        "p50": 0.118085,
+        "p90": 0.118085,
+        "maximum": 0.118085
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.118085,
+      "projectedCostPer100TurnsUSD": 11.81,
+      "targetReady": false,
+      "targetBand": "above"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 43124,
+      "p50": 43124,
+      "p90": 43124,
+      "maximum": 43124
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 1,
+      "verificationRevisionRate": 1,
+      "providerRequests": {
+        "count": 1,
+        "mean": 3,
+        "p50": 3,
+        "p90": 3,
+        "maximum": 3
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": [
+        {
+          "key": "wrong_attribution",
+          "count": 1
+        }
+      ]
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-022-reestablished-prior-occupancy-boundary",
+        "title": "A formerly lawful occupancy is not automatically resumable",
+        "status": "draft",
+        "difficulty": "advanced",
+        "topics": [
+          "existing buildings",
+          "change of occupancy",
+          "re-establishment of prior occupancy",
+          "certificate of occupancy",
+          "administrative provisions"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "building": "Existing prior-code commercial building",
+          "formerOccupancy": "Storage occupancy represented by the owner as lawful before July 1, 2008",
+          "currentOccupancy": "Office occupancy established under a certificate of occupancy issued after July 1, 2008",
+          "proposal": "Resume the former storage occupancy without a new filing or amended certificate of occupancy",
+          "ownerPosition": "The former occupancy may resume automatically because it was lawful before the current code",
+          "unknowns": [
+            "former and current occupancy-group classifications",
+            "former and current zoning use groups",
+            "current certificate of occupancy and approved construction documents",
+            "whether the former occupancy would be lawful in a new building of the same construction class",
+            "applicable current-code and other legal requirements",
+            "scope of any alteration work"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "8803",
+            "reference": "AC 28-102.4",
+            "codePrefix": "AC",
+            "sectionNumber": "28-102.4",
+            "exactPassages": [
+              "The lawful use or occupancy of any existing building or structure, including the use of any service equipment therein, may be continued unless a retroactive change is specifically required by the provisions of this code or other applicable laws or rules."
+            ],
+            "resolvedTitle": "§ 28-102.4 Existing buildings.",
+            "evidenceCharacters": 254,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "8805",
+            "reference": "AC 28-102.4.2",
+            "codePrefix": "AC",
+            "sectionNumber": "28-102.4.2",
+            "exactPassages": [
+              "Except as otherwise provided in sections 28-101.4.1 , 28-101.4.2 , 28-101.4.3 or 28-101.4.4 , changes in the use or occupancy of any building or structure made after July 1, 2008 shall comply with the provisions of this code.",
+              "Any changes made in the use or occupancy of a building or structure not in compliance with this code shall be prohibited and shall be a violation of this code.",
+              "After a change in use or occupancy has been made in a building, the re-establishment of a prior use or occupancy that would not be lawful in a new building of the same construction class shall be prohibited unless and until all the applicable provisions of this code and other applicable laws and rules for such reestablished use or occupancy shall have been complied with."
+            ],
+            "resolvedTitle": "§ 28-102.4.2 Change in use or occupancy.",
+            "evidenceCharacters": 968,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "9198",
+            "reference": "AC 28-118.3.1",
+            "codePrefix": "AC",
+            "sectionNumber": "28-118.3.1",
+            "exactPassages": [
+              "No building, open lot or portion thereof hereafter altered so as to change from one occupancy group to another, or from one zoning use group to another, either in whole or in part, shall be occupied or used unless and until the commissioner has issued a certificate of occupancy certifying that the alteration work for which the permit was issued has been completed substantially in accordance with the approved construction documents and the provisions of this code and other applicable laws and rules for the new occupancy or use."
+            ],
+            "resolvedTitle": "§ 28-118.3.1 Change of occupancy or use.",
+            "evidenceCharacters": 532,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "9199",
+            "reference": "AC 28-118.3.2",
+            "codePrefix": "AC",
+            "sectionNumber": "28-118.3.2",
+            "exactPassages": [
+              "No change shall be made to a building, open lot or portion thereof inconsistent with the last issued certificate of occupancy or, where applicable, inconsistent with the last issued certificate of completion for such building or open lot or which would bring it under some special provision of this code or other applicable laws or rules, unless and until the commissioner has issued a new or amended certificate of occupancy."
+            ],
+            "resolvedTitle": "§ 28-118.3.2 Changes inconsistent with existing certificate of occupancy.",
+            "evidenceCharacters": 426,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?",
+        "expectedConclusion": "No automatic right to resume the former storage occupancy is established by the selected evidence. AC 28-102.4 permits continuation of a lawful existing use or occupancy unless a retroactive change is required, but the proposal follows an intervening change to office occupancy and therefore is not established as mere continuation of the former occupancy. AC 28-102.4.2 requires post-July 1, 2008 changes in use or occupancy to comply with the current code, prohibits noncompliant changes, and specifically prohibits re-establishing a prior use or occupancy that would not be lawful in a new building of the same construction class until all applicable code provisions and other laws and rules for that re-established occupancy are satisfied. AC 28-118.3.1 requires a certificate of occupancy when alteration changes an occupancy group or zoning use group, and AC 28-118.3.2 prohibits changes inconsistent with the last certificate of occupancy until a new or amended certificate is issued. The former and current occupancy and zoning classifications, construction class, current certificate and approved documents, legality of the former occupancy in a comparable new building, applicable requirements, and proposed work must be verified before determining the required filing and whether the former occupancy may lawfully resume.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The selected passages reject automatic reliance on a formerly lawful occupancy, but the filing and compliance result depends on the actual classifications, construction class, current certificate, approved documents, applicable laws, and scope of work."
+        },
+        "sourceType": "deliberately constructed edge case",
+        "sourceReference": "Draft scenario constructed from canonical 2022 NYC Administrative Code Sections 28-102.4, 28-102.4.2, 28-118.3.1, and 28-118.3.2.",
+        "reviewer": null,
+        "reviewedAt": null,
+        "notes": "Draft candidate NYC-022 broadens existing-building coverage into re-establishment of a former occupancy. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.",
+        "requiredConcepts": [
+          "Distinguish continuation of a lawful existing occupancy from re-establishment after an intervening occupancy change.",
+          "State that post-July 1, 2008 occupancy changes generally must comply with the current code.",
+          "State the prohibition on a noncompliant occupancy change.",
+          "Explain the specific condition on re-establishing a prior occupancy that would not be lawful in a new building of the same construction class.",
+          "Identify the certificate-of-occupancy requirement for an alteration changing an occupancy group or zoning use group.",
+          "Identify the new-or-amended-certificate requirement for a change inconsistent with the last certificate.",
+          "Require the actual classifications, construction class, certificate, approved documents, applicable requirements, and work scope."
+        ],
+        "missingFacts": [
+          "Evidence of the former lawful storage occupancy.",
+          "Former and current occupancy-group classifications.",
+          "Former and current zoning use groups.",
+          "Building construction class.",
+          "Current certificate of occupancy and approved construction documents.",
+          "Whether the former occupancy would be lawful in a new building of the same construction class.",
+          "Applicable current-code provisions and other laws and rules.",
+          "Scope and classification of any proposed alteration work."
+        ],
+        "forbiddenClaims": [
+          "Any occupancy that was once lawful may be resumed automatically.",
+          "AC 28-102.4 makes the intervening office occupancy irrelevant.",
+          "A post-July 1, 2008 occupancy change may disregard current-code requirements.",
+          "No certificate amendment is needed regardless of the last issued certificate.",
+          "The proposal necessarily changes an occupancy group or zoning use group without verifying the classifications.",
+          "The former storage occupancy would be unlawful in a comparable new building without verifying the construction class and applicable requirements.",
+          "The proposed occupancy is approved or compliant on the stated facts."
+        ],
+        "requiredCitations": [
+          "AC 28-102.4",
+          "AC 28-102.4.2",
+          "AC 28-118.3.1",
+          "AC 28-118.3.2"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "AC 28-102.4",
+            "requiredClaim": "Conditional continuation of a lawful existing occupancy, without treating it as automatic re-establishment after an intervening change."
+          },
+          {
+            "reference": "AC 28-102.4.2",
+            "requiredClaim": "Current-code compliance for post-2008 occupancy changes, prohibition on noncompliant changes, and the condition on re-establishing a prior occupancy."
+          },
+          {
+            "reference": "AC 28-118.3.1",
+            "requiredClaim": "Certificate-of-occupancy requirement when an alteration changes an occupancy group or zoning use group."
+          },
+          {
+            "reference": "AC 28-118.3.2",
+            "requiredClaim": "New-or-amended-certificate requirement for a change inconsistent with the last certificate or triggering a special provision."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "e64a7aff-7a0c-4c31-9e92-bd5c068dd623",
+      "answeredAt": "2026-08-27T22:44:26.345Z",
+      "answerTimeMilliseconds": 43129,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-project-fact-verification-v30:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-7f437fdd-c85b-4e33-a06d-d15d6bb2133a",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T22:43:43.223Z"
+        },
+        "answerText": "No. The fact that storage was once lawful does not itself create an automatic right to revive it after the building was changed to office occupancy. The existing-building rule permits continuation of a lawful existing use or occupancy, but the re-establishment rule separately governs a prior use after a change has occurred.\n\nIf the former storage occupancy would not be lawful in a new building of the same construction class, it may not be re-established unless and until all applicable Code provisions and other applicable laws and rules for that re-established storage use have been complied with. Separately, changes in use or occupancy made after July 1, 2008 must comply with the Code, except as otherwise provided in the listed cross-referenced provisions; a noncomplying change is prohibited and is a violation.\n\nThe owner also cannot assume that no certificate action is needed. If storage would be inconsistent with the last-issued certificate of occupancy (or, where applicable, certificate of completion), a new or amended certificate of occupancy must be issued before the change. If alteration work changes an occupancy group or zoning use group, the space cannot be occupied or used until the commissioner issues a certificate of occupancy confirming that the permitted work was substantially completed in accordance with approved construction documents, the Code, and other applicable laws and rules.\n\nFirst establish the authorized terms of the last-issued certificate and the approved documents; the former and proposed occupancy-group classifications and zoning use groups; whether storage would be lawful in a new building of the same construction class; the applicable requirements for the particular proposed storage activity; and the scope of any proposed or required alteration work. The owner's representation that the pre-2008 storage use was lawful should also be verified from records. Even if verified, that prior lawfulness alone does not establish automatic resumption.",
+        "conclusion": "No. The fact that storage was once lawful does not itself create an automatic right to revive it after the building was changed to office occupancy. The existing-building rule permits continuation of a lawful existing use or occupancy, but the re-establishment rule separately governs a prior use after a change has occurred.",
+        "supportedPoints": [
+          {
+            "heading": "Existing-use continuation is not automatic revival",
+            "explanation": "A lawful use or occupancy of an existing building may continue unless a retroactive change is specifically required by the Code or other applicable laws or rules. That rule addresses continuation of a lawful existing use or occupancy; the separately supplied re-establishment rule applies after a change in use or occupancy has occurred.",
+            "sectionID": "8803",
+            "sourceIDs": [
+              "75d76099-e075-4a32-aaa5-70c7635c5761"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Re-establishing a prior use may require full compliance",
+            "explanation": "Except as otherwise provided in the listed cross-referenced sections, a change in use or occupancy made after July 1, 2008 must comply with the Code. A change not in compliance is prohibited and is a violation. After a change has occurred, a prior use or occupancy that would not be lawful in a new building of the same construction class is prohibited from re-establishment unless and until all applicable Code provisions and other applicable laws and rules for that re-established use or occupancy have been complied with.",
+            "sectionID": "8805",
+            "sourceIDs": [
+              "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+              "e7e47b07-8875-42cd-b4c4-877f531806a5",
+              "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "A change inconsistent with the last certificate requires certificate action",
+            "explanation": "No change inconsistent with the last-issued certificate of occupancy, or where applicable the last-issued certificate of completion, may be made unless and until the commissioner issues a new or amended certificate of occupancy. The provision also applies to a change that would bring the building, lot, or portion under a special provision of the Code or other applicable laws or rules.",
+            "sectionID": "9199",
+            "sourceIDs": [
+              "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Certain altered occupancy or use changes require a certificate before use",
+            "explanation": "Where a building, open lot, or portion is altered so as to change from one occupancy group to another or from one zoning use group to another, it may not be occupied or used until the commissioner issues a certificate of occupancy. The certificate must certify substantial completion of the permitted alteration work in accordance with approved construction documents, the Code, and other applicable laws and rules for the new occupancy or use.",
+            "sectionID": "9198",
+            "sourceIDs": [
+              "d497c9c6-b687-42ed-97df-d86d1529175b"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "If the former storage occupancy would not be lawful in a new building of the same construction class, it may not be re-established unless and until all applicable Code provisions and other applicable laws and rules for that re-established storage use have been complied with. Separately, changes in use or occupancy made after July 1, 2008 must comply with the Code, except as otherwise provided in the listed cross-referenced provisions; a noncomplying change is prohibited and is a violation.\n\nThe owner also cannot assume that no certificate action is needed. If storage would be inconsistent with the last-issued certificate of occupancy (or, where applicable, certificate of completion), a new or amended certificate of occupancy must be issued before the change. If alteration work changes an occupancy group or zoning use group, the space cannot be occupied or used until the commissioner issues a certificate of occupancy confirming that the permitted work was substantially completed in accordance with approved construction documents, the Code, and other applicable laws and rules.\n\nFirst establish the authorized terms of the last-issued certificate and the approved documents; the former and proposed occupancy-group classifications and zoning use groups; whether storage would be lawful in a new building of the same construction class; the applicable requirements for the particular proposed storage activity; and the scope of any proposed or required alteration work. The owner's representation that the pre-2008 storage use was lawful should also be verified from records. Even if verified, that prior lawfulness alone does not establish automatic resumption.",
+        "assumptions": [],
+        "missingFacts": [
+          "The former and proposed storage occupancy-group classifications.",
+          "The former and proposed storage zoning use groups.",
+          "The terms of the last-issued certificate of occupancy and, where applicable, the last-issued certificate of completion, including whether either authorizes the proposed storage use.",
+          "The approved construction documents and permit history for the office conversion.",
+          "Whether the proposed storage occupancy would be lawful in a new building of the same construction class.",
+          "The building's construction class.",
+          "The applicable Code provisions and other applicable laws and rules for the particular proposed storage activity.",
+          "The scope of alteration work proposed or required to resume storage.",
+          "Records independently verifying the owner's representation that the former storage occupancy was lawful before July 1, 2008.",
+          "Whether an exception cross-referenced in AC 28-102.4.2 applies to the proposed change.",
+          "Verify the represented project fact: Former Occupancy: Storage occupancy represented by the owner as lawful before July 1, 2008.",
+          "Verify the owner's position: The former occupancy may resume automatically because it was lawful before the current code.",
+          "Current certificate of occupancy and approved construction documents.",
+          "Whether the former occupancy would be lawful in a new building of the same construction class.",
+          "Applicable current-code and other legal requirements.",
+          "Scope of any alteration work."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied enacted evidence establishes general continuation, re-establishment, and certificate-of-occupancy rules, but does not establish the project's classifications, construction class, certificate terms, approved-document terms, substantive storage-use requirements, or applicability of every cross-referenced exception."
+        ],
+        "additionalEvidenceNeeded": [
+          "The last-issued certificate of occupancy or certificate of completion, approved construction documents, and permit history.",
+          "Documentation describing the proposed storage activity sufficiently to determine its occupancy-group and zoning-use-group classifications.",
+          "Construction-class documentation and an analysis of whether the proposed storage use would be lawful in a new building of that class.",
+          "The applicable substantive Code provisions and other laws and rules for the proposed storage use and any alteration work.",
+          "Records establishing the authorized and lawful pre-July 1, 2008 storage use."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "8803",
+            "sectionNumber": "28-102.4",
+            "title": "§ 28-102.4 Existing buildings.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "75d76099-e075-4a32-aaa5-70c7635c5761"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "75d76099-e075-4a32-aaa5-70c7635c5761",
+                "selectedText": "The lawful use or occupancy of any existing building or structure, including the use of any service equipment therein, may be continued unless a retroactive change is specifically required by the provisions of this code or other applicable laws or rules.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes that a lawful existing use or occupancy may continue unless a retroactive change is specifically required."
+          },
+          {
+            "sectionID": "8805",
+            "sectionNumber": "28-102.4.2",
+            "title": "§ 28-102.4.2 Change in use or occupancy.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+              "e7e47b07-8875-42cd-b4c4-877f531806a5",
+              "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+                "selectedText": "Except as otherwise provided in sections 28-101.4.1 , 28-101.4.2 , 28-101.4.3 or 28-101.4.4 , changes in the use or occupancy of any building or structure made after July 1, 2008 shall comply with the provisions of this code.",
+                "visualSources": []
+              },
+              {
+                "sourceID": "e7e47b07-8875-42cd-b4c4-877f531806a5",
+                "selectedText": "Any changes made in the use or occupancy of a building or structure not in compliance with this code shall be prohibited and shall be a violation of this code.",
+                "visualSources": []
+              },
+              {
+                "sourceID": "0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+                "selectedText": "After a change in use or occupancy has been made in a building, the re-establishment of a prior use or occupancy that would not be lawful in a new building of the same construction class shall be prohibited unless and until all the applicable provisions of this code and other applicable laws and rules for such reestablished use or occupancy shall have been complied with.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes post-July 1, 2008 compliance, prohibition of noncomplying changes, and the conditions for re-establishing a prior occupancy."
+          },
+          {
+            "sectionID": "9199",
+            "sectionNumber": "28-118.3.2",
+            "title": "§ 28-118.3.2 Changes inconsistent with existing certificate of occupancy.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "a7bdbb72-bbcc-4194-877d-63d41f15177b",
+                "selectedText": "No change shall be made to a building, open lot or portion thereof inconsistent with the last issued certificate of occupancy or, where applicable, inconsistent with the last issued certificate of completion for such building or open lot or which would bring it under some special provision of this code or other applicable laws or rules, unless and until the commissioner has issued a new or amended certificate of occupancy.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the new-or-amended-certificate requirement for a change inconsistent with the last-issued certificate."
+          },
+          {
+            "sectionID": "9198",
+            "sectionNumber": "28-118.3.1",
+            "title": "§ 28-118.3.1 Change of occupancy or use.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "d497c9c6-b687-42ed-97df-d86d1529175b"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "d497c9c6-b687-42ed-97df-d86d1529175b",
+                "selectedText": "No building, open lot or portion thereof hereafter altered so as to change from one occupancy group to another, or from one zoning use group to another, either in whole or in part, shall be occupied or used unless and until the commissioner has issued a certificate of occupancy certifying that the alteration work for which the permit was issued has been completed substantially in accordance with the approved construction documents and the provisions of this code and other applicable laws and rules for the new occupancy or use.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the certificate-of-occupancy requirement where alteration changes occupancy group or zoning use group."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "8803",
+          "8805",
+          "9198",
+          "9199",
+          "8796",
+          "9812",
+          "113",
+          "10189",
+          "8784",
+          "8785",
+          "8786"
+        ],
+        "evidenceSourceIDs": [
+          "75d76099-e075-4a32-aaa5-70c7635c5761",
+          "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+          "e7e47b07-8875-42cd-b4c4-877f531806a5",
+          "0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+          "d497c9c6-b687-42ed-97df-d86d1529175b",
+          "a7bdbb72-bbcc-4194-877d-63d41f15177b",
+          "research-permitext_discovered-id:8796-5",
+          "research-permitext_discovered-id:9812-6",
+          "research-permitext_discovered-id:113-7",
+          "research-permitext_discovered-id:10189-8",
+          "research-permitext_cross_reference-id:8784-1",
+          "research-permitext_cross_reference-id:8785-2",
+          "research-permitext_cross_reference-id:8786-3"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 11,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 4,
+          "governingCitationCount": 4,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 7,
+          "userPinnedCount": 6,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 3,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 16,
+          "requiredClaimCount": 6,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "AC 28-102.4",
+              "summary": "AC 28-102.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "75d76099-e075-4a32-aaa5-70c7635c5761"
+              ]
+            },
+            {
+              "label": "AC 28-102.4.2",
+              "summary": "AC 28-102.4.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "f5bf9a2e-6aa6-4d95-954e-b461506ea816"
+              ]
+            },
+            {
+              "label": "AC 28-102.4.2",
+              "summary": "AC 28-102.4.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e7e47b07-8875-42cd-b4c4-877f531806a5"
+              ]
+            },
+            {
+              "label": "AC 28-102.4.2",
+              "summary": "AC 28-102.4.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+              ]
+            },
+            {
+              "label": "AC 28-118.3.1",
+              "summary": "AC 28-118.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "d497c9c6-b687-42ed-97df-d86d1529175b"
+              ]
+            },
+            {
+              "label": "AC 28-118.3.2",
+              "summary": "AC 28-118.3.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "AC 28-102.4",
+              "summary": "AC 28-102.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "75d76099-e075-4a32-aaa5-70c7635c5761"
+              ]
+            },
+            {
+              "label": "AC 28-102.4.2",
+              "summary": "AC 28-102.4.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "f5bf9a2e-6aa6-4d95-954e-b461506ea816"
+              ]
+            },
+            {
+              "label": "AC 28-102.4.2",
+              "summary": "AC 28-102.4.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e7e47b07-8875-42cd-b4c4-877f531806a5"
+              ]
+            },
+            {
+              "label": "AC 28-102.4.2",
+              "summary": "AC 28-102.4.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+              ]
+            },
+            {
+              "label": "AC 28-118.3.1",
+              "summary": "AC 28-118.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "d497c9c6-b687-42ed-97df-d86d1529175b"
+              ]
+            },
+            {
+              "label": "AC 28-118.3.2",
+              "summary": "AC 28-118.3.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "AC 28-507.6.1",
+              "summary": "AC 28-507.6.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10189-8"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.3",
+              "summary": "AC 28-101.4.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8786-3"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "AC 28-101.5",
+              "summary": "AC 28-101.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8796-5"
+              ]
+            },
+            {
+              "label": "AC 28-401.3",
+              "summary": "AC 28-401.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9812-6"
+              ]
+            },
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-7"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "AC 28-101.4.1",
+              "summary": "AC 28-101.4.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8784-1"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.2",
+              "summary": "AC 28-101.4.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8785-2"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.3",
+              "summary": "AC 28-101.4.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8786-3"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [
+            "75d76099-e075-4a32-aaa5-70c7635c5761",
+            "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+            "e7e47b07-8875-42cd-b4c4-877f531806a5",
+            "0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+            "d497c9c6-b687-42ed-97df-d86d1529175b",
+            "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:8796-5",
+            "research-permitext_discovered-id:9812-6",
+            "research-permitext_discovered-id:113-7",
+            "research-permitext_discovered-id:10189-8",
+            "research-permitext_cross_reference-id:8784-1",
+            "research-permitext_cross_reference-id:8785-2",
+            "research-permitext_cross_reference-id:8786-3"
+          ],
+          "projectFactsUsed": [
+            "Building: Existing prior-code commercial building",
+            "Former Occupancy: Storage occupancy represented by the owner as lawful before July 1, 2008",
+            "Current Occupancy: Office occupancy established under a certificate of occupancy issued after July 1, 2008",
+            "Proposal: Resume the former storage occupancy without a new filing or amended certificate of occupancy",
+            "Owner Position: The former occupancy may resume automatically because it was lawful before the current code"
+          ],
+          "unresolvedProjectFacts": [
+            "Former Occupancy: Storage occupancy represented by the owner as lawful before July 1, 2008",
+            "Owner Position: The former occupancy may resume automatically because it was lawful before the current code",
+            "Unknowns: former and current occupancy-group classifications",
+            "Unknowns: former and current zoning use groups",
+            "Unknowns: current certificate of occupancy and approved construction documents",
+            "Unknowns: whether the former occupancy would be lawful in a new building of the same construction class",
+            "Unknowns: applicable current-code and other legal requirements",
+            "Unknowns: scope of any alteration work"
+          ],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Building: Existing prior-code commercial building",
+            "Former Occupancy: Storage occupancy represented by the owner as lawful before July 1, 2008",
+            "Current Occupancy: Office occupancy established under a certificate of occupancy issued after July 1, 2008",
+            "Proposal: Resume the former storage occupancy without a new filing or amended certificate of occupancy",
+            "Owner Position: The former occupancy may resume automatically because it was lawful before the current code"
+          ],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 6,
+          "coveredClaimCount": 6,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "75d76099-e075-4a32-aaa5-70c7635c5761",
+            "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+            "e7e47b07-8875-42cd-b4c4-877f531806a5",
+            "0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+            "d497c9c6-b687-42ed-97df-d86d1529175b",
+            "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "75d76099-e075-4a32-aaa5-70c7635c5761",
+            "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+            "e7e47b07-8875-42cd-b4c4-877f531806a5",
+            "0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+            "a7bdbb72-bbcc-4194-877d-63d41f15177b",
+            "d497c9c6-b687-42ed-97df-d86d1529175b"
+          ],
+          "citedEvidenceSourceIDs": [
+            "75d76099-e075-4a32-aaa5-70c7635c5761",
+            "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+            "e7e47b07-8875-42cd-b4c4-877f531806a5",
+            "0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+            "a7bdbb72-bbcc-4194-877d-63d41f15177b",
+            "d497c9c6-b687-42ed-97df-d86d1529175b"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8796-5",
+            "research-permitext_discovered-id:9812-6",
+            "research-permitext_discovered-id:113-7",
+            "research-permitext_discovered-id:10189-8",
+            "research-permitext_cross_reference-id:8784-1",
+            "research-permitext_cross_reference-id:8785-2",
+            "research-permitext_cross_reference-id:8786-3"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:75d76099-e075-4a32-aaa5-70c7635c5761",
+              "label": "AC 28-102.4 — § 28-102.4 Existing buildings.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "75d76099-e075-4a32-aaa5-70c7635c5761"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+              "label": "AC 28-102.4.2 — § 28-102.4.2 Change in use or occupancy.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "f5bf9a2e-6aa6-4d95-954e-b461506ea816"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:e7e47b07-8875-42cd-b4c4-877f531806a5",
+              "label": "AC 28-102.4.2 — § 28-102.4.2 Change in use or occupancy.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e7e47b07-8875-42cd-b4c4-877f531806a5"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+              "label": "AC 28-102.4.2 — § 28-102.4.2 Change in use or occupancy.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:d497c9c6-b687-42ed-97df-d86d1529175b",
+              "label": "AC 28-118.3.1 — § 28-118.3.1 Change of occupancy or use.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "d497c9c6-b687-42ed-97df-d86d1529175b"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:a7bdbb72-bbcc-4194-877d-63d41f15177b",
+              "label": "AC 28-118.3.2 — § 28-118.3.2 Changes inconsistent with existing certificate of occupancy.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 6,
+          "coveredClaimCount": 6,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "75d76099-e075-4a32-aaa5-70c7635c5761",
+            "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+            "e7e47b07-8875-42cd-b4c4-877f531806a5",
+            "0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+            "a7bdbb72-bbcc-4194-877d-63d41f15177b",
+            "d497c9c6-b687-42ed-97df-d86d1529175b"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:75d76099-e075-4a32-aaa5-70c7635c5761",
+              "label": "AC 28-102.4 — § 28-102.4 Existing buildings.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "75d76099-e075-4a32-aaa5-70c7635c5761"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "75d76099-e075-4a32-aaa5-70c7635c5761"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "75d76099-e075-4a32-aaa5-70c7635c5761"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+                        "e7e47b07-8875-42cd-b4c4-877f531806a5",
+                        "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "75d76099-e075-4a32-aaa5-70c7635c5761"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "75d76099-e075-4a32-aaa5-70c7635c5761"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "d497c9c6-b687-42ed-97df-d86d1529175b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "75d76099-e075-4a32-aaa5-70c7635c5761"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+              "label": "AC 28-102.4.2 — § 28-102.4.2 Change in use or occupancy.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "f5bf9a2e-6aa6-4d95-954e-b461506ea816"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "f5bf9a2e-6aa6-4d95-954e-b461506ea816"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "75d76099-e075-4a32-aaa5-70c7635c5761"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f5bf9a2e-6aa6-4d95-954e-b461506ea816"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+                        "e7e47b07-8875-42cd-b4c4-877f531806a5",
+                        "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f5bf9a2e-6aa6-4d95-954e-b461506ea816"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "d497c9c6-b687-42ed-97df-d86d1529175b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f5bf9a2e-6aa6-4d95-954e-b461506ea816"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:e7e47b07-8875-42cd-b4c4-877f531806a5",
+              "label": "AC 28-102.4.2 — § 28-102.4.2 Change in use or occupancy.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e7e47b07-8875-42cd-b4c4-877f531806a5"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "e7e47b07-8875-42cd-b4c4-877f531806a5"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "75d76099-e075-4a32-aaa5-70c7635c5761"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "e7e47b07-8875-42cd-b4c4-877f531806a5"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+                        "e7e47b07-8875-42cd-b4c4-877f531806a5",
+                        "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "e7e47b07-8875-42cd-b4c4-877f531806a5"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "d497c9c6-b687-42ed-97df-d86d1529175b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "e7e47b07-8875-42cd-b4c4-877f531806a5"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+              "label": "AC 28-102.4.2 — § 28-102.4.2 Change in use or occupancy.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "75d76099-e075-4a32-aaa5-70c7635c5761"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+                        "e7e47b07-8875-42cd-b4c4-877f531806a5",
+                        "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "d497c9c6-b687-42ed-97df-d86d1529175b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:d497c9c6-b687-42ed-97df-d86d1529175b",
+              "label": "AC 28-118.3.1 — § 28-118.3.1 Change of occupancy or use.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 3,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "d497c9c6-b687-42ed-97df-d86d1529175b"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "d497c9c6-b687-42ed-97df-d86d1529175b"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 3,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "75d76099-e075-4a32-aaa5-70c7635c5761"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "d497c9c6-b687-42ed-97df-d86d1529175b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+                        "e7e47b07-8875-42cd-b4c4-877f531806a5",
+                        "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "d497c9c6-b687-42ed-97df-d86d1529175b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "d497c9c6-b687-42ed-97df-d86d1529175b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "d497c9c6-b687-42ed-97df-d86d1529175b"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:a7bdbb72-bbcc-4194-877d-63d41f15177b",
+              "label": "AC 28-118.3.2 — § 28-118.3.2 Changes inconsistent with existing certificate of occupancy.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "75d76099-e075-4a32-aaa5-70c7635c5761"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+                        "e7e47b07-8875-42cd-b4c4-877f531806a5",
+                        "0fc3fd1a-10e2-4327-b391-c9159e5040f2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "d497c9c6-b687-42ed-97df-d86d1529175b"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a7bdbb72-bbcc-4194-877d-63d41f15177b"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260827-authority-term-boundary-v17",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "citedSourceIDs": [
+            "75d76099-e075-4a32-aaa5-70c7635c5761",
+            "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+            "e7e47b07-8875-42cd-b4c4-877f531806a5",
+            "0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+            "a7bdbb72-bbcc-4194-877d-63d41f15177b",
+            "d497c9c6-b687-42ed-97df-d86d1529175b"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:8796-5",
+            "research-permitext_discovered-id:9812-6",
+            "research-permitext_discovered-id:113-7",
+            "research-permitext_discovered-id:10189-8",
+            "research-permitext_cross_reference-id:8784-1",
+            "research-permitext_cross_reference-id:8785-2",
+            "research-permitext_cross_reference-id:8786-3"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 6,
+            "citedProvisionCount": 4,
+            "governingCitationCount": 4,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 7,
+            "reviewedOnlyProvisionCount": 7,
+            "assembledSourceCount": 13,
+            "assembledProvisionCount": 11
+          },
+          "sources": [
+            {
+              "sourceID": "75d76099-e075-4a32-aaa5-70c7635c5761",
+              "sectionID": "8803",
+              "reference": "AC 28-102.4",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "The lawful use or occupancy of any existing building or structure, including the use of any service equipment therein, may be continued unless a retroactive change is specifically required by the provisions of this code or other applicable laws or rules."
+            },
+            {
+              "sourceID": "f5bf9a2e-6aa6-4d95-954e-b461506ea816",
+              "sectionID": "8805",
+              "reference": "AC 28-102.4.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Except as otherwise provided in sections 28-101.4.1 , 28-101.4.2 , 28-101.4.3 or 28-101.4.4 , changes in the use or occupancy of any building or structure made after July 1, 2008 shall comply with the provisions of this code."
+            },
+            {
+              "sourceID": "e7e47b07-8875-42cd-b4c4-877f531806a5",
+              "sectionID": "8805",
+              "reference": "AC 28-102.4.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Any changes made in the use or occupancy of a building or structure not in compliance with this code shall be prohibited and shall be a violation of this code."
+            },
+            {
+              "sourceID": "0fc3fd1a-10e2-4327-b391-c9159e5040f2",
+              "sectionID": "8805",
+              "reference": "AC 28-102.4.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "After a change in use or occupancy has been made in a building, the re-establishment of a prior use or occupancy that would not be lawful in a new building of the same construction class shall be prohibited unless and until all the applicable provisions of this code and other applicable laws and rules for such reestablished use or occupancy shall have been complied with."
+            },
+            {
+              "sourceID": "d497c9c6-b687-42ed-97df-d86d1529175b",
+              "sectionID": "9198",
+              "reference": "AC 28-118.3.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "No building, open lot or portion thereof hereafter altered so as to change from one occupancy group to another, or from one zoning use group to another, either in whole or in part, shall be occupied or used unless and until the commissioner has issued a certificate of occupancy certifying that the alteration work for which the permit was issued has been completed substantially in accordance with the approved construction documents and the provisions of this code and other applicable laws and rules for the new occupancy or use."
+            },
+            {
+              "sourceID": "a7bdbb72-bbcc-4194-877d-63d41f15177b",
+              "sectionID": "9199",
+              "reference": "AC 28-118.3.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "No change shall be made to a building, open lot or portion thereof inconsistent with the last issued certificate of occupancy or, where applicable, inconsistent with the last issued certificate of completion for such building or open lot or which would bring it under some special provision of this code or other applicable laws or rules, unless and until the commissioner has issued a new or amended certificate of occupancy."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8796-5",
+              "sectionID": "8796",
+              "reference": "AC 28-101.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ALTERATION. Any construction, addition, change of use or occupancy, or renovation to a building or structure in existence. COMMISSIONER. The commissioner of buildings of the city of New York, or his or her duly authorized representative. CONSTRUCTION DOCUMENTS. Plans and specifications and other written, graphic and pictorial documents, prepared or assembled for describing the design, location, physical characteristics, and other elements of the project necessary for obtaining a building permit. EXISTING BUILDING OR STRUCTURE. A completed building or structure that is in existence at the time of an applicable reference in this code. HEREAFTER. On or after July 1, 2008. OCCUPANCY. The purpose or activity for which a building or space is used or is designed, arranged or intended to be used. REQUIRED. Shall mean required by the provisions of this code. SERVICE EQUIPMENT. Equipment or systems, and all components thereof, that provide sanitation, power, light, heat, ventilation, air conditioning, refuse disposal, fire-fighting, transportation or other facilities for buildings."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9812-6",
+              "sectionID": "9812",
+              "reference": "AC 28-401.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-401.3 § 28-401.3 Definitions. As used in this chapter the following terms shall have the following meanings unless the context or subject matter requires otherwise. BOILER, HIGH-PRESSURE. An appliance for supplying steam or hot water that, for a steam boiler, operates at a pressure of more than 15 psig (103 kPa gauge), and for a hot water boiler, operates at a pressure exceeding 160 psig (1103 kPa gauge) or at a temperature exceeding 250°F (121°C). CERTIFICATE OF COMPETENCE. A certificate issued by the department to an individual representing that such individual has completed all requirements for the master plumber or master fire suppression piping contractor license but has not obtained a seal and that such certificate of competence has been renewed as required and is currently in effect. The certificate of competence shall bear the name of the holder and the certificate number. The holder of a certificate of competence is not a licensed master plumber or licensed master fire suppression piping contractor and may practice the trade for which the certificate is issued only under the direct and continuing supervision of a licensed master plumber or licensed master fire suppression piping contractor or, with respect to a city employee under the direct and continuing supervision of a supervising licensed master plumber or licensed master fire suppression piping contractor. CITY AGENCY. A city, county, borough, or other office, position, administration, department, division, bureau, board or commission, or a corporation, institution or agency of government, the expenses of which are paid, in whole or in part, from the city treasury. COMBINED STANDPIPE SYSTEM. A standpipe to which a sprinkler system is connected or is being connected. DIRECT AND CONTINUING SUPERVISION. Responsible control exercised by a licensed individual, either personally or through one or more, but no more than three, levels of competent supervision over individuals performing the actual work of the licensee's trade who are (i) in the direct employ of an individual who is a licensee, or (ii) in the direct employ of the city agency employing the licensee or (iii) in the direct employ of a business employing the licensee, as allowed by the department, or (iv) where the licensee uses his or her license on behalf of a business, in the direct employ of such business provided that such business is disclosed to the department pursuant to this chapter. Such control shall be evidenced by such licensee's signature, and seal where applicable, upon any required statements, applications and/or permits and by demonstrating involvement of the licensee in the operations of the business, including hiring of employees, responsibility for financial matters, and oversight of work performance. Direct and continuing supervision includes field inspection, supervision of job sites, and the maintenance of records of such supervision and such other requirements as the commissioner may prescribe by rule for a particular license type. DIRECT EMPLOY. An individual is in the direct employ of a licensee or business or a city agency when such individual is on the payroll of such licensee or business or city agency and under the usual common law rules applicable in determining the employer-employee relationship has the status of an employee. The work performed by such employee shall not exceed the class of license held by the licensee. Direct employment shall be evidenced by payroll records, such as social security payments, income tax withholding or the disbursement of other funds as required by law for the benefit of such employee, timekeeping records, such as time cards and sign-in sheets, work orders, and assignment or route logs. DIRECT SUPERVISION. Responsible control exercised by a licensed individual over individuals performing the actual work of the licensee's trade. Such control shall be evidenced by such licensee's signature, and seal where applicable, upon any required statements, applications and/or permits. Direct supervision includes field inspection, supervision of job sites, and the maintenance of records of such supervision and such other requirements as the commissioner may prescribe by rule for a particular license type. All work shall be performed under the guidance and direction of the licensed individual, or, for gas work, a person who holds a gas work qualification pursuant to article 423 , who shall be present at all times such trade work is conducted. ELECTRICAL WORK. The installation, alteration, maintenance, repair, or demolition of electric wires and wiring apparatus and other appliances used or to be used for the transmission of electricity for electric light, heat, power, signaling, communication, alarm, or data transmission (see also \"Minor electrical work\" as defined in section 28-101.5 ). ELEVATOR AGENCY. An approved agency authorized by the commissioner to perform elevator work and to inspect and test elevators, escalators and other conveying equipment regulated by this code. ELEVATOR AGENCY HELPER. An individual having required qualifications to perform elevator work, as defined in this chapter, under the direct and continuing supervision of an elevator agency director. ELEVATOR WORK. Alteration, assembly, installation, maintenance, repair, replacement and modernization work, as defined by ASME A17.1 as modified by appendix K of the New York city building code, performed on conveyances regulated by this code or other applicable laws or rules. Elevator work does not include material hoists, platform lifts, stair chair lifts, or personnel hoists. Outfitting, removal, refinishing, or replacement of interior finishes, including wall panels, drop ceilings, handrails and flooring, removal or replacement of interior lighting, recladding of doors, transoms and front return panels, finishing or ornamental work on elevator car operating panels shall not be considered elevator work. Operation of an elevator by any person employed as an operator of such elevator, including operation of an elevator operating under a temporary certificate of occupancy as issued by the department of buildings or such other issuing agency shall not be considered elevator work. EMPLOYEE. An individual who is on the payroll of an employer and who under the usual common law rules applicable in determining the employee-employer relationship has the status of an employee. Such term shall not include an independent contractor. FIRE SUPPRESSION PIPING SYSTEM. Any system including any and all equipment and materials in connection therewith, the purpose of which is to control, contain, suppress or extinguish fire and shall include: 1. The systems, materials and equipment described or referred to in this code which shall include any standpipe system to which a sprinkler system is or is now being connected; or 2. Up to 30 sprinkler heads off the domestic water in any one building; or 3. Any dry, liquid or gaseous chemical fire containment, suppression, control or extinguishing system or any other device or means of control, suppression, containment or extinguishing of fire. Fire suppression piping systems shall not include: 1. Any electrical components that must be installed by a licensed electrician pursuant to the New York city electrical code; or 2. Portable fire extinguishers; or 3. Connection to domestic water being used for sprinklers. FIRE SUPPRESSION PIPING WORK. The installation, maintenance, repair, modification, extension, or alteration or testing of a fire suppression piping system in any building in the city of New York. Fire suppression piping work shall not include plumbing work. GENERAL CONTRACTOR. An individual, corporation, partnership or other business entity that applies for a permit pursuant to this code to construct a new residential structure containing no more than three dwelling units. The term \"general contractor\" shall not be construed to include an individual, corporation, partnership or other business entity that holds a license pursuant to this code or subchapter twenty-two of chapter two of title twenty of the administrative code, and enters into a contract to perform work exclusively within the scope of such license, nor shall it include an individual who constructs a residential structure containing no more than three dwelling units for his or her own occupancy, or any subcontractors working for the general contractor. GOVERNMENT AGENCY. Any office, position, administration, department, division, bureau, board, commission, corporation, institution or agency under the control of any city, county, state or the federal government of the United States of America. LICENSE. A license, registration, certification or other evidence, issued by the department pursuant to this chapter, representing that an individual, a sole proprietorship, partnership, corporation, business association or other person meets the qualifications and requirements as set out in this chapter and in the rules of the department and is authorized to engage in the particular trade, occupation or business as indicated on the license and representing that such license, with associated seal, where applicable, has been renewed as required and is currently in effect. The license shall bear the holder's full name, the type of license, the license class, where applicable, the license number and any restrictions relating to the use of such license. Such term shall not include a certificate of competence. LICENSED MASTER ELECTRICIAN, MASTER ELECTRICIAN. An individual who has satisfied the requirements of this chapter for the master electrician license, who has been issued a license and seal, and who is authorized under the provisions of this chapter to perform electrical work in the city of New York. A master electrician licensee shall practice their trade in association with a master electrician business. LICENSED MASTER FIRE SUPPRESSION PIPING CONTRACTOR, MASTER FIRE SUPPRESSION PIPING CONTRACTOR. An individual who has satisfied the requirements of this chapter for the master fire suppression piping contractor license, who has been issued a license and seal, and who is authorized under the provisions of this chapter to perform fire suppression piping work in the city of New York, according to the classification of license held. A master fire suppression piping contractor licensee shall practice his or her trade in association with a master fire suppression piping contractor business or as an employee of a city agency. LICENSED MASTER PLUMBER, MASTER PLUMBER. An individual who has satisfied the requirements of this chapter for the master plumber license, who has been issued a license and seal, and who is authorized under the provisions of this chapter to perform plumbing work in the city of New York. A master plumber licensee shall practice his or her trade in association with a master plumber business or as an employee of a city agency. LICENSED SPECIAL ELECTRICIAN, SPECIAL ELECTRICIAN. An individual who has satisfied the requirements of this chapter for the special electrician license and has been issued a license and seal. A special electrician licensee shall be an employee of an individual, a partnership or a corporation owning, leasing, or managing a building, buildings, or parts thereof who has obtained written authorization from the commissioner, pursuant to this chapter, to perform electrical work in or on specific buildings, lots, or parts thereof owned, leased, or managed by such individual, corporation, or partnership. LOW VOLTAGE ELECTRICAL WORK. Refer to section 28-101.5 . MASTER ELECTRICIAN BUSINESS. A sole proprietorship, partnership, or corporation authorized by the commissioner to engage in or carry on, as an independent contractor and as its regular business, the business of performing electrical work in or on any building, premises, or lot in the city under a license issued to a master electrician. PLUMBING WORK. The installation, ma"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-7",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "202 SECTION 202: Definitions 24-HOUR BASIS. The actual time that a person is an occupant within a facility for the purpose of receiving care. It shall not include a facility that is open for 24 hours and is capable of providing care to someone visiting the facility during any segment of the 24 hours. 100-HOUR TRAINING PROGRAM. A program that (i) includes 100 or more hours of training in technical subjects relating to a construction trade, including an apprenticeship program registered with the New York State Department of Labor, (ii) is approved by OSHA, the United States Department of Labor, the New York State Department of Education or the New York State Department of Labor and (iii) provides training that the department determines is equivalent to or exceeds the training required to comply with Section 3321 . 500-YEAR FLOOD ELEVATION. The elevation of the flood having a 0.2 percent chance of being equaled or exceeded in any given year, as specified on FEMA FIRM 360497 or FEMA FIS 360497. AAC MASONRY. Masonry made of autoclaved aerated concrete (AAC) units, manufactured without internal reinforcement and bonded together using thin- or thick-bed mortar. ACCESSIBLE. A site, building, facility or portion thereof that complies with Chapter 11 . ACCESSIBLE MEANS OF EGRESS. A continuous and unobstructed way of egress travel from any accessible point in a building or facility to a public way. Such way of egress travel may include an assisted rescue path. ACCESSIBLE ROUTE. A continuous, unobstructed path that complies with Chapter 11 . ACCESSIBLE UNIT. A dwelling unit or sleeping unit that complies with this code and the provisions for Accessible units in ICC A117.1. ACCREDITATION BODY. An approved, third-party organization that is independent of the grading and inspection agencies, and the lumber mills, and that initially accredits and subsequently monitors, on a continuing basis, the competency and performance of a grading or inspection agency related to carrying out specific tasks. ACTIVELY PROCTORED ONLINE TRAINING. Online training that satisfies each of the following conditions: 1. The person responsible for conducting such training confirms the identification of the person taking such training in a manner established by the department. 2. While such training is being conducted, the site of such training is actively observed by or on behalf of the person responsible for conducting such training. 3. Such training complies with any other requirements the department establishes by rule. ADHERED MASONRY VENEER. Veneer secured and supported through the adhesion of an approved bonding material applied to an approved backing. ADJUSTMENT (SCAFFOLD). The calibration or modification of a scaffold, including any part or component, that does not meet the definition of installation, removal, repair, maintenance, or use, and does not constitute normal use or operation of the scaffold. AEROSOL. A product that is dispensed from an aerosol container by a propellant, classified as follows: Level 1. Aerosol products with a total chemical heat of combustion that is greater than 0 and less than or equal to 8,600 British thermal units per pound (Btu/lb) (20 kJ/g). Level 2. Aerosol products with a total chemical heat of combustion that is greater than 8,600 Btu/lb (20 kJ/g), but less than or equal to 13,000 Btu/lb (30 kJ/g). Level 3. Aerosol products with a total chemical heat combustion that is greater than 13,000 Btu/lb (30 kJ/g). AGGREGATE. In roofing, crushed stone, crushed slag or water-worn gravel used for surfacing for roof coverings. AGRICULTURAL, BUILDING. A structure designed and constructed to house farm implements, hay, grain, poultry, livestock or other horticultural products. This structure shall not be a place of human habitation or a place of employment where agricultural products are processed, treated or packaged, nor shall it be a place used by the public. AIR-INFLATED STRUCTURE. A structure that uses air-pressurized membrane beams, arches or other elements to enclose space. Occupants of such a structure do not occupy the pressurized area used to support the structure. AIR-SUPPORTED STRUCTURE. A building wherein the shape of the structure is attained and maintained by elevated air pressure and occupants of the structure are within the elevated pressure area. Air-supported structures are of two basic types: Double skin. Similar to a single skin, but with an attached liner that is separated from the outer skin and provides an airspace which serves for insulation, acoustic, aesthetic or similar purposes. Single skin. Where there is only the single outer skin and the air pressure is directly against that skin. AISLE. An unenclosed exit access component that defines and provides a path of egress travel. AISLE ACCESSWAY. That portion of an exit that leads to an aisle. ALARM NOTIFICATION APPLIANCE. A fire alarm system component such as a bell, horn, speaker, light or text display that provides audible, tactile or visible outputs, or any combination thereof. ALARM SIGNAL. A signal indicating an emergency requiring immediate action, such as a signal indicative of fire. ALARM VERIFICATION FEATURE. A feature of automatic fire detection and alarm systems to reduce unwanted alarms wherein smoke detectors report alarm conditions for a minimum period of time, or confirm alarm conditions within a given time period, after being automatically reset, in order to be accepted as a valid alarm-initiation signal. ALLOWABLE STRESS DESIGN. A method of proportioning structural members, such that elastically computed stresses produced in the members by nominal loads do not exceed specified allowable stresses (also called \"working stress design\"). ALTERNATE LOAD PATH. A secondary or redundant load path capable of transferring the load from one structural element to other structural elements. ALTERNATE LOAD PATH METHOD. A design approach that accounts for an extreme event by providing alternate load paths for elements that are no longer able to carry load. In an alternate load path design, key elements are considered notionally removed, one at a time, and the structure is designed to transfer the loads from the removed element to other structural elements, as required by Section 1617 . ALTERNATING TREAD DEVICE. A device that has a series of steps between 50 and 70 degrees (0.87 and 1.22 rad) from horizontal, usually attached to a center support rail in an alternating manner so that the user does not have both feet on the same level at the same time. AMBULATORY CARE FACILITY. Buildings or portions thereof used to provide medical, surgical, psychiatric, nursing or similar care on a less than 24-hour basis to individuals who are rendered incapable of self-preservation by the services provided. ANCHOR BUILDING. An exterior perimeter building of a group other than H having direct access to a covered mall building but having required means of egress independent of the mall. ANCHORED MASONRY VENEER. Veneer secured and supported through the adhesion of an approved bonding material applied to an approved backing. ANIMAL SERVICE FACILITY. The following facilities where animals are sheltered on a 24-hour basis: animal hospitals, kennels, pounds, veterinary clinics and pet shops. ANNULAR SPACE. The opening around the penetrating item. ANNUNCIATOR. A unit containing one or more indicator lamps, alphanumeric displays or other equivalent means in which each indication provides status information about a circuit, condition or location. APARTMENT. A dwelling unit providing permanent provisions for both sanitation and kitchen facilities, occupied or arranged to be occupied by not more than one family maintaining a common household. APARTMENT, STUDENT. An apartment occupied or arranged to be occupied by students enrolled at a single accredited college or university and maintaining a common household pursuant to a lease, sublease, or occupancy agreement directly with such college or university. ARCHITECTURAL TERRA COTTA. Plain or ornamental hard-burned modified clay units, larger in size than brick, with glazed or unglazed ceramic finish. AREA (Masonry). Gross cross-sectional. The area delineated by the out-to-out specified dimensions of masonry in the plane under consideration. Net cross-sectional. The area of masonry units, grout and mortar crossed by the plane under consideration based on out-to-out specified dimensions. AREA, BUILDING. The area included within surrounding exterior walls (or exterior walls and firewalls) exclusive of vent shafts and courts. Areas of the building not provided with surrounding walls shall be included in the building area if such areas are included within the horizontal projection of the roof or floor above. AREA OF RESCUE ASSISTANCE. An area where persons unable to use stairways can remain temporarily to await instructions or assistance during emergency evacuation. AREA OF SPORT ACTIVITY. That portion of an indoor or outdoor space where the play or practice of a sport occurs. AREAWAY. A space below grade adjacent to a building open to the outer air and enclosed by walls. ARTICULATING BOOM CRANE. A crane whose boom consists of a series of folding, pin connected structural members, typically manipulated to extend or retract by power from hydraulic cylinders. ASPECT RATIO. The height of any portion of a building divided by its least dimension at the elevation from which the height is being measured. ASPHALT. A dark brown to black bitumen pitch that melts readily and which appears in nature in asphalt beds or is produced as a by-product of the petroleum industry. ASPHALT CONCRETE or ASPHALT PAVING. A mixture of liquid asphalt and graded aggregate used as a paving material. ASSEMBLY SPACE. Any part of a place of assembly, exclusive of the stage, that is occupied by numbers of persons during the major period of occupancy. Every tier of seating shall be considered a separate assembly space. ASSISTED RESCUE PATH. A portion of the accessible means of egress which begins at the area of rescue assistance and terminates at the public way. ATRIUM. An opening connecting two or more stories other than enclosed stairways, elevators, hoistways, escalators, plumbing, electrical, air-conditioning or any other vertical openings that are not required to be enclosed by other provisions of this code, which is closed at the top and not defined as a mall. Stories, as used in this definition, do not include balconies within assembly groups or mezzanines that comply with Section 505 . ATTIC. The space between the ceiling beams of the top story and the roof rafters. AUDIBLE ALARM NOTIFICATION APPLIANCE. A notification appliance that alerts by the sense of hearing. AUGERED-CAST-IN-PLACE PILES. Augered-cast-in-place piles are constructed by pumping grout into an augered hole during the withdrawal of the auger. The pile is reinforced with a single reinforcing bar, a reinforcing steel cage or a structural steel section. AUTOCLAVED AERATED CONCRETE (AAC). Low-density cementitious product of calcium silicate hydrates, whose material specifications are defined in ASTM C 1386. AUTOMATIC. As applied to fire protection devices, a device or system providing an emergency function without the necessity for human intervention and activated as a result of a predetermined temperature rise, rate of temperature rise and/or the presence of combustion products. AUTOMATIC FIRE-EXTINGUISHING SYSTEM. An approved system of devices and equipment that automatically detects a fire and discharges an approved fire-extinguishing agent onto or in the area of a fire. AUTOMATIC SMOKE DETECTION SYSTEM. A fire alarm system that has initiation devices that utilize smoke detectors for protection of an area such as a room or space with detectors to provide early warning of fire. AUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is heated to its thermal rating or above, allowing w"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10189-8",
+              "sectionID": "10189",
+              "reference": "AC 28-507.6.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-507.6.1 § 28-507.6.1 Issuance of an amended or partial certificate of occupancy. A partial or amended certificate of occupancy shall be issued subject to the following conditions: 1. Upon inspection, the apartment being created or altered (i) conforms substantially to the approved construction documents, complies with this code and other applicable laws, except as specifically provided in this article, and is safe for occupancy, or (ii) the department upon an inspection certifies that waiver of otherwise applicable requirements is appropriate because such apartment provides for the health and safety of all occupants of such dwelling by alternative means that are no less stringent than the requirements of this article. 2. Upon inspection, the required means of egress from all floors of the building comply with this code and other applicable laws. 3. A partial or amended certificate of occupancy or a temporary certificate of occupancy may be issued where there are open pre-existing violations in the building. All such open violations, including those specified in the exceptions below, shall remain administratively open and the department may thereafter continue to enforce against such violations until, in accordance with applicable provisions of this code, outstanding penalties are paid and, if applicable, certificates of correction are approved by the department. Exceptions: 1. Where a pre-existing violation in parts of the building outside of the new or altered apartment is classified as \"immediately hazardous,\" the condition that gave rise to the issuance of such immediately hazardous violation must be removed or remedied in accordance with the New York city construction codes and to the satisfaction of the commissioner of buildings, and evidence of such removal or remediation in the form of plans, drawings, photos, affidavits, or a combination thereof, with the signature and seal of a registered design professional or, if applicable, a licensee of the department in the applicable trade, must be submitted to the department prior to the issuance of such amended or partial certificate of occupancy or a temporary certificate of occupancy. 2. Any condition that gave rise to a pre-existing violation in the new or altered apartment must be removed or remedied by work performed under permits issued pursuant to this article. 3. Notwithstanding any inconsistent provision of this code, including sections 28-118.14 and 28-219.1 , a certificate of occupancy or a temporary certificate of occupancy may be issued for a basement or cellar apartment created or altered pursuant to this article where there are outstanding fines and civil penalties for pre-existing violations, provided that such fines and civil penalties may remain due and owing, and the department may thereafter enforce and collect such amounts in accordance with this code, unless such department determines that such fines and civil penalties should be waived in the interest of the program. When determining whether to waive such fines and civil penalties, the department may consider factors including the number and pecuniary amount of fines and civil penalties owed, the financial need of the owner, and the likely effect of such fines and civil penalties on compliance with this code. (L.L. 2024/126, 12/18/2024, eff. 6/16/2025)"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8784-1",
+              "sectionID": "8784",
+              "reference": "AC 28-101.4.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.1 § 28-101.4.1 Permit issued or work commenced prior to July 1, 2008. If a permit for work was issued prior to July 1, 2008 or, if no permit was necessary, work was commenced prior to July 1, 2008, all of the provisions of chapter 1 of title 27 of the administrative code as heretofore in effect shall apply to such work."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8785-2",
+              "sectionID": "8785",
+              "reference": "AC 28-101.4.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.2 § 28-101.4.2 Applications for construction document approval submitted prior to and within twelve months after July 1, 2008. Any work for which an application for construction document approval was submitted to the department prior to July 1, 2008 and not thereafter abandoned, or for which an application for construction document approval is submitted to the department within a period of twelve months after such date may, at the option of the owner, be performed in its entirety in accordance with the provisions of this code, or in accordance with the 1968 building code, provided that such work is commenced within twelve months after the date of issuance of a permit therefor and is diligently carried on to completion. The commissioner may, for good cause, extend the time period for commencement of the work beyond 12 months. Where the owner elects to perform the work in compliance with the 1968 building code, the following conditions shall apply: 1. Except as otherwise limited by the commissioner, administration and enforcement of the 1968 building code shall be in accordance with this code, including but not limited to approval of construction documents, issuance of permits and certificates of occupancy, tests and inspections, penalties and enforcement. Controlled inspections and semi-controlled inspections as referenced in the 1968 building code shall be deemed to be special inspections and shall comply with the provisions of this code relating to special inspections. Materials regulated in their use by the 1968 building code shall be subject to applicable provisions of this code. 2. Safety of public and property during construction operations including demolition shall be governed by chapter 33 of the New York city building code. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8786-3",
+              "sectionID": "8786",
+              "reference": "AC 28-101.4.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.3 § 28-101.4.3 Optional use of the 1968 building code for work on prior code buildings. Exceptions: 1. Fuel gas, plumbing, electrical, and mechanical work. The installation of and work on all appliances, equipment and systems regulated by the New York city fuel gas code, the New York city plumbing code, the New York city electrical code, and the New York city mechanical code shall be governed by applicable provisions of those codes relating to new and existing installations. 2. Fire protection systems. Alterations of buildings and changes of use or occupancy shall be governed by chapter 9 of the New York city building code, subject to special provisions for prior code buildings as set forth therein. 3. Elevators, conveyors and amusement rides. The installation of and work on elevators, conveyors, and amusement rides shall be governed by chapter 30 and appendix K of the New York city building code and the rules of the department, subject to special provisions for prior code buildings as set forth therein. 4. Safety during construction operations. Safety of public and property during construction operations including demolition shall be governed by chapter 33 of the New York city building code. 5. Accessibility. Alterations, including minor alterations, of buildings and changes of use or occupancy, shall be governed by chapter 11 of the New York city building code, subject to special provisions for prior code buildings as set forth therein. 6. Encroachments into the public right of way. Encroachments onto the public right of way shall be governed by chapter 32 of the New York city building code. 7. Administration and enforcement. Except as otherwise limited by the commissioner, administration and enforcement of the 1968 building code shall be in accordance with this code, including but not limited to approval of construction documents, issuance of permits and certificates of occupancy, tests and inspections, penalties and enforcement. 8. Special inspections. Controlled inspections and semi-controlled inspections as referenced in the 1968 building code shall be deemed to be special inspections and shall be governed by the provisions of this code relating to special inspections. 9. Materials. Materials regulated in their use by the 1968 building code shall be subject to applicable provisions of this code. 10. Security grilles. The installation and replacement of security grilles shall comply with section 1010.1.4.4 of the New York city building code. 11. Energy efficiency. All work related to energy efficiency shall be regulated by the New York city energy conservation code. 12. Roof recovering and replacements. 12.1 Installation and materials. Work involving the recovering or replacing of an existing roof covering shall be governed by sections 1511.1 through 1511.7 of the New York city building code; 12.2 Cool roofs. Work involving the recovering or replacing of an existing roof covering shall comply with section 1504.9 of the New York city building code unless the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46 m 2 ). 12.3 Green roofs. Notwithstanding the applicant's election to use the 1968 building code or prior code, work involving green roof systems and container gardens shall be permitted to be performed pursuant to Chapter 15 of the New York city building code. 12.4 Sustainable roofs. Work involving the replacing of an entire existing roof deck or roof assembly shall comply with section 1512.2 of the New York city building code. 13. Handrails. Where the alteration of a building includes the addition or replacement of an entire stair enclosure including the stairs, handrails shall comply with section 1011.11 and section 1014 of the New York city building code. Where the alteration of a building includes the addition or replacement of ramps, handrails shall comply with section 1012.8 and section 1014 of such code. 14. Guards. Where the alteration or repair of a building involves the addition or replacement of guards, such guards shall comply with sections 1015 and 1607.8 of the New York city building code. 15. Flood hazard areas. Within flood hazard areas in accordance with section 28-104.9.4 , all work for any activity regulated by Appendix G of the New York city building code shall be governed by such appendix. 16. Structural. The use of load resistance factor design (LRFD), calculation of live loads, and applicability of seismic and wind loads shall be governed by special provisions for prior code buildings as set forth in section 1601.2 of the New York city building code. 17. Emergency and standby power systems. The installation of and work on emergency and standby power systems shall comply with section 2702.1 of the New York city building code. 18. Parking garages and open parking lots. Parking garages and open parking lots shall comply with section 406.4.10 or 406.9.8 of the New York city building code, as applicable. 19. Mold protection. Alterations shall comply with sections 2506 and 2509 of the New York city building code relating to areas subject to moisture or water damage. 20. Where the alteration of a building includes the replacement of all exterior glazing, such alteration shall comply with section 1403.8 of the New York city building code. (Am. L.L. 2019/094, 5/19/2019, eff. 11/15/2019; Am. L.L. 2020/015, 1/10/2020, eff. 1/10/2021; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022; Am. L.L. 2024/055, 4/6/2024, eff. 12/21/2025; Am. L.L. 2024/128, 12/21/2024, eff. 12/21/2025) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2011/021 , L.L. 2013/130 , L.L. 2014/013 , L.L. 2020/015 , L.L. 2021/126 , L.L. 2024/055 , and L.L. 2024/128 ."
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?\nProject facts: Proposal: Resume the former storage occupancy without a new filing or amended certificate of occupancy; Owner Position: The former occupancy may resume automatically because it was lawful before the current code; Former Occupancy: Storage occupancy represented by the owner as lawful before July 1, 2008; Unknowns: whether the former occupancy would be lawful in a new building of the same construction class; Current Occupancy: Office occupancy established under a certificate of occupancy issued after July 1, 2008; Unknowns: former and current occupancy-group classifications; Unknowns: former and current zoning use groups; Unknowns: current certificate of occupancy and approved construction documents; Building: Existing prior-code commercial building; Unknowns: applicable current-code and other legal requirements; Unknowns: scope of any alteration work",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-102.4",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-102.4"
+                },
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-102.4.2",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-102.4.2"
+                },
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-118.3.1",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-118.3.1"
+                },
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-118.3.2",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-118.3.2"
+                }
+              ]
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-102.4",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-102.4"
+                },
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-102.4.2",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-102.4.2"
+                },
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-118.3.1",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-118.3.1"
+                },
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-118.3.2",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-118.3.2"
+                }
+              ]
+            },
+            "nextCurrentTopic": {
+              "text": "A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-102.4",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-102.4"
+                },
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-102.4.2",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-102.4.2"
+                },
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-118.3.1",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-118.3.1"
+                },
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-118.3.2",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-118.3.2"
+                }
+              ]
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 6,
+            "candidateCount": 12,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 3,
+            "characterCount": 42834,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "outside-current-library",
+              "text": "The current candidate set does not establish requirements controlled by the outside authorities identified below."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [
+              {
+                "kind": "outside-current-library",
+                "label": "NYC Zoning Resolution Research",
+                "sourceName": "NYC Zoning Resolution",
+                "sourceURL": "https://zr.planning.nyc.gov/",
+                "text": "NYC Zoning Resolution Research may require authoritative material outside the corpora routed for this Research turn."
+              }
+            ],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260827-supporting-web-v9",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-7f437fdd-c85b-4e33-a06d-d15d6bb2133a",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T22:43:43.223Z"
+          },
+          "webSupportRequested": true,
+          "webSupportReasons": [
+            "outside_library_support_needed"
+          ],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": true,
+          "webQuery": "A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?",
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 2,
+          "regenerated": true,
+          "history": [
+            {
+              "pass": false,
+              "issues": [
+                {
+                  "type": "wrong_attribution",
+                  "detail": "Move every web-derived statement out of supportedPoints, including paraphrases that omit the words bulletin, guidance, or BB. supportedPoints and enacted citations may state only rules established by assembled enacted text. Select each noncontrolling web statement in supportingSourceUses using its exact WEB_SOURCE_ID and WEB_CLAIM_ID pair, and label it as guidance in answerText."
+                }
+              ],
+              "model": "permitext-deterministic-answer-quality-gate"
+            },
+            {
+              "pass": true,
+              "issues": [],
+              "model": "permitext-deterministic-post-repair-acceptance"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T22:43:43.223Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v3",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "outside_library_support",
+            "large_evidence_package",
+            "multiple_required_claims",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 2,
+          "verificationIssueTypes": [
+            "wrong_attribution"
+          ]
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 53613,
+          "cachedInputTokens": 8390,
+          "outputTokens": 4110,
+          "totalTokens": 57723
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.118086,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "c10fcffa-62da-41e4-a475-b883b3018408",
+        "createdAt": "2026-08-27T22:43:43.219Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-luna",
+          "gpt-5.6-terra"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v3",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 2,
+        "verificationIssueTypes": [
+          "wrong_attribution"
+        ],
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 53613,
+        "cachedInputTokens": 8390,
+        "outputTokens": 4110,
+        "totalTokens": 57723,
+        "estimatedCostUSD": 0.118086,
+        "actualProviderCostUSD": 0.118085,
+        "conservativeProviderCostUSD": 0.118085,
+        "durationMilliseconds": 43124,
+        "failureCode": null,
+        "webSupportRequested": true,
+        "webSupportSearched": true,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T22:44:40.952Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 14051,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 5664,
+              "cachedInputTokens": 0,
+              "outputTokens": 1653,
+              "totalTokens": 7317
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 5664,
+          "cachedInputTokens": 0,
+          "outputTokens": 1653,
+          "totalTokens": 7317
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "Each required citation is present and accurately tied to the claim it supports. AC 28-102.4 is limited to continuation; AC 28-102.4.2 is used for post-2008 compliance, noncompliance, and re-establishment; AC 28-118.3.1 is properly conditional on alteration changing an occupancy or zoning-use group; and AC 28-118.3.2 supports the last-certificate inconsistency rule.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent a categorical approval, classification change, construction-class result, or certificate outcome. It frames all project-dependent determinations conditionally and identifies the supporting facts needed.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer appropriately rejects automatic resumption while preserving the conditional nature of the certificate, classification, construction-class, compliance, and alteration-work determinations.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer expressly states that the supplied evidence does not establish project-specific classifications, construction class, certificate and approved-document terms, substantive requirements, or cross-referenced exceptions, and it specifies additional evidence needed.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a clear legal conclusion and a usable verification sequence: review the last-issued certificate and approved documents, classifications, construction class, comparable-new-building legality, applicable requirements, and proposed work.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The response directly answers that the former occupancy cannot resume automatically and states what must be established before a lawful determination can be made.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer distinguishes protected continuation of a lawful existing use from re-establishment of a prior use after an intervening office occupancy change.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It states that post-July 1, 2008 changes in use or occupancy must comply with the Code, subject to the stated cross-referenced exceptions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It expressly states that a noncomplying change is prohibited and is a violation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It accurately states the condition for re-establishing a prior occupancy that would not be lawful in a new building of the same construction class: compliance with all applicable Code provisions and other laws and rules first.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It identifies that, if alteration work changes an occupancy group or zoning use group, a certificate of occupancy is required before occupancy or use.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It states that a new or amended certificate is required before a change inconsistent with the last-issued certificate of occupancy, or applicable certificate of completion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It calls for verification of classifications, zoning use groups, construction class, last-issued certificate, approved documents, applicable requirements, and alteration-work scope.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects automatic revival based solely on former lawfulness.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The intervening office occupancy is treated as material because it makes the request one for re-establishment rather than mere continuation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer states that post-2008 changes generally must comply with the Code and that noncomplying changes are prohibited.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "The answer states that certificate action may be required where the proposed storage use is inconsistent with the last-issued certificate.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It does not assume a group change; it conditions the AC 28-118.3.1 rule on alteration work changing an occupancy group or zoning use group and requires the classifications to be established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It does not conclude storage would be unlawful in a comparable new building; it makes that result conditional and calls for verification of construction class and applicable requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "The answer does not characterize the proposed storage occupancy as approved or compliant on the stated facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies the need to verify the owner's representation of lawful pre-July 1, 2008 storage from records.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "It requires the former and proposed occupancy-group classifications to be established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It requires the former and proposed zoning use groups to be established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It identifies the building construction class as necessary to the comparable-new-building analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It calls for the authorized terms of the last-issued certificate and the approved documents, and separately identifies certificate, approved-document, and permit-history records as needed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It specifically requires determining whether storage would be lawful in a new building of the same construction class.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "It calls for identification of applicable Code provisions and other applicable laws and rules for the particular storage activity.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-8",
+              "rationale": "It identifies the scope of proposed or required alteration work as a fact to establish.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.031164,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 4,
+            "canonicalCount": 4,
+            "selectedEvidenceCount": 4,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 43129,
+            "inputTokens": 53613,
+            "cachedInputTokens": 8390,
+            "outputTokens": 4110,
+            "totalTokens": 57723,
+            "estimatedCostUSD": 0.118086,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "Each required citation is present and accurately tied to the claim it supports. AC 28-102.4 is limited to continuation; AC 28-102.4.2 is used for post-2008 compliance, noncompliance, and re-establishment; AC 28-118.3.1 is properly conditional on alteration changing an occupancy or zoning-use group; and AC 28-118.3.2 supports the last-certificate inconsistency rule.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "7/7 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer does not invent a categorical approval, classification change, construction-class result, or certificate outcome. It frames all project-dependent determinations conditionally and identifies the supporting facts needed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/7 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer appropriately rejects automatic resumption while preserving the conditional nature of the certificate, classification, construction-class, compliance, and alteration-work determinations.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "8/8 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "The answer expressly states that the supplied evidence does not establish project-specific classifications, construction class, certificate and approved-document terms, substantive requirements, or cross-referenced exceptions, and it specifies additional evidence needed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "It gives a clear legal conclusion and a usable verification sequence: review the last-issued certificate and approved documents, classifications, construction class, comparable-new-building legality, applicable requirements, and proposed work.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "The response directly answers that the former occupancy cannot resume automatically and states what must be established before a lawful determination can be made.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer distinguishes protected continuation of a lawful existing use from re-establishment of a prior use after an intervening office occupancy change.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "It states that post-July 1, 2008 changes in use or occupancy must comply with the Code, subject to the stated cross-referenced exceptions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "It expressly states that a noncomplying change is prohibited and is a violation.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "It accurately states the condition for re-establishing a prior occupancy that would not be lawful in a new building of the same construction class: compliance with all applicable Code provisions and other laws and rules first.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "It identifies that, if alteration work changes an occupancy group or zoning use group, a certificate of occupancy is required before occupancy or use.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "It states that a new or amended certificate is required before a change inconsistent with the last-issued certificate of occupancy, or applicable certificate of completion.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-7",
+                "rationale": "It calls for verification of classifications, zoning use groups, construction class, last-issued certificate, approved documents, applicable requirements, and alteration-work scope.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer expressly rejects automatic revival based solely on former lawfulness.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "The intervening office occupancy is treated as material because it makes the request one for re-establishment rather than mere continuation.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "The answer states that post-2008 changes generally must comply with the Code and that noncomplying changes are prohibited.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "The answer states that certificate action may be required where the proposed storage use is inconsistent with the last-issued certificate.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-5",
+                "rationale": "It does not assume a group change; it conditions the AC 28-118.3.1 rule on alteration work changing an occupancy group or zoning use group and requires the classifications to be established.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-6",
+                "rationale": "It does not conclude storage would be unlawful in a comparable new building; it makes that result conditional and calls for verification of construction class and applicable requirements.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-7",
+                "rationale": "The answer does not characterize the proposed storage occupancy as approved or compliant on the stated facts.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The answer identifies the need to verify the owner's representation of lawful pre-July 1, 2008 storage from records.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "It requires the former and proposed occupancy-group classifications to be established.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "It requires the former and proposed zoning use groups to be established.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "It identifies the building construction class as necessary to the comparable-new-building analysis.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-5",
+                "rationale": "It calls for the authorized terms of the last-issued certificate and the approved documents, and separately identifies certificate, approved-document, and permit-history records as needed.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-6",
+                "rationale": "It specifically requires determining whether storage would be lawful in a new building of the same construction class.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-7",
+                "rationale": "It calls for identification of applicable Code provisions and other applicable laws and rules for the particular storage activity.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-8",
+                "rationale": "It identifies the scope of proposed or required alteration work as a fact to establish.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "4/4 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. Each required citation is present and accurately tied to the claim it supports. AC 28-102.4 is limited to continuation; AC 28-102.4.2 is used for post-2008 compliance, noncompliance, and re-establishment; AC 28-118.3.1 is properly conditional on alteration changing an occupancy or zoning-use group; and AC 28-118.3.2 supports the last-certificate inconsistency rule.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 4 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "7/7 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent a categorical approval, classification change, construction-class result, or certificate outcome. It frames all project-dependent determinations conditionally and identifies the supporting facts needed.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer appropriately rejects automatic resumption while preserving the conditional nature of the certificate, classification, construction-class, compliance, and alteration-work determinations.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "8/8 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer expressly states that the supplied evidence does not establish project-specific classifications, construction class, certificate and approved-document terms, substantive requirements, or cross-referenced exceptions, and it specifies additional evidence needed.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a clear legal conclusion and a usable verification sequence: review the last-issued certificate and approved documents, classifications, construction class, comparable-new-building legality, applicable requirements, and proposed work.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The response directly answers that the former occupancy cannot resume automatically and states what must be established before a lawful determination can be made.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer distinguishes protected continuation of a lawful existing use from re-establishment of a prior use after an intervening office occupancy change.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It states that post-July 1, 2008 changes in use or occupancy must comply with the Code, subject to the stated cross-referenced exceptions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It expressly states that a noncomplying change is prohibited and is a violation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It accurately states the condition for re-establishing a prior occupancy that would not be lawful in a new building of the same construction class: compliance with all applicable Code provisions and other laws and rules first.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It identifies that, if alteration work changes an occupancy group or zoning use group, a certificate of occupancy is required before occupancy or use.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It states that a new or amended certificate is required before a change inconsistent with the last-issued certificate of occupancy, or applicable certificate of completion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It calls for verification of classifications, zoning use groups, construction class, last-issued certificate, approved documents, applicable requirements, and alteration-work scope.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects automatic revival based solely on former lawfulness.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The intervening office occupancy is treated as material because it makes the request one for re-establishment rather than mere continuation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer states that post-2008 changes generally must comply with the Code and that noncomplying changes are prohibited.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "The answer states that certificate action may be required where the proposed storage use is inconsistent with the last-issued certificate.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It does not assume a group change; it conditions the AC 28-118.3.1 rule on alteration work changing an occupancy group or zoning use group and requires the classifications to be established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It does not conclude storage would be unlawful in a comparable new building; it makes that result conditional and calls for verification of construction class and applicable requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "The answer does not characterize the proposed storage occupancy as approved or compliant on the stated facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies the need to verify the owner's representation of lawful pre-July 1, 2008 storage from records.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "It requires the former and proposed occupancy-group classifications to be established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It requires the former and proposed zoning use groups to be established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It identifies the building construction class as necessary to the comparable-new-building analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It calls for the authorized terms of the last-issued certificate and the approved documents, and separately identifies certificate, approved-document, and permit-history records as needed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It specifically requires determining whether storage would be lawful in a new building of the same construction class.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "It calls for identification of applicable Code provisions and other applicable laws and rules for the particular storage activity.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-8",
+              "rationale": "It identifies the scope of proposed or required alteration work as a fact to establish.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

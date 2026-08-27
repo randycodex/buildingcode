@@ -1,0 +1,2031 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T22:38:20.542Z",
+  "updatedAt": "2026-08-27T22:38:57.984Z",
+  "configuration": {
+    "runID": "c4586708-a622-4083-8364-55c878fc7b04",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-project-fact-verification-v30",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "residential-multipurpose-occupancy"
+    ],
+    "caseStatuses": [
+      "approved"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "5439fcf1dca83265954186a0f47bd6ec173d94a3",
+    "approvedSpendCapUSD": 0.75,
+    "conservativeReservedUSD": 0.087538,
+    "actualUSD": 0.087538,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 4
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T22:38:57.856Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.06493,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.06493,
+        "p50": 0.06493,
+        "p90": 0.06493,
+        "maximum": 0.06493
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.06493,
+      "projectedCostPer100TurnsUSD": 6.49,
+      "targetReady": false,
+      "targetBand": "above"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 22577,
+      "p50": 22577,
+      "p90": 22577,
+      "maximum": 22577
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 1,
+      "verificationRevisionRate": 1,
+      "providerRequests": {
+        "count": 1,
+        "mean": 3,
+        "p50": 3,
+        "p90": 3,
+        "maximum": 3
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": [
+        {
+          "key": "missed_material_conclusion",
+          "count": 1
+        }
+      ]
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "residential-multipurpose-occupancy",
+        "title": "Occupancy classification of a residential multipurpose room",
+        "status": "approved",
+        "difficulty": "intermediate",
+        "topics": [
+          "occupancy classification",
+          "occupant load",
+          "accessory use",
+          "multipurpose room"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "buildingUse": "Apartment building",
+          "roomAreaNetSquareFeet": 900,
+          "typicalArrangement": "Tables and chairs",
+          "users": "Residents only"
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "132",
+            "reference": "BC 303.1.3",
+            "codePrefix": "BC",
+            "sectionNumber": "303.1.3",
+            "exactPassages": [
+              "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+            ],
+            "resolvedTitle": "303.1.3 Accessory assembly spaces.",
+            "evidenceCharacters": 408,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "2152",
+            "reference": "BC 1004.1.3",
+            "codePrefix": "BC",
+            "sectionNumber": "1004.1.3",
+            "exactPassages": [
+              "For areas without fixed seating, the occupant load shall be not less than that number determined by dividing the floor area under consideration by the occupant load factor assigned to the function of the space as set forth in Table 1004.1.3.",
+              "Unconcentrated (tables and chairs)",
+              "15 net"
+            ],
+            "resolvedTitle": "1004.1.3 Areas without fixed seating.",
+            "evidenceCharacters": 3565,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+        "expectedConclusion": "For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. The result depends on the actual net area, furniture arrangement, intended activities, and whether the room is truly accessory to the residential use.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The calculation may be stated from the supplied facts, but the classification conclusion must remain conditional on the actual layout, function, net area, and accessory relationship."
+        },
+        "sourceType": "real project",
+        "sourceReference": "Initial Permitext AI quality-evaluation case set supplied by the Permitext owner.",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "notes": "Exact enacted passages, calculation, and answer key were manually reviewed before approval.",
+        "requiredConcepts": [
+          "Use the 15-net-square-feet-per-occupant factor for unconcentrated tables and chairs.",
+          "Calculate 900 divided by 15 as an occupant load of 60.",
+          "Compare 60 with the fewer-than-75 threshold.",
+          "Explain the Group B or served-occupancy classification option when the room is accessory.",
+          "Avoid automatically classifying every residential amenity room as Group R-2."
+        ],
+        "missingFacts": [
+          "Confirm the actual net area.",
+          "Confirm the furniture arrangement and occupant-load factor.",
+          "Confirm the intended activities.",
+          "Confirm the room is accessory to the residential occupancy."
+        ],
+        "forbiddenClaims": [
+          "Every residential amenity room is automatically Group R-2.",
+          "The room is below 75 occupants without performing the calculation.",
+          "The result is unchanged for concentrated seating, standing space, or another function."
+        ],
+        "requiredCitations": [
+          "BC 303.1.3",
+          "BC 1004.1.3"
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "39aa85a0-3bdd-4e0b-904c-44f1ae6706cd",
+      "answeredAt": "2026-08-27T22:38:43.485Z",
+      "answerTimeMilliseconds": 22582,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-project-fact-verification-v30:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-c4b3517c-6377-4c36-9c73-0bde078852bc",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "Project configured code basis",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T22:38:20.910Z"
+        },
+        "answerText": "No—provided the room is actually accessory to the apartment-building occupancy and its intended table-and-chair use is the basis for the occupant-load calculation. For an area without fixed seating, the supplied 15-net factor for unconcentrated tables and chairs gives an occupant load of 60 persons (900 ÷ 15). Because that is fewer than 75 persons, BC 303.1.3 requires an assembly-purpose room accessory to another occupancy to be classified as Group B or as part of that occupancy; it does not require Group A-3 classification. The provision separately permits the room’s plumbing-fixture count to be calculated under the assembly-occupancy requirements.\n\nThis result is limited to the described normal table-and-chair use. The accessory relationship is a distinct code condition: resident-only use in an apartment building does not by itself establish that the room is legally accessory to that occupancy. If another intended function or layout produces an occupant load of 75 or more, the supplied evidence does not establish the classification outcome for that use.",
+        "conclusion": "No—provided the room is actually accessory to the apartment-building occupancy and its intended table-and-chair use is the basis for the occupant-load calculation. For an area without fixed seating, the supplied 15-net factor for unconcentrated tables and chairs gives an occupant load of 60 persons (900 ÷ 15). Because that is fewer than 75 persons, BC 303.1.3 requires an assembly-purpose room accessory to another occupancy to be classified as Group B or as part of that occupancy; it does not require Group A-3 classification. The provision separately permits the room’s plumbing-fixture count to be calculated under the assembly-occupancy requirements.",
+        "supportedPoints": [
+          {
+            "heading": "Accessory assembly-space classification",
+            "explanation": "A room or space used for assembly purposes, accessory to another occupancy, and having an occupant load of fewer than 75 persons must be classified as Group B or as part of that other occupancy. The provision separately permits plumbing fixtures for that room or space to be calculated under the assembly-occupancy requirements.",
+            "sectionID": "132",
+            "sourceIDs": [
+              "e40530b3-01f8-4357-893e-4d090b5f7551"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Table-and-chair occupant-load calculation",
+            "explanation": "For an area without fixed seating, occupant load is determined by dividing the floor area by the Table 1004.1.3 factor assigned to the space function. The supplied table entries identify unconcentrated tables and chairs and a 15-net factor. Applied to the stated 900 net square feet, that produces 60 occupants.",
+            "sectionID": "2152",
+            "sourceIDs": [
+              "c04bf282-413b-44e8-abca-1f4d61097943",
+              "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+              "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "This result is limited to the described normal table-and-chair use. The accessory relationship is a distinct code condition: resident-only use in an apartment building does not by itself establish that the room is legally accessory to that occupancy. If another intended function or layout produces an occupant load of 75 or more, the supplied evidence does not establish the classification outcome for that use.",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the room is legally accessory to the apartment-building occupancy, as required for the BC 303.1.3 classification rule."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied enacted evidence establishes the accessory-space rule and the stated table-and-chair occupant-load factor, but does not establish classification requirements for other actual room functions or layouts."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "132",
+            "sectionNumber": "303.1.3",
+            "title": "303.1.3 Accessory assembly spaces.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "e40530b3-01f8-4357-893e-4d090b5f7551"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "e40530b3-01f8-4357-893e-4d090b5f7551",
+                "selectedText": "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the fewer-than-75, accessory-assembly classification rule and the separate plumbing-fixture permission."
+          },
+          {
+            "sectionID": "2152",
+            "sectionNumber": "1004.1.3",
+            "title": "1004.1.3 Areas without fixed seating.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "c04bf282-413b-44e8-abca-1f4d61097943",
+              "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+              "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "c04bf282-413b-44e8-abca-1f4d61097943",
+                "selectedText": "For areas without fixed seating, the occupant load shall be not less than that number determined by dividing the floor area under consideration by the occupant load factor assigned to the function of the space as set forth in Table 1004.1.3.",
+                "visualSources": []
+              },
+              {
+                "sourceID": "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+                "selectedText": "Unconcentrated (tables and chairs)",
+                "visualSources": []
+              },
+              {
+                "sourceID": "4d867eb2-acd0-47d6-bfa6-c8647fd67101",
+                "selectedText": "15 net",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the area-based occupant-load method and supplied 15-net factor for unconcentrated tables and chairs."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "132",
+          "2152",
+          "128",
+          "135",
+          "113",
+          "10280",
+          "2156",
+          "232",
+          "138"
+        ],
+        "evidenceSourceIDs": [
+          "e40530b3-01f8-4357-893e-4d090b5f7551",
+          "c04bf282-413b-44e8-abca-1f4d61097943",
+          "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+          "4d867eb2-acd0-47d6-bfa6-c8647fd67101",
+          "research-permitext_discovered-id:128-2",
+          "research-permitext_discovered-id:135-3",
+          "research-permitext_discovered-id:113-5",
+          "research-permitext_discovered-id:10280-6",
+          "research-permitext_cross_reference-id:2156-2",
+          "research-permitext_cross_reference-id:232-3",
+          "research-permitext_cross_reference-id:138-5"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 9,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 2,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 7,
+          "userPinnedCount": 4,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 3,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 1,
+          "requiredClaimCount": 4,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 303.1.3",
+              "summary": "BC 303.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e40530b3-01f8-4357-893e-4d090b5f7551"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "c04bf282-413b-44e8-abca-1f4d61097943"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "9d57e1ec-46c1-471e-a3e9-d36ad223e793"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "BC 303.1.3",
+              "summary": "BC 303.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e40530b3-01f8-4357-893e-4d090b5f7551"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "c04bf282-413b-44e8-abca-1f4d61097943"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "9d57e1ec-46c1-471e-a3e9-d36ad223e793"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-5"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-5"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "BC 1004.3",
+              "summary": "BC 1004.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2156-2"
+              ]
+            },
+            {
+              "label": "BC 402.8.2",
+              "summary": "BC 402.8.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:232-3"
+              ]
+            },
+            {
+              "label": "BC 303.7",
+              "summary": "BC 303.7 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:138-5"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "BC 303.1.3",
+              "summary": "BC 303.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e40530b3-01f8-4357-893e-4d090b5f7551"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "c04bf282-413b-44e8-abca-1f4d61097943"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "9d57e1ec-46c1-471e-a3e9-d36ad223e793"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+              ]
+            },
+            {
+              "label": "BC 402.8.2",
+              "summary": "BC 402.8.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:232-3"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [
+            "e40530b3-01f8-4357-893e-4d090b5f7551",
+            "c04bf282-413b-44e8-abca-1f4d61097943",
+            "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+            "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:128-2",
+            "research-permitext_discovered-id:135-3",
+            "research-permitext_discovered-id:113-5",
+            "research-permitext_discovered-id:10280-6",
+            "research-permitext_cross_reference-id:2156-2",
+            "research-permitext_cross_reference-id:232-3",
+            "research-permitext_cross_reference-id:138-5"
+          ],
+          "projectFactsUsed": [
+            "Building Use: Apartment building",
+            "Room Area Net Square Feet: 900",
+            "Typical Arrangement: Tables and chairs",
+            "Users: Residents only"
+          ],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Building Use: Apartment building",
+            "Room Area Net Square Feet: 900",
+            "Typical Arrangement: Tables and chairs",
+            "Users: Residents only"
+          ],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 4,
+          "coveredClaimCount": 4,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "e40530b3-01f8-4357-893e-4d090b5f7551",
+            "c04bf282-413b-44e8-abca-1f4d61097943",
+            "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+            "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "e40530b3-01f8-4357-893e-4d090b5f7551",
+            "c04bf282-413b-44e8-abca-1f4d61097943",
+            "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+            "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+          ],
+          "citedEvidenceSourceIDs": [
+            "e40530b3-01f8-4357-893e-4d090b5f7551",
+            "c04bf282-413b-44e8-abca-1f4d61097943",
+            "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+            "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:128-2",
+            "research-permitext_discovered-id:135-3",
+            "research-permitext_discovered-id:113-5",
+            "research-permitext_discovered-id:10280-6",
+            "research-permitext_cross_reference-id:2156-2",
+            "research-permitext_cross_reference-id:232-3",
+            "research-permitext_cross_reference-id:138-5"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:e40530b3-01f8-4357-893e-4d090b5f7551",
+              "label": "BC 303.1.3 — 303.1.3 Accessory assembly spaces.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e40530b3-01f8-4357-893e-4d090b5f7551"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:c04bf282-413b-44e8-abca-1f4d61097943",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "c04bf282-413b-44e8-abca-1f4d61097943"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "9d57e1ec-46c1-471e-a3e9-d36ad223e793"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:4d867eb2-acd0-47d6-bfa6-c8647fd67101",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 4,
+          "coveredClaimCount": 4,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "e40530b3-01f8-4357-893e-4d090b5f7551",
+            "c04bf282-413b-44e8-abca-1f4d61097943",
+            "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+            "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:e40530b3-01f8-4357-893e-4d090b5f7551",
+              "label": "BC 303.1.3 — 303.1.3 Accessory assembly spaces.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e40530b3-01f8-4357-893e-4d090b5f7551"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "e40530b3-01f8-4357-893e-4d090b5f7551"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "e40530b3-01f8-4357-893e-4d090b5f7551"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c04bf282-413b-44e8-abca-1f4d61097943",
+                        "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+                        "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "e40530b3-01f8-4357-893e-4d090b5f7551"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:c04bf282-413b-44e8-abca-1f4d61097943",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "c04bf282-413b-44e8-abca-1f4d61097943"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "c04bf282-413b-44e8-abca-1f4d61097943"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "e40530b3-01f8-4357-893e-4d090b5f7551"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "c04bf282-413b-44e8-abca-1f4d61097943"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c04bf282-413b-44e8-abca-1f4d61097943",
+                        "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+                        "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "9d57e1ec-46c1-471e-a3e9-d36ad223e793"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "9d57e1ec-46c1-471e-a3e9-d36ad223e793"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "e40530b3-01f8-4357-893e-4d090b5f7551"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "9d57e1ec-46c1-471e-a3e9-d36ad223e793"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c04bf282-413b-44e8-abca-1f4d61097943",
+                        "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+                        "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:4d867eb2-acd0-47d6-bfa6-c8647fd67101",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "e40530b3-01f8-4357-893e-4d090b5f7551"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c04bf282-413b-44e8-abca-1f4d61097943",
+                        "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+                        "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260827-authority-term-boundary-v17",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "citedSourceIDs": [
+            "e40530b3-01f8-4357-893e-4d090b5f7551",
+            "c04bf282-413b-44e8-abca-1f4d61097943",
+            "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+            "4d867eb2-acd0-47d6-bfa6-c8647fd67101"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:128-2",
+            "research-permitext_discovered-id:135-3",
+            "research-permitext_discovered-id:113-5",
+            "research-permitext_discovered-id:10280-6",
+            "research-permitext_cross_reference-id:2156-2",
+            "research-permitext_cross_reference-id:232-3",
+            "research-permitext_cross_reference-id:138-5"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 4,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 2,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 7,
+            "reviewedOnlyProvisionCount": 7,
+            "assembledSourceCount": 11,
+            "assembledProvisionCount": 9
+          },
+          "sources": [
+            {
+              "sourceID": "e40530b3-01f8-4357-893e-4d090b5f7551",
+              "sectionID": "132",
+              "reference": "BC 303.1.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+            },
+            {
+              "sourceID": "c04bf282-413b-44e8-abca-1f4d61097943",
+              "sectionID": "2152",
+              "reference": "BC 1004.1.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "For areas without fixed seating, the occupant load shall be not less than that number determined by dividing the floor area under consideration by the occupant load factor assigned to the function of the space as set forth in Table 1004.1.3."
+            },
+            {
+              "sourceID": "9d57e1ec-46c1-471e-a3e9-d36ad223e793",
+              "sectionID": "2152",
+              "reference": "BC 1004.1.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Unconcentrated (tables and chairs)"
+            },
+            {
+              "sourceID": "4d867eb2-acd0-47d6-bfa6-c8647fd67101",
+              "sectionID": "2152",
+              "reference": "BC 1004.1.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "15 net"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:128-2",
+              "sectionID": "128",
+              "reference": "BC 302.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "302.1 302.1 General. Structures or portions of structures shall be classified with respect to occupancy in one or more of the groups listed below. A room or space that is intended to be occupied at different times for different purposes shall comply with all of the requirements that are applicable to each of the purposes for which the room or space will be occupied. Structures with multiple occupancies or uses shall comply with Section 508 . Where a structure, or portion thereof, is proposed for a purpose that is not specifically provided for in this code, such structure, or portion thereof, shall be classified in the group that the occupancy most nearly resembles, according to the fire safety and relative hazard involved, and as approved by the commissioner. 1. Assembly (see Section 303) : Groups A-1, A-2, A-3, A-4 and A-5 2. Business (see Section 304 ): Group B 3. Educational (see Section 305 ): Group E 4. Factory and Industrial (see Section 306 ): Groups F-1 and F-2 5. High Hazard (see Section 307 ): Groups H-1, H-2, H-3, H-4 and H-5 6. Institutional (see Section 308 ): Groups I-1, I-2, I-3 and I-4 7. Mercantile (see Section 309 ): Group M 8. Residential (see Section 310 ): Groups R-1, R-2 and R-3 9. Storage (see Section 311) : Groups S-1 and S-2 10. Utility and Miscellaneous (see Section 312 ): Group U For a listing of occupancy group classifications that corresponds with uses listed in the New York City Zoning Resolution, refer to department rules. For a listing of occupancy group classifications that corresponds with uses listed in the New York City Zoning Resolution, refer to department rules. Section BC 303: Assembly Group A"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:135-3",
+              "sectionID": "135",
+              "reference": "BC 303.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.4 303.4 Assembly Group A-3. Group A-3 occupancy includes assembly uses intended for worship, recreation or amusement and other assembly uses not classified elsewhere in Group A including, but not limited to: Amusement arcades Art galleries Bowling alleys Cafeterias for children up to and including the 12th grade Classrooms and instructional rooms with 75 persons or more; such rooms with fewer than 75 persons shall be classified as Group B or E Community halls Courtrooms Custodial care facilities with 75 or more persons, providing care to persons over the age of 2, where no more than four occupants are incapable of responding to an emergency situation without physical assistance from staff Dance studio or instruction (not including food or drink consumption) Exhibition halls Funeral parlors Gymnasiums (without spectator seating) Indoor swimming pools (without spectator seating) Indoor tennis courts (without spectator seating) Lecture halls Museums Places of religious worship (Houses of worship) Pool and billiard parlors School auditoriums Waiting areas in transportation terminals"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-5",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ASSEMBLY SPACE. Any part of a place of assembly, exclusive of the stage, that is occupied by numbers of persons during the major period of occupancy. Every tier of seating shall be considered a separate assembly space. CERTIFICATE OF OPERATION. A certificate issued by the department upon satisfactory inspection of a specific piece of hoisting equipment to ensure that the equipment is in compliance with this code. CUSTODIAL CARE FACILITY. A building or part thereof occupied by persons, on less than a 24-hour basis and not overnight, who because of age, disability or other reasons, receive personal care services by individuals other than parents or guardians, relatives by blood, marriage, domestic partnership, or adoption, in a place other than the home of the person cared for. DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling. FIXED SEATING. Furniture or fixture designed and installed for the use of sitting and secured in place including bench-type seats and seats with or without backs or arm rests. LOAD FACTOR. A factor that accounts for deviations of the actual load from the nominal load; for uncertainties in the analysis that transforms the load into a loud effect, and for the probability that more than one extreme load will occur simultaneously. OCCUPANT LOAD . The number of persons for which the means of egress of a building or portion thereof is designed . PARKING GARAGE. A structure or portion of a structure, other than a private garage or carport, used for the parking or storage of motor vehicles."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10280-6",
+              "sectionID": "10280",
+              "reference": "MC 201.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "201.4 201.4 Terms not defined. Where terms are not defined through the methods authorized by this section, such terms shall have ordinarily accepted meanings such as the context implies. Section MC 202: General Definitions ABRASIVE MATERIALS. Moderately abrasive particulate in high concentrations, and highly abrasive particulate in moderate and high concentrations, such as alumina, bauxite, iron silicate, sand and slag. ABSORPTION SYSTEM. A refrigerating system in which refrigerant is pressurized by pumping a chemical solution of refrigerant in absorbent, and then separated by the addition of heat in a generator, condensed (to reject heat), expanded, evaporated (to provide refrigeration), and reabsorbed in an absorber to repeat the cycle; the system may be single or multiple effect, the latter using multiple stages or internally cascaded use of heat to improve efficiency. ACCESS (TO). That which enables a device, fixture, appliance or equipment to be reached by ready access or by a means that first requires the removal or movement of a panel, door or similar obstruction (see also \"Ready access (to)\"). AIR. All air supplied to mechanical equipment and appliances for combustion, ventilation, cooling, and similar purposes. Standard air is air at standard temperature and pressure, namely, 70°F (21.1°C) and 29.92 inches of mercury (101.3 kPa). AIR CONDITIONING. The treatment of air so as to control simultaneously the temperature, humidity, cleanness and distribution of the air to meet the requirements of a conditioned space. AIR-CONDITIONING SYSTEM. A system that consists of heat exchangers, blowers, filters, supply, exhaust and return ducts, and shall include any apparatus installed in connection therewith. AIR DISPERSION SYSTEM. Any diffuser system designed to both convey air within a room, space or area and diffuse air into that space while operating under positive pressure. Systems are commonly constructed of, but not limited to, fabric or plastic film. AIR DISTRIBUTION SYSTEM. Any system of ducts, plenums and air-handling equipment that circulates air within a space or spaces and includes systems made up of one or more air-handling units. AIR, EXHAUST. Air being removed from any space, appliance or piece of equipment and conveyed directly to the atmosphere by means of openings or ducts. AIR-HANDLING UNIT. A blower or fan used for the purpose of distributing supply air to a room, space or area. AIR, INTAKE. Air supplied from the outdoors to any space, appliance or piece of equipment. AIR, MAKEUP. Any combination of outdoor and transfer air intended to replace exhaust air and exfiltration. AIR, OUTDOOR. Ambient air that enters a building through a ventilation system, through intentional openings for natural ventilation, or by infiltration. AIR, RELIEF. Air removed from any space, appliance or piece of equipment that serves to balance building pressurization due to introduction of outdoor air. Exhaust air shall not be considered relief air. AIR, RETURN. Air removed from a conditioned space or location and recirculated or relieved to the outdoors. AIR, TRANSFER. Air moved from one indoor space to another. AIR TRANSFER OPENING. An opening designed to allow the movement of environmental air between two contiguous spaces. APPLIANCE. A device or apparatus that is manufactured and designed to utilize energy and for which this code provides specific requirements. APPLIANCE, EXISTING . Any appliance regulated by this code that was legally installed prior to the effective date of this code, or for which a permit to install has been issued. APPLIANCE, FUEL-FIRED. An appliance that burns solid, liquid and/or gaseous fuel, including but not limited to wood stoves, household cooking ranges, furnaces, boilers, water heaters, clothes dryers and gas-fired refrigerators. APPLIANCE, GAS (EQUIPMENT). Any apparatus or equipment that uses gas as a fuel or raw material to produce light, heat, power, refrigeration or air conditioning. APPLIANCE TYPE. High-heat appliance. Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature greater than 2,000°F (1093.3°C). Low-heat appliance (residential appliance). Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature of 1,000°F (537.8°C) or less. Medium-heat appliance. Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature of more than 1,000°F (537.8°C), but not greater than 2,000°F (1093.3°C). APPLIANCE, VENTED. An appliance designed and installed in such a manner that all of the products of combustion are conveyed directly from the appliance to the outdoor atmosphere through an approved chimney or vent system. AUTOMATIC BOILER. Any class of boiler that is equipped with the controls and limit devices specified in Chapter 10 . BATHROOM. A room containing a bathtub, shower, spa or similar bathing fixture. BOILER, HIGH-PRESSURE. An appliance for supplying steam or hot water that, for a steam boiler, operates at a pressure of more than 15 psig (103.4 kPa gauge), and for a hot water boiler, operates at a pressure exceeding 160 psig (1103.2 kPa gauge) or at a temperature exceeding 250°F (121.1°C). BOILER, LOW-PRESSURE. A self-contained appliance for supplying steam or hot water as follows: Hot water heating boiler. A boiler in which no steam is generated, from which hot water is circulated for heating purposes and then returned to the boiler, and that operates at water pressures not exceeding 160 pounds per square inch gauge (psig) (1103.2 kPa gauge) and at water temperatures not exceeding 250°F (121.1°C) at or near the boiler outlet. Hot water supply boiler. A boiler, completely filled with water, which furnishes hot water to be used externally to itself, and that operates at water pressures not exceeding 160 psig (1103.2 kPa gauge) and at water temperatures not exceeding 250°F (121.1°C) at or near the boiler outlet. Steam heating boiler. A boiler in which steam is generated and that operates at a steam pressure not exceeding 15 psig (103.4 kPa gauge). BOILER ROOM. A room primarily utilized for the installation of a boiler. BRAZED JOINT. A gas-tight joint obtained by the joining of metal parts with metallic mixtures or alloys that melt at a temperature above 1,000°F (537.8°C), but lower than the melting temperature of the parts to be joined. BRAZING. A metal-joining process wherein coalescence is produced by the use of a nonferrous filler metal having a melting point above 1,000°F (537.8°C), but lower than that of the base metal being joined. The filler material is distributed between the closely fitted surfaces of the joint by capillary attraction. BREATHING ZONE. The region within an occupied space between planes 3 and 72 inches (76.2 and 1828.8 mm) above the floor and more than 2 feet (609.6 mm) from the walls of the space or from fixed air-conditioning equipment. BTU. Abbreviation for British thermal unit, which is the quantity of heat required to raise the temperature of 1 pound (453.6 g) of water 1°F (-17.22°C) (1 Btu = 1055 J). CEILING RADIATION DAMPER. A listed device installed in a ceiling membrane of a fire-resistance-rated floor/ceiling or roof/ceiling assembly to limit automatically the radiative heat transfer through an air inlet/outlet opening. CHIMNEY. A primarily vertical structure containing one or more flues used to remove products of combustion from fuel-burning appliances, refuse incineration, or industrial processes. Factory-built chimney. A listed and labeled chimney composed of factory-made components, assembled in the field in accordance with manufacturer's instructions and the conditions of the listing. Masonry chimney. A field-constructed chimney composed of solid masonry units, bricks, stones or concrete. Metal chimney. A field-constructed chimney composed of metal. CHIMNEY CONNECTOR. A pipe that connects a fuel-burning appliance to a chimney. CLEARANCE. The minimum distance through air measured between the heat-producing surface of the mechanical appliance, device or equipment and the surface of the combustible material or assembly. CLOSED COMBUSTION SOLID FUEL-BURNING APPLIANCE. A heat-producing appliance that employs a combustion chamber that does not have openings other than the flue collar, fuel charging door and adjustable openings provided to control the amount of combustion air that enters the combustion chamber. CLOTHES DRYER. An appliance used to dry wet laundry by means of heat. COMBINATION FIRE/SMOKE DAMPER. A listed device installed in ducts and air transfer openings designed to close automatically upon the detection of heat and resist the passage of flame and smoke. The device is installed to operate automatically, be controlled by a smoke detection system, and where required, is capable of being positioned from a fire command center. COMBUSTIBLE ASSEMBLY. Wall, floor, ceiling or other assembly constructed of one or more component materials that are not defined as noncombustible. COMBUSTIBLE LIQUID. For the purposes of transportation, a combustible liquid as defined in the regulations of the United States Department of Transportation, as set forth in 49 CFR 173.120. For all other purposes, a liquid, other than a compressed gas or cryogenic fluid, having a closed cup flash point at or above 100°F (37.8°C) classified as follows: Class II. Liquids having a closed cup flash point at or above 100°F (37.8°C) and below 140°F (60°C). Class IIIA. Liquids having a closed cup flash point at or above 140°F (60°C) and below 200°F (93.3°C). Class IIIB. Liquids having a closed cup flash point at or above 200°F (93.3°C). COMBUSTIBLE MATERIAL. Any material not defined as noncombustible. COMBUSTION. In the context of this code, refers to the rapid oxidation of fuel accompanied by the production of heat or heat and light. COMBUSTION AIR. Air necessary for complete combustion of a fuel, including theoretical air and excess air. COMBUSTION CHAMBER. The portion of an appliance within which combustion occurs. COMBUSTION PRODUCTS. Constituents resulting from the combustion of a fuel with the oxygen of the air, including the inert gases, but excluding excess air. COMMERCIAL COOKING APPLIANCES. Appliances used in a commercial food service establishment for heating or cooking food and which produce grease vapors, steam, fumes, smoke or odors that are required to be removed through a local exhaust ventilation system. Such appliances include deep fat fryers; upright broilers; griddles; broilers; steam-jacketed kettles; hot-top ranges; under-fired broilers (charbroilers); ovens; barbecues; rotisseries; and similar appliances. For the purpose of this definition, a food service establishment shall include any building or a portion thereof used for the preparation and serving of food. COMMERCIAL COOKING RECIRCULATING SYSTEM. Self-contained system consisting of the exhaust hood, the cooking equipment, the filters and the fire suppression system. The system is designed to capture cooking vapors and residues generated from commercial cooking equipment. The system removes contaminants from the exhaust air and recirculates the air to the space from which it was withdrawn. COMMERCIAL KITCHEN EXHAUST HOODS. Backshelf hood. A backshelf hood is also referred to as a low-proximity hood, or as a sidewall hood where wall mounted. Its front lower lip is low over the appliance(s) and is \"set back\" from the front of the appliance(s). It is always closed to the rear of the appliances by a panel where free-standing, or by a panel or wall where wall mounted, and its height above the cooking surface varies. (This style of hood can be constructed with partial end panels to increase its effectiveness in capturing the effluent generated by the cooking operation). Double island canopy hood. A double island canopy hood is place"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2156-2",
+              "sectionID": "2156",
+              "reference": "BC 1004.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.3 1004.3 Fixed seating. For areas having fixed seats and aisles, the occupant load shall be determined by the number of fixed seats installed therein. The occupant load for areas in which fixed seating is not installed, such as waiting spaces, shall be determined in accordance with Section 1004.1.3 and added to the number of fixed seats. The occupant load of wheelchair spaces and the associated companion seat shall be based on one occupant for each wheelchair space and one occupant for the associated companion seat provided in accordance with Section 1108.2.3. For areas having fixed seating without dividing arms, the occupant load shall be not less than the number of seats based on one person for each 18 inches (457.2 mm) of seating length. The occupant load of seating booths shall be based on one person for each 24 inches (609.6 mm) of booth seat length measured at the backrest of the seating booth."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:232-3",
+              "sectionID": "232",
+              "reference": "BC 402.8.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "402.8.2 402.8.2 Occupant load. The calculated occupant load used to determine the required number of means of egress shall be in accordance with this section."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:138-5",
+              "sectionID": "138",
+              "reference": "BC 303.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.7 303.7 Certificate of Operation. A Certificate of Operation shall be required, as per Section 28-117.1 , for the following assembly occupancies: 1. Indoor assembly occupancies used or intended for use by 75 persons or more, including open spaces at 20 feet (6096 mm) or more above or below grade plane, such as roofs or roof terraces. 2. Outdoor assembly occupancies used and intended for use by 200 persons or more. Section BC 304: Business Group B"
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?\nProject facts: Typical Arrangement: Tables and chairs; Building Use: Apartment building; Users: Residents only; Room Area Net Square Feet: 900",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 4,
+            "candidateCount": 12,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 3,
+            "characterCount": 29870,
+            "resolverFailureCount": 1,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 1,
+              "text": "1 enacted section was not available from the canonical resolver."
+            },
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "Project configured code basis"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260827-supporting-web-v9",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-c4b3517c-6377-4c36-9c73-0bde078852bc",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "Project configured code basis",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T22:38:20.910Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 2,
+          "regenerated": true,
+          "history": [
+            {
+              "pass": false,
+              "issues": [
+                {
+                  "type": "missed_material_conclusion",
+                  "detail": "The answer properly makes the result conditional on the room being accessory, but it leaves missingFacts empty. The project facts establish an apartment building and resident-only use, not the legally material accessory relationship required by BC 303.1.3. That relationship must remain identified as an unresolved project fact."
+                }
+              ],
+              "model": "gpt-5.6-luna"
+            },
+            {
+              "pass": true,
+              "issues": [],
+              "model": "permitext-deterministic-post-repair-acceptance"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T22:38:20.910Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v3",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 2,
+          "verificationIssueTypes": [
+            "missed_material_conclusion"
+          ]
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 35372,
+          "cachedInputTokens": 5371,
+          "outputTokens": 1774,
+          "totalTokens": 37146
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.06493,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "31a551c0-ab8a-424e-a3a6-0034e14781ef",
+        "createdAt": "2026-08-27T22:38:20.906Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra",
+          "gpt-5.6-luna"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v3",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 2,
+        "verificationIssueTypes": [
+          "missed_material_conclusion"
+        ],
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 35372,
+        "cachedInputTokens": 5371,
+        "outputTokens": 1774,
+        "totalTokens": 37146,
+        "estimatedCostUSD": 0.06493,
+        "actualProviderCostUSD": 0.06493,
+        "conservativeProviderCostUSD": 0.06493,
+        "durationMilliseconds": 22577,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T22:38:57.831Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 13989,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 3042,
+              "cachedInputTokens": 0,
+              "outputTokens": 1377,
+              "totalTokens": 4419
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 3042,
+          "cachedInputTokens": 0,
+          "outputTokens": 1377,
+          "totalTokens": 4419
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "Both citations support the specific propositions attributed to them. BC 1004.1.3 supplies the area-divided-by-factor method and the 15-net factor for unconcentrated tables and chairs; BC 303.1.3 supplies the fewer-than-75 and accessory-to-another-occupancy classification rule, including the separate plumbing-fixture permission.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer's calculation, conditional classification conclusion, plumbing observation, and limitation for different layouts/functions all follow from the supplied evidence or are appropriately framed as evidence limitations. It does not invent a classification result for uses outside the supplied facts.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer correctly conditions the result on the room being accessory and on the described table-and-chair use. It further explains that resident-only use does not itself establish the accessory relationship and limits the conclusion where a different layout or function changes the analysis.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly states that the supplied evidence does not establish the classification outcome if another intended function or layout produces an occupant load of 75 or more.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a clear conditional answer, shows the calculation, identifies the governing threshold and classification consequence, and flags the principal fact needing verification.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The response begins with a direct answer to whether Group A-3 classification is needed and then explains the applicable conditions and calculation.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly applies the supplied 15-net factor to unconcentrated tables and chairs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "The answer expressly calculates 900 ÷ 15 as 60 persons.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "The answer expressly states that 60 is fewer than 75 persons.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "The answer explains that, when the assembly-purpose room is accessory to another occupancy and below the threshold, BC 303.1.3 classifies it as Group B or part of the occupancy served.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "The answer does not equate residential amenity use with automatic Group R-2 treatment; it specifically states that resident-only use does not itself establish the accessory relationship.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer does not claim that every residential amenity room is automatically Group R-2 and instead supplies a conditional accessory-use analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer performs and states the 900 ÷ 15 calculation before reaching the fewer-than-75 conclusion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer expressly limits its conclusion to the described table-and-chair use and warns that a different function or layout may not be resolved by the supplied evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The project context explicitly supplies a 900-net-square-foot area, and the answer consistently applies that stated area in its calculation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The project context supplies tables and chairs, and the answer conditions the analysis on the actual table-and-chair use while recognizing that another layout could change the result.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer limits the conclusion to the stated normal use and identifies a different intended function as potentially outside what the supplied evidence can resolve.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer expressly identifies whether the room is legally accessory to the apartment-building occupancy as a distinct unresolved condition required for the BC 303.1.3 result.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.022608,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 2,
+            "canonicalCount": 2,
+            "selectedEvidenceCount": 2,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 22582,
+            "inputTokens": 35372,
+            "cachedInputTokens": 5371,
+            "outputTokens": 1774,
+            "totalTokens": 37146,
+            "estimatedCostUSD": 0.06493,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "Both citations support the specific propositions attributed to them. BC 1004.1.3 supplies the area-divided-by-factor method and the 15-net factor for unconcentrated tables and chairs; BC 303.1.3 supplies the fewer-than-75 and accessory-to-another-occupancy classification rule, including the separate plumbing-fixture permission.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "5/5 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer's calculation, conditional classification conclusion, plumbing observation, and limitation for different layouts/functions all follow from the supplied evidence or are appropriately framed as evidence limitations. It does not invent a classification result for uses outside the supplied facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/3 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer correctly conditions the result on the room being accessory and on the described table-and-chair use. It further explains that resident-only use does not itself establish the accessory relationship and limits the conclusion where a different layout or function changes the analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "4/4 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "The answer directly states that the supplied evidence does not establish the classification outcome if another intended function or layout produces an occupant load of 75 or more.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "It gives a clear conditional answer, shows the calculation, identifies the governing threshold and classification consequence, and flags the principal fact needing verification.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "The response begins with a direct answer to whether Group A-3 classification is needed and then explains the applicable conditions and calculation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer expressly applies the supplied 15-net factor to unconcentrated tables and chairs.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "The answer expressly calculates 900 ÷ 15 as 60 persons.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "The answer expressly states that 60 is fewer than 75 persons.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "The answer explains that, when the assembly-purpose room is accessory to another occupancy and below the threshold, BC 303.1.3 classifies it as Group B or part of the occupancy served.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "The answer does not equate residential amenity use with automatic Group R-2 treatment; it specifically states that resident-only use does not itself establish the accessory relationship.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer does not claim that every residential amenity room is automatically Group R-2 and instead supplies a conditional accessory-use analysis.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "The answer performs and states the 900 ÷ 15 calculation before reaching the fewer-than-75 conclusion.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "The answer expressly limits its conclusion to the described table-and-chair use and warns that a different function or layout may not be resolved by the supplied evidence.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The project context explicitly supplies a 900-net-square-foot area, and the answer consistently applies that stated area in its calculation.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The project context supplies tables and chairs, and the answer conditions the analysis on the actual table-and-chair use while recognizing that another layout could change the result.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "The answer limits the conclusion to the stated normal use and identifies a different intended function as potentially outside what the supplied evidence can resolve.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "The answer expressly identifies whether the room is legally accessory to the apartment-building occupancy as a distinct unresolved condition required for the BC 303.1.3 result.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "2/2 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. Both citations support the specific propositions attributed to them. BC 1004.1.3 supplies the area-divided-by-factor method and the 15-net factor for unconcentrated tables and chairs; BC 303.1.3 supplies the fewer-than-75 and accessory-to-another-occupancy classification rule, including the separate plumbing-fixture permission.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 2 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "5/5 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer's calculation, conditional classification conclusion, plumbing observation, and limitation for different layouts/functions all follow from the supplied evidence or are appropriately framed as evidence limitations. It does not invent a classification result for uses outside the supplied facts.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer correctly conditions the result on the room being accessory and on the described table-and-chair use. It further explains that resident-only use does not itself establish the accessory relationship and limits the conclusion where a different layout or function changes the analysis.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "4/4 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly states that the supplied evidence does not establish the classification outcome if another intended function or layout produces an occupant load of 75 or more.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a clear conditional answer, shows the calculation, identifies the governing threshold and classification consequence, and flags the principal fact needing verification.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The response begins with a direct answer to whether Group A-3 classification is needed and then explains the applicable conditions and calculation.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly applies the supplied 15-net factor to unconcentrated tables and chairs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "The answer expressly calculates 900 ÷ 15 as 60 persons.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "The answer expressly states that 60 is fewer than 75 persons.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "The answer explains that, when the assembly-purpose room is accessory to another occupancy and below the threshold, BC 303.1.3 classifies it as Group B or part of the occupancy served.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "The answer does not equate residential amenity use with automatic Group R-2 treatment; it specifically states that resident-only use does not itself establish the accessory relationship.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer does not claim that every residential amenity room is automatically Group R-2 and instead supplies a conditional accessory-use analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer performs and states the 900 ÷ 15 calculation before reaching the fewer-than-75 conclusion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer expressly limits its conclusion to the described table-and-chair use and warns that a different function or layout may not be resolved by the supplied evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The project context explicitly supplies a 900-net-square-foot area, and the answer consistently applies that stated area in its calculation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The project context supplies tables and chairs, and the answer conditions the analysis on the actual table-and-chair use while recognizing that another layout could change the result.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer limits the conclusion to the stated normal use and identifies a different intended function as potentially outside what the supplied evidence can resolve.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer expressly identifies whether the room is legally accessory to the apartment-building occupancy as a distinct unresolved condition required for the BC 303.1.3 result.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

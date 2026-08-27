@@ -50,16 +50,29 @@ Retained report:
 - [x] Add no-cost contract tests for these safeguards.
 - [x] Run the normal no-cost Research suites and the repository-wide `npm run check` gate.
 
-The safeguards are committed locally and the no-cost suite passes. The next gate is the capped targeted paid rerun.
+The safeguards are committed and pushed, and the no-cost repository gate passes.
 
 ## Paid validation after the no-cost tests pass
 
-- [ ] Rerun only the previously failed cases under an explicit spend cap.
-- [ ] Review the new answers for both quality and cost; do not accept an evaluator score blindly where the legal conclusion is still questionable.
+- [x] Rerun only the previously failed cases under an explicit spend cap.
+- [x] Review the new answers for both quality and cost; do not accept an evaluator score blindly where the legal conclusion is still questionable.
 - [ ] If the targeted cases improve without regressions, run one new complete frozen cohort.
 - [ ] Compare quality, p50/p90 latency, Luna/Terra escalation rate, and projected cost per 100 turns with the first cohort.
 
 First targeted attempt: the Certificate-of-Occupancy case correctly remained uncharged but failed before grading because automatic web support routed around the intentionally disabled Zoning Research corpus and produced an attribution conflict. It cost $0.134553 in provider calls. The source-policy repair now prevents an intentionally blocked corpus from triggering automatic web support; explicit official-guidance requests remain available.
+
+### Targeted rerun result
+
+Eleven completed targeted cases were evaluated with prompt v30: the repaired Certificate-of-Occupancy case plus the ten remaining first-cohort failures. There were no provider failures.
+
+- 5 passed every prior exact rubric gate.
+- 6 scored from 3.65 through 3.96 out of 4 but failed at least one exact completeness item.
+- Operating Research cost was $0.733283.
+- Total evaluation cost including the independent Terra grader was $1.119755.
+
+The review separated actual answer gaps from evaluator overreach. A conceptual omission, unsafe claim, unsupported citation, or materially inadequate uncertainty remains fatal. Missing-fact recognition now uses the existing 3-of-4 passing threshold rather than requiring every ancillary checklist item to appear verbatim; otherwise a useful 3.96 answer could fail solely for omitting a peripheral filing note. Three answers still have genuine required-concept gaps and remain targeted for repair: movable-seat approved-record context, sidewalk-cafe approved-capacity and electrical boundaries, and garage ventilation quantity/rate/capacity boundaries.
+
+Prompt v31 adds a material-completeness review that names distinct approved records, quantities, rates, capacities, dimensions, system-design inputs, and expressly implicated technical or agency conditions instead of collapsing them into phrases such as “full design” or “other requirements.” It also prohibits irrelevant permit or agency checklist padding.
 
 ## Commercial decision gate
 
@@ -88,4 +101,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Finish wiring the Project-fact safeguard, add its contracts, and run no-cost tests. Only then spend provider credit on the previously failed cases.
+Pass the repository-wide no-cost gate for prompt v31, then rerun only the three remaining conceptual failures under a capped paid diagnostic. Run a new immutable full cohort only if those three improve without a material regression.

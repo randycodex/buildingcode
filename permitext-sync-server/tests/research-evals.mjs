@@ -961,7 +961,7 @@ function scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge) {
   const passingScore = dataset.automaticScoring.scoreScale.passing;
   const requiredRubricsSatisfied =
     judge.judgment.requiredConcepts.every((item) => item.met) &&
-    judge.judgment.missingFacts.every((item) => item.met) &&
+    semanticMetrics.missingFactRecognition.score >= passingScore &&
     judge.judgment.forbiddenClaims.every((item) => !item.violated);
   const criticalFailures = [
     ...(!deterministic.structuralValidity.passed ? ["structural validity"] : []),
@@ -971,7 +971,7 @@ function scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge) {
     ...(violatedForbiddenClaims.length || literalForbiddenClaims.length ? ["forbidden claim"] : []),
     ...(judge.judgment.requiredConcepts.some((item) => !item.met) ? ["required concept missing"] : []),
     ...(semanticMetrics.appropriateUncertainty.score < passingScore ? ["unjustified certainty"] : []),
-    ...(judge.judgment.missingFacts.some((item) => !item.met) ? ["missing project fact not recognized"] : [])
+    ...(semanticMetrics.missingFactRecognition.score < passingScore ? ["material project facts not sufficiently recognized"] : [])
   ];
   const citationVerification = {
     structuralStatus: deterministic.citationValidation.passed
@@ -2523,9 +2523,25 @@ async function runSelfTest(dataset, datasetText) {
   const incompleteUncertainty = scoreCase(dataset, testCase, answer, 15_000, incompleteUncertaintyJudge);
   assert(
     incompleteUncertainty.metrics.missingFactRecognition.score === 3 &&
-      !incompleteUncertainty.requiredRubricsSatisfied &&
-      !incompleteUncertainty.passed,
-    "Research eval self-test allowed a missing required uncertainty condition to pass on weighted score."
+      incompleteUncertainty.requiredRubricsSatisfied &&
+      incompleteUncertainty.passed,
+    "Research eval self-test treated one noncritical missing-fact omission as a fatal exact-match gate."
+  );
+  const materiallyIncompleteUncertaintyJudge = structuredClone(judge);
+  materiallyIncompleteUncertaintyJudge.judgment.missingFacts[0].met = false;
+  materiallyIncompleteUncertaintyJudge.judgment.missingFacts[1].met = false;
+  const materiallyIncompleteUncertainty = scoreCase(
+    dataset,
+    testCase,
+    answer,
+    15_000,
+    materiallyIncompleteUncertaintyJudge
+  );
+  assert(
+    materiallyIncompleteUncertainty.metrics.missingFactRecognition.score < 3 &&
+      materiallyIncompleteUncertainty.criticalFailures.includes("material project facts not sufficiently recognized") &&
+      !materiallyIncompleteUncertainty.passed,
+    "Research eval self-test allowed materially incomplete missing-fact recognition to pass."
   );
   const incompleteConceptJudge = structuredClone(judge);
   incompleteConceptJudge.judgment.requiredConcepts[0].met = false;

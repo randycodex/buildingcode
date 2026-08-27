@@ -1,0 +1,1826 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T22:42:57.500Z",
+  "updatedAt": "2026-08-27T22:43:42.192Z",
+  "configuration": {
+    "runID": "aa385564-642e-46dd-8637-67640ed604dd",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-project-fact-verification-v30",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-019-buildings-bulletin-policy-boundary"
+    ],
+    "caseStatuses": [
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "5439fcf1dca83265954186a0f47bd6ec173d94a3",
+    "approvedSpendCapUSD": 0.75,
+    "conservativeReservedUSD": 0.106205,
+    "actualUSD": 0.106205,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 4
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T22:43:41.991Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.078099,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.078099,
+        "p50": 0.078099,
+        "p90": 0.078099,
+        "maximum": 0.078099
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.078099,
+      "projectedCostPer100TurnsUSD": 7.81,
+      "targetReady": false,
+      "targetBand": "above"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 28256,
+      "p50": 28256,
+      "p90": 28256,
+      "maximum": 28256
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 1,
+      "verificationRevisionRate": 1,
+      "providerRequests": {
+        "count": 1,
+        "mean": 3,
+        "p50": 3,
+        "p90": 3,
+        "maximum": 3
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": [
+        {
+          "key": "fact_evidence_confusion",
+          "count": 1
+        },
+        {
+          "key": "misstated_provision",
+          "count": 1
+        }
+      ]
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-019-buildings-bulletin-policy-boundary",
+        "title": "Construction Code text does not substitute for a Buildings Bulletin",
+        "status": "draft",
+        "difficulty": "advanced",
+        "topics": [
+          "Buildings Bulletins",
+          "cellar bathrooms",
+          "illegal residential conversions",
+          "outside current library",
+          "authority boundaries"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "building": "One- or two-family dwelling with a proposed three-fixture bathroom in the cellar",
+          "claim": "Buildings Bulletin 2011-010 is said to permit the bathroom",
+          "availableEvidence": "Only AC 28-210.1 is selected from Permitext's current Construction Code Research library",
+          "unknowns": [
+            "the authoritative Buildings Bulletin text and all stated conditions",
+            "lawful family count and occupancy",
+            "cellar use and layout",
+            "Zoning Resolution compliance",
+            "Housing Maintenance Code compliance",
+            "other applicable code provisions and agency records"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "9361",
+            "reference": "AC 28-210.1",
+            "codePrefix": "AC",
+            "sectionNumber": "28-210.1",
+            "exactPassages": [
+              "It shall be unlawful, except in accordance with all requirements of this code, to convert any dwelling for occupancy by more than the legally authorized number of families or to assist, take part in, maintain or permit the maintenance of such conversion. Upon the finding of such violation and the imposition of punishment for such violation as set forth in this code the department or if applicable the environmental control board shall forward to the internal revenue service, the New York state department of taxation and finance and the New York city department of finance the name and address of the respondent or defendant, the address of the building or structure with respect to which the violation occurred and the time period during which the violation was found to have existed."
+            ],
+            "resolvedTitle": "§ 28-210.1 Illegal residential conversions.",
+            "evidenceCharacters": 789,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "Does the current Permitext Construction Code evidence prove that a three-fixture bathroom is permitted in the cellar of this one- or two-family dwelling under Buildings Bulletin 2011-010, the Zoning Resolution, and the Housing Maintenance Code?",
+        "expectedConclusion": "No. AC 28-210.1 establishes that converting or maintaining a dwelling for occupancy by more than the legally authorized number of families is unlawful except in accordance with all code requirements. It does not establish a cellar-bathroom allowance, reproduce Buildings Bulletin 2011-010, prove compliance with the bulletin's conditions, or supply the Zoning Resolution and Housing Maintenance Code requirements. Those authorities are outside Permitext's current Construction Code Research scope and must be obtained and reviewed in authoritative form together with the project's lawful occupancy, cellar use, layout, and other applicable requirements. The selected evidence supports an illegal-conversion caution only; it cannot approve the bathroom.",
+        "expectedUncertainty": {
+          "level": "outside selected authority",
+          "description": "The selected Construction Code passage does not include the Buildings Bulletin, Zoning Resolution, Housing Maintenance Code, or project facts needed to determine whether the proposed cellar bathroom is permissible."
+        },
+        "sourceType": "Buildings Bulletin",
+        "sourceReference": "NYC Department of Buildings Bulletin 2011-010, official PDF: https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2011-010.pdf. The bulletin is scenario provenance and remains outside the selected evidence.",
+        "reviewer": null,
+        "reviewedAt": null,
+        "notes": "Draft candidate NYC-019 tests an explicit outside-authority boundary. Permitext must link to the official Buildings Bulletins source without representing that it has retrieved or analyzed the bulletin.",
+        "requiredConcepts": [
+          "Explain the illegal-residential-conversion rule supported by AC 28-210.1.",
+          "State that AC 28-210.1 does not itself establish a cellar-bathroom allowance.",
+          "State that Buildings Bulletin 2011-010 is not included in the selected evidence.",
+          "State that the selected evidence does not establish the Zoning Resolution or Housing Maintenance Code requirements.",
+          "Refuse to approve the bathroom from the current Construction Code evidence.",
+          "Require authoritative outside-source review and project-specific occupancy and cellar facts."
+        ],
+        "missingFacts": [
+          "Authoritative text and applicability conditions of Buildings Bulletin 2011-010.",
+          "Lawfully authorized number of families and current occupancy records.",
+          "Proposed and existing cellar use and layout.",
+          "Applicable Zoning Resolution provisions.",
+          "Applicable Housing Maintenance Code provisions.",
+          "Other applicable Construction Code provisions and agency records."
+        ],
+        "forbiddenClaims": [
+          "AC 28-210.1 permits a three-fixture cellar bathroom.",
+          "Buildings Bulletin 2011-010 was analyzed as selected evidence.",
+          "Every one- or two-family dwelling may install a cellar bathroom.",
+          "A cellar bathroom never affects illegal-conversion analysis.",
+          "The current candidate set establishes Zoning Resolution compliance.",
+          "The current candidate set establishes Housing Maintenance Code compliance.",
+          "The proposed bathroom is approved or compliant."
+        ],
+        "requiredCitations": [
+          "AC 28-210.1"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "AC 28-210.1",
+            "requiredClaim": "Illegal conversion or maintenance for occupancy beyond the legally authorized family count, while not treating the section as a cellar-bathroom approval."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "099602e6-e2ec-4966-934f-de562f57325a",
+      "answeredAt": "2026-08-27T22:43:25.862Z",
+      "answerTimeMilliseconds": 28261,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-project-fact-verification-v30:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-271f8bc6-1d78-4e7e-9e10-d273022b6a14",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-07-16",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "zoning cue",
+              "blockedReason": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · NYC Zoning Resolution unavailable for Research · Project default applied",
+          "limitation": "NYC Zoning Resolution was not searched. Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+          "resolvedAt": "2026-08-27T22:42:57.605Z"
+        },
+        "answerText": "No. The current Permitext Construction Code evidence does not prove that a three-fixture bathroom in this dwelling’s cellar is permitted under Buildings Bulletin 2011-010, the Zoning Resolution, or the Housing Maintenance Code. The sole controlling passage, AC 28-210.1, regulates conversion of a dwelling for occupancy by more than the legally authorized number of families. It neither authorizes a cellar bathroom nor establishes fixture-count, cellar-use, or bathroom-installation conditions.\n\nAC 28-210.1 provides that conversion for occupancy by more than the legally authorized number of families is unlawful except in accordance with all requirements of this code. Therefore, if the proposed cellar use or work creates, maintains, or assists such a conversion, that conversion is prohibited unless it meets all requirements of this code. The current facts do not establish the lawful family count, actual or proposed occupancy arrangement, or whether the bathroom relates to a conversion.\n\nThe authoritative text, status, and conditions of Buildings Bulletin 2011-010 were not supplied. The Zoning Resolution was not searched in this research scope, and no Housing Maintenance Code provision was supplied. Those authorities therefore cannot establish permission on this record. Nor does the supplied Construction Code evidence include the plumbing, sanitary-fixture, cellar-habitation, ventilation, egress, permit, or approval provisions needed to decide whether this installation itself complies.",
+        "conclusion": "No. The current Permitext Construction Code evidence does not prove that a three-fixture bathroom in this dwelling’s cellar is permitted under Buildings Bulletin 2011-010, the Zoning Resolution, or the Housing Maintenance Code. The sole controlling passage, AC 28-210.1, regulates conversion of a dwelling for occupancy by more than the legally authorized number of families. It neither authorizes a cellar bathroom nor establishes fixture-count, cellar-use, or bathroom-installation conditions.",
+        "supportedPoints": [
+          {
+            "heading": "Family-count conversions are restricted",
+            "explanation": "AC 28-210.1 makes it unlawful, except in accordance with all requirements of this code, to convert a dwelling for occupancy by more than the legally authorized number of families, or to assist, take part in, maintain, or permit maintenance of that conversion. Its application to this proposal depends on whether the cellar use or work involves such a conversion.",
+            "sectionID": "9361",
+            "sourceIDs": [
+              "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "AC 28-210.1 provides that conversion for occupancy by more than the legally authorized number of families is unlawful except in accordance with all requirements of this code. Therefore, if the proposed cellar use or work creates, maintains, or assists such a conversion, that conversion is prohibited unless it meets all requirements of this code. The current facts do not establish the lawful family count, actual or proposed occupancy arrangement, or whether the bathroom relates to a conversion.\n\nThe authoritative text, status, and conditions of Buildings Bulletin 2011-010 were not supplied. The Zoning Resolution was not searched in this research scope, and no Housing Maintenance Code provision was supplied. Those authorities therefore cannot establish permission on this record. Nor does the supplied Construction Code evidence include the plumbing, sanitary-fixture, cellar-habitation, ventilation, egress, permit, or approval provisions needed to decide whether this installation itself complies.",
+        "assumptions": [],
+        "missingFacts": [
+          "The dwelling’s legally authorized family count and actual and proposed occupancy arrangement.",
+          "The intended cellar use and layout, including whether the bathroom would serve or facilitate a dwelling unit or an occupancy conversion.",
+          "The authoritative Buildings Bulletin text and all stated conditions.",
+          "Lawful family count and occupancy.",
+          "Zoning Resolution compliance.",
+          "Housing Maintenance Code compliance.",
+          "Other applicable code provisions and agency records."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "Permitext evaluated only the enacted evidence assembled for this question. That evidence does not establish a rule permitting or prohibiting this particular three-fixture cellar bathroom.",
+          "NYC Zoning Resolution was not searched. Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+          "No authoritative Buildings Bulletin 2011-010 text or Housing Maintenance Code provision was supplied.",
+          "The supplied evidence does not include provisions governing plumbing fixtures, cellar bathroom installation, ventilation, habitability, egress, permits, or approvals."
+        ],
+        "additionalEvidenceNeeded": [
+          "The complete authoritative Buildings Bulletin 2011-010, including its effective status and all stated conditions.",
+          "Applicable enacted Zoning Resolution provisions for the property and proposed cellar use.",
+          "Applicable enacted Housing Maintenance Code provisions.",
+          "Applicable current NYC Plumbing, Building, Mechanical, and Administrative Code provisions governing the proposed installation.",
+          "For professional reliance, relevant Department of Buildings records and approved construction documents."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "9361",
+            "sectionNumber": "28-210.1",
+            "title": "§ 28-210.1 Illegal residential conversions.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "bd8964b0-7399-4c1c-8769-4af77d8b165e",
+                "selectedText": "It shall be unlawful, except in accordance with all requirements of this code, to convert any dwelling for occupancy by more than the legally authorized number of families or to assist, take part in, maintain or permit the maintenance of such conversion. Upon the finding of such violation and the imposition of punishment for such violation as set forth in this code the department or if applicable the environmental control board shall forward to the internal revenue service, the New York state department of taxation and finance and the New York city department of finance the name and address of the respondent or defendant, the address of the building or structure with respect to which the violation occurred and the time period during which the violation was found to have existed.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "AC 28-210.1 supplies the enacted restriction on conversion of a dwelling for occupancy by more than the legally authorized number of families, but does not itself authorize the proposed bathroom."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "9361",
+          "113",
+          "8796",
+          "9812",
+          "10280"
+        ],
+        "evidenceSourceIDs": [
+          "bd8964b0-7399-4c1c-8769-4af77d8b165e",
+          "research-permitext_discovered-id:113-2",
+          "research-permitext_discovered-id:8796-3",
+          "research-permitext_discovered-id:9812-4",
+          "research-permitext_discovered-id:10280-5"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 5,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 4,
+          "userPinnedCount": 1,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 7,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "AC 28-210.1",
+              "summary": "AC 28-210.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "AC 28-210.1",
+              "summary": "AC 28-210.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrouted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-2"
+              ]
+            },
+            {
+              "label": "AC 28-101.5",
+              "summary": "AC 28-101.5 is supporting enacted evidence on the unrouted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8796-3"
+              ]
+            },
+            {
+              "label": "AC 28-401.3",
+              "summary": "AC 28-401.3 is supporting enacted evidence on the unrouted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9812-4"
+              ]
+            }
+          ],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:8796-3",
+            "research-permitext_discovered-id:9812-4",
+            "research-permitext_discovered-id:10280-5"
+          ],
+          "projectFactsUsed": [
+            "Building: One- or two-family dwelling with a proposed three-fixture bathroom in the cellar",
+            "Claim: Buildings Bulletin 2011-010 is said to permit the bathroom",
+            "Available Evidence: Only AC 28-210.1 is selected from Permitext's current Construction Code Research library"
+          ],
+          "unresolvedProjectFacts": [
+            "Unknowns: the authoritative Buildings Bulletin text and all stated conditions",
+            "Unknowns: lawful family count and occupancy",
+            "Unknowns: cellar use and layout",
+            "Unknowns: Zoning Resolution compliance",
+            "Unknowns: Housing Maintenance Code compliance",
+            "Unknowns: other applicable code provisions and agency records"
+          ],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Building: One- or two-family dwelling with a proposed three-fixture bathroom in the cellar",
+            "Claim: Buildings Bulletin 2011-010 is said to permit the bathroom",
+            "Available Evidence: Only AC 28-210.1 is selected from Permitext's current Construction Code Research library"
+          ],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "Does the current Permitext Construction Code evidence prove that a three-fixture bathroom is permitted in the cellar of this one- or two-family dwelling under Buildings Bulletin 2011-010, the Zoning Resolution, and the Housing Maintenance Code?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Does the current Permitext Construction Code evidence prove that a three-fixture bathroom is permitted in the cellar of this one- or two-family dwelling under Buildings Bulletin 2011-010, the Zoning Resolution, and the Housing Maintenance Code?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+          ],
+          "citedEvidenceSourceIDs": [
+            "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:8796-3",
+            "research-permitext_discovered-id:9812-4",
+            "research-permitext_discovered-id:10280-5"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:bd8964b0-7399-4c1c-8769-4af77d8b165e",
+              "label": "AC 28-210.1 — § 28-210.1 Illegal residential conversions.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:bd8964b0-7399-4c1c-8769-4af77d8b165e",
+              "label": "AC 28-210.1 — § 28-210.1 Illegal residential conversions.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260827-authority-term-boundary-v17",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "citedSourceIDs": [
+            "bd8964b0-7399-4c1c-8769-4af77d8b165e"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:8796-3",
+            "research-permitext_discovered-id:9812-4",
+            "research-permitext_discovered-id:10280-5"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 4,
+            "reviewedOnlyProvisionCount": 4,
+            "assembledSourceCount": 5,
+            "assembledProvisionCount": 5
+          },
+          "sources": [
+            {
+              "sourceID": "bd8964b0-7399-4c1c-8769-4af77d8b165e",
+              "sectionID": "9361",
+              "reference": "AC 28-210.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "It shall be unlawful, except in accordance with all requirements of this code, to convert any dwelling for occupancy by more than the legally authorized number of families or to assist, take part in, maintain or permit the maintenance of such conversion. Upon the finding of such violation and the imposition of punishment for such violation as set forth in this code the department or if applicable the environmental control board shall forward to the internal revenue service, the New York state department of taxation and finance and the New York city department of finance the name and address of the respondent or defendant, the address of the building or structure with respect to which the violation occurred and the time period during which the violation was found to have existed."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-2",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrouted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "CELLAR. That portion of a building that is partly or wholly underground, and having one-half or more of its clear height (measured from finished floor to finished ceiling) below the grade plane. Cellars shall not be counted as stories in measuring the height of the buildings. CONSTRUCTION. The excavation, erection, alteration, and repair of buildings or any component parts, including all operations incidental thereto. DWELLING. A building or structure that is occupied in whole or in part as the home, residence or sleeping place of one or more families. DWELLING, TWO-FAMILY. Any building or structure designed and occupied exclusively for residence purposes on a long-term basis for more than a month at a time by not more than two families. Two-family dwellings shall also be deemed to include a dwelling located in a series of two-family dwellings each of which faces or is accessible to a legal street or public thoroughfare, provided that each such dwelling is equipped as a separate dwelling with all essential services, and also provided that each such dwelling is arranged so that it may be approved as a legal two-family dwelling. FAMILY. 1. A single person occupying a dwelling unit and maintaining a common household with not more than two boarders, roomers or lodgers; 2. Two or more persons related by blood, adoption, legal guardianship, marriage or domestic partnership; occupying a dwelling unit and maintaining a common household with not more than two boarders, roomers or lodgers; 3. Not more than three unrelated persons occupying a dwelling unit and maintaining a common household; 4. Not more than three unrelated persons occupying a dwelling unit in a congregate housing or shared living arrangement and maintaining a common household; 5. Members of a group home; 6. Foster children placed in accordance with provisions of the New York State Social Services Law , their foster parent(s), and other persons related to the foster parents by blood, marriage or domestic partnership; where all residents occupy and maintain a common household with not more than two boarders, roomers or lodgers; or 7. Up to seven unrelated students enrolled at a single accredited college or university occupying a student apartment and maintaining a common household pursuant to a lease, sublease, or occupancy agreement directly with such college or university, provided that: 7.1. The entire structure in which the dwelling unit is located is fully sprinklered in accordance with Chapter 9 of this code; 7.2. Such occupancy does not exceed the maximums contained in Section 27-2075 (a) of the New York City Housing Maintenance Code ; 7.3. Prior to commencement of such occupancy, and on an annual basis thereafter such college or university has submitted a fire safety plan containing fire safety and evacuation procedures for such dwelling unit that is acceptable to the Fire Commissioner and in compliance with any rules promulgated by the Fire Commissioner; and 7.4. The dwelling unit complies with additional occupancy and construction requirements as may be established by rule by the Housing Preservation and Development Commissioner. A common household is deemed to exist if all household members have access to all parts of the dwelling unit. Lack of access to all parts of the dwelling unit establishes a rebuttable presumption that no common household exists. NEW CONSTRUCTION. See Section G201.1.2. OTHER STRUCTURES . Structures , other than buildings , for which loads are specified in Chapter 16 . SERVICES. Includes, but is not limited to, toilet rooms, drinking fountains, public telephones and food."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8796-3",
+              "sectionID": "8796",
+              "reference": "AC 28-101.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrouted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.5 § 28-101.5 Definitions. As used in this chapter and elsewhere in this title, the following terms shall have the following meanings unless the context or subject matter requires otherwise: 1968 BUILDING CODE. Chapter 1 of title 27 of the administrative code as hereafter in effect. 1968 OR PRIOR CODE BUILDINGS OR STRUCTURES (PRIOR CODE BUILDINGS). (i) A building or structure in existence prior to July 1, 2008 or one for which a lawful building permit was issued for the erection of such building or structure prior to July 1, 2008. (ii) A building or structure erected in accordance with the 1968 building code under a lawful building permit issued for the erection of such building or structure on or after July 1, 2008 in accordance with section 28-101.4.2 of this code. ACCEPTANCE OR ACCEPTED. In reference to construction documents, the endorsement by the department of construction documents with less than full examination by the department based on the professional certification of a registered design professional in accordance with a program established by the commissioner. ADDITION. An alteration of a building in existence that increases its exterior dimensions including but not limited to an extension or increase in floor area or height (including an increase in height or area resulting from the construction of a rooftop structure or rooftop mechanical equipment) of the building. ADMINISTRATIVE CODE. The administrative code of the city of New York. ALTERATION. Any construction, addition, change of use or occupancy, or renovation to a building or structure in existence. APPROVAL OR APPROVED. In reference to construction documents, the determination by the department after full examination that submitted construction documents comply with this code and other applicable laws and rules. In reference to materials, the determination by the commissioner that material is acceptable for its intended use. APPROVED AGENCY. An established and recognized agency that is regularly engaged in conducting tests or furnishing inspection services, when approved pursuant to department rules as qualified to perform or witness identified testing or inspection services. APPROVED FABRICATOR. An established and qualified person, firm or corporation approved by the commissioner to custom manufacture or build products or assemblies regulated by this code, including the production of concrete. APPROVED INSPECTION AGENCY. An approved agency that is approved by the department as qualified to perform one or more of the inspections required by this code. APPROVED TESTING AGENCY. An approved agency that is approved by the department as qualified to test and evaluate the performance of one or more of the materials regulated in their use by this code. Such term shall include, when approved pursuant to department rules, a third party testing or certification agency, evaluation agency, testing laboratory, testing service, licensed concrete testing laboratory, or other entity concerned with product evaluation. ARCHITECT. A person licensed and registered to practice the profession of architecture under the Education Law of the State of New York. BUILDING. Any structure used or intended for supporting or sheltering any use or occupancy. The term shall be construed as if followed by the phrase \"structure, premises, lot or part thereof\" unless otherwise indicated by the text. CHARTER. The New York city charter. CERTIFICATE OF COMPLIANCE. A certificate stating that materials and products meet specified standards or that work was done in compliance with approved construction documents and other applicable provisions of law, or, with respect to specified service equipment, a certificate issued by the department authorizing the operation of such equipment. CITY. The city of New York. COMMISSIONER. The commissioner of buildings of the city of New York, or his or her duly authorized representative. CONSTRUCTION DOCUMENTS. Plans and specifications and other written, graphic and pictorial documents, prepared or assembled for describing the design, location, physical characteristics, and other elements of the project necessary for obtaining a building permit. DAY. A calendar day, computed in accordance with section 20 of the New York state general construction law, unless otherwise specified as a business day. DEFERRED SUBMITTAL. Those portions of the design that are not submitted at the time of the application for construction document approval and that are to be submitted to the department within a specified period of time after the issuance of a permit. DEMOLITION. Full or partial demolition. DEMOLITION, FULL. The dismantling, razing, or removal of all of a building or structure, including all operations incidental thereto. DEMOLITION, PARTIAL. The dismantling, razing, or removal of structural members, floors, interior bearing walls, and/or exterior walls or portions thereof, including all operations incidental thereto. DEPARTMENT. The department of buildings of the city of New York. ENGINEER. A person licensed and registered to practice the profession of engineering under the Education Law of the State of New York. ENLARGEMENT. An addition. ENVIRONMENTAL CONTROL BOARD or ECB. The environmental control board established pursuant to section 1049-a of the charter within the office of administrative trials and hearings. EXISTING BUILDING OR STRUCTURE. A completed building or structure that is in existence at the time of an applicable reference in this code. FABRICATED ITEM. Products and assemblies regulated by this code that are custom manufactured or built prior to their incorporation into the work at the construction site. Fabricated items shall not include listed, labeled or approved products or assemblies. Materials produced in accordance with standard specifications referenced by this code, such as rolled structural steel shapes, steel-reinforcing bars, masonry units, and wood structural panels, or in accordance with a referenced standard listed in this code, which provides requirements for quality control done under the supervision of a third-party quality control agency, shall not be considered fabricated items. FIRE PROTECTION PLAN. A report containing a narrative description of the life and fire safety systems and evacuation system for a structure. GREEN BUILDING PROJECT. A building project or renovation undertaken that, when constructed, will produce, from renewable resources, a decrease in carbon, or carbon equivalent, emissions in a percentage no less than 50 percent of such building’s prior year emissions. This may include installation of renewable energy sources such as solar energy, geothermal ground source heat pumps, or wind energy systems. HEREAFTER. On or after July 1, 2008. HERETOFORE. Before July 1, 2008. INSPECTION CERTIFICATE. Identification applied to a product by an approved agency containing the name of the manufacturer, the function and performance characteristics, and the name and identification of the approved agency that indicates that the product or material has been inspected and evaluated by such approved agency. An inspection certificate shall also mean a certificate issued by the department upon satisfactory completion of an inspection or test. INTERIM CERTIFICATE OF OCCUPANCY. A type of temporary certificate of occupancy authorizing occupancy of one or more floors of a building prior to the completion of all work needed to obtain a certificate of occupancy for the building, and that remains in effect until the issuance of a certificate of occupancy for the building. LABEL. An identification applied on a product by the manufacturer that contains the name of the manufacturer, the function and performance characteristics of the product or material, and the name and identification of an approved agency and that indicates that a representative sample of the product or material has been tested and evaluated by an approved agency for compliance with nationally recognized standards or tests to determine suitable usage in a specific manner. LABELED. Material to which has been attached a label, symbol or other identifying mark of the manufacturer that contains the name of the manufacturer, the function and performance characteristics of the product or material, and the name and identification of an approved agency and that indicates that a representative sample of the material has been tested and evaluated by an approved agency for compliance with nationally recognized standards or tests to determine suitable usage in a specified manner. LAND SURVEYOR. A person licensed and registered to practice the profession of land surveying under the Education Law of the State of New York. LANDSCAPE ARCHITECT. A person licensed and registered to practice the profession of landscape architecture under the education law of the state of New York. LETTER OF COMPLETION. A document issued by the department indicating that permitted work has been completed, including satisfactory final inspection in accordance with this code. A letter of completion is issued only in circumstances where a certificate of occupancy is not required upon completion of the permitted work. LIMITED ALTERATION APPLICATION. Application for limited oil-burning appliance alterations, limited plumbing alterations, limited sprinkler alterations and limited standpipe alterations submitted pursuant to exception 1 of section 28-104.6 . Such work shall not include any associated work that would otherwise require an alteration permit including, but not limited to, any construction of fire-rated partitions and enclosures. Category 1 work shall be limited to a new installation into an existing building or system. The utilization of this category shall be limited by an annual monetary cap. Category 2 work shall include any existing system or component that is replaced, repaired or altered. This category shall not be limited by a monetary cap. LIMITED OIL-BURNING APPLIANCE ALTERATIONS. An alteration, installation, replacement or repair to an oil-burning appliance that is limited in scope, falling into one of the following categories. Any construction or alteration to fire-rated partitions or enclosures, with the exception of through-penetrations that are firestopped, shall require a separate application filed with the department. Category 1. An addition to an existing oil-burning appliance where the total cost of the proposed Category 1 work in the building does not exceed $50,000 in any 12-month period and where the proposed work is limited to the installation of: 1. oil equipment, 2. oil-fired appliances, located within the same enclosure or room as the existing oil-burning appliance, 3. unit heaters, or 4. oil piping including no more than two above-ground oil tanks each with a capacity of no more than 330 gallons (1250 L) provided such oil tanks also comply with the capacity limits established in section 1305.11 of the New York city mechanical code. The newly installed tanks shall have a UL listing, be labeled or meet the alternative tank design and construction standards contained in section 1305.14 of the New York city mechanical code. Category 2. An alteration, repair or replacement of an existing oil-burning appliance that is not subject to cost or duration limitations and that is limited to the following: 1. Replacement of oil burners, oil-burning appliances or water heaters in which the heat input per appliance does not exceed 3 million Btu/h (879 kW). 2. Relocation of an oil burner or oil-burning appliance or water heater within the same enclosure or room. 3. Placement of a temporary department of buildings registered oil-fired mobile boiler and corresponding fuel oil storage tank with associated piping at a site for emergency heating. 4. Placement of a temporary fuel oil storage tank with a capacity of 5,000 gallons (18 927 L) or less at a site for emergency use and connected to an existing oil-burning appliance. 5. Repair, replacemen"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9812-4",
+              "sectionID": "9812",
+              "reference": "AC 28-401.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrouted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-401.3 § 28-401.3 Definitions. As used in this chapter the following terms shall have the following meanings unless the context or subject matter requires otherwise. BOILER, HIGH-PRESSURE. An appliance for supplying steam or hot water that, for a steam boiler, operates at a pressure of more than 15 psig (103 kPa gauge), and for a hot water boiler, operates at a pressure exceeding 160 psig (1103 kPa gauge) or at a temperature exceeding 250°F (121°C). CERTIFICATE OF COMPETENCE. A certificate issued by the department to an individual representing that such individual has completed all requirements for the master plumber or master fire suppression piping contractor license but has not obtained a seal and that such certificate of competence has been renewed as required and is currently in effect. The certificate of competence shall bear the name of the holder and the certificate number. The holder of a certificate of competence is not a licensed master plumber or licensed master fire suppression piping contractor and may practice the trade for which the certificate is issued only under the direct and continuing supervision of a licensed master plumber or licensed master fire suppression piping contractor or, with respect to a city employee under the direct and continuing supervision of a supervising licensed master plumber or licensed master fire suppression piping contractor. CITY AGENCY. A city, county, borough, or other office, position, administration, department, division, bureau, board or commission, or a corporation, institution or agency of government, the expenses of which are paid, in whole or in part, from the city treasury. COMBINED STANDPIPE SYSTEM. A standpipe to which a sprinkler system is connected or is being connected. DIRECT AND CONTINUING SUPERVISION. Responsible control exercised by a licensed individual, either personally or through one or more, but no more than three, levels of competent supervision over individuals performing the actual work of the licensee's trade who are (i) in the direct employ of an individual who is a licensee, or (ii) in the direct employ of the city agency employing the licensee or (iii) in the direct employ of a business employing the licensee, as allowed by the department, or (iv) where the licensee uses his or her license on behalf of a business, in the direct employ of such business provided that such business is disclosed to the department pursuant to this chapter. Such control shall be evidenced by such licensee's signature, and seal where applicable, upon any required statements, applications and/or permits and by demonstrating involvement of the licensee in the operations of the business, including hiring of employees, responsibility for financial matters, and oversight of work performance. Direct and continuing supervision includes field inspection, supervision of job sites, and the maintenance of records of such supervision and such other requirements as the commissioner may prescribe by rule for a particular license type. DIRECT EMPLOY. An individual is in the direct employ of a licensee or business or a city agency when such individual is on the payroll of such licensee or business or city agency and under the usual common law rules applicable in determining the employer-employee relationship has the status of an employee. The work performed by such employee shall not exceed the class of license held by the licensee. Direct employment shall be evidenced by payroll records, such as social security payments, income tax withholding or the disbursement of other funds as required by law for the benefit of such employee, timekeeping records, such as time cards and sign-in sheets, work orders, and assignment or route logs. DIRECT SUPERVISION. Responsible control exercised by a licensed individual over individuals performing the actual work of the licensee's trade. Such control shall be evidenced by such licensee's signature, and seal where applicable, upon any required statements, applications and/or permits. Direct supervision includes field inspection, supervision of job sites, and the maintenance of records of such supervision and such other requirements as the commissioner may prescribe by rule for a particular license type. All work shall be performed under the guidance and direction of the licensed individual, or, for gas work, a person who holds a gas work qualification pursuant to article 423 , who shall be present at all times such trade work is conducted. ELECTRICAL WORK. The installation, alteration, maintenance, repair, or demolition of electric wires and wiring apparatus and other appliances used or to be used for the transmission of electricity for electric light, heat, power, signaling, communication, alarm, or data transmission (see also \"Minor electrical work\" as defined in section 28-101.5 ). ELEVATOR AGENCY. An approved agency authorized by the commissioner to perform elevator work and to inspect and test elevators, escalators and other conveying equipment regulated by this code. ELEVATOR AGENCY HELPER. An individual having required qualifications to perform elevator work, as defined in this chapter, under the direct and continuing supervision of an elevator agency director. ELEVATOR WORK. Alteration, assembly, installation, maintenance, repair, replacement and modernization work, as defined by ASME A17.1 as modified by appendix K of the New York city building code, performed on conveyances regulated by this code or other applicable laws or rules. Elevator work does not include material hoists, platform lifts, stair chair lifts, or personnel hoists. Outfitting, removal, refinishing, or replacement of interior finishes, including wall panels, drop ceilings, handrails and flooring, removal or replacement of interior lighting, recladding of doors, transoms and front return panels, finishing or ornamental work on elevator car operating panels shall not be considered elevator work. Operation of an elevator by any person employed as an operator of such elevator, including operation of an elevator operating under a temporary certificate of occupancy as issued by the department of buildings or such other issuing agency shall not be considered elevator work. EMPLOYEE. An individual who is on the payroll of an employer and who under the usual common law rules applicable in determining the employee-employer relationship has the status of an employee. Such term shall not include an independent contractor. FIRE SUPPRESSION PIPING SYSTEM. Any system including any and all equipment and materials in connection therewith, the purpose of which is to control, contain, suppress or extinguish fire and shall include: 1. The systems, materials and equipment described or referred to in this code which shall include any standpipe system to which a sprinkler system is or is now being connected; or 2. Up to 30 sprinkler heads off the domestic water in any one building; or 3. Any dry, liquid or gaseous chemical fire containment, suppression, control or extinguishing system or any other device or means of control, suppression, containment or extinguishing of fire. Fire suppression piping systems shall not include: 1. Any electrical components that must be installed by a licensed electrician pursuant to the New York city electrical code; or 2. Portable fire extinguishers; or 3. Connection to domestic water being used for sprinklers. FIRE SUPPRESSION PIPING WORK. The installation, maintenance, repair, modification, extension, or alteration or testing of a fire suppression piping system in any building in the city of New York. Fire suppression piping work shall not include plumbing work. GENERAL CONTRACTOR. An individual, corporation, partnership or other business entity that applies for a permit pursuant to this code to construct a new residential structure containing no more than three dwelling units. The term \"general contractor\" shall not be construed to include an individual, corporation, partnership or other business entity that holds a license pursuant to this code or subchapter twenty-two of chapter two of title twenty of the administrative code, and enters into a contract to perform work exclusively within the scope of such license, nor shall it include an individual who constructs a residential structure containing no more than three dwelling units for his or her own occupancy, or any subcontractors working for the general contractor. GOVERNMENT AGENCY. Any office, position, administration, department, division, bureau, board, commission, corporation, institution or agency under the control of any city, county, state or the federal government of the United States of America. LICENSE. A license, registration, certification or other evidence, issued by the department pursuant to this chapter, representing that an individual, a sole proprietorship, partnership, corporation, business association or other person meets the qualifications and requirements as set out in this chapter and in the rules of the department and is authorized to engage in the particular trade, occupation or business as indicated on the license and representing that such license, with associated seal, where applicable, has been renewed as required and is currently in effect. The license shall bear the holder's full name, the type of license, the license class, where applicable, the license number and any restrictions relating to the use of such license. Such term shall not include a certificate of competence. LICENSED MASTER ELECTRICIAN, MASTER ELECTRICIAN. An individual who has satisfied the requirements of this chapter for the master electrician license, who has been issued a license and seal, and who is authorized under the provisions of this chapter to perform electrical work in the city of New York. A master electrician licensee shall practice their trade in association with a master electrician business. LICENSED MASTER FIRE SUPPRESSION PIPING CONTRACTOR, MASTER FIRE SUPPRESSION PIPING CONTRACTOR. An individual who has satisfied the requirements of this chapter for the master fire suppression piping contractor license, who has been issued a license and seal, and who is authorized under the provisions of this chapter to perform fire suppression piping work in the city of New York, according to the classification of license held. A master fire suppression piping contractor licensee shall practice his or her trade in association with a master fire suppression piping contractor business or as an employee of a city agency. LICENSED MASTER PLUMBER, MASTER PLUMBER. An individual who has satisfied the requirements of this chapter for the master plumber license, who has been issued a license and seal, and who is authorized under the provisions of this chapter to perform plumbing work in the city of New York. A master plumber licensee shall practice his or her trade in association with a master plumber business or as an employee of a city agency. LICENSED SPECIAL ELECTRICIAN, SPECIAL ELECTRICIAN. An individual who has satisfied the requirements of this chapter for the special electrician license and has been issued a license and seal. A special electrician licensee shall be an employee of an individual, a partnership or a corporation owning, leasing, or managing a building, buildings, or parts thereof who has obtained written authorization from the commissioner, pursuant to this chapter, to perform electrical work in or on specific buildings, lots, or parts thereof owned, leased, or managed by such individual, corporation, or partnership. LOW VOLTAGE ELECTRICAL WORK. Refer to section 28-101.5 . MASTER ELECTRICIAN BUSINESS. A sole proprietorship, partnership, or corporation authorized by the commissioner to engage in or carry on, as an independent contractor and as its regular business, the business of performing electrical work in or on any building, premises, or lot in the city under a license issued to a master electrician. PLUMBING WORK. The installation, ma"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10280-5",
+              "sectionID": "10280",
+              "reference": "MC 201.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrouted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "201.4 201.4 Terms not defined. Where terms are not defined through the methods authorized by this section, such terms shall have ordinarily accepted meanings such as the context implies. Section MC 202: General Definitions ABRASIVE MATERIALS. Moderately abrasive particulate in high concentrations, and highly abrasive particulate in moderate and high concentrations, such as alumina, bauxite, iron silicate, sand and slag. ABSORPTION SYSTEM. A refrigerating system in which refrigerant is pressurized by pumping a chemical solution of refrigerant in absorbent, and then separated by the addition of heat in a generator, condensed (to reject heat), expanded, evaporated (to provide refrigeration), and reabsorbed in an absorber to repeat the cycle; the system may be single or multiple effect, the latter using multiple stages or internally cascaded use of heat to improve efficiency. ACCESS (TO). That which enables a device, fixture, appliance or equipment to be reached by ready access or by a means that first requires the removal or movement of a panel, door or similar obstruction (see also \"Ready access (to)\"). AIR. All air supplied to mechanical equipment and appliances for combustion, ventilation, cooling, and similar purposes. Standard air is air at standard temperature and pressure, namely, 70°F (21.1°C) and 29.92 inches of mercury (101.3 kPa). AIR CONDITIONING. The treatment of air so as to control simultaneously the temperature, humidity, cleanness and distribution of the air to meet the requirements of a conditioned space. AIR-CONDITIONING SYSTEM. A system that consists of heat exchangers, blowers, filters, supply, exhaust and return ducts, and shall include any apparatus installed in connection therewith. AIR DISPERSION SYSTEM. Any diffuser system designed to both convey air within a room, space or area and diffuse air into that space while operating under positive pressure. Systems are commonly constructed of, but not limited to, fabric or plastic film. AIR DISTRIBUTION SYSTEM. Any system of ducts, plenums and air-handling equipment that circulates air within a space or spaces and includes systems made up of one or more air-handling units. AIR, EXHAUST. Air being removed from any space, appliance or piece of equipment and conveyed directly to the atmosphere by means of openings or ducts. AIR-HANDLING UNIT. A blower or fan used for the purpose of distributing supply air to a room, space or area. AIR, INTAKE. Air supplied from the outdoors to any space, appliance or piece of equipment. AIR, MAKEUP. Any combination of outdoor and transfer air intended to replace exhaust air and exfiltration. AIR, OUTDOOR. Ambient air that enters a building through a ventilation system, through intentional openings for natural ventilation, or by infiltration. AIR, RELIEF. Air removed from any space, appliance or piece of equipment that serves to balance building pressurization due to introduction of outdoor air. Exhaust air shall not be considered relief air. AIR, RETURN. Air removed from a conditioned space or location and recirculated or relieved to the outdoors. AIR, TRANSFER. Air moved from one indoor space to another. AIR TRANSFER OPENING. An opening designed to allow the movement of environmental air between two contiguous spaces. APPLIANCE. A device or apparatus that is manufactured and designed to utilize energy and for which this code provides specific requirements. APPLIANCE, EXISTING . Any appliance regulated by this code that was legally installed prior to the effective date of this code, or for which a permit to install has been issued. APPLIANCE, FUEL-FIRED. An appliance that burns solid, liquid and/or gaseous fuel, including but not limited to wood stoves, household cooking ranges, furnaces, boilers, water heaters, clothes dryers and gas-fired refrigerators. APPLIANCE, GAS (EQUIPMENT). Any apparatus or equipment that uses gas as a fuel or raw material to produce light, heat, power, refrigeration or air conditioning. APPLIANCE TYPE. High-heat appliance. Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature greater than 2,000°F (1093.3°C). Low-heat appliance (residential appliance). Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature of 1,000°F (537.8°C) or less. Medium-heat appliance. Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature of more than 1,000°F (537.8°C), but not greater than 2,000°F (1093.3°C). APPLIANCE, VENTED. An appliance designed and installed in such a manner that all of the products of combustion are conveyed directly from the appliance to the outdoor atmosphere through an approved chimney or vent system. AUTOMATIC BOILER. Any class of boiler that is equipped with the controls and limit devices specified in Chapter 10 . BATHROOM. A room containing a bathtub, shower, spa or similar bathing fixture. BOILER, HIGH-PRESSURE. An appliance for supplying steam or hot water that, for a steam boiler, operates at a pressure of more than 15 psig (103.4 kPa gauge), and for a hot water boiler, operates at a pressure exceeding 160 psig (1103.2 kPa gauge) or at a temperature exceeding 250°F (121.1°C). BOILER, LOW-PRESSURE. A self-contained appliance for supplying steam or hot water as follows: Hot water heating boiler. A boiler in which no steam is generated, from which hot water is circulated for heating purposes and then returned to the boiler, and that operates at water pressures not exceeding 160 pounds per square inch gauge (psig) (1103.2 kPa gauge) and at water temperatures not exceeding 250°F (121.1°C) at or near the boiler outlet. Hot water supply boiler. A boiler, completely filled with water, which furnishes hot water to be used externally to itself, and that operates at water pressures not exceeding 160 psig (1103.2 kPa gauge) and at water temperatures not exceeding 250°F (121.1°C) at or near the boiler outlet. Steam heating boiler. A boiler in which steam is generated and that operates at a steam pressure not exceeding 15 psig (103.4 kPa gauge). BOILER ROOM. A room primarily utilized for the installation of a boiler. BRAZED JOINT. A gas-tight joint obtained by the joining of metal parts with metallic mixtures or alloys that melt at a temperature above 1,000°F (537.8°C), but lower than the melting temperature of the parts to be joined. BRAZING. A metal-joining process wherein coalescence is produced by the use of a nonferrous filler metal having a melting point above 1,000°F (537.8°C), but lower than that of the base metal being joined. The filler material is distributed between the closely fitted surfaces of the joint by capillary attraction. BREATHING ZONE. The region within an occupied space between planes 3 and 72 inches (76.2 and 1828.8 mm) above the floor and more than 2 feet (609.6 mm) from the walls of the space or from fixed air-conditioning equipment. BTU. Abbreviation for British thermal unit, which is the quantity of heat required to raise the temperature of 1 pound (453.6 g) of water 1°F (-17.22°C) (1 Btu = 1055 J). CEILING RADIATION DAMPER. A listed device installed in a ceiling membrane of a fire-resistance-rated floor/ceiling or roof/ceiling assembly to limit automatically the radiative heat transfer through an air inlet/outlet opening. CHIMNEY. A primarily vertical structure containing one or more flues used to remove products of combustion from fuel-burning appliances, refuse incineration, or industrial processes. Factory-built chimney. A listed and labeled chimney composed of factory-made components, assembled in the field in accordance with manufacturer's instructions and the conditions of the listing. Masonry chimney. A field-constructed chimney composed of solid masonry units, bricks, stones or concrete. Metal chimney. A field-constructed chimney composed of metal. CHIMNEY CONNECTOR. A pipe that connects a fuel-burning appliance to a chimney. CLEARANCE. The minimum distance through air measured between the heat-producing surface of the mechanical appliance, device or equipment and the surface of the combustible material or assembly. CLOSED COMBUSTION SOLID FUEL-BURNING APPLIANCE. A heat-producing appliance that employs a combustion chamber that does not have openings other than the flue collar, fuel charging door and adjustable openings provided to control the amount of combustion air that enters the combustion chamber. CLOTHES DRYER. An appliance used to dry wet laundry by means of heat. COMBINATION FIRE/SMOKE DAMPER. A listed device installed in ducts and air transfer openings designed to close automatically upon the detection of heat and resist the passage of flame and smoke. The device is installed to operate automatically, be controlled by a smoke detection system, and where required, is capable of being positioned from a fire command center. COMBUSTIBLE ASSEMBLY. Wall, floor, ceiling or other assembly constructed of one or more component materials that are not defined as noncombustible. COMBUSTIBLE LIQUID. For the purposes of transportation, a combustible liquid as defined in the regulations of the United States Department of Transportation, as set forth in 49 CFR 173.120. For all other purposes, a liquid, other than a compressed gas or cryogenic fluid, having a closed cup flash point at or above 100°F (37.8°C) classified as follows: Class II. Liquids having a closed cup flash point at or above 100°F (37.8°C) and below 140°F (60°C). Class IIIA. Liquids having a closed cup flash point at or above 140°F (60°C) and below 200°F (93.3°C). Class IIIB. Liquids having a closed cup flash point at or above 200°F (93.3°C). COMBUSTIBLE MATERIAL. Any material not defined as noncombustible. COMBUSTION. In the context of this code, refers to the rapid oxidation of fuel accompanied by the production of heat or heat and light. COMBUSTION AIR. Air necessary for complete combustion of a fuel, including theoretical air and excess air. COMBUSTION CHAMBER. The portion of an appliance within which combustion occurs. COMBUSTION PRODUCTS. Constituents resulting from the combustion of a fuel with the oxygen of the air, including the inert gases, but excluding excess air. COMMERCIAL COOKING APPLIANCES. Appliances used in a commercial food service establishment for heating or cooking food and which produce grease vapors, steam, fumes, smoke or odors that are required to be removed through a local exhaust ventilation system. Such appliances include deep fat fryers; upright broilers; griddles; broilers; steam-jacketed kettles; hot-top ranges; under-fired broilers (charbroilers); ovens; barbecues; rotisseries; and similar appliances. For the purpose of this definition, a food service establishment shall include any building or a portion thereof used for the preparation and serving of food. COMMERCIAL COOKING RECIRCULATING SYSTEM. Self-contained system consisting of the exhaust hood, the cooking equipment, the filters and the fire suppression system. The system is designed to capture cooking vapors and residues generated from commercial cooking equipment. The system removes contaminants from the exhaust air and recirculates the air to the space from which it was withdrawn. COMMERCIAL KITCHEN EXHAUST HOODS. Backshelf hood. A backshelf hood is also referred to as a low-proximity hood, or as a sidewall hood where wall mounted. Its front lower lip is low over the appliance(s) and is \"set back\" from the front of the appliance(s). It is always closed to the rear of the appliances by a panel where free-standing, or by a panel or wall where wall mounted, and its height above the cooking surface varies. (This style of hood can be constructed with partial end panels to increase its effectiveness in capturing the effluent generated by the cooking operation). Double island canopy hood. A double island canopy hood is place"
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "Does the current Permitext Construction Code evidence prove that a three-fixture bathroom is permitted in the cellar of this one- or two-family dwelling under Buildings Bulletin 2011-010, the Zoning Resolution, and the Housing Maintenance Code?\nProject facts: Building: One- or two-family dwelling with a proposed three-fixture bathroom in the cellar; Claim: Buildings Bulletin 2011-010 is said to permit the bathroom; Available Evidence: Only AC 28-210.1 is selected from Permitext's current Construction Code Research library; Unknowns: the authoritative Buildings Bulletin text and all stated conditions; Unknowns: Housing Maintenance Code compliance; Unknowns: other applicable code provisions and agency records; Unknowns: cellar use and layout; Unknowns: Zoning Resolution compliance; Unknowns: lawful family count and occupancy",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Does the current Permitext Construction Code evidence prove that a three-fixture bathroom is permitted in the cellar of this one- or two-family dwelling under Buildings Bulletin 2011-010, the Zoning Resolution, and the Housing Maintenance Code?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Does the current Permitext Construction Code evidence prove that a three-fixture bathroom is permitted in the cellar of this one- or two-family dwelling under Buildings Bulletin 2011-010, the Zoning Resolution, and the Housing Maintenance Code?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "Does the current Permitext Construction Code evidence prove that a three-fixture bathroom is permitted in the cellar of this one- or two-family dwelling under Buildings Bulletin 2011-010, the Zoning Resolution, and the Housing Maintenance Code?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 1,
+            "candidateCount": 12,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 0,
+            "characterCount": 41264,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "outside-current-library",
+              "text": "The current candidate set does not establish requirements controlled by the outside authorities identified below."
+            },
+            {
+              "code": "RESEARCH_CORPUS_LIMITATION",
+              "text": "NYC Zoning Resolution was not searched. Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [
+              {
+                "kind": "outside-current-library",
+                "label": "NYC Zoning Resolution Research",
+                "sourceName": "NYC Zoning Resolution",
+                "sourceURL": "https://zr.planning.nyc.gov/",
+                "text": "NYC Zoning Resolution Research may require authoritative material outside the corpora routed for this Research turn."
+              },
+              {
+                "kind": "outside-current-library",
+                "label": "NYC Buildings Bulletins",
+                "sourceName": "NYC Department of Buildings — Buildings Bulletins",
+                "sourceURL": "https://www.nyc.gov/site/buildings/codes/building-bulletins.page",
+                "text": "NYC Buildings Bulletins may require authoritative material outside the corpora routed for this Research turn."
+              },
+              {
+                "kind": "outside-current-library",
+                "label": "NYC Housing Maintenance Code",
+                "sourceName": "NYC Laws — Housing Maintenance Code",
+                "sourceURL": "https://www.nyc.gov/site/hpd/services-and-information/housing-maintenance-code.page",
+                "text": "NYC Housing Maintenance Code may require authoritative material outside the corpora routed for this Research turn."
+              }
+            ],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "blockedReason": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+                "routeReason": "zoning cue"
+              }
+            ],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260827-supporting-web-v9",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-271f8bc6-1d78-4e7e-9e10-d273022b6a14",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-07-16",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "zoning cue",
+                "blockedReason": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · NYC Zoning Resolution unavailable for Research · Project default applied",
+            "limitation": "NYC Zoning Resolution was not searched. Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+            "resolvedAt": "2026-08-27T22:42:57.605Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [
+            "selected_evidence_boundary"
+          ],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 2,
+          "regenerated": true,
+          "history": [
+            {
+              "pass": false,
+              "issues": [
+                {
+                  "type": "fact_evidence_confusion",
+                  "detail": "The missingFacts field lists missing evidence and research materials as if they were unresolved project facts, including the authoritative Buildings Bulletin text, applicable code provisions, Zoning Resolution compliance, Housing Maintenance Code provisions, and agency records. These belong in evidence limitations or additionalEvidenceNeeded; missingFacts should identify unresolved project conditions such as lawful family count, occupancy, cellar use, and layout."
+                },
+                {
+                  "type": "misstated_provision",
+                  "detail": "The answer repeatedly paraphrases AC 28-210.1 as requiring compliance with “all applicable code requirements.” The selected text says “all requirements of this code.” That broader formulation risks attributing requirements outside the cited provision to AC 28-210.1."
+                }
+              ],
+              "model": "gpt-5.6-luna"
+            },
+            {
+              "pass": true,
+              "issues": [],
+              "model": "permitext-deterministic-post-repair-acceptance"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T22:42:57.605Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v3",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 2,
+          "verificationIssueTypes": [
+            "fact_evidence_confusion",
+            "misstated_provision"
+          ]
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 42982,
+          "cachedInputTokens": 5153,
+          "outputTokens": 2373,
+          "totalTokens": 45355
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.078099,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "3aa91c3c-9089-4c15-a7ae-9d4d2ae148e5",
+        "createdAt": "2026-08-27T22:42:57.604Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra",
+          "gpt-5.6-luna"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v3",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 2,
+        "verificationIssueTypes": [
+          "fact_evidence_confusion",
+          "misstated_provision"
+        ],
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 42982,
+        "cachedInputTokens": 5153,
+        "outputTokens": 2373,
+        "totalTokens": 45355,
+        "estimatedCostUSD": 0.078099,
+        "actualProviderCostUSD": 0.078099,
+        "conservativeProviderCostUSD": 0.078099,
+        "durationMilliseconds": 28256,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T22:43:41.969Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 15728,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 3871,
+              "cachedInputTokens": 0,
+              "outputTokens": 1697,
+              "totalTokens": 5568
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 3871,
+          "cachedInputTokens": 0,
+          "outputTokens": 1697,
+          "totalTokens": 5568
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "The answer accurately attributes to AC 28-210.1 the restriction on converting, assisting, maintaining, or permitting conversion of a dwelling for occupancy beyond the legally authorized number of families. It expressly distinguishes that rule from approval of a cellar bathroom, as required.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 3,
+            "rationale": "The central legal conclusions are grounded in the absence of the needed authorities from the selected evidence and in the text of AC 28-210.1. However, the answer adds an unsupported statement about Permitext/AI Research's zoning-search exclusion and unspecified internal 'gates'; that operational assertion is not in the supplied evidence or rubric.",
+            "failureExcerpt": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": [
+              "“Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.”"
+            ]
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer appropriately concludes only that the current evidence does not prove permission. It identifies the absent bulletin, zoning, Housing Maintenance Code, and project-specific facts, and does not purport to make a compliance determination.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly states that the sole selected passage cannot establish whether the three-fixture cellar bathroom is permitted and identifies the additional authorities and facts necessary for a determination.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a clear no-proof conclusion, explains the limited illegal-conversion issue, identifies relevant unknowns, and provides a concrete list of authoritative legal sources, code topics, and records to obtain.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It begins with a direct 'No' and squarely answers whether the current Permitext Construction Code evidence proves the claimed permission.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer accurately explains the family-count conversion restriction in AC 28-210.1, including the prohibition on conversion and maintenance beyond the legally authorized family count.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It expressly says AC 28-210.1 'neither authorizes a cellar bathroom' nor establishes relevant installation conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It states that the authoritative text, status, and conditions of Buildings Bulletin 2011-010 were not supplied.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It states that no Housing Maintenance Code provision was supplied and that the Zoning Resolution was not searched in the stated research scope, so those requirements are not established by the selected evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "The answer refuses to approve the bathroom from the present evidence, stating that the evidence does not prove it is permitted.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It calls for authoritative outside legal sources and identifies necessary project facts, including lawful family count, occupancy arrangement, and cellar use and layout.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects the proposition that AC 28-210.1 authorizes the cellar bathroom.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It says the authoritative Buildings Bulletin text and conditions were not supplied; it does not represent the bulletin as analyzed selected evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It makes no universal assertion about one- or two-family dwellings being allowed cellar bathrooms.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It cautions that the bathroom's relationship to a conversion depends on the proposed cellar use and work; it does not say bathrooms never affect conversion analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It expressly states that the current record cannot establish permission under zoning and seeks applicable Zoning Resolution provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It expressly states that no Housing Maintenance Code provision was supplied and requests applicable enacted provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "It does not approve or find the proposed bathroom compliant; it concludes that the evidence does not prove permission.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies the need for the complete authoritative Buildings Bulletin 2011-010, its effective status, and all stated conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "It identifies the legally authorized family count and actual/proposed occupancy arrangement as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It requests the intended cellar use and layout and explains their relevance to whether the bathroom serves or facilitates a unit or conversion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It identifies the need for applicable enacted Zoning Resolution provisions for the property and proposed cellar use.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It identifies the need for applicable enacted Housing Maintenance Code provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It identifies other applicable Construction Code provisions and relevant DOB records and approved construction documents.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.028106,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 1,
+            "canonicalCount": 1,
+            "selectedEvidenceCount": 1,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 28261,
+            "inputTokens": 42982,
+            "cachedInputTokens": 5153,
+            "outputTokens": 2373,
+            "totalTokens": 45355,
+            "estimatedCostUSD": 0.078099,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "The answer accurately attributes to AC 28-210.1 the restriction on converting, assisting, maintaining, or permitting conversion of a dwelling for occupancy beyond the legally authorized number of families. It expressly distinguishes that rule from approval of a cellar bathroom, as required.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "6/6 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 3,
+              "rationale": "The central legal conclusions are grounded in the absence of the needed authorities from the selected evidence and in the text of AC 28-210.1. However, the answer adds an unsupported statement about Permitext/AI Research's zoning-search exclusion and unspecified internal 'gates'; that operational assertion is not in the supplied evidence or rubric.",
+              "failureExcerpt": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": [
+                "“Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.”"
+              ]
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/7 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer appropriately concludes only that the current evidence does not prove permission. It identifies the absent bulletin, zoning, Housing Maintenance Code, and project-specific facts, and does not purport to make a compliance determination.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "6/6 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "The answer directly states that the sole selected passage cannot establish whether the three-fixture cellar bathroom is permitted and identifies the additional authorities and facts necessary for a determination.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "It gives a clear no-proof conclusion, explains the limited illegal-conversion issue, identifies relevant unknowns, and provides a concrete list of authoritative legal sources, code topics, and records to obtain.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "It begins with a direct 'No' and squarely answers whether the current Permitext Construction Code evidence proves the claimed permission.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer accurately explains the family-count conversion restriction in AC 28-210.1, including the prohibition on conversion and maintenance beyond the legally authorized family count.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "It expressly says AC 28-210.1 'neither authorizes a cellar bathroom' nor establishes relevant installation conditions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "It states that the authoritative text, status, and conditions of Buildings Bulletin 2011-010 were not supplied.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "It states that no Housing Maintenance Code provision was supplied and that the Zoning Resolution was not searched in the stated research scope, so those requirements are not established by the selected evidence.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "The answer refuses to approve the bathroom from the present evidence, stating that the evidence does not prove it is permitted.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "It calls for authoritative outside legal sources and identifies necessary project facts, including lawful family count, occupancy arrangement, and cellar use and layout.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer expressly rejects the proposition that AC 28-210.1 authorizes the cellar bathroom.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "It says the authoritative Buildings Bulletin text and conditions were not supplied; it does not represent the bulletin as analyzed selected evidence.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "It makes no universal assertion about one- or two-family dwellings being allowed cellar bathrooms.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "It cautions that the bathroom's relationship to a conversion depends on the proposed cellar use and work; it does not say bathrooms never affect conversion analysis.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-5",
+                "rationale": "It expressly states that the current record cannot establish permission under zoning and seeks applicable Zoning Resolution provisions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-6",
+                "rationale": "It expressly states that no Housing Maintenance Code provision was supplied and requests applicable enacted provisions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-7",
+                "rationale": "It does not approve or find the proposed bathroom compliant; it concludes that the evidence does not prove permission.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The answer identifies the need for the complete authoritative Buildings Bulletin 2011-010, its effective status, and all stated conditions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "It identifies the legally authorized family count and actual/proposed occupancy arrangement as unresolved.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "It requests the intended cellar use and layout and explains their relevance to whether the bathroom serves or facilitates a unit or conversion.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "It identifies the need for applicable enacted Zoning Resolution provisions for the property and proposed cellar use.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-5",
+                "rationale": "It identifies the need for applicable enacted Housing Maintenance Code provisions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-6",
+                "rationale": "It identifies other applicable Construction Code provisions and relevant DOB records and approved construction documents.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "1/1 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. The answer accurately attributes to AC 28-210.1 the restriction on converting, assisting, maintaining, or permitting conversion of a dwelling for occupancy beyond the legally authorized number of families. It expressly distinguishes that rule from approval of a cellar bathroom, as required.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 1 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "6/6 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 3,
+            "rationale": "The central legal conclusions are grounded in the absence of the needed authorities from the selected evidence and in the text of AC 28-210.1. However, the answer adds an unsupported statement about Permitext/AI Research's zoning-search exclusion and unspecified internal 'gates'; that operational assertion is not in the supplied evidence or rubric.",
+            "failureExcerpt": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": [
+              "“Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.”"
+            ]
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer appropriately concludes only that the current evidence does not prove permission. It identifies the absent bulletin, zoning, Housing Maintenance Code, and project-specific facts, and does not purport to make a compliance determination.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "6/6 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly states that the sole selected passage cannot establish whether the three-fixture cellar bathroom is permitted and identifies the additional authorities and facts necessary for a determination.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a clear no-proof conclusion, explains the limited illegal-conversion issue, identifies relevant unknowns, and provides a concrete list of authoritative legal sources, code topics, and records to obtain.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It begins with a direct 'No' and squarely answers whether the current Permitext Construction Code evidence proves the claimed permission.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 3.84,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer accurately explains the family-count conversion restriction in AC 28-210.1, including the prohibition on conversion and maintenance beyond the legally authorized family count.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It expressly says AC 28-210.1 'neither authorizes a cellar bathroom' nor establishes relevant installation conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It states that the authoritative text, status, and conditions of Buildings Bulletin 2011-010 were not supplied.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It states that no Housing Maintenance Code provision was supplied and that the Zoning Resolution was not searched in the stated research scope, so those requirements are not established by the selected evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "The answer refuses to approve the bathroom from the present evidence, stating that the evidence does not prove it is permitted.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It calls for authoritative outside legal sources and identifies necessary project facts, including lawful family count, occupancy arrangement, and cellar use and layout.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects the proposition that AC 28-210.1 authorizes the cellar bathroom.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It says the authoritative Buildings Bulletin text and conditions were not supplied; it does not represent the bulletin as analyzed selected evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It makes no universal assertion about one- or two-family dwellings being allowed cellar bathrooms.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It cautions that the bathroom's relationship to a conversion depends on the proposed cellar use and work; it does not say bathrooms never affect conversion analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It expressly states that the current record cannot establish permission under zoning and seeks applicable Zoning Resolution provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It expressly states that no Housing Maintenance Code provision was supplied and requests applicable enacted provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "It does not approve or find the proposed bathroom compliant; it concludes that the evidence does not prove permission.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies the need for the complete authoritative Buildings Bulletin 2011-010, its effective status, and all stated conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "It identifies the legally authorized family count and actual/proposed occupancy arrangement as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It requests the intended cellar use and layout and explains their relevance to whether the bathroom serves or facilitates a unit or conversion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It identifies the need for applicable enacted Zoning Resolution provisions for the property and proposed cellar use.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It identifies the need for applicable enacted Housing Maintenance Code provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It identifies other applicable Construction Code provisions and relevant DOB records and approved construction documents.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

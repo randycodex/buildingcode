@@ -1,0 +1,2458 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T22:44:41.611Z",
+  "updatedAt": "2026-08-27T22:45:24.576Z",
+  "configuration": {
+    "runID": "6b26d0b0-9d7d-43e5-8d2e-b3716183d91a",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-project-fact-verification-v30",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-024-prior-code-roof-recovering-boundary"
+    ],
+    "caseStatuses": [
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "5439fcf1dca83265954186a0f47bd6ec173d94a3",
+    "approvedSpendCapUSD": 0.75,
+    "conservativeReservedUSD": 0.074461,
+    "actualUSD": 0.074461,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 3
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T22:45:24.435Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.039445,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.039445,
+        "p50": 0.039445,
+        "p90": 0.039445,
+        "maximum": 0.039445
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.039445,
+      "projectedCostPer100TurnsUSD": 3.94,
+      "targetReady": true,
+      "targetBand": "below"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 21230,
+      "p50": 21230,
+      "p90": 21230,
+      "maximum": 21230
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 2,
+        "p50": 2,
+        "p90": 2,
+        "maximum": 2
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-024-prior-code-roof-recovering-boundary",
+        "title": "Prior-code roof recovering does not qualify for the cool-roof exception by percentage alone",
+        "status": "draft",
+        "difficulty": "intermediate",
+        "topics": [
+          "existing buildings",
+          "prior-code buildings",
+          "roof recovering",
+          "cool roofs",
+          "conjunctive exceptions"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "building": "Existing prior-code commercial building with a roof represented as 10,000 square feet",
+          "proposedWork": "Recovering 4,000 square feet of the existing roof covering",
+          "ownerPosition": "The owner says the 1968 Building Code election avoids current cool-roof requirements because the proposed work covers less than 50 percent of the roof",
+          "unknowns": [
+            "verified total roof area",
+            "verified area to be recovered or replaced",
+            "whether the work is roof recovering or replacement within the selected provisions",
+            "roof slope, covering, and material assembly",
+            "whether another Section 1504.9 exception applies",
+            "applicable filing, approval, and inspection requirements"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "8786",
+            "reference": "AC 28-101.4.3",
+            "codePrefix": "AC",
+            "sectionNumber": "28-101.4.3",
+            "exactPassages": [
+              "12.1 Installation and materials. Work involving the recovering or replacing of an existing roof covering shall be governed by sections 1511.1 through 1511.7 of the New York city building code;",
+              "12.2 Cool roofs. Work involving the recovering or replacing of an existing roof covering shall comply with section 1504.9 of the New York city building code unless the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46 m 2 )."
+            ],
+            "resolvedTitle": "§ 28-101.4.3 Optional use of the 1968 building code for work on prior code buildings.",
+            "evidenceCharacters": 5943,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "3403",
+            "reference": "BC 1511.1",
+            "codePrefix": "BC",
+            "sectionNumber": "1511.1",
+            "exactPassages": [
+              "Materials and methods of application used for recovering or replacing an existing roof covering shall comply with the requirements of Chapter 15 .",
+              "1. Section 1504.9 shall not apply if the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46.5 m 2 )."
+            ],
+            "resolvedTitle": "1511.1 General.",
+            "evidenceCharacters": 883,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?",
+        "expectedConclusion": "No, not on the stated measurements. AC 28-101.4.3 and BC 1511.1 both condition the Section 1504.9 exception on the area to be recovered or replaced being less than 50 percent of the roof area and less than 500 square feet. The stated 4,000-square-foot scope is less than 50 percent of a 10,000-square-foot roof but is not less than 500 square feet, so percentage alone does not establish the exception. AC 28-101.4.3 also directs roof-covering recovery and replacement work to BC 1511.1 through 1511.7, and BC 1511.1 generally requires the materials and methods to comply with Chapter 15. The selected evidence therefore does not support the owner's claim that a prior-code election bypasses these roof provisions. The actual roof and work areas, work classification, roof assembly, other Section 1504.9 exceptions, and applicable filing and approval requirements must be verified. Because the technical requirements and other exceptions within Section 1504.9 are not selected, this evidence does not establish final cool-roof compliance.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The selected passages establish that both size conditions are required for this exception, but they do not verify the measurements, classify the work, supply the full Section 1504.9 requirements, or resolve other possible exceptions."
+        },
+        "sourceType": "deliberately constructed edge case",
+        "sourceReference": "Draft scenario constructed solely from canonical enacted 2022 NYC Administrative Code Section 28-101.4.3 and Building Code Section 1511.1.",
+        "reviewer": null,
+        "reviewedAt": null,
+        "notes": "Draft candidate NYC-024 broadens existing-building coverage into prior-code roof recovering and tests the conjunctive percentage-and-area exception without treating the owner's measurements or code election as proof. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.",
+        "requiredConcepts": [
+          "Treat the less-than-50-percent and less-than-500-square-foot conditions as conjunctive.",
+          "State that the represented 4,000-square-foot scope does not satisfy the less-than-500-square-foot condition.",
+          "Reject the claim that percentage alone establishes the Section 1504.9 exception.",
+          "Explain that AC 28-101.4.3 directs roof recovery and replacement work to BC 1511.1 through 1511.7.",
+          "Explain that BC 1511.1 generally requires recovering or replacement materials and methods to comply with Chapter 15.",
+          "Do not treat a prior-code or 1968 Building Code election as a waiver of the selected roof provisions.",
+          "Request verified areas, work classification, roof facts, other possible Section 1504.9 exceptions, and applicable approvals.",
+          "State that the selected evidence does not establish final Section 1504.9 technical compliance."
+        ],
+        "missingFacts": [
+          "Verified total roof area.",
+          "Verified area to be recovered or replaced.",
+          "Whether the project scope is recovering or replacing an existing roof covering under the selected provisions.",
+          "Roof slope, existing covering, proposed materials, and assembly.",
+          "Whether another exception within Section 1504.9 applies.",
+          "The applicable Section 1504.9 technical requirements.",
+          "Required filing, approval, inspection, and other applicable-code information."
+        ],
+        "forbiddenClaims": [
+          "Being under either one of the two size thresholds is sufficient.",
+          "An area equal to 50 percent satisfies a less-than-50-percent condition.",
+          "An area equal to 500 square feet satisfies a less-than-500-square-foot condition.",
+          "The owner's represented roof and work areas are verified by the selected evidence.",
+          "Electing the 1968 Building Code removes the selected Chapter 15 requirements.",
+          "The selected evidence contains every technical requirement and exception in Section 1504.9.",
+          "No other Section 1504.9 exception can apply.",
+          "The proposed roof work is approved or compliant on the stated facts."
+        ],
+        "requiredCitations": [
+          "AC 28-101.4.3",
+          "BC 1511.1"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "AC 28-101.4.3",
+            "requiredClaim": "Prior-code roof recovery and replacement work is directed to BC 1511.1 through 1511.7, and the stated cool-roof exception requires both size conditions."
+          },
+          {
+            "reference": "BC 1511.1",
+            "requiredClaim": "Chapter 15 generally governs the materials and methods, and Section 1504.9 is inapplicable under the selected exception only when both size conditions are met."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "548d3a52-6181-4749-886a-02f78780b854",
+      "answeredAt": "2026-08-27T22:45:03.149Z",
+      "answerTimeMilliseconds": 21234,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-project-fact-verification-v30:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-a2fdd49c-fdd6-462b-ac19-6fbaf32e1929",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "historical-code cue",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · 1968 NYC Building Code excluded from ordinary Research · Project default applied",
+          "limitation": "1968 NYC Building Code was not searched. Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+          "resolvedAt": "2026-08-27T22:44:41.922Z"
+        },
+        "answerText": "No. On the stated quantities, the work does not qualify for the less-than-50-percent/less-than-500-square-foot exception. Although 4,000 square feet is 40% of a represented 10,000-square-foot roof, the exception is conjunctive: the area must be both less than 50% of roof area and less than 500 square feet. At 4,000 square feet, it fails the independent 500-square-foot limit. An election to use the 1968 Building Code does not avoid this result: AC 28-101.4.3 expressly directs roof-covering recovery or replacement to BC 1511.1 through 1511.7 and requires compliance with BC 1504.9 unless that two-part exception applies. BC 1511.1 also requires the materials and application methods to comply with Chapter 15.\n\nAccordingly, unless a separate BC 1504.9 exception applies, the recovered/replaced roof covering must meet the reflectance criteria applicable to its slope: for slope no greater than 2:12, either initial solar reflectance 0.70 with thermal emittance 0.75, or SRI 82; for steeper roofs, either initial solar reflectance 0.25 with thermal emittance 0.75, or SRI 39.\n\nStill verify the actual total roof area and actual recovered/replaced area; that the scope is in fact roof recovery or replacement under these provisions; roof slope; the proposed covering/material assembly and its test documentation; and whether any of BC 1504.9's other stated exceptions applies (such as qualifying green-roof, ballasted, equipment-covered, specified material, or other listed conditions). Applicable filing, approval, and inspection requirements also remain unestablished by the supplied passages. The 1968 Code itself was not supplied or searched, but the current enacted AC provision supplied here expressly preserves the cited current roof-work requirements for an optional-1968-Code project.",
+        "conclusion": "No. On the stated quantities, the work does not qualify for the less-than-50-percent/less-than-500-square-foot exception. Although 4,000 square feet is 40% of a represented 10,000-square-foot roof, the exception is conjunctive: the area must be both less than 50% of roof area and less than 500 square feet. At 4,000 square feet, it fails the independent 500-square-foot limit. An election to use the 1968 Building Code does not avoid this result: AC 28-101.4.3 expressly directs roof-covering recovery or replacement to BC 1511.1 through 1511.7 and requires compliance with BC 1504.9 unless that two-part exception applies. BC 1511.1 also requires the materials and application methods to comply with Chapter 15.",
+        "supportedPoints": [
+          {
+            "heading": "1968-Code option retains current roof-work provisions",
+            "explanation": "For work involving recovering or replacing an existing roof covering, AC 28-101.4.3 directs the work to BC 1511.1 through 1511.7 and separately requires compliance with BC 1504.9 except under its stated area exception. BC 1511.1 requires materials and methods of application for that work to comply with Chapter 15.",
+            "sectionID": "8786",
+            "sourceIDs": [
+              "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+              "67765e71-e90e-41a2-98b5-5f449d584194"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Area exception requires both thresholds",
+            "explanation": "BC 1511.1 provides that BC 1504.9 does not apply only if the recovery/replacement area is less than 50 percent of the roof area and less than 500 square feet. With the represented areas, 4,000 square feet is below 50 percent of 10,000 square feet but is not below 500 square feet, so the stated work fails the exception.",
+            "sectionID": "3403",
+            "sourceIDs": [
+              "c26ee7c2-383b-4b17-9004-2532b8826df3",
+              "055bdca1-8349-43a1-b594-77bba5223c4c"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Reflectance standards and separate exceptions",
+            "explanation": "BC 1504.9 sets distinct reflectance/emittance or SRI alternatives by roof slope and contains additional enumerated exceptions. Whether one of those exceptions applies depends on the actual roof slope, covering, assembly, and roof conditions.",
+            "sectionID": "3243",
+            "sourceIDs": [
+              "research-permitext_discovered-id:3243-1"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "Accordingly, unless a separate BC 1504.9 exception applies, the recovered/replaced roof covering must meet the reflectance criteria applicable to its slope: for slope no greater than 2:12, either initial solar reflectance 0.70 with thermal emittance 0.75, or SRI 82; for steeper roofs, either initial solar reflectance 0.25 with thermal emittance 0.75, or SRI 39.\n\nStill verify the actual total roof area and actual recovered/replaced area; that the scope is in fact roof recovery or replacement under these provisions; roof slope; the proposed covering/material assembly and its test documentation; and whether any of BC 1504.9's other stated exceptions applies (such as qualifying green-roof, ballasted, equipment-covered, specified material, or other listed conditions). Applicable filing, approval, and inspection requirements also remain unestablished by the supplied passages. The 1968 Code itself was not supplied or searched, but the current enacted AC provision supplied here expressly preserves the cited current roof-work requirements for an optional-1968-Code project.",
+        "assumptions": [],
+        "missingFacts": [
+          "Verified total roof area.",
+          "Verified area proposed for recovery or replacement.",
+          "Whether the described scope is roof recovery or roof replacement within the selected provisions.",
+          "Roof slope.",
+          "Proposed roof-covering and material assembly, including documentation of applicable reflectance, emittance, or SRI values.",
+          "Whether any other enumerated BC 1504.9 exception applies to any portion of the roof, including the relevant factual conditions for that exception.",
+          "Applicable filing, approval, and inspection requirements.",
+          "Verify the owner's position: The owner says the 1968 Building Code election avoids current cool-roof requirements because the proposed work covers less than 50 percent of the roof.",
+          "Verified area to be recovered or replaced.",
+          "Whether the work is roof recovering or replacement within the selected provisions.",
+          "Whether another Section 1504.9 exception applies."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This answer is limited to the supplied current enacted AC 28-101.4.3, BC 1511.1, and BC 1504.9 evidence. The 1968 NYC Building Code was not searched or supplied, and its contents are not used as a basis for this answer."
+        ],
+        "additionalEvidenceNeeded": [
+          "Roof plans or field verification documenting total roof area, the exact work area, roof slope, and the proposed roof assembly.",
+          "Product data or test documentation for the proposed roof covering's solar reflectance, thermal emittance, or SRI, as applicable.",
+          "Documentation supporting any claimed BC 1504.9 exception.",
+          "Applicable provisions or records establishing filing, approval, and inspection requirements."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "8786",
+            "sectionNumber": "28-101.4.3",
+            "title": "§ 28-101.4.3 Optional use of the 1968 building code for work on prior code buildings.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+              "67765e71-e90e-41a2-98b5-5f449d584194"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+                "selectedText": "12.1 Installation and materials. Work involving the recovering or replacing of an existing roof covering shall be governed by sections 1511.1 through 1511.7 of the New York city building code;",
+                "visualSources": []
+              },
+              {
+                "sourceID": "67765e71-e90e-41a2-98b5-5f449d584194",
+                "selectedText": "12.2 Cool roofs. Work involving the recovering or replacing of an existing roof covering shall comply with section 1504.9 of the New York city building code unless the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46 m 2 ).",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes that optional use of the 1968 Building Code does not displace the cited current Building Code provisions for roof-covering recovery or replacement."
+          },
+          {
+            "sectionID": "3403",
+            "sectionNumber": "1511.1",
+            "title": "1511.1 General.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "c26ee7c2-383b-4b17-9004-2532b8826df3",
+              "055bdca1-8349-43a1-b594-77bba5223c4c"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "c26ee7c2-383b-4b17-9004-2532b8826df3",
+                "selectedText": "Materials and methods of application used for recovering or replacing an existing roof covering shall comply with the requirements of Chapter 15 .",
+                "visualSources": []
+              },
+              {
+                "sourceID": "055bdca1-8349-43a1-b594-77bba5223c4c",
+                "selectedText": "1. Section 1504.9 shall not apply if the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46.5 m 2 ).",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes Chapter 15 compliance and the conjunctive less-than-50-percent and less-than-500-square-foot exception."
+          },
+          {
+            "sectionID": "3243",
+            "sectionNumber": "1504.9",
+            "title": "1504.9 Reflectance.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:3243-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:3243-1",
+                "selectedText": "1504.9 1504.9 Reflectance. Roof coverings on roofs or setbacks with slope equal to or less than two units vertical in 12 units horizontal (17 percent) shall have: 1. a minimum initial solar reflectance of 0.7 in accordance with ASTM C1549 or ASTM E 1918, and a minimum thermal emittance of 0.75 as determined in accordance with ASTM C1371 or ASTM E 408; or 2. a minimum SRI of 82 as determined in accordance with ASTM E 1980. Roof coverings on roofs or setbacks with slope greater than two units vertical in 12 units horizontal (17 percent) shall have: 1. A minimum initial solar reflectance of 0.25 in accordance with ASTM C 1549 or ASTM E 1918, and a minimum thermal emittance of 0.75 as determined in accordance with ASTM C 1371 or ASTM E 408; or 2. A minimum SRI of 39 as determined in accordance with ASTM E 1980. Exceptions: 1. Terraces on setbacks comprising less than 25 percent of the area of the largest floor plate in the building. 2. Any portion of a roof covered by a green roof system, including such a system with agricultural plantings, in compliance with Section 1507.16 of this code. 3. Any portion of a roof used as outdoor recreation space by the occupants of the building that is landscaped, covered by wood decking or covered with a walking surface or other protective surface, provided that such walking surface or protective surface has a minimum initial solar reflectance of 0.3 as determined in accordance with ASTM C 1549 or ASTM E 1918. 4. Ballasted roofs, provided that the ballast has a minimum initial solar reflectance of 0.2 as determined in accordance with ASTM C 1549 or ASTM E 1918. 5. Any portion of a roof that is under mechanical equipment, flush mounted solar panels lying directly on the roof surface, duckboarding, decking, platform, roof tank, cooling tower or any other rooftop structure or equipment exempted by rule by the commissioner. 6. Any roof or portion of a roof composed of glass, metal, clay or concrete tile or plastic/rubber intended to simulate clay or concrete tile, wood, or slate. 7. Any portion of a roof used by a school or daycare center as a playground for children. 8. Any roof, if the amount of rooftop space not subject to exceptions 1 through 7 is in the aggregate less than 100 square feet. (Am. L.L. 2019/094, 5/19/2019, eff. 11/15/2019) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2011/021 . Section BC 1505: Fire Classification",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the slope-dependent reflectance criteria and the separately listed exceptions."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "8786",
+          "3403",
+          "3243",
+          "113",
+          "8796"
+        ],
+        "evidenceSourceIDs": [
+          "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+          "67765e71-e90e-41a2-98b5-5f449d584194",
+          "c26ee7c2-383b-4b17-9004-2532b8826df3",
+          "055bdca1-8349-43a1-b594-77bba5223c4c",
+          "research-permitext_discovered-id:3243-1",
+          "research-permitext_discovered-id:113-2",
+          "research-permitext_discovered-id:8796-3"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 5,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 3,
+          "governingCitationCount": 3,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 2,
+          "userPinnedCount": 4,
+          "permitextDiscoveredCount": 3,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 11,
+          "requiredClaimCount": 5,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "AC 28-101.4.3",
+              "summary": "AC 28-101.4.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "c5bfe5be-8c80-4238-8ac1-18b1c41039a9"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.3",
+              "summary": "AC 28-101.4.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "67765e71-e90e-41a2-98b5-5f449d584194"
+              ]
+            },
+            {
+              "label": "BC 1511.1",
+              "summary": "BC 1511.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "c26ee7c2-383b-4b17-9004-2532b8826df3"
+              ]
+            },
+            {
+              "label": "BC 1511.1",
+              "summary": "BC 1511.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "055bdca1-8349-43a1-b594-77bba5223c4c"
+              ]
+            },
+            {
+              "label": "BC 1504.9",
+              "summary": "BC 1504.9 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:3243-1"
+              ]
+            }
+          ],
+          "generalRules": [],
+          "exceptions": [
+            {
+              "label": "AC 28-101.4.3",
+              "summary": "AC 28-101.4.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "c5bfe5be-8c80-4238-8ac1-18b1c41039a9"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.3",
+              "summary": "AC 28-101.4.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "67765e71-e90e-41a2-98b5-5f449d584194"
+              ]
+            },
+            {
+              "label": "BC 1511.1",
+              "summary": "BC 1511.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "c26ee7c2-383b-4b17-9004-2532b8826df3"
+              ]
+            },
+            {
+              "label": "BC 1511.1",
+              "summary": "BC 1511.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "055bdca1-8349-43a1-b594-77bba5223c4c"
+              ]
+            },
+            {
+              "label": "BC 1504.9",
+              "summary": "BC 1504.9 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:3243-1"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-2"
+              ]
+            },
+            {
+              "label": "AC 28-101.5",
+              "summary": "AC 28-101.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8796-3"
+              ]
+            }
+          ],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+            "67765e71-e90e-41a2-98b5-5f449d584194",
+            "c26ee7c2-383b-4b17-9004-2532b8826df3",
+            "055bdca1-8349-43a1-b594-77bba5223c4c"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:3243-1",
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:8796-3"
+          ],
+          "projectFactsUsed": [
+            "Building: Existing prior-code commercial building with a roof represented as 10,000 square feet",
+            "Proposed Work: Recovering 4,000 square feet of the existing roof covering",
+            "Owner Position: The owner says the 1968 Building Code election avoids current cool-roof requirements because the proposed work covers less than 50 percent of the roof",
+            "The active-topic building is existing."
+          ],
+          "unresolvedProjectFacts": [
+            "Owner Position: The owner says the 1968 Building Code election avoids current cool-roof requirements because the proposed work covers less than 50 percent of the roof",
+            "Unknowns: verified total roof area",
+            "Unknowns: verified area to be recovered or replaced",
+            "Unknowns: whether the work is roof recovering or replacement within the selected provisions",
+            "Unknowns: roof slope, covering, and material assembly",
+            "Unknowns: whether another Section 1504.9 exception applies",
+            "Unknowns: applicable filing, approval, and inspection requirements"
+          ],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Building: Existing prior-code commercial building with a roof represented as 10,000 square feet",
+            "Proposed Work: Recovering 4,000 square feet of the existing roof covering",
+            "Owner Position: The owner says the 1968 Building Code election avoids current cool-roof requirements because the proposed work covers less than 50 percent of the roof"
+          ],
+          "conversation": [
+            "The active-topic building is existing."
+          ],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?",
+          "turnKind": "established",
+          "establishedFacts": [
+            {
+              "id": "building_status",
+              "key": "building_status",
+              "value": "existing",
+              "statement": "The active-topic building is existing.",
+              "kind": "established",
+              "sourceText": "An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?",
+              "source": "user"
+            }
+          ],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [
+            "building_status"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?",
+              "establishedFacts": [
+                {
+                  "id": "building_status",
+                  "key": "building_status",
+                  "value": "existing",
+                  "statement": "The active-topic building is existing.",
+                  "kind": "established",
+                  "sourceText": "An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?",
+                  "source": "user"
+                }
+              ],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 5,
+          "coveredClaimCount": 5,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+            "67765e71-e90e-41a2-98b5-5f449d584194",
+            "c26ee7c2-383b-4b17-9004-2532b8826df3",
+            "055bdca1-8349-43a1-b594-77bba5223c4c",
+            "research-permitext_discovered-id:3243-1"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+            "67765e71-e90e-41a2-98b5-5f449d584194",
+            "c26ee7c2-383b-4b17-9004-2532b8826df3",
+            "055bdca1-8349-43a1-b594-77bba5223c4c",
+            "research-permitext_discovered-id:3243-1"
+          ],
+          "citedEvidenceSourceIDs": [
+            "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+            "67765e71-e90e-41a2-98b5-5f449d584194",
+            "c26ee7c2-383b-4b17-9004-2532b8826df3",
+            "055bdca1-8349-43a1-b594-77bba5223c4c",
+            "research-permitext_discovered-id:3243-1"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:8796-3"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+              "label": "AC 28-101.4.3 — § 28-101.4.3 Optional use of the 1968 building code for work on prior code buildings.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "c5bfe5be-8c80-4238-8ac1-18b1c41039a9"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:67765e71-e90e-41a2-98b5-5f449d584194",
+              "label": "AC 28-101.4.3 — § 28-101.4.3 Optional use of the 1968 building code for work on prior code buildings.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "67765e71-e90e-41a2-98b5-5f449d584194"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:c26ee7c2-383b-4b17-9004-2532b8826df3",
+              "label": "BC 1511.1 — 1511.1 General.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "c26ee7c2-383b-4b17-9004-2532b8826df3"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:055bdca1-8349-43a1-b594-77bba5223c4c",
+              "label": "BC 1511.1 — 1511.1 General.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "055bdca1-8349-43a1-b594-77bba5223c4c"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:3243-1",
+              "label": "BC 1504.9 — 1504.9 Reflectance.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:3243-1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 5,
+          "coveredClaimCount": 5,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+            "67765e71-e90e-41a2-98b5-5f449d584194",
+            "c26ee7c2-383b-4b17-9004-2532b8826df3",
+            "055bdca1-8349-43a1-b594-77bba5223c4c",
+            "research-permitext_discovered-id:3243-1"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+              "label": "AC 28-101.4.3 — § 28-101.4.3 Optional use of the 1968 building code for work on prior code buildings.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "c5bfe5be-8c80-4238-8ac1-18b1c41039a9"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "c5bfe5be-8c80-4238-8ac1-18b1c41039a9"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+                        "67765e71-e90e-41a2-98b5-5f449d584194"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c26ee7c2-383b-4b17-9004-2532b8826df3",
+                        "055bdca1-8349-43a1-b594-77bba5223c4c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "c5bfe5be-8c80-4238-8ac1-18b1c41039a9"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:3243-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "c5bfe5be-8c80-4238-8ac1-18b1c41039a9"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:67765e71-e90e-41a2-98b5-5f449d584194",
+              "label": "AC 28-101.4.3 — § 28-101.4.3 Optional use of the 1968 building code for work on prior code buildings.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "67765e71-e90e-41a2-98b5-5f449d584194"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "67765e71-e90e-41a2-98b5-5f449d584194"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+                        "67765e71-e90e-41a2-98b5-5f449d584194"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c26ee7c2-383b-4b17-9004-2532b8826df3",
+                        "055bdca1-8349-43a1-b594-77bba5223c4c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "67765e71-e90e-41a2-98b5-5f449d584194"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:3243-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "67765e71-e90e-41a2-98b5-5f449d584194"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:c26ee7c2-383b-4b17-9004-2532b8826df3",
+              "label": "BC 1511.1 — 1511.1 General.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "c26ee7c2-383b-4b17-9004-2532b8826df3"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "c26ee7c2-383b-4b17-9004-2532b8826df3"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+                        "67765e71-e90e-41a2-98b5-5f449d584194"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "c26ee7c2-383b-4b17-9004-2532b8826df3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c26ee7c2-383b-4b17-9004-2532b8826df3",
+                        "055bdca1-8349-43a1-b594-77bba5223c4c"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:3243-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "c26ee7c2-383b-4b17-9004-2532b8826df3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:055bdca1-8349-43a1-b594-77bba5223c4c",
+              "label": "BC 1511.1 — 1511.1 General.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "055bdca1-8349-43a1-b594-77bba5223c4c"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "055bdca1-8349-43a1-b594-77bba5223c4c"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+                        "67765e71-e90e-41a2-98b5-5f449d584194"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "055bdca1-8349-43a1-b594-77bba5223c4c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c26ee7c2-383b-4b17-9004-2532b8826df3",
+                        "055bdca1-8349-43a1-b594-77bba5223c4c"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:3243-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "055bdca1-8349-43a1-b594-77bba5223c4c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:3243-1",
+              "label": "BC 1504.9 — 1504.9 Reflectance.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:3243-1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:3243-1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+                        "67765e71-e90e-41a2-98b5-5f449d584194"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:3243-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "c26ee7c2-383b-4b17-9004-2532b8826df3",
+                        "055bdca1-8349-43a1-b594-77bba5223c4c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:3243-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:3243-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260827-authority-term-boundary-v17",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "citedSourceIDs": [
+            "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+            "67765e71-e90e-41a2-98b5-5f449d584194",
+            "c26ee7c2-383b-4b17-9004-2532b8826df3",
+            "055bdca1-8349-43a1-b594-77bba5223c4c",
+            "research-permitext_discovered-id:3243-1"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:8796-3"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 5,
+            "citedProvisionCount": 3,
+            "governingCitationCount": 3,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 2,
+            "reviewedOnlyProvisionCount": 2,
+            "assembledSourceCount": 7,
+            "assembledProvisionCount": 5
+          },
+          "sources": [
+            {
+              "sourceID": "c5bfe5be-8c80-4238-8ac1-18b1c41039a9",
+              "sectionID": "8786",
+              "reference": "AC 28-101.4.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "12.1 Installation and materials. Work involving the recovering or replacing of an existing roof covering shall be governed by sections 1511.1 through 1511.7 of the New York city building code;"
+            },
+            {
+              "sourceID": "67765e71-e90e-41a2-98b5-5f449d584194",
+              "sectionID": "8786",
+              "reference": "AC 28-101.4.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "12.2 Cool roofs. Work involving the recovering or replacing of an existing roof covering shall comply with section 1504.9 of the New York city building code unless the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46 m 2 )."
+            },
+            {
+              "sourceID": "c26ee7c2-383b-4b17-9004-2532b8826df3",
+              "sectionID": "3403",
+              "reference": "BC 1511.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Materials and methods of application used for recovering or replacing an existing roof covering shall comply with the requirements of Chapter 15 ."
+            },
+            {
+              "sourceID": "055bdca1-8349-43a1-b594-77bba5223c4c",
+              "sectionID": "3403",
+              "reference": "BC 1511.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1. Section 1504.9 shall not apply if the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46.5 m 2 )."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:3243-1",
+              "sectionID": "3243",
+              "reference": "BC 1504.9",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1504.9 1504.9 Reflectance. Roof coverings on roofs or setbacks with slope equal to or less than two units vertical in 12 units horizontal (17 percent) shall have: 1. a minimum initial solar reflectance of 0.7 in accordance with ASTM C1549 or ASTM E 1918, and a minimum thermal emittance of 0.75 as determined in accordance with ASTM C1371 or ASTM E 408; or 2. a minimum SRI of 82 as determined in accordance with ASTM E 1980. Roof coverings on roofs or setbacks with slope greater than two units vertical in 12 units horizontal (17 percent) shall have: 1. A minimum initial solar reflectance of 0.25 in accordance with ASTM C 1549 or ASTM E 1918, and a minimum thermal emittance of 0.75 as determined in accordance with ASTM C 1371 or ASTM E 408; or 2. A minimum SRI of 39 as determined in accordance with ASTM E 1980. Exceptions: 1. Terraces on setbacks comprising less than 25 percent of the area of the largest floor plate in the building. 2. Any portion of a roof covered by a green roof system, including such a system with agricultural plantings, in compliance with Section 1507.16 of this code. 3. Any portion of a roof used as outdoor recreation space by the occupants of the building that is landscaped, covered by wood decking or covered with a walking surface or other protective surface, provided that such walking surface or protective surface has a minimum initial solar reflectance of 0.3 as determined in accordance with ASTM C 1549 or ASTM E 1918. 4. Ballasted roofs, provided that the ballast has a minimum initial solar reflectance of 0.2 as determined in accordance with ASTM C 1549 or ASTM E 1918. 5. Any portion of a roof that is under mechanical equipment, flush mounted solar panels lying directly on the roof surface, duckboarding, decking, platform, roof tank, cooling tower or any other rooftop structure or equipment exempted by rule by the commissioner. 6. Any roof or portion of a roof composed of glass, metal, clay or concrete tile or plastic/rubber intended to simulate clay or concrete tile, wood, or slate. 7. Any portion of a roof used by a school or daycare center as a playground for children. 8. Any roof, if the amount of rooftop space not subject to exceptions 1 through 7 is in the aggregate less than 100 square feet. (Am. L.L. 2019/094, 5/19/2019, eff. 11/15/2019) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2011/021 . Section BC 1505: Fire Classification"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-2",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "AGGREGATE. In roofing, crushed stone, crushed slag or water-worn gravel used for surfacing for roof coverings. BALLAST. In roofing, ballast comes in the form of large stones or paver systems or light-weight interlocking paver systems and is used to provide uplift resistance to components of the roof assembly systems that are not adhered or mechanically attached to the roof deck. EQUIPMENT. Tools, machinery, or other implements used to facilitate construction or demolition work. GREEN ROOF SYSTEM. See definition for \"Vegetative Roof.\" PLATFORM. A work surface elevated above lower levels. Platforms can be constructed using individual wood planks, fabricated planks or fabricated decks. ROOF COVERING . The covering applied to the roof deck for weather resistance , fire classification or appearance . ROOF RECOVER . The process of installing an additional roof covering over a prepared existing roof covering without removing the existing roof covering . ROOFTOP STRUCTURE . An enclosed or unenclosed structure on or above the roof of any part of a building ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8796-3",
+              "sectionID": "8796",
+              "reference": "AC 28-101.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.5 § 28-101.5 Definitions. As used in this chapter and elsewhere in this title, the following terms shall have the following meanings unless the context or subject matter requires otherwise: 1968 BUILDING CODE. Chapter 1 of title 27 of the administrative code as hereafter in effect. 1968 OR PRIOR CODE BUILDINGS OR STRUCTURES (PRIOR CODE BUILDINGS). (i) A building or structure in existence prior to July 1, 2008 or one for which a lawful building permit was issued for the erection of such building or structure prior to July 1, 2008. (ii) A building or structure erected in accordance with the 1968 building code under a lawful building permit issued for the erection of such building or structure on or after July 1, 2008 in accordance with section 28-101.4.2 of this code. ACCEPTANCE OR ACCEPTED. In reference to construction documents, the endorsement by the department of construction documents with less than full examination by the department based on the professional certification of a registered design professional in accordance with a program established by the commissioner. ADDITION. An alteration of a building in existence that increases its exterior dimensions including but not limited to an extension or increase in floor area or height (including an increase in height or area resulting from the construction of a rooftop structure or rooftop mechanical equipment) of the building. ADMINISTRATIVE CODE. The administrative code of the city of New York. ALTERATION. Any construction, addition, change of use or occupancy, or renovation to a building or structure in existence. APPROVAL OR APPROVED. In reference to construction documents, the determination by the department after full examination that submitted construction documents comply with this code and other applicable laws and rules. In reference to materials, the determination by the commissioner that material is acceptable for its intended use. APPROVED AGENCY. An established and recognized agency that is regularly engaged in conducting tests or furnishing inspection services, when approved pursuant to department rules as qualified to perform or witness identified testing or inspection services. APPROVED FABRICATOR. An established and qualified person, firm or corporation approved by the commissioner to custom manufacture or build products or assemblies regulated by this code, including the production of concrete. APPROVED INSPECTION AGENCY. An approved agency that is approved by the department as qualified to perform one or more of the inspections required by this code. APPROVED TESTING AGENCY. An approved agency that is approved by the department as qualified to test and evaluate the performance of one or more of the materials regulated in their use by this code. Such term shall include, when approved pursuant to department rules, a third party testing or certification agency, evaluation agency, testing laboratory, testing service, licensed concrete testing laboratory, or other entity concerned with product evaluation. ARCHITECT. A person licensed and registered to practice the profession of architecture under the Education Law of the State of New York. BUILDING. Any structure used or intended for supporting or sheltering any use or occupancy. The term shall be construed as if followed by the phrase \"structure, premises, lot or part thereof\" unless otherwise indicated by the text. CHARTER. The New York city charter. CERTIFICATE OF COMPLIANCE. A certificate stating that materials and products meet specified standards or that work was done in compliance with approved construction documents and other applicable provisions of law, or, with respect to specified service equipment, a certificate issued by the department authorizing the operation of such equipment. CITY. The city of New York. COMMISSIONER. The commissioner of buildings of the city of New York, or his or her duly authorized representative. CONSTRUCTION DOCUMENTS. Plans and specifications and other written, graphic and pictorial documents, prepared or assembled for describing the design, location, physical characteristics, and other elements of the project necessary for obtaining a building permit. DAY. A calendar day, computed in accordance with section 20 of the New York state general construction law, unless otherwise specified as a business day. DEFERRED SUBMITTAL. Those portions of the design that are not submitted at the time of the application for construction document approval and that are to be submitted to the department within a specified period of time after the issuance of a permit. DEMOLITION. Full or partial demolition. DEMOLITION, FULL. The dismantling, razing, or removal of all of a building or structure, including all operations incidental thereto. DEMOLITION, PARTIAL. The dismantling, razing, or removal of structural members, floors, interior bearing walls, and/or exterior walls or portions thereof, including all operations incidental thereto. DEPARTMENT. The department of buildings of the city of New York. ENGINEER. A person licensed and registered to practice the profession of engineering under the Education Law of the State of New York. ENLARGEMENT. An addition. ENVIRONMENTAL CONTROL BOARD or ECB. The environmental control board established pursuant to section 1049-a of the charter within the office of administrative trials and hearings. EXISTING BUILDING OR STRUCTURE. A completed building or structure that is in existence at the time of an applicable reference in this code. FABRICATED ITEM. Products and assemblies regulated by this code that are custom manufactured or built prior to their incorporation into the work at the construction site. Fabricated items shall not include listed, labeled or approved products or assemblies. Materials produced in accordance with standard specifications referenced by this code, such as rolled structural steel shapes, steel-reinforcing bars, masonry units, and wood structural panels, or in accordance with a referenced standard listed in this code, which provides requirements for quality control done under the supervision of a third-party quality control agency, shall not be considered fabricated items. FIRE PROTECTION PLAN. A report containing a narrative description of the life and fire safety systems and evacuation system for a structure. GREEN BUILDING PROJECT. A building project or renovation undertaken that, when constructed, will produce, from renewable resources, a decrease in carbon, or carbon equivalent, emissions in a percentage no less than 50 percent of such building’s prior year emissions. This may include installation of renewable energy sources such as solar energy, geothermal ground source heat pumps, or wind energy systems. HEREAFTER. On or after July 1, 2008. HERETOFORE. Before July 1, 2008. INSPECTION CERTIFICATE. Identification applied to a product by an approved agency containing the name of the manufacturer, the function and performance characteristics, and the name and identification of the approved agency that indicates that the product or material has been inspected and evaluated by such approved agency. An inspection certificate shall also mean a certificate issued by the department upon satisfactory completion of an inspection or test. INTERIM CERTIFICATE OF OCCUPANCY. A type of temporary certificate of occupancy authorizing occupancy of one or more floors of a building prior to the completion of all work needed to obtain a certificate of occupancy for the building, and that remains in effect until the issuance of a certificate of occupancy for the building. LABEL. An identification applied on a product by the manufacturer that contains the name of the manufacturer, the function and performance characteristics of the product or material, and the name and identification of an approved agency and that indicates that a representative sample of the product or material has been tested and evaluated by an approved agency for compliance with nationally recognized standards or tests to determine suitable usage in a specific manner. LABELED. Material to which has been attached a label, symbol or other identifying mark of the manufacturer that contains the name of the manufacturer, the function and performance characteristics of the product or material, and the name and identification of an approved agency and that indicates that a representative sample of the material has been tested and evaluated by an approved agency for compliance with nationally recognized standards or tests to determine suitable usage in a specified manner. LAND SURVEYOR. A person licensed and registered to practice the profession of land surveying under the Education Law of the State of New York. LANDSCAPE ARCHITECT. A person licensed and registered to practice the profession of landscape architecture under the education law of the state of New York. LETTER OF COMPLETION. A document issued by the department indicating that permitted work has been completed, including satisfactory final inspection in accordance with this code. A letter of completion is issued only in circumstances where a certificate of occupancy is not required upon completion of the permitted work. LIMITED ALTERATION APPLICATION. Application for limited oil-burning appliance alterations, limited plumbing alterations, limited sprinkler alterations and limited standpipe alterations submitted pursuant to exception 1 of section 28-104.6 . Such work shall not include any associated work that would otherwise require an alteration permit including, but not limited to, any construction of fire-rated partitions and enclosures. Category 1 work shall be limited to a new installation into an existing building or system. The utilization of this category shall be limited by an annual monetary cap. Category 2 work shall include any existing system or component that is replaced, repaired or altered. This category shall not be limited by a monetary cap. LIMITED OIL-BURNING APPLIANCE ALTERATIONS. An alteration, installation, replacement or repair to an oil-burning appliance that is limited in scope, falling into one of the following categories. Any construction or alteration to fire-rated partitions or enclosures, with the exception of through-penetrations that are firestopped, shall require a separate application filed with the department. Category 1. An addition to an existing oil-burning appliance where the total cost of the proposed Category 1 work in the building does not exceed $50,000 in any 12-month period and where the proposed work is limited to the installation of: 1. oil equipment, 2. oil-fired appliances, located within the same enclosure or room as the existing oil-burning appliance, 3. unit heaters, or 4. oil piping including no more than two above-ground oil tanks each with a capacity of no more than 330 gallons (1250 L) provided such oil tanks also comply with the capacity limits established in section 1305.11 of the New York city mechanical code. The newly installed tanks shall have a UL listing, be labeled or meet the alternative tank design and construction standards contained in section 1305.14 of the New York city mechanical code. Category 2. An alteration, repair or replacement of an existing oil-burning appliance that is not subject to cost or duration limitations and that is limited to the following: 1. Replacement of oil burners, oil-burning appliances or water heaters in which the heat input per appliance does not exceed 3 million Btu/h (879 kW). 2. Relocation of an oil burner or oil-burning appliance or water heater within the same enclosure or room. 3. Placement of a temporary department of buildings registered oil-fired mobile boiler and corresponding fuel oil storage tank with associated piping at a site for emergency heating. 4. Placement of a temporary fuel oil storage tank with a capacity of 5,000 gallons (18 927 L) or less at a site for emergency use and connected to an existing oil-burning appliance. 5. Repair, replacemen"
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?\nProject facts: Owner Position: The owner says the 1968 Building Code election avoids current cool-roof requirements because the proposed work covers less than 50 percent of the roof; Building: Existing prior-code commercial building with a roof represented as 10,000 square feet; Proposed Work: Recovering 4,000 square feet of the existing roof covering; Unknowns: whether the work is roof recovering or replacement within the selected provisions; Unknowns: whether another Section 1504.9 exception applies; Unknowns: verified total roof area; Unknowns: verified area to be recovered or replaced; Unknowns: roof slope, covering, and material assembly; Unknowns: applicable filing, approval, and inspection requirements",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "relevance_comparison",
+            "question": {
+              "text": "An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-101.4.3",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-101.4.3"
+                },
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "1511.1",
+                  "referenceKind": "section",
+                  "reference": "BC § 1511.1"
+                }
+              ]
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-101.4.3",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-101.4.3"
+                },
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "1511.1",
+                  "referenceKind": "section",
+                  "reference": "BC § 1511.1"
+                }
+              ]
+            },
+            "nextCurrentTopic": {
+              "text": "An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "AC",
+                  "sectionNumber": "28-101.4.3",
+                  "referenceKind": "section",
+                  "reference": "AC § 28-101.4.3"
+                },
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "1511.1",
+                  "referenceKind": "section",
+                  "reference": "BC § 1511.1"
+                }
+              ]
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": false
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": true,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": true,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 4,
+            "candidateCount": 5,
+            "discoveredCount": 3,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 0,
+            "characterCount": 29588,
+            "resolverFailureCount": 8,
+            "nonMaterialCandidateCount": 7
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 8,
+              "text": "8 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "code": "RESEARCH_CORPUS_LIMITATION",
+              "text": "1968 NYC Building Code was not searched. Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "historical-code cue"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260827-supporting-web-v9",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-a2fdd49c-fdd6-462b-ac19-6fbaf32e1929",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "historical-code cue",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · 1968 NYC Building Code excluded from ordinary Research · Project default applied",
+            "limitation": "1968 NYC Building Code was not searched. Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+            "resolvedAt": "2026-08-27T22:44:41.922Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T22:44:41.922Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v3",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "complex_question_language",
+            "multiple_required_claims",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 21030,
+          "cachedInputTokens": 1704,
+          "outputTokens": 1810,
+          "totalTokens": 22840
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.039445,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "2e769f98-e8db-444e-b25b-d59f69d1e376",
+        "createdAt": "2026-08-27T22:44:41.918Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra",
+          "gpt-5.6-luna"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v3",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 2,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 21030,
+        "cachedInputTokens": 1704,
+        "outputTokens": 1810,
+        "totalTokens": 22840,
+        "estimatedCostUSD": 0.039445,
+        "actualProviderCostUSD": 0.039445,
+        "conservativeProviderCostUSD": 0.039445,
+        "durationMilliseconds": 21230,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T22:45:24.411Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 20740,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 5772,
+              "cachedInputTokens": 0,
+              "outputTokens": 1956,
+              "totalTokens": 7728
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 5772,
+          "cachedInputTokens": 0,
+          "outputTokens": 1956,
+          "totalTokens": 7728
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "The answer accurately attributes the roof-work cross-reference and two-part area exception to AC 28-101.4.3 and BC 1511.1, respectively. Its BC 1504.9 citation is also supported by the supplied passage for the slope-based criteria and enumerated exceptions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer stays within the supplied enacted provisions. The numerical reflectance, emittance, and SRI alternatives, as well as the possibility of separate exceptions, are supported by the supplied BC 1504.9 text. It does not invent an approval or compliance result.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer treats the represented quantities as unverified, conditions any technical outcome on actual roof facts and other exceptions, and expressly states that filing, approval, and inspection requirements remain unestablished.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It expressly identifies the evidence limitations and the facts still needed to determine technical compliance, including actual areas, work classification, roof slope, assembly, product documentation, other exceptions, and administrative requirements.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response gives a clear conclusion, explains why the owner’s percentage-only position fails, identifies the applicable general requirements, and provides a concrete verification list.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers that the stated work does not qualify for the exception and specifies what remains to be verified.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly states that the exception is conjunctive and that both thresholds must be met.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It specifically states that 4,000 square feet fails the independent 500-square-foot limit.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It rejects percentage alone as a basis for the exception by explaining that the separate 500-square-foot threshold is not satisfied.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It explains that AC 28-101.4.3 directs roof-covering recovery or replacement work to BC 1511.1 through 1511.7.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It states that BC 1511.1 requires materials and application methods to comply with Chapter 15.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It clearly says that electing the 1968 Building Code does not avoid the result under the supplied current roof-work provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It requests verification of actual areas, work classification, roof slope and assembly, other BC 1504.9 exceptions, and filing, approval, and inspection requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "The answer does not claim final cool-roof compliance; it conditions the result on further roof, product, exception, and administrative verification and states relevant matters remain unestablished.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer correctly treats the two size conditions as conjunctive.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer does not state or imply that an area equal to 50 percent is less than 50 percent.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer does not state or imply that 500 square feet is less than 500 square feet.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It repeatedly characterizes the roof and work quantities as represented or actual facts requiring verification.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It expressly rejects the proposition that the 1968 Code election removes the cited current roof-work requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It recognizes the need to assess separately listed exceptions and technical facts rather than claiming exhaustive final resolution from the threshold analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "It expressly preserves the possibility that a separate BC 1504.9 exception may apply.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-8",
+              "rationale": "It does not claim the work is approved or compliant and states that applicable approval and inspection requirements remain unestablished.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer requests verification of the actual total roof area.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer requests verification of the actual recovered or replaced area.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer asks whether the scope is in fact roof recovery or replacement under the selected provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer identifies roof slope, proposed covering/material assembly, and applicable test documentation as requiring verification.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "The answer asks whether any other stated BC 1504.9 exception applies and identifies examples as fact-dependent.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "The answer identifies the slope-dependent technical alternatives and states that the applicable values and documentation depend on the actual roof and assembly facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "The answer expressly states that applicable filing, approval, and inspection requirements remain unestablished.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.035016,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 3,
+            "canonicalCount": 3,
+            "selectedEvidenceCount": 3,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 21234,
+            "inputTokens": 21030,
+            "cachedInputTokens": 1704,
+            "outputTokens": 1810,
+            "totalTokens": 22840,
+            "estimatedCostUSD": 0.039445,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "The answer accurately attributes the roof-work cross-reference and two-part area exception to AC 28-101.4.3 and BC 1511.1, respectively. Its BC 1504.9 citation is also supported by the supplied passage for the slope-based criteria and enumerated exceptions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "8/8 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer stays within the supplied enacted provisions. The numerical reflectance, emittance, and SRI alternatives, as well as the possibility of separate exceptions, are supported by the supplied BC 1504.9 text. It does not invent an approval or compliance result.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/8 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer treats the represented quantities as unverified, conditions any technical outcome on actual roof facts and other exceptions, and expressly states that filing, approval, and inspection requirements remain unestablished.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "7/7 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "It expressly identifies the evidence limitations and the facts still needed to determine technical compliance, including actual areas, work classification, roof slope, assembly, product documentation, other exceptions, and administrative requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "The response gives a clear conclusion, explains why the owner’s percentage-only position fails, identifies the applicable general requirements, and provides a concrete verification list.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "It directly answers that the stated work does not qualify for the exception and specifies what remains to be verified.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer expressly states that the exception is conjunctive and that both thresholds must be met.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "It specifically states that 4,000 square feet fails the independent 500-square-foot limit.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "It rejects percentage alone as a basis for the exception by explaining that the separate 500-square-foot threshold is not satisfied.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "It explains that AC 28-101.4.3 directs roof-covering recovery or replacement work to BC 1511.1 through 1511.7.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "It states that BC 1511.1 requires materials and application methods to comply with Chapter 15.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "It clearly says that electing the 1968 Building Code does not avoid the result under the supplied current roof-work provisions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-7",
+                "rationale": "It requests verification of actual areas, work classification, roof slope and assembly, other BC 1504.9 exceptions, and filing, approval, and inspection requirements.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-8",
+                "rationale": "The answer does not claim final cool-roof compliance; it conditions the result on further roof, product, exception, and administrative verification and states relevant matters remain unestablished.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer correctly treats the two size conditions as conjunctive.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "The answer does not state or imply that an area equal to 50 percent is less than 50 percent.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "The answer does not state or imply that 500 square feet is less than 500 square feet.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "It repeatedly characterizes the roof and work quantities as represented or actual facts requiring verification.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-5",
+                "rationale": "It expressly rejects the proposition that the 1968 Code election removes the cited current roof-work requirements.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-6",
+                "rationale": "It recognizes the need to assess separately listed exceptions and technical facts rather than claiming exhaustive final resolution from the threshold analysis.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-7",
+                "rationale": "It expressly preserves the possibility that a separate BC 1504.9 exception may apply.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-8",
+                "rationale": "It does not claim the work is approved or compliant and states that applicable approval and inspection requirements remain unestablished.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The answer requests verification of the actual total roof area.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The answer requests verification of the actual recovered or replaced area.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "The answer asks whether the scope is in fact roof recovery or replacement under the selected provisions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "The answer identifies roof slope, proposed covering/material assembly, and applicable test documentation as requiring verification.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-5",
+                "rationale": "The answer asks whether any other stated BC 1504.9 exception applies and identifies examples as fact-dependent.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-6",
+                "rationale": "The answer identifies the slope-dependent technical alternatives and states that the applicable values and documentation depend on the actual roof and assembly facts.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-7",
+                "rationale": "The answer expressly states that applicable filing, approval, and inspection requirements remain unestablished.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "3/3 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. The answer accurately attributes the roof-work cross-reference and two-part area exception to AC 28-101.4.3 and BC 1511.1, respectively. Its BC 1504.9 citation is also supported by the supplied passage for the slope-based criteria and enumerated exceptions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 2 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "8/8 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer stays within the supplied enacted provisions. The numerical reflectance, emittance, and SRI alternatives, as well as the possibility of separate exceptions, are supported by the supplied BC 1504.9 text. It does not invent an approval or compliance result.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer treats the represented quantities as unverified, conditions any technical outcome on actual roof facts and other exceptions, and expressly states that filing, approval, and inspection requirements remain unestablished.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "7/7 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It expressly identifies the evidence limitations and the facts still needed to determine technical compliance, including actual areas, work classification, roof slope, assembly, product documentation, other exceptions, and administrative requirements.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response gives a clear conclusion, explains why the owner’s percentage-only position fails, identifies the applicable general requirements, and provides a concrete verification list.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers that the stated work does not qualify for the exception and specifies what remains to be verified.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer expressly states that the exception is conjunctive and that both thresholds must be met.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It specifically states that 4,000 square feet fails the independent 500-square-foot limit.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It rejects percentage alone as a basis for the exception by explaining that the separate 500-square-foot threshold is not satisfied.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It explains that AC 28-101.4.3 directs roof-covering recovery or replacement work to BC 1511.1 through 1511.7.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It states that BC 1511.1 requires materials and application methods to comply with Chapter 15.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It clearly says that electing the 1968 Building Code does not avoid the result under the supplied current roof-work provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It requests verification of actual areas, work classification, roof slope and assembly, other BC 1504.9 exceptions, and filing, approval, and inspection requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "The answer does not claim final cool-roof compliance; it conditions the result on further roof, product, exception, and administrative verification and states relevant matters remain unestablished.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer correctly treats the two size conditions as conjunctive.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer does not state or imply that an area equal to 50 percent is less than 50 percent.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer does not state or imply that 500 square feet is less than 500 square feet.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It repeatedly characterizes the roof and work quantities as represented or actual facts requiring verification.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It expressly rejects the proposition that the 1968 Code election removes the cited current roof-work requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It recognizes the need to assess separately listed exceptions and technical facts rather than claiming exhaustive final resolution from the threshold analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "It expressly preserves the possibility that a separate BC 1504.9 exception may apply.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-8",
+              "rationale": "It does not claim the work is approved or compliant and states that applicable approval and inspection requirements remain unestablished.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer requests verification of the actual total roof area.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer requests verification of the actual recovered or replaced area.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer asks whether the scope is in fact roof recovery or replacement under the selected provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer identifies roof slope, proposed covering/material assembly, and applicable test documentation as requiring verification.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "The answer asks whether any other stated BC 1504.9 exception applies and identifies examples as fact-dependent.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "The answer identifies the slope-dependent technical alternatives and states that the applicable values and documentation depend on the actual roof and assembly facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "The answer expressly states that applicable filing, approval, and inspection requirements remain unestablished.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
