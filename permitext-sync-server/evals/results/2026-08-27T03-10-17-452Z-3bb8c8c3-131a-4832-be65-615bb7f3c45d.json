@@ -1,0 +1,2557 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T03:10:17.452Z",
+  "updatedAt": "2026-08-27T03:10:54.702Z",
+  "configuration": {
+    "runID": "3bb8c8c3-131a-4832-be65-615bb7f3c45d",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-project-condition-coverage-v27",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "targeted",
+    "repeat": 1,
+    "caseIDs": [
+      "accessory-assembly-plumbing-fixtures"
+    ],
+    "caseStatuses": [
+      "approved"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "b5265d57a515ce903bf9820baeff247e3a2dc0f2",
+    "approvedSpendCapUSD": 2,
+    "conservativeReservedUSD": 0.072254,
+    "actualUSD": 0.072254,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 3
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T03:10:54.602Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.048699,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.048699,
+        "p50": 0.048699,
+        "p90": 0.048699,
+        "maximum": 0.048699
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.048699,
+      "projectedCostPer100TurnsUSD": 4.87,
+      "targetReady": true,
+      "targetBand": "within"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 23484,
+      "p50": 23484,
+      "p90": 23484,
+      "maximum": 23484
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 2,
+        "p50": 2,
+        "p90": 2,
+        "maximum": 2
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "accessory-assembly-plumbing-fixtures",
+        "title": "Plumbing fixtures for an accessory assembly space",
+        "status": "approved",
+        "difficulty": "advanced",
+        "topics": [
+          "plumbing fixtures",
+          "accessory assembly",
+          "occupant load",
+          "fixture calculation"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "space": "Residential multipurpose room",
+          "potentialClassification": "Group B under the accessory assembly provision",
+          "unknowns": [
+            "assembly use category",
+            "occupant load",
+            "shared facilities",
+            "sex distribution"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "132",
+            "reference": "BC 303.1.3",
+            "codePrefix": "BC",
+            "sectionNumber": "303.1.3",
+            "exactPassages": [
+              "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+            ],
+            "resolvedTitle": "303.1.3 Accessory assembly spaces.",
+            "evidenceCharacters": 408,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "11909",
+            "reference": "PC 403.1",
+            "codePrefix": "PC",
+            "sectionNumber": "403.1",
+            "exactPassages": [
+              "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code.",
+              "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies."
+            ],
+            "resolvedTitle": "403.1 Minimum number of fixtures.",
+            "evidenceCharacters": 7906,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "11910",
+            "reference": "PC 403.1.1",
+            "codePrefix": "PC",
+            "sectionNumber": "403.1.1",
+            "exactPassages": [
+              "To determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor.",
+              "Exception: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex."
+            ],
+            "resolvedTitle": "403.1.1 Fixture calculations.",
+            "evidenceCharacters": 912,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+        "expectedConclusion": "Not automatically. BC 303.1.3 directly permits the plumbing fixtures for a qualifying accessory assembly room with fewer than 75 occupants to be calculated using the applicable Assembly fixture requirements even when the room is classified as Group B or as part of the occupancy it serves. The selected PC 403.1 passage supplies the general Table 403.1 framework, but its separate fewer-than-75 permission is expressly limited to a building or nonaccessory tenant assembly space and does not independently extend that permission to this accessory room. The appropriate assembly category must first be identified from the room's actual use. PC 403.1.1 supplies the selected calculation mechanics: divide the occupant load equally between the sexes unless approved statistical information supports another distribution, apply the fixture ratios, combine fractions as required for multiple occupancies, and round up. A final fixture count requires the calculated occupant load, applicable assembly use, existing shared facilities, and other relevant project conditions.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The answer must reject an automatic Group B fixture conclusion and state that a final count is unavailable until the assembly category, occupant load, shared-facility conditions, and other calculation inputs are confirmed."
+        },
+        "sourceType": "real project",
+        "sourceReference": "Initial Permitext AI quality-evaluation case set supplied by the Permitext owner.",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "notes": "Exact enacted passages, calculation rules, and answer key were manually reviewed before approval.",
+        "requiredConcepts": [
+          "State that Group B classification does not automatically control the fixture calculation.",
+          "Attribute permission to use applicable Assembly fixture requirements for the qualifying accessory assembly room directly to BC 303.1.3.",
+          "Explain that the selected PC 403.1 fewer-than-75 passage applies to a building or nonaccessory tenant assembly space and does not independently extend that permission to the accessory room.",
+          "Use PC 403.1 only for the general Table 403.1, occupant-load, and occupancy-classification framework supported by its selected text.",
+          "Require identification of the appropriate assembly category based on actual use.",
+          "Explain the general equal division between the sexes and the statistical-data exception.",
+          "Explain application of fixture ratios, combination of fractions for multiple occupancies, and rounding up.",
+          "Avoid providing a final fixture count without the required project facts."
+        ],
+        "missingFacts": [
+          "Confirm the calculated occupant load.",
+          "Confirm the applicable assembly use category.",
+          "Confirm existing shared facilities and relevant project conditions.",
+          "Confirm whether approved statistical information supports a different distribution between the sexes."
+        ],
+        "forbiddenClaims": [
+          "Group B classification always controls the plumbing fixture calculation.",
+          "State that the selected PC 403.1 fewer-than-75 provision independently applies its building or nonaccessory tenant-space rule to this accessory assembly room.",
+          "Residential unit fixtures automatically satisfy the multipurpose-room requirement.",
+          "Provide a final fixture count without the occupant load, assembly use, shared facilities, and project conditions."
+        ],
+        "requiredCitations": [
+          "BC 303.1.3",
+          "PC 403.1",
+          "PC 403.1.1"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "BC 303.1.3",
+            "requiredClaim": "Direct authority for using Assembly fixture requirements for a qualifying accessory assembly room."
+          },
+          {
+            "reference": "PC 403.1",
+            "requiredClaim": "General Table 403.1 framework and Building Code control of occupant load and occupancy classification; its selected special permission is limited to building or nonaccessory tenant assembly space."
+          },
+          {
+            "reference": "PC 403.1.1",
+            "requiredClaim": "Sex allocation, fixture-ratio application, multiple-occupancy fraction handling, rounding, and the approved-statistical-data exception."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "eff8ef10-2864-4f08-8c9e-2f98ea2bcbaa",
+      "answeredAt": "2026-08-27T03:10:41.255Z",
+      "answerTimeMilliseconds": 23490,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-project-condition-coverage-v27:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-4ecd6086-3b11-40a9-9ed5-315fdeb6633a",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "Project configured code basis",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T03:10:17.780Z"
+        },
+        "answerText": "Not automatically. If the room actually qualifies as an accessory assembly space with an occupant load below 75, BC 303.1.3 classifies it as Group B (or part of its accessory occupancy) but expressly permits its plumbing-fixture count to be calculated under the Assembly occupancy requirements. The supplied evidence does not establish that the normal Group B fixture calculation is also permitted for that accessory room merely because of that classification.\n\nPC 403.1 generally bases fixtures on the occupancy classification and Table 403.1, but that table was not supplied. The separate PC 403.1 Assembly-calculation permission you provided applies to a building or nonaccessory tenant space; it is therefore not independent authority for this accessory multipurpose room. For this room, the directly applicable supplied provision is BC 303.1.3's Assembly-calculation option.\n\nNo fixture count can be calculated from the supplied passages because the applicable Table 403.1 fixture ratios and the room's final occupant load/use category are not established. If a count is made under the table, the default is to divide occupant load equally by sex, apply the applicable ratios, add fractional requirements across occupancies before rounding up, and round up to whole fixtures. A different sex distribution requires approved statistical data.",
+        "conclusion": "Not automatically. If the room actually qualifies as an accessory assembly space with an occupant load below 75, BC 303.1.3 classifies it as Group B (or part of its accessory occupancy) but expressly permits its plumbing-fixture count to be calculated under the Assembly occupancy requirements. The supplied evidence does not establish that the normal Group B fixture calculation is also permitted for that accessory room merely because of that classification.",
+        "supportedPoints": [
+          {
+            "heading": "Accessory assembly rooms may use Assembly fixture requirements",
+            "explanation": "A room or space used for assembly purposes, accessory to another occupancy, and with an occupant load of fewer than 75 persons is classified as Group B or as part of the accessory occupancy. Despite that classification, its plumbing-fixture count is permitted to be calculated using Assembly occupancy requirements.",
+            "sectionID": "132",
+            "sourceIDs": [
+              "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Fixture requirements ordinarily follow the occupancy table",
+            "explanation": "Plumbing fixtures must be provided for the occupancy type and in the minimum number in Table 403.1; occupant load and occupancy classification are determined under the Building Code. The supplied evidence does not include the Table 403.1 Group B or Assembly rows, so it does not establish either numerical fixture result or an affirmative normal-Group-B calculation option for this accessory room.",
+            "sectionID": "11909",
+            "sourceIDs": [
+              "55c80e1c-a51f-472a-ad80-0c32ba140981"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "The separate Plumbing Code Assembly permission has limited scope",
+            "explanation": "The supplied Plumbing Code permission for Assembly fixture calculations applies to building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B under the cited Building Code provision. Its stated nonaccessory scope does not independently govern the described accessory multipurpose room.",
+            "sectionID": "11909",
+            "sourceIDs": [
+              "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Fixture calculation method",
+            "explanation": "For a Table 403.1 calculation, divide total occupant load equally by sex, apply the applicable fixture ratio to each sex, and—where multiple occupancies are involved—sum the fractional results for each occupancy before rounding up to a whole number.",
+            "sectionID": "11910",
+            "sourceIDs": [
+              "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Different sex distribution requires approved data",
+            "explanation": "The equal sex split need not be used only where approved statistical data supports a different distribution.",
+            "sectionID": "11910",
+            "sourceIDs": [
+              "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "PC 403.1 generally bases fixtures on the occupancy classification and Table 403.1, but that table was not supplied. The separate PC 403.1 Assembly-calculation permission you provided applies to a building or nonaccessory tenant space; it is therefore not independent authority for this accessory multipurpose room. For this room, the directly applicable supplied provision is BC 303.1.3's Assembly-calculation option.\n\nNo fixture count can be calculated from the supplied passages because the applicable Table 403.1 fixture ratios and the room's final occupant load/use category are not established. If a count is made under the table, the default is to divide occupant load equally by sex, apply the applicable ratios, add fractional requirements across occupancies before rounding up, and round up to whole fixtures. A different sex distribution requires approved statistical data.",
+        "assumptions": [],
+        "missingFacts": [
+          "For application to the actual room: whether it is accessory to another occupancy and its Building Code occupant load is fewer than 75 persons.",
+          "The room's actual assembly use category and final occupant load for selecting and applying the applicable Table 403.1 fixture ratios.",
+          "Whether existing or shared plumbing facilities are proposed to serve the room; the supplied evidence does not establish whether or how they may be credited.",
+          "Whether approved statistical data supports a sex distribution other than 50 percent for each sex, if a final fixture count is calculated."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The enacted evidence supplied does not include Table 403.1, so it cannot establish the applicable Group B or Assembly fixture ratios, a numerical fixture count, or an affirmative normal-Group-B calculation path for the accessory room.",
+          "Permitext limited this answer to the enacted evidence assembled for the current question."
+        ],
+        "additionalEvidenceNeeded": [
+          "The applicable Table 403.1 rows for the room's actual Assembly use category and for any proposed Group B calculation.",
+          "If shared facilities are proposed, the enacted provisions governing whether those facilities may serve or be credited to this room."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "132",
+            "sectionNumber": "303.1.3",
+            "title": "303.1.3 Accessory assembly spaces.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+                "selectedText": "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the classification rule and Assembly fixture-calculation option for qualifying accessory assembly spaces."
+          },
+          {
+            "sectionID": "11909",
+            "sectionNumber": "403.1",
+            "title": "403.1 Minimum number of fixtures.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "55c80e1c-a51f-472a-ad80-0c32ba140981"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "55c80e1c-a51f-472a-ad80-0c32ba140981",
+                "selectedText": "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes that fixture quantities follow the occupancy type and Table 403.1."
+          },
+          {
+            "sectionID": "11909",
+            "sectionNumber": "403.1",
+            "title": "403.1 Minimum number of fixtures.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+                "selectedText": "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the separately limited Assembly-calculation permission for building or nonaccessory tenant spaces."
+          },
+          {
+            "sectionID": "11910",
+            "sectionNumber": "403.1.1",
+            "title": "403.1.1 Fixture calculations.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+                "selectedText": "To determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the sex allocation, ratio application, summation, and rounding procedure."
+          },
+          {
+            "sectionID": "11910",
+            "sectionNumber": "403.1.1",
+            "title": "403.1.1 Fixture calculations.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb",
+                "selectedText": "Exception: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the approved-statistical-data exception to the equal sex split."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "132",
+          "11909",
+          "11910",
+          "2137",
+          "2156",
+          "2152",
+          "11911",
+          "113",
+          "11913",
+          "12002",
+          "11914"
+        ],
+        "evidenceSourceIDs": [
+          "0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+          "55c80e1c-a51f-472a-ad80-0c32ba140981",
+          "ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+          "cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+          "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb",
+          "research-permitext_discovered-id:2137-3",
+          "research-permitext_discovered-id:2156-4",
+          "research-permitext_discovered-id:2152-5",
+          "research-permitext_discovered-id:11911-7",
+          "research-permitext_discovered-id:113-11",
+          "research-permitext_cross_reference-id:11913-2",
+          "research-permitext_cross_reference-id:12002-3",
+          "research-permitext_cross_reference-id:11914-6"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 11,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 3,
+          "governingCitationCount": 3,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 8,
+          "userPinnedCount": 5,
+          "permitextDiscoveredCount": 5,
+          "crossReferenceCount": 3,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 4,
+          "requiredClaimCount": 5,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 303.1.3",
+              "summary": "BC 303.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+              ]
+            },
+            {
+              "label": "PC 403.1",
+              "summary": "PC 403.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "55c80e1c-a51f-472a-ad80-0c32ba140981"
+              ]
+            },
+            {
+              "label": "PC 403.1",
+              "summary": "PC 403.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+              ]
+            },
+            {
+              "label": "PC 403.1.1",
+              "summary": "PC 403.1.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+              ]
+            },
+            {
+              "label": "PC 403.1.1",
+              "summary": "PC 403.1.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "BC 303.1.3",
+              "summary": "BC 303.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "PC 403.1",
+              "summary": "PC 403.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "55c80e1c-a51f-472a-ad80-0c32ba140981"
+              ]
+            },
+            {
+              "label": "PC 403.1",
+              "summary": "PC 403.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+              ]
+            },
+            {
+              "label": "PC 403.1.1",
+              "summary": "PC 403.1.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+              ]
+            },
+            {
+              "label": "PC 403.1.1",
+              "summary": "PC 403.1.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+              ]
+            },
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-11"
+              ]
+            },
+            {
+              "label": "PC 403.2",
+              "summary": "PC 403.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11913-2"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-11"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "PC 403.2",
+              "summary": "PC 403.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11913-2"
+              ]
+            },
+            {
+              "label": "PC 419.2",
+              "summary": "PC 419.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:12002-3"
+              ]
+            },
+            {
+              "label": "PC 403.2.1",
+              "summary": "PC 403.2.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11914-6"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "BC 303.1.3",
+              "summary": "BC 303.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+              ]
+            },
+            {
+              "label": "PC 403.1",
+              "summary": "PC 403.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "55c80e1c-a51f-472a-ad80-0c32ba140981"
+              ]
+            },
+            {
+              "label": "PC 403.1",
+              "summary": "PC 403.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+              ]
+            },
+            {
+              "label": "PC 403.1.1",
+              "summary": "PC 403.1.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+              ]
+            },
+            {
+              "label": "PC 403.1.1",
+              "summary": "PC 403.1.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2152-5"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [
+            "0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+            "55c80e1c-a51f-472a-ad80-0c32ba140981",
+            "ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+            "cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+            "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:2137-3",
+            "research-permitext_discovered-id:2156-4",
+            "research-permitext_discovered-id:2152-5",
+            "research-permitext_discovered-id:11911-7",
+            "research-permitext_discovered-id:113-11",
+            "research-permitext_cross_reference-id:11913-2",
+            "research-permitext_cross_reference-id:12002-3",
+            "research-permitext_cross_reference-id:11914-6"
+          ],
+          "projectFactsUsed": [
+            "Space: Residential multipurpose room",
+            "Potential Classification: Group B under the accessory assembly provision",
+            "The active-topic building is Group B."
+          ],
+          "unresolvedProjectFacts": [
+            "Unknowns: assembly use category, occupant load, shared facilities, sex distribution"
+          ],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Space: Residential multipurpose room",
+            "Potential Classification: Group B under the accessory assembly provision"
+          ],
+          "conversation": [
+            "The active-topic building is Group B."
+          ],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+          "turnKind": "established",
+          "establishedFacts": [
+            {
+              "id": "occupancy_group",
+              "key": "occupancy_group",
+              "value": "B",
+              "statement": "The active-topic building is Group B.",
+              "kind": "established",
+              "sourceText": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+              "source": "user"
+            }
+          ],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [
+            "occupancy_group"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+              "establishedFacts": [
+                {
+                  "id": "occupancy_group",
+                  "key": "occupancy_group",
+                  "value": "B",
+                  "statement": "The active-topic building is Group B.",
+                  "kind": "established",
+                  "sourceText": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+                  "source": "user"
+                }
+              ],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 5,
+          "coveredClaimCount": 5,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+            "55c80e1c-a51f-472a-ad80-0c32ba140981",
+            "ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+            "cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+            "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+            "55c80e1c-a51f-472a-ad80-0c32ba140981",
+            "ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+            "cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+            "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+          ],
+          "citedEvidenceSourceIDs": [
+            "0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+            "55c80e1c-a51f-472a-ad80-0c32ba140981",
+            "ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+            "cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+            "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2137-3",
+            "research-permitext_discovered-id:2156-4",
+            "research-permitext_discovered-id:2152-5",
+            "research-permitext_discovered-id:11911-7",
+            "research-permitext_discovered-id:113-11",
+            "research-permitext_cross_reference-id:11913-2",
+            "research-permitext_cross_reference-id:12002-3",
+            "research-permitext_cross_reference-id:11914-6"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+              "label": "BC 303.1.3 — 303.1.3 Accessory assembly spaces.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:55c80e1c-a51f-472a-ad80-0c32ba140981",
+              "label": "PC 403.1 — 403.1 Minimum number of fixtures.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+              "label": "PC 403.1 — 403.1 Minimum number of fixtures.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+              "label": "PC 403.1.1 — 403.1.1 Fixture calculations.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb",
+              "label": "PC 403.1.1 — 403.1.1 Fixture calculations.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 5,
+          "coveredClaimCount": 5,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+            "55c80e1c-a51f-472a-ad80-0c32ba140981",
+            "ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+            "cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+            "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+              "label": "BC 303.1.3 — 303.1.3 Accessory assembly spaces.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:55c80e1c-a51f-472a-ad80-0c32ba140981",
+              "label": "PC 403.1 — 403.1 Minimum number of fixtures.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+              "label": "PC 403.1 — 403.1 Minimum number of fixtures.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+              "label": "PC 403.1.1 — 403.1.1 Fixture calculations.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 3,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 3,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb",
+              "label": "PC 403.1.1 — 403.1.1 Fixture calculations.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 4,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 4,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "0d87193c-0bb2-4755-a5f7-0f7a94343eea"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "55c80e1c-a51f-472a-ad80-0c32ba140981"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "ffddc35a-61d5-41d9-ba8e-1f908e64501c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "cdc16d52-5745-4624-9dc2-b4b8063ad4bd"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260827-dependent-condition-coverage-v15",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "citedSourceIDs": [
+            "0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+            "55c80e1c-a51f-472a-ad80-0c32ba140981",
+            "ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+            "cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+            "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:2137-3",
+            "research-permitext_discovered-id:2156-4",
+            "research-permitext_discovered-id:2152-5",
+            "research-permitext_discovered-id:11911-7",
+            "research-permitext_discovered-id:113-11",
+            "research-permitext_cross_reference-id:11913-2",
+            "research-permitext_cross_reference-id:12002-3",
+            "research-permitext_cross_reference-id:11914-6"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 5,
+            "citedProvisionCount": 3,
+            "governingCitationCount": 3,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 8,
+            "reviewedOnlyProvisionCount": 8,
+            "assembledSourceCount": 13,
+            "assembledProvisionCount": 11
+          },
+          "sources": [
+            {
+              "sourceID": "0d87193c-0bb2-4755-a5f7-0f7a94343eea",
+              "sectionID": "132",
+              "reference": "BC 303.1.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+            },
+            {
+              "sourceID": "55c80e1c-a51f-472a-ad80-0c32ba140981",
+              "sectionID": "11909",
+              "reference": "PC 403.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code."
+            },
+            {
+              "sourceID": "ffddc35a-61d5-41d9-ba8e-1f908e64501c",
+              "sectionID": "11909",
+              "reference": "PC 403.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies."
+            },
+            {
+              "sourceID": "cdc16d52-5745-4624-9dc2-b4b8063ad4bd",
+              "sectionID": "11910",
+              "reference": "PC 403.1.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "To determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor."
+            },
+            {
+              "sourceID": "0d9b4af6-ca22-4f0b-8f47-4d1fc840aafb",
+              "sectionID": "11910",
+              "reference": "PC 403.1.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Exception: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2137-3",
+              "sectionID": "2137",
+              "reference": "BC 1004.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.1 1004.1 Design occupant load. Design occupant load. In determining means of egress requirements, the number of occupants for whom means of egress facilities shall be provided shall be established by the largest number computed in accordance with Section 1004.1.3, unless otherwise permitted by Section 1004.1.3.1, 1004.1.3.2 or 1004.2."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2156-4",
+              "sectionID": "2156",
+              "reference": "BC 1004.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.3 1004.3 Fixed seating. For areas having fixed seats and aisles, the occupant load shall be determined by the number of fixed seats installed therein. The occupant load for areas in which fixed seating is not installed, such as waiting spaces, shall be determined in accordance with Section 1004.1.3 and added to the number of fixed seats. The occupant load of wheelchair spaces and the associated companion seat shall be based on one occupant for each wheelchair space and one occupant for the associated companion seat provided in accordance with Section 1108.2.3. For areas having fixed seating without dividing arms, the occupant load shall be not less than the number of seats based on one person for each 18 inches (457.2 mm) of seating length. The occupant load of seating booths shall be based on one person for each 24 inches (609.6 mm) of booth seat length measured at the backrest of the seating booth."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2152-5",
+              "sectionID": "2152",
+              "reference": "BC 1004.1.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Table 1004.1.3 Maximum Floor Area Allowances Per Occupant Function of Space Occupant Load Factor a Function of Space Occupant Load Factor a Accessory storage areas, mechanical equipment room 300 gross Agricultural building 300 gross Aircraft hangars 500 gross Assembly Gaming floors (keno, slots, etc.) Exhibit gallery and museum 11 gross 30 net Assembly with fixed seats See Section 1004.3 Assembly without fixed seats Concentrated (chairs only - not fixed) Dance floor Dance floor (ballroom) Standing space / waiting area Unconcentrated (tables and chairs) 7 net 5 net 10 net 5 net 15 net Bowling centers, allow 5 persons for each lane including 15 feet of runway, and for additional areas 7 net Business areas, including accessory areas on terraces and rooftops 100 gross b, d Courtrooms - other than fixed seating areas 40 net Day Care Age under 6 months Age 6 months - 2 years Age 2 years - 6 years Age above 6 years 50 net 40 net 30 net 50 net Dormitories 50 gross Educational Classroom area Shops and other vocational room areas Kindergarten, and pre-kindergarten 20 net 50 net 30 net Exercise rooms 50 gross Group H-5 Fabrication and manufacturing areas 200 gross Gymnasiums 15 net Industrial areas 100 gross Institutional areas Inpatient treatment areas Outpatient areas Sleeping areas 240 gross 100 gross 120 gross Kitchens, commercial 200 gross Library Reading rooms Stack area 50 net 100 gross Locker rooms 50 gross Mall buildings - covered and open See Section 402.8.2 Mercantile Areas on other floors Basement and grade floor areas Storage, stock, shipping areas 60 gross 30 gross 300 gross Parking garages 200 gross Passenger terminal Baggage claim Baggage handling Concourse Passenger terminal or platform Waiting area (Standing) Waiting areas (Seated) 20 gross 300 gross 100 gross 1.5 × C* 15 gross 5 net Residential Within dwelling units Rooftop and terrace accessory to Groups R-2 and R-3 Indoor residential amenity spaces accessory to Group R-2 (concentrated) e Indoor residential amenity spaces accessory to Group R-2 (unconcentrated) e 200 gross 200 gross b, c, d 15 net 50 net Skating rinks, swimming pools Rink and pool Decks 50 gross 15 gross Stages and platforms 15 net for performing area and 50 net remaining area Warehouses 500 gross C* - capacity of all passenger vehicles that can be unloaded simultaneously. For SI: 1 square foot = 0.0929 m 2 , 1 foot = 304.8 mm. a. Floor area in square feet per occupant. b. For the purposes of occupant load calculation, permanent fixtures and amenities such as shrubs, decorative pools, non-walkable paving surfaces, etc. may be deducted from the total floor area. c. A rooftop or terrace in Group R-2 or R-3 occupancies that is provided for the incidental, recreational use by the residential tenants residing in the same residential building. d. Where the maximum occupant load of the rooftop or terrace exceeds 74 persons based on occupant load calculations, a Place of Assembly Certificate of Operation is required pursuant to Section 28-117.1 of the Administrative Code and Item 1 of Section 303.7 of this code. e. To be used only when the occupant load for the function of the space is not listed elsewhere in Table 1004.1.3 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11911-7",
+              "sectionID": "11911",
+              "reference": "PC 403.1.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "403.1.2 403.1.2 Family or assisted-use toilet and bath fixtures. Fixtures located within family or assisted-use toilet and bathing rooms required by Section 1109.2.1 of the New York City Building Code are permitted to be included in the number of required fixtures for either the male or female occupants in assembly and mercantile occupancies."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-11",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "CERTIFICATE OF OPERATION. A certificate issued by the department upon satisfactory inspection of a specific piece of hoisting equipment to ensure that the equipment is in compliance with this code. DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling. FIXED SEATING. Furniture or fixture designed and installed for the use of sitting and secured in place including bench-type seats and seats with or without backs or arm rests. FOOD COURT. See Section 402.2. NURSING HOMES . See Section 308 . 2 . 2 . OCCUPANT LOAD . The number of persons for which the means of egress of a building or portion thereof is designed . PARKING GARAGE. A structure or portion of a structure, other than a private garage or carport, used for the parking or storage of motor vehicles. WHEELCHAIR SPACE . A space for a single wheelchair and its occupant ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:11913-2",
+              "sectionID": "11913",
+              "reference": "PC 403.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "403.2 403.2 Separate facilities. Where plumbing fixtures are required, separate facilities shall be provided for each sex. Exceptions: 1. Separate facilities shall not be required for dwelling units and sleeping units. 2. In structures or tenant spaces where combined employee and public toilet facilities are provided in accordance with Section 403.3, separate facilities shall not be required where the total number of employees, customers, patrons and visitors is 30 or fewer. 3. In structures or tenant spaces where required toilet facilities for only employee use are provided in accordance with Section 403.3, separate facilities shall not be required where the total number of employees is 30 or fewer. 4. In structures or tenant spaces where required toilet facilities for only public use are provided in accordance with Section 403.3, separate facilities shall not be required where the total number of customers, patrons and visitors is 30 or fewer."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:12002-3",
+              "sectionID": "12002",
+              "reference": "PC 419.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "419.2 419.2 Substitution for water closets. In each bathroom or toilet room, urinals shall not be substituted for more than 50 percent of the required water closets."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:11914-6",
+              "sectionID": "11914",
+              "reference": "PC 403.2.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "403.2.1 403.2.1 Family or assisted-use toilet facilities serving as separate facilities. Where a building or tenant space requires a separate toilet facility for each sex and each toilet facility is required to have only one water closet, two-family* or assisted-use toilet facilities shall be permitted to serve as the required separate facilities. Family or assisted-use toilet facilities shall not be required to be identified for exclusive use by either sex as required by Section 403.4. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 . * Editor's note: As set forth in L.L. 2023/077; intended reference is likelty \"two family or assisted-use toilet facilities....\""
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?\nProject facts: Space: Residential multipurpose room; Potential Classification: Group B under the accessory assembly provision; Unknowns: assembly use category, occupant load, shared facilities, sex distribution",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 5,
+            "candidateCount": 12,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 3,
+            "characterCount": 27856,
+            "resolverFailureCount": 2,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 2,
+              "text": "2 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "Project configured code basis"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260826-supporting-web-v7",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-4ecd6086-3b11-40a9-9ed5-315fdeb6633a",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "Project configured code basis",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T03:10:17.780Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T03:10:17.780Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v3",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "multiple_required_claims",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 21888,
+          "cachedInputTokens": 1476,
+          "outputTokens": 2069,
+          "totalTokens": 23957
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.048699,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "c11efbc6-b6fd-46d1-91d7-767b2e82d90e",
+        "createdAt": "2026-08-27T03:10:17.769Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra",
+          "gpt-5.6-luna"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v3",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 2,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 21888,
+        "cachedInputTokens": 1476,
+        "outputTokens": 2069,
+        "totalTokens": 23957,
+        "estimatedCostUSD": 0.048699,
+        "actualProviderCostUSD": 0.048699,
+        "conservativeProviderCostUSD": 0.048699,
+        "durationMilliseconds": 23484,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T03:10:54.584Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 12993,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 4461,
+              "cachedInputTokens": 1877,
+              "outputTokens": 1501,
+              "totalTokens": 5962
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 4461,
+          "cachedInputTokens": 1877,
+          "outputTokens": 1501,
+          "totalTokens": 5962
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "All required citations are used for claims supported by their selected text. BC 303.1.3 is correctly identified as the direct authority for the qualifying accessory-room Assembly fixture option; PC 403.1 is correctly used for the Table 403.1/Building Code framework and the limited nonaccessory provision; and PC 403.1.1 is correctly used for sex allocation, ratios, fraction aggregation, rounding, and the statistical-data exception.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent fixture ratios, a final count, a Group B calculation entitlement, or a shared-facility credit rule. It appropriately confines its conclusions to the supplied passages and identifies the absent table and project inputs.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer gives the required conditional conclusion, rejects an automatic normal-Group-B result, and explains that a count cannot be calculated from the supplied materials and unresolved inputs.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer expressly states that the supplied Table 403.1 content is absent and that the evidence cannot establish ratios, a numerical count, or an affirmative normal-Group-B path. It also identifies further unresolved project facts and needed shared-facility provisions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer provides a usable legal conclusion, distinguishes the two code provisions' scopes, gives the available calculation mechanics, and lists the factual and code-table information needed to finish the analysis.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It begins with the direct answer, \"Not automatically,\" then explains why Group B classification alone does not establish use of normal Group B fixture requirements.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "Expressly states that Group B classification does not itself establish a normal Group B fixture calculation path.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "Correctly attributes the qualifying accessory-room Assembly fixture-calculation permission directly to BC 303.1.3.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "Correctly explains that PC 403.1's separate permission is for a building or nonaccessory tenant space and is not independent authority for the accessory room.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "Uses PC 403.1 for its supported general framework: Table 403.1 controls minimum fixture numbers, and Building Code controls occupant load and occupancy classification.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "Requires identification of the room's actual Assembly use category before selecting applicable fixture ratios.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "States the default equal division by sex and the approved-statistical-data basis for another distribution.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "Explains ratio application, summing fractional requirements across occupancies, and rounding up.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "Does not provide a final fixture count and explains that the table, final occupant load, use category, and other facts remain unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects automatic reliance on Group B classification.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer correctly says the PC 403.1 nonaccessory provision is not independent authority for this accessory room.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer makes no assertion that residential-unit fixtures automatically satisfy the room's requirement; instead, it identifies shared-facility treatment as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "The answer supplies no final fixture count and identifies missing inputs, including occupant load, assembly category, and shared-facility treatment.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies the final Building Code occupant load as needed before a count can be calculated.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer identifies the room's actual Assembly use category as necessary to select applicable Table 403.1 ratios.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer identifies proposed existing/shared facilities and the need for provisions governing whether they may be credited.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer identifies whether approved statistical data supports a non-50/50 sex distribution as an unresolved input.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.023555,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 5,
+            "canonicalCount": 5,
+            "selectedEvidenceCount": 5,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 23490,
+            "inputTokens": 21888,
+            "cachedInputTokens": 1476,
+            "outputTokens": 2069,
+            "totalTokens": 23957,
+            "estimatedCostUSD": 0.048699,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "All required citations are used for claims supported by their selected text. BC 303.1.3 is correctly identified as the direct authority for the qualifying accessory-room Assembly fixture option; PC 403.1 is correctly used for the Table 403.1/Building Code framework and the limited nonaccessory provision; and PC 403.1.1 is correctly used for sex allocation, ratios, fraction aggregation, rounding, and the statistical-data exception.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "8/8 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer does not invent fixture ratios, a final count, a Group B calculation entitlement, or a shared-facility credit rule. It appropriately confines its conclusions to the supplied passages and identifies the absent table and project inputs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/4 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer gives the required conditional conclusion, rejects an automatic normal-Group-B result, and explains that a count cannot be calculated from the supplied materials and unresolved inputs.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "4/4 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "The answer expressly states that the supplied Table 403.1 content is absent and that the evidence cannot establish ratios, a numerical count, or an affirmative normal-Group-B path. It also identifies further unresolved project facts and needed shared-facility provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "The answer provides a usable legal conclusion, distinguishes the two code provisions' scopes, gives the available calculation mechanics, and lists the factual and code-table information needed to finish the analysis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "It begins with the direct answer, \"Not automatically,\" then explains why Group B classification alone does not establish use of normal Group B fixture requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "Expressly states that Group B classification does not itself establish a normal Group B fixture calculation path.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "Correctly attributes the qualifying accessory-room Assembly fixture-calculation permission directly to BC 303.1.3.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "Correctly explains that PC 403.1's separate permission is for a building or nonaccessory tenant space and is not independent authority for the accessory room.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "Uses PC 403.1 for its supported general framework: Table 403.1 controls minimum fixture numbers, and Building Code controls occupant load and occupancy classification.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "Requires identification of the room's actual Assembly use category before selecting applicable fixture ratios.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "States the default equal division by sex and the approved-statistical-data basis for another distribution.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-7",
+                "rationale": "Explains ratio application, summing fractional requirements across occupancies, and rounding up.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-8",
+                "rationale": "Does not provide a final fixture count and explains that the table, final occupant load, use category, and other facts remain unresolved.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer expressly rejects automatic reliance on Group B classification.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "The answer correctly says the PC 403.1 nonaccessory provision is not independent authority for this accessory room.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "The answer makes no assertion that residential-unit fixtures automatically satisfy the room's requirement; instead, it identifies shared-facility treatment as unresolved.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "The answer supplies no final fixture count and identifies missing inputs, including occupant load, assembly category, and shared-facility treatment.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The answer identifies the final Building Code occupant load as needed before a count can be calculated.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The answer identifies the room's actual Assembly use category as necessary to select applicable Table 403.1 ratios.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "The answer identifies proposed existing/shared facilities and the need for provisions governing whether they may be credited.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "The answer identifies whether approved statistical data supports a non-50/50 sex distribution as an unresolved input.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "5/5 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. All required citations are used for claims supported by their selected text. BC 303.1.3 is correctly identified as the direct authority for the qualifying accessory-room Assembly fixture option; PC 403.1 is correctly used for the Table 403.1/Building Code framework and the limited nonaccessory provision; and PC 403.1.1 is correctly used for sex allocation, ratios, fraction aggregation, rounding, and the statistical-data exception.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 3 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "8/8 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer does not invent fixture ratios, a final count, a Group B calculation entitlement, or a shared-facility credit rule. It appropriately confines its conclusions to the supplied passages and identifies the absent table and project inputs.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer gives the required conditional conclusion, rejects an automatic normal-Group-B result, and explains that a count cannot be calculated from the supplied materials and unresolved inputs.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "4/4 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer expressly states that the supplied Table 403.1 content is absent and that the evidence cannot establish ratios, a numerical count, or an affirmative normal-Group-B path. It also identifies further unresolved project facts and needed shared-facility provisions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer provides a usable legal conclusion, distinguishes the two code provisions' scopes, gives the available calculation mechanics, and lists the factual and code-table information needed to finish the analysis.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It begins with the direct answer, \"Not automatically,\" then explains why Group B classification alone does not establish use of normal Group B fixture requirements.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "Expressly states that Group B classification does not itself establish a normal Group B fixture calculation path.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "Correctly attributes the qualifying accessory-room Assembly fixture-calculation permission directly to BC 303.1.3.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "Correctly explains that PC 403.1's separate permission is for a building or nonaccessory tenant space and is not independent authority for the accessory room.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "Uses PC 403.1 for its supported general framework: Table 403.1 controls minimum fixture numbers, and Building Code controls occupant load and occupancy classification.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "Requires identification of the room's actual Assembly use category before selecting applicable fixture ratios.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "States the default equal division by sex and the approved-statistical-data basis for another distribution.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "Explains ratio application, summing fractional requirements across occupancies, and rounding up.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "Does not provide a final fixture count and explains that the table, final occupant load, use category, and other facts remain unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects automatic reliance on Group B classification.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer correctly says the PC 403.1 nonaccessory provision is not independent authority for this accessory room.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer makes no assertion that residential-unit fixtures automatically satisfy the room's requirement; instead, it identifies shared-facility treatment as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "The answer supplies no final fixture count and identifies missing inputs, including occupant load, assembly category, and shared-facility treatment.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies the final Building Code occupant load as needed before a count can be calculated.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer identifies the room's actual Assembly use category as necessary to select applicable Table 403.1 ratios.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer identifies proposed existing/shared facilities and the need for provisions governing whether they may be credited.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer identifies whether approved statistical data supports a non-50/50 sex distribution as an unresolved input.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

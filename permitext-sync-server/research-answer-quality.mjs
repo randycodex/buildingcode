@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-dependent-condition-coverage-v15";
+  "20260827-authority-term-boundary-v16";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -199,6 +199,11 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     )
       ? hcrVanitySourceIDs
       : [];
+  const conflatedLavatoryVanitySourceIDs =
+    hcrVanitySourceIDs.length &&
+    /\b(?:lavatory\s*[/(]\s*vanity|vanity\s*[/(]\s*lavatory)\b/i.test(applicabilityText)
+      ? hcrVanitySourceIDs
+      : [];
   const cumulativeSingleExitSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
     /not exceeding six stories\s+and\s+not exceeding 2,?000 square feet/i.test(
       availableEvidence.get(sourceID)?.text
@@ -273,6 +278,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       unsupportedNormalGroupBFixturePermissionSourceIDs.length === 0 &&
       missingMultipleOccupancyFractionSequenceSourceIDs.length === 0 &&
       missingTypeBNYCContextSourceIDs.length === 0 &&
+      conflatedLavatoryVanitySourceIDs.length === 0 &&
       misstatedCumulativeConditionSourceIDs.length === 0 &&
       unsupportedExitAccessExpansionSourceIDs.length === 0 &&
       misboundAccessibleDiningSurfaceRuleSourceIDs.length === 0 &&
@@ -291,6 +297,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     unsupportedNormalGroupBFixturePermissionSourceIDs,
     missingMultipleOccupancyFractionSequenceSourceIDs,
     missingTypeBNYCContextSourceIDs,
+    conflatedLavatoryVanitySourceIDs,
     misstatedCumulativeConditionSourceIDs,
     unsupportedExitAccessExpansionSourceIDs,
     misboundAccessibleDiningSurfaceRuleSourceIDs,
@@ -398,6 +405,12 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "missed_material_conclusion",
       detail: `Place BC 1107.2.2.7.2.2 in its Type B+NYC unit toilet-and-bathing-room context before explaining its water-closet clearance and permitted lavatory location. Unless the user established that the subject unit and bathroom are within that scope, make the Building Code discussion conditional on Type B+NYC applicability and include that applicability as a missing project fact. Bind the context to: ${references(result.missingTypeBNYCContextSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.conflatedLavatoryVanitySourceIDs?.length) {
+    issues.push({
+      type: "misstated_provision",
+      detail: `Keep lavatory and vanity as distinct terms. Do not join them with a slash, parentheses, or other shorthand that implies they are interchangeable; state separately what the cited Building Code text says about a lavatory and what it does not establish about a vanity. Bind that distinction to: ${references(result.conflatedLavatoryVanitySourceIDs, result.sources)}.`
     });
   }
   if (result.misstatedCumulativeConditionSourceIDs?.length) {

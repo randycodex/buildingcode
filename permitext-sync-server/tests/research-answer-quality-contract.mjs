@@ -508,6 +508,25 @@ const contextualVanityAnswer = evaluateResearchAnswerQuality({
 });
 assert.equal(contextualVanityAnswer.pass, true);
 
+const conflatedVanityAnswer = evaluateResearchAnswerQuality({
+  question: vanityQuestion,
+  evidence: vanityEvidence,
+  answer: {
+    answerText: "No. If the Type B+NYC scope applies, this provision permits a compliant lavatory location; it does not establish an HCR lavatory/vanity requirement.",
+    supportedPoints: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }],
+    citations: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }]
+  }
+});
+assert.equal(conflatedVanityAnswer.pass, false);
+assert.deepEqual(
+  conflatedVanityAnswer.conflatedLavatoryVanitySourceIDs,
+  ["bc-type-b-nyc-toilet-room"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(conflatedVanityAnswer).at(-1).type,
+  "misstated_provision"
+);
+
 const unresolvedTypeBNYCAnswer = evaluateResearchAnswerQuality({
   question: vanityQuestion,
   evidence: vanityEvidence,
