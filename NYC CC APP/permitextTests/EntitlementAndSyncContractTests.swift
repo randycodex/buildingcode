@@ -6382,6 +6382,97 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         )
     }
 
+    func testResearchProjectContextDisclosureIncludesServerProjectInformation() throws {
+        let conversation = try JSONDecoder().decode(
+            ResearchConversation.self,
+            from: Data(
+                """
+                {
+                  "id":"conversation-a",
+                  "title":"Parking review",
+                  "createdAt":"2026-08-27T00:00:00Z",
+                  "updatedAt":"2026-08-27T00:01:00Z",
+                  "primaryProjectID":"project-a",
+                  "projectContext":{
+                    "projectID":"project-a",
+                    "facts":["Additional Research Fact: Existing use remains in place."]
+                  },
+                  "projectInformation":{
+                    "address":"1760 Jerome Avenue, Bronx, NY",
+                    "description":"Proposed enlargement",
+                    "facts":[
+                      "Zoning Fact — Address: 1760 Jerome Avenue, Bronx, NY (user-confirmed; not independently verified)",
+                      "Zoning Fact — Zoning Districts: R7-1 (NYC Planning sourced data; verify current official records)"
+                    ],
+                    "structuredFacts":[]
+                  },
+                  "projectContextReviewRequired":false,
+                  "sourceStatus":"current",
+                  "sources":[],
+                  "messages":[]
+                }
+                """.utf8
+            )
+        )
+
+        let disclosure = ResearchProjectContextDisclosure.resolve(
+            projectID: conversation.primaryProjectID,
+            projectInformation: conversation.projectInformation,
+            additionalFacts: conversation.projectContext?.facts ?? []
+        )
+
+        XCTAssertTrue(disclosure.isAssigned)
+        XCTAssertEqual(disclosure.title, "Project context included: 3 facts")
+        XCTAssertEqual(disclosure.facts.count, 3)
+        XCTAssertTrue(disclosure.facts.contains { $0.contains("1760 Jerome Avenue") })
+        XCTAssertTrue(disclosure.facts.contains { $0.contains("R7-1") })
+        XCTAssertTrue(disclosure.facts.contains { $0.contains("Existing use remains in place") })
+
+        let localFallback = ResearchProjectContextDisclosure.resolve(
+            projectID: "project-a",
+            projectInformation: nil,
+            additionalFacts: [],
+            localAddress: "47 Cooper Street, Manhattan, NY",
+            localDescription: "Interior renovation",
+            localStructuredFacts: [
+                ProjectStructuredFact(
+                    id: "zoning-districts",
+                    key: "zoning-districts",
+                    label: "Zoning Districts",
+                    value: "R7A",
+                    status: "sourced",
+                    source: "nyc-planning",
+                    sourceText: "NYC Planning",
+                    updatedAt: nil
+                ),
+                ProjectStructuredFact(
+                    id: "floor-affected",
+                    key: "floor-affected",
+                    label: "Floor affected",
+                    value: "3",
+                    status: "confirmed",
+                    source: "project",
+                    sourceText: "",
+                    updatedAt: nil
+                )
+            ]
+        )
+        XCTAssertEqual(localFallback.title, "Project context included: 3 facts")
+        XCTAssertTrue(localFallback.facts.contains("Address: 47 Cooper Street, Manhattan, NY"))
+        XCTAssertTrue(localFallback.facts.contains("Zoning Districts: R7A"))
+        XCTAssertTrue(localFallback.facts.contains("Description: Interior renovation"))
+        XCTAssertFalse(localFallback.facts.contains { $0.contains("Floor affected") })
+
+        XCTAssertEqual(
+            ResearchProjectContextDisclosure.resolve(
+                projectID: nil,
+                projectInformation: conversation.projectInformation,
+                additionalFacts: ["This must not be included."]
+            ).title,
+            "Project facts: Unassigned — no Project facts will be included."
+        )
+    }
+
     func testResearchStructuredCopyPreservesTrustMetadataAndCitations() {
         var answer = ResearchAnswer(
             conclusion: "A cited conclusion.",

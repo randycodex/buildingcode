@@ -167,6 +167,7 @@ struct ResearchConversation: Codable, Hashable, Identifiable, Sendable {
     var updatedAt: String
     var primaryProjectID: String? = nil
     var projectContext: ResearchProjectContext? = nil
+    var projectInformation: ResearchProjectInformation? = nil
     var projectContextReviewRequired: Bool = false
     var sourceStatus: String = "current"
     var sources: [ResearchSource] = []
@@ -194,6 +195,15 @@ struct ResearchProjectContext: Codable, Hashable, Sendable {
     var facts: [String]? = nil
     var source: String? = nil
     var updatedAt: String? = nil
+}
+
+/// The current saved Project information returned alongside a Research
+/// conversation. These facts are assembled by the server and are the same
+/// Project context made available to the Research pipeline.
+struct ResearchProjectInformation: Codable, Hashable, Sendable {
+    var address: String? = nil
+    var description: String? = nil
+    var facts: [String]? = nil
 }
 
 struct ResearchSource: Codable, Hashable, Identifiable, Sendable {

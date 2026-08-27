@@ -94,6 +94,63 @@ enum ResearchConversationCacheLifecycle {
     }
 }
 
+struct ResearchProjectContextDisclosure: Equatable {
+    let isAssigned: Bool
+    let facts: [String]
+
+    var title: String {
+        guard isAssigned else {
+            return "Project facts: Unassigned — no Project facts will be included."
+        }
+        guard !facts.isEmpty else {
+            return "Assigned Project has no saved facts."
+        }
+        return "Project context included: \(facts.count) \(facts.count == 1 ? "fact" : "facts")"
+    }
+
+    static func resolve(
+        projectID: String?,
+        projectInformation: ResearchProjectInformation?,
+        additionalFacts: [String],
+        localAddress: String = "",
+        localDescription: String = "",
+        localStructuredFacts: [ProjectStructuredFact] = []
+    ) -> ResearchProjectContextDisclosure {
+        guard projectID?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
+            return ResearchProjectContextDisclosure(isAssigned: false, facts: [])
+        }
+        let serverFacts = projectInformation?.facts ?? []
+        let normalizedLocalAddress = localAddress.trimmingCharacters(in: .whitespacesAndNewlines)
+        var derivedLocalFacts: [String] = []
+        if !normalizedLocalAddress.isEmpty {
+            derivedLocalFacts.append("Address: \(normalizedLocalAddress)")
+        }
+        derivedLocalFacts.append(contentsOf: localStructuredFacts.compactMap { fact -> String? in
+            let status = fact.status.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            guard ["stated", "confirmed", "sourced"].contains(status),
+                  fact.key != "floor-affected",
+                  normalizedLocalAddress.isEmpty || fact.key != "address"
+            else { return nil }
+            let label = fact.label.trimmingCharacters(in: .whitespacesAndNewlines)
+            let value = fact.value.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !label.isEmpty, !value.isEmpty else { return nil }
+            return "\(label): \(value)"
+        })
+        let normalizedLocalDescription = localDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !normalizedLocalDescription.isEmpty {
+            derivedLocalFacts.append("Description: \(normalizedLocalDescription)")
+        }
+        let localFacts = serverFacts.isEmpty ? derivedLocalFacts : serverFacts
+        var seen = Set<String>()
+        let facts = (localFacts + additionalFacts).compactMap { value -> String? in
+            let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !normalized.isEmpty, seen.insert(normalized).inserted else { return nil }
+            return normalized
+        }
+        return ResearchProjectContextDisclosure(isAssigned: true, facts: facts)
+    }
+}
+
 private struct PendingResearchVisualReview: Identifiable, Equatable {
     let id = UUID()
     let originalSelection: ResearchSelectionRequest
@@ -745,19 +802,31 @@ struct ResearchView: View {
 
     @ViewBuilder
     private var projectFactsReview: some View {
-        let facts = conversation?.projectContext?.facts ?? []
-        if conversation?.primaryProjectID == nil {
-            Label("Project facts: Unassigned — no Project facts will be included.", systemImage: "folder.badge.questionmark")
+        let localProject = library.folder(forBackendProjectID: conversation?.primaryProjectID)
+        let disclosure = ResearchProjectContextDisclosure.resolve(
+            projectID: conversation?.primaryProjectID,
+            projectInformation: conversation?.projectInformation,
+            additionalFacts: conversation?.projectContext?.facts ?? [],
+            localAddress: localProject?.address ?? "",
+            localDescription: localProject?.description ?? "",
+            localStructuredFacts: localProject?.structuredFacts ?? []
+        )
+        if !disclosure.isAssigned {
+            Label(disclosure.title, systemImage: "folder.badge.questionmark")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("research-composer-project-facts")
         } else {
-            DisclosureGroup("Project facts included: \(facts.count)") {
+            DisclosureGroup(disclosure.title) {
                 VStack(alignment: .leading, spacing: 5) {
-                    ForEach(facts, id: \.self) { fact in
+                    ForEach(disclosure.facts, id: \.self) { fact in
                         Text("• \(fact)")
                     }
-                    Text("Project facts provide context; they are not code authority.")
+                    Text(
+                        disclosure.facts.isEmpty
+                            ? "No saved Project facts will be sent. Private notes are not included."
+                            : "Project facts provide context; they are not code authority."
+                    )
                         .fontWeight(.semibold)
                 }
                 .font(.caption2)
