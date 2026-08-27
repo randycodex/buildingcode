@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260827-natural-selected-boundary-v19";
+export const researchEvidenceAssemblyVersion = "20260827-pinned-evidence-budget-v20";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -18,6 +18,12 @@ export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCrossReferences: 6,
   maximumCharacters: 48_000,
   maximumCharactersPerSource: 12_000
+});
+
+export const researchPinnedEvidenceAssemblyLimits = Object.freeze({
+  maximumDiscovered: 4,
+  maximumTargetedDefinitions: 1,
+  maximumCrossReferences: 3
 });
 
 const sourceOrigins = Object.freeze({
@@ -624,7 +630,24 @@ export async function assembleResearchEvidence({
     projectFacts,
     topicContext
   });
-  const limits = appliedLimits(requestedLimits);
+  const requestedLimitsApplied = appliedLimits(requestedLimits);
+  const limits = pinnedEvidence.length
+    ? {
+        ...requestedLimitsApplied,
+        maximumDiscovered: Math.min(
+          requestedLimitsApplied.maximumDiscovered,
+          researchPinnedEvidenceAssemblyLimits.maximumDiscovered
+        ),
+        maximumTargetedDefinitions: Math.min(
+          requestedLimitsApplied.maximumTargetedDefinitions,
+          researchPinnedEvidenceAssemblyLimits.maximumTargetedDefinitions
+        ),
+        maximumCrossReferences: Math.min(
+          requestedLimitsApplied.maximumCrossReferences,
+          researchPinnedEvidenceAssemblyLimits.maximumCrossReferences
+        )
+      }
+    : requestedLimitsApplied;
   const appliedStrategy = strategy?.mode === researchEvidenceStrategies.pinnedFirst
     ? {
         mode: researchEvidenceStrategies.pinnedFirst,
@@ -866,9 +889,12 @@ export async function assembleResearchEvidence({
     if (!record.text) break;
     sources.push(record);
     if (targeted.excerpt) targetedDefinitionCount += 1;
-    canonicalForExpansion.push(useSelectedPassageOnly || query.relevanceComparison
-      ? { ...resolved, text: record.text, canonicalText: record.text, crossReferences: [] }
-      : resolved);
+    canonicalForExpansion.push({
+      ...(useSelectedPassageOnly || query.relevanceComparison
+        ? { ...resolved, text: record.text, canonicalText: record.text, crossReferences: [] }
+        : resolved),
+      researchAssemblyOrigin: sourceOrigins.discovered
+    });
     includedSectionIdentities.add(sectionIdentity(resolved));
     characterCount += record.text.length;
     discoveredCount += 1;
@@ -945,6 +971,10 @@ export async function assembleResearchEvidence({
       }
     }
     for (const source of canonicalForExpansion) {
+      if (
+        pinnedEvidence.length &&
+        source?.researchAssemblyOrigin === sourceOrigins.discovered
+      ) continue;
       for (const reference of normalizedCrossReferences(source, {
         inlineOnly: query.relevanceComparison
       })) {

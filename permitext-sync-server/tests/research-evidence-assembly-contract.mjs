@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {
   assembleResearchEvidence,
   researchEvidenceAssemblyLimits,
+  researchPinnedEvidenceAssemblyLimits,
   researchEvidenceAssemblyVersion,
   researchEvidenceRetrievalQuery,
   researchEvidenceStrategies,
@@ -264,8 +265,8 @@ assert.match(crossReferences[0].text, /Canonical cross-reference one/);
 assert.equal(crossReferences[0].evidencePriority.claimCoverageRequired, false);
 assert.equal(assembled.usage.crossReferenceCount, 1);
 assert(
-  assembled.limitations.some((item) => item.kind === "cross-reference-limit"),
-  "A bounded package must disclose omitted direct cross-references."
+  !assembled.limitations.some((item) => item.kind === "cross-reference-limit"),
+  "A discovered section skipped by the pinned-evidence expansion policy must not create a false omitted-cross-reference warning."
 );
 assert(
   assembled.usage.characterCount <= assembled.limits.maximumCharacters,
@@ -467,6 +468,46 @@ assert.equal(researchEvidenceAssemblyLimits.maximumCandidates, 12);
 assert.equal(researchEvidenceAssemblyLimits.maximumDiscovered, 10);
 assert.equal(researchEvidenceAssemblyLimits.maximumCrossReferences, 6);
 assert.equal(researchEvidenceAssemblyLimits.maximumCharacters, 48_000);
+assert.deepEqual(researchPinnedEvidenceAssemblyLimits, {
+  maximumDiscovered: 4,
+  maximumTargetedDefinitions: 1,
+  maximumCrossReferences: 3
+});
+
+const defaultPinnedBudget = await assembleResearchEvidence({
+  question: "What else applies to the selected passage?",
+  pinnedEvidence: [{
+    sectionID: "pinned",
+    codePrefix: "BC",
+    sectionNumber: "1019.3",
+    selectedText: "Interior exit access stairways shall be enclosed."
+  }],
+  discover: async () => ({ candidates: [] }),
+  resolveSection
+});
+assert.equal(defaultPinnedBudget.limits.maximumDiscovered, 4);
+assert.equal(defaultPinnedBudget.limits.maximumTargetedDefinitions, 1);
+assert.equal(defaultPinnedBudget.limits.maximumCrossReferences, 3);
+
+const pinnedDiscoveryDoesNotExpandCrossReferences = await assembleResearchEvidence({
+  question: "What else applies to the selected passage?",
+  pinnedEvidence: [{
+    sectionID: "pinned",
+    codePrefix: "BC",
+    sectionNumber: "1019.3",
+    selectedText: "Interior exit access stairways shall be enclosed."
+  }],
+  discover,
+  resolveSection,
+  limits: { maximumDiscovered: 2, maximumCrossReferences: 3, maximumCharacters: 3_000 }
+});
+assert.deepEqual(
+  pinnedDiscoveryDoesNotExpandCrossReferences.sources
+    .filter((source) => source.origin === "permitext_cross_reference")
+    .map((source) => source.sectionID),
+  ["cross-1"],
+  "Automatically discovered sections must not fan out their own cross-references when user-pinned enacted evidence already defines the primary scope."
+);
 
 const twoReaderPins = [{ codePrefix: "PC", sectionNumber: "101.1" }, {
   codePrefix: "PC",

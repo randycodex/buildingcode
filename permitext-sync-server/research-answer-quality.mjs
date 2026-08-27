@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-dining-surface-grammar-v11";
+  "20260827-accessory-assembly-scope-v12";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -128,6 +128,19 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     /\baccessory to (?:an?|the)\s+Group B occupancy\b/i.test(applicabilityText)
       ? accessoryAssemblySourceIDs
       : [];
+  const restrictedPC403AccessorySourceIDs = accessoryAssemblyPlumbingQuestion
+    ? knownCitedSourceIDs.filter((sourceID) =>
+      availableEvidence.get(sourceID)?.reference === "PC 403.1" &&
+      /\bbuilding or nonaccessory tenant space\b/i.test(availableEvidence.get(sourceID)?.text)
+    )
+    : [];
+  const disclosesPC403NonaccessoryScope =
+    /\bbuilding or nonaccessory tenant(?: assembly)? space\b/i.test(applicabilityText) &&
+    /\b(?:limited|restricted|confined|only|does not|not independently|separate|distinct)\b/i.test(applicabilityText);
+  const missingPC403NonaccessoryScopeDisclosureSourceIDs =
+    restrictedPC403AccessorySourceIDs.length && !disclosesPC403NonaccessoryScope
+      ? restrictedPC403AccessorySourceIDs
+      : [];
   const hcrVanityQuestion =
     /\bHCR\b/i.test(question) &&
     /\bvanity\b/i.test(question);
@@ -209,6 +222,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       missingParallelTableCategorySourceIDs.length === 0 &&
       missingZoningModificationPathDisclosureSourceIDs.length === 0 &&
       misattributedAccessoryAssemblyRelationshipSourceIDs.length === 0 &&
+      missingPC403NonaccessoryScopeDisclosureSourceIDs.length === 0 &&
       missingTypeBNYCContextSourceIDs.length === 0 &&
       misstatedCumulativeConditionSourceIDs.length === 0 &&
       unsupportedExitAccessExpansionSourceIDs.length === 0 &&
@@ -223,6 +237,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     missingParallelTableCategorySourceIDs,
     missingZoningModificationPathDisclosureSourceIDs,
     misattributedAccessoryAssemblyRelationshipSourceIDs,
+    missingPC403NonaccessoryScopeDisclosureSourceIDs,
     missingTypeBNYCContextSourceIDs,
     misstatedCumulativeConditionSourceIDs,
     unsupportedExitAccessExpansionSourceIDs,
@@ -301,6 +316,12 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "wrong_attribution",
       detail: `BC 303.1.3 requires the assembly room to be accessory to another or served principal occupancy; Group B is the resulting room classification, not necessarily the principal occupancy to which it is accessory. Correct that relationship and bind it to: ${references(result.misattributedAccessoryAssemblyRelationshipSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.missingPC403NonaccessoryScopeDisclosureSourceIDs?.length) {
+    issues.push({
+      type: "wrong_attribution",
+      detail: `For an accessory assembly-room question, do not use PC 403.1's separate fewer-than-75 permission as authority for the accessory room without its express scope. State that the selected PC permission is limited to a building or nonaccessory tenant assembly space and does not independently extend to the accessory room; use BC 303.1.3 as the direct authority for the accessory-room Assembly fixture option. Bind the PC limitation to: ${references(result.missingPC403NonaccessoryScopeDisclosureSourceIDs, result.sources)}.`
     });
   }
   if (result.missingTypeBNYCContextSourceIDs?.length) {

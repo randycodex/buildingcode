@@ -211,6 +211,41 @@ const correctedAccessoryRelationship = evaluateResearchAnswerQuality({
 });
 assert.equal(correctedAccessoryRelationship.pass, true);
 
+const pc403RestrictedAssemblyEvidence = {
+  ...source("pc-nonaccessory-assembly", "403.1", "governing", "aligned"),
+  codePrefix: "PC",
+  text: "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B shall be permitted to be calculated in accordance with Assembly requirements."
+};
+const overbroadPC403AccessoryAnswer = evaluateResearchAnswerQuality({
+  question: accessoryAssemblyQuestion,
+  evidence: [...accessoryAssemblyEvidence, pc403RestrictedAssemblyEvidence],
+  answer: {
+    answerText: "BC 303.1.3 permits the Assembly calculation. PC 403.1 separately confirms that any qualifying Group B assembly room may use it.",
+    supportedPoints: [{ sourceIDs: ["bc-accessory-assembly"] }, { sourceIDs: ["pc-nonaccessory-assembly"] }],
+    citations: [{ sourceIDs: ["bc-accessory-assembly"] }, { sourceIDs: ["pc-nonaccessory-assembly"] }]
+  }
+});
+assert.equal(overbroadPC403AccessoryAnswer.pass, false);
+assert.deepEqual(
+  overbroadPC403AccessoryAnswer.missingPC403NonaccessoryScopeDisclosureSourceIDs,
+  ["pc-nonaccessory-assembly"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(overbroadPC403AccessoryAnswer).at(-1).type,
+  "wrong_attribution"
+);
+
+const boundedPC403AccessoryAnswer = evaluateResearchAnswerQuality({
+  question: accessoryAssemblyQuestion,
+  evidence: [...accessoryAssemblyEvidence, pc403RestrictedAssemblyEvidence],
+  answer: {
+    answerText: "BC 303.1.3 directly permits the accessory room's Assembly calculation. The selected PC 403.1 permission is limited to a building or nonaccessory tenant assembly space and does not independently extend that permission to this accessory room.",
+    supportedPoints: [{ sourceIDs: ["bc-accessory-assembly"] }, { sourceIDs: ["pc-nonaccessory-assembly"] }],
+    citations: [{ sourceIDs: ["bc-accessory-assembly"] }, { sourceIDs: ["pc-nonaccessory-assembly"] }]
+  }
+});
+assert.equal(boundedPC403AccessoryAnswer.pass, true);
+
 const diningSurfaceEvidence = [{
   ...source("bc-dining-surfaces", "1108.2.9.1", "governing", "aligned"),
   text: "At least 10 percent of the total number of seating and standing spaces, but not less than one, of each type of dining surfaces shall be accessible."
