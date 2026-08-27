@@ -5025,10 +5025,12 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(processingSource.contains("backendError.statusCode == 409 {"))
         XCTAssertTrue(processingSource.contains("This Apple purchase is already linked to another Permitext account."))
 
-        XCTAssertTrue(settingsSource.contains("100 turns included monthly"))
-        XCTAssertTrue(settingsSource.contains("Additional turns do not expire and are used after the monthly included turns."))
+        XCTAssertTrue(settingsSource.contains("Research turns"))
+        XCTAssertTrue(settingsSource.contains("Need more Research? Additional turns do not expire and are used after the monthly included turns."))
+        XCTAssertTrue(settingsSource.contains("if !library.availableResearchTurnPacks.isEmpty"))
         XCTAssertTrue(settingsSource.contains("Unused additional Research turns (they are forfeited and are not automatically refunded)"))
         XCTAssertTrue(researchSource.contains("You have used this month's included Research turns. Buy more turns to continue; your question is still here."))
+        XCTAssertTrue(researchSource.contains("Additional Research turns are temporarily unavailable. Your question is still here. Try again later."))
     }
 }
 
