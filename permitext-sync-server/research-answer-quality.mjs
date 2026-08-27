@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-dining-surface-binding-v10";
+  "20260827-dining-surface-grammar-v11";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -178,7 +178,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
   );
   const misstatedAccessibleDiningSurfacePercentageSourceIDs =
     accessibleDiningSurfaceSourceIDs.length &&
-    /10\s*percent\s+of\s+(?:the\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+of\s+each\s+(?:dining[- ]surface\s+)?type|10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i.test(applicabilityText)
+    /10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i.test(applicabilityText)
       ? accessibleDiningSurfaceSourceIDs
       : [];
   const citationSourceIDsByRole = {

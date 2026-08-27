@@ -266,6 +266,21 @@ assert.deepEqual(
   ["bc-dining-surfaces"]
 );
 
+const misstatedDiningPercentageWithTotalPerType = evaluateResearchAnswerQuality({
+  question: "How many dining surfaces must be accessible?",
+  evidence: diningSurfaceEvidence,
+  answer: {
+    answerText: "At least 10 percent of the total seating and standing spaces of each type of dining surface must be accessible.",
+    supportedPoints: [{ sourceIDs: ["bc-dining-surfaces"] }],
+    citations: [{ sourceIDs: ["bc-dining-surfaces"] }]
+  }
+});
+assert.equal(misstatedDiningPercentageWithTotalPerType.pass, false);
+assert.deepEqual(
+  misstatedDiningPercentageWithTotalPerType.misstatedAccessibleDiningSurfacePercentageSourceIDs,
+  ["bc-dining-surfaces"]
+);
+
 const misboundDiningCalculation = evaluateResearchAnswerQuality({
   question: "How many dining surfaces must be accessible?",
   evidence: [chapter11IncorporationEvidence, ...diningSurfaceEvidence],
