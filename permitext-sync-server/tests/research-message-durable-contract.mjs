@@ -49,6 +49,11 @@ assert.match(
   "Hybrid Research telemetry no longer distinguishes provider/validation fallback from verification-driven repair."
 );
 assert.match(
+  messageHandlerSlice,
+  /if \(attempt > 0\) \{[\s\S]*?permitext-deterministic-post-repair-acceptance[\s\S]*?break;/,
+  "Research can still expose a user-visible failure solely because a second subjective verifier rejects an objectively valid repair."
+);
+assert.match(
   appSource,
   /async function openAIResearchInterpretationWithStructuredRetry\([\s\S]*retryableResearchInterpretationCodes\.has\(error\?\.code\)[\s\S]*structuredResponseRetry: true[\s\S]*structuredResponseRetryCount: 1/,
   "A malformed model response does not receive one bounded schema retry with combined provider usage."

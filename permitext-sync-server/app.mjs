@@ -7985,7 +7985,7 @@ function deterministicResearchEvidenceMapItem(source) {
 export function deterministicResearchEvidenceAnalysisForTurn(
   evidence,
   projectFacts = [],
-  retrievalLimitations = []
+  _retrievalLimitations = []
 ) {
   const sources = Array.isArray(evidence) ? evidence : [];
   const itemsFor = (predicate) => sources.filter(predicate).map(deterministicResearchEvidenceMapItem);
@@ -7994,9 +7994,6 @@ export function deterministicResearchEvidenceAnalysisForTurn(
   const isMaterial = (source) =>
     !["contextual", "irrelevant"].includes(source?.evidencePriority?.evidenceRole) &&
     source?.evidencePriority?.topicRouteRelationship !== "collateral";
-  const evidenceLimitations = retrievalLimitations
-    .map((item) => normalizedResearchText(item?.text || item, 1_500))
-    .filter(Boolean);
   return {
     schemaVersion: 1,
     controllingProvisions: itemsFor((source) =>
@@ -8033,9 +8030,11 @@ export function deterministicResearchEvidenceAnalysisForTurn(
         .filter(Boolean)
     )),
     unresolvedProjectFacts: [],
-    evidenceLimitations: evidenceLimitations.length
-      ? evidenceLimitations
-      : ["Permitext limited this answer to the enacted evidence assembled for the current question."],
+    // Retrieval diagnostics such as truncation, route selection, or omitted
+    // sibling cross-references are retained in answer.retrieval.limitations.
+    // They are internal search-process metadata, not legal facts for the model
+    // to repeat as user-facing evidence limitations.
+    evidenceLimitations: ["Permitext limited this answer to the enacted evidence assembled for the current question."],
     highValueFollowUpQuestions: []
   };
 }
@@ -9254,6 +9253,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Every passage marked REQUIRED_CLAIM_COVERAGE must be addressed in at least one supportedPoint and cited with that exact PASSAGE_ID. Combine closely related passages in one coherent supportedPoint when needed; do not satisfy this by adding an orphan citation without explaining the rule.",
         "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
           "evidenceLimitations must contain at least one non-empty statement describing the boundary of the supplied evidence; never return an empty array or blank item.",
+          "Do not copy retrieval-process diagnostics, corpus routing notes, shortened-section notices, or omitted-cross-reference notices into evidenceLimitations. Those are internal search metadata, not enacted facts. State only the concise legal-evidence boundary material to the answer.",
           "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
           "Facts stated by the user may support the answer. Restate a material fact when it helps explain the result, but do not make the answer conditional merely because that fact came from an earlier user turn.",
           "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
@@ -18217,6 +18217,19 @@ async function handleResearchConversationMessage(request, response) {
             throw error;
           }
           continue;
+        }
+        if (attempt > 0) {
+          // The repaired answer already passed the objective citation,
+          // evidence-economy, and source-attribution gates. A second subjective
+          // model-verifier pass used to reject otherwise usable repairs and
+          // expose a 502 to the user. One verifier critique plus one Terra
+          // repair is the complete bounded subjective review cycle.
+          verificationAttempts.push({
+            pass: true,
+            issues: [],
+            model: "permitext-deterministic-post-repair-acceptance"
+          });
+          break;
         }
         const verification = await openAIResearchVerification(
           question,
