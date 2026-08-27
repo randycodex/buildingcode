@@ -2475,6 +2475,22 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func saveResearchFeedback(
+        conversationID: String,
+        answerID: String,
+        category: String,
+        comment: String?
+    ) async throws -> ResearchFeedback {
+        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        return try await accountBackendClient.saveResearchFeedback(
+            account: signedInAccount,
+            conversationID: conversationID,
+            answerID: answerID,
+            category: category,
+            comment: comment
+        )
+    }
+
     func renameResearchConversation(id: String, title: String) async throws -> ResearchConversation {
         guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
         return try await accountBackendClient.renameResearchConversation(

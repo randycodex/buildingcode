@@ -85,11 +85,11 @@ assert.match(
 );
 const postgresCommitIndex = appSource.indexOf("WITH committed_usage AS (");
 const postgresTransactionIndex = appSource.indexOf(
-  "const results = await sql.transaction(queries",
+  "results = await sql.transaction(queries",
   postgresCommitIndex
 );
 const postCommitReservationCheckIndex = appSource.indexOf(
-  "const usageResult = results[0]",
+  "const usageResult = results[usageResultIndex]",
   postgresTransactionIndex
 );
 assert.ok(

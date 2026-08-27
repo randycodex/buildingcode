@@ -89,6 +89,20 @@ struct ResearchConversationMessageRequest: Codable, Hashable, Sendable {
     let requestID: String
 }
 
+struct ResearchFeedbackRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let conversationID: String
+    let answerID: String
+    let category: String
+    var comment: String? = nil
+    var professionalRole: String? = nil
+    var supportingReference: String? = nil
+}
+
+struct ResearchFeedbackResponse: Codable, Hashable, Sendable {
+    let feedback: ResearchFeedback
+}
+
 struct ResearchConversationRenameRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let conversationID: String
@@ -199,7 +213,27 @@ struct ResearchMessage: Codable, Hashable, Identifiable, Sendable {
     var question: String? = nil
     var answer: ResearchAnswer? = nil
     var requestID: String? = nil
+    var feedback: ResearchFeedback? = nil
     let createdAt: String
+}
+
+struct ResearchFeedback: Codable, Hashable, Sendable {
+    let id: String
+    var status: String? = nil
+    let category: String
+    var userComment: String? = nil
+    var professionalRole: String? = nil
+    var supportingReference: String? = nil
+    var updatedAt: String? = nil
+
+    var displayStatus: String {
+        switch status {
+        case "under_review", "triaged": return "Under review"
+        case "resolved": return "Resolved"
+        case "closed": return "Closed"
+        default: return "Received"
+        }
+    }
 }
 
 struct ResearchAnswer: Codable, Hashable, Sendable {
@@ -283,6 +317,79 @@ struct ResearchSupportingSource: Codable, Hashable, Sendable {
 }
 
 extension ResearchAnswer {
+    var researchAuthorityLabel: String? {
+        if let supplied = authorityLabel?.trimmingCharacters(in: .whitespacesAndNewlines), !supplied.isEmpty {
+            return supplied
+        }
+        switch authorityStatus {
+        case "supported_by_enacted_text": return "Supported by enacted text"
+        case "official_supporting_guidance": return "Official supporting guidance — noncontrolling"
+        case "conditional": return "Conditional on Project facts"
+        case "insufficient_evidence": return "Insufficient enacted evidence"
+        case "project_context": return "Project facts only — not code authority"
+        default: return nil
+        }
+    }
+
+    func researchMetadataText(sourceStatus: String) -> String {
+        var parts: [String] = []
+        if let edition = codeEdition?.trimmingCharacters(in: .whitespacesAndNewlines), !edition.isEmpty {
+            parts.append("Edition: \(edition)")
+        }
+        let normalizedStatus = sourceStatus.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !normalizedStatus.isEmpty {
+            parts.append("Source status: \(normalizedStatus == "changed" ? "Changed — review before relying" : "Current when researched")")
+        }
+        if let date = researchSourceDateLabel {
+            parts.append("Sources checked: \(date)")
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    func structuredCopyText(sourceStatus: String) -> String {
+        var sections: [String] = ["Permitext Research"]
+        if let label = researchAuthorityLabel { sections.append(label) }
+
+        let narrative = (answerText?.trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 }
+            ?? [conclusion, explanation].filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.joined(separator: "\n\n")
+        if !narrative.isEmpty { sections.append(narrative) }
+
+        let metadata = researchMetadataText(sourceStatus: sourceStatus)
+        if !metadata.isEmpty { sections.append(metadata) }
+        if let disclosure = codeBasis?.disclosure, !disclosure.isEmpty { sections.append("Code basis\n\(disclosure)") }
+        if let limitation = codeBasis?.limitation, !limitation.isEmpty { sections.append("Code-basis limitation\n\(limitation)") }
+
+        func appendList(_ title: String, _ items: [String]) {
+            let cleaned = items.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+            if !cleaned.isEmpty { sections.append(title + "\n" + cleaned.map { "• \($0)" }.joined(separator: "\n")) }
+        }
+        appendList("Assumptions", assumptions)
+        appendList("Missing Project facts", missingFacts)
+        appendList("Limitations", evidenceLimitations)
+        appendList("Follow-up questions", followUpQuestions)
+        appendList("Additional evidence needed", additionalEvidenceNeeded)
+
+        if !citations.isEmpty {
+            let lines = citations.map { citation in
+                var identity = [citation.corpusLabel, citation.codePrefix, citation.sectionNumber, citation.title]
+                    .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: " · ")
+                let detail = [citation.codeEdition, citation.applicabilityStatus, citation.relevance]
+                    .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: " · ")
+                if !detail.isEmpty { identity += " — \(detail)" }
+                return "• \(identity)"
+            }
+            sections.append("Citations\n" + lines.joined(separator: "\n"))
+        }
+
+        let warning = disclaimer?.trimmingCharacters(in: .whitespacesAndNewlines)
+        sections.append((warning?.isEmpty == false ? warning! + "\n" : "") + "Permitext is AI-assisted research, not an official interpretation. Verify the cited sources before filing, design, permitting, or construction reliance.")
+        return sections.joined(separator: "\n\n")
+    }
+
     var researchSourceDateLabel: String? {
         guard
             let value = sourceAsOf?.trimmingCharacters(in: .whitespacesAndNewlines),

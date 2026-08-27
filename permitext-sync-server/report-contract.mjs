@@ -403,6 +403,16 @@ function normalizeResearchManifestItem(item, base) {
       .map((value) => optionalText(value, 2_000)),
     citations: Array.isArray(item.citations) ? structuredClone(item.citations).slice(0, 100) : [],
     evidence: Array.isArray(item.evidence) ? structuredClone(item.evidence).slice(0, 100) : [],
+    authorityStatus: optionalText(item.authorityStatus, 64),
+    authorityLabel: optionalText(item.authorityLabel, 256),
+    codeEdition: optionalText(item.codeEdition, 256),
+    codeBasis: item.codeBasis && typeof item.codeBasis === "object"
+      ? structuredClone(item.codeBasis)
+      : null,
+    sourceAsOf: item.sourceAsOf
+      ? requiredISO(item.sourceAsOf, "Report Research source date")
+      : "",
+    disclaimer: optionalText(item.disclaimer, 2_000),
     reviewStatus: requiredText(item.reviewStatus || "unreviewed", "Report Research review status", 64)
   };
 }

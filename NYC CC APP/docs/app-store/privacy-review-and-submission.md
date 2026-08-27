@@ -6,7 +6,8 @@ This is the working checklist for App Store version 1.0. It separates preparatio
 
 - Bundle ID: `com.randycodex.permitext`
 - Version: `1.0`
-- Current uploaded build: `34`
+- Current local build: `40`
+- App Store Connect/TestFlight build: confirm the exact live build before selecting the submission candidate
 - Minimum iOS: `17.0`
 - Device family: iPhone only
 - Uses non-exempt encryption: no
@@ -55,6 +56,9 @@ These answers are derived from the app privacy manifest and the published privac
 - Other User Content: collected, linked to identity, App Functionality
   - saved sections, notes, tags, Projects, comments, Notebook and Report content
   - Research questions, selected evidence, answers, citations, history, and feedback
+  - user-requested Research may send the question, recent conversation, selected or retrieved evidence,
+    assigned Project facts, and selected official images to OpenAI; private notes are excluded and API
+    response storage is disabled with `store: false`
 
 ### Usage data
 
@@ -102,7 +106,7 @@ Recommended configuration:
 
 ## Version 1.0 items still required in App Store Connect
 
-- Select build 34 for version 1.0
+- Select the exact final version 1.0 build only after its upload and physical-device smoke test; the current local build is 40
 - Upload the prepared iPhone 6.9-inch screenshots from `screenshots/iphone-6.9/submission/`
 - Enter description, keywords, URLs, and copyright
 - Add the app's free price schedule

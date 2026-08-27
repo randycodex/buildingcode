@@ -452,7 +452,7 @@ async function main() {
         !settingsTemplateSource.includes('data-plan-option="research"') &&
         !settingsTemplateSource.includes("Upgrade option") &&
         settingsTemplateSource.includes("Upgrade to Pro - $20.00/month") &&
-        settingsTemplateSource.includes("100 selected-evidence Research turns each month") &&
+        settingsTemplateSource.includes("100 AI-assisted Research turns each month") &&
         !settingsTemplateSource.includes("Research Add-On") &&
         !settingsTemplateSource.includes("account-research-checkout") &&
         !iosSettingsSource.includes("planFeatureRow(") &&
@@ -460,7 +460,7 @@ async function main() {
         iosSettingsSource.includes('Label(currentPlanTitle, systemImage: "checkmark.circle.fill")') &&
         iosSettingsSource.includes('Text("Active")') &&
         iosSettingsSource.includes('return "Lifetime Pro"') &&
-        iosSettingsSource.includes("100 selected-evidence Research turns each month") &&
+        iosSettingsSource.includes("100 AI-assisted Research turns each month") &&
         !settingsTemplateSource.includes('class="settings-billing-line"'),
       "Settings lost the single $20 Pro plan with included Research or restored a separate Research add-on."
     );
@@ -1900,8 +1900,8 @@ async function main() {
         !webRoot.text.includes("account-plan-detail") &&
         !workspaceScript.text.includes("account-plan-detail") &&
         webRoot.text.includes("Reading and search are available anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
-        webRoot.text.includes("Pro is active, including Research. Projects, Notebook, Report, professional exports, offline access, and selected-evidence Research are unlocked.") &&
-        webRoot.text.includes("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 selected-evidence Research turns each month. Code reading and search remain free.") &&
+        webRoot.text.includes("Pro is active. Projects, Notebook, Report, professional exports, offline access, and AI-assisted Research are unlocked.") &&
+        webRoot.text.includes("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.") &&
         workspaceScript.text.includes("New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices.") &&
         workspaceScript.text.includes("settingsAccountSummary(account ? state.account : null)") &&
         workspaceScript.text.includes("settingsPlanCopy({ pro, source })") &&
@@ -2255,6 +2255,7 @@ async function main() {
     assert(
       workspaceScript.text.includes('const researchChatPlaceholder = "Ask a Research question…"') &&
         (workspaceScript.text.match(/input\.placeholder = researchChatPlaceholder;/g) || []).length === 2 &&
+        workspaceScript.text.includes("Private notes are not included") &&
         !workspaceScript.text.includes('research-trust-notice') &&
         !workspaceScript.text.includes("appendTrustNotice") &&
         privacyPolicy.text.includes("grounds code conclusions in applicable enacted text") &&
@@ -2263,7 +2264,7 @@ async function main() {
         privacyPolicy.text.includes("Research evidence sent for generation") &&
         !workspaceScript.text.includes('trustBanner.className = "research-trust-banner"') &&
         !workspaceScript.text.includes('noteLabel.textContent = "Private note · not code text"'),
-      "Research trust labeling should remain in the composer while the detailed boundary lives in the Privacy Policy."
+      "Research trust labeling and the private-notes boundary should remain in the composer while full details live in the Privacy Policy."
     );
     assert(
       workspaceScript.text.includes('findButton.textContent = "Search"') &&
@@ -6231,10 +6232,10 @@ async function main() {
     });
     assert(
       researchFeedback.response.status === 201 &&
-        researchFeedback.json.feedback.status === "candidate" &&
+        researchFeedback.json.feedback.status === "received" &&
         researchFeedback.json.feedback.professionalRole === "architect_designer" &&
         researchFeedback.json.feedback.supportingReference === "BC 1004.1.3 and the selected enacted passage",
-      "Research feedback was not saved as a human-review candidate."
+      "Research feedback was not saved with a neutral customer-facing status."
     );
     assert(
       await readFile(join(evaluationRoot, "research-cases.json"), "utf8") === evaluationCasesBeforeFeedback &&
@@ -6370,7 +6371,7 @@ async function main() {
     });
     assert(
       conversationAfterTriage.response.ok &&
-        conversationAfterTriage.json.conversation.messages[1].feedback?.status === "candidate" &&
+        conversationAfterTriage.json.conversation.messages[1].feedback?.status === "under_review" &&
         conversationAfterTriage.json.conversation.messages[1].feedback?.updatedAt === researchFeedback.json.feedback.updatedAt &&
         !JSON.stringify(conversationAfterTriage.json).includes(privateTriageSentinel) &&
         !JSON.stringify(conversationAfterTriage.json).includes("evaluation_candidate"),
@@ -6553,6 +6554,44 @@ async function main() {
       body: { auth: { accountUserID: userID }, conversationID }
     });
     assert(deletedConversation.response.ok && deletedConversation.json.deleted, "Research conversation deletion failed.");
+    const storeAfterConversationDeletion = JSON.parse(await readFile(dataPath, "utf8"));
+    const deletedAnswerIDs = new Set(
+      (researchStore.researchAnswersByUserID?.[userID] || [])
+        .filter((answer) => answer.conversationID === conversationID)
+        .map((answer) => answer.id)
+    );
+    assert(
+      !(storeAfterConversationDeletion.researchConversationsByUserID?.[userID] || [])
+        .some((item) => item.id === conversationID) &&
+      !(storeAfterConversationDeletion.researchAnswersByUserID?.[userID] || [])
+        .some((answer) => answer.conversationID === conversationID) &&
+      !(storeAfterConversationDeletion.researchFeedbackByUserID?.[userID] || [])
+        .some((feedback) =>
+          feedback.conversationID === conversationID || deletedAnswerIDs.has(feedback.answerID)
+        ) &&
+      !(storeAfterConversationDeletion.projectLinksByUserID?.[userID] || [])
+        .some((link) =>
+          (link.targetKind === "researchConversation" && link.targetID === conversationID) ||
+          (link.targetKind === "researchAnswer" && deletedAnswerIDs.has(link.targetID))
+        ) &&
+      !(storeAfterConversationDeletion.activityEventsByUserID?.[userID] || [])
+        .some((event) =>
+          (event.objectKind === "researchConversation" && event.objectID === conversationID) ||
+          (event.objectKind === "researchAnswer" && deletedAnswerIDs.has(event.objectID)) ||
+          event.metadata?.conversationID === conversationID ||
+          event.metadata?.researchConversationID === conversationID
+        ),
+      "Research conversation deletion left an answer, feedback, Project link, or activity record in active file storage."
+    );
+    const replayedConversationDeletion = await request("/research/conversations/delete", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, conversationID }
+    });
+    assert(
+      replayedConversationDeletion.response.ok && replayedConversationDeletion.json.deleted === false,
+      "Repeating Research conversation deletion was not an idempotent no-op."
+    );
     const deletedConversationRead = await request("/research/conversations/get", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,

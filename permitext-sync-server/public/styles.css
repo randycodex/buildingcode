@@ -5601,6 +5601,33 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
   line-height: 1.35;
 }
 
+.research-answer-copy-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.research-answer-copy-row .research-answer-copy {
+  width: fit-content;
+  min-height: 30px;
+  padding-inline: var(--space-3);
+}
+
+.research-answer-copy-status {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.research-answer-corpus-metadata {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  line-height: 1.35;
+}
+
 .research-answer-paragraph:first-child {
   font-size: 1.02rem;
   font-weight: 400;
@@ -6520,6 +6547,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-evidenc
   background: color-mix(in srgb, var(--text-primary) 6%, var(--surface));
   color: var(--text-secondary);
   cursor: not-allowed;
+}
+
+.evidence-visual-provider-disclosure {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.35;
 }
 
 .evidence-candidate-source-requirements strong,
@@ -8092,6 +8126,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin: 0;
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.76) !important;
+  line-height: 1.35;
+}
+
+.research-project-context-preview {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
   line-height: 1.35;
 }
 

@@ -10,7 +10,7 @@
   <body>
     <main>
       <h1>Privacy Policy</h1>
-      <p class="effective-date">Effective August 24, 2026</p>
+      <p class="effective-date">Effective August 27, 2026</p>
 
       <p>
         Permitext is operated by Higinio Jimenez Manzano. This policy explains what information
@@ -73,13 +73,16 @@
         Research responses. A Research request can send the question, recent conversation messages,
         selected and Permitext-retrieved enacted evidence, current Project facts, established or
         hypothetical conversation facts, structured evidence analysis, and any separately identified
-        supporting official-web context needed to generate and verify the answer. Private notes are
-        not included. Permitext uses the Responses API with <code>store: false</code>, so the generated
+        supporting official-web context needed to generate and verify the answer. When selected official
+        evidence includes an image, that image is also sent to OpenAI for analysis. Private notes are not
+        included. Permitext uses the Responses API with <code>store: false</code>, so the generated
         response is not stored for later API retrieval. OpenAI's default API policy states that API
         data is not used to train its models unless the API account owner opts in, and that abuse-
         monitoring logs may be retained for up to 30 days unless longer retention is legally required.
+        OpenAI's current policy also describes encrypted prompt-cache tensors that may remain in
+        GPU-local storage for up to 24 hours.
         These controls and provider practices may change; see
-        <a href="https://platform.openai.com/docs/models/default-usage-policies-by-endpoint" target="_blank" rel="noopener noreferrer">OpenAI's current data-controls policy</a>.
+        <a href="https://developers.openai.com/api/docs/guides/your-data" target="_blank" rel="noopener noreferrer">OpenAI's current data-controls policy</a>.
         Each provider also processes information under its own terms and privacy practices.
       </p>
       <p>
@@ -88,9 +91,11 @@
         from Research evidence sent for generation.
       </p>
       <p>
-        When Research requests an official-web search, Permitext removes email addresses, phone
-        numbers, personal or client names, and street addresses from the search query before limiting
-        that search to configured official domains. This search-query protection is separate from the
+        When Research requests an official-web search, Permitext attempts to remove obvious identifiers
+        from the search query, including email addresses, phone numbers, explicitly labeled personal or
+        client names, common-form street addresses and intersections, and BBL or block-and-lot identifiers,
+        before limiting that search to configured official domains. This protection reduces identifying
+        details but cannot guarantee that every possible identifier will be recognized. It is separate from the
         core Research generation described above, which may include current Project facts when you
         assign the conversation to a Project.
       </p>
@@ -142,7 +147,7 @@
             </tr>
             <tr>
               <td>OpenAI Research request data</td>
-              <td>Response storage is disabled; default abuse-monitoring logs may remain for up to 30 days</td>
+              <td>Response storage is disabled; encrypted prompt-cache tensors may remain for up to 24 hours and default abuse-monitoring logs may remain for up to 30 days</td>
               <td>Controlled by OpenAI's API retention policy; approved Zero Data Retention controls may differ</td>
             </tr>
             <tr>

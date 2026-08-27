@@ -58,7 +58,7 @@ assert.match(terms, /\$20 per month/);
 assert.match(terms, /no free trial/i);
 assert.match(terms, /unofficial research and workspace tool/i);
 assert.match(refunds, /within 72 hours of that\s+charge/i);
-assert.match(refunds, /initial charge and every renewal charge/i);
+assert.match(refunds, /initial(?: subscription)? charge,?\s+(?:and )?every renewal charge/i);
 assert.match(refunds, /Search and\s+Research usage do not change eligibility/i);
 assert.doesNotMatch(refunds, /seven calendar\s+days|five paid Research turns/i);
 assert.match(refunds, /reportaproblem\.apple\.com/);

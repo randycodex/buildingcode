@@ -272,11 +272,18 @@ async function main() {
     assert.equal(removed.response.status, 200);
     assert.deepEqual(simplifiedRevisions(removed.json.artifactRevisions), {
       account: { revision: 5, changedDomains: ["research"] },
-      projects: [{
-        projectID: projectIDs[1],
-        revision: 2,
-        changedDomains: ["activity", "foundation", "research"]
-      }]
+      projects: [
+        {
+          projectID: projectIDs[0],
+          revision: 4,
+          changedDomains: ["activity", "foundation", "research"]
+        },
+        {
+          projectID: projectIDs[1],
+          revision: 2,
+          changedDomains: ["activity", "foundation", "research"]
+        }
+      ]
     });
 
     const cleared = await request("/research/conversations/clear-history", {
@@ -304,7 +311,7 @@ async function main() {
       revision: item.revision,
       domains: item.domains
     })), [
-      { projectID: projectIDs[0], revision: 3, domains: ["activity", "foundation", "research"] },
+      { projectID: projectIDs[0], revision: 4, domains: ["activity", "foundation", "research"] },
       { projectID: projectIDs[1], revision: 2, domains: ["activity", "foundation", "research"] }
     ]);
     const legacyCheckpointAfterResearch = await request("/sync/checkpoint", {

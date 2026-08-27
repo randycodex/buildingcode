@@ -6359,4 +6359,127 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             )
         }
     }
+
+    func testResearchDisclosureGateIsVersioned() {
+        XCTAssertTrue(ResearchDisclosureGate.requiresAcknowledgement(completedVersion: 0))
+        XCTAssertFalse(
+            ResearchDisclosureGate.requiresAcknowledgement(
+                completedVersion: ResearchDisclosureGate.currentVersion
+            )
+        )
+        let suiteName = "ResearchDisclosureGateTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        ResearchDisclosureGate.acknowledge(accountID: "account-a", defaults: defaults)
+        XCTAssertEqual(
+            ResearchDisclosureGate.completedVersion(accountID: "account-a", defaults: defaults),
+            ResearchDisclosureGate.currentVersion
+        )
+        XCTAssertEqual(
+            ResearchDisclosureGate.completedVersion(accountID: "account-b", defaults: defaults),
+            0,
+            "Each signed-in account must receive its own first-use disclosure."
+        )
+    }
+
+    func testResearchStructuredCopyPreservesTrustMetadataAndCitations() {
+        var answer = ResearchAnswer(
+            conclusion: "A cited conclusion.",
+            explanation: "A bounded explanation.",
+            authorityStatus: "supported_by_enacted_text",
+            codeEdition: "2022 NYC Construction Codes",
+            codeBasis: ResearchCodeBasis(
+                disclosure: "Sources searched: 2022 NYC Construction Codes",
+                limitation: "Zoning was not searched."
+            ),
+            sourceAsOf: "2026-08-26T00:00:00Z",
+            evidenceLimitations: ["Project occupancy remains unverified."],
+            citations: [
+                ResearchCitation(
+                    sectionID: "2675",
+                    codePrefix: "BC",
+                    sectionNumber: "101.1",
+                    title: "Title",
+                    relevance: "Governs the cited conclusion.",
+                    codeEdition: "2022",
+                    corpusLabel: "NYC Construction Codes",
+                    applicabilityStatus: "current"
+                )
+            ],
+            disclaimer: "AI-generated research assistance."
+        )
+        answer.missingFacts = ["Confirm occupancy classification."]
+
+        let copied = answer.structuredCopyText(sourceStatus: "changed")
+
+        XCTAssertEqual(answer.researchAuthorityLabel, "Supported by enacted text")
+        XCTAssertTrue(copied.contains("Supported by enacted text"))
+        XCTAssertTrue(copied.contains("Edition: 2022 NYC Construction Codes"))
+        XCTAssertTrue(copied.contains("Source status: Changed — review before relying"))
+        XCTAssertTrue(copied.contains("Zoning was not searched."))
+        XCTAssertTrue(copied.contains("BC · 101.1 · Title"))
+        XCTAssertTrue(copied.contains("Project occupancy remains unverified."))
+        XCTAssertTrue(copied.contains("not an official interpretation"))
+    }
+
+    func testResearchFeedbackDecodesAdditivelyAndMapsNeutralStatus() throws {
+        let response = try JSONDecoder().decode(
+            ResearchFeedbackResponse.self,
+            from: Data(
+                """
+                {"feedback":{"id":"feedback-1","status":"candidate","category":"citation_problem","userComment":"Wrong section","updatedAt":"2026-08-27T00:00:00Z"}}
+                """.utf8
+            )
+        )
+        XCTAssertEqual(response.feedback.category, "citation_problem")
+        XCTAssertEqual(response.feedback.displayStatus, "Received")
+
+        let olderMessage = try JSONDecoder().decode(
+            ResearchMessage.self,
+            from: Data(
+                """
+                {"id":"answer-1","role":"assistant","createdAt":"2026-08-27T00:00:00Z"}
+                """.utf8
+            )
+        )
+        XCTAssertNil(olderMessage.feedback)
+    }
+
+    func testResearchViewContainsPrivacyVisualAndCacheDeletionContracts() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let source = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/ResearchView.swift"),
+            encoding: .utf8
+        )
+        XCTAssertTrue(source.contains("Private notes are not included."))
+        XCTAssertTrue(source.contains("Selected official images are sent to OpenAI for analysis."))
+        let sendQuestionRange = try XCTUnwrap(
+            source.range(from: "private func sendQuestion", to: "private func completedConversationAfterLostResponse")
+        )
+        let deletionRange = try XCTUnwrap(
+            source.range(from: "private func deleteConversation", to: "private func cacheHistory")
+        )
+        XCTAssertFalse(
+            source[sendQuestionRange].contains("clearCachedConversation"),
+            "A completed Research answer must remain available offline."
+        )
+        XCTAssertTrue(
+            source[deletionRange].contains("clearCachedConversation(conversationID: id)"),
+            "Deleting a Research conversation must also remove its offline cache."
+        )
+        XCTAssertTrue(source.contains("Copy answer"))
+        XCTAssertTrue(source.contains("Report a problem"))
+    }
+}
+
+private extension String {
+    func range(from start: String, to end: String) -> Range<String.Index>? {
+        guard let lower = range(of: start)?.lowerBound,
+              let upper = range(of: end, range: lower..<endIndex)?.lowerBound,
+              lower < upper
+        else { return nil }
+        return lower..<upper
+    }
 }

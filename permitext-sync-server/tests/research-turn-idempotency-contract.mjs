@@ -268,7 +268,15 @@ const paidStore = {
     }]
   },
   researchAnswersByUserID: {},
-  researchConversationsByUserID: { [paidUserID]: [] },
+  researchConversationsByUserID: {
+    [paidUserID]: [{
+      id: paidConversation.id,
+      title: paidConversation.title,
+      messages: [],
+      createdAt: paidConversation.createdAt,
+      updatedAt: paidConversation.createdAt
+    }]
+  },
   activityEventsByUserID: {}
 };
 const paidCommit = {

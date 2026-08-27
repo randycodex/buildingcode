@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260826-supporting-web-v7";
+export const researchSourcePolicyVersion = "20260827-supporting-web-v8";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -79,6 +79,15 @@ export function sanitizeResearchWebQuery(value) {
     .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, " ")
     .replace(/(?:\+?1[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}(?:\s*(?:x|ext\.?)\s*\d+)?/gi, " ")
     .replace(/\b(?:client|client name|owner name|applicant name|tenant name)\s*[:=\-]\s*[^,;|\n.!?]+/gi, " ")
+    .replace(
+      /\b(?:borough\s*[1-5]\s*[,;]?\s*)?block\s*[:#=\-]?\s*\d{1,6}\s*[,;\/\-\s]+lot\s*[:#=\-]?\s*\d{1,6}\b/gi,
+      " "
+    )
+    .replace(/\b(?:BBL|BIN|parcel(?:\s*(?:id|identifier))?)\s*[:#=\-]?\s*[A-Z0-9-]{5,20}\b/gi, " ")
+    .replace(
+      /\b(?:[A-Z0-9.'-]+\s+){0,5}(?:STREET|ST|AVENUE|AVE|ROAD|RD|BOULEVARD|BLVD|LANE|LN|DRIVE|DR|COURT|CT|PLACE|PL|PARKWAY|PKWY|HIGHWAY|HWY|WAY|TERRACE|TER)\s+(?:AND|&|AT|\/)\s+(?:[A-Z0-9.'-]+\s+){0,5}(?:STREET|ST|AVENUE|AVE|ROAD|RD|BOULEVARD|BLVD|LANE|LN|DRIVE|DR|COURT|CT|PLACE|PL|PARKWAY|PKWY|HIGHWAY|HWY|WAY|TERRACE|TER)\b/gi,
+      " "
+    )
     .replace(
       /\b\d{1,6}\s+(?:[NSEW]\.?(?:\s+|$))?(?:[A-Z0-9.'-]+\s+){0,5}(?:STREET|ST|AVENUE|AVE|ROAD|RD|BOULEVARD|BLVD|LANE|LN|DRIVE|DR|COURT|CT|PLACE|PL|PARKWAY|PKWY|HIGHWAY|HWY|WAY|TERRACE|TER)\b(?:\s*(?:,|#|APT\.?|SUITE|UNIT)\s*[A-Z0-9-]+)?/gi,
       " "

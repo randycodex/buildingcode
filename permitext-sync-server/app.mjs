@@ -1156,14 +1156,10 @@ function createFileStoreAdapter() {
         return updated;
       });
     },
-    async deleteResearchConversation(userID, conversationID) {
-      return this.withMutation((store) => {
-        const conversations = store.researchConversationsByUserID?.[userID] || [];
-        const remaining = conversations.filter((item) => item.id !== conversationID);
-        if (remaining.length === conversations.length) return false;
-        store.researchConversationsByUserID[userID] = remaining;
-        return true;
-      });
+    async deleteResearchConversation(userID, conversationID, options = {}) {
+      return this.withMutation((store) =>
+        applyResearchConversationDeletion(store, userID, conversationID, options)
+      );
     },
     async listFoundationArtifacts(userID, options = {}) {
       const store = await this.read();
@@ -3757,14 +3753,127 @@ async function createPostgresStoreAdapter() {
       `;
       return rows.length ? safeJSON(rows[0].conversation, null) : null;
     },
-    async deleteResearchConversation(userID, conversationID) {
+    async deleteResearchConversation(userID, conversationID, options = {}) {
       await ensureSchema();
-      const rows = await sql`
-        DELETE FROM permitext_research_conversations
-        WHERE id = ${conversationID} AND user_id = ${userID}
-        RETURNING id
-      `;
-      return rows.length > 0;
+      const activityStorageUserIDs = Array.from(new Set([
+        userID,
+        ...(Array.isArray(options.activityStorageUserIDs) ? options.activityStorageUserIDs : [])
+      ].map((value) => String(value || "").trim()).filter(Boolean)));
+      const [rows] = await sql.transaction([sql`
+        WITH target_conversation AS MATERIALIZED (
+          SELECT id, conversation
+          FROM permitext_research_conversations
+          WHERE id = ${conversationID} AND user_id = ${userID}
+          FOR UPDATE
+        ),
+        target_answers AS MATERIALIZED (
+          SELECT id
+          FROM permitext_research_answers
+          WHERE user_id = ${userID}
+            AND conversation_id IN (SELECT id FROM target_conversation)
+        ),
+        target_snapshots AS MATERIALIZED (
+          SELECT id
+          FROM permitext_evidence_snapshots
+          WHERE user_id = ${userID}
+            AND answer_id IN (SELECT id FROM target_answers)
+        ),
+        target_selected_passages AS MATERIALIZED (
+          SELECT source->>'id' AS id
+          FROM target_conversation,
+            jsonb_array_elements(
+              CASE
+                WHEN jsonb_typeof(conversation->'sources') = 'array'
+                  THEN conversation->'sources'
+                ELSE '[]'::jsonb
+              END
+            ) AS source
+          WHERE COALESCE(source->>'id', '') <> ''
+        ),
+        deleted_feedback AS (
+          DELETE FROM permitext_research_feedback
+          WHERE user_id = ${userID}
+            AND EXISTS (SELECT 1 FROM target_conversation)
+            AND (
+              conversation_id = ${conversationID}
+              OR answer_id IN (SELECT id FROM target_answers)
+            )
+          RETURNING id
+        ),
+        deleted_project_links AS (
+          DELETE FROM permitext_project_links
+          WHERE user_id = ${userID}
+            AND EXISTS (SELECT 1 FROM target_conversation)
+            AND (
+              (target_kind = 'researchConversation' AND target_id = ${conversationID})
+              OR (target_kind = 'researchAnswer' AND target_id IN (SELECT id FROM target_answers))
+              OR (target_kind = 'approvedEvidence' AND target_id IN (SELECT id FROM target_snapshots))
+              OR (target_kind = 'selectedPassage' AND target_id IN (SELECT id FROM target_selected_passages))
+            )
+          RETURNING project_id
+        ),
+        deleted_activity AS (
+          DELETE FROM permitext_project_activity
+          WHERE user_id = ANY(${activityStorageUserIDs})
+            AND EXISTS (SELECT 1 FROM target_conversation)
+            AND (
+              (object_kind = 'researchConversation' AND object_id = ${conversationID})
+              OR (object_kind = 'researchAnswer' AND object_id IN (SELECT id FROM target_answers))
+              OR event->'metadata'->>'conversationID' = ${conversationID}
+              OR event->'metadata'->>'researchConversationID' = ${conversationID}
+            )
+          RETURNING project_id
+        ),
+        deleted_snapshots AS (
+          DELETE FROM permitext_evidence_snapshots
+          WHERE user_id = ${userID}
+            AND id IN (SELECT id FROM target_snapshots)
+          RETURNING id
+        ),
+        deleted_answers AS (
+          DELETE FROM permitext_research_answers
+          WHERE user_id = ${userID}
+            AND id IN (SELECT id FROM target_answers)
+          RETURNING id
+        ),
+        deleted_conversation AS (
+          DELETE FROM permitext_research_conversations
+          WHERE id IN (SELECT id FROM target_conversation)
+            AND user_id = ${userID}
+          RETURNING id
+        ),
+        affected_projects AS (
+          SELECT NULLIF(conversation->>'primaryProjectID', '') AS project_id
+          FROM target_conversation
+          UNION
+          SELECT project_id FROM deleted_project_links
+          UNION
+          SELECT project_id FROM deleted_activity
+        )
+        SELECT
+          EXISTS(SELECT 1 FROM deleted_conversation) AS deleted,
+          (SELECT count(*)::int FROM deleted_answers) AS deleted_answer_count,
+          (SELECT count(*)::int FROM deleted_snapshots) AS deleted_evidence_snapshot_count,
+          (SELECT count(*)::int FROM deleted_feedback) AS deleted_feedback_count,
+          (SELECT count(*)::int FROM deleted_project_links) AS deleted_project_link_count,
+          (SELECT count(*)::int FROM deleted_activity) AS deleted_activity_count,
+          COALESCE(
+            (SELECT jsonb_agg(project_id ORDER BY project_id)
+             FROM affected_projects
+             WHERE project_id IS NOT NULL),
+            '[]'::jsonb
+          ) AS project_ids
+      `], { isolationLevel: "Serializable" });
+      const result = rows[0] || {};
+      return {
+        deleted: result.deleted === true,
+        deletedAnswerCount: Number(result.deleted_answer_count || 0),
+        deletedEvidenceSnapshotCount: Number(result.deleted_evidence_snapshot_count || 0),
+        deletedFeedbackCount: Number(result.deleted_feedback_count || 0),
+        deletedProjectLinkCount: Number(result.deleted_project_link_count || 0),
+        deletedActivityCount: Number(result.deleted_activity_count || 0),
+        projectIDs: Array.isArray(result.project_ids) ? result.project_ids.map(String) : []
+      };
     },
     async listFoundationArtifacts(userID, options = {}) {
       await ensureSchema();
@@ -4907,6 +5016,11 @@ async function createPostgresStoreAdapter() {
         SELECT answer
         FROM permitext_research_answers
         WHERE id = ${answer.id} AND user_id = ${userID}
+          AND EXISTS (
+            SELECT 1
+            FROM permitext_research_conversations
+            WHERE id = ${conversation.id} AND user_id = ${userID}
+          )
         LIMIT 1
       `;
       if (existingAnswerRows.length) {
@@ -4917,8 +5031,27 @@ async function createPostgresStoreAdapter() {
         return { replayed: true, answer: existing, conversation };
       }
 
-      const queries = [];
+      const queries = [sql`
+        WITH target_conversation AS MATERIALIZED (
+          SELECT id
+          FROM permitext_research_conversations
+          WHERE id = ${conversation.id} AND user_id = ${userID}
+          FOR UPDATE
+        ), target_state AS (
+          SELECT (SELECT id FROM target_conversation LIMIT 1) AS id
+        )
+        SELECT
+          id,
+          CASE
+            WHEN id IS NULL
+              THEN ('RESEARCH_CONVERSATION_DELETED:' || COALESCE(id, ''))::integer
+            ELSE 1
+          END AS conversation_assertion
+        FROM target_state
+      `];
+      let usageResultIndex = null;
       if (reservationID && usageEntry) {
+        usageResultIndex = queries.length;
         queries.push(sql`
           WITH committed_usage AS (
             UPDATE permitext_research_usage
@@ -4983,23 +5116,12 @@ async function createPostgresStoreAdapter() {
         RETURNING id
       `);
       queries.push(sql`
-        INSERT INTO permitext_research_conversations (
-          id, user_id, title, conversation, created_at, updated_at
-        )
-        VALUES (
-          ${conversation.id},
-          ${userID},
-          ${conversation.title},
-          ${JSON.stringify(conversation)}::jsonb,
-          ${conversation.createdAt}::timestamptz,
-          ${conversation.updatedAt}::timestamptz
-        )
-        ON CONFLICT (id) DO UPDATE SET
-          user_id = EXCLUDED.user_id,
-          title = EXCLUDED.title,
-          conversation = EXCLUDED.conversation,
-          updated_at = EXCLUDED.updated_at
-        WHERE permitext_research_conversations.user_id = ${userID}
+        UPDATE permitext_research_conversations
+        SET title = ${conversation.title},
+            conversation = ${JSON.stringify(conversation)}::jsonb,
+            updated_at = ${conversation.updatedAt}::timestamptz
+        WHERE id = ${conversation.id} AND user_id = ${userID}
+        RETURNING id
       `);
       for (const event of events) {
         queries.push(sql`
@@ -5015,9 +5137,17 @@ async function createPostgresStoreAdapter() {
         `);
       }
 
-      const results = await sql.transaction(queries, { isolationLevel: "Serializable" });
+      let results;
+      try {
+        results = await sql.transaction(queries, { isolationLevel: "Serializable" });
+      } catch (error) {
+        if (String(error?.message || "").includes("RESEARCH_CONVERSATION_DELETED")) {
+          throw researchConversationDeletedError();
+        }
+        throw error;
+      }
       if (reservationID && usageEntry) {
-        const usageResult = results[0];
+        const usageResult = results[usageResultIndex];
         if (!usageResult?.length) {
           throw new Error("Research usage reservation was not found.");
         }
@@ -5501,9 +5631,9 @@ async function updateStoredResearchCandidateDisposition(userID, conversationID, 
   return adapter.updateResearchCandidateDisposition(userID, conversationID, change);
 }
 
-async function deleteStoredResearchConversation(userID, conversationID) {
+async function deleteStoredResearchConversation(userID, conversationID, options = {}) {
   const adapter = await storeAdapter();
-  return adapter.deleteResearchConversation(userID, conversationID);
+  return adapter.deleteResearchConversation(userID, conversationID, options);
 }
 
 async function listStoredFoundationArtifacts(userID, options = {}) {
@@ -5900,6 +6030,125 @@ async function completeResearchUsageReservation(userID, reservationID, entry) {
   await adapter.completeResearchUsageReservation(userID, reservationID, entry);
 }
 
+function emptyResearchConversationDeletionResult() {
+  return {
+    deleted: false,
+    deletedAnswerCount: 0,
+    deletedEvidenceSnapshotCount: 0,
+    deletedFeedbackCount: 0,
+    deletedProjectLinkCount: 0,
+    deletedActivityCount: 0,
+    projectIDs: []
+  };
+}
+
+function researchConversationDeletionActivityMatches(event, conversationID, answerIDs) {
+  const objectKind = String(event?.objectKind || "");
+  const objectID = String(event?.objectID || "");
+  return (
+    (objectKind === "researchConversation" && objectID === conversationID) ||
+    (objectKind === "researchAnswer" && answerIDs.has(objectID)) ||
+    String(event?.metadata?.conversationID || "") === conversationID ||
+    String(event?.metadata?.researchConversationID || "") === conversationID
+  );
+}
+
+/**
+ * Remove every active-storage record owned by one Research conversation.
+ * File storage calls this inside withMutation, so the cascade is persisted only
+ * after the complete mutation succeeds. A missing or non-owned conversation is
+ * an idempotent no-op and cannot be used to remove another user's records.
+ */
+export function applyResearchConversationDeletion(store, userID, conversationID, options = {}) {
+  const normalizedUserID = String(userID || "").trim();
+  const normalizedConversationID = String(conversationID || "").trim();
+  const conversations = store.researchConversationsByUserID?.[normalizedUserID] || [];
+  const conversation = conversations.find((item) => item.id === normalizedConversationID);
+  if (!conversation) return emptyResearchConversationDeletionResult();
+
+  store.researchConversationsByUserID ||= {};
+  store.researchAnswersByUserID ||= {};
+  store.researchFeedbackByUserID ||= {};
+  store.projectLinksByUserID ||= {};
+  store.activityEventsByUserID ||= {};
+
+  const answers = store.researchAnswersByUserID[normalizedUserID] || [];
+  const deletedAnswers = answers.filter((answer) =>
+    String(answer?.conversationID || "") === normalizedConversationID
+  );
+  const answerIDs = new Set(deletedAnswers.map((answer) => String(answer.id || "")).filter(Boolean));
+  const evidenceSnapshotIDs = new Set(deletedAnswers.flatMap((answer) =>
+    (Array.isArray(answer?.evidence) ? answer.evidence : [])
+      .map((snapshot) => String(snapshot?.id || "").trim())
+      .filter(Boolean)
+  ));
+  const selectedPassageIDs = new Set((Array.isArray(conversation.sources) ? conversation.sources : [])
+    .map((source) => String(source?.id || "").trim())
+    .filter(Boolean));
+
+  const feedback = store.researchFeedbackByUserID[normalizedUserID] || [];
+  const retainedFeedback = feedback.filter((item) =>
+    String(item?.conversationID || "") !== normalizedConversationID &&
+    !answerIDs.has(String(item?.answerID || ""))
+  );
+  const links = store.projectLinksByUserID[normalizedUserID] || [];
+  const deletedLinks = links.filter((link) =>
+    (link?.targetKind === "researchConversation" && String(link?.targetID || "") === normalizedConversationID) ||
+    (link?.targetKind === "researchAnswer" && answerIDs.has(String(link?.targetID || ""))) ||
+    (link?.targetKind === "approvedEvidence" && evidenceSnapshotIDs.has(String(link?.targetID || ""))) ||
+    (link?.targetKind === "selectedPassage" && selectedPassageIDs.has(String(link?.targetID || "")))
+  );
+  const deletedLinkRecords = new Set(deletedLinks);
+  const activityStorageUserIDs = Array.from(new Set([
+    normalizedUserID,
+    ...(Array.isArray(options.activityStorageUserIDs) ? options.activityStorageUserIDs : [])
+  ].map((value) => String(value || "").trim()).filter(Boolean)));
+  let deletedActivityCount = 0;
+  const affectedProjectIDs = new Set([
+    String(conversation.primaryProjectID || "").trim(),
+    ...deletedLinks.map((link) => String(link?.projectID || "").trim())
+  ].filter(Boolean));
+  for (const storageUserID of activityStorageUserIDs) {
+    const events = store.activityEventsByUserID[storageUserID] || [];
+    const retainedEvents = events.filter((event) => {
+      if (!researchConversationDeletionActivityMatches(event, normalizedConversationID, answerIDs)) {
+        return true;
+      }
+      deletedActivityCount += 1;
+      const projectID = String(event?.projectID || "").trim();
+      if (projectID) affectedProjectIDs.add(projectID);
+      return false;
+    });
+    store.activityEventsByUserID[storageUserID] = retainedEvents;
+  }
+
+  store.researchConversationsByUserID[normalizedUserID] = conversations.filter((item) =>
+    item.id !== normalizedConversationID
+  );
+  store.researchAnswersByUserID[normalizedUserID] = answers.filter((answer) =>
+    String(answer?.conversationID || "") !== normalizedConversationID
+  );
+  store.researchFeedbackByUserID[normalizedUserID] = retainedFeedback;
+  store.projectLinksByUserID[normalizedUserID] = links.filter((link) => !deletedLinkRecords.has(link));
+
+  return {
+    deleted: true,
+    deletedAnswerCount: deletedAnswers.length,
+    deletedEvidenceSnapshotCount: evidenceSnapshotIDs.size,
+    deletedFeedbackCount: feedback.length - retainedFeedback.length,
+    deletedProjectLinkCount: deletedLinks.length,
+    deletedActivityCount,
+    projectIDs: [...affectedProjectIDs].sort()
+  };
+}
+
+export function researchConversationDeletedError() {
+  const error = new Error("This Research conversation was deleted while the answer was being prepared.");
+  error.code = "RESEARCH_CONVERSATION_DELETED";
+  error.statusCode = 409;
+  return error;
+}
+
 /**
  * In-memory file-store mutation for Research message completion.
  * Used by the file adapter under withMutation so either all of usage+answer+
@@ -5919,16 +6168,17 @@ export function applyResearchConversationMessageCommit(store, userID, {
   store.researchUsageByUserID ||= {};
   store.researchCreditsByUserID ||= {};
 
+  const conversations = store.researchConversationsByUserID[userID] || [];
+  const conversationIndex = conversations.findIndex((item) => item.id === conversation.id);
+  if (conversationIndex === -1) {
+    throw researchConversationDeletedError();
+  }
+
   const answers = store.researchAnswersByUserID[userID] || [];
   const existingAnswer = answers.find((item) => item.id === answer.id);
   if (existingAnswer) {
     if (canonicalJSONString(existingAnswer) !== canonicalJSONString(answer)) {
       throw new Error("Immutable Research answer cannot be changed.");
-    }
-    const conversations = store.researchConversationsByUserID[userID] || [];
-    const hasConversation = conversations.some((item) => item.id === conversation.id);
-    if (!hasConversation) {
-      throw new Error("Research conversation missing after answer commit.");
     }
     return { replayed: true, answer: existingAnswer, conversation };
   }
@@ -5975,10 +6225,7 @@ export function applyResearchConversationMessageCommit(store, userID, {
   answers.push(answer);
   store.researchAnswersByUserID[userID] = answers;
 
-  const conversations = store.researchConversationsByUserID[userID] || [];
-  const conversationIndex = conversations.findIndex((item) => item.id === conversation.id);
-  if (conversationIndex === -1) conversations.push(conversation);
-  else conversations[conversationIndex] = conversation;
+  conversations[conversationIndex] = conversation;
   store.researchConversationsByUserID[userID] = conversations;
 
   const activity = store.activityEventsByUserID[userID] || [];
@@ -6083,20 +6330,10 @@ export function applyCodeQuestionAnalysisCompletion(store, actorUserID, storageU
 
 async function commitResearchConversationMessage(userID, payload) {
   const adapter = await storeAdapter();
-  if (typeof adapter.commitResearchConversationMessage === "function") {
-    return adapter.commitResearchConversationMessage(userID, payload);
+  if (typeof adapter.commitResearchConversationMessage !== "function") {
+    throw new Error("Atomic Research conversation completion is unavailable.");
   }
-  // Fallback: persist answer/conversation/events first, then mark usage complete so a
-  // crash cannot leave usage billed without durable research records.
-  await saveStoredResearchAnswer(userID, payload.answer);
-  await saveStoredResearchConversation(userID, payload.conversation);
-  for (const event of payload.events || []) {
-    await saveStoredActivityEvent(userID, event);
-  }
-  if (payload.reservationID && payload.usageEntry) {
-    await completeResearchUsageReservation(userID, payload.reservationID, payload.usageEntry);
-  }
-  return { replayed: false, answer: payload.answer, conversation: payload.conversation };
+  return adapter.commitResearchConversationMessage(userID, payload);
 }
 
 async function commitCodeQuestionAnalysisCompletion(actorUserID, storageUserID, payload) {
@@ -10535,6 +10772,37 @@ function researchAnswerForClient(answer) {
   return clientAnswer;
 }
 
+export function researchAuthorityClassification({
+  evidenceBoundaryFallback = false,
+  citations = [],
+  supportingSources = [],
+  missingFacts = []
+} = {}) {
+  const hasEnactedCitation = (Array.isArray(citations) ? citations : []).some((citation) =>
+    !["contextual", "irrelevant"].includes(String(citation?.evidenceRole || "supporting"))
+  );
+  const hasOfficialSupportingGuidance =
+    !hasEnactedCitation &&
+    (Array.isArray(supportingSources) ? supportingSources : []).length > 0;
+  const status = evidenceBoundaryFallback
+    ? "insufficient_evidence"
+    : hasOfficialSupportingGuidance
+      ? "official_supporting_guidance"
+      : !hasEnactedCitation
+        ? "insufficient_evidence"
+        : (Array.isArray(missingFacts) ? missingFacts : []).length > 0
+          ? "conditional"
+          : "supported_by_enacted_text";
+  const label = status === "insufficient_evidence"
+    ? "Insufficient enacted evidence"
+    : status === "official_supporting_guidance"
+      ? "Official supporting guidance — noncontrolling"
+      : status === "conditional"
+        ? "Conditional on Project facts"
+        : "Supported by enacted text";
+  return { status, label };
+}
+
 export function researchMessageForClient(message) {
   if (!message || typeof message !== "object") return message;
   const { researchRequestID, ...clientMessage } = message;
@@ -14578,6 +14846,12 @@ async function reportSourcesForProject(userID, projectID) {
             answer.answer?.additionalEvidenceNeeded || [],
           citations: answer.citations || [],
           evidence: answer.evidence || [],
+          authorityStatus: answer.answer?.authorityStatus || "",
+          authorityLabel: answer.answer?.authorityLabel || "",
+          codeEdition: answer.answer?.codeEdition || "",
+          codeBasis: answer.answer?.codeBasis || null,
+          sourceAsOf: answer.answer?.sourceAsOf || "",
+          disclaimer: answer.answer?.disclaimer || "",
           reviewStatus: answer.reviewStatus || "unreviewed"
         }
       });
@@ -15690,15 +15964,7 @@ async function handleResearchConversationGet(request, response) {
         const feedback = feedbackByAnswerID.get(message.id);
         return !feedback ? message : {
           ...message,
-          feedback: {
-            id: feedback.id,
-            status: "candidate",
-            category: feedback.category,
-            userComment: feedback.userComment,
-            professionalRole: feedback.professionalRole || "",
-            supportingReference: feedback.supportingReference || "",
-            updatedAt: feedback.userUpdatedAt || feedback.updatedAt
-          }
+          feedback: researchFeedbackForClient(feedback)
         };
       })
     }
@@ -15842,14 +16108,7 @@ async function handleResearchAnswerGet(request, response) {
   sendJSON(response, 200, {
     answer: {
       ...researchAnswerRecordForClient(answer),
-      userFeedback: feedback ? {
-        id: feedback.id,
-        category: feedback.category,
-        userComment: feedback.userComment,
-        professionalRole: feedback.professionalRole || "",
-        supportingReference: feedback.supportingReference || "",
-        updatedAt: feedback.userUpdatedAt || feedback.updatedAt
-      } : answer.userFeedback
+      userFeedback: feedback ? researchFeedbackForClient(feedback) : answer.userFeedback
     }
   });
 }
@@ -16823,6 +17082,34 @@ const researchFeedbackProfessionalRoles = new Set([
   "other"
 ]);
 
+export function researchFeedbackStatusForClient(feedback) {
+  const status = String(
+    feedback?.resolutionStatus || feedback?.triageStatus || feedback?.status || ""
+  ).trim().toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  if (["reviewing", "under_review", "triaged", "evaluation_candidate", "in_progress"].includes(status)) {
+    return "under_review";
+  }
+  if (["resolved", "corrected", "complete", "completed"].includes(status)) {
+    return "resolved";
+  }
+  if (["closed", "dismissed", "rejected"].includes(status)) {
+    return "closed";
+  }
+  return "received";
+}
+
+function researchFeedbackForClient(feedback) {
+  return {
+    id: feedback.id,
+    status: researchFeedbackStatusForClient(feedback),
+    category: feedback.category,
+    userComment: feedback.userComment,
+    professionalRole: feedback.professionalRole || "",
+    supportingReference: feedback.supportingReference || "",
+    updatedAt: feedback.userUpdatedAt || feedback.updatedAt
+  };
+}
+
 async function handleResearchFeedback(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
@@ -16900,15 +17187,7 @@ async function handleResearchFeedback(request, response) {
       : []
   );
   sendJSON(response, existing ? 200 : 201, {
-    feedback: {
-      id: feedback.id,
-      status: feedback.status,
-      category: feedback.category,
-      userComment: feedback.userComment,
-      professionalRole: feedback.professionalRole,
-      supportingReference: feedback.supportingReference,
-      updatedAt: feedback.userUpdatedAt
-    },
+    feedback: researchFeedbackForClient(feedback),
     artifactRevisions
   });
 }
@@ -18369,20 +18648,14 @@ async function handleResearchConversationMessage(request, response) {
       !evidenceBoundaryFallback &&
       !result.interpretation.citations?.length &&
       Boolean(result.interpretation.supportingSources?.length);
-    const authorityStatus = evidenceBoundaryFallback
-      ? "insufficient_evidence"
-      : supportingGuidanceOnly
-        ? "official_supporting_guidance"
-        : result.interpretation.missingFacts?.length
-          ? "conditional"
-          : "supported_by_enacted_text";
-    const authorityLabel = authorityStatus === "insufficient_evidence"
-      ? "Insufficient enacted evidence"
-      : authorityStatus === "official_supporting_guidance"
-        ? "Official supporting guidance — noncontrolling"
-      : authorityStatus === "conditional"
-        ? "Conditional on Project facts"
-        : "Supported by enacted text";
+    const authority = researchAuthorityClassification({
+      evidenceBoundaryFallback,
+      citations: result.interpretation.citations,
+      supportingSources: result.interpretation.supportingSources,
+      missingFacts: result.interpretation.missingFacts
+    });
+    const authorityStatus = authority.status;
+    const authorityLabel = authority.label;
     const disclaimer = "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.";
     const materialAssembledEvidence = assembledEvidence.filter((section) =>
       !["contextual", "irrelevant"].includes(section?.evidencePriority?.evidenceRole)
@@ -18734,6 +19007,13 @@ async function handleResearchConversationMessage(request, response) {
           )))
         : researchOperation.verificationIssueTypes
     });
+    if (error.code === "RESEARCH_CONVERSATION_DELETED") {
+      progressResponse.failActive("failed");
+      progressResponse.error(error.statusCode || 409, error.message, {
+        code: "RESEARCH_CONVERSATION_DELETED"
+      });
+      return;
+    }
     if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
       progressResponse.failActive("failed");
       progressResponse.error(422, "A cited code section is incomplete and cannot be analyzed yet.", {
@@ -18842,44 +19122,27 @@ async function handleResearchConversationDelete(request, response) {
   const conversationID = String(context.body.conversationID || "").trim();
   const conversation = await storedResearchConversation(context.userID, conversationID);
   if (!conversation) {
-    sendError(response, 404, "Research conversation not found.");
+    sendJSON(response, 200, { deleted: false });
     return;
   }
-  if (conversation?.primaryProjectID) {
-    const now = new Date().toISOString();
-    let removedLink;
-    try {
-      removedLink = await removeResearchConversationProjectLink(
-        context.userID,
-        conversation.id,
-        conversation.primaryProjectID,
-        now
-      );
-    } catch (error) {
-      if (sendCodeQuestionError(response, error)) return;
-      throw error;
-    }
-    if (removedLink) {
-      await recordResearchConversationRemovalActivity(
-        context.userID,
-        conversation.primaryProjectID,
-        removedLink,
-        now
-      );
-    }
+  const activityStorageUserIDs = [context.userID];
+  if (conversation.primaryProjectID) {
+    const access = await projectAccessForUser(context.userID, conversation.primaryProjectID);
+    if (access?.storageOwnerUserID) activityStorageUserIDs.push(access.storageOwnerUserID);
   }
-  const deleted = await deleteStoredResearchConversation(context.userID, conversationID);
-  if (!deleted) {
+  const deletion = await deleteStoredResearchConversation(context.userID, conversationID, {
+    activityStorageUserIDs
+  });
+  if (!deletion.deleted) {
     sendError(response, 409, "Research conversation changed before it could be deleted. Refresh and try again.");
     return;
   }
-  const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
-    conversation.primaryProjectID
-      ? [{
-          projectID: conversation.primaryProjectID,
-          domains: ["activity", "foundation", "research"]
-        }]
-      : []
+  const artifactRevisions = await bumpResearchArtifactRevisions(
+    context.userID,
+    deletion.projectIDs.map((projectID) => ({
+      projectID,
+      domains: ["activity", "foundation", "research"]
+    }))
   );
   sendJSON(response, 200, { deleted: true, artifactRevisions });
 }
@@ -18905,8 +19168,9 @@ async function handleResearchConversationClearHistory(request, response) {
     if (conversation?.primaryProjectID) {
       await saveStoredResearchConversation(context.userID, { ...conversation, historyHiddenAt: now });
       hiddenProjectConversationCount += 1;
-    } else if (await deleteStoredResearchConversation(context.userID, conversation.id)) {
-      deletedConversationCount += 1;
+    } else {
+      const deletion = await deleteStoredResearchConversation(context.userID, conversation.id);
+      if (deletion.deleted) deletedConversationCount += 1;
     }
   }
   const artifactRevisions = conversations.length

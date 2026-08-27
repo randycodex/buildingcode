@@ -47,7 +47,7 @@
     "test:ux-alignment": "node tests/ux-ui-alignment-phase1-contract.mjs && node tests/ux-ui-accessibility-phase2-contract.mjs && node tests/ux-ui-meaning-phase3-contract.mjs && node tests/settings-wording-parity-contract.mjs && node tests/ux-ui-reader-save-phase4-contract.mjs && node tests/ux-ui-first-use-phase5-contract.mjs && node tests/ux-ui-governance-phase6-contract.mjs",
     "test:research-provider": "node --check research-provider-client.mjs && node --check tests/research-provider-client-contract.mjs && node tests/research-provider-client-contract.mjs",
     "test:research-routing": "node --check research-model-routing.mjs && node --check tests/research-model-routing-contract.mjs && node tests/research-model-routing-contract.mjs",
-    "test:research-safety": "node --check tests/research-turn-idempotency-contract.mjs && node tests/research-turn-idempotency-contract.mjs && node --check tests/research-trust-boundary-contract.mjs && node tests/research-trust-boundary-contract.mjs",
+    "test:research-safety": "node --check tests/research-turn-idempotency-contract.mjs && node tests/research-turn-idempotency-contract.mjs && node --check tests/research-trust-boundary-contract.mjs && node tests/research-trust-boundary-contract.mjs && node --check tests/research-conversation-deletion-contract.mjs && node tests/research-conversation-deletion-contract.mjs",
     "test:rate-limit": "node tests/rate-limit-contract.mjs && node tests/rate-limit-postgres.mjs",
     "test:routing": "node tests/vercel-routing-contract.mjs",
     "eval:research": "node tests/research-evals.mjs",

@@ -59,6 +59,28 @@ function researchDisplayList(value) {
   return stringList(value).map(researchDisplayText).filter(Boolean);
 }
 
+function researchCorpusMetadataLines(codeBasis) {
+  const entries = [
+    ...(Array.isArray(codeBasis?.searchedCorpora) ? codeBasis.searchedCorpora : [])
+      .map((corpus) => ({ kind: "Searched", corpus })),
+    ...(Array.isArray(codeBasis?.pinnedCorpora) ? codeBasis.pinnedCorpora : [])
+      .map((corpus) => ({ kind: "Explicit evidence", corpus }))
+  ];
+  return entries.map(({ kind, corpus }) => [
+    kind,
+    corpus.label || corpus.id || "Research corpus",
+    corpus.codeEdition ? `Edition: ${corpus.codeEdition}` : "Edition not provided",
+    corpus.applicabilityStatus
+      ? `Applicability: ${String(corpus.applicabilityStatus).replace(/[-_]+/g, " ")}`
+      : "Applicability status not provided"
+  ].join(" · "));
+}
+
+function researchSourceDate(value) {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toISOString().slice(0, 10) : "";
+}
+
 function reportPresentation(manifest) {
   const accent = String(manifest.presentation?.branding?.accentColorHex || "").trim().toLowerCase();
   return {
@@ -168,6 +190,24 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
       .font("Helvetica-Bold")
       .fontSize(12)
       .text(item.question, { paragraphGap: 7 });
+    const sourceDate = researchSourceDate(item.sourceAsOf);
+    const boundary = [
+      item.authorityLabel || item.authorityStatus,
+      item.codeEdition ? `Edition: ${item.codeEdition}` : "",
+      sourceDate ? `Research basis captured ${sourceDate}` : ""
+    ].filter(Boolean).join(" · ");
+    if (boundary) {
+      document
+        .fillColor(colors.muted)
+        .font("Helvetica")
+        .fontSize(8.5)
+        .text(boundary, { lineGap: 1, paragraphGap: 7 });
+    }
+    drawList(document, "Code basis", [
+      item.codeBasis?.disclosure,
+      item.codeBasis?.limitation
+    ].filter(Boolean));
+    drawList(document, "Corpus basis", researchCorpusMetadataLines(item.codeBasis));
     document
       .font("Helvetica-Bold")
       .fontSize(9.5)
@@ -208,6 +248,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
         [citation.sectionID, ...(citation.sourceIDs || [])].filter(Boolean).join(" / ")
       )
     );
+    drawList(document, "Professional-use notice", [item.disclaimer].filter(Boolean));
   } else {
     document
       .fillColor(colors.ink)

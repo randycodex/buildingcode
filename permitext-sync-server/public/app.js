@@ -246,6 +246,9 @@ const workspaceRegistryKey = "permitext:webWorkspaces:v2";
 const workspaceStateKeyPrefix = "permitext:webWorkspace:v2:";
 const activeWorkspaceSessionKey = "permitext:webWorkspaceActive:v2";
 const firstUseWelcomeSeenKey = "permitext:webFirstUseWelcome:v1";
+const researchDisclosureAcknowledgmentVersion = "2026-08-27-v1";
+const researchDisclosureAcknowledgmentKeyPrefix = "permitext:researchDisclosureAcknowledged:";
+const researchDisclosureAcknowledgedAccounts = new Set();
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
@@ -15133,6 +15136,83 @@ function researchAnswerNarrativeText(result) {
     .join("\n\n");
 }
 
+function researchApplicabilityStatusLabel(value) {
+  const status = String(value || "").trim().toLowerCase();
+  if (status === "current-enacted-edition") return "Current enacted edition";
+  if (status === "historical") return "Historical";
+  if (status === "future-effective") return "Future effective";
+  if (!status) return "Applicability status not provided";
+  return status.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function researchCorpusMetadataLines(codeBasis) {
+  const entries = [
+    ...(Array.isArray(codeBasis?.searchedCorpora) ? codeBasis.searchedCorpora : [])
+      .map((corpus) => ({ kind: "Searched", corpus })),
+    ...(Array.isArray(codeBasis?.pinnedCorpora) ? codeBasis.pinnedCorpora : [])
+      .map((corpus) => ({ kind: "Explicit evidence", corpus }))
+  ];
+  return entries.map(({ kind, corpus }) => [
+    kind,
+    corpus.label || corpus.id || "Research corpus",
+    corpus.codeEdition ? `Edition: ${corpus.codeEdition}` : "Edition not provided",
+    `Applicability: ${researchApplicabilityStatusLabel(corpus.applicabilityStatus)}`
+  ].join(" · "));
+}
+
+function researchAnswerCopyText(result) {
+  const codeBasis = result?.codeBasis || {};
+  const parsedSourceAsOf = result?.sourceAsOf ? new Date(result.sourceAsOf) : null;
+  const sourceAsOf = parsedSourceAsOf && Number.isFinite(parsedSourceAsOf.getTime())
+    ? parsedSourceAsOf.toISOString().slice(0, 10)
+    : "";
+  const factUsage = result?.factUsage || {};
+  const analysis = result?.structuredEvidenceAnalysis || {};
+  const factsUsed = Array.from(new Set([
+    ...(factUsage.projectContext || []),
+    ...(factUsage.conversation || []),
+    ...(factUsage.other || []),
+    ...(analysis.projectFactsUsed || result?.projectFactsUsed || [])
+  ].map(researchDisplayText).filter(Boolean)));
+  const citationLines = (result?.citations || []).map((citation) => [
+    citation.evidenceRole === "contextual"
+      ? "Context"
+      : citation.evidenceRole === "supporting"
+        ? "Supporting"
+        : "Governing",
+    citation.corpusLabel,
+    citation.codeEdition,
+    [citation.codePrefix, citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title]
+      .filter(Boolean)
+      .join(" ")
+  ].filter(Boolean).join(" · "));
+  const sections = [];
+  const appendSection = (heading, values) => {
+    const normalized = (Array.isArray(values) ? values : [values])
+      .map(researchDisplayText)
+      .filter(Boolean);
+    if (!normalized.length) return;
+    sections.push(`${heading}\n${normalized.map((value) => `- ${value}`).join("\n")}`);
+  };
+  appendSection("Answer classification", result?.authorityLabel || result?.authorityStatus);
+  appendSection("Code basis", [
+    codeBasis.disclosure || (result?.codeEdition ? `Code basis: ${result.codeEdition}` : ""),
+    codeBasis.limitation,
+    sourceAsOf ? `Research basis captured ${sourceAsOf}` : ""
+  ]);
+  appendSection("Corpus basis", researchCorpusMetadataLines(codeBasis));
+  appendSection("Answer", researchAnswerNarrativeText(result));
+  appendSection("Facts used", factsUsed);
+  appendSection("Assumptions", result?.assumptions);
+  appendSection("Project facts to verify", result?.missingFacts);
+  appendSection("Limits of this answer", result?.evidenceLimitations);
+  appendSection("Related evidence to add", result?.additionalEvidenceNeeded);
+  appendSection("Citations", citationLines);
+  appendSection("Professional-use notice", result?.disclaimer ||
+    "AI-generated research assistance, not an official code determination.");
+  return sections.join("\n\n");
+}
+
 function appendResearchAnswerNarrative(container, result) {
   const text = researchAnswerNarrativeText(result);
   if (!text) return;
@@ -15267,6 +15347,23 @@ function appendResearchUnresolved(container, result) {
   container.append(heading, section);
 }
 
+function researchFeedbackUserStatus(feedback) {
+  if (!feedback) return "";
+  const status = String(
+    feedback.userStatus || feedback.resolutionStatus || feedback.triageStatus || feedback.status || ""
+  ).trim().toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  if (["reviewing", "under_review", "evaluation_candidate", "in_progress"].includes(status)) {
+    return "Under review";
+  }
+  if (["resolved", "corrected", "complete", "completed"].includes(status)) {
+    return "Resolved";
+  }
+  if (["closed", "dismissed", "rejected"].includes(status)) {
+    return "Closed";
+  }
+  return "Received";
+}
+
 function renderResearchFeedback(container, message, conversationID) {
   if (!message?.id || !conversationID) return;
   const form = document.createElement("form");
@@ -15373,7 +15470,7 @@ function renderResearchFeedback(container, message, conversationID) {
   const syncCompactState = () => {
     helpfulButton.setAttribute("aria-pressed", String(selectedCategory === "helpful"));
     problemButton.setAttribute("aria-pressed", String(Boolean(selectedCategory && selectedCategory !== "helpful")));
-    status.textContent = message.feedback ? "Feedback saved" : "";
+    status.textContent = researchFeedbackUserStatus(message.feedback);
   };
   const setBusy = (busy) => {
     helpfulButton.disabled = busy;
@@ -15470,6 +15567,18 @@ function renderResearchInterpretation(container, result, options = {}) {
       .filter(Boolean)
       .join(" · ");
     card.append(codeDisclosure);
+  }
+  const corpusMetadataLines = researchCorpusMetadataLines(codeBasis);
+  if (corpusMetadataLines.length) {
+    const corpusMetadata = document.createElement("ul");
+    corpusMetadata.className = "research-answer-corpus-metadata";
+    corpusMetadata.setAttribute("aria-label", "Research corpus editions and applicability");
+    corpusMetadataLines.forEach((line) => {
+      const item = document.createElement("li");
+      item.textContent = line;
+      corpusMetadata.append(item);
+    });
+    card.append(corpusMetadata);
   }
 
   appendResearchProjectContextDisclosure(card, result);
@@ -15662,6 +15771,27 @@ function renderResearchInterpretation(container, result, options = {}) {
   wireResearchDetailsMotion(details, detailsBody);
   evidenceReviewed.append(evidenceReviewedSummary, evidenceReviewedBody);
   card.append(evidenceReviewed);
+  const copyRow = document.createElement("div");
+  copyRow.className = "research-answer-copy-row";
+  const copyButton = document.createElement("button");
+  copyButton.type = "button";
+  copyButton.className = "ghost-button research-answer-copy";
+  copyButton.textContent = "Copy answer";
+  const copyStatus = document.createElement("span");
+  copyStatus.className = "research-answer-copy-status";
+  copyStatus.setAttribute("role", "status");
+  copyStatus.setAttribute("aria-live", "polite");
+  copyButton.addEventListener("click", async () => {
+    copyButton.disabled = true;
+    const copied = await copyTextToClipboard(researchAnswerCopyText(result));
+    copyStatus.textContent = copied ? "Copied with sources and notice" : "Copy unavailable";
+    copyButton.disabled = false;
+    window.setTimeout(() => {
+      if (copyStatus.isConnected) copyStatus.textContent = "";
+    }, 2_000);
+  });
+  copyRow.append(copyButton, copyStatus);
+  card.append(copyRow);
   const disclaimer = document.createElement("p");
   disclaimer.className = "research-answer-disclaimer";
   disclaimer.textContent = String(
@@ -17023,10 +17153,14 @@ function renderEvidenceDiscovery(container) {
           renderResults();
         });
         visualReviewConfirmation.append(visualReviewCheckbox, visualReviewCopy);
+        const visualProviderDisclosure = document.createElement("p");
+        visualProviderDisclosure.className = "evidence-visual-provider-disclosure";
+        visualProviderDisclosure.textContent = "Selected official images are sent to OpenAI for analysis. Private notes are not included.";
         visualSourcesDetails.append(
           visualSourcesToggle,
           visualSourcesGallery,
-          visualReviewConfirmation
+          visualReviewConfirmation,
+          visualProviderDisclosure
         );
         visualSources.append(
           visualSourcesHeading,
@@ -17627,7 +17761,7 @@ function researchComposerDisclosure() {
   const disclosure = document.createElement("p");
   disclosure.className = "research-composer-disclosure";
   disclosure.append(document.createTextNode(
-    "AI-assisted—not an official interpretation. Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Do not include confidential or unnecessary personal information. "
+    "AI-assisted—not an official interpretation. Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential or unnecessary personal information. "
   ));
   const privacyLink = document.createElement("a");
   privacyLink.href = "/privacy";
@@ -17636,6 +17770,84 @@ function researchComposerDisclosure() {
   privacyLink.textContent = "Privacy";
   disclosure.append(privacyLink);
   return disclosure;
+}
+
+function researchDisclosureAcknowledgmentKey() {
+  const accountID = String(activeAccount()?.userID || "signed-out").trim() || "signed-out";
+  return `${researchDisclosureAcknowledgmentKeyPrefix}${researchDisclosureAcknowledgmentVersion}:${accountID}`;
+}
+
+function researchDisclosureIsAcknowledged() {
+  const key = researchDisclosureAcknowledgmentKey();
+  if (researchDisclosureAcknowledgedAccounts.has(key)) return true;
+  try {
+    if (localStorage.getItem(key) === researchDisclosureAcknowledgmentVersion) {
+      researchDisclosureAcknowledgedAccounts.add(key);
+      return true;
+    }
+  } catch {
+    // A confirmed acknowledgment remains valid for this page session when storage is unavailable.
+  }
+  return false;
+}
+
+async function ensureResearchDisclosureAcknowledged(container) {
+  if (researchDisclosureIsAcknowledged()) return true;
+  const confirmed = await confirmWebWarning(
+    "Before your first Research question",
+    "Permitext sends your question, recent chat, selected or retrieved evidence, and assigned Project facts to OpenAI. Private notes are not included. Research is AI-assisted and is not an official interpretation. Verify cited text, source status, and Project facts before relying on an answer for filing, design, permitting, or construction.",
+    {
+      confirmLabel: "I understand",
+      cancelLabel: "Not now",
+      container
+    }
+  );
+  if (!confirmed) return false;
+  const key = researchDisclosureAcknowledgmentKey();
+  researchDisclosureAcknowledgedAccounts.add(key);
+  try {
+    localStorage.setItem(key, researchDisclosureAcknowledgmentVersion);
+  } catch {
+    // The in-memory acknowledgment still prevents another prompt during this page session.
+  }
+  return true;
+}
+
+function researchProjectContextPreview(projectID, projectInformation = null) {
+  const preview = document.createElement("p");
+  preview.className = "research-project-context-preview";
+  const update = (nextProjectID = projectID, nextInformation = projectInformation) => {
+    const normalizedProjectID = String(nextProjectID || "").trim();
+    if (!normalizedProjectID) {
+      preview.textContent = "Unassigned: no saved Project facts will be sent. Private notes are not included.";
+      return;
+    }
+    const localProject = visibleProjectRecords(currentContentSummary().projects || [])
+      .find((project) => researchProjectID(project) === normalizedProjectID) || null;
+    const information = nextInformation || localProject || {};
+    const usableFacts = projectStructuredFacts(information).filter((fact) =>
+      fact.key !== "floor-affected" && ["stated", "confirmed", "sourced"].includes(fact.status)
+    );
+    const address = String(information.address || localProject?.address || "").trim();
+    const labels = [
+      ...(address ? [`Address: ${address}`] : []),
+      ...usableFacts
+        .filter((fact) => fact.key !== "address" || !address)
+        .map((fact) => `${fact.label}: ${fact.value}`)
+    ];
+    const visible = labels.slice(0, 3);
+    const remainder = Math.max(0, labels.length - visible.length);
+    const hasDescription = Boolean(String(information.description || localProject?.description || "").trim());
+    preview.textContent = [
+      visible.length ? `Project context sent: ${visible.join(" · ")}` : "Assigned Project has no saved structured facts",
+      remainder ? `+${remainder} more saved ${remainder === 1 ? "fact" : "facts"}` : "",
+      hasDescription ? "Saved Project description is also included" : "",
+      "Private notes are not included"
+    ].filter(Boolean).join(". ");
+  };
+  preview.updateResearchProject = update;
+  update(projectID, projectInformation);
+  return preview;
 }
 
 function researchFailureMessage(error) {
@@ -17680,10 +17892,12 @@ function renderNewResearchComposer(container, researchEnabled) {
     unassignedLabel: "Unassigned — no Project context",
     ariaLabel: "Project context for new Research"
   });
+  const projectPreview = researchProjectContextPreview(initialProjectID);
   projectSelect.addEventListener("change", () => {
     initialProjectID = projectSelect.value;
+    projectPreview.updateResearchProject(initialProjectID);
   });
-  projectField.append(projectLabel, projectSelect);
+  projectField.append(projectLabel, projectSelect, projectPreview);
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
@@ -17717,6 +17931,10 @@ function renderNewResearchComposer(container, researchEnabled) {
     event.preventDefault();
     const question = input.value.replace(/\s+/g, " ").trim();
     if (question.length < 3 || sendButton.disabled) return;
+    if (!(await ensureResearchDisclosureAcknowledged(form))) {
+      input.focus({ preventScroll: true });
+      return;
+    }
     input.disabled = true;
     sendButton.disabled = true;
     status.textContent = "";
@@ -19553,6 +19771,10 @@ async function renderResearchConversation(conversationID, options = {}) {
 
   const composer = document.createElement("form");
   composer.className = "research-composer";
+  const projectPreview = researchProjectContextPreview(
+    conversation.primaryProjectID,
+    conversation.projectInformation
+  );
   const input = document.createElement("textarea");
   input.className = "research-question-input";
   input.rows = 3;
@@ -19609,6 +19831,10 @@ async function renderResearchConversation(conversationID, options = {}) {
     event.preventDefault();
     const question = input.value.trim() || starterAnalysisQuestion;
     if (question.length < 3 || sendButton.disabled) return;
+    if (!(await ensureResearchDisclosureAcknowledged(composer))) {
+      input.focus({ preventScroll: true });
+      return;
+    }
     input.disabled = true;
     sendButton.disabled = true;
     status.textContent = "";
@@ -19655,7 +19881,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     });
   });
   composerBox.append(input, sendButton);
-  composer.append(researchComposerDisclosure(), composerBox, status);
+  composer.append(projectPreview, researchComposerDisclosure(), composerBox, status);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);
@@ -21873,6 +22099,28 @@ function printReportManifestAsPDF(manifest) {
         const heading = documentRoot.createElement("h3");
         heading.textContent = item.question;
         article.append(heading);
+        const sourceDate = item.sourceAsOf ? new Date(item.sourceAsOf) : null;
+        const sourceDateLabel = sourceDate && Number.isFinite(sourceDate.getTime())
+          ? `Research basis captured ${sourceDate.toISOString().slice(0, 10)}`
+          : "";
+        const boundary = documentRoot.createElement("p");
+        boundary.className = "meta";
+        boundary.textContent = [
+          item.authorityLabel || item.authorityStatus,
+          item.codeEdition ? `Edition: ${item.codeEdition}` : "",
+          sourceDateLabel
+        ].filter(Boolean).join(" · ");
+        if (boundary.textContent) article.append(boundary);
+        appendReportPDFList(documentRoot, article, "Code basis", [
+          item.codeBasis?.disclosure,
+          item.codeBasis?.limitation
+        ].filter(Boolean));
+        appendReportPDFList(
+          documentRoot,
+          article,
+          "Corpus basis",
+          researchCorpusMetadataLines(item.codeBasis)
+        );
         appendReportPDFResearchAnswer(documentRoot, article, item);
         appendReportPDFList(
           documentRoot,
@@ -21910,6 +22158,12 @@ function printReportManifestAsPDF(manifest) {
           (item.citations || []).map((citation) =>
             [citation.sectionID, ...(citation.sourceIDs || [])].filter(Boolean).join(" · ")
           )
+        );
+        appendReportPDFList(
+          documentRoot,
+          article,
+          "Professional-use notice",
+          [item.disclaimer].filter(Boolean)
         );
       } else if (item.kind === "projectFacts") {
         const heading = documentRoot.createElement("h3");

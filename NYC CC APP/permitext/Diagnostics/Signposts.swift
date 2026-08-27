@@ -507,6 +507,24 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         ).conversation
     }
 
+    func saveResearchFeedback(
+        account: SignedInAccount,
+        conversationID: String,
+        answerID: String,
+        category: String,
+        comment: String?
+    ) async throws -> ResearchFeedback {
+        try await transport.researchFeedback(
+            ResearchFeedbackRequest(
+                auth: authContext(for: account),
+                conversationID: conversationID,
+                answerID: answerID,
+                category: category,
+                comment: comment
+            )
+        ).feedback
+    }
+
     func renameResearchConversation(
         account: SignedInAccount,
         conversationID: String,

@@ -287,7 +287,7 @@ struct SettingsView: View {
                         .accessibilityIdentifier("storekit-operation-message")
                 }
 
-                Text("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 selected-evidence Research turns each month. Code reading and search remain free.")
+                Text("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -633,7 +633,7 @@ struct SettingsView: View {
             if library.currentEntitlementSource == .lifetimeGrant {
                 return "Lifetime Pro is active, including Research. This gifted account does not need an App Store subscription."
             }
-            return "Pro is active, including Research. Projects, Notebook, Report, professional exports, offline access, and selected-evidence Research are unlocked."
+            return "Pro is active. Projects, Notebook, Report, professional exports, offline access, and AI-assisted Research are unlocked."
         }
         return "Reading and search are available anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync."
     }
@@ -1530,7 +1530,7 @@ struct ProSubscriptionStoreView: View {
                     Text("Permitext Pro")
                         .font(.title2.weight(.bold))
 
-                    Text("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 selected-evidence Research turns each month.")
+                    Text("Unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -1546,7 +1546,7 @@ struct ProSubscriptionStoreView: View {
                             .font(.headline)
                         Text("\(library.proProductDisplayPrice ?? "$20.00")/month")
                             .font(.title3.weight(.semibold))
-                        Text("Pro: unlimited saves, notes, Projects, Notebook, Report, exports, continuity, sync, and 100 selected-evidence Research turns each month.")
+                        Text("Pro: unlimited saves, notes, Projects, Notebook, Report, exports, continuity, sync, and 100 AI-assisted Research turns each month.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)

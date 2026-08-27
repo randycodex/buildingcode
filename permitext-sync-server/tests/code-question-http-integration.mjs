@@ -1271,7 +1271,7 @@ async function main() {
         conversationID: deleteConversation.id
       }),
       200,
-      "Deleting linked Research after recording its decision unlink"
+      "Deleting linked Research and its conversation-owned decision activity"
     );
     const deleteDecisionState = await expectStatus(
       await postAs(owner, "/projects/code-questions/state", {
@@ -1284,7 +1284,8 @@ async function main() {
     assert.equal(deleteDecisionState.researchConversationID, null);
     assert.equal(
       decisionUnlinkEvents(deleteDecisionState, deleteDecision.id, deleteConversation.id).length,
-      1
+      0,
+      "Deleting Research must not retain conversation-identifying unlink activity."
     );
 
     const viewerResearchStart = await postAs(viewer, "/projects/code-questions/research/start", {

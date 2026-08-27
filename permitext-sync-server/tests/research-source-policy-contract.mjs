@@ -54,6 +54,13 @@ const sanitized = sanitizeResearchWebQuery(
 assert.doesNotMatch(sanitized, /Acme Tower|lead@|212|123 West 42nd|Suite 9/i);
 assert.match(sanitized, /NYC BC 1019\.3 DOB guidance/);
 
+const sanitizedProjectIdentifiers = sanitizeResearchWebQuery(
+  "BBL: 2028500003; Block 2850, Lot 3; Jerome Avenue and East 176th Street. " +
+  "Find official NYC zoning guidance for off-street parking."
+);
+assert.doesNotMatch(sanitizedProjectIdentifiers, /2028500003|2850|Lot 3|Jerome|176th/i);
+assert.match(sanitizedProjectIdentifiers, /NYC zoning guidance for off-street parking/);
+
 assert.deepEqual(
   extractResearchOfficialDocumentReferences(
     "Use Buildings Bulletin 2022-013, BB 2022-013, and DOB Bulletin No. 2025-001."

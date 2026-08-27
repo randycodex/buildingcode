@@ -200,6 +200,177 @@ try {
   assert(await countRows("permitext_sessions") === 0, "Sign-in stored a plaintext legacy session.");
   assert(await countRows("permitext_account_sessions") === 1, "Sign-in did not store a hashed account session.");
 
+  const deletionConversationID = `postgres-research-delete-${runID}`;
+  const deletionAnswerID = `postgres-research-answer-delete-${runID}`;
+  const deletionSnapshotID = `postgres-research-snapshot-delete-${runID}`;
+  const deletionSelectedPassageID = `postgres-research-passage-delete-${runID}`;
+  const deletionProjectID = `postgres-research-project-delete-${runID}`;
+  const deletionNow = new Date().toISOString();
+  await sql`
+    INSERT INTO permitext_research_conversations (
+      id, user_id, title, conversation, created_at, updated_at
+    ) VALUES (
+      ${deletionConversationID}, ${userID}, 'Deletion contract fixture',
+      ${JSON.stringify({
+        id: deletionConversationID,
+        title: "Deletion contract fixture",
+        primaryProjectID: deletionProjectID,
+        sources: [{ id: deletionSelectedPassageID }],
+        messages: [],
+        createdAt: deletionNow,
+        updatedAt: deletionNow
+      })}::jsonb,
+      ${deletionNow}::timestamptz, ${deletionNow}::timestamptz
+    )
+  `;
+  await sql`
+    INSERT INTO permitext_research_answers (
+      id, user_id, conversation_id, project_id, answer, created_at
+    ) VALUES (
+      ${deletionAnswerID}, ${userID}, ${deletionConversationID}, ${deletionProjectID},
+      ${JSON.stringify({
+        id: deletionAnswerID,
+        conversationID: deletionConversationID,
+        projectID: deletionProjectID,
+        evidence: [{ id: deletionSnapshotID }],
+        createdAt: deletionNow
+      })}::jsonb,
+      ${deletionNow}::timestamptz
+    )
+  `;
+  await sql`
+    INSERT INTO permitext_evidence_snapshots (
+      id, user_id, answer_id, source_id, snapshot, approved_at
+    ) VALUES (
+      ${deletionSnapshotID}, ${userID}, ${deletionAnswerID}, 'postgres-delete-source',
+      ${JSON.stringify({ id: deletionSnapshotID, answerID: deletionAnswerID })}::jsonb,
+      ${deletionNow}::timestamptz
+    )
+  `;
+  await sql`
+    INSERT INTO permitext_research_feedback (
+      id, user_id, conversation_id, answer_id, feedback, created_at, updated_at
+    ) VALUES (
+      ${`postgres-research-feedback-delete-${runID}`}, ${userID},
+      ${deletionConversationID}, ${deletionAnswerID},
+      ${JSON.stringify({ conversationID: deletionConversationID, answerID: deletionAnswerID })}::jsonb,
+      ${deletionNow}::timestamptz, ${deletionNow}::timestamptz
+    )
+  `;
+  for (const [kind, targetID] of [
+    ["researchConversation", deletionConversationID],
+    ["researchAnswer", deletionAnswerID],
+    ["approvedEvidence", deletionSnapshotID],
+    ["selectedPassage", deletionSelectedPassageID]
+  ]) {
+    const linkID = `postgres-research-link-delete-${kind}-${runID}`;
+    await sql`
+      INSERT INTO permitext_project_links (
+        id, user_id, project_id, target_kind, target_id, relationship,
+        link, created_at, updated_at, deleted_at
+      ) VALUES (
+        ${linkID}, ${userID}, ${deletionProjectID}, ${kind}, ${targetID}, 'reference',
+        ${JSON.stringify({
+          id: linkID,
+          projectID: deletionProjectID,
+          targetKind: kind,
+          targetID
+        })}::jsonb,
+        ${deletionNow}::timestamptz, ${deletionNow}::timestamptz, NULL
+      )
+    `;
+  }
+  for (const [kind, objectID, metadata] of [
+    ["researchConversation", deletionConversationID, {}],
+    ["researchAnswer", deletionAnswerID, { conversationID: deletionConversationID }]
+  ]) {
+    const eventID = `postgres-research-activity-delete-${kind}-${runID}`;
+    await sql`
+      INSERT INTO permitext_project_activity (
+        id, user_id, project_id, action, object_kind, object_id, event, created_at
+      ) VALUES (
+        ${eventID}, ${userID}, ${deletionProjectID}, 'research.delete-fixture', ${kind}, ${objectID},
+        ${JSON.stringify({
+          id: eventID,
+          projectID: deletionProjectID,
+          objectKind: kind,
+          objectID,
+          metadata
+        })}::jsonb,
+        ${deletionNow}::timestamptz
+      )
+    `;
+  }
+  const foreignConversationID = `postgres-research-delete-foreign-${runID}`;
+  await sql`
+    INSERT INTO permitext_research_conversations (
+      id, user_id, title, conversation, created_at, updated_at
+    ) VALUES (
+      ${foreignConversationID}, ${deletionUserID}, 'Foreign deletion fixture',
+      ${JSON.stringify({
+        id: foreignConversationID,
+        title: "Foreign deletion fixture",
+        sources: [],
+        messages: [],
+        createdAt: deletionNow,
+        updatedAt: deletionNow
+      })}::jsonb,
+      ${deletionNow}::timestamptz, ${deletionNow}::timestamptz
+    )
+  `;
+  const nonOwnerResearchDeletion = await request("/research/conversations/delete", {
+    method: "POST",
+    token,
+    body: { auth: { accountUserID: userID }, conversationID: foreignConversationID }
+  });
+  const foreignConversationRows = await sql`
+    SELECT count(*)::int AS count
+    FROM permitext_research_conversations
+    WHERE id = ${foreignConversationID} AND user_id = ${deletionUserID}
+  `;
+  assert(
+    nonOwnerResearchDeletion.response.ok && nonOwnerResearchDeletion.json.deleted === false &&
+      Number(foreignConversationRows[0]?.count || 0) === 1,
+    "Postgres Research deletion exposed or removed another user's conversation."
+  );
+  const researchDeletion = await request("/research/conversations/delete", {
+    method: "POST",
+    token,
+    body: { auth: { accountUserID: userID }, conversationID: deletionConversationID }
+  });
+  assert(researchDeletion.response.ok && researchDeletion.json.deleted === true, "Postgres Research deletion failed.");
+  const researchDeletionRows = await sql`
+    SELECT
+      (SELECT count(*) FROM permitext_research_conversations WHERE id = ${deletionConversationID} AND user_id = ${userID})::int AS conversations,
+      (SELECT count(*) FROM permitext_research_answers WHERE conversation_id = ${deletionConversationID} AND user_id = ${userID})::int AS answers,
+      (SELECT count(*) FROM permitext_evidence_snapshots WHERE answer_id = ${deletionAnswerID} AND user_id = ${userID})::int AS snapshots,
+      (SELECT count(*) FROM permitext_research_feedback WHERE conversation_id = ${deletionConversationID} AND user_id = ${userID})::int AS feedback,
+      (SELECT count(*) FROM permitext_project_links WHERE user_id = ${userID} AND (
+        (target_kind = 'researchConversation' AND target_id = ${deletionConversationID}) OR
+        (target_kind = 'researchAnswer' AND target_id = ${deletionAnswerID}) OR
+        (target_kind = 'approvedEvidence' AND target_id = ${deletionSnapshotID}) OR
+        (target_kind = 'selectedPassage' AND target_id = ${deletionSelectedPassageID})
+      ))::int AS links,
+      (SELECT count(*) FROM permitext_project_activity WHERE user_id = ${userID} AND (
+        (object_kind = 'researchConversation' AND object_id = ${deletionConversationID}) OR
+        (object_kind = 'researchAnswer' AND object_id = ${deletionAnswerID}) OR
+        event->'metadata'->>'conversationID' = ${deletionConversationID}
+      ))::int AS activity
+  `;
+  assert(
+    Object.values(researchDeletionRows[0] || {}).every((count) => Number(count || 0) === 0),
+    "Postgres Research deletion left conversation-owned active-storage records behind."
+  );
+  const replayedResearchDeletion = await request("/research/conversations/delete", {
+    method: "POST",
+    token,
+    body: { auth: { accountUserID: userID }, conversationID: deletionConversationID }
+  });
+  assert(
+    replayedResearchDeletion.response.ok && replayedResearchDeletion.json.deleted === false,
+    "Postgres Research deletion replay was not idempotent."
+  );
+
   const savedItem = {
     savedItem: {
       id: `postgres-saved-${runID}`,

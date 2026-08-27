@@ -163,6 +163,21 @@ const manifestInput = {
       additionalEvidenceNeeded: [],
       citations: [{ sectionID: "BC-1004.1", sourceIDs: ["source-1"] }],
       evidence: [{ id: "snapshot-1", passageText: "Selected passage" }],
+      authorityStatus: "conditional",
+      authorityLabel: "Conditional on Project facts",
+      codeEdition: "2022 Construction Codes",
+      codeBasis: {
+        disclosure: "Searched the enacted 2022 NYC Construction Codes.",
+        limitation: "The supplied evidence does not include every referenced authority.",
+        searchedCorpora: [{
+          id: "construction-codes",
+          label: "2022 NYC Construction Codes",
+          codeEdition: "2022 Construction Codes",
+          applicabilityStatus: "current-enacted-edition"
+        }]
+      },
+      sourceAsOf: generatedAt,
+      disclaimer: "AI-generated research assistance—not an official code determination.",
       reviewStatus: "unreviewed"
     },
     {
@@ -232,6 +247,12 @@ assert.equal(manifest.immutable, true);
 assert.equal(manifest.items[1].sourceClassification, "project-material");
 assert.equal(manifest.items[2].sourceClassification, "published-code");
 assert.equal(manifest.items[3].sourceClassification, "ai-assisted");
+assert.equal(manifest.items[3].authorityStatus, "conditional");
+assert.equal(manifest.items[3].authorityLabel, "Conditional on Project facts");
+assert.equal(manifest.items[3].codeEdition, "2022 Construction Codes");
+assert.equal(manifest.items[3].sourceAsOf, generatedAt);
+assert.equal(manifest.items[3].codeBasis.searchedCorpora[0].id, "construction-codes");
+assert.match(manifest.items[3].disclaimer, /not an official code determination/);
 assert.equal(manifest.items[4].sourceClassification, "project-material");
 assert.equal(manifest.presentation.template.id, "template-client");
 assert.equal(manifest.presentation.branding.accentColorHex, "#1267a0");
@@ -280,13 +301,13 @@ assert(
 );
 assert.equal(
   pdfPageCount(renderedWithoutPreview),
-  2,
-  "Report footer rendering must not create blank trailing pages."
+  3,
+  "The Research source boundary and professional-use notice should render on populated Report pages without a blank trailing page."
 );
 assert.equal(
   pdfPageCount(renderedPDF),
-  pdfPageCount(renderedWithoutPreview) + 1,
-  "The expanded Research result and Workboard preview should add exactly one populated page."
+  pdfPageCount(renderedWithoutPreview),
+  "The embedded Workboard preview should use the existing populated Report pages rather than create a blank trailing page."
 );
 
 console.log("Permitext Report contract passed.");

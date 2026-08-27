@@ -1,5 +1,34 @@
 import StoreKit
 import SwiftUI
+import UIKit
+
+enum ResearchDisclosureGate {
+    static let currentVersion = 1
+    private static let defaultsKeyPrefix = "permitext.research.disclosure.accepted-version"
+
+    static func requiresAcknowledgement(completedVersion: Int) -> Bool {
+        completedVersion < currentVersion
+    }
+
+    static func defaultsKey(accountID: String?) -> String {
+        let normalized = accountID?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return "\(defaultsKeyPrefix).\(normalized?.isEmpty == false ? normalized! : "signed-out")"
+    }
+
+    static func completedVersion(
+        accountID: String?,
+        defaults: UserDefaults = .standard
+    ) -> Int {
+        defaults.integer(forKey: defaultsKey(accountID: accountID))
+    }
+
+    static func acknowledge(
+        accountID: String?,
+        defaults: UserDefaults = .standard
+    ) {
+        defaults.set(currentVersion, forKey: defaultsKey(accountID: accountID))
+    }
+}
 
 struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
     static let cacheScope = "research-pending-request"
@@ -17,6 +46,11 @@ private struct PendingResearchVisualReview: Identifiable, Equatable {
 private struct PendingResearchDeletion: Identifiable, Equatable {
     let id: String
     let title: String
+}
+
+private struct PendingResearchFeedbackReport: Identifiable, Equatable {
+    let id = UUID()
+    let messageID: String
 }
 
 struct ResearchRequestReconciliation {
@@ -198,6 +232,7 @@ struct ResearchView: View {
     @State private var isSending = false
     @State private var activeResearchRequestTask: Task<Void, Never>?
     @State private var pendingQuestionAttempt: ResearchQuestionAttempt?
+    @State private var pendingDisclosureAttempt: ResearchQuestionAttempt?
     @State private var failedQuestionAttempt: ResearchQuestionAttempt?
     @State private var errorMessage: String?
     @State private var questionErrorMessage: String?
@@ -212,6 +247,8 @@ struct ResearchView: View {
     @State private var recoverySettingsSection: SettingsSection = .account
     @State private var isRefreshingSources = false
     @State private var isConfirmingProjectContext = false
+    @State private var pendingFeedbackReport: PendingResearchFeedbackReport?
+    @State private var feedbackMessageID: String?
     @State private var isVisible = false
     private let cache: ProjectHubOfflineCache
 
@@ -265,6 +302,28 @@ struct ResearchView: View {
                     onCancel: { cancelVisualReview(pending) },
                     onConfirm: { sourceIDs in
                         Task { await confirmVisualReview(pending, sourceIDs: sourceIDs) }
+                    }
+                )
+            }
+            .sheet(item: $pendingDisclosureAttempt) { attempt in
+                ResearchDisclosureAcknowledgementSheet(
+                    onCancel: { pendingDisclosureAttempt = nil },
+                    onContinue: {
+                        ResearchDisclosureGate.acknowledge(
+                            accountID: library.signedInAccount?.appUserID
+                        )
+                        pendingDisclosureAttempt = nil
+                        question = ""
+                        startQuestionRequest(attempt)
+                    }
+                )
+            }
+            .sheet(item: $pendingFeedbackReport) { report in
+                ResearchFeedbackSheet(
+                    onCancel: { pendingFeedbackReport = nil },
+                    onSubmit: { category, comment in
+                        pendingFeedbackReport = nil
+                        Task { await saveFeedback(messageID: report.messageID, category: category, comment: comment) }
                     }
                 )
             }
@@ -578,12 +637,13 @@ struct ResearchView: View {
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("research-composer-trust-boundary")
             HStack(spacing: 3) {
-                Text("Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Do not include confidential or unnecessary personal information.")
+                Text("Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential or unnecessary personal information.")
                 Link("Privacy", destination: URL(string: "https://permitext.com/privacy")!)
             }
             .font(.caption2)
             .foregroundStyle(.secondary)
             .accessibilityIdentifier("research-composer-privacy-disclosure")
+            projectFactsReview
             if let composerBlockMessage {
                 Text(composerBlockMessage)
                     .font(.caption)
@@ -624,6 +684,32 @@ struct ResearchView: View {
             }
         }
         .padding(12)
+    }
+
+    @ViewBuilder
+    private var projectFactsReview: some View {
+        let facts = conversation?.projectContext?.facts ?? []
+        if conversation?.primaryProjectID == nil {
+            Label("Project facts: Unassigned — no Project facts will be included.", systemImage: "folder.badge.questionmark")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .accessibilityIdentifier("research-composer-project-facts")
+        } else {
+            DisclosureGroup("Project facts included: \(facts.count)") {
+                VStack(alignment: .leading, spacing: 5) {
+                    ForEach(facts, id: \.self) { fact in
+                        Text("• \(fact)")
+                    }
+                    Text("Project facts provide context; they are not code authority.")
+                        .fontWeight(.semibold)
+                }
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .padding(.top, 5)
+            }
+            .font(.caption)
+            .accessibilityIdentifier("research-composer-project-facts")
+        }
     }
 
     private var researchSendIsBlocked: Bool {
@@ -784,7 +870,14 @@ struct ResearchView: View {
                 .background(Color.secondary.opacity(0.14), in: RoundedRectangle(cornerRadius: 16))
                 .frame(maxWidth: .infinity, alignment: .trailing)
         } else if let answer = message.answer {
-            ResearchAnswerView(answer: answer) { citation in
+            ResearchAnswerView(
+                answer: answer,
+                sourceStatus: conversation?.sourceStatus ?? "current",
+                feedback: message.feedback,
+                isSavingFeedback: feedbackMessageID == message.id,
+                onHelpful: { Task { await saveFeedback(messageID: message.id, category: "helpful", comment: nil) } },
+                onReportProblem: { pendingFeedbackReport = PendingResearchFeedbackReport(messageID: message.id) }
+            ) { citation in
                 openCitation(citation, sources: sources)
             }
         }
@@ -1111,8 +1204,38 @@ struct ResearchView: View {
     private func startQuestionRequest() {
         let normalized = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard normalized.count >= 3 else { return }
+        let attempt = ResearchQuestionAttempt(id: UUID().uuidString, question: normalized)
+        let completedDisclosureVersion = ResearchDisclosureGate.completedVersion(
+            accountID: library.signedInAccount?.appUserID
+        )
+        if ResearchDisclosureGate.requiresAcknowledgement(completedVersion: completedDisclosureVersion) {
+            pendingDisclosureAttempt = attempt
+            return
+        }
         question = ""
-        startQuestionRequest(ResearchQuestionAttempt(id: UUID().uuidString, question: normalized))
+        startQuestionRequest(attempt)
+    }
+
+    private func saveFeedback(messageID: String, category: String, comment: String?) async {
+        guard let conversationID = conversation?.id, feedbackMessageID == nil else { return }
+        feedbackMessageID = messageID
+        defer { feedbackMessageID = nil }
+        do {
+            let saved = try await library.saveResearchFeedback(
+                conversationID: conversationID,
+                answerID: messageID,
+                category: category,
+                comment: comment?.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+            guard conversation?.id == conversationID,
+                  let index = conversation?.messages.firstIndex(where: { $0.id == messageID })
+            else { return }
+            conversation?.messages[index].feedback = saved
+            if let updated = conversation { cacheConversation(updated) }
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     private func startQuestionRequest(_ attempt: ResearchQuestionAttempt) {
@@ -1296,6 +1419,7 @@ struct ResearchView: View {
                 questionErrorMessage = nil
             }
             clearCachedQuestionAttempt(conversationID: id)
+            clearCachedConversation(conversationID: id)
             await loadHistory(forceNetwork: true)
         } catch {
             errorMessage = error.localizedDescription
@@ -1340,6 +1464,15 @@ struct ResearchView: View {
         )
     }
 
+    private func clearCachedConversation(conversationID: String) {
+        guard let account = library.signedInAccount else { return }
+        try? cache.remove(
+            accountID: account.appUserID,
+            projectID: conversationID,
+            scope: "research-conversation"
+        )
+    }
+
     private func restoreCachedQuestionAttempt(
         for conversation: ResearchConversation,
         accountID: String
@@ -1367,6 +1500,81 @@ struct ResearchView: View {
         }
         failedQuestionAttempt = attempt
         questionErrorMessage = "Research was interrupted before an answer was saved. Retry to recover the same request. Your question is still here."
+    }
+}
+
+private struct ResearchDisclosureAcknowledgementSheet: View {
+    let onCancel: () -> Void
+    let onContinue: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 18) {
+                Text("Before you use Research")
+                    .font(.title2.weight(.bold))
+                Label("What is sent", systemImage: "arrow.up.doc")
+                    .font(.headline)
+                Text("Permitext sends your question, recent chat, selected or retrieved evidence, and assigned Project facts to OpenAI. Private notes are not included.")
+                    .foregroundStyle(.secondary)
+                Label("How to rely on it", systemImage: "checkmark.shield")
+                    .font(.headline)
+                Text("Permitext is AI-assisted research, not an official interpretation or professional opinion. Verify cited sources, source status, and Project facts before filing, design, permitting, or construction reliance.")
+                    .foregroundStyle(.secondary)
+                Link("Read the Privacy Policy", destination: URL(string: "https://permitext.com/privacy")!)
+                Spacer()
+                Button("Continue to Research", action: onContinue)
+                    .buttonStyle(.borderedProminent)
+                    .frame(maxWidth: .infinity)
+                Button("Cancel", role: .cancel, action: onCancel)
+                    .frame(maxWidth: .infinity)
+            }
+            .padding(20)
+            .navigationTitle("Research Notice")
+            .navigationBarTitleDisplayMode(.inline)
+            .interactiveDismissDisabled()
+        }
+    }
+}
+
+private struct ResearchFeedbackSheet: View {
+    let onCancel: () -> Void
+    let onSubmit: (String, String?) -> Void
+    @State private var category = "incorrect_misleading"
+    @State private var comment = ""
+
+    private let categories = [
+        ("incorrect_misleading", "Incorrect or misleading"),
+        ("missing_information", "Missing important information"),
+        ("citation_problem", "Citation problem"),
+        ("other", "Other")
+    ]
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Picker("Problem", selection: $category) {
+                    ForEach(categories, id: \.0) { value, label in
+                        Text(label).tag(value)
+                    }
+                }
+                TextField("Optional details", text: $comment, axis: .vertical)
+                    .lineLimit(3...8)
+                Text("Reports help Permitext investigate and correct Research quality. Internal review notes are never shown here.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .navigationTitle("Report a problem")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel", action: onCancel) }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Submit") {
+                        let normalized = comment.trimmingCharacters(in: .whitespacesAndNewlines)
+                        onSubmit(category, normalized.isEmpty ? nil : normalized)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1398,6 +1606,10 @@ private struct ResearchVisualReviewSheet: View {
                     Text("Permitext will preserve the exact selected image bytes and their integrity identity with the Research record.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Text("Selected official images are sent to OpenAI for analysis. Private notes are not included.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("research-visual-openai-disclosure")
                 }
                 .padding(18)
             }
@@ -1503,11 +1715,17 @@ private struct ResearchVisualReviewSheet: View {
 
 private struct ResearchAnswerView: View {
     let answer: ResearchAnswer
+    let sourceStatus: String
+    let feedback: ResearchFeedback?
+    let isSavingFeedback: Bool
+    let onHelpful: () -> Void
+    let onReportProblem: () -> Void
     let onOpenCitation: (ResearchCitation) -> Void
+    @State private var didCopy = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if let authorityLabel = answer.authorityLabel, !authorityLabel.isEmpty {
+            if let authorityLabel = answer.researchAuthorityLabel, !authorityLabel.isEmpty {
                 Text(authorityLabel)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
@@ -1592,6 +1810,28 @@ private struct ResearchAnswerView: View {
             Text(answer.disclaimer ?? "AI-generated research assistance, not an official code determination.")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+            HStack(spacing: 14) {
+                Button(didCopy ? "Copied" : "Copy answer", systemImage: didCopy ? "checkmark" : "doc.on.doc") {
+                    UIPasteboard.general.string = answer.structuredCopyText(sourceStatus: sourceStatus)
+                    didCopy = true
+                }
+                Button("Helpful", systemImage: feedback?.category == "helpful" ? "hand.thumbsup.fill" : "hand.thumbsup") {
+                    onHelpful()
+                }
+                Button("Report a problem", systemImage: "exclamationmark.bubble") {
+                    onReportProblem()
+                }
+            }
+            .font(.caption.weight(.semibold))
+            .buttonStyle(.plain)
+            .disabled(isSavingFeedback)
+            .accessibilityIdentifier("research-answer-actions")
+            if let feedback {
+                Text("Feedback: \(feedback.displayStatus)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("research-answer-feedback-status")
+            }
         }
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1621,6 +1861,7 @@ private struct ResearchAnswerView: View {
         let disclosedBasis = answer.codeBasis?.disclosure?.trimmingCharacters(in: .whitespacesAndNewlines)
         let basisLimitation = answer.codeBasis?.limitation?.trimmingCharacters(in: .whitespacesAndNewlines)
         let parts = [
+            answer.researchMetadataText(sourceStatus: sourceStatus),
             disclosedBasis?.isEmpty == false ? disclosedBasis : answer.codeEdition,
             basisLimitation?.isEmpty == false ? basisLimitation : nil,
             captured.map { "Research basis captured \($0)" }

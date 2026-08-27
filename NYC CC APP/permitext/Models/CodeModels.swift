@@ -2486,6 +2486,7 @@ protocol PermitextBackendTransport {
     func researchConversationCreate(_ request: ResearchConversationCreateRequest) async throws -> ResearchConversationResponse
     func researchConversationAddEvidence(_ request: ResearchConversationEvidenceRequest) async throws -> ResearchConversationEvidenceResponse
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse
+    func researchFeedback(_ request: ResearchFeedbackRequest) async throws -> ResearchFeedbackResponse
     func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse
     func researchConversationAssignProject(_ request: ResearchConversationAssignProjectRequest) async throws -> ResearchConversationResponse
     func researchConversationDelete(_ request: ResearchConversationDeleteRequest) async throws -> ResearchConversationDeleteResponse
@@ -2786,6 +2787,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
             bearerToken: request.auth.bearerToken,
             timeoutInterval: max(requestTimeout, 300)
         )
+    }
+
+    func researchFeedback(_ request: ResearchFeedbackRequest) async throws -> ResearchFeedbackResponse {
+        try await post("research/feedback", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func researchConversationRename(_ request: ResearchConversationRenameRequest) async throws -> ResearchConversationResponse {
@@ -3395,6 +3400,32 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 replayed: false,
                 requestID: request.requestID
             )
+        }
+        #endif
+        throw URLError(.unsupportedURL)
+    }
+
+    func researchFeedback(_ request: ResearchFeedbackRequest) async throws -> ResearchFeedbackResponse {
+        #if DEBUG
+        if phase3ResearchFixtureEnabled {
+            var conversation = try phase3ResearchConversation(id: request.conversationID)
+            guard let messageIndex = conversation.messages.firstIndex(where: {
+                $0.id == request.answerID && $0.role == "assistant"
+            }) else {
+                throw URLError(.fileDoesNotExist)
+            }
+            let feedback = ResearchFeedback(
+                id: conversation.messages[messageIndex].feedback?.id ?? "phase3-feedback-\(request.answerID)",
+                status: "candidate",
+                category: request.category,
+                userComment: request.comment,
+                professionalRole: request.professionalRole,
+                supportingReference: request.supportingReference,
+                updatedAt: phase3ResearchTimestamp(adding: 180)
+            )
+            conversation.messages[messageIndex].feedback = feedback
+            phase3ResearchConversations[conversation.id] = conversation
+            return ResearchFeedbackResponse(feedback: feedback)
         }
         #endif
         throw URLError(.unsupportedURL)
@@ -4862,6 +4893,13 @@ protocol AccountBackendClient {
         question: String,
         requestID: String
     ) async throws -> ResearchConversation
+    func saveResearchFeedback(
+        account: SignedInAccount,
+        conversationID: String,
+        answerID: String,
+        category: String,
+        comment: String?
+    ) async throws -> ResearchFeedback
     func renameResearchConversation(
         account: SignedInAccount,
         conversationID: String,
