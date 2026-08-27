@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-source-bound-paraphrase-repair-v19";
+  "20260827-source-bound-paraphrase-repair-v20";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -36,6 +36,12 @@ const sidewalkCafeFurnitureObstructionPattern =
 
 const sidewalkCafeObstructionCanonicalPhrase =
   "No part of an awning, enclosure, fixture, equipment, or removable platform may obstruct a building exit, cellar access hatch, or areaway";
+
+const table403AuthorityMisstatementPattern =
+  /Table\s+403\.1\s+(?:itself\s+)?controls\s+the\s+(?:applicable\s+)?occupancy\s+(?:type|classification),?\s*(?:the\s+)?occupant\s+load,?\s*and\s*(?:the\s+)?(?:fixture\s+minimum|minimum\s+fixture\s+count)/gi;
+
+const table403AuthorityCanonicalPhrase =
+  "The Building Code determines occupancy classification and occupant load; Table 403.1 supplies the applicable minimum fixture counts";
 
 const diningSurfaceCalculationPattern =
   /\b10\s*percent\b|\bminimum\s+accessible\s+share\b/i;
@@ -294,6 +300,20 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     )
       ? accessibleDiningSurfaceSourceIDs
       : [];
+  const table403AuthoritySourceIDs = knownCitedSourceIDs.filter((sourceID) =>
+    availableEvidence.get(sourceID)?.reference === "PC 403.1" &&
+    /number of occupants shall be determined by the New York City Building Code/i.test(
+      availableEvidence.get(sourceID)?.text
+    ) &&
+    /occupancy classification shall be determined in accordance with the New York City Building Code/i.test(
+      availableEvidence.get(sourceID)?.text
+    )
+  );
+  const misstatedTable403AuthoritySourceIDs =
+    table403AuthoritySourceIDs.length &&
+    new RegExp(table403AuthorityMisstatementPattern.source, "i").test(applicabilityText)
+      ? table403AuthoritySourceIDs
+      : [];
   const citationSourceIDsByRole = {
     governing: knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.evidenceRole === "governing"),
     supporting: knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.evidenceRole === "supporting"),
@@ -331,7 +351,8 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       misstatedCumulativeConditionSourceIDs.length === 0 &&
       unsupportedExitAccessExpansionSourceIDs.length === 0 &&
       misboundAccessibleDiningSurfaceRuleSourceIDs.length === 0 &&
-      misstatedAccessibleDiningSurfacePercentageSourceIDs.length === 0,
+      misstatedAccessibleDiningSurfacePercentageSourceIDs.length === 0 &&
+      misstatedTable403AuthoritySourceIDs.length === 0,
     unknownAnswerSourceIDs,
     orphanCitationSourceIDs,
     uncitedSupportedPointSourceIDs,
@@ -351,6 +372,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     unsupportedExitAccessExpansionSourceIDs,
     misboundAccessibleDiningSurfaceRuleSourceIDs,
     misstatedAccessibleDiningSurfacePercentageSourceIDs,
+    misstatedTable403AuthoritySourceIDs,
     citedSourceIDs: knownCitedSourceIDs,
     reviewedOnlySourceIDs,
     evidenceEconomy,
@@ -383,7 +405,16 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
     )
     .map((source) => compactText(source?.sourceID))
     .filter(Boolean);
-  if (!diningSourceIDs.length && !obstructionSourceIDs.length) return answer;
+  const table403AuthoritySourceIDs = (Array.isArray(evidence) ? evidence : [])
+    .filter((source) =>
+      compactText(source?.codePrefix).toUpperCase() === "PC" &&
+      compactText(source?.sectionNumber) === "403.1" &&
+      /number of occupants shall be determined by the New York City Building Code/i.test(compactText(source?.text)) &&
+      /occupancy classification shall be determined in accordance with the New York City Building Code/i.test(compactText(source?.text))
+    )
+    .map((source) => compactText(source?.sourceID))
+    .filter(Boolean);
+  if (!diningSourceIDs.length && !obstructionSourceIDs.length && !table403AuthoritySourceIDs.length) return answer;
   const citedSourceIDs = new Set(
     (Array.isArray(answer.citations) ? answer.citations : [])
       .flatMap((citation) => Array.isArray(citation?.sourceIDs) ? citation.sourceIDs : [])
@@ -392,7 +423,8 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
   );
   const boundDiningSourceIDs = diningSourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
   const boundObstructionSourceIDs = obstructionSourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
-  if (!boundDiningSourceIDs.length && !boundObstructionSourceIDs.length) return answer;
+  const boundTable403AuthoritySourceIDs = table403AuthoritySourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
+  if (!boundDiningSourceIDs.length && !boundObstructionSourceIDs.length && !boundTable403AuthoritySourceIDs.length) return answer;
 
   const replacementPattern = new RegExp(accessibleDiningSurfaceMisstatementPattern.source, "ig");
   const repairText = (value) => {
@@ -416,6 +448,9 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
     }
     if (boundObstructionSourceIDs.length) {
       text = text.replace(sidewalkCafeFurnitureObstructionPattern, sidewalkCafeObstructionCanonicalPhrase);
+    }
+    if (boundTable403AuthoritySourceIDs.length) {
+      text = text.replace(table403AuthorityMisstatementPattern, table403AuthorityCanonicalPhrase);
     }
     return text;
   };
@@ -487,6 +522,12 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "misstated_provision",
       detail: `State the dining-surface calculation as at least 10 percent of the total seating and standing spaces, with not less than one accessible space of each dining-surface type; do not apply 10 percent separately to each type. Bind it to: ${references(result.misstatedAccessibleDiningSurfacePercentageSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.misstatedTable403AuthoritySourceIDs?.length) {
+    issues.push({
+      type: "misstated_provision",
+      detail: `State that the Building Code determines occupancy classification and occupant load, while Table 403.1 supplies minimum fixture counts. Do not attribute the classification and load determinations to Table 403.1: ${references(result.misstatedTable403AuthoritySourceIDs, result.sources)}.`
     });
   }
   if (result.misboundAccessibleDiningSurfaceRuleSourceIDs?.length) {

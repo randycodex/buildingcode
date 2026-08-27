@@ -143,6 +143,23 @@ function requestOptions(overrides = {}) {
 }
 
 {
+  const networkFailure = new TypeError("fetch failed", {
+    cause: Object.assign(new Error("headers timed out"), { code: "UND_ERR_HEADERS_TIMEOUT" })
+  });
+  await assert.rejects(
+    requestResearchProvider(requestOptions({
+      maximumAttempts: 1,
+      fetchImpl: async () => { throw networkFailure; }
+    })),
+    (error) => {
+      assert.equal(error.code, "RESEARCH_PROVIDER_ERROR");
+      assert.equal(error.providerCause, "UND_ERR_HEADERS_TIMEOUT");
+      return true;
+    }
+  );
+}
+
+{
   let fetchAttempts = 0;
   const result = await requestResearchProvider(requestOptions({
     fetchImpl: async () => {

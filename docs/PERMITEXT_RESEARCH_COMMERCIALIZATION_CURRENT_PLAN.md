@@ -90,6 +90,19 @@ The new source-bound paraphrase repair corrects those two statements only when t
 
 The final capped sidewalk-only confirmation passed 4.00/4: 9/9 required concepts, 11/11 required missing-fact conditions, all five required citations, and no unsupported claim or critical failure. The production Research turn took 40.285 seconds and cost $0.083952; total diagnostic cost including the independent grader was $0.131864. It used Terra for the complex answer, Luna verification, and one bounded repair for a false evidence-limitation statement. This clears the final targeted blocker for a new frozen cohort.
 
+### Frozen v2 cohort attempt
+
+The immutable v2 cohort began from commit `de87dbc07780c597dde6f65cfb94f7457d433148` with 20/20 cases evidence-ready. It is retained as a partial operational diagnostic, not a quality or commercialization result:
+
+- 11 Research turns completed: 8 passed and 3 were subthreshold.
+- The mixed-occupancy plumbing answer misstated the division of authority between the Building Code and Table 403.1 and did not state the shared-facility evidence boundary directly.
+- The legacy fire-alarm answer did not state clearly that a separate qualifying building/occupancy-wide trigger cannot automatically be confined to the enlarged portion.
+- The garage answer correctly rejected the proposed controls but again hid detector quantity, airflow rate, and capacity inside a generic full-design limitation.
+- Case 12 timed out at the provider. The next eight cases encountered immediate network/provider failures; all nine failed turns remained uncharged.
+- Actual settled evaluation cost was $0.985185. Because requests without a billable response cannot safely be assumed free, 19 failed-attempt reservations remained conservative and brought the recorded upper bound to $3.935989 under the $4.00 cap.
+
+The provider client now reports nested network causes instead of only `TypeError`, and future frozen cohorts stop on the first case error so one outage cannot cascade across the remaining suite. The incomplete evidence is retained at `permitext-sync-server/evals/results/2026-08-27T23-21-46-942Z-b53d4522-4a59-49cb-b625-47760ffa7a37.md`.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -117,4 +130,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Run the immutable v2 20-case cohort under its $4.00 hard evaluation cap, then compare quality, operating cost per 100 turns, p50/p90 latency, routing, escalation, and verification behavior with the first cohort. Do not proceed to public paid Research if material forbidden claims or unsupported compliance conclusions remain.
+Pass the repository-wide no-cost gate for the provider fail-fast and three quality remediations, then commit and push. Run only the three completed subthreshold cases under a capped diagnostic after provider stability is confirmed. If they pass without material regression, create a new immutable v3 cohort; stop that cohort on its first provider error. Do not proceed to public paid Research while the three quality defects or incomplete full-cohort evidence remain.

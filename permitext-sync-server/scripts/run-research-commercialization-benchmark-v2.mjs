@@ -27,9 +27,10 @@ export const researchCommercializationBenchmarkV2 = Object.freeze({
   accurateModel: "gpt-5.6-terra",
   fastModel: "gpt-5.6-luna",
   routingMode: "hybrid",
-  applicationCommit: "3bc0b5c6965666ea6d6588d36f7b5ce2bff6ed2d",
-  completedAt: null,
-  resultFile: null
+  applicationCommit: "de87dbc07780c597dde6f65cfb94f7457d433148",
+  completedAt: "2026-08-27T23:30:55.140Z",
+  resultStatus: "partial",
+  resultFile: "evals/results/2026-08-27T23-21-46-942Z-b53d4522-4a59-49cb-b625-47760ffa7a37.json"
 });
 
 export function researchCommercializationBenchmarkV2Environment(environment = process.env) {
@@ -58,6 +59,7 @@ export function validateResearchCommercializationBenchmarkV2() {
   assert.match(profile.applicationCommit, /^[a-f0-9]{40}$/);
   if (profile.completedAt || profile.resultFile) {
     assert(profile.completedAt && Number.isFinite(Date.parse(profile.completedAt)));
+    assert(["complete", "partial", "failed"].includes(profile.resultStatus));
     assert(profile.resultFile?.endsWith(".json"));
   }
   return profile;
@@ -69,6 +71,7 @@ function runEvaluation(profile, environment) {
       "tests/research-evals.mjs",
       "--run-live",
       "--include-drafts",
+      "--stop-on-error",
       ...profile.excludedSafetyCaseIDs.flatMap((caseID) => ["--exclude-case", caseID])
     ], {
       cwd: resolve(fileURLToPath(new URL("..", import.meta.url))),

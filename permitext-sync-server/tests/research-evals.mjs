@@ -2173,7 +2173,7 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
   console.log(
     `${runLabel}: ${checkedCases.length} cases × ${repeat} repetition(s). ` +
     "Each case runs one production Research turn and one separate grader; internal verification or revision can add provider requests. " +
-    "The approved spend cap is checked before every paid request."
+    `The approved spend cap is checked before every paid request.${options.stopOnError ? " This run stops after the first case error." : ""}`
   );
   await saveSnapshot("running");
   let haltedFailure = null;
@@ -2248,6 +2248,12 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
           haltedFailure = {
             caseID: testCase.id,
             code: error.code || null,
+            message: error.message
+          };
+        } else if (options.stopOnError) {
+          haltedFailure = {
+            caseID: testCase.id,
+            code: error.code || error.name || null,
             message: error.message
           };
         }
@@ -3322,7 +3328,7 @@ async function main() {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
-    console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20");
+    console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error]");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
     console.log("Compare: --compare CURRENT_RUN_JSON --against BASELINE_RUN_OR_BASELINE_JSON");
     console.log("Default/--dry-run mode validates the dataset and canonical evidence without calling OpenAI.");
@@ -3375,6 +3381,7 @@ async function main() {
   const requestedModel = argumentValue("--model");
   const requestedPromptVersion = argumentValue("--prompt-version");
   const repeat = positiveIntegerArgument("--repeat");
+  const stopOnError = process.argv.includes("--stop-on-error");
   if (requestedModel) process.env.PERMITEXT_RESEARCH_MODEL = requestedModel;
   if (requestedPromptVersion) {
     assert(
@@ -3469,7 +3476,11 @@ async function main() {
       return;
     }
     if (liveMode) {
-      await runLiveCases(baseURL, selectedDataset, checkedCases, datasetText, { suiteScope, repeat });
+      await runLiveCases(baseURL, selectedDataset, checkedCases, datasetText, {
+        suiteScope,
+        repeat,
+        stopOnError
+      });
     } else {
       await runMockConversationCases(
         baseURL,

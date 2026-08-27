@@ -535,8 +535,7 @@
         "Applicable Assembly category and Table 403.1 ratio.",
         "Whether the same facilities may legally and practically serve all occupants.",
         "Existing fixture availability and location.",
-        "Whether approved statistical data supports a non-50/50 sex distribution.",
-        "Filing and Certificate of Occupancy implications."
+        "Whether approved statistical data supports a non-50/50 sex distribution."
       ],
       "forbiddenClaims": [
         "Each occupancy fraction must be rounded separately before the results are added.",
@@ -769,7 +768,7 @@
         }
       ],
       "question": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?",
-      "expectedConclusion": "The enlargement does not, by itself, prove that the entire legacy system must be replaced. BC 901.9.1 requires additions and alterations to existing systems to comply with new-system requirements without automatically requiring the entire existing system to comply, subject to the additional triggers in Sections 901.9.2 through 901.9.6. BC 901.9.3 requires fire-protection systems in enlarged portions and where Chapter 9 would require them for new construction. If the resulting Group B occupancy exceeds 100,000 square feet and the highest occupied floor is 75 feet or less above the lowest Fire Department vehicle-access level, BC 907.2.2.2 requires the identified smoke-detection, fire-alarm, and emergency voice/alarm systems for the qualifying Group B occupancy; that requirement cannot automatically be limited to only the enlarged portion. On the stated facts, BC 901.9.2 is not triggered unless the asserted absence of an occupancy or use change is incorrect. A main-use or dominant-occupancy change applies to the entire building; a space occupancy-classification or usage change applies throughout that space. The selected evidence does not determine whether the legacy equipment can be extended, interfaced, or retained, or whether technical conditions ultimately require modification or replacement. Applicable Buildings Bulletin 2024-001 conditions and project-specific DOB and FDNY review remain necessary outside the selected evidence.",
+      "expectedConclusion": "The enlargement does not, by itself, prove that the entire legacy system must be replaced. BC 901.9.1 requires additions and alterations to existing systems to comply with new-system requirements without automatically requiring the entire existing system to comply, subject to the additional triggers in Sections 901.9.2 through 901.9.6. BC 901.9.3 requires fire-protection systems in enlarged portions and where Chapter 9 would require them for new construction. If the resulting Group B occupancy exceeds 100,000 square feet and the highest occupied floor is 75 feet or less above the lowest Fire Department vehicle-access level, BC 907.2.2.2 requires the identified smoke-detection, fire-alarm, and emergency voice/alarm systems for the qualifying Group B occupancy; that requirement cannot automatically be limited to only the enlarged portion. On the stated facts, BC 901.9.2 is not triggered unless the asserted absence of an occupancy or use change is incorrect. A main-use or dominant-occupancy change applies to the entire building; a space occupancy-classification or usage change applies throughout that space. The selected evidence does not determine whether the legacy equipment can be extended, interfaced, or retained, or whether technical conditions ultimately require modification or replacement.",
       "expectedUncertainty": {
         "level": "conditional",
         "description": "The selected passages establish upgrade triggers and scope principles, but they cannot establish whether the existing system may be retained or must be replaced without project-specific system, occupancy, area, height, and compatibility facts."
@@ -797,9 +796,7 @@
         "Exact enlargement and existing-system modification scope.",
         "Existing-system approval records, listing, condition, capacity, available parts, and sequence of operation.",
         "Compatibility of new and existing equipment.",
-        "Whether other Chapter 9 triggers apply.",
-        "Applicable Buildings Bulletin 2024-001 conditions and project-specific DOB and FDNY review.",
-        "Applicable electrical, emergency-power, testing, monitoring, and FDNY requirements."
+        "Whether other Chapter 9 triggers apply."
       ],
       "forbiddenClaims": [
         "Every enlargement requires replacement of the entire fire-alarm system.",
@@ -1110,9 +1107,10 @@
         "proposedControl": "Operate the ventilation system from carbon monoxide detectors only, using a 35 ppm carbon monoxide set point",
         "unknowns": [
           "detector manufacturer instructions",
-          "detector locations and coverage",
+          "detector quantity, locations, and coverage",
           "whether any other control sequence is proposed",
-          "full mechanical-system design"
+          "required ventilation airflow rate and system capacity",
+          "other applicable Mechanical Code provisions and project conditions"
         ]
       },
       "selectedEvidence": [

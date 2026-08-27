@@ -371,6 +371,51 @@ const completeFractionSequence = evaluateResearchAnswerQuality({
 });
 assert.equal(completeFractionSequence.pass, true);
 
+const pc403AuthorityEvidence = {
+  ...source("pc-fixture-authority", "403.1", "governing", "aligned"),
+  codePrefix: "PC",
+  text: "The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code. Plumbing fixtures shall be provided in the minimum number shown in Table 403.1."
+};
+const misstatedTable403Authority = {
+  answerText: "Table 403.1 controls the applicable occupancy type, occupant load, and fixture minimum.",
+  supportedPoints: [{
+    explanation: "Table 403.1 controls the applicable occupancy type, occupant load, and fixture minimum.",
+    sourceIDs: ["pc-fixture-authority"]
+  }],
+  citations: [{ sourceIDs: ["pc-fixture-authority"] }]
+};
+const rejectedTable403Authority = evaluateResearchAnswerQuality({
+  question: "How are fixture ratios selected?",
+  evidence: [pc403AuthorityEvidence],
+  answer: misstatedTable403Authority
+});
+assert.equal(rejectedTable403Authority.pass, false);
+assert.deepEqual(
+  rejectedTable403Authority.misstatedTable403AuthoritySourceIDs,
+  ["pc-fixture-authority"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(rejectedTable403Authority).at(-1).type,
+  "misstated_provision"
+);
+const repairedTable403Authority = applyResearchDeterministicAnswerRepairs(
+  misstatedTable403Authority,
+  [pc403AuthorityEvidence]
+);
+assert.match(
+  repairedTable403Authority.answerText,
+  /Building Code determines occupancy classification and occupant load; Table 403\.1 supplies the applicable minimum fixture counts/i
+);
+assert.match(
+  repairedTable403Authority.supportedPoints[0].explanation,
+  /Building Code determines occupancy classification and occupant load/i
+);
+assert.equal(evaluateResearchAnswerQuality({
+  question: "How are fixture ratios selected?",
+  evidence: [pc403AuthorityEvidence],
+  answer: repairedTable403Authority
+}).pass, true);
+
 const diningSurfaceEvidence = [{
   ...source("bc-dining-surfaces", "1108.2.9.1", "governing", "aligned"),
   text: "At least 10 percent of the total number of seating and standing spaces, but not less than one, of each type of dining surfaces shall be accessible."

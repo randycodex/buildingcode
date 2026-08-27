@@ -26,6 +26,7 @@ function providerCause({ cause, payload, status }) {
   return sanitizedProviderToken(payload?.error?.code) ||
     sanitizedProviderToken(payload?.error?.type) ||
     sanitizedProviderToken(typeof cause?.code === "string" ? cause.code : null) ||
+    sanitizedProviderToken(typeof cause?.cause?.code === "string" ? cause.cause.code : null) ||
     sanitizedProviderToken(cause?.name) ||
     (status ? `http_${status}` : "network_error");
 }
