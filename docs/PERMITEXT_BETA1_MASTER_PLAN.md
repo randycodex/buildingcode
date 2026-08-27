@@ -40,7 +40,7 @@ Current development branch: `codex/research-commercialization`
 - [x] Finish the generic safeguard for declared unknowns and unverified owner/applicant representations.
 - [x] Complete the repository-wide no-cost test gate.
 - [x] Rerun the 11 subthreshold cases and subsequent three-case diagnostics under explicit spend caps.
-- [ ] Confirm the final source-bound sidewalk-café repair with one capped paid case.
+- [x] Confirm the final source-bound sidewalk-café repair with one capped paid case; it passed 4.00/4.
 - [ ] Run a new frozen full cohort only if the targeted cases improve without material regressions.
 - [ ] Confirm that p50/p90 full-service cost supports the $20 plan and 100 included turns.
 
