@@ -11,6 +11,20 @@ This record captures owner decisions for implementation and provider setup. It i
 - Annual plan: none for Beta 1; reconsider only after actual Research cost and retention data exist.
 - Included Research: 100 turns per UTC calendar month, subject to safety and cost guardrails.
 - Additional Research: optional one-time, non-expiring turn packs, used only after included turns and shared through the Permitext account.
+- Turn-pack prices and paid continuation remain unpublished until the hybrid-model benchmark contains at least 25 completed representative turns and includes payment, infrastructure, refund, tax, and support costs.
+
+## Hybrid Research economics checkpoint — 2026-08-27
+
+- Configuration: Luna verification with Terra answering or repair when the deterministic router identifies a complex Research question.
+- Corrected approved-case sample: 6 of 6 passed at 4.00/4.00. The sample combines the unaffected passing cases from the six-case cohort with the latest corrected reruns for residential accessory classification, accessory-assembly plumbing fixtures, and the Building Code/HCR authority boundary.
+- Product-model cost per completed turn: $0.052529 mean, $0.049354 p50, and $0.083626 nearest-rank p90.
+- Projected product-model cost per 100 completed turns: $5.25 mean, $4.94 p50, and $8.36 nearest-rank p90.
+- Answer latency: 20.0 seconds p50 and 23.5 seconds nearest-rank p90.
+- One of six turns required one internal repair. Internal verification and repair remain part of the same customer turn.
+- Decision: retain the $20 monthly Pro plan and its 100 included Research turns provisionally. Do not publish turn-pack prices or enable paid continuation from this six-case sample.
+- Next evidence gate: collect at least 19 additional representative completed turns, preserve the approved cases as regression evidence, and calculate p50/p90 total service cost before setting pack prices.
+
+This checkpoint is an operating-cost decision, not public Research approval or a substitute for the evaluation-governance release gates.
 
 ## Research exposure limits
 
