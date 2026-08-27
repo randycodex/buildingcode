@@ -7417,6 +7417,10 @@ function researchUsageCopy(usage) {
   return `${included.toLocaleString()} included turns remain this month.${additionalCopy}`;
 }
 
+function hasAvailableWebResearchTurnPack(usage = researchUsage) {
+  return Boolean((usage?.packs || []).some((pack) => pack.webAvailable));
+}
+
 function renderPlanUsageRows(container) {
   if (!container) return;
   clear(container);
@@ -17455,7 +17459,10 @@ function renderResearchProgressCard(progress, { completed = false } = {}) {
       cancel.textContent = "Cancel";
       cancel.addEventListener("click", () => progress.controller.abort());
       actions.append(cancel);
-    } else if (progress.errorCode === "RESEARCH_TURNS_REQUIRED") {
+    } else if (
+      progress.errorCode === "RESEARCH_TURNS_REQUIRED" &&
+      hasAvailableWebResearchTurnPack()
+    ) {
       const purchase = document.createElement("button");
       purchase.className = "ghost-button research-progress-retry";
       purchase.type = "button";
@@ -17923,7 +17930,7 @@ async function renderResearch(paneID = "utility:analysis") {
     const copy = document.createElement("p");
     copy.textContent = researchUsageCopy(researchUsage);
     usage.append(heading, copy);
-    if (researchUsage.canBuyMore) {
+    if (hasAvailableWebResearchTurnPack(researchUsage)) {
       const buyMore = document.createElement("button");
       buyMore.type = "button";
       buyMore.className = "ghost-button";

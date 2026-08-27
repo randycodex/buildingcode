@@ -827,31 +827,49 @@ struct ResearchView: View {
 
     private var researchTurnRecoveryView: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("100 turns included monthly")
+            Text("Research turns")
                 .font(.subheadline.weight(.semibold))
-            Text("Additional turns do not expire and are used after the monthly included turns.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+            Text(library.researchTurnAllowanceSummary)
+                .font(.headline)
 
-            ForEach(library.availableResearchTurnPacks) { pack in
-                Button {
-                    Task { await library.purchaseResearchTurnPack(pack, using: purchase) }
-                } label: {
-                    HStack {
-                        Text("Buy \(pack.turns) turns")
-                        Spacer()
-                        Text(library.researchTurnDisplayPrice(for: pack) ?? "")
+            if library.availableResearchTurnPacks.isEmpty {
+                Text("Additional Research turns are temporarily unavailable. Your question is still here. Try again later.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button("Check again", systemImage: "arrow.clockwise") {
+                    Task {
+                        await library.refreshResearchTurnAllowance(showsErrors: true)
                     }
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .foregroundStyle(Color.black)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Color.white.opacity(0.96), in: Capsule(style: .continuous))
                 }
+                .font(.caption.weight(.semibold))
                 .buttonStyle(.plain)
-                .disabled(library.isResearchTurnPurchaseBusy)
+            } else {
+                Text("Need more Research? Additional turns do not expire and are used after the monthly included turns.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                ForEach(library.availableResearchTurnPacks) { pack in
+                    Button {
+                        Task { await library.purchaseResearchTurnPack(pack, using: purchase) }
+                    } label: {
+                        HStack {
+                            Text("Buy \(pack.turns) more turns")
+                            Spacer()
+                            Text(library.researchTurnDisplayPrice(for: pack) ?? "")
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .foregroundStyle(Color.black)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(Color.white.opacity(0.96), in: Capsule(style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(library.isResearchTurnPurchaseBusy)
+                }
             }
 
             if library.isResearchTurnPurchaseBusy {

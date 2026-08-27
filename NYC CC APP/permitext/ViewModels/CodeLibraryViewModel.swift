@@ -2807,7 +2807,15 @@ final class CodeLibraryViewModel: ObservableObject {
 
     var researchTurnAllowanceSummary: String {
         guard let researchTurnAllowance else { return "100 turns included monthly" }
-        return "\(researchTurnAllowance.includedRemaining) included + \(researchTurnAllowance.purchasedRemaining) additional"
+        let included = researchTurnAllowance.includedRemaining
+        let purchased = researchTurnAllowance.purchasedRemaining
+        if researchTurnAllowance.totalRemaining == nil {
+            return "\(included) included turns remain this month. Continued access is available."
+        }
+        if purchased > 0 {
+            return "\(included) included + \(purchased) additional"
+        }
+        return "\(included) included turns remain this month."
     }
 
     var availableResearchTurnPacks: [ResearchTurnPack] {

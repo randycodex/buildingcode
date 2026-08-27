@@ -371,37 +371,39 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 10) {
             Divider()
 
-            Text("100 turns included monthly")
+            Text("Research turns")
                 .font(.subheadline.weight(.semibold))
 
             Text(library.researchTurnAllowanceSummary)
                 .font(.headline)
                 .foregroundStyle(.primary)
 
-            Text("Additional turns do not expire and are used after the monthly included turns.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+            if !library.availableResearchTurnPacks.isEmpty {
+                Text("Need more Research? Additional turns do not expire and are used after the monthly included turns.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
 
-            ForEach(library.availableResearchTurnPacks) { pack in
-                Button {
-                    Task { await library.purchaseResearchTurnPack(pack, using: purchase) }
-                } label: {
-                    HStack {
-                        Text("\(pack.turns) additional turns")
-                        Spacer()
-                        Text(library.researchTurnDisplayPrice(for: pack) ?? "")
+                ForEach(library.availableResearchTurnPacks) { pack in
+                    Button {
+                        Task { await library.purchaseResearchTurnPack(pack, using: purchase) }
+                    } label: {
+                        HStack {
+                            Text("Buy \(pack.turns) more turns")
+                            Spacer()
+                            Text(library.researchTurnDisplayPrice(for: pack) ?? "")
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .foregroundStyle(Color.black)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 12)
+                        .background(Color.white.opacity(0.96), in: Capsule(style: .continuous))
                     }
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .foregroundStyle(Color.black)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 12)
-                    .background(Color.white.opacity(0.96), in: Capsule(style: .continuous))
+                    .buttonStyle(.plain)
+                    .disabled(library.isResearchTurnPurchaseBusy)
+                    .opacity(library.isResearchTurnPurchaseBusy ? 0.6 : 1)
                 }
-                .buttonStyle(.plain)
-                .disabled(library.isResearchTurnPurchaseBusy)
-                .opacity(library.isResearchTurnPurchaseBusy ? 0.6 : 1)
             }
 
             if library.isResearchTurnPurchaseBusy {

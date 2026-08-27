@@ -10,7 +10,16 @@ const iosSettings = await readFile(
   new URL("../../NYC CC APP/permitext/Views/SettingsView.swift", import.meta.url),
   "utf8"
 );
+const iosResearch = await readFile(
+  new URL("../../NYC CC APP/permitext/Views/ResearchView.swift", import.meta.url),
+  "utf8"
+);
+const iosViewModel = await readFile(
+  new URL("../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift", import.meta.url),
+  "utf8"
+);
 const webIndex = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+const webApp = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 
 const signedOut = {
   plan: settingsPlanCopy(),
@@ -66,5 +75,16 @@ for (const copy of [
 
 assert(!iosSettings.includes('CodeEyebrow(text: "Offline Access"'));
 assert(webIndex.includes('id="settings-offline-title"'));
+
+const additionalTurnCopy = "Need more Research? Additional turns do not expire and are used after the monthly included turns.";
+assert(iosSettings.includes(additionalTurnCopy));
+assert(iosResearch.includes(additionalTurnCopy));
+assert(webIndex.includes(additionalTurnCopy));
+assert(iosSettings.includes("if !library.availableResearchTurnPacks.isEmpty"));
+assert(iosResearch.includes("if library.availableResearchTurnPacks.isEmpty"));
+assert(iosResearch.includes("Additional Research turns are temporarily unavailable. Your question is still here. Try again later."));
+assert(iosViewModel.includes("included turns remain this month."));
+assert(webApp.includes("function hasAvailableWebResearchTurnPack"));
+assert(webApp.includes("hasAvailableWebResearchTurnPack(researchUsage)"));
 
 console.log("permitext settings wording parity contract passed");
