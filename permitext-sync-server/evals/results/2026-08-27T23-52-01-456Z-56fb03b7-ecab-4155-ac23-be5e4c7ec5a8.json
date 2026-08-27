@@ -1,0 +1,1885 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T23:52:01.456Z",
+  "updatedAt": "2026-08-27T23:52:27.380Z",
+  "configuration": {
+    "runID": "56fb03b7-ecab-4155-ac23-be5e4c7ec5a8",
+    "datasetSHA256": "da3a0e1061b94d9707abc713d0827a8c1df46b9d8a873e9544b35ac9d90eeefb",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-material-completeness-v31",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-016-enclosed-garage-intermittent-ventilation"
+    ],
+    "caseStatuses": [
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "1fd8407110292ef1eaee8cbb2722eef8bf95aa55",
+    "approvedSpendCapUSD": 0.75,
+    "conservativeReservedUSD": 0.04286,
+    "actualUSD": 0.04286,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 3
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T23:52:27.225Z",
+    "targets": {
+      "minimumCompletedTurns": 20,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.023273,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.023273,
+        "p50": 0.023273,
+        "p90": 0.023273,
+        "maximum": 0.023273
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.023273,
+      "projectedCostPer100TurnsUSD": 2.33,
+      "targetReady": true,
+      "targetBand": "below"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 13304,
+      "p50": 13304,
+      "p90": 13304,
+      "maximum": 13304
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 2,
+        "p50": 2,
+        "p90": 2,
+        "maximum": 2
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-016-enclosed-garage-intermittent-ventilation",
+        "title": "Intermittent enclosed-garage ventilation detector controls",
+        "status": "draft",
+        "difficulty": "intermediate",
+        "topics": [
+          "mechanical ventilation",
+          "enclosed parking garages",
+          "carbon monoxide detection",
+          "nitrogen dioxide detection"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "project": "Enclosed parking garage with an intermittently operated mechanical ventilation system",
+          "proposedControl": "Operate the ventilation system from carbon monoxide detectors only, using a 35 ppm carbon monoxide set point",
+          "unknowns": [
+            "detector manufacturer instructions",
+            "detector quantity, locations, and coverage",
+            "whether any other control sequence is proposed",
+            "required ventilation airflow rate and system capacity",
+            "other applicable Mechanical Code provisions and project conditions"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "10442",
+            "reference": "MC 404.1",
+            "codePrefix": "MC",
+            "sectionNumber": "404.1",
+            "exactPassages": [
+              "Where mechanical ventilation systems for enclosed parking garages operate intermittently, such operation shall be automatic by means of carbon monoxide detectors applied in conjunction with nitrogen dioxide detectors.",
+              "Such detectors shall be installed in accordance with their manufacturers' instructions.",
+              "Such systems shall operate automatically upon detection of a concentration of carbon monoxide of 25 parts per million (ppm) or nitrogen dioxide of 500 parts per billion (ppb)."
+            ],
+            "resolvedTitle": "404.1 Enclosed parking garages.",
+            "evidenceCharacters": 481,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "An enclosed parking garage will use intermittent mechanical ventilation. The proposed controls use carbon monoxide detectors only and start the system at 35 ppm carbon monoxide. Based only on the selected Mechanical Code provision, is that control sequence compliant, and what can and cannot be concluded?",
+        "expectedConclusion": "The proposed control sequence does not match MC 404.1. For intermittent operation in an enclosed parking garage, automatic operation must use carbon monoxide detectors in conjunction with nitrogen dioxide detectors. The system must operate automatically when carbon monoxide reaches 25 ppm or nitrogen dioxide reaches 500 ppb, so a carbon-monoxide-only sequence at 35 ppm omits the required nitrogen dioxide detection and exceeds the stated carbon monoxide trigger. The detectors must also be installed according to their manufacturers' instructions. The selected provision does not establish detector quantity or placement, the complete ventilation rate and capacity, or compliance of the rest of the mechanical design.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The selected provision resolves the detector types and automatic-operation thresholds, but it does not establish the complete ventilation-system design or detector layout."
+        },
+        "sourceType": "deliberately constructed edge case",
+        "sourceReference": "Draft scenario constructed from the canonical enacted text of 2022 NYC Mechanical Code Section 404.1 after correcting a confirmed legacy body-ID collision.",
+        "reviewer": null,
+        "reviewedAt": null,
+        "notes": "Draft candidate NYC-016. This case is also a regression guard for canonical Mechanical Code body selection. It requires knowledgeable-human review before approval.",
+        "requiredConcepts": [
+          "State that intermittent enclosed-garage ventilation must operate automatically.",
+          "Require carbon monoxide detection in conjunction with nitrogen dioxide detection.",
+          "Identify 25 ppm carbon monoxide as an automatic-operation threshold.",
+          "Identify 500 ppb nitrogen dioxide as an automatic-operation threshold.",
+          "State that detector installation must follow the manufacturers' instructions.",
+          "Explain that the selected evidence does not establish detector quantity, detector placement, ventilation rate, system capacity, or complete mechanical-design compliance."
+        ],
+        "missingFacts": [
+          "Detector manufacturer and installation instructions.",
+          "Detector quantity, locations, and coverage.",
+          "Complete control sequence.",
+          "Required ventilation airflow rate and system capacity.",
+          "Other applicable Mechanical Code provisions and project conditions."
+        ],
+        "forbiddenClaims": [
+          "Carbon monoxide detection alone satisfies MC 404.1.",
+          "A 35 ppm carbon monoxide trigger satisfies MC 404.1.",
+          "Nitrogen dioxide detection is optional.",
+          "The system must wait until both the carbon monoxide and nitrogen dioxide thresholds are reached.",
+          "MC 404.1 alone establishes detector quantity or placement.",
+          "The selected evidence proves that the complete garage ventilation design complies with the Mechanical Code."
+        ],
+        "requiredCitations": [
+          "MC 404.1"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "MC 404.1",
+            "requiredClaim": "Automatic intermittent operation using carbon monoxide detection together with nitrogen dioxide detection, the 25 ppm and 500 ppb alternative trigger thresholds, and manufacturer-instruction installation."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "e4e3964b-f2c7-4c66-ab77-dc81394aca79",
+      "answeredAt": "2026-08-27T23:52:14.876Z",
+      "answerTimeMilliseconds": 13316,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-78a62557-321b-456e-8907-f8283068c8a9",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T23:52:01.566Z"
+        },
+        "answerText": "No. Based on the selected MC 404.1 text, the proposed sequence is not compliant for an intermittently operated mechanical ventilation system in an enclosed parking garage. Automatic operation must be by carbon monoxide detectors used in conjunction with nitrogen dioxide detectors; carbon-monoxide-only control does not meet that stated requirement. The system also must operate automatically at 25 ppm carbon monoxide or 500 ppb nitrogen dioxide. A 35 ppm carbon monoxide start point is higher than the stated 25 ppm threshold and therefore does not comply with that threshold.\n\nThe selected provision also requires the detectors to be installed in accordance with their manufacturers’ instructions. The supplied facts do not establish manufacturer instructions or the proposed detector quantity, locations, or coverage, so installation compliance cannot be determined. Nor does the selected text establish the required ventilation airflow rate, system capacity, or compliance with other potentially applicable Mechanical Code provisions and project conditions. It establishes the detector types, automatic-operation requirement, stated activation thresholds, and manufacturer-instruction condition only.",
+        "conclusion": "No. Based on the selected MC 404.1 text, the proposed sequence is not compliant for an intermittently operated mechanical ventilation system in an enclosed parking garage. Automatic operation must be by carbon monoxide detectors used in conjunction with nitrogen dioxide detectors; carbon-monoxide-only control does not meet that stated requirement. The system also must operate automatically at 25 ppm carbon monoxide or 500 ppb nitrogen dioxide. A 35 ppm carbon monoxide start point is higher than the stated 25 ppm threshold and therefore does not comply with that threshold.",
+        "supportedPoints": [
+          {
+            "heading": "Both carbon monoxide and nitrogen dioxide detection are required",
+            "explanation": "For intermittently operated mechanical ventilation in an enclosed parking garage, automatic operation must be by carbon monoxide detectors applied in conjunction with nitrogen dioxide detectors. A control sequence using carbon monoxide detectors only does not satisfy this requirement.",
+            "sectionID": "10442",
+            "sourceIDs": [
+              "03785018-b122-4c44-bf4c-57dbab9b388c"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Automatic operation thresholds",
+            "explanation": "The system must operate automatically upon detection of carbon monoxide at 25 ppm or nitrogen dioxide at 500 ppb. The proposed 35 ppm carbon monoxide start point exceeds the stated 25 ppm carbon monoxide threshold.",
+            "sectionID": "10442",
+            "sourceIDs": [
+              "43494461-c613-4a7f-883b-5ee9379c354f"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Detector installation must follow manufacturer instructions",
+            "explanation": "The detectors must be installed in accordance with their manufacturers’ instructions. The supplied facts do not establish whether the proposed detector quantity, locations, and coverage meet those instructions.",
+            "sectionID": "10442",
+            "sourceIDs": [
+              "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "The selected provision also requires the detectors to be installed in accordance with their manufacturers’ instructions. The supplied facts do not establish manufacturer instructions or the proposed detector quantity, locations, or coverage, so installation compliance cannot be determined. Nor does the selected text establish the required ventilation airflow rate, system capacity, or compliance with other potentially applicable Mechanical Code provisions and project conditions. It establishes the detector types, automatic-operation requirement, stated activation thresholds, and manufacturer-instruction condition only.",
+        "assumptions": [],
+        "missingFacts": [
+          "Detector manufacturer instructions, needed to determine whether the installation complies with MC 404.1.",
+          "Detector quantity, locations, and coverage, needed to evaluate installation against the manufacturer instructions.",
+          "Whether any nitrogen dioxide detection and associated automatic control sequence is proposed; the stated carbon-monoxide-only sequence does not comply, but this fact would identify whether another sequence is intended.",
+          "Required ventilation airflow rate and system capacity, which the selected text does not establish.",
+          "Other applicable Mechanical Code provisions and project conditions, which are not supplied and are outside the selected-text determination.",
+          "Whether any other control sequence is proposed."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This answer is limited to the supplied enacted text of MC 404.1. That text establishes detector/control and manufacturer-instruction requirements, but does not establish ventilation airflow rates, system capacity, or all other potentially applicable Mechanical Code requirements."
+        ],
+        "additionalEvidenceNeeded": [
+          "The applicable detector manufacturers’ installation instructions.",
+          "The detector layout showing quantity, locations, coverage, and both carbon monoxide and nitrogen dioxide detection.",
+          "The proposed automatic control sequence, including the nitrogen dioxide activation response.",
+          "The applicable provisions and design inputs governing required ventilation airflow rate and system capacity."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "10442",
+            "sectionNumber": "404.1",
+            "title": "404.1 Enclosed parking garages.",
+            "codePrefix": "MC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "03785018-b122-4c44-bf4c-57dbab9b388c"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "03785018-b122-4c44-bf4c-57dbab9b388c",
+                "selectedText": "Where mechanical ventilation systems for enclosed parking garages operate intermittently, such operation shall be automatic by means of carbon monoxide detectors applied in conjunction with nitrogen dioxide detectors.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes that intermittent garage ventilation must operate automatically using carbon monoxide detectors in conjunction with nitrogen dioxide detectors."
+          },
+          {
+            "sectionID": "10442",
+            "sectionNumber": "404.1",
+            "title": "404.1 Enclosed parking garages.",
+            "codePrefix": "MC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "43494461-c613-4a7f-883b-5ee9379c354f"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "43494461-c613-4a7f-883b-5ee9379c354f",
+                "selectedText": "Such systems shall operate automatically upon detection of a concentration of carbon monoxide of 25 parts per million (ppm) or nitrogen dioxide of 500 parts per billion (ppb).",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes automatic-operation thresholds of 25 ppm carbon monoxide or 500 ppb nitrogen dioxide."
+          },
+          {
+            "sectionID": "10442",
+            "sectionNumber": "404.1",
+            "title": "404.1 Enclosed parking garages.",
+            "codePrefix": "MC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "1c29d23b-ec6c-41ed-b64d-1a209646f1cb",
+                "selectedText": "Such detectors shall be installed in accordance with their manufacturers' instructions.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes installation in accordance with detector manufacturers’ instructions."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "10442"
+        ],
+        "evidenceSourceIDs": [
+          "03785018-b122-4c44-bf4c-57dbab9b388c",
+          "1c29d23b-ec6c-41ed-b64d-1a209646f1cb",
+          "43494461-c613-4a7f-883b-5ee9379c354f"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 1,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 0,
+          "userPinnedCount": 3,
+          "permitextDiscoveredCount": 0,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 6,
+          "requiredClaimCount": 3,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "MC 404.1",
+              "summary": "MC 404.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "03785018-b122-4c44-bf4c-57dbab9b388c"
+              ]
+            },
+            {
+              "label": "MC 404.1",
+              "summary": "MC 404.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+              ]
+            },
+            {
+              "label": "MC 404.1",
+              "summary": "MC 404.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "43494461-c613-4a7f-883b-5ee9379c354f"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "MC 404.1",
+              "summary": "MC 404.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "03785018-b122-4c44-bf4c-57dbab9b388c"
+              ]
+            },
+            {
+              "label": "MC 404.1",
+              "summary": "MC 404.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+              ]
+            },
+            {
+              "label": "MC 404.1",
+              "summary": "MC 404.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "43494461-c613-4a7f-883b-5ee9379c354f"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "03785018-b122-4c44-bf4c-57dbab9b388c",
+            "1c29d23b-ec6c-41ed-b64d-1a209646f1cb",
+            "43494461-c613-4a7f-883b-5ee9379c354f"
+          ],
+          "permitextDiscoveredEvidence": [],
+          "projectFactsUsed": [
+            "Project: Enclosed parking garage with an intermittently operated mechanical ventilation system",
+            "Proposed Control: Operate the ventilation system from carbon monoxide detectors only, using a 35 ppm carbon monoxide set point"
+          ],
+          "unresolvedProjectFacts": [
+            "Unknowns: detector manufacturer instructions",
+            "Unknowns: detector quantity, locations, and coverage",
+            "Unknowns: whether any other control sequence is proposed",
+            "Unknowns: required ventilation airflow rate and system capacity",
+            "Unknowns: other applicable Mechanical Code provisions and project conditions"
+          ],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Project: Enclosed parking garage with an intermittently operated mechanical ventilation system",
+            "Proposed Control: Operate the ventilation system from carbon monoxide detectors only, using a 35 ppm carbon monoxide set point"
+          ],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "An enclosed parking garage will use intermittent mechanical ventilation. The proposed controls use carbon monoxide detectors only and start the system at 35 ppm carbon monoxide. Based only on the selected Mechanical Code provision, is that control sequence compliant, and what can and cannot be concluded?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "An enclosed parking garage will use intermittent mechanical ventilation. The proposed controls use carbon monoxide detectors only and start the system at 35 ppm carbon monoxide. Based only on the selected Mechanical Code provision, is that control sequence compliant, and what can and cannot be concluded?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "03785018-b122-4c44-bf4c-57dbab9b388c",
+            "1c29d23b-ec6c-41ed-b64d-1a209646f1cb",
+            "43494461-c613-4a7f-883b-5ee9379c354f"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "03785018-b122-4c44-bf4c-57dbab9b388c",
+            "43494461-c613-4a7f-883b-5ee9379c354f",
+            "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+          ],
+          "citedEvidenceSourceIDs": [
+            "03785018-b122-4c44-bf4c-57dbab9b388c",
+            "43494461-c613-4a7f-883b-5ee9379c354f",
+            "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+          ],
+          "nonRequiredEvidenceSourceIDs": [],
+          "claims": [
+            {
+              "id": "required-passage:03785018-b122-4c44-bf4c-57dbab9b388c",
+              "label": "MC 404.1 — 404.1 Enclosed parking garages.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "03785018-b122-4c44-bf4c-57dbab9b388c"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:1c29d23b-ec6c-41ed-b64d-1a209646f1cb",
+              "label": "MC 404.1 — 404.1 Enclosed parking garages.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:43494461-c613-4a7f-883b-5ee9379c354f",
+              "label": "MC 404.1 — 404.1 Enclosed parking garages.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "43494461-c613-4a7f-883b-5ee9379c354f"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "03785018-b122-4c44-bf4c-57dbab9b388c",
+            "43494461-c613-4a7f-883b-5ee9379c354f",
+            "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:03785018-b122-4c44-bf4c-57dbab9b388c",
+              "label": "MC 404.1 — 404.1 Enclosed parking garages.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "03785018-b122-4c44-bf4c-57dbab9b388c"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "03785018-b122-4c44-bf4c-57dbab9b388c"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "03785018-b122-4c44-bf4c-57dbab9b388c"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "43494461-c613-4a7f-883b-5ee9379c354f"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "03785018-b122-4c44-bf4c-57dbab9b388c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "03785018-b122-4c44-bf4c-57dbab9b388c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:1c29d23b-ec6c-41ed-b64d-1a209646f1cb",
+              "label": "MC 404.1 — 404.1 Enclosed parking garages.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "03785018-b122-4c44-bf4c-57dbab9b388c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "43494461-c613-4a7f-883b-5ee9379c354f"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:43494461-c613-4a7f-883b-5ee9379c354f",
+              "label": "MC 404.1 — 404.1 Enclosed parking garages.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "43494461-c613-4a7f-883b-5ee9379c354f"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "43494461-c613-4a7f-883b-5ee9379c354f"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "03785018-b122-4c44-bf4c-57dbab9b388c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "43494461-c613-4a7f-883b-5ee9379c354f"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "43494461-c613-4a7f-883b-5ee9379c354f"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "43494461-c613-4a7f-883b-5ee9379c354f"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260827-source-bound-paraphrase-repair-v20",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "citedSourceIDs": [
+            "03785018-b122-4c44-bf4c-57dbab9b388c",
+            "43494461-c613-4a7f-883b-5ee9379c354f",
+            "1c29d23b-ec6c-41ed-b64d-1a209646f1cb"
+          ],
+          "reviewedOnlySourceIDs": [],
+          "evidenceEconomy": {
+            "citedSourceCount": 3,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 0,
+            "reviewedOnlyProvisionCount": 0,
+            "assembledSourceCount": 3,
+            "assembledProvisionCount": 1
+          },
+          "sources": [
+            {
+              "sourceID": "03785018-b122-4c44-bf4c-57dbab9b388c",
+              "sectionID": "10442",
+              "reference": "MC 404.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Where mechanical ventilation systems for enclosed parking garages operate intermittently, such operation shall be automatic by means of carbon monoxide detectors applied in conjunction with nitrogen dioxide detectors."
+            },
+            {
+              "sourceID": "1c29d23b-ec6c-41ed-b64d-1a209646f1cb",
+              "sectionID": "10442",
+              "reference": "MC 404.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Such detectors shall be installed in accordance with their manufacturers' instructions."
+            },
+            {
+              "sourceID": "43494461-c613-4a7f-883b-5ee9379c354f",
+              "sectionID": "10442",
+              "reference": "MC 404.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Such systems shall operate automatically upon detection of a concentration of carbon monoxide of 25 parts per million (ppm) or nitrogen dioxide of 500 parts per billion (ppb)."
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "An enclosed parking garage will use intermittent mechanical ventilation. The proposed controls use carbon monoxide detectors only and start the system at 35 ppm carbon monoxide. Based only on the selected Mechanical Code provision, is that control sequence compliant, and what can and cannot be concluded?\nProject facts: Proposed Control: Operate the ventilation system from carbon monoxide detectors only, using a 35 ppm carbon monoxide set point; Project: Enclosed parking garage with an intermittently operated mechanical ventilation system; Unknowns: other applicable Mechanical Code provisions and project conditions; Unknowns: whether any other control sequence is proposed; Unknowns: required ventilation airflow rate and system capacity; Unknowns: detector quantity, locations, and coverage; Unknowns: detector manufacturer instructions",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "An enclosed parking garage will use intermittent mechanical ventilation. The proposed controls use carbon monoxide detectors only and start the system at 35 ppm carbon monoxide. Based only on the selected Mechanical Code provision, is that control sequence compliant, and what can and cannot be concluded?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "An enclosed parking garage will use intermittent mechanical ventilation. The proposed controls use carbon monoxide detectors only and start the system at 35 ppm carbon monoxide. Based only on the selected Mechanical Code provision, is that control sequence compliant, and what can and cannot be concluded?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "An enclosed parking garage will use intermittent mechanical ventilation. The proposed controls use carbon monoxide detectors only and start the system at 35 ppm carbon monoxide. Based only on the selected Mechanical Code provision, is that control sequence compliant, and what can and cannot be concluded?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "pinned_first",
+            "reason": "question_explicitly_bounded_to_selected_evidence"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 3,
+            "candidateCount": 0,
+            "discoveredCount": 0,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 0,
+            "characterCount": 2036,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [],
+          "discovery": {
+            "retrievalVersion": "20260827-pinned-evidence-budget-v20",
+            "searchedSectionCount": 0,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260827-supporting-web-v9",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-78a62557-321b-456e-8907-f8283068c8a9",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T23:52:01.566Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [
+            "selected_evidence_boundary"
+          ],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T23:52:01.566Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v4",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "material_evidence_boundary"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 10912,
+          "cachedInputTokens": 1978,
+          "outputTokens": 1140,
+          "totalTokens": 12052
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.023273,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "06070dae-e80d-4d0a-8014-309382ce09b1",
+        "createdAt": "2026-08-27T23:52:01.563Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra",
+          "gpt-5.6-luna"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v4",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 2,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 10912,
+        "cachedInputTokens": 1978,
+        "outputTokens": 1140,
+        "totalTokens": 12052,
+        "estimatedCostUSD": 0.023273,
+        "actualProviderCostUSD": 0.023273,
+        "conservativeProviderCostUSD": 0.023273,
+        "durationMilliseconds": 13304,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T23:52:27.204Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 11790,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 3656,
+              "cachedInputTokens": 1947,
+              "outputTokens": 1315,
+              "totalTokens": 4971
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 3656,
+          "cachedInputTokens": 1947,
+          "outputTokens": 1315,
+          "totalTokens": 4971
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "The answer repeatedly cites MC 404.1 for the exact requirements supported by the selected enacted text: combined CO/NO2 detection, the 25 ppm CO or 500 ppb NO2 automatic-operation triggers, and installation under manufacturer instructions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer makes no invented code requirements or unsupported compliance conclusions. Its conclusion that a CO-only, 35-ppm sequence does not comply follows directly from the stated detector and threshold requirements.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer correctly gives a definite conclusion on the stated control sequence while limiting broader conclusions about layout, installation compliance, airflow, capacity, and other applicable provisions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It expressly states that the selected text does not establish detector quantity, locations, coverage, airflow rate, system capacity, or compliance with other applicable provisions and conditions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer clearly identifies the two specific control defects, identifies the manufacturer-instruction condition, and lists the information needed to evaluate issues outside the selected provision.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers 'No,' explains why the CO-only 35 ppm proposal fails MC 404.1, and distinguishes what the selected provision can and cannot resolve.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer states that the system must operate automatically for the specified intermittently operated enclosed garage condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "The answer explicitly requires carbon monoxide detectors used in conjunction with nitrogen dioxide detectors.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "The answer identifies 25 ppm carbon monoxide as an automatic-operation threshold.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "The answer identifies 500 ppb nitrogen dioxide as an automatic-operation threshold.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "The answer states that detectors must be installed in accordance with their manufacturers' instructions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "The answer explains that the selected provision does not establish detector quantity, placement, ventilation airflow rate, system capacity, or complete mechanical-design compliance.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly concludes that carbon-monoxide-only control does not meet the requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer expressly concludes that a 35 ppm CO start point does not comply with the 25 ppm threshold.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer treats nitrogen dioxide detection as required in conjunction with carbon monoxide detection, not optional.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "The answer correctly uses '25 ppm carbon monoxide or 500 ppb nitrogen dioxide' and does not assert that both thresholds must be reached.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "The answer says the selected provision does not establish detector quantity, locations, or coverage.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "The answer expressly limits its conclusion and states that broader mechanical-design compliance cannot be determined from the selected text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies detector manufacturer instructions as needed to assess installation compliance.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer identifies detector quantity, locations, and coverage as unestablished by the supplied facts and selected text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer identifies the possible existence of another control sequence and the nitrogen-dioxide activation response as unresolved design information.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer identifies required ventilation airflow rate and system capacity as outside what the selected provision establishes.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "The answer identifies other applicable Mechanical Code provisions and project conditions as not supplied and outside the selected-text determination.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.019587,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 3,
+            "canonicalCount": 3,
+            "selectedEvidenceCount": 3,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 13316,
+            "inputTokens": 10912,
+            "cachedInputTokens": 1978,
+            "outputTokens": 1140,
+            "totalTokens": 12052,
+            "estimatedCostUSD": 0.023273,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "The answer repeatedly cites MC 404.1 for the exact requirements supported by the selected enacted text: combined CO/NO2 detection, the 25 ppm CO or 500 ppb NO2 automatic-operation triggers, and installation under manufacturer instructions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "6/6 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer makes no invented code requirements or unsupported compliance conclusions. Its conclusion that a CO-only, 35-ppm sequence does not comply follows directly from the stated detector and threshold requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/6 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer correctly gives a definite conclusion on the stated control sequence while limiting broader conclusions about layout, installation compliance, airflow, capacity, and other applicable provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "5/5 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "It expressly states that the selected text does not establish detector quantity, locations, coverage, airflow rate, system capacity, or compliance with other applicable provisions and conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "The answer clearly identifies the two specific control defects, identifies the manufacturer-instruction condition, and lists the information needed to evaluate issues outside the selected provision.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "It directly answers 'No,' explains why the CO-only 35 ppm proposal fails MC 404.1, and distinguishes what the selected provision can and cannot resolve.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer states that the system must operate automatically for the specified intermittently operated enclosed garage condition.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "The answer explicitly requires carbon monoxide detectors used in conjunction with nitrogen dioxide detectors.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "The answer identifies 25 ppm carbon monoxide as an automatic-operation threshold.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "The answer identifies 500 ppb nitrogen dioxide as an automatic-operation threshold.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "The answer states that detectors must be installed in accordance with their manufacturers' instructions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "The answer explains that the selected provision does not establish detector quantity, placement, ventilation airflow rate, system capacity, or complete mechanical-design compliance.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer expressly concludes that carbon-monoxide-only control does not meet the requirement.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "The answer expressly concludes that a 35 ppm CO start point does not comply with the 25 ppm threshold.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "The answer treats nitrogen dioxide detection as required in conjunction with carbon monoxide detection, not optional.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "The answer correctly uses '25 ppm carbon monoxide or 500 ppb nitrogen dioxide' and does not assert that both thresholds must be reached.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-5",
+                "rationale": "The answer says the selected provision does not establish detector quantity, locations, or coverage.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-6",
+                "rationale": "The answer expressly limits its conclusion and states that broader mechanical-design compliance cannot be determined from the selected text.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The answer identifies detector manufacturer instructions as needed to assess installation compliance.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The answer identifies detector quantity, locations, and coverage as unestablished by the supplied facts and selected text.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "The answer identifies the possible existence of another control sequence and the nitrogen-dioxide activation response as unresolved design information.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "The answer identifies required ventilation airflow rate and system capacity as outside what the selected provision establishes.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-5",
+                "rationale": "The answer identifies other applicable Mechanical Code provisions and project conditions as not supplied and outside the selected-text determination.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "3/3 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. The answer repeatedly cites MC 404.1 for the exact requirements supported by the selected enacted text: combined CO/NO2 detection, the 25 ppm CO or 500 ppb NO2 automatic-operation triggers, and installation under manufacturer instructions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 1 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "6/6 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer makes no invented code requirements or unsupported compliance conclusions. Its conclusion that a CO-only, 35-ppm sequence does not comply follows directly from the stated detector and threshold requirements.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer correctly gives a definite conclusion on the stated control sequence while limiting broader conclusions about layout, installation compliance, airflow, capacity, and other applicable provisions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "5/5 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It expressly states that the selected text does not establish detector quantity, locations, coverage, airflow rate, system capacity, or compliance with other applicable provisions and conditions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer clearly identifies the two specific control defects, identifies the manufacturer-instruction condition, and lists the information needed to evaluate issues outside the selected provision.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers 'No,' explains why the CO-only 35 ppm proposal fails MC 404.1, and distinguishes what the selected provision can and cannot resolve.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer states that the system must operate automatically for the specified intermittently operated enclosed garage condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "The answer explicitly requires carbon monoxide detectors used in conjunction with nitrogen dioxide detectors.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "The answer identifies 25 ppm carbon monoxide as an automatic-operation threshold.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "The answer identifies 500 ppb nitrogen dioxide as an automatic-operation threshold.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "The answer states that detectors must be installed in accordance with their manufacturers' instructions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "The answer explains that the selected provision does not establish detector quantity, placement, ventilation airflow rate, system capacity, or complete mechanical-design compliance.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly concludes that carbon-monoxide-only control does not meet the requirement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer expressly concludes that a 35 ppm CO start point does not comply with the 25 ppm threshold.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer treats nitrogen dioxide detection as required in conjunction with carbon monoxide detection, not optional.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "The answer correctly uses '25 ppm carbon monoxide or 500 ppb nitrogen dioxide' and does not assert that both thresholds must be reached.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "The answer says the selected provision does not establish detector quantity, locations, or coverage.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "The answer expressly limits its conclusion and states that broader mechanical-design compliance cannot be determined from the selected text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer identifies detector manufacturer instructions as needed to assess installation compliance.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer identifies detector quantity, locations, and coverage as unestablished by the supplied facts and selected text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The answer identifies the possible existence of another control sequence and the nitrogen-dioxide activation response as unresolved design information.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer identifies required ventilation airflow rate and system capacity as outside what the selected provision establishes.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "The answer identifies other applicable Mechanical Code provisions and project conditions as not supplied and outside the selected-text determination.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,3005 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T23:50:53.667Z",
+  "updatedAt": "2026-08-27T23:51:45.359Z",
+  "configuration": {
+    "runID": "156b868d-c7d1-4733-ac6b-7e5f395856f5",
+    "datasetSHA256": "da3a0e1061b94d9707abc713d0827a8c1df46b9d8a873e9544b35ac9d90eeefb",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-material-completeness-v31",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-011-legacy-fire-alarm-enlargement"
+    ],
+    "caseStatuses": [
+      "draft"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "1fd8407110292ef1eaee8cbb2722eef8bf95aa55",
+    "approvedSpendCapUSD": 0.75,
+    "conservativeReservedUSD": 0.090223,
+    "actualUSD": 0.090223,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 3
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T23:51:45.196Z",
+    "targets": {
+      "minimumCompletedTurns": 20,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.049017,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.049017,
+        "p50": 0.049017,
+        "p90": 0.049017,
+        "maximum": 0.049017
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.049017,
+      "projectedCostPer100TurnsUSD": 4.9,
+      "targetReady": true,
+      "targetBand": "within"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 26513,
+      "p50": 26513,
+      "p90": 26513,
+      "maximum": 26513
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 2,
+        "p50": 2,
+        "p90": 2,
+        "maximum": 2
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-011-legacy-fire-alarm-enlargement",
+        "title": "Legacy fire-alarm system scope after a Group B enlargement",
+        "status": "draft",
+        "difficulty": "advanced",
+        "topics": [
+          "fire alarm",
+          "existing systems",
+          "building enlargement",
+          "occupancy changes",
+          "large-area Group B"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "occupancy": "Group B",
+          "existingSystem": "Previously approved legacy fire-alarm system",
+          "project": "Building enlargement with no stated use or occupancy change",
+          "resultingArea": "May exceed 100,000 gross square feet",
+          "unknowns": [
+            "highest occupied-floor height above Fire Department vehicle access",
+            "exact enlargement and system-modification scope",
+            "whether any occupancy classification or usage changes",
+            "existing-system capacity and compatibility",
+            "other Chapter 9 triggers"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "1550",
+            "reference": "BC 901.9.1",
+            "codePrefix": "BC",
+            "sectionNumber": "901.9.1",
+            "exactPassages": [
+              "Additions, alterations, renovations or repairs to existing systems shall conform to that required for new systems without requiring the existing system to comply with all of the requirements of this code, except as otherwise required in Sections 901.9.2 through 901.9.6. Additions, alterations or repairs shall not cause an existing installation to become unsafe, hazardous or overloaded."
+            ],
+            "resolvedTitle": "901.9.1 Additions, alterations or repairs.",
+            "evidenceCharacters": 388,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "1552",
+            "reference": "BC 901.9.2",
+            "codePrefix": "BC",
+            "sectionNumber": "901.9.2",
+            "exactPassages": [
+              "Fire protection systems governed by this chapter shall be provided:",
+              "1. To the entire building as if the building were hereafter erected, where a change is made in the main use or dominant occupancy of such building.",
+              "2. Throughout a space, where a change is made in the occupancy group classification or usage of the space."
+            ],
+            "resolvedTitle": "901.9.2 Additional requirements based on change of occupancy or use.",
+            "evidenceCharacters": 322,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "1553",
+            "reference": "BC 901.9.3",
+            "codePrefix": "BC",
+            "sectionNumber": "901.9.3",
+            "exactPassages": [
+              "Fire protection systems shall be provided in enlarged portions of a building and where this chapter would require such systems in new construction for a space or building."
+            ],
+            "resolvedTitle": "901.9.3 Additional requirements for enlargements.",
+            "evidenceCharacters": 472,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          },
+          {
+            "sectionID": "1755",
+            "reference": "BC 907.2.2.2",
+            "codePrefix": "BC",
+            "sectionNumber": "907.2.2.2",
+            "exactPassages": [
+              "Group B occupancies having a total gross area exceeding 100,000 square feet (9290.3 m 2 ) located in buildings where the highest occupied floor is 75 feet (22 860 mm) or less above the lowest level of Fire Department vehicle access shall be provided with automatic smoke detection connected to an automatic fire alarm system in accordance with Section 907.2.13.1 and an emergency voice/alarm communication system in accordance with Section 907.5.2.2 that initiates a total evacuation signal."
+            ],
+            "resolvedTitle": "907.2.2.2 Large-area buildings.",
+            "evidenceCharacters": 491,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?",
+        "expectedConclusion": "The enlargement does not, by itself, prove that the entire legacy system must be replaced. BC 901.9.1 requires additions and alterations to existing systems to comply with new-system requirements without automatically requiring the entire existing system to comply, subject to the additional triggers in Sections 901.9.2 through 901.9.6. BC 901.9.3 requires fire-protection systems in enlarged portions and where Chapter 9 would require them for new construction. If the resulting Group B occupancy exceeds 100,000 square feet and the highest occupied floor is 75 feet or less above the lowest Fire Department vehicle-access level, BC 907.2.2.2 requires the identified smoke-detection, fire-alarm, and emergency voice/alarm systems for the qualifying Group B occupancy; that requirement cannot automatically be limited to only the enlarged portion. On the stated facts, BC 901.9.2 is not triggered unless the asserted absence of an occupancy or use change is incorrect. A main-use or dominant-occupancy change applies to the entire building; a space occupancy-classification or usage change applies throughout that space. The selected evidence does not determine whether the legacy equipment can be extended, interfaced, or retained, or whether technical conditions ultimately require modification or replacement.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The selected passages establish upgrade triggers and scope principles, but they cannot establish whether the existing system may be retained or must be replaced without project-specific system, occupancy, area, height, and compatibility facts."
+        },
+        "sourceType": "Buildings Bulletin",
+        "sourceReference": "Scenario derived from NYC Department of Buildings Bulletin 2024-001, February 9, 2024: https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2024-001.pdf. The bulletin is scenario provenance and is not silently included in the selected production evidence.",
+        "reviewer": null,
+        "reviewedAt": null,
+        "notes": "Draft candidate NYC-011. Exact enacted passages were copied from Permitext canonical content. The project scenario and answer rubric require knowledgeable fire-alarm and NYC code review before approval.",
+        "requiredConcepts": [
+          "Reject automatic full-system replacement based solely on enlargement.",
+          "Explain BC 901.9.1's new-work rule and its protection against automatic whole-system compliance.",
+          "Explain the enlarged-portion and new-construction trigger in BC 901.9.3.",
+          "Distinguish whole-building main or dominant-occupancy changes from space-level classification or usage changes.",
+          "Apply both BC 907.2.2.2 conditions: gross area over 100,000 square feet and the stated height relationship.",
+          "Identify the systems expressly required by BC 907.2.2.2 when both conditions apply.",
+          "Do not automatically limit the BC 907.2.2.2 system requirement to only the enlarged portion when both conditions apply to the qualifying Group B occupancy.",
+          "State that technical compatibility, retention, interface, and replacement cannot be resolved from the selected passages.",
+          "Request the missing project and existing-system information."
+        ],
+        "missingFacts": [
+          "Resulting total gross Group B area.",
+          "Highest occupied-floor height relative to Fire Department vehicle access.",
+          "Confirmation that neither main or dominant occupancy nor space classification or usage changes.",
+          "Exact enlargement and existing-system modification scope.",
+          "Existing-system approval records, listing, condition, capacity, available parts, and sequence of operation.",
+          "Compatibility of new and existing equipment.",
+          "Whether other Chapter 9 triggers apply."
+        ],
+        "forbiddenClaims": [
+          "Every enlargement requires replacement of the entire fire-alarm system.",
+          "A previously approved legacy system may automatically remain unchanged.",
+          "Exceeding 100,000 square feet alone triggers BC 907.2.2.2 without confirming the height condition.",
+          "When both BC 907.2.2.2 conditions apply to the qualifying Group B occupancy, its required systems may automatically be limited to only the enlarged portion.",
+          "Any occupancy change anywhere requires whole-building compliance.",
+          "BC 901.9.2 concerns only occupancy-group labels and not changes in space usage.",
+          "The selected evidence proves that the old and new systems can be interfaced.",
+          "The DOB bulletin constitutes project-specific approval.",
+          "The selected passages resolve FDNY acceptance, electrical compliance, system listing, or sequence-of-operation requirements."
+        ],
+        "requiredCitations": [
+          "BC 901.9.1",
+          "BC 901.9.2",
+          "BC 901.9.3",
+          "BC 907.2.2.2"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "BC 901.9.1",
+            "requiredClaim": "New-work requirements for additions or alterations to existing systems and the rule against automatic whole-system compliance."
+          },
+          {
+            "reference": "BC 901.9.2",
+            "requiredClaim": "Entire-building versus space-level consequences of occupancy or usage changes."
+          },
+          {
+            "reference": "BC 901.9.3",
+            "requiredClaim": "Fire-protection requirements for enlarged portions and new-construction triggers."
+          },
+          {
+            "reference": "BC 907.2.2.2",
+            "requiredClaim": "Group B large-area and height conditions and the resulting required systems."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "344497e9-81ff-4d81-b495-2f028c4a9b8d",
+      "answeredAt": "2026-08-27T23:51:20.491Z",
+      "answerTimeMilliseconds": 26518,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "Routed New York City enacted sources",
+        "codeVersion": "multiple-authorized-corpora",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "Routed New York City enacted sources",
+          "codeVersion": "multiple-authorized-corpora",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-627de479-be50-4ea3-8ddd-e632021071ef",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            },
+            {
+              "id": "nyc-2022-fire-code",
+              "label": "2022 NYC Fire Code",
+              "codeEdition": "2022 NYC Fire Code — current consolidated text",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-consolidation",
+              "routeReason": "Fire Code or FDNY cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "FC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · 2022 NYC Fire Code · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T23:50:53.982Z"
+        },
+        "answerText": "No. On the facts stated, the selected provisions do not automatically require replacement of the entire previously approved legacy fire-alarm system. For alterations or additions to an existing system, the new or modified work must meet new-system requirements, but the existing system need not be brought into full compliance with the 2022 Code unless one of BC 901.9.2 through 901.9.6 requires it. The work also cannot leave the installation unsafe, hazardous, or overloaded.\n\nThe enlargement itself requires fire-protection systems in the enlarged portion and wherever Chapter 9 would require them in new construction for the space or building. If the resulting Group B occupancy exceeds 100,000 gross square feet and its highest occupied floor is 75 feet or less above the lowest Fire Department vehicle-access level, BC 907.2.2.2 requires automatic smoke detection connected to an automatic fire-alarm system and an emergency voice/alarm communication system that initiates a total-evacuation signal. That is a building/occupancy-wide new-construction trigger in the supplied text; the selected evidence does not say its required features may be confined to the enlarged portion. It still does not expressly mandate wholesale replacement rather than a compliant extension, upgrade, or other compliant system solution.\n\nNo main-use/dominant-occupancy change or space occupancy-group/usage change is stated. Accordingly, the supplied change-of-use provisions do not currently establish an entire-building retrofit. If the main use or dominant occupancy changes, the Chapter 9 systems must be provided throughout the building as if newly erected; if a space’s occupancy group classification or usage changes, they must be provided throughout that space.\n\nMaterial scope facts are: (1) the actual post-work Group B total gross area; (2) the highest occupied-floor height above the lowest Fire Department vehicle-access level; (3) the exact enlarged area and which alarm components will be added, altered, or repaired; (4) whether the legacy system has adequate capacity and compatibility to perform the required new or modified functions without becoming unsafe, hazardous, or overloaded; (5) whether any main-use, dominant-occupancy, occupancy-classification, or space-usage change is actually proposed; and (6) any other applicable Chapter 9 trigger. The selected evidence also does not provide the technical criteria in the referenced smoke-detection and voice/alarm sections, so it cannot establish the required detector arrangement, voice/alarm design, or whether a proposed legacy-system modification meets those referenced standards.\n\nSeparately, the supplied Administrative Code provision says that if the work increases a prior-code building’s floor surface area by more than 110 percent over its existing floor surface area, the entire building must comply as a new building. That potential whole-building result depends on the existing and proposed floor-surface-area calculation, including the stated exclusions; it cannot be assessed from the resulting gross area alone.",
+        "conclusion": "No. On the facts stated, the selected provisions do not automatically require replacement of the entire previously approved legacy fire-alarm system. For alterations or additions to an existing system, the new or modified work must meet new-system requirements, but the existing system need not be brought into full compliance with the 2022 Code unless one of BC 901.9.2 through 901.9.6 requires it. The work also cannot leave the installation unsafe, hazardous, or overloaded.",
+        "supportedPoints": [
+          {
+            "heading": "Existing-system work is not automatically a full retrofit",
+            "explanation": "Additions, alterations, renovations, or repairs to an existing fire-protection system must conform to requirements for new systems, but the existing system need not comply with all current-code requirements unless Sections 901.9.2 through 901.9.6 otherwise require it. The work must not make the installation unsafe, hazardous, or overloaded.",
+            "sectionID": "1550",
+            "sourceIDs": [
+              "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Change of use can expand the retrofit scope",
+            "explanation": "Chapter 9 fire-protection systems must be provided throughout the entire building as if newly erected when the main use or dominant occupancy changes, and throughout a space when that space’s occupancy-group classification or usage changes.",
+            "sectionID": "1552",
+            "sourceIDs": [
+              "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+              "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+              "f6069634-d858-4ad0-a943-c318031e9ede"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Enlargement invokes new-construction Chapter 9 triggers",
+            "explanation": "Fire-protection systems must be provided in enlarged portions and wherever Chapter 9 would require them in new construction for a space or building.",
+            "sectionID": "1553",
+            "sourceIDs": [
+              "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Large, lower-height Group B buildings require specified alarm features",
+            "explanation": "A Group B occupancy with total gross area exceeding 100,000 square feet, in a building whose highest occupied floor is 75 feet or less above the lowest Fire Department vehicle-access level, must have automatic smoke detection connected to an automatic fire-alarm system and an emergency voice/alarm communication system that initiates a total-evacuation signal.",
+            "sectionID": "1755",
+            "sourceIDs": [
+              "9e00e723-7824-4f29-a22f-7e4856c9a513"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Very large prior-code-building enlargement can require new-building compliance",
+            "explanation": "For a prior-code building, work that increases floor surface area by more than 110 percent over existing floor surface area requires the entire building to comply as a newly erected building. The provision defines floor surface area as the gross square footage of all horizontal floor and roof surfaces at any level and specifies exclusions used to determine existing floor surface area.",
+            "sectionID": "8792",
+            "sourceIDs": [
+              "research-permitext_discovered-id:8792-5",
+              "research-permitext_discovered-id:8794-8"
+            ],
+            "evidenceRole": "supporting"
+          }
+        ],
+        "explanation": "The enlargement itself requires fire-protection systems in the enlarged portion and wherever Chapter 9 would require them in new construction for the space or building. If the resulting Group B occupancy exceeds 100,000 gross square feet and its highest occupied floor is 75 feet or less above the lowest Fire Department vehicle-access level, BC 907.2.2.2 requires automatic smoke detection connected to an automatic fire-alarm system and an emergency voice/alarm communication system that initiates a total-evacuation signal. That is a building/occupancy-wide new-construction trigger in the supplied text; the selected evidence does not say its required features may be confined to the enlarged portion. It still does not expressly mandate wholesale replacement rather than a compliant extension, upgrade, or other compliant system solution.\n\nNo main-use/dominant-occupancy change or space occupancy-group/usage change is stated. Accordingly, the supplied change-of-use provisions do not currently establish an entire-building retrofit. If the main use or dominant occupancy changes, the Chapter 9 systems must be provided throughout the building as if newly erected; if a space’s occupancy group classification or usage changes, they must be provided throughout that space.\n\nMaterial scope facts are: (1) the actual post-work Group B total gross area; (2) the highest occupied-floor height above the lowest Fire Department vehicle-access level; (3) the exact enlarged area and which alarm components will be added, altered, or repaired; (4) whether the legacy system has adequate capacity and compatibility to perform the required new or modified functions without becoming unsafe, hazardous, or overloaded; (5) whether any main-use, dominant-occupancy, occupancy-classification, or space-usage change is actually proposed; and (6) any other applicable Chapter 9 trigger. The selected evidence also does not provide the technical criteria in the referenced smoke-detection and voice/alarm sections, so it cannot establish the required detector arrangement, voice/alarm design, or whether a proposed legacy-system modification meets those referenced standards.\n\nSeparately, the supplied Administrative Code provision says that if the work increases a prior-code building’s floor surface area by more than 110 percent over its existing floor surface area, the entire building must comply as a new building. That potential whole-building result depends on the existing and proposed floor-surface-area calculation, including the stated exclusions; it cannot be assessed from the resulting gross area alone.",
+        "assumptions": [],
+        "missingFacts": [
+          "The actual resulting total gross area of the Group B occupancy, to determine whether it exceeds 100,000 square feet.",
+          "The height of the highest occupied floor above the lowest level of Fire Department vehicle access, to determine whether the 75-foot-or-less condition in BC 907.2.2.2 is met.",
+          "The exact enlarged area and the scope of fire-alarm additions, alterations, repairs, and modifications.",
+          "Legacy-system capacity and compatibility for the proposed modifications and required functions, including whether the work would make the installation unsafe, hazardous, or overloaded.",
+          "Whether the project involves any change in main use, dominant occupancy, occupancy-group classification, or usage of a space.",
+          "Other applicable Chapter 9 triggers.",
+          "Existing floor surface area and proposed post-work floor surface area, including the statutory exclusions, to determine whether the enlargement exceeds the Administrative Code’s 110-percent threshold.",
+          "Exact enlargement and system-modification scope.",
+          "Whether any occupancy classification or usage changes."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied evidence is limited to the selected 2022 provisions. It does not include the technical requirements of the referenced smoke-detection and emergency voice/alarm sections, the other Chapter 9 triggers, or the full provisions of BC 901.9.2 through 901.9.6."
+        ],
+        "additionalEvidenceNeeded": [
+          "Approved existing fire-alarm plans, acceptance/signoff records, and current system documentation showing equipment, circuits, capacities, and compatibility.",
+          "Proposed fire-alarm drawings and sequence/scope identifying new, altered, and retained components and how the required functions will be provided.",
+          "A building-height/Fire-Department-vehicle-access measurement establishing the highest occupied-floor height.",
+          "Area calculations for the Group B occupancy and, separately, existing and proposed floor surface area for the 110-percent prior-code-building test.",
+          "The enacted text of BC 907.2.13.1 and BC 907.5.2.2 to evaluate the referenced smoke-detection and voice/alarm design criteria.",
+          "The applicable other Chapter 9 provisions if other fire-protection triggers are implicated."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "1550",
+            "sectionNumber": "901.9.1",
+            "title": "901.9.1 Additions, alterations or repairs.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+                "selectedText": "Additions, alterations, renovations or repairs to existing systems shall conform to that required for new systems without requiring the existing system to comply with all of the requirements of this code, except as otherwise required in Sections 901.9.2 through 901.9.6. Additions, alterations or repairs shall not cause an existing installation to become unsafe, hazardous or overloaded.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the baseline rule for additions and alterations to existing fire-protection systems."
+          },
+          {
+            "sectionID": "1552",
+            "sectionNumber": "901.9.2",
+            "title": "901.9.2 Additional requirements based on change of occupancy or use.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+              "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+              "f6069634-d858-4ad0-a943-c318031e9ede"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+                "selectedText": "Fire protection systems governed by this chapter shall be provided:",
+                "visualSources": []
+              },
+              {
+                "sourceID": "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+                "selectedText": "1. To the entire building as if the building were hereafter erected, where a change is made in the main use or dominant occupancy of such building.",
+                "visualSources": []
+              },
+              {
+                "sourceID": "f6069634-d858-4ad0-a943-c318031e9ede",
+                "selectedText": "2. Throughout a space, where a change is made in the occupancy group classification or usage of the space.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the entire-building and space-wide triggers for changes of occupancy or use."
+          },
+          {
+            "sectionID": "1553",
+            "sectionNumber": "901.9.3",
+            "title": "901.9.3 Additional requirements for enlargements.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+                "selectedText": "Fire protection systems shall be provided in enlarged portions of a building and where this chapter would require such systems in new construction for a space or building.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the enlargement rule and the separate new-construction trigger."
+          },
+          {
+            "sectionID": "1755",
+            "sectionNumber": "907.2.2.2",
+            "title": "907.2.2.2 Large-area buildings.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "9e00e723-7824-4f29-a22f-7e4856c9a513"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "9e00e723-7824-4f29-a22f-7e4856c9a513",
+                "selectedText": "Group B occupancies having a total gross area exceeding 100,000 square feet (9290.3 m 2 ) located in buildings where the highest occupied floor is 75 feet (22 860 mm) or less above the lowest level of Fire Department vehicle access shall be provided with automatic smoke detection connected to an automatic fire alarm system in accordance with Section 907.2.13.1 and an emergency voice/alarm communication system in accordance with Section 907.5.2.2 that initiates a total evacuation signal.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the area-and-height-conditioned Group B automatic smoke-detection and voice/alarm requirement."
+          },
+          {
+            "sectionID": "8792",
+            "sectionNumber": "28-101.4.5",
+            "title": "§ 28-101.4.5 Work that increases existing floor surface area of a prior code building by more than 110 percent.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:8792-5"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:8792-5",
+                "selectedText": "28-101.4.5 § 28-101.4.5 Work that increases existing floor surface area of a prior code building by more than 110 percent. Notwithstanding sections 28-101.4.3 and 28-102.4.3 or any other provision of this code that would authorize alterations of prior code buildings in accordance with the 1968 building code or prior codes, where the proposed work at the completion of construction will increase the amount of floor surface area of a prior code building by more than 110%, over the amount of existing floor surface area, such entire building shall be made to comply with the provisions of this code as if it were a new building hereafter erected. See section 28-105.2 for permits for such work. Exceptions. When determining the amount of existing floor surface area for the purposes of section 28-101.4.5 , the following shall be excluded from the measured square footage of floor surface area: 1. The square footage of floors removed during the course of the work when such floors are removed together with the supporting beams, joists, decking and slabs on grade. 2. The square footage of any floor that was installed together with the supporting beams, joists, decking and slabs on grade less than 12 months prior to submission of the application for construction document approval for the proposed work. For the purposes of this exception, floors installed pursuant to a work permit signed off less than 12 months before such submission shall not be counted as existing floor surface area.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the potential whole-building new-code compliance result for a prior-code building enlarged by more than 110 percent and the supplied floor-surface-area definition."
+          },
+          {
+            "sectionID": "8794",
+            "sectionNumber": "28-101.4.5.2",
+            "title": "§ 28-101.4.5.2 Definitions.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:8794-8"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:8794-8",
+                "selectedText": "28-101.4.5.2 § 28-101.4.5.2 Definitions. As used in Section 28-101.4.5 , the following term shall have the following meaning unless the context or subject matter requires otherwise. FLOOR SURFACE AREA. Floor surface area is the gross square foot area of all horizontal floor and roof surfaces, including roofs of bulkheads and superstructures, of a building or structure at any level, including cellar, attic and roof.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the potential whole-building new-code compliance result for a prior-code building enlarged by more than 110 percent and the supplied floor-surface-area definition."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "1550",
+          "1552",
+          "1553",
+          "1755",
+          "113",
+          "8792",
+          "8793",
+          "8794",
+          "31004659",
+          "1563",
+          "1554"
+        ],
+        "evidenceSourceIDs": [
+          "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+          "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+          "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+          "f6069634-d858-4ad0-a943-c318031e9ede",
+          "337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+          "9e00e723-7824-4f29-a22f-7e4856c9a513",
+          "research-permitext_discovered-id:113-1",
+          "research-permitext_discovered-id:8792-5",
+          "research-permitext_discovered-id:8793-6",
+          "research-permitext_discovered-id:8794-8",
+          "research-permitext_cross_reference-id:31004659-1",
+          "research-permitext_cross_reference-id:1563-3",
+          "research-permitext_cross_reference-id:1554-9"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 11,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 6,
+          "governingCitationCount": 4,
+          "supportingCitationCount": 2,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 5,
+          "userPinnedCount": 6,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 3,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 9,
+          "requiredClaimCount": 6,
+          "searchedCorpusCount": 2,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 901.9.1",
+              "summary": "BC 901.9.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+              ]
+            },
+            {
+              "label": "BC 901.9.2",
+              "summary": "BC 901.9.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540"
+              ]
+            },
+            {
+              "label": "BC 901.9.2",
+              "summary": "BC 901.9.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "54f8bb38-6a94-4f12-9487-7ec083016a4d"
+              ]
+            },
+            {
+              "label": "BC 901.9.2",
+              "summary": "BC 901.9.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "f6069634-d858-4ad0-a943-c318031e9ede"
+              ]
+            },
+            {
+              "label": "BC 901.9.3",
+              "summary": "BC 901.9.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+              ]
+            },
+            {
+              "label": "BC 907.2.2.2",
+              "summary": "BC 907.2.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "9e00e723-7824-4f29-a22f-7e4856c9a513"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "BC 901.9.1",
+              "summary": "BC 901.9.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+              ]
+            },
+            {
+              "label": "BC 901.9.2",
+              "summary": "BC 901.9.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540"
+              ]
+            },
+            {
+              "label": "BC 901.9.2",
+              "summary": "BC 901.9.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "54f8bb38-6a94-4f12-9487-7ec083016a4d"
+              ]
+            },
+            {
+              "label": "BC 901.9.2",
+              "summary": "BC 901.9.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "f6069634-d858-4ad0-a943-c318031e9ede"
+              ]
+            },
+            {
+              "label": "BC 907.2.2.2",
+              "summary": "BC 907.2.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "9e00e723-7824-4f29-a22f-7e4856c9a513"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "BC 901.9.3",
+              "summary": "BC 901.9.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.5",
+              "summary": "AC 28-101.4.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8792-5"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.5.1",
+              "summary": "AC 28-101.4.5.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8793-6"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-1"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.5.2",
+              "summary": "AC 28-101.4.5.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8794-8"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "FC 29-101",
+              "summary": "FC 29-101 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:31004659-1"
+              ]
+            },
+            {
+              "label": "BC 901.9.6",
+              "summary": "BC 901.9.6 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:1563-3"
+              ]
+            },
+            {
+              "label": "BC 901.9.4",
+              "summary": "BC 901.9.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:1554-9"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [
+            "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+            "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+            "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+            "f6069634-d858-4ad0-a943-c318031e9ede",
+            "337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+            "9e00e723-7824-4f29-a22f-7e4856c9a513"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:113-1",
+            "research-permitext_discovered-id:8792-5",
+            "research-permitext_discovered-id:8793-6",
+            "research-permitext_discovered-id:8794-8",
+            "research-permitext_cross_reference-id:31004659-1",
+            "research-permitext_cross_reference-id:1563-3",
+            "research-permitext_cross_reference-id:1554-9"
+          ],
+          "projectFactsUsed": [
+            "Occupancy: Group B",
+            "Existing System: Previously approved legacy fire-alarm system",
+            "Project: Building enlargement with no stated use or occupancy change",
+            "Resulting Area: May exceed 100,000 gross square feet",
+            "The active-topic building is existing."
+          ],
+          "unresolvedProjectFacts": [
+            "Unknowns: highest occupied-floor height above Fire Department vehicle access",
+            "Unknowns: exact enlargement and system-modification scope",
+            "Unknowns: whether any occupancy classification or usage changes",
+            "Unknowns: existing-system capacity and compatibility",
+            "Unknowns: other Chapter 9 triggers"
+          ],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Occupancy: Group B",
+            "Existing System: Previously approved legacy fire-alarm system",
+            "Project: Building enlargement with no stated use or occupancy change",
+            "Resulting Area: May exceed 100,000 gross square feet"
+          ],
+          "conversation": [
+            "The active-topic building is existing."
+          ],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?",
+          "turnKind": "established",
+          "establishedFacts": [
+            {
+              "id": "building_status",
+              "key": "building_status",
+              "value": "existing",
+              "statement": "The active-topic building is existing.",
+              "kind": "established",
+              "sourceText": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?",
+              "source": "user"
+            }
+          ],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [
+            "building_status"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?",
+              "establishedFacts": [
+                {
+                  "id": "building_status",
+                  "key": "building_status",
+                  "value": "existing",
+                  "statement": "The active-topic building is existing.",
+                  "kind": "established",
+                  "sourceText": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?",
+                  "source": "user"
+                }
+              ],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 6,
+          "coveredClaimCount": 6,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+            "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+            "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+            "f6069634-d858-4ad0-a943-c318031e9ede",
+            "337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+            "9e00e723-7824-4f29-a22f-7e4856c9a513"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+            "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+            "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+            "f6069634-d858-4ad0-a943-c318031e9ede",
+            "337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+            "9e00e723-7824-4f29-a22f-7e4856c9a513",
+            "research-permitext_discovered-id:8792-5",
+            "research-permitext_discovered-id:8794-8"
+          ],
+          "citedEvidenceSourceIDs": [
+            "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+            "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+            "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+            "f6069634-d858-4ad0-a943-c318031e9ede",
+            "337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+            "9e00e723-7824-4f29-a22f-7e4856c9a513",
+            "research-permitext_discovered-id:8792-5",
+            "research-permitext_discovered-id:8794-8"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:113-1",
+            "research-permitext_discovered-id:8792-5",
+            "research-permitext_discovered-id:8793-6",
+            "research-permitext_discovered-id:8794-8",
+            "research-permitext_cross_reference-id:31004659-1",
+            "research-permitext_cross_reference-id:1563-3",
+            "research-permitext_cross_reference-id:1554-9"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+              "label": "BC 901.9.1 — 901.9.1 Additions, alterations or repairs.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+              "label": "BC 901.9.2 — 901.9.2 Additional requirements based on change of occupancy or use.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:54f8bb38-6a94-4f12-9487-7ec083016a4d",
+              "label": "BC 901.9.2 — 901.9.2 Additional requirements based on change of occupancy or use.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "54f8bb38-6a94-4f12-9487-7ec083016a4d"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:f6069634-d858-4ad0-a943-c318031e9ede",
+              "label": "BC 901.9.2 — 901.9.2 Additional requirements based on change of occupancy or use.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "f6069634-d858-4ad0-a943-c318031e9ede"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+              "label": "BC 901.9.3 — 901.9.3 Additional requirements for enlargements.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:9e00e723-7824-4f29-a22f-7e4856c9a513",
+              "label": "BC 907.2.2.2 — 907.2.2.2 Large-area buildings.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 6,
+          "coveredClaimCount": 6,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+            "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+            "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+            "f6069634-d858-4ad0-a943-c318031e9ede",
+            "337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+            "9e00e723-7824-4f29-a22f-7e4856c9a513",
+            "research-permitext_discovered-id:8792-5",
+            "research-permitext_discovered-id:8794-8"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+              "label": "BC 901.9.1 — 901.9.1 Additions, alterations or repairs.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:8792-5",
+                        "research-permitext_discovered-id:8794-8"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+              "label": "BC 901.9.2 — 901.9.2 Additional requirements based on change of occupancy or use.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:8792-5",
+                        "research-permitext_discovered-id:8794-8"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:54f8bb38-6a94-4f12-9487-7ec083016a4d",
+              "label": "BC 901.9.2 — 901.9.2 Additional requirements based on change of occupancy or use.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "54f8bb38-6a94-4f12-9487-7ec083016a4d"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "54f8bb38-6a94-4f12-9487-7ec083016a4d"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:8792-5",
+                        "research-permitext_discovered-id:8794-8"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:f6069634-d858-4ad0-a943-c318031e9ede",
+              "label": "BC 901.9.2 — 901.9.2 Additional requirements based on change of occupancy or use.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "f6069634-d858-4ad0-a943-c318031e9ede"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "f6069634-d858-4ad0-a943-c318031e9ede"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:8792-5",
+                        "research-permitext_discovered-id:8794-8"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+              "label": "BC 901.9.3 — 901.9.3 Additional requirements for enlargements.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:8792-5",
+                        "research-permitext_discovered-id:8794-8"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:9e00e723-7824-4f29-a22f-7e4856c9a513",
+              "label": "BC 907.2.2.2 — 907.2.2.2 Large-area buildings.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 3,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 3,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+                        "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+                        "f6069634-d858-4ad0-a943-c318031e9ede"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "337b7c8f-372d-41f2-bda1-19cd3a2ca073"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:8792-5",
+                        "research-permitext_discovered-id:8794-8"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "9e00e723-7824-4f29-a22f-7e4856c9a513"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260827-source-bound-paraphrase-repair-v20",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "citedSourceIDs": [
+            "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+            "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+            "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+            "f6069634-d858-4ad0-a943-c318031e9ede",
+            "337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+            "9e00e723-7824-4f29-a22f-7e4856c9a513",
+            "research-permitext_discovered-id:8792-5",
+            "research-permitext_discovered-id:8794-8"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:113-1",
+            "research-permitext_discovered-id:8793-6",
+            "research-permitext_cross_reference-id:31004659-1",
+            "research-permitext_cross_reference-id:1563-3",
+            "research-permitext_cross_reference-id:1554-9"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 8,
+            "citedProvisionCount": 6,
+            "governingCitationCount": 4,
+            "supportingCitationCount": 2,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 5,
+            "reviewedOnlyProvisionCount": 5,
+            "assembledSourceCount": 13,
+            "assembledProvisionCount": 11
+          },
+          "sources": [
+            {
+              "sourceID": "d3da3e31-f991-4c04-92de-9a3f0c1eb0e2",
+              "sectionID": "1550",
+              "reference": "BC 901.9.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Additions, alterations, renovations or repairs to existing systems shall conform to that required for new systems without requiring the existing system to comply with all of the requirements of this code, except as otherwise required in Sections 901.9.2 through 901.9.6. Additions, alterations or repairs shall not cause an existing installation to become unsafe, hazardous or overloaded."
+            },
+            {
+              "sourceID": "cb56ff8c-6cef-4d9f-823f-ab26fd2bd540",
+              "sectionID": "1552",
+              "reference": "BC 901.9.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Fire protection systems governed by this chapter shall be provided:"
+            },
+            {
+              "sourceID": "54f8bb38-6a94-4f12-9487-7ec083016a4d",
+              "sectionID": "1552",
+              "reference": "BC 901.9.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1. To the entire building as if the building were hereafter erected, where a change is made in the main use or dominant occupancy of such building."
+            },
+            {
+              "sourceID": "f6069634-d858-4ad0-a943-c318031e9ede",
+              "sectionID": "1552",
+              "reference": "BC 901.9.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "2. Throughout a space, where a change is made in the occupancy group classification or usage of the space."
+            },
+            {
+              "sourceID": "337b7c8f-372d-41f2-bda1-19cd3a2ca073",
+              "sectionID": "1553",
+              "reference": "BC 901.9.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Fire protection systems shall be provided in enlarged portions of a building and where this chapter would require such systems in new construction for a space or building."
+            },
+            {
+              "sourceID": "9e00e723-7824-4f29-a22f-7e4856c9a513",
+              "sectionID": "1755",
+              "reference": "BC 907.2.2.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Group B occupancies having a total gross area exceeding 100,000 square feet (9290.3 m 2 ) located in buildings where the highest occupied floor is 75 feet (22 860 mm) or less above the lowest level of Fire Department vehicle access shall be provided with automatic smoke detection connected to an automatic fire alarm system in accordance with Section 907.2.13.1 and an emergency voice/alarm communication system in accordance with Section 907.5.2.2 that initiates a total evacuation signal."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-1",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "AREA, BUILDING. The area included within surrounding exterior walls (or exterior walls and firewalls) exclusive of vent shafts and courts. Areas of the building not provided with surrounding walls shall be included in the building area if such areas are included within the horizontal projection of the roof or floor above. CONSTRUCTION. The excavation, erection, alteration, and repair of buildings or any component parts, including all operations incidental thereto. DWELLING. A building or structure that is occupied in whole or in part as the home, residence or sleeping place of one or more families. EMERGENCY VOICE/ALARM COMMUNICATIONS. Dedicated manual or automatic facilities for originating and distributing voice instructions, as well as alert and evacuation signals pertaining to a fire or other emergency, to the occupants of a building. FIRE ALARM SYSTEM . A system or portion of a combination system consisting of components and circuits arranged to monitor and annunciate the status of fire alarm or supervisory signal - initiating devices and to initiate the appropriate response to those signals . FIRE PROTECTION SYSTEM. Approved devices, equipment and systems or combinations of systems used to detect a fire, activate an alarm, extinguish or control a fire, control or manage smoke and products of a fire or any combination thereof. NEW CONSTRUCTION. See Section G201.1.2. SMOKE. Air-borne solid and liquid particulates and gases evolved when a material undergoes pyrolysis or combustion, including the quality of air that is entrained or otherwise mixed into the mass."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8792-5",
+              "sectionID": "8792",
+              "reference": "AC 28-101.4.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.5 § 28-101.4.5 Work that increases existing floor surface area of a prior code building by more than 110 percent. Notwithstanding sections 28-101.4.3 and 28-102.4.3 or any other provision of this code that would authorize alterations of prior code buildings in accordance with the 1968 building code or prior codes, where the proposed work at the completion of construction will increase the amount of floor surface area of a prior code building by more than 110%, over the amount of existing floor surface area, such entire building shall be made to comply with the provisions of this code as if it were a new building hereafter erected. See section 28-105.2 for permits for such work. Exceptions. When determining the amount of existing floor surface area for the purposes of section 28-101.4.5 , the following shall be excluded from the measured square footage of floor surface area: 1. The square footage of floors removed during the course of the work when such floors are removed together with the supporting beams, joists, decking and slabs on grade. 2. The square footage of any floor that was installed together with the supporting beams, joists, decking and slabs on grade less than 12 months prior to submission of the application for construction document approval for the proposed work. For the purposes of this exception, floors installed pursuant to a work permit signed off less than 12 months before such submission shall not be counted as existing floor surface area."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8793-6",
+              "sectionID": "8793",
+              "reference": "AC 28-101.4.5.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.5.1 § 28-101.4.5.1 Changes in scope of work. In cases where changes in the scope of work during the course of construction would result in increasing the floor surface area at the completion of construction by more than 110 percent, over the amount of existing floor surface area as determined pursuant to section 28-101.4.5 , such entire building shall be made to comply with the provisions of this code as if hereafter erected and such work shall be refiled as a new building application in accordance with the provisions of section 28-105.2 . Exception: Work to the extent necessary to relieve an emergency condition may be performed prior to amending plans or obtaining a new permit pursuant to sections 28-105.4.1 and 28-105.12.2 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8794-8",
+              "sectionID": "8794",
+              "reference": "AC 28-101.4.5.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.5.2 § 28-101.4.5.2 Definitions. As used in Section 28-101.4.5 , the following term shall have the following meaning unless the context or subject matter requires otherwise. FLOOR SURFACE AREA. Floor surface area is the gross square foot area of all horizontal floor and roof surfaces, including roofs of bulkheads and superstructures, of a building or structure at any level, including cellar, attic and roof."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:31004659-1",
+              "sectionID": "31004659",
+              "reference": "FC 29-101",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-consolidation",
+              "text": "29-101 Short title. This title shall be known as and may be cited as the \"New York city fire code\" or the \"fire code.\""
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:1563-3",
+              "sectionID": "1563",
+              "reference": "BC 901.9.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "901.9.6 901.9.6 Seismic supports. The determination as to whether seismic requirements apply to an alteration shall be made in accordance with the 1968 Building Code and interpretations by the department relating to such determinations. Any applicable seismic loads and requirements shall be permitted to be determined in accordance with Chapter 16 of this code or the 1968 Building Code and Reference Standard RS 9-6 of such code. Section BC 902: Definitions"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:1554-9",
+              "sectionID": "1554",
+              "reference": "BC 901.9.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "901.9.4 901.9.4 Additional requirements based on value of alterations. Fire protection systems shall be provided to buildings and spaces in accordance with the provisions of Sections 901.9.4.1 through 901.9.4.3."
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?\nProject facts: Resulting Area: May exceed 100,000 gross square feet; Unknowns: highest occupied-floor height above Fire Department vehicle access; Existing System: Previously approved legacy fire-alarm system; Project: Building enlargement with no stated use or occupancy change; Unknowns: exact enlargement and system-modification scope; Unknowns: whether any occupancy classification or usage changes; Unknowns: existing-system capacity and compatibility; Occupancy: Group B; Unknowns: other Chapter 9 triggers",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "correction",
+            "question": {
+              "text": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "An existing prior-code Group B building has a previously approved legacy fire-alarm system. A proposed enlargement does not change the stated use or occupancy, but the resulting Group B gross area may exceed 100,000 square feet. The height of the highest occupied floor above the lowest level of Fire Department vehicle access has not been confirmed. Does the selected 2022 Building Code evidence automatically require replacement of the entire legacy system, and what additional facts determine the required scope?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": false
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": true,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 6,
+            "candidateCount": 12,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 3,
+            "characterCount": 9111,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 13306,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              },
+              {
+                "id": "nyc-2022-fire-code",
+                "label": "2022 NYC Fire Code",
+                "codeEdition": "2022 NYC Fire Code — current consolidated text",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codePrefixes": [
+                  "FC"
+                ],
+                "routeReason": "Fire Code or FDNY cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260827-supporting-web-v9",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "Routed New York City enacted sources",
+            "codeVersion": "multiple-authorized-corpora",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-627de479-be50-4ea3-8ddd-e632021071ef",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              },
+              {
+                "id": "nyc-2022-fire-code",
+                "label": "2022 NYC Fire Code",
+                "codeEdition": "2022 NYC Fire Code — current consolidated text",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-consolidation",
+                "routeReason": "Fire Code or FDNY cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "FC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · 2022 NYC Fire Code · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T23:50:53.982Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T23:50:53.982Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v4",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "multiple_required_claims",
+            "complex_evidence_form",
+            "multiple_corpora"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 22358,
+          "cachedInputTokens": 1978,
+          "outputTokens": 2490,
+          "totalTokens": 24848
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.049017,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "6204d11f-9f76-4c5d-9573-d82691a83b41",
+        "createdAt": "2026-08-27T23:50:53.978Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra",
+          "gpt-5.6-luna"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v4",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 2,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 22358,
+        "cachedInputTokens": 1978,
+        "outputTokens": 2490,
+        "totalTokens": 24848,
+        "estimatedCostUSD": 0.049017,
+        "actualProviderCostUSD": 0.049017,
+        "conservativeProviderCostUSD": 0.049017,
+        "durationMilliseconds": 26513,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T23:51:45.171Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 24047,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 6557,
+              "cachedInputTokens": 0,
+              "outputTokens": 2341,
+              "totalTokens": 8898
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 6557,
+          "cachedInputTokens": 0,
+          "outputTokens": 2341,
+          "totalTokens": 8898
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 3,
+            "rationale": "All four required citations are present and accurately support their required claim-specific roles. The additional Administrative Code discussion is substantively supported by the supplied passages, but the standalone citation relevance statement for AC 28-101.4.5.2 overstates that subsection's role: it supplies the definition, while the more-than-110-percent whole-building consequence comes from AC 28-101.4.5.",
+            "failureExcerpt": "\"AC 28-101.4.5.2 ... Establishes the potential whole-building new-code compliance result for a prior-code building enlarged by more than 110 percent\"",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer stays within the enacted passages and appropriately frames technical system conclusions as unresolved. Its statements regarding the 110-percent Administrative Code threshold and the referenced-section limitations are supported by the supplied evidence.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer gives a conditional result tied to area and height, identifies that no use change is stated, and does not claim that retention, interfacing, or replacement of the legacy system can be determined from the selected text.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It expressly says that the evidence cannot establish technical compliance, detector arrangement, voice/alarm design, or whether the legacy modification meets the referenced standards, and it identifies further needed records and facts.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer supplies a clear bottom-line answer, explains the applicable scope rules and conditional Group B trigger, identifies the relevant missing facts, and separately flags the potentially consequential 110-percent prior-code-building provision.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers that enlargement alone does not automatically require full legacy-system replacement and then identifies the additional scope-determining facts and conditions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer directly rejects automatic whole-system replacement based solely on the enlargement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It accurately states BC 901.9.1's new-work rule, its exception for Sections 901.9.2 through 901.9.6, and the unsafe/hazardous/overloaded limitation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It explains that systems are required in enlarged portions and wherever Chapter 9 would require them for new construction.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It distinguishes a main-use or dominant-occupancy change, which applies throughout the building, from a space classification or usage change, which applies throughout that space.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It correctly applies both BC 907.2.2.2 conditions: Group B gross area exceeding 100,000 square feet and highest occupied floor 75 feet or less above the specified vehicle-access level.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It identifies automatic smoke detection connected to an automatic fire-alarm system and an emergency voice/alarm communication system initiating a total-evacuation signal.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It correctly states that the selected text does not permit automatically confining the qualifying BC 907.2.2.2 features to the enlarged portion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "It expressly states that wholesale replacement versus a compliant extension, upgrade, or other solution is not determined, and identifies capacity and compatibility as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-9",
+              "rationale": "It requests the missing project information, existing-system records, capacity/compatibility information, proposed drawings, and other applicable Chapter 9 provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects an automatic entire-system replacement result.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It does not say the legacy system may remain unchanged; it conditions any solution on compliance and unresolved technical facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It makes the BC 907.2.2.2 consequence conditional on both the area threshold and the unconfirmed height condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It says the selected evidence does not say the qualifying BC 907.2.2.2 features may be confined to the enlarged portion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It accurately limits whole-building compliance under BC 901.9.2 to a main-use or dominant-occupancy change, distinguishing the space-level trigger.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It expressly includes both occupancy-group classification and space usage changes.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "It treats legacy-system compatibility as an unresolved fact and requests supporting documentation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-8",
+              "rationale": "The answer makes no claim about a DOB bulletin or project-specific approval.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-9",
+              "rationale": "It does not claim that the passages resolve FDNY acceptance, electrical compliance, listings, or sequence-of-operation requirements; instead, it identifies relevant technical limitations and needed documentation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer requests the actual resulting total gross Group B area.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer requests the highest occupied-floor height relative to the lowest Fire Department vehicle-access level.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "Although no change is stated in the project context, the answer consistently applies that premise and appropriately asks whether any relevant occupancy or usage change is actually proposed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer requests the exact enlarged area and the scope of alarm additions, alterations, repairs, and modifications.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It requests approval plans, signoff records, system documentation, equipment, circuits, capacities, and proposed sequence/scope information.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It explicitly identifies legacy-system capacity and compatibility as material unresolved facts and requests documentation on compatibility.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "It identifies and requests evaluation of other applicable Chapter 9 triggers.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.041206,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 6,
+            "canonicalCount": 6,
+            "selectedEvidenceCount": 6,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 26518,
+            "inputTokens": 22358,
+            "cachedInputTokens": 1978,
+            "outputTokens": 2490,
+            "totalTokens": 24848,
+            "estimatedCostUSD": 0.049017,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 3,
+              "rationale": "All four required citations are present and accurately support their required claim-specific roles. The additional Administrative Code discussion is substantively supported by the supplied passages, but the standalone citation relevance statement for AC 28-101.4.5.2 overstates that subsection's role: it supplies the definition, while the more-than-110-percent whole-building consequence comes from AC 28-101.4.5.",
+              "failureExcerpt": "\"AC 28-101.4.5.2 ... Establishes the potential whole-building new-code compliance result for a prior-code building enlarged by more than 110 percent\"",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "9/9 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer stays within the enacted passages and appropriately frames technical system conclusions as unresolved. Its statements regarding the 110-percent Administrative Code threshold and the referenced-section limitations are supported by the supplied evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/9 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The answer gives a conditional result tied to area and height, identifies that no use change is stated, and does not claim that retention, interfacing, or replacement of the legacy system can be determined from the selected text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "7/7 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "It expressly says that the evidence cannot establish technical compliance, detector arrangement, voice/alarm design, or whether the legacy modification meets the referenced standards, and it identifies further needed records and facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "The answer supplies a clear bottom-line answer, explains the applicable scope rules and conditional Group B trigger, identifies the relevant missing facts, and separately flags the potentially consequential 110-percent prior-code-building provision.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "It directly answers that enlargement alone does not automatically require full legacy-system replacement and then identifies the additional scope-determining facts and conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer directly rejects automatic whole-system replacement based solely on the enlargement.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "It accurately states BC 901.9.1's new-work rule, its exception for Sections 901.9.2 through 901.9.6, and the unsafe/hazardous/overloaded limitation.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "It explains that systems are required in enlarged portions and wherever Chapter 9 would require them for new construction.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "It distinguishes a main-use or dominant-occupancy change, which applies throughout the building, from a space classification or usage change, which applies throughout that space.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "It correctly applies both BC 907.2.2.2 conditions: Group B gross area exceeding 100,000 square feet and highest occupied floor 75 feet or less above the specified vehicle-access level.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "It identifies automatic smoke detection connected to an automatic fire-alarm system and an emergency voice/alarm communication system initiating a total-evacuation signal.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-7",
+                "rationale": "It correctly states that the selected text does not permit automatically confining the qualifying BC 907.2.2.2 features to the enlarged portion.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-8",
+                "rationale": "It expressly states that wholesale replacement versus a compliant extension, upgrade, or other solution is not determined, and identifies capacity and compatibility as unresolved.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-9",
+                "rationale": "It requests the missing project information, existing-system records, capacity/compatibility information, proposed drawings, and other applicable Chapter 9 provisions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer expressly rejects an automatic entire-system replacement result.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "It does not say the legacy system may remain unchanged; it conditions any solution on compliance and unresolved technical facts.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "It makes the BC 907.2.2.2 consequence conditional on both the area threshold and the unconfirmed height condition.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "It says the selected evidence does not say the qualifying BC 907.2.2.2 features may be confined to the enlarged portion.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-5",
+                "rationale": "It accurately limits whole-building compliance under BC 901.9.2 to a main-use or dominant-occupancy change, distinguishing the space-level trigger.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-6",
+                "rationale": "It expressly includes both occupancy-group classification and space usage changes.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-7",
+                "rationale": "It treats legacy-system compatibility as an unresolved fact and requests supporting documentation.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-8",
+                "rationale": "The answer makes no claim about a DOB bulletin or project-specific approval.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-9",
+                "rationale": "It does not claim that the passages resolve FDNY acceptance, electrical compliance, listings, or sequence-of-operation requirements; instead, it identifies relevant technical limitations and needed documentation.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The answer requests the actual resulting total gross Group B area.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The answer requests the highest occupied-floor height relative to the lowest Fire Department vehicle-access level.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "Although no change is stated in the project context, the answer consistently applies that premise and appropriately asks whether any relevant occupancy or usage change is actually proposed.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "The answer requests the exact enlarged area and the scope of alarm additions, alterations, repairs, and modifications.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-5",
+                "rationale": "It requests approval plans, signoff records, system documentation, equipment, circuits, capacities, and proposed sequence/scope information.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-6",
+                "rationale": "It explicitly identifies legacy-system capacity and compatibility as material unresolved facts and requests documentation on compatibility.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-7",
+                "rationale": "It identifies and requests evaluation of other applicable Chapter 9 triggers.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 3,
+            "rationale": "6/6 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. All four required citations are present and accurately support their required claim-specific roles. The additional Administrative Code discussion is substantively supported by the supplied passages, but the standalone citation relevance statement for AC 28-101.4.5.2 overstates that subsection's role: it supplies the definition, while the more-than-110-percent whole-building consequence comes from AC 28-101.4.5.",
+            "failureExcerpt": "\"AC 28-101.4.5.2 ... Establishes the potential whole-building new-code compliance result for a prior-code building enlarged by more than 110 percent\"",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 4 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "9/9 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer stays within the enacted passages and appropriately frames technical system conclusions as unresolved. Its statements regarding the 110-percent Administrative Code threshold and the referenced-section limitations are supported by the supplied evidence.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer gives a conditional result tied to area and height, identifies that no use change is stated, and does not claim that retention, interfacing, or replacement of the legacy system can be determined from the selected text.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "7/7 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "It expressly says that the evidence cannot establish technical compliance, detector arrangement, voice/alarm design, or whether the legacy modification meets the referenced standards, and it identifies further needed records and facts.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer supplies a clear bottom-line answer, explains the applicable scope rules and conditional Group B trigger, identifies the relevant missing facts, and separately flags the potentially consequential 110-percent prior-code-building provision.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "It directly answers that enlargement alone does not automatically require full legacy-system replacement and then identifies the additional scope-determining facts and conditions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 3.84,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer directly rejects automatic whole-system replacement based solely on the enlargement.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It accurately states BC 901.9.1's new-work rule, its exception for Sections 901.9.2 through 901.9.6, and the unsafe/hazardous/overloaded limitation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It explains that systems are required in enlarged portions and wherever Chapter 9 would require them for new construction.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It distinguishes a main-use or dominant-occupancy change, which applies throughout the building, from a space classification or usage change, which applies throughout that space.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It correctly applies both BC 907.2.2.2 conditions: Group B gross area exceeding 100,000 square feet and highest occupied floor 75 feet or less above the specified vehicle-access level.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "It identifies automatic smoke detection connected to an automatic fire-alarm system and an emergency voice/alarm communication system initiating a total-evacuation signal.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It correctly states that the selected text does not permit automatically confining the qualifying BC 907.2.2.2 features to the enlarged portion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-8",
+              "rationale": "It expressly states that wholesale replacement versus a compliant extension, upgrade, or other solution is not determined, and identifies capacity and compatibility as unresolved.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-9",
+              "rationale": "It requests the missing project information, existing-system records, capacity/compatibility information, proposed drawings, and other applicable Chapter 9 provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects an automatic entire-system replacement result.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It does not say the legacy system may remain unchanged; it conditions any solution on compliance and unresolved technical facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It makes the BC 907.2.2.2 consequence conditional on both the area threshold and the unconfirmed height condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It says the selected evidence does not say the qualifying BC 907.2.2.2 features may be confined to the enlarged portion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It accurately limits whole-building compliance under BC 901.9.2 to a main-use or dominant-occupancy change, distinguishing the space-level trigger.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It expressly includes both occupancy-group classification and space usage changes.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-7",
+              "rationale": "It treats legacy-system compatibility as an unresolved fact and requests supporting documentation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-8",
+              "rationale": "The answer makes no claim about a DOB bulletin or project-specific approval.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-9",
+              "rationale": "It does not claim that the passages resolve FDNY acceptance, electrical compliance, listings, or sequence-of-operation requirements; instead, it identifies relevant technical limitations and needed documentation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The answer requests the actual resulting total gross Group B area.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The answer requests the highest occupied-floor height relative to the lowest Fire Department vehicle-access level.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "Although no change is stated in the project context, the answer consistently applies that premise and appropriately asks whether any relevant occupancy or usage change is actually proposed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "The answer requests the exact enlarged area and the scope of alarm additions, alterations, repairs, and modifications.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It requests approval plans, signoff records, system documentation, equipment, circuits, capacities, and proposed sequence/scope information.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It explicitly identifies legacy-system capacity and compatibility as material unresolved facts and requests documentation on compatibility.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-7",
+              "rationale": "It identifies and requests evaluation of other applicable Chapter 9 triggers.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

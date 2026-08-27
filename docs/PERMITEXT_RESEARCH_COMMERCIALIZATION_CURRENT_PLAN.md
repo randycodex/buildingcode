@@ -103,6 +103,16 @@ The immutable v2 cohort began from commit `de87dbc07780c597dde6f65cfb94f7457d433
 
 The provider client now reports nested network causes instead of only `TypeError`, and future frozen cohorts stop on the first case error so one outage cannot cascade across the remaining suite. The incomplete evidence is retained at `permitext-sync-server/evals/results/2026-08-27T23-21-46-942Z-b53d4522-4a59-49cb-b625-47760ffa7a37.md`.
 
+### Targeted v2 remediation confirmation
+
+After the provider health check succeeded, the three subthreshold v2 cases were rerun separately through the production Research path with a $0.75 per-case cap and stop-on-error enabled:
+
+- mixed-occupancy plumbing passed 4.00/4 in 35.604 seconds; the Research operation cost $0.092032 and the full diagnostic including the independent grader cost $0.123114;
+- legacy fire-alarm scope passed 3.84/4 in 26.518 seconds; the Research operation cost $0.049017 and the full diagnostic cost $0.090223; all required concepts, missing facts, and citations passed, with only a nonmaterial citation-relevance description losing one point;
+- garage ventilation controls passed 4.00/4 in 13.316 seconds; the Research operation cost $0.023273 and the full diagnostic cost $0.042860.
+
+The three Research operations cost $0.164322 in total and the complete diagnostics cost $0.256197. None produced a provider error, unsupported claim, forbidden claim, or critical failure. These targeted results clear the three v2 defects for a new frozen cohort; they do not replace the required complete cohort.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -130,4 +140,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Pass the repository-wide no-cost gate for the provider fail-fast and three quality remediations, then commit and push. Run only the three completed subthreshold cases under a capped diagnostic after provider stability is confirmed. If they pass without material regression, create a new immutable v3 cohort; stop that cohort on its first provider error. Do not proceed to public paid Research while the three quality defects or incomplete full-cohort evidence remain.
+Create and commit a new immutable v3 cohort profile from the remediated application commit, then run the complete 20-case cohort under its hard spend cap and stop on the first provider error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.

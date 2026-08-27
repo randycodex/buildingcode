@@ -42,7 +42,7 @@ Current development branch: `codex/research-commercialization`
 - [x] Rerun the 11 subthreshold cases and subsequent three-case diagnostics under explicit spend caps.
 - [x] Confirm the final source-bound sidewalk-café repair with one capped paid case; it passed 4.00/4.
 - [x] Attempt the frozen v2 cohort; retain it as partial evidence after 11 completed turns and a provider outage.
-- [ ] Resolve the three v2 quality failures and verify provider fail-fast behavior before a v3 cohort.
+- [x] Resolve the three v2 quality failures and verify provider fail-fast behavior before a v3 cohort.
 - [ ] Run a new frozen full cohort only if the targeted cases improve without material regressions.
 - [ ] Confirm that p50/p90 full-service cost supports the $20 plan and 100 included turns.
 
