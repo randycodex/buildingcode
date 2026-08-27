@@ -9,10 +9,11 @@ import {
 } from "../scripts/run-research-commercialization-benchmark.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const [datasetText, evaluationSource, appSource] = await Promise.all([
+const [datasetText, evaluationSource, appSource, readme] = await Promise.all([
   readFile(join(root, "../evals/research-cases.json"), "utf8"),
   readFile(join(root, "research-evals.mjs"), "utf8"),
-  readFile(join(root, "../app.mjs"), "utf8")
+  readFile(join(root, "../app.mjs"), "utf8"),
+  readFile(join(root, "../README.md"), "utf8")
 ]);
 const dataset = JSON.parse(datasetText);
 const profile = validateResearchCommercializationBenchmark();
@@ -42,6 +43,8 @@ assert.equal(environment.PERMITEXT_RESEARCH_TARGET_100_TURN_COST_MAX_USD, "6.00"
 assert.equal(environment.PERMITEXT_RESEARCH_KILL_SWITCH, "0");
 assert.equal(environment.PERMITEXT_RESEARCH_PAID_TURNS_ENABLED, "0");
 assert.equal(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD, "12.00");
+assert.match(readme, /which runs 20 distinct/);
+assert.match(readme, /map-only fire-district case remains in the safety suite/);
 assert.match(
   evaluationSource,
   /terminalEvaluationOperationStatuses[\s\S]*terminalEvaluationOperation\([\s\S]*awaitingOperationTelemetry[\s\S]*result\.operationMetric = operationMetric/,

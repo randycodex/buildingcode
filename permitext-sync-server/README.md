@@ -169,9 +169,11 @@ enables the Luna/Terra hybrid locally, and never enables test mock generation.
 
 The frozen historical hybrid benchmark remains available as
 `npm run eval:research:hybrid-benchmark`. A new commercialization decision must
-use `npm run eval:research:commercialization-benchmark`, which runs the 21
-distinct approved and draft diagnostic questions once on a clean committed
-checkout. The one-time profile refuses to run again after its result is frozen.
+use `npm run eval:research:commercialization-benchmark`, which runs 20 distinct
+approved and draft diagnostic questions once on a clean committed checkout.
+The map-only fire-district case remains in the safety suite but is excluded from
+pricing until its visual pixels can be reviewed explicitly. The one-time profile
+refuses to run again after its result is frozen.
 
 `OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, and records versioned model/token usage without logging the question or code text. Customer Account and Research views show included and purchased turns plus the monthly reset date; token totals and estimated provider cost remain owner-only operational data. The OpenAI account that owns the API key is responsible for model usage charges.
 
