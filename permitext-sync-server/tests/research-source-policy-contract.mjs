@@ -5,6 +5,7 @@ import {
   extractResearchOfficialDocumentReferences,
   normalizeResearchOfficialDomains,
   normalizeResearchWebSources,
+  researchDiscoveryNeedsAutomaticWebSupport,
   researchSourcePolicyConfiguration,
   researchSourcePolicyVersion,
   researchWebSupportTrigger,
@@ -107,6 +108,35 @@ assert.equal(
 assert.deepEqual(
   researchWebSupportTrigger({ corpusCoverage: "incomplete" }, {}).reasons,
   ["outside_library_support_needed"]
+);
+assert.equal(
+  researchDiscoveryNeedsAutomaticWebSupport({
+    outsideCurrentLibrary: [{
+      label: "NYC Zoning Resolution Research",
+      sourceName: "NYC Zoning Resolution"
+    }],
+    unavailableCorpora: [{
+      id: "nyc-zoning-resolution",
+      label: "NYC Zoning Resolution",
+      blockedReason: "Zoning Research is intentionally disabled."
+    }]
+  }),
+  false,
+  "An intentionally blocked corpus must not be routed around its governance gate through automatic web support."
+);
+assert.equal(
+  researchDiscoveryNeedsAutomaticWebSupport({
+    outsideCurrentLibrary: [{
+      label: "Manufacturer installation instructions",
+      sourceName: "Equipment manufacturer"
+    }],
+    unavailableCorpora: [{
+      id: "nyc-zoning-resolution",
+      label: "NYC Zoning Resolution"
+    }]
+  }),
+  true,
+  "A genuinely separate outside-library source may still trigger automatic supporting-web research."
 );
 assert.deepEqual(unresolvedResearchAuthorityAcronyms("Does HCR require a vanity?"), ["HCR"]);
 assert.deepEqual(

@@ -220,6 +220,7 @@ import {
   normalizeResearchWebSources,
   researchSourcePolicyVersion,
   researchSourcePolicyConfiguration,
+  researchDiscoveryNeedsAutomaticWebSupport,
   sanitizeResearchWebQuery,
   extractResearchOfficialDocumentReferences,
   researchWebSupportTrigger
@@ -18165,7 +18166,9 @@ async function handleResearchConversationMessage(request, response) {
       ? { useWeb: false, reasons: [] }
       : researchWebSupportTrigger({
           question,
-          outsideLibraryRequired: Boolean(evidencePackage.discovery?.outsideCurrentLibrary?.length)
+          outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(
+            evidencePackage.discovery
+          )
         });
     const webSupportRequested = webSupportPolicyDecision.useWeb;
     const allowOfficialGuidanceOnly =

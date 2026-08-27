@@ -59,6 +59,8 @@ The safeguards are committed locally and the no-cost suite passes. The next gate
 - [ ] If the targeted cases improve without regressions, run one new complete frozen cohort.
 - [ ] Compare quality, p50/p90 latency, Luna/Terra escalation rate, and projected cost per 100 turns with the first cohort.
 
+First targeted attempt: the Certificate-of-Occupancy case correctly remained uncharged but failed before grading because automatic web support routed around the intentionally disabled Zoning Research corpus and produced an attribution conflict. It cost $0.134553 in provider calls. The source-policy repair now prevents an intentionally blocked corpus from triggering automatic web support; explicit official-guidance requests remain available.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:

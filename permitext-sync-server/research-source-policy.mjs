@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260827-supporting-web-v8";
+export const researchSourcePolicyVersion = "20260827-supporting-web-v9";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -134,6 +134,44 @@ export function unresolvedResearchAuthorityAcronyms(value) {
       .filter((acronym) => !knownResearchAcronyms.has(acronym))
       .filter((acronym) => !new RegExp(`\\(${acronym}\\)`).test(text))
   ));
+}
+
+function comparableOutsideLibraryLabel(value) {
+  return normalizedText(value)
+    .toLowerCase()
+    .replace(/\bresearch\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Returns true only for an outside-library source that is not already an
+ * intentionally blocked Research corpus. An explicit request for official
+ * web guidance is evaluated separately and may still use web support.
+ */
+export function researchDiscoveryNeedsAutomaticWebSupport(discovery = {}) {
+  const unavailableCorpora = Array.isArray(discovery?.unavailableCorpora)
+    ? discovery.unavailableCorpora
+    : [];
+  const blockedLabels = unavailableCorpora.flatMap((corpus) => [
+    comparableOutsideLibraryLabel(corpus?.id),
+    comparableOutsideLibraryLabel(corpus?.label)
+  ]).filter(Boolean);
+  return (Array.isArray(discovery?.outsideCurrentLibrary)
+    ? discovery.outsideCurrentLibrary
+    : []).some((source) => {
+      const sourceLabels = [
+        comparableOutsideLibraryLabel(source?.sourceName),
+        comparableOutsideLibraryLabel(source?.label)
+      ].filter(Boolean);
+      if (!sourceLabels.length) return true;
+      return !sourceLabels.some((sourceLabel) => blockedLabels.some((blockedLabel) =>
+        sourceLabel === blockedLabel ||
+        sourceLabel.includes(blockedLabel) ||
+        blockedLabel.includes(sourceLabel)
+      ));
+    });
 }
 
 export function researchWebSupportTrigger(input = {}, environment = process.env) {
