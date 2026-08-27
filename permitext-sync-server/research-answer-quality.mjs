@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-accessory-group-b-boundary-v13";
+  "20260827-project-condition-coverage-v14";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -120,6 +120,18 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
   const accessoryAssemblySourceIDs = accessoryAssemblyPlumbingQuestion
     ? knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.reference === "BC 303.1.3")
     : [];
+  const citedAccessoryClassificationSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
+    availableEvidence.get(sourceID)?.reference === "BC 303.1.3"
+  );
+  const userStatesAccessoryRelationship = /\baccessory\b/i.test(question);
+  const assertsAccessoryRelationshipAsFact =
+    /\b(?:because|since)\s+(?:the\s+)?(?:room|space|it)\s+is\s+accessory\b/i.test(applicabilityText);
+  const unestablishedAccessoryRelationshipSourceIDs =
+    citedAccessoryClassificationSourceIDs.length &&
+    !userStatesAccessoryRelationship &&
+    assertsAccessoryRelationshipAsFact
+      ? citedAccessoryClassificationSourceIDs
+      : [];
   const userStatesGroupBPrincipalOccupancy =
     /\baccessory to (?:an?|the)\s+Group B occupancy\b/i.test(question);
   const misattributedAccessoryAssemblyRelationshipSourceIDs =
@@ -147,6 +159,21 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     accessoryAssemblySourceIDs.length && assertsNormalGroupBFixturePermission
       ? accessoryAssemblySourceIDs
       : [];
+  const multipleOccupancyFractionSourceIDs = accessoryAssemblyPlumbingQuestion
+    ? knownCitedSourceIDs.filter((sourceID) =>
+      availableEvidence.get(sourceID)?.reference === "PC 403.1.1" &&
+      /\bmultiple occupancies\b[\s\S]*\bfractional numbers?\b[\s\S]*\b(?:added|summed|combined)\b[\s\S]*\bround/i.test(
+        availableEvidence.get(sourceID)?.text
+      )
+    )
+    : [];
+  const statesMultipleOccupancyFractionSequence =
+    /\b(?:add|added|sum|summed|combine|combined)\b[^.]{0,100}\bfraction(?:s|al\s+(?:numbers?|(?:fixture\s+)?requirements?))\b[^.]{0,100}\b(?:before|then|prior to)\b[^.]{0,60}\bround/i.test(applicabilityText) ||
+    /\bfraction(?:s|al\s+(?:numbers?|(?:fixture\s+)?requirements?))\b[^.]{0,100}\b(?:add|added|sum|summed|combine|combined)\b[^.]{0,100}\b(?:before|then|prior to)\b[^.]{0,60}\bround/i.test(applicabilityText);
+  const missingMultipleOccupancyFractionSequenceSourceIDs =
+    multipleOccupancyFractionSourceIDs.length && !statesMultipleOccupancyFractionSequence
+      ? multipleOccupancyFractionSourceIDs
+      : [];
   const hcrVanityQuestion =
     /\bHCR\b/i.test(question) &&
     /\bvanity\b/i.test(question);
@@ -155,8 +182,15 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       availableEvidence.get(sourceID)?.reference === "BC 1107.2.2.7.2.2"
     )
     : [];
+  const userStatesTypeBNYCApplicability = /\bType B\+NYC\b/i.test(question);
+  const preservesTypeBNYCApplicabilityAsConditional =
+    /\b(?:if|whether|assuming|provided|confirm|applicab(?:le|ility)|subject to)\b[^.]{0,100}\bType B\+NYC\b/i.test(applicabilityText) ||
+    /\bType B\+NYC\b[^.]{0,100}\b(?:applies|applicable|applicability|subject to|must be confirmed|remains unknown)\b/i.test(applicabilityText);
   const missingTypeBNYCContextSourceIDs =
-    hcrVanitySourceIDs.length && !/\bType B\+NYC\b/i.test(applicabilityText)
+    hcrVanitySourceIDs.length && (
+      !/\bType B\+NYC\b/i.test(applicabilityText) ||
+      (!userStatesTypeBNYCApplicability && !preservesTypeBNYCApplicabilityAsConditional)
+    )
       ? hcrVanitySourceIDs
       : [];
   const cumulativeSingleExitSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
@@ -227,9 +261,11 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       missingApplicabilityDisclosureSourceIDs.length === 0 &&
       missingParallelTableCategorySourceIDs.length === 0 &&
       missingZoningModificationPathDisclosureSourceIDs.length === 0 &&
+      unestablishedAccessoryRelationshipSourceIDs.length === 0 &&
       misattributedAccessoryAssemblyRelationshipSourceIDs.length === 0 &&
       missingPC403NonaccessoryScopeDisclosureSourceIDs.length === 0 &&
       unsupportedNormalGroupBFixturePermissionSourceIDs.length === 0 &&
+      missingMultipleOccupancyFractionSequenceSourceIDs.length === 0 &&
       missingTypeBNYCContextSourceIDs.length === 0 &&
       misstatedCumulativeConditionSourceIDs.length === 0 &&
       unsupportedExitAccessExpansionSourceIDs.length === 0 &&
@@ -243,9 +279,11 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     missingApplicabilityDisclosureSourceIDs,
     missingParallelTableCategorySourceIDs,
     missingZoningModificationPathDisclosureSourceIDs,
+    unestablishedAccessoryRelationshipSourceIDs,
     misattributedAccessoryAssemblyRelationshipSourceIDs,
     missingPC403NonaccessoryScopeDisclosureSourceIDs,
     unsupportedNormalGroupBFixturePermissionSourceIDs,
+    missingMultipleOccupancyFractionSequenceSourceIDs,
     missingTypeBNYCContextSourceIDs,
     misstatedCumulativeConditionSourceIDs,
     unsupportedExitAccessExpansionSourceIDs,
@@ -320,6 +358,12 @@ export function researchAnswerQualityRevisionIssues(result) {
       detail: `When concluding that a use is not permitted as-of-right under the underlying zoning district, limit that conclusion to the underlying district rules and expressly preserve separate special-purpose-district, authorization, special-permit, or variance pathways not resolved by the supplied evidence. Bind the underlying use conclusion to: ${references(result.missingZoningModificationPathDisclosureSourceIDs, result.sources)}.`
     });
   }
+  if (result.unestablishedAccessoryRelationshipSourceIDs?.length) {
+    issues.push({
+      type: "overstated_compliance",
+      detail: `Do not infer that a room is legally accessory merely because it serves residents or a principal occupancy. Unless the user expressly established the accessory relationship, make the BC 303.1.3 classification conclusion conditional on that relationship and include it as a missing project fact. Bind the condition to: ${references(result.unestablishedAccessoryRelationshipSourceIDs, result.sources)}.`
+    });
+  }
   if (result.misattributedAccessoryAssemblyRelationshipSourceIDs?.length) {
     issues.push({
       type: "wrong_attribution",
@@ -338,10 +382,16 @@ export function researchAnswerQualityRevisionIssues(result) {
       detail: `Do not conclude that the normal Group B fixture calculation remains permitted merely because the accessory assembly room is classified as Group B. Lead with Not automatically: the supplied BC 303.1.3 establishes the Assembly-calculation option, while the absent Table 403.1 prevents this evidence package from establishing that normal Group B ratios may also be used. Bind the limited conclusion to: ${references(result.unsupportedNormalGroupBFixturePermissionSourceIDs, result.sources)}.`
     });
   }
+  if (result.missingMultipleOccupancyFractionSequenceSourceIDs?.length) {
+    issues.push({
+      type: "missed_material_conclusion",
+      detail: `State the supplied multiple-occupancy calculation sequence explicitly: calculate each occupancy with its applicable ratio, add the resulting fractional fixture requirements, and only then round up. Bind that sequence to: ${references(result.missingMultipleOccupancyFractionSequenceSourceIDs, result.sources)}.`
+    });
+  }
   if (result.missingTypeBNYCContextSourceIDs?.length) {
     issues.push({
       type: "missed_material_conclusion",
-      detail: `Place BC 1107.2.2.7.2.2 in its Type B+NYC unit toilet-and-bathing-room context before explaining its water-closet clearance and permitted lavatory location. Bind that applicability context to: ${references(result.missingTypeBNYCContextSourceIDs, result.sources)}.`
+      detail: `Place BC 1107.2.2.7.2.2 in its Type B+NYC unit toilet-and-bathing-room context before explaining its water-closet clearance and permitted lavatory location. Unless the user established that the subject unit and bathroom are within that scope, make the Building Code discussion conditional on Type B+NYC applicability and include that applicability as a missing project fact. Bind the context to: ${references(result.missingTypeBNYCContextSourceIDs, result.sources)}.`
     });
   }
   if (result.misstatedCumulativeConditionSourceIDs?.length) {

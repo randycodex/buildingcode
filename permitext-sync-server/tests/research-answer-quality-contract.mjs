@@ -211,6 +211,38 @@ const correctedAccessoryRelationship = evaluateResearchAnswerQuality({
 });
 assert.equal(correctedAccessoryRelationship.pass, true);
 
+const residentAmenityQuestion =
+  "Does a 900-net-square-foot residents-only multipurpose room with tables and chairs need to be classified as Group A-3?";
+const inferredAccessoryRelationship = evaluateResearchAnswerQuality({
+  question: residentAmenityQuestion,
+  evidence: accessoryAssemblyEvidence,
+  answer: {
+    answerText: "No. Because the room is accessory to the apartment-building occupancy, it is Group B.",
+    supportedPoints: [{ sourceIDs: ["bc-accessory-assembly"] }],
+    citations: [{ sourceIDs: ["bc-accessory-assembly"] }]
+  }
+});
+assert.equal(inferredAccessoryRelationship.pass, false);
+assert.deepEqual(
+  inferredAccessoryRelationship.unestablishedAccessoryRelationshipSourceIDs,
+  ["bc-accessory-assembly"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(inferredAccessoryRelationship).at(-1).type,
+  "overstated_compliance"
+);
+
+const conditionalAccessoryRelationship = evaluateResearchAnswerQuality({
+  question: residentAmenityQuestion,
+  evidence: accessoryAssemblyEvidence,
+  answer: {
+    answerText: "If the room is accessory to the apartment-building occupancy, its calculated occupant load may support the BC 303.1.3 Group B classification path; whether that accessory relationship applies remains a missing project fact.",
+    supportedPoints: [{ sourceIDs: ["bc-accessory-assembly"] }],
+    citations: [{ sourceIDs: ["bc-accessory-assembly"] }]
+  }
+});
+assert.equal(conditionalAccessoryRelationship.pass, true);
+
 const pc403RestrictedAssemblyEvidence = {
   ...source("pc-nonaccessory-assembly", "403.1", "governing", "aligned"),
   codePrefix: "PC",
@@ -275,6 +307,53 @@ const boundedNormalGroupBFixtureAnswer = evaluateResearchAnswerQuality({
   }
 });
 assert.equal(boundedNormalGroupBFixtureAnswer.pass, true);
+
+const pc403MultipleOccupancyEvidence = {
+  ...source("pc-multiple-occupancy-fractions", "403.1.1", "governing", "aligned"),
+  codePrefix: "PC",
+  text: "Where multiple occupancies are present, fractional numbers resulting from applying the fixture ratios for each occupancy shall be added and rounded up to the next whole number."
+};
+const incompleteFractionSequence = evaluateResearchAnswerQuality({
+  question: accessoryAssemblyQuestion,
+  evidence: [...accessoryAssemblyEvidence, pc403MultipleOccupancyEvidence],
+  answer: {
+    answerText: "Not automatically. Use the applicable Assembly ratio, apply the ratios, and round fractions up as specified.",
+    supportedPoints: [
+      { sourceIDs: ["bc-accessory-assembly"] },
+      { sourceIDs: ["pc-multiple-occupancy-fractions"] }
+    ],
+    citations: [
+      { sourceIDs: ["bc-accessory-assembly"] },
+      { sourceIDs: ["pc-multiple-occupancy-fractions"] }
+    ]
+  }
+});
+assert.equal(incompleteFractionSequence.pass, false);
+assert.deepEqual(
+  incompleteFractionSequence.missingMultipleOccupancyFractionSequenceSourceIDs,
+  ["pc-multiple-occupancy-fractions"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(incompleteFractionSequence).at(-1).type,
+  "missed_material_conclusion"
+);
+
+const completeFractionSequence = evaluateResearchAnswerQuality({
+  question: accessoryAssemblyQuestion,
+  evidence: [...accessoryAssemblyEvidence, pc403MultipleOccupancyEvidence],
+  answer: {
+    answerText: "Not automatically. Apply the applicable ratio to each occupancy, add the resulting fractional fixture requirements, and only then round up.",
+    supportedPoints: [
+      { sourceIDs: ["bc-accessory-assembly"] },
+      { sourceIDs: ["pc-multiple-occupancy-fractions"] }
+    ],
+    citations: [
+      { sourceIDs: ["bc-accessory-assembly"] },
+      { sourceIDs: ["pc-multiple-occupancy-fractions"] }
+    ]
+  }
+});
+assert.equal(completeFractionSequence.pass, true);
 
 const diningSurfaceEvidence = [{
   ...source("bc-dining-surfaces", "1108.2.9.1", "governing", "aligned"),
@@ -392,12 +471,27 @@ const contextualVanityAnswer = evaluateResearchAnswerQuality({
   question: vanityQuestion,
   evidence: vanityEvidence,
   answer: {
-    answerText: "No. In its Type B+NYC unit toilet-and-bathing-room context, it permits a compliant lavatory location and does not establish an HCR vanity requirement.",
+    answerText: "No. If the subject unit and bathroom are within the Type B+NYC scope, the provision permits a compliant lavatory location and does not establish an HCR vanity requirement; that applicability must be confirmed.",
     supportedPoints: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }],
     citations: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }]
   }
 });
 assert.equal(contextualVanityAnswer.pass, true);
+
+const unresolvedTypeBNYCAnswer = evaluateResearchAnswerQuality({
+  question: vanityQuestion,
+  evidence: vanityEvidence,
+  answer: {
+    answerText: "No. Within the supplied Type B+NYC unit toilet-and-bathing-room scope, it permits a compliant lavatory location and does not establish an HCR vanity requirement.",
+    supportedPoints: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }],
+    citations: [{ sourceIDs: ["bc-type-b-nyc-toilet-room"] }]
+  }
+});
+assert.equal(unresolvedTypeBNYCAnswer.pass, false);
+assert.deepEqual(
+  unresolvedTypeBNYCAnswer.missingTypeBNYCContextSourceIDs,
+  ["bc-type-b-nyc-toilet-room"]
+);
 
 const implicitSectionVanityAnswer = evaluateResearchAnswerQuality({
   question: "Does this section prove that HCR requires a vanity in the bathroom?",

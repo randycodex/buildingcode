@@ -8273,11 +8273,25 @@ function mockResearchInterpretation(question, evidence, options = {}) {
       section?.sectionNumber === "403.1" &&
       /\bbuilding or nonaccessory tenant space\b/i.test(section?.text || "")
     );
+  const accessoryAssemblyFractionSequence =
+    accessoryAssemblyFixtureBoundary && answerEvidence.some((section) =>
+      section?.codePrefix === "PC" &&
+      section?.sectionNumber === "403.1.1" &&
+      /\bmultiple occupancies\b[\s\S]*\bfractional numbers?\b[\s\S]*\b(?:added|summed|combined)\b[\s\S]*\bround/i.test(
+        section?.text || ""
+      )
+    );
+  const accessoryAssemblyFixtureAnswer = [
+    "Not automatically. BC 303.1.3 directly permits a qualifying accessory assembly room to use the applicable Assembly fixture calculation. The selected PC 403.1 permission is limited to a building or nonaccessory tenant assembly space and does not independently extend to the accessory room. Without the applicable Table 403.1 rows, the assembled evidence does not establish whether normal Group B ratios may also be used.",
+    accessoryAssemblyFractionSequence
+      ? "For multiple occupancies, apply the applicable ratio to each occupancy, add the resulting fractional fixture requirements, and only then round up."
+      : ""
+  ].filter(Boolean).join(" ");
   const acceptsConditionalYes = /^(?:can|could|does|is|are|may|must|should|will|would)\b/i
     .test(String(question || "").trim());
   const directAnswer = conversational
     ? accessoryAssemblyFixtureBoundary
-      ? "Not automatically. BC 303.1.3 directly permits a qualifying accessory assembly room to use the applicable Assembly fixture calculation. The selected PC 403.1 permission is limited to a building or nonaccessory tenant assembly space and does not independently extend to the accessory room. Without the applicable Table 403.1 rows, the assembled evidence does not establish whether normal Group B ratios may also be used."
+      ? accessoryAssemblyFixtureAnswer
       : acceptsConditionalYes
       ? "Potentially, yes—but only if the conditions in the assembled enacted provisions are satisfied by the project."
       : "The assembled enacted provisions provide a conditional answer, but the remaining project facts must be confirmed before relying on it."
@@ -8288,8 +8302,14 @@ function mockResearchInterpretation(question, evidence, options = {}) {
   const ancestorScopeApplication = governingAncestorScope
     ? `The pinned provision sits within the ${governingAncestorScope.title || governingAncestorScope.sectionNumber} scope. Confirm whether that scope applies to the project before applying the descendant rule.`
     : "";
+  const typeBNYCApplication =
+    /\bHCR\b/i.test(question) && answerEvidence.some((section) =>
+      section?.codePrefix === "BC" && section?.sectionNumber === "1107.2.2.7.2.2"
+    )
+      ? "If the subject unit and bathroom are within the Type B+NYC scope, apply the cited Building Code rule; that applicability must be confirmed separately from any HCR requirement."
+      : "";
   return {
-    answerText: [directAnswer, application, ancestorScopeApplication].filter(Boolean).join("\n\n"),
+    answerText: [directAnswer, application, ancestorScopeApplication, typeBNYCApplication].filter(Boolean).join("\n\n"),
     supportedPoints: answerEvidenceGroups.slice(0, maximumResearchSupportedPoints).map(({ section, sourceIDs }) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
@@ -8300,7 +8320,9 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     })),
     assumptions: ["Only the enacted 2022 New York City Construction Code provisions assembled for this answer were treated as governing authority."],
     missingFacts: [
-      governingAncestorScope
+      typeBNYCApplication
+        ? "Confirm whether the subject unit and bathroom are within the Type B+NYC scope."
+        : governingAncestorScope
         ? `Confirm whether the project is subject to the ${governingAncestorScope.title || governingAncestorScope.sectionNumber} scope.`
         : "Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."
     ],
@@ -9299,8 +9321,11 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "When the same supplied table row places the user's stated category beside a materially different conditional category, briefly identify the alternate value and its qualifying condition when that contrast explains the result. Never apply the alternate value without the qualifying fact.",
         "Preserve express subject-scope restrictions before using a special permission. For an accessory assembly-room fixture question, BC 303.1.3 is the direct authority for the Assembly fixture option; a selected PC 403.1 permission limited to a building or nonaccessory tenant assembly space must be identified as separately limited and must not be presented as independent authority for the accessory room.",
         "For an accessory assembly room classified as Group B, do not infer from the classification alone that normal Group B fixture ratios may be used. When Table 403.1 is not supplied, lead with Not automatically: BC 303.1.3 establishes the Assembly-calculation option, while the selected evidence does not establish that a normal Group B calculation is also permitted.",
+        "Do not infer that a room is legally accessory merely because it is used by residents or serves a principal occupancy. Unless the user expressly established the accessory relationship, make any BC 303.1.3 classification conclusion conditional on that relationship and include it in missingFacts.",
         "A missing fact belongs in missingFacts or followUpQuestions only when it can change the requested conclusion. A fact that merely confirms an already-supported, more conservative result may be identified as a professional validation item, but it must not weaken or condition that result.",
         "When a calculation rule permits a non-50/50 sex distribution only when approved statistical data supports it, identify whether that approved data exists as a missing project fact whenever the final fixture calculation remains unresolved.",
+        "When supplied PC 403.1.1 text governs multiple occupancies, state its full calculation order: apply the applicable ratio to each occupancy, add the resulting fractional requirements, and only then round up.",
+        "When discussing Type B+NYC provisions, do not assume the subject unit and bathroom are within that scope merely because the provision was selected. Unless the user established applicability, make the Building Code discussion conditional on Type B+NYC applicability and include that applicability in missingFacts.",
         "Treat a corpus or evidence limitation as a boundary on what Permitext evaluated, not as proof that another provision imposes a requirement. Do not say an outside or unsupplied provision requires verification or might change the result unless supplied enacted evidence establishes that consequence.",
         "Every passage marked REQUIRED_CLAIM_COVERAGE must be cited with that exact PASSAGE_ID and its material rule or limitation addressed in answerText. Use a supportedPoint when the passage establishes an affirmative rule; a passage cited solely to explain that it does not establish the requested proposition need not be duplicated as a positive supportedPoint.",
         "Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed.",
@@ -9528,6 +9553,9 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Fail with missed_material_conclusion when a table answer omits a materially different conditional category supplied beside the user's category in the same row and that omission could mislead the user about why the stated value fails or passes. Do not demand unrelated rows or categories.",
       "For an accessory assembly-room fixture question, fail with wrong_attribution if the answer uses PC 403.1's separate permission as authority for that accessory room without stating that the selected PC sentence is limited to a building or nonaccessory tenant assembly space. BC 303.1.3 is the direct authority for the accessory-room Assembly fixture option.",
       "For an accessory assembly room classified as Group B, fail with overstated_compliance if the answer says normal Group B fixture ratios remain permitted or are the normal starting point solely because of that classification. Without the applicable Table 403.1 rows, the supported conclusion is Not automatically; BC 303.1.3 establishes the Assembly-calculation option but not a separate affirmative Group B calculation permission.",
+      "Fail with overstated_compliance when an answer treats a room as legally accessory merely because residents use it or it serves a principal occupancy. If the user did not establish the accessory relationship, BC 303.1.3 classification must be conditional and the relationship must remain a missing project fact.",
+      "Fail with missed_material_conclusion when supplied PC 403.1.1 multiple-occupancy text is material but the answer omits that the fractional requirements calculated for each occupancy are added before the total is rounded up.",
+      "For a Type B+NYC provision, fail with missed_material_conclusion when the user did not establish that the subject unit and bathroom are within that scope and the answer neither makes applicability conditional nor identifies it as a missing project fact.",
       "Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement, or says unsupplied law requires verification or could change the result without enacted support.",
       "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",
       "Treat established active-topic facts as supplied user facts. Fail an answer that calls one of them missing, makes the conclusion conditional solely because it came from an earlier turn, or asks the user to reconfirm it without a contradiction. Do not treat prior assistant conclusions as established facts.",
