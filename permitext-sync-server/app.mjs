@@ -8261,10 +8261,24 @@ function mockResearchInterpretation(question, evidence, options = {}) {
   const governingAncestorScope = governingAncestorScopes.find((section) =>
     /Type B\+NYC/i.test([section?.title, section?.text].join(" "))
   ) || governingAncestorScopes.at(-1);
+  const accessoryAssemblyFixtureBoundary =
+    /\b(?:plumbing fixtures?|fixture requirements?)\b/i.test(question) &&
+    /\bGroup B\b/i.test(question) &&
+    /\b(?:fewer than|under|less than)\s+75\b/i.test(question) &&
+    answerEvidence.some((section) =>
+      section?.codePrefix === "BC" && section?.sectionNumber === "303.1.3"
+    ) &&
+    answerEvidence.some((section) =>
+      section?.codePrefix === "PC" &&
+      section?.sectionNumber === "403.1" &&
+      /\bbuilding or nonaccessory tenant space\b/i.test(section?.text || "")
+    );
   const acceptsConditionalYes = /^(?:can|could|does|is|are|may|must|should|will|would)\b/i
     .test(String(question || "").trim());
   const directAnswer = conversational
-    ? acceptsConditionalYes
+    ? accessoryAssemblyFixtureBoundary
+      ? "Not automatically. BC 303.1.3 directly permits a qualifying accessory assembly room to use the applicable Assembly fixture calculation. The selected PC 403.1 permission is limited to a building or nonaccessory tenant assembly space and does not independently extend to the accessory room. Without the applicable Table 403.1 rows, the assembled evidence does not establish whether normal Group B ratios may also be used."
+      : acceptsConditionalYes
       ? "Potentially, yes—but only if the conditions in the assembled enacted provisions are satisfied by the project."
       : "The assembled enacted provisions provide a conditional answer, but the remaining project facts must be confirmed before relying on it."
     : `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`;
