@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {
   createResearchOperationMetric,
   researchEconomicsReport,
+  researchPackPricingReport,
   researchPercentile
 } from "../research-economics.mjs";
 
@@ -101,5 +102,52 @@ const unsafeCharging = researchEconomicsReport([
 assert.equal(unsafeCharging.charging.failedCharged, 1);
 assert.equal(unsafeCharging.charging.integrityPass, false);
 assert.equal(unsafeCharging.readyForPricingDecision, false);
+
+const pricing = researchPackPricingReport(report, {
+  infrastructureCostPerTurnUSD: 0.005,
+  supportReserveRate: 0.04,
+  refundReserveRate: 0.02,
+  targetGrossMarginRate: 0.6,
+  channels: [
+    { id: "web", percentageFeeRate: 0.03, fixedFeeUSD: 0.30, priceIncrementUSD: 0.01 },
+    { id: "ios", percentageFeeRate: 0.15, fixedFeeUSD: 0, priceIncrementUSD: 0.01 }
+  ]
+});
+assert.equal(pricing.pricingDecisionReady, true);
+assert.equal(pricing.decisionStatus, "benchmark-ready");
+assert.equal(pricing.packs.length, 2);
+assert.equal(pricing.packs[0].turns, 25);
+assert.equal(pricing.packs[1].turns, 100);
+assert.equal(pricing.benchmark.failedOperationAllowancePerTurnUSD, 0.002);
+const webP90 = pricing.packs[0].channels.find((channel) => channel.id === "web").p90;
+const iosP90 = pricing.packs[0].channels.find((channel) => channel.id === "ios").p90;
+assert.equal(webP90.providerCostPerTurnUSD, 0.082);
+assert.equal(webP90.operatingCostUSD, 2.175);
+assert.equal(webP90.minimumListPriceUSD, 6.31);
+assert.equal(webP90.grossMarginRate >= 0.6, true);
+assert.equal(iosP90.minimumListPriceUSD, 6.89);
+assert.equal(iosP90.grossMarginRate >= 0.6, true);
+
+const illustrativePricing = researchPackPricingReport(unsafeCharging, {
+  infrastructureCostPerTurnUSD: 0,
+  supportReserveRate: 0,
+  refundReserveRate: 0,
+  targetGrossMarginRate: 0.5,
+  packTurnCounts: [25],
+  channels: [{ id: "web", percentageFeeRate: 0, fixedFeeUSD: 0 }]
+});
+assert.equal(illustrativePricing.pricingDecisionReady, false);
+assert.equal(illustrativePricing.decisionStatus, "illustrative-only-benchmark-not-ready");
+
+assert.throws(
+  () => researchPackPricingReport(report, {
+    infrastructureCostPerTurnUSD: 0,
+    supportReserveRate: 0.5,
+    refundReserveRate: 0.5,
+    targetGrossMarginRate: 0.5,
+    channels: [{ id: "web", percentageFeeRate: 0, fixedFeeUSD: 0 }]
+  }),
+  /must total less than 1/
+);
 
 console.log("permitext Research economics contract passed");

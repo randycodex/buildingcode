@@ -178,6 +178,16 @@ minimal Luna request verifies that the server-only key has model access and
 available API credit so a known provider-account failure cannot begin a partial
 pricing run.
 
+After a clean benchmark, `researchPackPricingReport` converts the measured p50
+and p90 completed-turn costs into minimum-price scenarios for explicitly supplied
+pack sizes and sales channels. Infrastructure per turn, payment fees, fixed
+fees, support and refund reserves, target gross margin, and store price increments
+are required assumptions; none are silently treated as current commercial terms.
+The report includes failed-operation cost amortization and remains labeled
+`illustrative-only-benchmark-not-ready` until the source economics report passes
+its sample, cost-target, and charge-integrity gates. It is decision support only:
+it does not configure Stripe or App Store products or expose turn packs to users.
+
 `OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, and records versioned model/token usage without logging the question or code text. Customer Account and Research views show included and purchased turns plus the monthly reset date; token totals and estimated provider cost remain owner-only operational data. The OpenAI account that owns the API key is responsible for model usage charges.
 
 ### Research evaluation set

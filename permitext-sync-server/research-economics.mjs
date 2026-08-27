@@ -15,6 +15,35 @@ function fixed(value, places = 6) {
   return Number(nonnegativeNumber(value).toFixed(places));
 }
 
+function boundedRate(value, label) {
+  const rate = Number(value);
+  if (!Number.isFinite(rate) || rate < 0 || rate >= 1) {
+    throw new TypeError(`${label} must be a number from 0 up to, but not including, 1.`);
+  }
+  return rate;
+}
+
+function positiveNumber(value, label) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) {
+    throw new TypeError(`${label} must be a positive number.`);
+  }
+  return number;
+}
+
+function requiredNonnegativeNumber(value, label) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number < 0) {
+    throw new TypeError(`${label} must be a nonnegative number.`);
+  }
+  return number;
+}
+
+function roundUp(value, increment) {
+  const units = Math.ceil((value - Number.EPSILON) / increment);
+  return fixed(units * increment, 2);
+}
+
 function normalizedStatus(value) {
   const status = String(value || "").trim().toLowerCase();
   return ["completed", "failed", "cancelled", "replayed", "rejected"].includes(status)
@@ -296,5 +325,162 @@ export function researchEconomicsReport(rawOperations = [], options = {}) {
       integrityPass: chargeIntegrityPass
     },
     readyForPricingDecision: sampleReady && targetReady && chargeIntegrityPass
+  };
+}
+
+function normalizedPricingChannel(channel = {}) {
+  const id = normalizedString(channel.id, 80);
+  if (!id) throw new TypeError("Each Research pack pricing channel requires an ID.");
+  return {
+    id,
+    percentageFeeRate: boundedRate(channel.percentageFeeRate, `${id} percentage fee rate`),
+    fixedFeeUSD: requiredNonnegativeNumber(channel.fixedFeeUSD, `${id} fixed fee`),
+    priceIncrementUSD: positiveNumber(channel.priceIncrementUSD ?? 0.01, `${id} price increment`)
+  };
+}
+
+function packPriceScenario({
+  turns,
+  providerCostPerTurnUSD,
+  infrastructureCostPerTurnUSD,
+  supportReserveRate,
+  refundReserveRate,
+  targetGrossMarginRate,
+  channel
+}) {
+  const operatingCostUSD = fixed(
+    turns * (providerCostPerTurnUSD + infrastructureCostPerTurnUSD)
+  );
+  const requiredNetRevenueUSD = operatingCostUSD / (1 - targetGrossMarginRate);
+  const proportionalDeductions = channel.percentageFeeRate + supportReserveRate + refundReserveRate;
+  if (proportionalDeductions >= 1) {
+    throw new TypeError(
+      `${channel.id} percentage fee and reserve rates must total less than 1.`
+    );
+  }
+  const rawMinimumListPriceUSD =
+    (requiredNetRevenueUSD + channel.fixedFeeUSD) / (1 - proportionalDeductions);
+  const minimumListPriceUSD = roundUp(rawMinimumListPriceUSD, channel.priceIncrementUSD);
+  const paymentFeeUSD = fixed(
+    minimumListPriceUSD * channel.percentageFeeRate + channel.fixedFeeUSD
+  );
+  const supportReserveUSD = fixed(minimumListPriceUSD * supportReserveRate);
+  const refundReserveUSD = fixed(minimumListPriceUSD * refundReserveRate);
+  const netRevenueUSD = fixed(
+    minimumListPriceUSD - paymentFeeUSD - supportReserveUSD - refundReserveUSD
+  );
+  const grossProfitUSD = fixed(netRevenueUSD - operatingCostUSD);
+  const grossMarginRate = netRevenueUSD > 0 ? fixed(grossProfitUSD / netRevenueUSD, 4) : null;
+  return {
+    providerCostPerTurnUSD: fixed(providerCostPerTurnUSD),
+    providerCostUSD: fixed(turns * providerCostPerTurnUSD),
+    infrastructureCostUSD: fixed(turns * infrastructureCostPerTurnUSD),
+    operatingCostUSD,
+    rawMinimumListPriceUSD: fixed(rawMinimumListPriceUSD),
+    minimumListPriceUSD,
+    paymentFeeUSD,
+    supportReserveUSD,
+    refundReserveUSD,
+    netRevenueUSD,
+    grossProfitUSD,
+    grossMarginRate
+  };
+}
+
+/**
+ * Converts a clean Research benchmark into minimum sustainable pack-price
+ * scenarios. This report is decision support only: it does not configure or
+ * expose products, and it remains not ready while the source benchmark is not
+ * ready for a pricing decision.
+ */
+export function researchPackPricingReport(benchmarkReport = {}, assumptions = {}) {
+  const economics = benchmarkReport?.economics || {};
+  const completedTurnCost = economics.completedTurnCostUSD || {};
+  const p50ProviderCostPerTurnUSD = nonnegativeNumber(completedTurnCost.p50, NaN);
+  const p90ProviderCostPerTurnUSD = nonnegativeNumber(completedTurnCost.p90, NaN);
+  if (!Number.isFinite(p50ProviderCostPerTurnUSD) || !Number.isFinite(p90ProviderCostPerTurnUSD)) {
+    throw new TypeError("Research pack pricing requires benchmark p50 and p90 completed-turn costs.");
+  }
+  const completedCharged = nonnegativeInteger(benchmarkReport?.sample?.completedCharged);
+  const failedOperationAllowancePerTurnUSD = completedCharged > 0
+    ? nonnegativeNumber(economics.failedOperatingCostUSD) / completedCharged
+    : 0;
+  const providerCosts = {
+    p50: p50ProviderCostPerTurnUSD + failedOperationAllowancePerTurnUSD,
+    p90: p90ProviderCostPerTurnUSD + failedOperationAllowancePerTurnUSD
+  };
+  const infrastructureCostPerTurnUSD = requiredNonnegativeNumber(
+    assumptions.infrastructureCostPerTurnUSD,
+    "Infrastructure cost per turn"
+  );
+  const supportReserveRate = boundedRate(
+    assumptions.supportReserveRate,
+    "Support reserve rate"
+  );
+  const refundReserveRate = boundedRate(
+    assumptions.refundReserveRate,
+    "Refund reserve rate"
+  );
+  const targetGrossMarginRate = boundedRate(
+    assumptions.targetGrossMarginRate,
+    "Target gross margin rate"
+  );
+  const turns = Array.from(new Set(
+    (Array.isArray(assumptions.packTurnCounts) ? assumptions.packTurnCounts : [25, 100])
+      .map((value) => nonnegativeInteger(value))
+      .filter((value) => value > 0)
+  )).sort((left, right) => left - right);
+  if (!turns.length) throw new TypeError("Research pack pricing requires at least one positive turn count.");
+  const channels = (Array.isArray(assumptions.channels) ? assumptions.channels : [])
+    .map(normalizedPricingChannel);
+  if (!channels.length) throw new TypeError("Research pack pricing requires at least one sales channel.");
+  if (new Set(channels.map((channel) => channel.id)).size !== channels.length) {
+    throw new TypeError("Research pack pricing channel IDs must be unique.");
+  }
+  const pricingDecisionReady = benchmarkReport?.readyForPricingDecision === true;
+  return {
+    generatedAt: new Date().toISOString(),
+    pricingDecisionReady,
+    decisionStatus: pricingDecisionReady
+      ? "benchmark-ready"
+      : "illustrative-only-benchmark-not-ready",
+    benchmark: {
+      completedCharged,
+      sampleReady: benchmarkReport?.sample?.sampleReady === true,
+      targetReady: economics.targetReady === true,
+      chargeIntegrityPass: benchmarkReport?.charging?.integrityPass === true,
+      failedOperationAllowancePerTurnUSD: fixed(failedOperationAllowancePerTurnUSD)
+    },
+    assumptions: {
+      infrastructureCostPerTurnUSD: fixed(infrastructureCostPerTurnUSD),
+      supportReserveRate,
+      refundReserveRate,
+      targetGrossMarginRate,
+      channels
+    },
+    packs: turns.map((turnCount) => ({
+      turns: turnCount,
+      channels: channels.map((channel) => ({
+        id: channel.id,
+        p50: packPriceScenario({
+          turns: turnCount,
+          providerCostPerTurnUSD: providerCosts.p50,
+          infrastructureCostPerTurnUSD,
+          supportReserveRate,
+          refundReserveRate,
+          targetGrossMarginRate,
+          channel
+        }),
+        p90: packPriceScenario({
+          turns: turnCount,
+          providerCostPerTurnUSD: providerCosts.p90,
+          infrastructureCostPerTurnUSD,
+          supportReserveRate,
+          refundReserveRate,
+          targetGrossMarginRate,
+          channel
+        })
+      }))
+    }))
   };
 }
