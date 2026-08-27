@@ -2778,7 +2778,7 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     }
 
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse {
-        // Terra may need substantially longer than an ordinary metadata read.
+        // Verified Research may need substantially longer than an ordinary metadata read.
         // Keep the normal transport timeout tight, but do not abandon a valid
         // Research generation while the server is still working.
         try await post(

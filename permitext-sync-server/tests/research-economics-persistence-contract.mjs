@@ -33,6 +33,11 @@ assert.match(
 );
 assert.match(
   appSource,
+  /PERMITEXT_RESEARCH_ECONOMICS_MINIMUM_COMPLETED_TURNS \|\| 25/,
+  "Controlled evaluations cannot set an explicit minimum completed-turn cohort without changing Production's default."
+);
+assert.match(
+  appSource,
   /status: "replayed"[\s\S]*charged: false/,
   "Durable replay telemetry does not preserve its no-charge state."
 );

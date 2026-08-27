@@ -17018,7 +17018,9 @@ async function internalResearchSpendReport() {
     researchOperationsSince(periodStart)
   ]);
   const economics = researchEconomicsReport(operations, {
-    minimumCompletedTurns: 25,
+    minimumCompletedTurns: Number(
+      process.env.PERMITEXT_RESEARCH_ECONOMICS_MINIMUM_COMPLETED_TURNS || 25
+    ),
     targetCostPer100MinimumUSD: Number(
       process.env.PERMITEXT_RESEARCH_TARGET_100_TURN_COST_MIN_USD || 4
     ),
