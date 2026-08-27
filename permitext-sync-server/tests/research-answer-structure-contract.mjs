@@ -69,8 +69,11 @@ assert.match(serverSource, /Do not target a fixed number of paragraphs or senten
 assert.match(serverSource, /Use the shortest answer that fully and reliably resolves the question/);
 assert.match(serverSource, /Never omit a material qualification, applicability issue, conflicting provision, or evidence limitation/);
 assert.match(serverSource, /RELATIONSHIP: \$\{section\.relationship/);
-assert.match(serverSource, /governing ancestor scope for pinned evidence materially qualifies the pinned descendant/);
-assert.match(serverSource, /Do not classify that applicability context or its citation as collateral or irrelevant/);
+assert.match(serverSource, /USER_SELECTED_TEXT is the exact model-visible focus and citation target/);
+assert.doesNotMatch(serverSource, /`CANONICAL_SECTION_CONTEXT:/);
+assert.match(serverSource, /Do not force a generic ancestor heading or redundant parent restatement/);
+assert.match(serverSource, /Preserve cumulative and alternative conditions exactly/);
+assert.match(serverSource, /A and B must not be restated as A or B/);
 assert.match(clientSource, /function appendResearchAnswerNarrative\(container, result\)/);
 assert.match(clientSource, /text\.split\(\/\\n\\s\*\\n\/\)/);
 assert.match(clientSource, /list\.className = "research-answer-list"/);

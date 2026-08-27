@@ -251,4 +251,31 @@ assert.deepEqual(
   "Pinned-section questions must retain their governing Type B+NYC scope even when the user says only this section."
 );
 
+const singleExitItemEvidence = [{
+  ...source("bc-single-exit-item-seven", "1006.3.2", "governing", "aligned"),
+  text: "Buildings of Occupancy Group R-2 of construction Type I or II not exceeding six stories and not exceeding 2,000 square feet per story."
+}];
+const driftingSingleExitAnswer = evaluateResearchAnswerQuality({
+  question: "Can this six-story residential building use one exit stair?",
+  evidence: singleExitItemEvidence,
+  answer: {
+    answerText: "A single exit or access to a single exit is allowed if the building does not exceed six stories or 2,000 square feet per story.",
+    supportedPoints: [{ sourceIDs: ["bc-single-exit-item-seven"] }],
+    citations: [{ sourceIDs: ["bc-single-exit-item-seven"] }]
+  }
+});
+assert.equal(driftingSingleExitAnswer.pass, false);
+assert.deepEqual(
+  driftingSingleExitAnswer.misstatedCumulativeConditionSourceIDs,
+  ["bc-single-exit-item-seven"]
+);
+assert.deepEqual(
+  driftingSingleExitAnswer.unsupportedExitAccessExpansionSourceIDs,
+  ["bc-single-exit-item-seven"]
+);
+assert.deepEqual(
+  researchAnswerQualityRevisionIssues(driftingSingleExitAnswer).slice(-2).map((issue) => issue.type),
+  ["misstated_provision", "unsupported_requirement"]
+);
+
 console.log("Permitext Research answer-quality and evidence-economy contract passed.");

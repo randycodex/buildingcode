@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260826-answer-ancestor-scope-applicability-v6";
+  "20260826-answer-pinned-condition-fidelity-v7";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -140,6 +140,24 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     hcrVanitySourceIDs.length && !/\bType B\+NYC\b/i.test(applicabilityText)
       ? hcrVanitySourceIDs
       : [];
+  const cumulativeSingleExitSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
+    /not exceeding six stories\s+and\s+not exceeding 2,?000 square feet/i.test(
+      availableEvidence.get(sourceID)?.text
+    )
+  );
+  const misstatedCumulativeConditionSourceIDs =
+    cumulativeSingleExitSourceIDs.length &&
+    /(?:does\s+not\s+exceed|not\s+exceeding)\s+six\s+stories\s+or\s+(?:does\s+not\s+exceed|not\s+exceeding\s+)?2,?000\s+square\s+feet/i.test(applicabilityText)
+      ? cumulativeSingleExitSourceIDs
+      : [];
+  const unsupportedExitAccessExpansionSourceIDs =
+    cumulativeSingleExitSourceIDs.length &&
+    /\b(?:single|one)\s+exit\s+or\s+access\s+to\s+(?:a\s+single|one|an?)\s+exit\b/i.test(applicabilityText) &&
+    !cumulativeSingleExitSourceIDs.some((sourceID) =>
+      /\baccess\s+to\s+(?:a\s+single|one|an?)\s+exit\b/i.test(availableEvidence.get(sourceID)?.text)
+    )
+      ? cumulativeSingleExitSourceIDs
+      : [];
   const citationSourceIDsByRole = {
     governing: knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.evidenceRole === "governing"),
     supporting: knownCitedSourceIDs.filter((sourceID) => availableEvidence.get(sourceID)?.evidenceRole === "supporting"),
@@ -169,7 +187,9 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       missingParallelTableCategorySourceIDs.length === 0 &&
       missingZoningModificationPathDisclosureSourceIDs.length === 0 &&
       misattributedAccessoryAssemblyRelationshipSourceIDs.length === 0 &&
-      missingTypeBNYCContextSourceIDs.length === 0,
+      missingTypeBNYCContextSourceIDs.length === 0 &&
+      misstatedCumulativeConditionSourceIDs.length === 0 &&
+      unsupportedExitAccessExpansionSourceIDs.length === 0,
     unknownAnswerSourceIDs,
     orphanCitationSourceIDs,
     uncitedSupportedPointSourceIDs,
@@ -180,6 +200,8 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     missingZoningModificationPathDisclosureSourceIDs,
     misattributedAccessoryAssemblyRelationshipSourceIDs,
     missingTypeBNYCContextSourceIDs,
+    misstatedCumulativeConditionSourceIDs,
+    unsupportedExitAccessExpansionSourceIDs,
     citedSourceIDs: knownCitedSourceIDs,
     reviewedOnlySourceIDs,
     evidenceEconomy,
@@ -253,6 +275,18 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "missed_material_conclusion",
       detail: `Place BC 1107.2.2.7.2.2 in its Type B+NYC unit toilet-and-bathing-room context before explaining its water-closet clearance and permitted lavatory location. Bind that applicability context to: ${references(result.missingTypeBNYCContextSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.misstatedCumulativeConditionSourceIDs?.length) {
+    issues.push({
+      type: "misstated_provision",
+      detail: `Preserve the cumulative Item 7 conditions: the building must not exceed six stories and must not exceed 2,000 square feet per story. Do not restate those conditions with or. Bind the corrected statement to: ${references(result.misstatedCumulativeConditionSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.unsupportedExitAccessExpansionSourceIDs?.length) {
+    issues.push({
+      type: "unsupported_requirement",
+      detail: `The pinned Item 7 passage supports the one-exit allowance asked about but does not supply the phrase access to one exit. Remove that unsupported expansion and stay within: ${references(result.unsupportedExitAccessExpansionSourceIDs, result.sources)}.`
     });
   }
   return issues;

@@ -7578,6 +7578,9 @@ function researchPrompt(question, evidence, options = {}) {
       `TOPIC_ROUTE_RELATIONSHIP: ${section.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
       `RELATIONSHIP: ${section.relationship || "Automatically assembled enacted evidence"}`,
       `RETRIEVAL_REASON: ${section.retrievalReason || section.relationship || "Authorized enacted evidence"}`,
+      section.origin === "user_pinned" && section.userSelectedText
+        ? `USER_SELECTED_TEXT: ${section.text}`
+        : "",
       `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
       section.evidencePriority?.claimCoverageReason
         ? `REQUIRED_CLAIM_REASON: ${section.evidencePriority.claimCoverageReason}`
@@ -9114,7 +9117,8 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
         "Evidence labeled historical or future-effective is available only because the user explicitly pinned it. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence.",
         "Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic.",
-        "When RELATIONSHIP identifies a source as governing ancestor scope for pinned evidence, treat that source as material applicability context for the pinned descendant, not as a collateral example. State the ancestor scope when relying on the descendant. If the supplied facts do not establish whether that scope applies, identify the applicability fact as unresolved without weakening a conclusion that is independently supported.",
+        "For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not replace it with, or import a sibling table row, exception, or rule from, broader section context.",
+        "When RELATIONSHIP identifies a source as governing ancestor scope for pinned evidence and its enacted text establishes an applicability category or condition needed to interpret the pinned descendant, treat that scope as material context rather than a collateral example. Do not force a generic ancestor heading or redundant parent restatement into the answer merely because it was supplied. If a material ancestor scope is not established by project facts, identify that applicability fact as unresolved without weakening an independently supported conclusion.",
         "supportedPoints are exclusively for rules established by the assembled enacted evidence. Never put a bulletin, agency-guidance, or other supporting-web claim in supportedPoints, and never attach an enacted SECTION_ID or PASSAGE_ID to such a claim.",
         "Put every material source-specific web-guidance statement only in supportingSourceUses by selecting the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair. Never write a new claim for that pair. In answerText, identify it as noncontrolling guidance and keep it distinct from the enacted rule.",
         options.allowOfficialGuidanceOnly
@@ -9135,6 +9139,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Use answerText to apply the supported rules to the question and user-provided Project facts. Do not merely repeat the structured supportedPoints.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
         "For a numeric limit or table comparison, compare the stated project value with every directly applicable supplied limit. If the value complies with a stricter baseline limit, state that direct conclusion and do not make it conditional on qualifying for a more generous allowance.",
+        "Preserve cumulative and alternative conditions exactly. When enacted text requires A and B, never restate it as A or B; when it permits alternatives, do not turn or into and.",
         "When the same supplied table row places the user's stated category beside a materially different conditional category, briefly identify the alternate value and its qualifying condition when that contrast explains the result. Never apply the alternate value without the qualifying fact.",
         "A missing fact belongs in missingFacts or followUpQuestions only when it can change the requested conclusion. A fact that merely confirms an already-supported, more conservative result may be identified as a professional validation item, but it must not weaken or condition that result.",
         "Treat a corpus or evidence limitation as a boundary on what Permitext evaluated, not as proof that another provision imposes a requirement. Do not say an outside or unsupplied provision requires verification or might change the result unless supplied enacted evidence establishes that consequence.",
@@ -9284,6 +9289,9 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     `TOPIC_ROUTE_RELATIONSHIP: ${source.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
     `RELATIONSHIP: ${source.relationship || "Automatically assembled enacted evidence"}`,
     `RETRIEVAL_REASON: ${source.retrievalReason || source.relationship || "Authorized enacted evidence"}`,
+    source.origin === "user_pinned" && source.userSelectedText
+      ? `USER_SELECTED_TEXT: ${source.text}`
+      : "",
     `TEXT: ${source.text}`
   ].join("\n")).join("\n\n---\n\n");
   const requestBody = {
@@ -9306,11 +9314,13 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Fail with missed_material_conclusion if cited historical or future-effective evidence is not expressly identified as historical or not yet effective, or if the answer silently presents it as ordinary current law.",
       "Fail an answer that introduces a collateral code example or citation that does not materially qualify the requested conclusion and was not requested by the user.",
       "Fail with irrelevant_citation when the answer cites evidence labeled with a collateral topic route merely because a supplied project fact matched that separate code topic. Such evidence may be reviewed internally without appearing in the answer.",
-      "A source whose RELATIONSHIP identifies it as governing ancestor scope for pinned evidence materially qualifies the pinned descendant. Do not classify that applicability context or its citation as collateral or irrelevant merely because the ancestor is broader. Fail with missed_material_conclusion if an answer relies on the descendant while omitting a supplied material ancestor scope; if applicability to the project is not established, preserve that unresolved fact without weakening an independently supported conclusion.",
+      "For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not validate a sibling table row, exception, or rule that is absent from that selected text merely because it belongs to the same section.",
+      "A source whose RELATIONSHIP identifies it as governing ancestor scope for pinned evidence is material only when its enacted text establishes an applicability category or condition needed to interpret the pinned descendant. Do not classify such material scope as collateral merely because the ancestor is broader, but do not require or cite a generic ancestor heading or redundant parent restatement merely because it was supplied. Preserve any genuinely unresolved applicability fact without weakening an independently supported conclusion.",
       "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
       "Fail with repeated_established_fact when the answer asks the user to establish or reconfirm a fact already supplied for the active topic. Independent professional verification of documents or measurements is different and may still be identified when material.",
       "When the user has established that a building is fully sprinklered, treat installed throughout as established factual context. The answer may request documentation of compliance with a named installation standard when material, but must not return fully sprinklered or installed throughout as a missing fact or follow-up question.",
       "For a numeric limit or table comparison, fail with weakest_supported_conclusion when the stated value satisfies a stricter directly applicable supplied limit but the answer makes compliance conditional on qualifying for a more generous allowance.",
+      "Fail with misstated_provision when the answer changes a cumulative enacted condition into an alternative or an enacted alternative into a cumulative condition. In particular, A and B must not be restated as A or B.",
       "Fail with missed_material_conclusion when a table answer omits a materially different conditional category supplied beside the user's category in the same row and that omission could mislead the user about why the stated value fails or passes. Do not demand unrelated rows or categories.",
       "Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement, or says unsupplied law requires verification or could change the result without enacted support.",
       "Treat every item in the deterministic required-claim checklist as mandatory answer coverage. Fail if its exact passage is absent from a supported point or citation, or if the answer contradicts it.",

@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260826-pinned-ancestor-context-v13";
+export const researchEvidenceAssemblyVersion = "20260826-pinned-prose-context-v15";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -489,7 +489,7 @@ function canonicalAncestorReferences(source, maximum = maximumPinnedAncestorCont
   const codePrefix = compactText(source?.codePrefix).toUpperCase();
   const sectionNumber = compactText(source?.sectionNumber).replace(/\.$/, "");
   const parts = sectionNumber.split(".").filter(Boolean);
-  if (!codePrefix || parts.length < 3) return [];
+  if (!codePrefix || parts.length < 4) return [];
   const references = [];
   while (parts.length > 2 && references.length < maximum) {
     parts.pop();
@@ -728,6 +728,33 @@ export async function assembleResearchEvidence({
     record.userSelectedText = compactText(
       entry.pinned.userSelectedText || entry.pinned.selectedText || entry.pinned.text
     );
+    if (
+      entry.resolved &&
+      !entry.pinned.richSourceID &&
+      record.userSelectedText &&
+      compactText(record.text) !== record.userSelectedText
+    ) {
+      const canonicalContextText = record.richSourceID
+        ? canonicalText(entry.value)
+        : record.text;
+      const selectedText = record.userSelectedText.slice(0, allowance).trimEnd();
+      const contextAllowance = Math.max(0, allowance - selectedText.length);
+      record.text = selectedText;
+      record.canonicalContextText = canonicalContextText.slice(0, contextAllowance).trimEnd();
+      record.canonicalContextComplete = canonicalContextText.length <= contextAllowance;
+      record.truncated = selectedText.length < record.userSelectedText.length ||
+        canonicalContextText.length > record.canonicalContextText.length;
+      record.pinnedSelectionExact = selectedText.length === record.userSelectedText.length;
+      [
+        "richSourceID",
+        "richSourceKind",
+        "richSourceReference",
+        "richSourceCanonicalReference",
+        "richSourceContentHash",
+        "richSourceRowCount",
+        "richSourceGrids"
+      ].forEach((key) => delete record[key]);
+    }
     const exactStructuredText = entry.pinned.richSourceID
       ? String(entry.pinned.text || entry.pinned.selectedText || "").trim()
       : "";
@@ -753,7 +780,7 @@ export async function assembleResearchEvidence({
     }
     sources.push(record);
     if (targeted.excerpt) targetedDefinitionCount += 1;
-    characterCount += record.text.length;
+    characterCount += record.text.length + String(record.canonicalContextText || "").length;
     const identity = sectionIdentity(record);
     if (identity) includedSectionIdentities.add(identity);
     if (entry.resolved) {

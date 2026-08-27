@@ -1,0 +1,1783 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-27T00:04:54.232Z",
+  "updatedAt": "2026-08-27T00:05:43.773Z",
+  "configuration": {
+    "runID": "c53bf858-e336-43cf-b627-fbc656654d9e",
+    "datasetSHA256": "bdda1e9937ac4291a34cab1f13e4f6de67e080c6298eff2b96fb2f870c856fcf",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260826-exact-pinned-answer-v14",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "targeted",
+    "repeat": 1,
+    "caseIDs": [
+      "single-stair-six-story-r2"
+    ],
+    "caseStatuses": [
+      "approved"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260722-exact-rubric-v2",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "267f2e78e359b38ea738e5bc73862994067d62bf",
+    "approvedSpendCapUSD": 2,
+    "conservativeReservedUSD": 0.110887,
+    "actualUSD": 0.110887,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 4
+  },
+  "economics": {
+    "generatedAt": "2026-08-27T00:05:43.740Z",
+    "targets": {
+      "minimumCompletedTurns": 25,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.086559,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.086559,
+        "p50": 0.086559,
+        "p90": 0.086559,
+        "maximum": 0.086559
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.086559,
+      "projectedCostPer100TurnsUSD": 8.66,
+      "targetReady": false,
+      "targetBand": "above"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 30758,
+      "p50": 30758,
+      "p90": 30758,
+      "maximum": 30758
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 3,
+        "p50": 3,
+        "p90": 3,
+        "maximum": 3
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "single-stair-six-story-r2",
+        "title": "Single stair in a six-story residential building",
+        "status": "approved",
+        "difficulty": "intermediate",
+        "topics": [
+          "means of egress",
+          "single exit",
+          "Group R-2",
+          "construction type"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "stories": 6,
+          "areaPerStorySquareFeet": 1950,
+          "use": "Residential building",
+          "unknowns": [
+            "occupancy classification",
+            "construction type"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "2185",
+            "reference": "BC 1006.3.2",
+            "codePrefix": "BC",
+            "sectionNumber": "1006.3.2",
+            "exactPassages": [
+              "7. Buildings of Occupancy Group R-2 of construction Type I or II not exceeding six stories and not exceeding 2,000 square feet (185.8 m 2 ) per story."
+            ],
+            "resolvedTitle": "1006.3.2 Single exits.",
+            "evidenceCharacters": 4073,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+        "expectedConclusion": "BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II construction, does not exceed six stories, and does not exceed 2,000 square feet per story. The stated height and floor area satisfy two of those conditions, but compliance cannot be confirmed until the occupancy classification and construction type are known. This passage only establishes that the single-exit allowance may be available; other applicable egress, fire-protection, travel-distance, and design requirements must be checked under their respective sections without inventing requirements that are not in the selected evidence.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The answer may say the story and area limits are met, but it must condition eligibility on confirmed Group R-2 occupancy and Type I or II construction."
+        },
+        "sourceType": "real project",
+        "sourceReference": "Initial Permitext AI quality-evaluation case set supplied by the Permitext owner.",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "notes": "Exact enacted passage and the answer key were manually reviewed before approval.",
+        "requiredConcepts": [
+          "Identify Group R-2 as a condition of Item 7.",
+          "Identify Type I or Type II construction as a condition.",
+          "Identify the six-story maximum.",
+          "Identify the 2,000-square-foot-per-story maximum.",
+          "Recognize that six stories and approximately 1,950 square feet satisfy only the stated height and area conditions.",
+          "Limit the conclusion to potential availability of the single-exit allowance."
+        ],
+        "missingFacts": [
+          "Confirm the occupancy classification is Group R-2.",
+          "Confirm the construction type is Type I or Type II.",
+          "Check other applicable requirements under evidence supplied for those requirements."
+        ],
+        "forbiddenClaims": [
+          "Every six-story residential building can have one stair.",
+          "The building qualifies without confirming Group R-2 and Type I or Type II construction.",
+          "Assert specific additional requirements that are not supported by selected passages."
+        ],
+        "requiredCitations": [
+          "BC 1006.3.2"
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "0b796cef-1d69-4724-ac66-3412dc28fabb",
+      "answeredAt": "2026-08-27T00:05:25.384Z",
+      "answerTimeMilliseconds": 30762,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260826-exact-pinned-answer-v14:conversational-v4",
+        "evidenceVersion": "20260826-pinned-prose-context-v15:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-93f19369-e03f-4f48-aaed-53b1d7a1ba20",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "Project configured code basis",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-27T00:04:54.628Z"
+        },
+        "answerText": "**Conditionally, yes.** The supplied 2022 NYC single-exit provision allows one exit for a building that is **Group R-2**, of **Type I or Type II construction**, with **no more than six stories** and **no more than 2,000 square feet per story**. Your stated six stories meets the story cap, and approximately 1,950 square feet per story is below the 2,000-square-foot cap if the exact code-relevant area of *every* story is confirmed at or below 2,000 square feet.\n\nA definitive one-stair conclusion cannot be made from the stated facts because  residential  does not itself establish Group R-2, and the construction type is unknown. If the building is confirmed as R-2, Type I or II, and each story is 2,000 square feet or less, it fits this supplied single-exit allowance. The supplied evidence does not establish compliance with the remaining egress and stair provisions that may apply to the design.",
+        "conclusion": "**Conditionally, yes.** The supplied 2022 NYC single-exit provision allows one exit for a building that is **Group R-2**, of **Type I or Type II construction**, with **no more than six stories** and **no more than 2,000 square feet per story**. Your stated six stories meets the story cap, and approximately 1,950 square feet per story is below the 2,000-square-foot cap if the exact code-relevant area of *every* story is confirmed at or below 2,000 square feet.",
+        "supportedPoints": [
+          {
+            "heading": "Single-exit allowance for qualifying R-2 buildings",
+            "explanation": "A building may use the supplied single-exit allowance only where all listed conditions are met cumulatively: Occupancy Group R-2, construction Type I or II, not more than six stories, and not more than 2,000 square feet per story. The stated six-story height satisfies the supplied six-story maximum; the reported approximate 1,950 square feet per story is below the limit only if exact areas confirm that no story exceeds 2,000 square feet.",
+            "sectionID": "2185",
+            "sourceIDs": [
+              "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "A definitive one-stair conclusion cannot be made from the stated facts because  residential  does not itself establish Group R-2, and the construction type is unknown. If the building is confirmed as R-2, Type I or II, and each story is 2,000 square feet or less, it fits this supplied single-exit allowance. The supplied evidence does not establish compliance with the remaining egress and stair provisions that may apply to the design.",
+        "assumptions": [],
+        "missingFacts": [
+          "The code occupancy classification: whether the residential building is Occupancy Group R-2.",
+          "The construction type: whether the building is Type I or Type II.",
+          "The exact code-relevant area of each story, including confirmation that no story exceeds 2,000 square feet."
+        ],
+        "followUpQuestions": [
+          "Is the proposed building classified as Group R-2?",
+          "What construction type is proposed—Type I, Type II, or another type?",
+          "What is the exact code-relevant area of each of the six stories?"
+        ],
+        "evidenceLimitations": [
+          "This answer is limited to the supplied current-enacted 2022 NYC Construction Codes evidence.",
+          "The supplied evidence establishes the stated single-exit allowance but does not include the complete set of potentially applicable egress provisions, such as detailed exit-access, travel-distance, stair, discharge, and fire-protection requirements.",
+          "The NYC Existing Building Code effective July 17, 2027 was excluded as future-effective, and the 1968 NYC Building Code was excluded as historical; neither was applied."
+        ],
+        "additionalEvidenceNeeded": [
+          "The applicable occupancy-classification provisions or an established Group R-2 classification for the actual residential use.",
+          "The proposed construction type and supporting construction-code analysis.",
+          "Exact story-area calculations using the measurement basis applicable to the single-exit provision.",
+          "The remaining applicable 2022 NYC egress provisions needed to confirm the complete one-stair design."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "2185",
+            "sectionNumber": "1006.3.2",
+            "title": "1006.3.2 Single exits.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "3b2fc162-29ab-4f22-aeef-5b8ae7aee472",
+                "selectedText": "7. Buildings of Occupancy Group R-2 of construction Type I or II not exceeding six stories and not exceeding 2,000 square feet (185.8 m 2 ) per story.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the cumulative Group R-2, Type I or II, six-story, and 2,000-square-foot-per-story conditions for the supplied single-exit allowance."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2185",
+          "113",
+          "7826",
+          "7823",
+          "10280",
+          "2146",
+          "6880",
+          "9057",
+          "2503",
+          "1503",
+          "7828",
+          "4253",
+          "3558",
+          "10372",
+          "10421"
+        ],
+        "evidenceSourceIDs": [
+          "3b2fc162-29ab-4f22-aeef-5b8ae7aee472",
+          "research-permitext_discovered-id:113-2",
+          "research-permitext_discovered-id:7826-3",
+          "research-permitext_discovered-id:7823-4",
+          "research-permitext_discovered-id:10280-5",
+          "research-permitext_discovered-id:2146-6",
+          "research-permitext_discovered-id:6880-7",
+          "research-permitext_discovered-id:9057-8",
+          "research-permitext_discovered-id:2503-9",
+          "research-permitext_discovered-id:1503-10",
+          "research-permitext_discovered-id:7828-11",
+          "research-permitext_cross_reference-id:4253-4",
+          "research-permitext_cross_reference-id:3558-6",
+          "research-permitext_cross_reference-id:10372-20",
+          "research-permitext_cross_reference-id:10421-21"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 15,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 14,
+          "userPinnedCount": 1,
+          "permitextDiscoveredCount": 10,
+          "crossReferenceCount": 4,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 3,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 1006.3.2 — single-exit allowance for Group R-2 buildings",
+              "summary": "The supplied current-enacted provision permits a single exit for a building of Occupancy Group R-2 and Type I or II construction when it does not exceed six stories and does not exceed 2,000 square feet per story. The evidence supports a potentially applicable allowance, not a definitive approval, because the project's occupancy classification, construction type, and exact per-story area remain unresolved.",
+              "sourceIDs": [
+                "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "Means-of-egress terminology",
+              "summary": "The supplied definitions describe means of egress as a continuous, unobstructed path from occupied portions of a building to a public way, consisting of exit access, exit, and exit discharge. They provide terminology but do not independently establish that one stair is permitted.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-2"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [
+            {
+              "label": "Conditions embedded in the single-exit provision",
+              "summary": "The single-stair possibility depends cumulatively on all supplied thresholds and classifications: Group R-2 occupancy, Type I or II construction, no more than six stories, and no more than 2,000 square feet per story.",
+              "sourceIDs": [
+                "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+              ]
+            }
+          ],
+          "limitations": [
+            {
+              "label": "Residential use does not establish Group R-2",
+              "summary": "The premise says only “Residential building.” The supplied evidence requires Occupancy Group R-2; no evidence supplied here establishes that the proposed use is classified as R-2.",
+              "sourceIDs": [
+                "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+              ]
+            },
+            {
+              "label": "Construction type is unresolved",
+              "summary": "The single-exit allowance is limited to Type I or Type II construction, but the project's construction type is expressly unknown.",
+              "sourceIDs": [
+                "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+              ]
+            },
+            {
+              "label": "Area threshold requires exact verification",
+              "summary": "The stated approximately 1,950 square feet per story is below 2,000 square feet if accurate, but “approximately” does not establish that each story is no more than 2,000 square feet. The threshold must be verified using the code-relevant area measurement.",
+              "sourceIDs": [
+                "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+              ]
+            },
+            {
+              "label": "Bounded evidence does not establish all egress requirements",
+              "summary": "The supplied package includes the key single-exit allowance but does not provide the complete set of potentially applicable egress provisions, including any other conditions governing exit access, travel distance, stair design, discharge, or fire protection. Retrieval also reports unavailable canonical sections and possible missed exceptions or cross-references.",
+              "sourceIDs": [
+                "3b2fc162-29ab-4f22-aeef-5b8ae7aee472",
+                "research-permitext_discovered-id:2146-6",
+                "research-permitext_discovered-id:2503-9",
+                "research-permitext_discovered-id:1503-10"
+              ]
+            },
+            {
+              "label": "Irrelevant or collateral retrieved material",
+              "summary": "The standpipe, sprinkler, mechanical, structural, interior-finish, fire-alarm, and covered-building passages are not controlling support for the one-exit question on this record. Their lexical relevance does not establish legal applicability.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:7826-3",
+                "research-permitext_discovered-id:7823-4",
+                "research-permitext_discovered-id:10280-5",
+                "research-permitext_discovered-id:6880-7",
+                "research-permitext_discovered-id:9057-8",
+                "research-permitext_discovered-id:2503-9",
+                "research-permitext_discovered-id:1503-10",
+                "research-permitext_discovered-id:7828-11",
+                "research-permitext_cross_reference-id:4253-4",
+                "research-permitext_cross_reference-id:3558-6",
+                "research-permitext_cross_reference-id:10372-20",
+                "research-permitext_cross_reference-id:10421-21"
+              ]
+            }
+          ],
+          "definitions": [
+            {
+              "label": "Relevant supplied definitions",
+              "summary": "The evidence defines dwelling unit, exit access, exit discharge, means of egress, occupant load, and story above grade plane. These definitions may affect detailed egress analysis, but the supplied excerpts do not resolve the project's occupancy classification or all measurement issues.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-2"
+              ]
+            }
+          ],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:7826-3",
+            "research-permitext_discovered-id:7823-4",
+            "research-permitext_discovered-id:10280-5",
+            "research-permitext_discovered-id:2146-6",
+            "research-permitext_discovered-id:6880-7",
+            "research-permitext_discovered-id:9057-8",
+            "research-permitext_discovered-id:2503-9",
+            "research-permitext_discovered-id:1503-10",
+            "research-permitext_discovered-id:7828-11",
+            "research-permitext_cross_reference-id:4253-4",
+            "research-permitext_cross_reference-id:3558-6",
+            "research-permitext_cross_reference-id:10372-20",
+            "research-permitext_cross_reference-id:10421-21"
+          ],
+          "projectFactsUsed": [
+            "Stories: 6",
+            "Area Per Story Square Feet: 1950",
+            "Use: Residential building",
+            "Unknowns: occupancy classification, construction type",
+            "The active-topic building has 6 stories."
+          ],
+          "unresolvedProjectFacts": [
+            "Whether the building is classified as Occupancy Group R-2",
+            "Construction type: whether Type I or Type II",
+            "Exact code-relevant area of every story and whether each is no more than 2,000 square feet",
+            "Whether all other applicable 2022 NYC egress requirements are satisfied, including requirements not included in the bounded evidence package"
+          ],
+          "evidenceLimitations": [
+            "This map is limited to the supplied 2022 NYC Construction Codes current-enacted evidence; retrieval relevance does not establish applicability.",
+            "The NYC Existing Building Code identified as effective July 17, 2027 was excluded as future-effective and is not applied.",
+            "The 1968 NYC Building Code was excluded as historical and is not applied.",
+            "Sixteen enacted sections were unavailable from the canonical resolver.",
+            "At least one enacted section was shortened due to the evidence character limit.",
+            "One or more large definition sections were represented only by targeted excerpts.",
+            "Additional direct cross-references were identified but were not included.",
+            "Lexical retrieval may miss exceptions, cross-references, tables, definitions, or differently worded requirements.",
+            "At least one candidate referenced a table whose complete structured values were unavailable for review. The supplied package therefore cannot establish a complete code conclusion."
+          ],
+          "highValueFollowUpQuestions": [
+            "What is the code occupancy classification—specifically, is the building Group R-2?",
+            "What is the construction type—specifically, is it Type I or Type II?",
+            "What are the exact code-relevant areas of each story, rather than approximate areas?"
+          ]
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Stories: 6",
+            "Area Per Story Square Feet: 1950",
+            "Use: Residential building",
+            "Unknowns: occupancy classification, construction type"
+          ],
+          "conversation": [
+            "The active-topic building has 6 stories."
+          ],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+          "turnKind": "established",
+          "establishedFacts": [
+            {
+              "id": "story_count",
+              "key": "story_count",
+              "value": "6",
+              "statement": "The active-topic building has 6 stories.",
+              "kind": "established",
+              "sourceText": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+              "source": "user"
+            }
+          ],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [
+            "story_count"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+              "establishedFacts": [
+                {
+                  "id": "story_count",
+                  "key": "story_count",
+                  "value": "6",
+                  "statement": "The active-topic building has 6 stories.",
+                  "kind": "established",
+                  "sourceText": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+                  "source": "user"
+                }
+              ],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260811-exact-passage-required-claims-v1",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+          ],
+          "citedEvidenceSourceIDs": [
+            "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:7826-3",
+            "research-permitext_discovered-id:7823-4",
+            "research-permitext_discovered-id:10280-5",
+            "research-permitext_discovered-id:2146-6",
+            "research-permitext_discovered-id:6880-7",
+            "research-permitext_discovered-id:9057-8",
+            "research-permitext_discovered-id:2503-9",
+            "research-permitext_discovered-id:1503-10",
+            "research-permitext_discovered-id:7828-11",
+            "research-permitext_cross_reference-id:4253-4",
+            "research-permitext_cross_reference-id:3558-6",
+            "research-permitext_cross_reference-id:10372-20",
+            "research-permitext_cross_reference-id:10421-21"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:3b2fc162-29ab-4f22-aeef-5b8ae7aee472",
+              "label": "BC 1006.3.2 — 1006.3.2 Single exits.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:3b2fc162-29ab-4f22-aeef-5b8ae7aee472",
+              "label": "BC 1006.3.2 — 1006.3.2 Single exits.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260826-answer-pinned-condition-fidelity-v7",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "citedSourceIDs": [
+            "3b2fc162-29ab-4f22-aeef-5b8ae7aee472"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:7826-3",
+            "research-permitext_discovered-id:7823-4",
+            "research-permitext_discovered-id:10280-5",
+            "research-permitext_discovered-id:2146-6",
+            "research-permitext_discovered-id:6880-7",
+            "research-permitext_discovered-id:9057-8",
+            "research-permitext_discovered-id:2503-9",
+            "research-permitext_discovered-id:1503-10",
+            "research-permitext_discovered-id:7828-11",
+            "research-permitext_cross_reference-id:4253-4",
+            "research-permitext_cross_reference-id:3558-6",
+            "research-permitext_cross_reference-id:10372-20",
+            "research-permitext_cross_reference-id:10421-21"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 14,
+            "reviewedOnlyProvisionCount": 14,
+            "assembledSourceCount": 15,
+            "assembledProvisionCount": 15
+          },
+          "sources": [
+            {
+              "sourceID": "3b2fc162-29ab-4f22-aeef-5b8ae7aee472",
+              "sectionID": "2185",
+              "reference": "BC 1006.3.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "7. Buildings of Occupancy Group R-2 of construction Type I or II not exceeding six stories and not exceeding 2,000 square feet (185.8 m 2 ) per story."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-2",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "AUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is heated to its thermal rating or above, allowing water to discharge over a specified area. DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling. EXIT ACCESS. That portion of a means of egress system that leads from any occupied portion of a building or structure to an exit. EXIT DISCHARGE. That portion of a means of egress system between the termination of an exit and a public way. MEANS OF EGRESS. A continuous and unobstructed path of vertical and horizontal egress travel from any occupied portion of a building or structure to a public way. A means of egress consists of three separate and distinct parts: the exit access, the exit and the exit discharge. OCCUPANT LOAD . The number of persons for which the means of egress of a building or portion thereof is designed . PARKING GARAGE. A structure or portion of a structure, other than a private garage or carport, used for the parking or storage of motor vehicles. STORY ABOVE GRADE PLANE . Any story having its finished floor surface entirely above grade plane , except that a basement shall also be considered a story above grade plane ( see \" Story \" and \" Basement \")."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7826-3",
+              "sectionID": "7826",
+              "reference": "BC Q105.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q105.1 Q105.1 General. Standpipe and hose systems, where required by this code, shall be installed in accordance with NFPA 14, Standard for the Installation of Standpipe and Hose Systems , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions 3.3.3.1 Delete and replace with the following: \"Fire Department Connection (FDC).\" 3.3.3.1.1 Delete and replace with the following: \"Standpipe System Fire Department Connection (Standpipe FDC). A connection through which the fire department can pump water to a standpipe system at the required system demand. Supplemental water can also be provided into the sprinkler system or other system furnishing water for fire extinguishment to supplement existing water supplies. Unless otherwise allowed in the New York City Building Code , FDCs shall be 2-way connections.\" 3.3.3.1.2 Delete. 3.3.5.1 Delete the words 'NFPA 101' and replace with 'the New York City Building Code '. 3.3.6 Delete and replace with the following: \"Fire Department. The New York City Fire Department (FDNY).\" 3.3.7 Add at end the following: \"For the purposes of this section, a penthouse of any area with an occupant load greater than 10 shall be considered a story.\" 3.3.8 Delete the words \"or reel\". 3.3.9.1.1 Delete. 3.3.18 Delete. 3.3.19.2 Delete the words \"trained personnel\" and replace with \"building occupants\". 3.3.19.3 Delete the words \"trained personnel\" and replace with '\"building occupants\". Add at end the following: \"The hose stations shall be attached to the hose connections by a reducing coupling.\" 3.3.21 Delete the words 'and exclusive of pressure from the fire department connection'. Add 3.3.24 to read as follows: \"3.3.24 Zones\" Add 3.3.24.1 to read as follows: \"Standpipe System Zone. A vertical subdivision of a standpipe system limited or determined by the pressure limitations of the system components. Standpipe System Zones shall not exceed 300 feet (91.4 m) in height.\" Add 3.3.24.2 to read as follows: \"Fire Department Connection (FDC) Zone. A vertical subdivision of a standpipe system in buildings with more than two standpipe system zones arranged so that the Fire Department will pump through express FDC risers to upper zones.\" Chapter 4 System Components and Hardware 4.2.2 Delete and replace with the following: \"Pipe for buried portions of the standpipe system, whether inside or outside of the building, shall be red brass, ductile iron, hard tempered type \"K\" copper tubing, galvanized steel or other approved corrosion resistant material. All such pipe, other than ductile iron, shall be adequately wrapped or otherwise protected against corrosion.\" Add 4.2.2.1 as follows: \"Where ductile iron pipe is installed in accordance with Table 4.2.1, it shall be lined in accordance with AWWA C 104, Cement-Mortar Lining for Ductile-Iron Pipe and Fittings .\" 4.2.3 Add at end the following: \"Piping conforming to the specifications contained in this section may only be used in buildings with floor heights not exceeding 300 feet (91.4 m) above grade plane or in the highest 300 feet (91.4 m) portion of other buildings. Otherwise, piping conforming to the wall thicknesses specified in 4.2.4 shall be used.\" 4.4.1.2 Delete. 4.4.2.2.2 Replace \"NFPA 51B\" with \"the New York City Fire Code \". 4.4.2.2.3 Replace \"NFPA 51B\" with \"the New York City Fire Code \". 4.5.1 Add at end the following: \"6 inch (152 mm) and larger sectional and riser control valves shall have a minimum 3/4 inch (197 mm) valved bypass.\" 4.6.2.1 Delete and replace with the following: \"Class III Standpipe Hose Stations. Class III standpipe systems shall have 2 1/2 in. (64 mm) hose connections located as required for Class I standpipes. At each hose connection there shall be a hose station. The hose stations shall be equipped with a minimum of 125 feet (38.1 m), or a maximum of 150 feet (45.7 m), of 1 1/2 in. (38 mm) fire hose, connected to an adjustable"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7823-4",
+              "sectionID": "7823",
+              "reference": "BC Q102.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q102.1 Q102.1 General. Sprinkler systems, where required by this code, shall be installed in accordance with NFPA 13, Standard for the Installation of Sprinkler Systems , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions No changes. Chapter 4 General Requirements No changes. Chapter 5 Classification of Occupancies and Commodities No changes. Chapter 6 System Components and Hardware 6.3.1.1.1 Delete after the word wall and replace with the following: \"in accordance with the New York City Plumbing Code .\" Add the following at the end of section 6.3.9.1.1 : \"The use of pipe or tube other than that described above must involve consideration of many factors, including but not limited to the following: 1. Pressure rating. 2. Beam strength (hangers). 3. Corrosion (chemical and electrolytic). 4. Resistance to failure when exposed to elevated temperatures. 5. Methods of joining (strength, permanence, fire hazard). 6. Availability of fittings (for sprinkler outlets and proper routings). 7. Physical characteristics relating to integrity during earthquakes. 8. Toxicity. 9. Combustibility. 10. Movement during sprinkler operation (water distribution).\" Add Section 6.3.9.9 Non-metallic piping and fittings are permitted to be used only in Group R occupancies 6 stories or less in height. 6.7.1.3 Delete. 6.7.3 Delete. Add Section 6.8.2.2.3 The alarm apparatus for a dry-pipe system shall also consist of approved low and high air pressure alarm attachments to the dry-pipe valve. 6.8.5 Change \"8.16.2.6\" to \"8.17.1.9\". Chapter 7 System Requirements 7.1.5 Delete. 7.1.5.1 Delete. Add 7.2.6.3.4 to read as follows: \"High / Low air pressure in the system shall be monitored so that either condition sends a supervisory signal. Such signal shall trigger an audible notification signal and shall report to a supervising station if the system is required otherwise to do so.\" 7.2.6.8.3 Delete and replace with the following: \"High / Low air pressure in the system shall be monitored so that either condition sends a supervisory signal. Such signal shall trigger an audible notification signal and shall report to a supervising station if the system is required otherwise to do so.\" 7.6.3.1 Delete. Figure 7.6.3.1 Delete. 7.6.3.2 Add the following sentence at the end: \"Backflow prevention device relief discharge shall be piped to a safe location. 7.9 Delete entire section, including subsections. Chapter 8 Installation Requirements 8.2.1 Delete the first sentence and replace with the following: \"The maximum floor area on any one floor to be protected by a single riser from a control and alarm device shall be as follows:\" 8.15.3.2.1 Delete the words after \"is\" and replace with the following: \"permanently blocked off so that storage cannot occur.\" 8.15.4.1* Delete the reference to 8.15.4.4 and add the following at the end: \"when required by other sections of this standard or the New York City Building Code .\" 8.15.4.4 Delete. 8.15.5.3 Delete the words \"in NFPA 101, or the applicable building code\" and replace with the following: \"in accordance with the New York City Building Code .\" 8.15.5.4* Delete the words \"in elevator machine rooms or\". 8.15.7.4 Delete. 8.15.7.5 Delete. 8.15.8.1.2 Delete all words after and including \"as defined\". 8.15.8.2* Delete and replace with the following: \"Closets and Pantries. Sprinklers are not required in clothes closets, linen closets, and pantries within: (1) Dwelling units in hotels and motels where the area of the closet or pantry does not exceed 24 square feet (2.2 m), the least dimension does not exceed 3 feet (0.9 m), and the walls and ceilings are surfaced with noncombustible or limited-combustible materials; and (2) Dwelling units in Group R occupancies other than hotels and motels where the area of the closet or pantry does not exceed 12 square feet (1.1 m), the room or space upon which the closet or pantry o"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10280-5",
+              "sectionID": "10280",
+              "reference": "MC 201.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "201.4 201.4 Terms not defined. Where terms are not defined through the methods authorized by this section, such terms shall have ordinarily accepted meanings such as the context implies. Section MC 202: General Definitions ABRASIVE MATERIALS. Moderately abrasive particulate in high concentrations, and highly abrasive particulate in moderate and high concentrations, such as alumina, bauxite, iron silicate, sand and slag. ABSORPTION SYSTEM. A refrigerating system in which refrigerant is pressurized by pumping a chemical solution of refrigerant in absorbent, and then separated by the addition of heat in a generator, condensed (to reject heat), expanded, evaporated (to provide refrigeration), and reabsorbed in an absorber to repeat the cycle; the system may be single or multiple effect, the latter using multiple stages or internally cascaded use of heat to improve efficiency. ACCESS (TO). That which enables a device, fixture, appliance or equipment to be reached by ready access or by a means that first requires the removal or movement of a panel, door or similar obstruction (see also \"Ready access (to)\"). AIR. All air supplied to mechanical equipment and appliances for combustion, ventilation, cooling, and similar purposes. Standard air is air at standard temperature and pressure, namely, 70°F (21.1°C) and 29.92 inches of mercury (101.3 kPa). AIR CONDITIONING. The treatment of air so as to control simultaneously the temperature, humidity, cleanness and distribution of the air to meet the requirements of a conditioned space. AIR-CONDITIONING SYSTEM. A system that consists of heat exchangers, blowers, filters, supply, exhaust and return ducts, and shall include any apparatus installed in connection therewith. AIR DISPERSION SYSTEM. Any diffuser system designed to both convey air within a room, space or area and diffuse air into that space while operating under positive pressure. Systems are commonly constructed of, but not limited to, fabric or plastic film. AIR DISTRIBUTION SYSTEM. Any system of ducts, plenums and air-handling equipment that circulates air within a space or spaces and includes systems made up of one or more air-handling units. AIR, EXHAUST. Air being removed from any space, appliance or piece of equipment and conveyed directly to the atmosphere by means of openings or ducts. AIR-HANDLING UNIT. A blower or fan used for the purpose of distributing supply air to a room, space or area. AIR, INTAKE. Air supplied from the outdoors to any space, appliance or piece of equipment. AIR, MAKEUP. Any combination of outdoor and transfer air intended to replace exhaust air and exfiltration. AIR, OUTDOOR. Ambient air that enters a building through a ventilation system, through intentional openings for natural ventilation, or by infiltration. AIR, RELIEF. Air removed from any space, appliance or piece of equipment that serves to balance building pressurization due to introduction of outdoor air. Exhaust air shall not be considered relief air. AIR, RETURN. Air removed from a conditioned space or location and recirculated or relieved to the outdoors. AIR, TRANSFER. Air moved from one indoor space to another. AIR TRANSFER OPENING. An opening designed to allow the movement of environmental air between two contiguous spaces. APPLIANCE. A device or apparatus that is manufactured and designed to utilize energy and for which this code provides specific requirements. APPLIANCE, EXISTING . Any appliance regulated by this code that was legally installed prior to the effective date of this code, or for which a permit to install has been issued. APPLIANCE, FUEL-FIRED. An appliance that burns solid, liquid and/or gaseous fuel, including but not limited to wood stoves, household cooking ranges, furnaces, boilers, water heaters, clothes dryers and gas-fired refrigerators. APPLIANCE, GAS (EQUIPMENT). Any apparatus or equipment that uses gas as a fuel or raw material to produce light, heat, power, refrigeration or air conditioning. APPLIANCE TYPE. High-heat appliance. Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature greater than 2,000°F (1093.3°C). Low-heat appliance (residential appliance). Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature of 1,000°F (537.8°C) or less. Medium-heat appliance. Any appliance in which the products of combustion at the point of entrance to the flue under normal operating conditions have a temperature of more than 1,000°F (537.8°C), but not greater than 2,000°F (1093.3°C). APPLIANCE, VENTED. An appliance designed and installed in such a"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2146-6",
+              "sectionID": "2146",
+              "reference": "BC 1004.1.1.2.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.1.1.2.3 1004.1.1.2.3 Group R-2 accessory spaces as primary function on a story. Where the aggregate Group R-2 occupancy accessory area of all rooms, areas or spaces, including outdoor spaces that are not provided with independent means of egress and that do not converge into interior means of egress, exceed 50 percent of the building area of the story in which they are located, and the total number of occupants on such story exceeds 150 persons, the following conditions shall apply: 1. The interior corridors or portions thereof serving such accessory spaces shall be constructed as public corridors in accordance with Table 1020.1.2 with 1-hour fire-resistance-rated fire barriers, and 2-hour fire-resistance-rated fire barriers where a dead-end corridor exceeds 40 feet (12 192 mm) in length; 2. Access to the corridors shall be limited to those necessary for exit access through the corridor from normally occupied spaces. Direct openings from the mechanical, electrical and other storage spaces shall not be permitted, except that access to the corridor may be provided through a vestibule constructed with fire barriers, with a minimum fire-resistance rating consistent with the required hourly rating for the corridor; 3. Corridors or portions thereof serving such accessory spaces shall be sufficient to accommodate a total occupant load on the basis of 3 square feet (0.28 m 2 ) per person; 4. The minimum dimension of such corridors shall be sufficient to accommodate the total occupant load discharging into such corridors, but shall in no case be less than 5 feet (1524 mm) in minimum dimension; and 5. In addition to Conditions 1 through 4 above, one of the following conditions shall be met: 5.1. Each of the interior exit stairways and ramps serving such story shall be protected by a smokeproof enclosure in accordance with Section 909.20; 5.2. The corridor or portions of the corridor serving the rooms, areas or spaces that are accessory to the Group R-2 occupancy shall be pressurized in accordance with requirements that are applicable to interior exit stairways. Connecting interior exit stairways need not be pressurized unless otherwise required by this code; 5.3. All passenger elevators serving the rooms, areas, or spaces that are accessory to the Group R-2 occupancy shall comply with occupant self-evacuation elevator requirements in Section 3008.1 through 3008.11; or 5.4. One additional exit stairway meeting the requirements of Sections 1009 and 1023 shall be provided in addition to the minimum number of exits required by Section 1006 . The total width of any combination of remaining exit stairways with one exit stairway removed shall not be less than the total width required by Section 1005.3. Rooms, areas or spaces that do not comply with the conditions in Sections 1004.1.1.2.1 and 1004.1.1.2.2, or Section 1004.1.1.2.3 where applicable, shall have occupant loads calculated cumulatively per story and be classified as Occupancy Group A."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:6880-7",
+              "sectionID": "6880",
+              "reference": "BC D105.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "D105.1 D105.1 General. The preceding provisions of this appendix shall not apply in the following instances: 1. Temporary platforms, reviewing stands, and similar miscellaneous structures used for a limited period of time, subject to the approval of the commissioner. 2. Fences not over 6 feet (1829 mm) high. 3. Water towers, tank structures, and trestles may be constructed of wood planking and timbers of dimensions not less than as required for Type IV construction when not over 35 feet (10 668 mm) high and having an exterior separation of at least 30 feet (9144 mm). 4. Detached greenhouses accessory to a one- or two-family dwelling located on the same lot at least 6 feet (1829 mm) from any lot line or building walls and not exceeding 14 feet (4267 mm) in height. 5. Porches on dwellings not over one story in height, and not over 10 feet (3048 mm) wide from the face of the building, provided such porch does not come within 5 feet (1524 mm) of any property line. 6. Sheds open on a long side not over 15 feet (4572 mm) high and 500 square feet (46 m 2 ) in area. 7. Existing one- and two-family dwellings of a type of construction not permitted in the fire district can be extended 25 percent of the floor area existing at the time of inclusion in the fire district by any type of construction permitted by this code. 8. Wood decks less than 600 square feet (56 m 2 ) where constructed of 2-inch (51 mm) nominal wood, pressure treated for exterior use. 9. 9. One- or two-family detached or semidetached dwellings of two stories or less in height and 2,500 square feet (232 m 2 ) or less in area per story located within Zoning Districts R-2 through R-5 may be constructed or reconstructed of construction Type VA, or if damaged for any cause only the damaged portions shall be required to be reconstructed to conform to Type VA construction. In addition, one-family dwellings located within Zoning District R-1 anywhere in the city, may be constructed of Type VB construction in conformance with the area and height limits established by Tables 504.3 , 504.4 and 506.2 of this code. 10. An accessory building or structure used as an office or similar use for an open parking lot located on the same lot, may be constructed of Type VA or VB construction provided its area shall be limited to 150 square feet (14 m 2 ) and height of 10 feet (3048 mm) maximum. Such structure shall be located not less than 6 feet (1829 mm) from any lot line or buildings on the same lot. 11. Temporary fences, sidewalk sheds, signs, and other safeguards installed in accordance with Chapter 33 . 12. One- or two-family detached, zero lot line or semi-detached dwellings of three stories in height and 2,500 square feet (232 m 2 ) or less in area per story located within Zoning Districts R-1 through R-5 within Lower Density Growth Management Areas as defined by the New York City Zoning Resolution may be constructed or reconstructed of construction Type VA where such buildings are equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, or if damaged for any cause only the damaged portions shall be required to be reconstructed to conform to Type VA construction where such buildings are equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1. In addition, no portion of a one- or two-family detached, zero lot line or semi-detached dwellings located within Zoning Districts R-1, R-2 or R-5 within Lower Density Growth Management Areas shall exceed a maximum building height of 35 feet (10 668 mm) above the grade plane. Section BC D106: Fire District Maps for the Boroughs of Staten Island (Richmond County) and Queens"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9057-8",
+              "sectionID": "9057",
+              "reference": "AC 28-109.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-109.2 § 28-109.2 Covered buildings. Covered buildings include: 1. High-rise buildings as described in section 403 of the New York city building code. 2. Occupancy groups B, E, F, H, M or S occupying two or more stories with over 20,000 gross square feet (1858 m 2 ) of floor area per floor, or occupying two or more stories in a building with a total floor area exceeding 50,000 gross square feet (4645 m 2 ). 3. Any building containing an assembly occupancy having an occupant load of 300 or more persons. 4. Occupancy group I or R-1 occupying two or more stories and containing sleeping accommodations for 30 or more persons. 5. Occupancy group R-2 occupancies containing 30 or more dwelling units in a building where over 10,000 gross square feet (929 m 2 ) of floor area is occupied by occupancy group A, E, M or I. 6. Covered mall buildings and open mall buildings designed pursuant to section 402 of the New York city building code. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2503-9",
+              "sectionID": "2503",
+              "reference": "BC 1027.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1027.6 1027.6 Exterior exit stairway and ramp protection. Exterior exit stairways and ramps shall be separated from the interior of the building as required in Section 1023.2. Openings shall be limited to those necessary for egress from normally occupied spaces. Where a vertical plane projecting from the edge of an exterior exit stairway or ramp and landings is exposed by other parts of the building at an angle of less than 180 degrees (3.14 rad), the exterior wall shall be rated in accordance with Section 1023.7. Exceptions: 1. In all occupancies other than Group R-1 or R-2, separation from the interior of the building is not required in buildings that are not more than two stories above grade plane where a level of exit discharge serving such occupancies is the first story above grade plane. 2. Separation from the interior of the building is not required where the exterior exit stairway or ramp is served by an exterior exit ramp or balcony that connects two remote exterior exit stairways or other approved exits, with a perimeter that is not less than 50 percent open. To be considered open, the opening shall be not less than 50 percent of the height of the enclosing wall, with the top of the openings not less than 7 feet (2133.6 mm) above the top of the balcony. 3. Separation from the open-ended corridor of the building is not required for exterior exit stairways or ramps, provided that Items 3.1 through 3.5 are met. 3.1. The building, including open-ended corridors, and stairways and ramps, shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1 or 903.3.1.2. 3.2. The open-ended corridors comply with Section 1020 . 3.3. The open-ended corridors are connected on each end to an exterior exit stairway or ramp complying with Section 1027 . 3.4. The exterior walls and openings adjacent to the exterior exit stairway or ramp comply with Section 1023.7. 3.5. At any location in an open-ended corridor where a change of direction exceeding 45 degrees (0.79 rad) occurs, a clear opening of not less than 35 square feet (3.3 m 2 ) or an exterior stairway or ramp shall be provided. Where clear openings are provided, they shall be located so as to minimize the accumulation of smoke or toxic gases."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:1503-10",
+              "sectionID": "1503",
+              "reference": "BC 803.11",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "803.11 803.11 Interior finish requirements based on group. Interior wall and ceiling finish shall have a flame spread index and smoke-developed index not greater than that specified in Table 803.11 of this code for the group and location designated. Interior wall and ceiling finish materials tested in accordance with NFPA 286 and meeting the acceptance criteria of Section 803.1.2.1 of this code, shall be permitted to be used where a Class A classification, in accordance with ASTM E 84 or UL 723, is required. Table 803.11 Interior Wall and Ceiling Finish Requirements by Occupancy k Group Sprinklered l Nonsprinklered Interior exit stairways, interior exit ramps and exit passageways a, b Corridors and enclosure for exit access stairways and exit access ramps Rooms and enclosed spaces c Interior exit stairways, interior exit ramps and exit passageways a, b Corridors and enclosure for exit access stairways and exit access ramps Rooms and enclosed spaces c Group Sprinklered l Nonsprinklered Interior exit stairways, interior exit ramps and exit passageways a, b Corridors and enclosure for exit access stairways and exit access ramps Rooms and enclosed spaces c Interior exit stairways, interior exit ramps and exit passageways a, b Corridors and enclosure for exit access stairways and exit access ramps Rooms and enclosed spaces c A-1 & A-2 B B C A A d B e A-3 f , A-4, A-5 B B C A A d C B, E, M, R-1 B B B A A B F B C C A B B H B B C g A A B I-1 B C C A B B I-2 B B B h, i A A B I-3 A A j C A A B I-4 B B B h, i A A B R-2 B B C A A C R-3 C C C C C C S B C C A B C U No restrictions No restrictions For SI: 1 inch = 25.4 mm, 1 square foot = 0.0929 m 2 . a. Class C interior finish materials shall be permitted for wainscotting or paneling of not more than 1,000 square feet (92 m 2 ) of applied surface area in the grade lobby where applied directly to a noncombustible base or over furring strips applied to a noncombustible base and fireblocked as required by Section 803.13.1. b. In other than Group I-3 occupancies in buildings less than three stories above grade plane, Class B interior finish for nonsprinklered buildings and Class C interior finish for sprinklered buildings shall be permitted in interior exit stairways and ramps. c. Requirements for rooms and enclosed spaces shall be based upon spaces enclosed by partitions. Where a fire-resistance rating is required for structural elements, the enclosing partitions shall extend from the floor to the ceiling. Partitions that do not comply with this shall be considered enclosing spaces and the rooms or spaces on both sides shall be considered one. In determining the applicable requirements for rooms and enclosed spaces, the specific occupancy thereof shall be the governing factor regardless of the group classification of the building or structure. d. Lobby areas in Group A-1, A-2 and A-3 occupancies shall not be less than Class B materials. e. Class C interior finish materials shall be permitted in places of assembly with an occupant load of 300 persons or less. f. For places of religious worship, wood used for ornamental purposes, trusses, paneling or chancel furnishing shall be permitted. g. Class B material is required where the building exceeds two stories. h. Class C interior finish materials shall be permitted in administrative spaces. i. Class C interior finish materials shall be permitted in rooms with a capacity of four persons or less. j. Class B materials shall be permitted as wainscotting extending not more than 48 inches above the finished floor in corridors and exit access stairways and ramps. k. Finish materials as provided for in other sections of this code. l. Applies when protected by an automatic sprinkler system installed in accordance with Section 903.3.1.1 or 903.3.1.2."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7828-11",
+              "sectionID": "7828",
+              "reference": "BC Q107.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q107.1 Q107.1 General. Fire alarm system design, installation, testing, and maintenance, where required by this code, shall be conducted and documented in accordance with NFPA 72, National Fire Alarm and Signaling Code , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions No changes. Chapter 4 Reserved Chapter 5 Reserved Chapter 6 Reserved Chapter 7 Documentation No changes. Chapter 8 Reserved Chapter 9 Reserved Chapter 10 Fundamentals 10.5.1.1 Delete and replace with the following: \"Fire alarm system and emergency communication system plans and specifications shall be developed in accordance with the New York City Building Code by persons licensed and registered to practice the profession of engineering under the Education Law of the State of New York, who are also experienced in the proper design, application, installation, and testing of the system.\" 10.5.1.2 Delete. 10.5.2.1 Add at beginning the following: \"Fire alarm installations shall be performed by a New York City licensed electrical contractor.\" 10.5.3.1 Add at beginning the following: \"Fire alarm inspection, testing and maintenance shall be performed by a New York City licensed electrical contractor holding a New York State registration for 'Business of Installing, Servicing or Maintaining Security or Fire Alarm Systems' or those fire alarm companies holding a New York State registration for 'Business of Installing, Servicing or Maintaining Security or Fire Alarm Systems,' and in accordance with rules and regulations promulgated by the Fire Commissioner.\" 10.6.3.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.4 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.4 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.6.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.6.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.7.2.1 Delete and replace with the following: \"The secondary power supply for fire alarm systems and supervising station facilities shall have sufficient capacity to operate the system in accordance with the New York City Electrical Code . The secondary power supply for other systems shall have sufficient capacity to operate the system under quiescent load (system operating in a nonalarm condition) for a minimum of 24 hours and, at the end of that period, shall be capable of operating all alarm notification appliances used for evacuation or to direct aid to the location of an emergency for 5 minutes, unless otherwise permitted or required by 10.6.7.2.1.1 through 10.6.7.2.2. 10.6.7.2.1.2 Reserved. 10.6.7.2.1.3 Reserved. 10.6.7.2.1.4 Delete and replace with the following: \"The secondary power supply for high-power speaker arrays used for wide-area mass notification systems shall be in accordance with 24.6.5.2.\" Add 1 0.6.7.2.1.8 to read as follows: \"The secondary power supply for two-way voice radio communication enhancement system shall be in accordance with 24.9.5.3.1.\" Chapter 11 Reserved Chapter 12 Circuits and Pathways Add 12.3.6.1 to read as follows: \"Class-N circuits shall not be installed unless approved by the Fire Department.\" Chapter 13 Reserved Chapter 14 Inspection, Testing, and Maintenance 14.1.1 Delete and replace with the following: \"The inspection, testing and maintenance of systems, their initiating devices, and notification appliances shall comply with the requirements of this chapter and the New York City Fire Code .\" 14.1.2 Delete and replace with the following: \"The inspection, testing and maintenance of single- and multiple-station smoke and heat alarms and household fire alarm systems shall comply with the requirements of this chapter and the New York City Fire Code .\" 14.4.9 Delete and replace with the following: \"In-building auxiliary radio communication systems (ARCS) shall be inspected and operationally tested in accordance with the requirements of the New York City Fire Code and rules promulgated by the Fire Department.\" 14.6.3 Delete and replace with the following: \"Supervising Station Records. For supervising station alarm systems, records pertaining to signals received at the supervising station that result from maintenance, inspection, and testing shall be maintained in accordance with the New York City Fire Code .\" 14.6.3.1 Delete. 14.6.3.2 Delete. 14.6.4 Delete. Chapter 15 Reserved Chapter 16 Reserved Chapter 17 Initiating Devices Add 17.5.3.2.1 to read as follows: \"Partial coverage smoke detection shall be located in common areas and work spaces such as corridors, lobbies, storage rooms, equipment rooms, and other tenantless spaces, where required.\" Add 17.5.3.2.2 to read as follows: \"Selective coverage smoke detection shall be located as follows:\" \"(1) In each mechanical equipment, electrical, transformer, telephone equipment or similar room, in elevator machine rooms, and in elevator lobbies.\" \"(2) In air distribution systems in accordance with Section 606 of the New York City Mechanical Code .\" 17.10.2.4 Delete and replace with the following: \"The selection and placement of the gas detectors shall be based on an engineering evaluation including, but not limited to, the following: (1) Structural features, size, and shape of the rooms and bays (2) Occupancy and uses of areas (3) Ceiling heights (4) Ceiling shape, surface, and obstructions (5) Ventilation (6) Ambient environment (7) Gas characteristics of the gases present (8) Configuration of the contents in the area to be protected (9) Response time(s)\" Chapter 18 Notification Appliances No changes. Chapter 19 Reserved Chapter 20 Reserved Chapter 21 Emergency Control Function Interfaces 21.3.3 Delete and replace with the following: \"Unless otherwise required by the authority having jurisdiction, only the elevator lobby, elevator hoistway, and elevator machine room smoke detectors, sprinkler waterflow alarm-initiating devices, or other automatic fire detection as permitted by 21.3.9, and initiating devices used to initiate shutdown of elevator power in accordance with 21.4 shall be used to recall elevators for fire fighters' service.\" 21.3.13 Delete and replace with the following: \"Separate outputs from the fire alarm systems to the elevator controller(s) shall be provided to implement elevator Phase 1 Emergency Recall Operation in accordance with ANSI/ASME A17.1a/CSA B44a, Safety Code for Elevators and Escalators.\" 21.3.13.1 Delete and replace with the following: \"See ANSI/ASME A17.1a/CSA B44a, Safety Code for Elevators and Escalators, for designated and alternate levels of elevator recall.\" 21.3.13.2 Delete and replace with the following: \"See ANSI/ASME A17.1a/CSA B44a, Safety Code for Elevators and Escalators, for designated and alternate levels of elevator recall.\" 21.3.13.3 Delete and replace with the following: \"See ANSI/ASME A17.1a/CSA B44a, Safety Code for Elevators and Escalators, for designated and alternate levels of elevator recall.\" 21.4.2 Delete and replace with the following: \"If heat detectors are used to shut down elevator power prior to sprinkler operation, they shall be placed within 24 in. (610 mm) of each sprinkler head and be installed in accordance with the requirements of Chapter 17. Upon activation of the heat detector used for elevator power shutdown, there shall be permitted to be a delay in the activation of the power shunt trip. This delay should be the time that it takes the elevator cab to travel from the top of the hoist way to the lowest recall level. Alternatively, engineering methods, such as those specified in Annex B, shall be permitted to be used to select and place heat detectors to ensure response prior to any sprinkler head operation under a variety of the growth rate scenarios.\" 21.4.3 Delete and replace with the following: \"Pressure or water flow switches shall not be used to shut down elevator power.\" 21.6 Delete section, including all subsections, and replace with the following: \"21.6 Occupant Evacuation Elevators.\" \"21.6.1 Elevator Status. Any elevator specifically designated and marked for use by occupants for evacuation during fires shall comply with all of the provisions of 21.5 and 21.6.\" \"21.6.2 Elevator Occupant Evacuation Operation (OEO). Outputs from the fire alarm system to the elevator controller(s) shall be provided to implement elevator occupant evacuation operation in accordance with section 2.27 of ASME A17.1/CSA B44 as modified by Chapter K1 of Appendix K of the New York City Building Code , as required in 21.6.2.1 and 21.6.2.2.\" \"21.6.2.1 Partial Evacuation. Where an elevator or group of elevators is designed for use by occupants for evacuation, the provisions of 21.6.2.1.1 through 21.6.2.1.4 shall apply for partial evacuation.\" \"21.6.2.1.1 Initiation. Output signal(s) shall be provided to initiate elevator occupant evacuation operation upon automatic or manual detection of a fire on a specific floor or floors as a result of either or both of the following: (1) Activation of any automatic fire alarm initiating device in the building, other than an initiating device used for elevator Phase I Emergency Recall Operation in accordance with Chapter K1 of Appendix K of the New York City Building Code . (2)* Activation of manual means at the fire command center by authorized or emergency personnel.\" \"21.6.2.1.2* Floor Identification. (A) The output signal(s) shall identify each floor to be evacuated. (B) The identified floors shall be a contiguous block of floors including the following: (1) The floor with the first activated automatic initiating device. (2) Floors with any subsequently activated automatic initiating device(s). (3) Floors identified by manual means from the fire command center. (4) One floor above the highest floor identified by 21.6.2.1.2(B)(1) through 21.6.2.1.2(B)(3). (5) One floor below the lowest floor identified by 21.6.2.1.2(B)(1) through 21.6.2.1.2(B)(3). (C) The identified floors shall be displayed on a standard emergency services interface along with the other elevator status information required by 21.6.1.\" \"21.6.2.1.3 Manual Floor Selection. (A) A means shall"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:4253-4",
+              "sectionID": "4253",
+              "reference": "BC 1816.2.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1816.2.1 1816.2.1 Peak ground acceleration. Peak ground acceleration shall be determined based on either (i) a site-specific study taking into account soil amplification effects as specified in Section 11.4.8 of ASCE 7 or (ii) the Maximum Considered Geometric Mean peak ground acceleration adjusted for site class effects PGA M as provided in Table 1816.2.1 without adjustment for targeted risk. Table 1816.2.1 Values of Maximum Considered Earthquake Geometric Mean (MCE G ) Peak Ground Accelerations Adjusted for Site Class Effects, PGA M Site Class PGA M(g) A 0.15 B (m) 0.17 B (un-m) 0.18 C 0.22 D 0.26 E 0.36"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:3558-6",
+              "sectionID": "3558",
+              "reference": "BC 1609.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1609.3 1609.3 Basic design wind speed. The basic design wind speed, V, in mph, for determining wind speed shall be that of Table 1609.3 . Table 1609.3 Basic Design Wind Speed Risk Category Basic Design Wind Speed, mph (3-sec gust, 33 ft. for Exposure Category C) Mean Recurrence Interval, years Probability of Exceedance in 50 years, % I 110 300 15 II 117 700 7 III 127 1,700 3 IV 132 3,000 1.6 Note: Values are ultimate design 3-second gust wind speeds in miles per hour at 33 feet (10 058 mm) above ground for Exposure Category C."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10372-20",
+              "sectionID": "10372",
+              "reference": "MC 308.4.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "308.4.2 308.4.2 Reduction table. The allowable clearance reduction shall be based on one of the methods specified in Table 308.4.2 . Where required clearances are not listed in Table 308.4.2 , the reduced clearances shall be determined by linear interpolation between the distances listed in the table. Reduced clearances shall not be derived by extrapolation below the range of the table. Table 308.4.2 Clearance Reduction Methods b Type of Protective Assembly a Reduced Clearance With Protection (inches) a Horizontal combustible assemblies located above the heat source Horizontal combustible assemblies located beneath the heat source and all vertical combustible assemblies Required clearance to combustibles without protection (inches) a Required clearance to combustible without protection (inches) a 36 18 9 6 36 18 9 6 Type of Protective Assembly a Reduced Clearance With Protection (inches) a Horizontal combustible assemblies located above the heat source Horizontal combustible assemblies located beneath the heat source and all vertical combustible assemblies Required clearance to combustibles without protection (inches) a Required clearance to combustible without protection (inches) a 36 18 9 6 36 18 9 6 Galvanized sheet metal, minimum nominal thickness of .0296 inch (No."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10421-21",
+              "sectionID": "10421",
+              "reference": "MC 403.3.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "4"
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260826-pinned-prose-context-v15",
+          "retrievalQuery": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?\nProject facts: Area Per Story Square Feet: 1950; Use: Residential building; Stories: 6; Unknowns: occupancy classification, construction type",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": true,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 1,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 4,
+            "characterCount": 48000,
+            "resolverFailureCount": 16,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 16,
+              "text": "16 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "referenced-table-review-required",
+              "text": "At least one candidate refers to a table whose complete structured values are not in the proposed passage. That candidate cannot be prepared until the table itself can be reviewed as evidence."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "Project configured code basis"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260826-supporting-web-v7",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-93f19369-e03f-4f48-aaed-53b1d7a1ba20",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "Project configured code basis",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-27T00:04:54.628Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-terra"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-27T00:04:54.628Z",
+        "routing": {
+          "version": "20260825-luna-terra-hybrid-v2",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "gpt-5.6-luna",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-terra",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 50790,
+          "cachedInputTokens": 0,
+          "outputTokens": 2991,
+          "totalTokens": 53781
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.086559,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "fb805c3a-4ff5-42b3-807a-49c727eca38a",
+        "createdAt": "2026-08-27T00:04:54.624Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-luna",
+          "gpt-5.6-terra"
+        ],
+        "routingVersion": "20260825-luna-terra-hybrid-v2",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 3,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 50790,
+        "cachedInputTokens": 0,
+        "outputTokens": 2991,
+        "totalTokens": 53781,
+        "estimatedCostUSD": 0.086559,
+        "actualProviderCostUSD": 0.086559,
+        "conservativeProviderCostUSD": 0.086559,
+        "durationMilliseconds": 30758,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-27T00:05:43.713Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-exact-rubric-v2",
+        "responseTimeMilliseconds": 17975,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 2865,
+              "cachedInputTokens": 1561,
+              "outputTokens": 1784,
+              "totalTokens": 4649
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 2865,
+          "cachedInputTokens": 1561,
+          "outputTokens": 1784,
+          "totalTokens": 4649
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "The answer cites BC 1006.3.2 for the cumulative conditions reflected in the supplied passage: Group R-2, Type I or II construction, no more than six stories, and no more than 2,000 square feet per story. The citation is used consistently with the supplied enacted evidence.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 3,
+            "rationale": "The substantive code analysis remains grounded in the selected passage and is appropriately conditional. However, the evidence-limitations discussion includes unsupported procedural/code-edition assertions about excluding a future-effective Existing Building Code and the 1968 code; neither is contained in the supplied evidence.",
+            "failureExcerpt": "The NYC Existing Building Code effective July 17, 2027 was excluded as future-effective, and the 1968 NYC Building Code was excluded as historical; neither was applied.",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": [
+              "The NYC Existing Building Code effective July 17, 2027 was excluded as future-effective.",
+              "The 1968 NYC Building Code was excluded as historical."
+            ]
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The response correctly treats the result as conditional, explains that residential use alone does not establish Group R-2, and identifies construction type as unknown. It also limits the result to the supplied allowance rather than claiming complete design compliance.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly states that the supplied evidence cannot support a definitive one-stair conclusion or establish compliance with remaining potentially applicable egress and stair provisions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a usable conditional answer, compares the stated story count and approximate floor area to the stated limits, identifies the facts to verify, and explains the limits of the supplied evidence. The extraneous code-history statement does not materially impair its utility.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The answer opens with a direct conditional answer and then explains precisely why eligibility cannot yet be confirmed from the project facts provided.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The response expressly identifies Group R-2 as a required condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "The response expressly identifies Type I or Type II construction as a required condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "The response states the maximum is no more than six stories and correctly notes that the stated six stories meets that cap.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "The response states the maximum is no more than 2,000 square feet per story and compares the stated approximately 1,950 square feet to that limit.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "The response recognizes that the supplied facts establish the story and approximate-area conditions only, while Group R-2 and construction type remain unconfirmed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "The response limits its conclusion to fitting the supplied single-exit allowance and expressly states that the evidence does not establish complete compliance with other potentially applicable provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer does not claim that every six-story residential building may have one stair; it requires confirmation of R-2 occupancy and Type I or II construction.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer explicitly says a definitive conclusion cannot be made because the occupancy classification and construction type are not established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer identifies categories of provisions that may apply only to explain the evidence limitation. It does not assert that any specific unprovided requirement applies or prescribe its contents.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The response identifies confirmation that the residential use is Occupancy Group R-2 as needed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The response identifies confirmation that the construction type is Type I or Type II as needed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The response says the supplied evidence does not establish compliance with remaining potentially applicable egress and stair provisions and requests the remaining applicable egress evidence for complete confirmation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.024328,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 1,
+            "canonicalCount": 1,
+            "selectedEvidenceCount": 1,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 30762,
+            "inputTokens": 50790,
+            "cachedInputTokens": 0,
+            "outputTokens": 2991,
+            "totalTokens": 53781,
+            "estimatedCostUSD": 0.086559,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "The answer cites BC 1006.3.2 for the cumulative conditions reflected in the supplied passage: Group R-2, Type I or II construction, no more than six stories, and no more than 2,000 square feet per story. The citation is used consistently with the supplied enacted evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "6/6 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 3,
+              "rationale": "The substantive code analysis remains grounded in the selected passage and is appropriately conditional. However, the evidence-limitations discussion includes unsupported procedural/code-edition assertions about excluding a future-effective Existing Building Code and the 1968 code; neither is contained in the supplied evidence.",
+              "failureExcerpt": "The NYC Existing Building Code effective July 17, 2027 was excluded as future-effective, and the 1968 NYC Building Code was excluded as historical; neither was applied.",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": [
+                "The NYC Existing Building Code effective July 17, 2027 was excluded as future-effective.",
+                "The 1968 NYC Building Code was excluded as historical."
+              ]
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/3 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "The response correctly treats the result as conditional, explains that residential use alone does not establish Group R-2, and identifies construction type as unknown. It also limits the result to the supplied allowance rather than claiming complete design compliance.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "3/3 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "The answer directly states that the supplied evidence cannot support a definitive one-stair conclusion or establish compliance with remaining potentially applicable egress and stair provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "It gives a usable conditional answer, compares the stated story count and approximate floor area to the stated limits, identifies the facts to verify, and explains the limits of the supplied evidence. The extraneous code-history statement does not materially impair its utility.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "The answer opens with a direct conditional answer and then explains precisely why eligibility cannot yet be confirmed from the project facts provided.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The response expressly identifies Group R-2 as a required condition.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "The response expressly identifies Type I or Type II construction as a required condition.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "The response states the maximum is no more than six stories and correctly notes that the stated six stories meets that cap.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "The response states the maximum is no more than 2,000 square feet per story and compares the stated approximately 1,950 square feet to that limit.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "The response recognizes that the supplied facts establish the story and approximate-area conditions only, while Group R-2 and construction type remain unconfirmed.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "The response limits its conclusion to fitting the supplied single-exit allowance and expressly states that the evidence does not establish complete compliance with other potentially applicable provisions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer does not claim that every six-story residential building may have one stair; it requires confirmation of R-2 occupancy and Type I or II construction.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "The answer explicitly says a definitive conclusion cannot be made because the occupancy classification and construction type are not established.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "The answer identifies categories of provisions that may apply only to explain the evidence limitation. It does not assert that any specific unprovided requirement applies or prescribe its contents.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "The response identifies confirmation that the residential use is Occupancy Group R-2 as needed.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "The response identifies confirmation that the construction type is Type I or Type II as needed.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "The response says the supplied evidence does not establish compliance with remaining potentially applicable egress and stair provisions and requests the remaining applicable egress evidence for complete confirmation.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "1/1 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. The answer cites BC 1006.3.2 for the cumulative conditions reflected in the supplied passage: Group R-2, Type I or II construction, no more than six stories, and no more than 2,000 square feet per story. The citation is used consistently with the supplied enacted evidence.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 1 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "6/6 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 3,
+            "rationale": "The substantive code analysis remains grounded in the selected passage and is appropriately conditional. However, the evidence-limitations discussion includes unsupported procedural/code-edition assertions about excluding a future-effective Existing Building Code and the 1968 code; neither is contained in the supplied evidence.",
+            "failureExcerpt": "The NYC Existing Building Code effective July 17, 2027 was excluded as future-effective, and the 1968 NYC Building Code was excluded as historical; neither was applied.",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": [
+              "The NYC Existing Building Code effective July 17, 2027 was excluded as future-effective.",
+              "The 1968 NYC Building Code was excluded as historical."
+            ]
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The response correctly treats the result as conditional, explains that residential use alone does not establish Group R-2, and identifies construction type as unknown. It also limits the result to the supplied allowance rather than claiming complete design compliance.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "3/3 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer directly states that the supplied evidence cannot support a definitive one-stair conclusion or establish compliance with remaining potentially applicable egress and stair provisions.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It gives a usable conditional answer, compares the stated story count and approximate floor area to the stated limits, identifies the facts to verify, and explains the limits of the supplied evidence. The extraneous code-history statement does not materially impair its utility.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The answer opens with a direct conditional answer and then explains precisely why eligibility cannot yet be confirmed from the project facts provided.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 3.84,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The response expressly identifies Group R-2 as a required condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "The response expressly identifies Type I or Type II construction as a required condition.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "The response states the maximum is no more than six stories and correctly notes that the stated six stories meets that cap.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "The response states the maximum is no more than 2,000 square feet per story and compares the stated approximately 1,950 square feet to that limit.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "The response recognizes that the supplied facts establish the story and approximate-area conditions only, while Group R-2 and construction type remain unconfirmed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "The response limits its conclusion to fitting the supplied single-exit allowance and expressly states that the evidence does not establish complete compliance with other potentially applicable provisions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer does not claim that every six-story residential building may have one stair; it requires confirmation of R-2 occupancy and Type I or II construction.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "The answer explicitly says a definitive conclusion cannot be made because the occupancy classification and construction type are not established.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "The answer identifies categories of provisions that may apply only to explain the evidence limitation. It does not assert that any specific unprovided requirement applies or prescribe its contents.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "The response identifies confirmation that the residential use is Occupancy Group R-2 as needed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "The response identifies confirmation that the construction type is Type I or Type II as needed.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "The response says the supplied evidence does not establish compliance with remaining potentially applicable egress and stair provisions and requests the remaining applicable egress evidence for complete confirmation.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -233,9 +233,11 @@ assert.equal(assembled.discovery.searchedSectionCount, 250);
 
 assert.equal(assembled.sources[0].sourceID, "user-pinned-source");
 assert.equal(assembled.sources[0].origin, "user_pinned");
-assert.match(assembled.sources[0].text, /unless an exception applies/);
+assert.equal(assembled.sources[0].text, "Interior exit access stairways shall be enclosed.");
+assert.match(assembled.sources[0].canonicalContextText, /unless an exception applies/);
 assert.equal(assembled.sources[0].canonicalContextResolved, true);
 assert.equal(assembled.sources[0].canonicalContextComplete, true);
+assert.equal(assembled.sources[0].pinnedSelectionExact, true);
 assert.equal(assembled.sources[0].evidencePriority.claimCoverageRequired, true);
 
 const discovered = assembled.sources.filter((source) => source.origin === "permitext_discovered");
@@ -325,6 +327,29 @@ const structuredPinned = await assembleResearchEvidence({
 assert.equal(structuredPinned.sources[0].text, "Exact structured table text.");
 assert.equal(structuredPinned.sources[0].richSourceID, "table-source-1");
 assert.equal(structuredPinned.sources[0].richSourceGrids[0].rows[0].cells[0].rowSpan, 1);
+
+const pinnedProseWithinTableSection = await assembleResearchEvidence({
+  question: "Can this six-story R-2 building use one exit?",
+  pinnedEvidence: [{
+    id: "pinned-item-seven",
+    sectionID: "prose-table",
+    codePrefix: "BC",
+    sectionNumber: "1006.3.2",
+    selectedText: "Item 7 permits one exit for a Group R-2 Type I or II building not exceeding six stories and 2,000 square feet per story."
+  }],
+  discover: async () => ({ candidates: [] }),
+  resolveSection,
+  limits: { maximumCharacters: 2_000, maximumCharactersPerSource: 1_000 }
+});
+assert.equal(
+  pinnedProseWithinTableSection.sources[0].text,
+  "Item 7 permits one exit for a Group R-2 Type I or II building not exceeding six stories and 2,000 square feet per story.",
+  "A pinned prose item must not be replaced by a structured table from the same canonical section."
+);
+assert.match(pinnedProseWithinTableSection.sources[0].canonicalContextText, /Item 7 permits one exit/);
+assert.doesNotMatch(pinnedProseWithinTableSection.sources[0].canonicalContextText, /Story Occupancy/);
+assert.equal(pinnedProseWithinTableSection.sources[0].pinnedSelectionExact, true);
+assert.equal(pinnedProseWithinTableSection.sources[0].richSourceID, undefined);
 
 const structuredProse = await assembleResearchEvidence({
   question: "Can this six-story R-2 building use one exit?",
