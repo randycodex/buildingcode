@@ -6446,31 +6446,94 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
     }
 
     func testResearchViewContainsPrivacyVisualAndCacheDeletionContracts() throws {
-        let projectRoot = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let source = try String(
-            contentsOf: projectRoot.appendingPathComponent("permitext/Views/ResearchView.swift"),
-            encoding: .utf8
+        XCTAssertTrue(ResearchTrustCopy.composerPrivacyDisclosure.contains("Private notes are not included."))
+        XCTAssertTrue(ResearchTrustCopy.firstUseDisclosure.contains("Private notes are not included."))
+        XCTAssertTrue(
+            ResearchTrustCopy.visualEvidenceDisclosure.contains(
+                "Selected official images are sent to OpenAI for analysis."
+            )
         )
-        XCTAssertTrue(source.contains("Private notes are not included."))
-        XCTAssertTrue(source.contains("Selected official images are sent to OpenAI for analysis."))
-        let sendQuestionRange = try XCTUnwrap(
-            source.range(from: "private func sendQuestion", to: "private func completedConversationAfterLostResponse")
+        XCTAssertEqual(ResearchTrustCopy.copyAnswerAction, "Copy answer")
+        XCTAssertEqual(ResearchTrustCopy.reportProblemAction, "Report a problem")
+
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ResearchConversationCacheLifecycle.\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        let accountID = "account-a"
+        let conversationID = "conversation-a"
+        let cachedConversation = ResearchQuestionAttempt(id: "answer-a", question: "Completed answer")
+        let pendingAttempt = ResearchQuestionAttempt(id: "request-a", question: "Pending question")
+
+        try ResearchConversationCacheLifecycle.store(
+            cachedConversation,
+            cache: cache,
+            accountID: accountID,
+            conversationID: conversationID
         )
-        let deletionRange = try XCTUnwrap(
-            source.range(from: "private func deleteConversation", to: "private func cacheHistory")
+        try cache.store(
+            pendingAttempt,
+            accountID: accountID,
+            projectID: conversationID,
+            scope: ResearchQuestionAttempt.cacheScope
+        )
+        XCTAssertNotNil(
+            try ResearchConversationCacheLifecycle.load(
+                ResearchQuestionAttempt.self,
+                cache: cache,
+                accountID: accountID,
+                conversationID: conversationID
+            ),
+            "Caching a completed Research result must preserve it for offline access."
+        )
+
+        try ResearchConversationCacheLifecycle.removeDeletedConversation(
+            cache: cache,
+            accountID: accountID,
+            conversationID: conversationID
+        )
+        XCTAssertNil(
+            try ResearchConversationCacheLifecycle.load(
+                ResearchQuestionAttempt.self,
+                cache: cache,
+                accountID: accountID,
+                conversationID: conversationID
+            ),
+            "Deleting a Research conversation must remove its offline conversation cache."
+        )
+        XCTAssertNil(
+            try cache.load(
+                ResearchQuestionAttempt.self,
+                accountID: accountID,
+                projectID: conversationID,
+                scope: ResearchQuestionAttempt.cacheScope
+            ),
+            "Deleting a Research conversation must remove its interrupted-request cache."
+        )
+    }
+
+    func testHostedUnitTestsSkipNormalAppLifecycleSideEffects() {
+        XCTAssertFalse(
+            PermitextLifecyclePolicy.runsNormalDebugLifecycle(
+                hasPhysicalStressConfiguration: false,
+                hasPhase3ResearchConfiguration: false,
+                environment: ["XCTestConfigurationFilePath": "/tmp/permitext.xctestconfiguration"]
+            )
         )
         XCTAssertFalse(
-            source[sendQuestionRange].contains("clearCachedConversation"),
-            "A completed Research answer must remain available offline."
+            PermitextLifecyclePolicy.runsNormalDebugLifecycle(
+                hasPhysicalStressConfiguration: true,
+                hasPhase3ResearchConfiguration: false,
+                environment: [:]
+            )
         )
         XCTAssertTrue(
-            source[deletionRange].contains("clearCachedConversation(conversationID: id)"),
-            "Deleting a Research conversation must also remove its offline cache."
+            PermitextLifecyclePolicy.runsNormalDebugLifecycle(
+                hasPhysicalStressConfiguration: false,
+                hasPhase3ResearchConfiguration: false,
+                environment: [:]
+            )
         )
-        XCTAssertTrue(source.contains("Copy answer"))
-        XCTAssertTrue(source.contains("Report a problem"))
     }
 }
 

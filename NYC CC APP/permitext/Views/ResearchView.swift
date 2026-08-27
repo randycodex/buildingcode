@@ -37,6 +37,63 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
     let question: String
 }
 
+enum ResearchTrustCopy {
+    static let composerPrivacyDisclosure = "Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential or unnecessary personal information."
+    static let firstUseDisclosure = "Permitext sends your question, recent chat, selected or retrieved evidence, and assigned Project facts to OpenAI. Private notes are not included."
+    static let visualEvidenceDisclosure = "Selected official images are sent to OpenAI for analysis. Private notes are not included."
+    static let copyAnswerAction = "Copy answer"
+    static let reportProblemAction = "Report a problem"
+}
+
+enum ResearchConversationCacheLifecycle {
+    static let conversationScope = "research-conversation"
+
+    static func store<Value: Codable & Sendable>(
+        _ value: Value,
+        cache: ProjectHubOfflineCache,
+        accountID: String,
+        conversationID: String
+    ) throws {
+        try cache.store(
+            value,
+            accountID: accountID,
+            projectID: conversationID,
+            scope: conversationScope
+        )
+    }
+
+    static func load<Value: Codable & Sendable>(
+        _ type: Value.Type,
+        cache: ProjectHubOfflineCache,
+        accountID: String,
+        conversationID: String
+    ) throws -> ProjectHubOfflineCacheLoad<Value>? {
+        try cache.load(
+            type,
+            accountID: accountID,
+            projectID: conversationID,
+            scope: conversationScope
+        )
+    }
+
+    static func removeDeletedConversation(
+        cache: ProjectHubOfflineCache,
+        accountID: String,
+        conversationID: String
+    ) throws {
+        try cache.remove(
+            accountID: accountID,
+            projectID: conversationID,
+            scope: ResearchQuestionAttempt.cacheScope
+        )
+        try cache.remove(
+            accountID: accountID,
+            projectID: conversationID,
+            scope: conversationScope
+        )
+    }
+}
+
 private struct PendingResearchVisualReview: Identifiable, Equatable {
     let id = UUID()
     let originalSelection: ResearchSelectionRequest
@@ -637,7 +694,7 @@ struct ResearchView: View {
                 .foregroundStyle(.secondary)
                 .accessibilityIdentifier("research-composer-trust-boundary")
             HStack(spacing: 3) {
-                Text("Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential or unnecessary personal information.")
+                Text(ResearchTrustCopy.composerPrivacyDisclosure)
                 Link("Privacy", destination: URL(string: "https://permitext.com/privacy")!)
             }
             .font(.caption2)
@@ -1068,11 +1125,11 @@ struct ResearchView: View {
         failedQuestionAttempt = nil
         questionErrorMessage = nil
         isLoading = true
-        if let cached = try? cache.load(
+        if let cached = try? ResearchConversationCacheLifecycle.load(
             ResearchConversation.self,
+            cache: cache,
             accountID: account.appUserID,
-            projectID: id,
-            scope: "research-conversation"
+            conversationID: id
         ) {
             conversation = cached.value
         }
@@ -1418,8 +1475,13 @@ struct ResearchView: View {
                 failedQuestionAttempt = nil
                 questionErrorMessage = nil
             }
-            clearCachedQuestionAttempt(conversationID: id)
-            clearCachedConversation(conversationID: id)
+            if let account = library.signedInAccount {
+                try? ResearchConversationCacheLifecycle.removeDeletedConversation(
+                    cache: cache,
+                    accountID: account.appUserID,
+                    conversationID: id
+                )
+            }
             await loadHistory(forceNetwork: true)
         } catch {
             errorMessage = error.localizedDescription
@@ -1437,11 +1499,11 @@ struct ResearchView: View {
 
     private func cacheConversation(_ conversation: ResearchConversation) {
         guard let account = library.signedInAccount else { return }
-        try? cache.store(
+        try? ResearchConversationCacheLifecycle.store(
             conversation,
+            cache: cache,
             accountID: account.appUserID,
-            projectID: conversation.id,
-            scope: "research-conversation"
+            conversationID: conversation.id
         )
     }
 
@@ -1461,15 +1523,6 @@ struct ResearchView: View {
             accountID: account.appUserID,
             projectID: conversationID,
             scope: ResearchQuestionAttempt.cacheScope
-        )
-    }
-
-    private func clearCachedConversation(conversationID: String) {
-        guard let account = library.signedInAccount else { return }
-        try? cache.remove(
-            accountID: account.appUserID,
-            projectID: conversationID,
-            scope: "research-conversation"
         )
     }
 
@@ -1514,7 +1567,7 @@ private struct ResearchDisclosureAcknowledgementSheet: View {
                     .font(.title2.weight(.bold))
                 Label("What is sent", systemImage: "arrow.up.doc")
                     .font(.headline)
-                Text("Permitext sends your question, recent chat, selected or retrieved evidence, and assigned Project facts to OpenAI. Private notes are not included.")
+                Text(ResearchTrustCopy.firstUseDisclosure)
                     .foregroundStyle(.secondary)
                 Label("How to rely on it", systemImage: "checkmark.shield")
                     .font(.headline)
@@ -1606,7 +1659,7 @@ private struct ResearchVisualReviewSheet: View {
                     Text("Permitext will preserve the exact selected image bytes and their integrity identity with the Research record.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("Selected official images are sent to OpenAI for analysis. Private notes are not included.")
+                    Text(ResearchTrustCopy.visualEvidenceDisclosure)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .accessibilityIdentifier("research-visual-openai-disclosure")
@@ -1811,14 +1864,14 @@ private struct ResearchAnswerView: View {
                 .font(.caption2)
                 .foregroundStyle(.secondary)
             HStack(spacing: 14) {
-                Button(didCopy ? "Copied" : "Copy answer", systemImage: didCopy ? "checkmark" : "doc.on.doc") {
+                Button(didCopy ? "Copied" : ResearchTrustCopy.copyAnswerAction, systemImage: didCopy ? "checkmark" : "doc.on.doc") {
                     UIPasteboard.general.string = answer.structuredCopyText(sourceStatus: sourceStatus)
                     didCopy = true
                 }
                 Button("Helpful", systemImage: feedback?.category == "helpful" ? "hand.thumbsup.fill" : "hand.thumbsup") {
                     onHelpful()
                 }
-                Button("Report a problem", systemImage: "exclamationmark.bubble") {
+                Button(ResearchTrustCopy.reportProblemAction, systemImage: "exclamationmark.bubble") {
                     onReportProblem()
                 }
             }

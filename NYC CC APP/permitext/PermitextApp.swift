@@ -107,6 +107,24 @@ private enum PermitextAuthenticationPreparationError: Error {
     case staleSessionRemains
 }
 
+enum PermitextLifecyclePolicy {
+    static func isHostedUnitTest(environment: [String: String]) -> Bool {
+        environment["XCTestConfigurationFilePath"] != nil
+            || environment["XCTestBundlePath"] != nil
+            || environment["XCInjectBundleInto"] != nil
+    }
+
+    static func runsNormalDebugLifecycle(
+        hasPhysicalStressConfiguration: Bool,
+        hasPhase3ResearchConfiguration: Bool,
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) -> Bool {
+        !hasPhysicalStressConfiguration
+            && !hasPhase3ResearchConfiguration
+            && !isHostedUnitTest(environment: environment)
+    }
+}
+
 @main
 struct PermitextApp: App {
     @StateObject private var library: CodeLibraryViewModel
@@ -150,7 +168,10 @@ struct PermitextApp: App {
 
     private var runsNormalLifecycle: Bool {
 #if DEBUG
-        physicalStressConfiguration == nil && phase3ResearchConfiguration == nil
+        PermitextLifecyclePolicy.runsNormalDebugLifecycle(
+            hasPhysicalStressConfiguration: physicalStressConfiguration != nil,
+            hasPhase3ResearchConfiguration: phase3ResearchConfiguration != nil
+        )
 #else
         true
 #endif
