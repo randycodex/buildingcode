@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260827-strict-selected-boundary-v18";
+export const researchEvidenceAssemblyVersion = "20260827-natural-selected-boundary-v19";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -34,7 +34,7 @@ export const researchEvidenceStrategies = Object.freeze({
 });
 
 const selectedEvidenceCuePattern = /\b(?:selected|pinned)\s+(?:code\s+)?(?:passage|passages|evidence|text)|\b(?:both|this|these|the)\s+(?:selected\s+)?(?:passage|passages|provision|provisions|text)\b/i;
-const strictSelectedEvidenceBoundaryPattern = /\b(?:based|using|relying)\s+only\s+on\s+(?:the\s+)?selected\s+(?:code\s+)?(?:passage|passages|evidence|text)\b|\bbased\s+only\s+on\s+(?:the\s+)?selected\b/i;
+const strictSelectedEvidenceBoundaryPattern = /\b(?:based|using|relying)\s+only\s+on\s+(?:the\s+)?selected\s+(?:(?:building\s+)?code\s+)?(?:passage|passages|evidence|text)\b|\bbased\s+only\s+on\s+(?:the\s+)?selected\b|\bfrom\s+(?:the\s+)?selected\s+(?:(?:building\s+)?code\s+)?(?:passage|passages|evidence|text)\b/i;
 const broaderEvidenceCuePattern = /\b(?:applicab(?:le|ility)|comply|compliance|exception|exceptions|definition|definitions|defined|table|tables|calculate|calculation|other provisions?|additional provisions?|related provisions?|cross[- ]references?|project[- ]specific|verify|verification)\b/i;
 
 function explicitCodeReferences(value) {

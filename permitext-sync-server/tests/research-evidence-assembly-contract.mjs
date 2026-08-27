@@ -498,6 +498,18 @@ assert.deepEqual(
   },
   "A Reader question explicitly bounded to its selected passages should begin with those passages."
 );
+assert.deepEqual(
+  researchEvidenceStrategyForTurn({
+    question: "What can be concluded from the selected Building Code passages, and what remains unresolved?",
+    pinnedEvidence: twoReaderPins,
+    originSurface: "chat"
+  }),
+  {
+    mode: researchEvidenceStrategies.pinnedFirst,
+    reason: "question_explicitly_bounded_to_selected_evidence"
+  },
+  "Natural selected-passage boundary wording must not trigger broad retrieval."
+);
 for (const question of [
   "Do the selected passages establish compliance?",
   "Which exception applies beyond these passages?",
