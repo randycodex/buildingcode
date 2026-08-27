@@ -18,6 +18,9 @@ const [datasetText, evaluationSource, appSource, readme] = await Promise.all([
 ]);
 const dataset = JSON.parse(datasetText);
 const profile = validateResearchCommercializationBenchmark();
+const frozenResult = JSON.parse(
+  await readFile(join(root, "..", profile.resultFile), "utf8")
+);
 const diagnosticCases = dataset.cases.filter((testCase) =>
   ["approved", "draft"].includes(testCase.status) &&
   !profile.excludedSafetyCaseIDs.includes(testCase.id)
@@ -31,9 +34,19 @@ assert.equal(profile.targetQuestionCount, 20);
 assert.equal(profile.minimumCompletedTurns, 20);
 assert.deepEqual(profile.excludedSafetyCaseIDs, ["nyc-018-fire-district-map-boundary"]);
 assert.equal(profile.promptVersion, "20260827-explicit-unknown-coverage-v29");
-assert.equal(profile.completedAt, null);
-assert.equal(profile.gitCommit, null);
-assert.equal(profile.resultFile, null);
+assert.equal(profile.completedAt, "2026-08-27T22:08:25.090Z");
+assert.equal(profile.gitCommit, "30ecbb657a1a051d264c7916f74c3d91e728cf80");
+assert.equal(
+  profile.resultFile,
+  "evals/results/2026-08-27T21-53-23-508Z-bf772b34-fb6e-4b54-b303-7adab469edb5.json"
+);
+assert.equal(frozenResult.configuration.gitCommit, profile.gitCommit);
+assert.equal(frozenResult.configuration.actualUSD, 1.726035);
+assert.equal(frozenResult.economics.sample.completedCharged, 20);
+assert.equal(frozenResult.economics.economics.projectedCostPer100TurnsUSD, 5.35);
+assert.equal(frozenResult.economics.charging.integrityPass, true);
+assert.equal(frozenResult.economics.readyForPricingDecision, true);
+assert.equal(frozenResult.results.filter((result) => result.scoring?.passed).length, 9);
 assert.equal(environment.PERMITEXT_RESEARCH_ROUTING_MODE, "hybrid");
 assert.equal(environment.PERMITEXT_RESEARCH_FAST_MODEL, "gpt-5.6-luna");
 assert.equal(environment.PERMITEXT_RESEARCH_ACCURATE_MODEL, "gpt-5.6-terra");
@@ -93,4 +106,4 @@ assert.match(
   "The Research prompt does not preserve separately declared material unknowns."
 );
 
-console.log("Permitext open commercialization benchmark profile contract passed; paid model calls: no.");
+console.log("Permitext frozen commercialization benchmark profile contract passed; paid model calls: no.");

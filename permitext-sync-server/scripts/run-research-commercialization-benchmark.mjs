@@ -25,9 +25,9 @@ export const researchCommercializationBenchmark = Object.freeze({
   accurateModel: "gpt-5.6-terra",
   fastModel: "gpt-5.6-luna",
   routingMode: "hybrid",
-  gitCommit: null,
-  completedAt: null,
-  resultFile: null,
+  gitCommit: "30ecbb657a1a051d264c7916f74c3d91e728cf80",
+  completedAt: "2026-08-27T22:08:25.090Z",
+  resultFile: "evals/results/2026-08-27T21-53-23-508Z-bf772b34-fb6e-4b54-b303-7adab469edb5.json",
   accuratePricing: Object.freeze({
     inputUSDPerMillionTokens: "2.00",
     cachedInputUSDPerMillionTokens: "0.20",
