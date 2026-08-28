@@ -1,0 +1,2209 @@
+{
+  "schemaVersion": 3,
+  "status": "completed",
+  "createdAt": "2026-08-28T01:43:17.103Z",
+  "updatedAt": "2026-08-28T01:44:03.109Z",
+  "configuration": {
+    "runID": "2f961482-50cb-4b2d-afa9-1a7e46c324ad",
+    "datasetSHA256": "da3a0e1061b94d9707abc713d0827a8c1df46b9d8a873e9544b35ac9d90eeefb",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "jurisdictions": [
+      "New York City, New York"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260827-material-completeness-v31",
+    "evidenceVersion": "selected-multimodal-evidence-v3",
+    "retrievalVersion": "automatic-enacted-corpus-with-pinned-evidence",
+    "suiteScope": "diagnostic",
+    "repeat": 1,
+    "caseIDs": [
+      "nyc-bc-1019-3-exception-attribution"
+    ],
+    "caseStatuses": [
+      "approved"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260826-established-facts-v3",
+    "pricingVersion": "openai-gpt-5.6-terra-2026-08-24",
+    "gitCommit": "120fa1b927f04dde5f60886d8add36f5ff5d0a2e",
+    "approvedSpendCapUSD": 0.75,
+    "conservativeReservedUSD": 0.08338,
+    "actualUSD": 0.08338,
+    "pendingPaidRequestCount": 0,
+    "paidRequestCount": 3
+  },
+  "economics": {
+    "generatedAt": "2026-08-28T01:44:02.963Z",
+    "targets": {
+      "minimumCompletedTurns": 20,
+      "costPer100MinimumUSD": 4,
+      "costPer100MaximumUSD": 6
+    },
+    "sample": {
+      "operations": 1,
+      "completed": 1,
+      "completedCharged": 1,
+      "completedUncharged": 0,
+      "failed": 0,
+      "cancelled": 0,
+      "replayed": 0,
+      "rejected": 0,
+      "sampleReady": false
+    },
+    "economics": {
+      "totalOperatingCostUSD": 0.054498,
+      "failedOperatingCostUSD": 0,
+      "completedTurnCostUSD": {
+        "count": 1,
+        "mean": 0.054498,
+        "p50": 0.054498,
+        "p90": 0.054498,
+        "maximum": 0.054498
+      },
+      "amortizedCostPerCompletedTurnUSD": 0.054498,
+      "projectedCostPer100TurnsUSD": 5.45,
+      "targetReady": true,
+      "targetBand": "within"
+    },
+    "latencyMilliseconds": {
+      "count": 1,
+      "mean": 28382,
+      "p50": 28382,
+      "p90": 28382,
+      "maximum": 28382
+    },
+    "routing": {
+      "escalatedTurns": 0,
+      "escalationRate": 0,
+      "verificationRevisionTurns": 0,
+      "verificationRevisionRate": 0,
+      "providerRequests": {
+        "count": 1,
+        "mean": 2,
+        "p50": 2,
+        "p90": 2,
+        "maximum": 2
+      },
+      "models": [
+        {
+          "key": "gpt-5.6-luna",
+          "count": 1
+        },
+        {
+          "key": "gpt-5.6-terra",
+          "count": 1
+        }
+      ],
+      "modes": [
+        {
+          "key": "hybrid",
+          "count": 1
+        }
+      ],
+      "escalationStages": [],
+      "verificationIssues": []
+    },
+    "failures": {
+      "count": 0,
+      "rate": 0,
+      "codes": []
+    },
+    "charging": {
+      "chargedCompletedTurns": 1,
+      "unchargedCompletedOperations": 0,
+      "failedCharged": 0,
+      "replayedCharged": 0,
+      "rejectedCharged": 0,
+      "integrityPass": true
+    },
+    "readyForPricingDecision": false
+  },
+  "baseline": null,
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "nyc-bc-1019-3-exception-attribution",
+        "title": "BC 1019.3 draft-curtain premise belongs to Exception 4, not Exception 2",
+        "status": "approved",
+        "difficulty": "advanced",
+        "topics": [
+          "means of egress",
+          "exit access stairways",
+          "exception attribution",
+          "draft curtain"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "jurisdiction": "New York City, New York",
+        "projectContext": {
+          "proposal": "Open exit access stair represented as relying on BC 1019.3 Exception 2 with a draft curtain",
+          "unknowns": [
+            "occupancy",
+            "sprinkler system",
+            "stories connected",
+            "independent exits",
+            "openness to other stories",
+            "remoteness"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "sectionID": "2412",
+            "reference": "BC 1019.3",
+            "codePrefix": "BC",
+            "sectionNumber": "1019.3",
+            "exactPassages": [
+              "In other than Group H, I-2 and I-3 occupancies, exit access stairways or ramps shall be enclosed with a shaft enclosure constructed in accordance with Section 713.",
+              "2. In buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, exit access stairways and ramps that serve between only the first and second stories above grade, provided the first and second stories have access to the minimum number of approved independent exits as required by Section 1006, and in no case be less than two means of egress. Such interconnected stories shall not be open to other stories. Unenclosed exit access stairways and ramps shall be remotely located in accordance with Section 1007.",
+              "4. Exit access stairways and ramps in buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, where the area of the vertical opening between stories does not exceed twice the horizontal projected area of the stairway or ramp and the opening is protected by a draft curtain and closely spaced sprinklers in accordance with NFPA 13 as modified by Appendix Q. In other than Group B and M occupancies, this provision is limited to openings that do not connect more than four stories."
+            ],
+            "resolvedTitle": "1019.3 Occupancies other than Groups H, I-2 and I-3.",
+            "evidenceCharacters": 2702,
+            "ready": true,
+            "missingPassages": [],
+            "error": null
+          }
+        ],
+        "question": "Per NYC BC 1019.3, Exception 2, are we permitted to have the open stair as shown, provided that the required draft curtain is installed?",
+        "expectedConclusion": "Potentially, but not on the basis stated. BC 1019.3 establishes a general enclosure rule. Exception 2 is a distinct potential pathway for an unenclosed exit access stair between only the first and second stories above grade in a building sprinklered throughout under Section 903.3.1.1, subject to its independent-exit, separation-from-other-stories, and remoteness conditions. Exception 2 does not contain a draft-curtain requirement. The draft curtain and closely spaced sprinklers appear in Exception 4, which is a different compliance pathway with different conditions. Permitext cannot confirm the project's compliance until the occupancy and the material facts for the selected pathway are established.",
+        "expectedUncertainty": {
+          "level": "conditional",
+          "description": "The answer must decisively correct the wrong exception attribution and identify the two distinct pathways before conditioning project compliance on missing facts."
+        },
+        "sourceType": "deliberately constructed edge case",
+        "sourceReference": "Regression scenario and required behaviors supplied by the Permitext owner from canonical enacted BC 1019.3.",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-08-10T00:00:00.000Z",
+        "notes": "The canonical section contains the general rule and all eight exceptions. This regression fails if the answer only requests more information or attributes the draft-curtain condition to Exception 2.",
+        "requiredConcepts": [
+          "Recognize the general enclosure rule in BC 1019.3.",
+          "Recognize Exception 2 as a potential unenclosed-stair pathway.",
+          "State that Exception 2 does not require a draft curtain.",
+          "State that the draft-curtain and closely spaced sprinkler condition appears in Exception 4.",
+          "Explain that Exceptions 2 and 4 are distinct compliance pathways with different conditions.",
+          "State the strongest supported correction before discussing uncertainty.",
+          "Avoid confirming project compliance without the material project facts."
+        ],
+        "missingFacts": [
+          "Confirm that the occupancy is outside Groups H, I-2, and I-3.",
+          "Confirm that the building is sprinklered throughout in accordance with Section 903.3.1.1.",
+          "Confirm whether the stair connects only the first and second stories above grade if relying on Exception 2.",
+          "Confirm the required independent exits from both interconnected stories if relying on Exception 2.",
+          "Confirm that the interconnected stories are not open to other stories if relying on Exception 2.",
+          "Confirm remoteness under Section 1007 if relying on Exception 2."
+        ],
+        "forbiddenClaims": [
+          "Exception 2 requires a draft curtain.",
+          "Installing a draft curtain by itself satisfies Exception 2.",
+          "Exceptions 2 and 4 are one combined compliance pathway.",
+          "The open stair is compliant on the stated facts.",
+          "The supplied BC 1019.3 evidence is missing the draft-curtain provision.",
+          "Only state that more information is required without first correcting the exception attribution."
+        ],
+        "requiredCitations": [
+          "BC 1019.3"
+        ],
+        "requiredCitationClaims": [
+          {
+            "reference": "BC 1019.3",
+            "requiredClaim": "The general enclosure rule, the distinct Exception 2 pathway, and the separate draft-curtain condition in Exception 4."
+          }
+        ],
+        "ready": true
+      },
+      "repetition": 1,
+      "conversationID": "0ee8adcd-fc5f-4d19-b544-85c14549fa50",
+      "answeredAt": "2026-08-28T01:43:46.204Z",
+      "answerTimeMilliseconds": 28393,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:conversational-v4",
+        "evidenceVersion": "20260827-pinned-evidence-budget-v20:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260824-routed-authorized-corpora-v2",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "project-default",
+          "projectID": "research-eval-project-9d5fad5c-597c-409b-a2f0-33a20ce8e15d",
+          "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "projectCodeVersionRecognized": true,
+          "projectCodeVersionSupported": true,
+          "projectCodeVersionRetrieved": true,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "construction-code cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+          "limitation": null,
+          "resolvedAt": "2026-08-28T01:43:17.836Z"
+        },
+        "answerText": "Not under Exception 2 merely by adding a draft curtain. Exception 2 is a separate allowance for an exit access stair/ramp serving only between the first and second stories above grade. It requires a building equipped throughout with an automatic sprinkler system complying with BC 903.3.1.1, the minimum number of approved independent exits required by BC 1006 (and never fewer than two means of egress), no opening of those interconnected stories to other stories, and remote location of the unenclosed stair/ramp under BC 1007. A draft curtain is not one of Exception 2’s stated conditions.\n\nThe draft-curtain path is Exception 4, not Exception 2. On the supplied text, the open stair may be allowed under Exception 4 only if the building is equipped throughout with a BC 903.3.1.1/NFPA 13 sprinkler system; the vertical-opening area is no more than twice the stair’s horizontal projected area; and the opening has both a draft curtain and closely spaced sprinklers in accordance with NFPA 13 as modified by Appendix Q. If the occupancy is other than Group B or M, the opening also may not connect more than four stories.\n\nAccordingly, installation of the draft curtain alone does not establish permission for the open stair shown. The stated unknowns prevent determining whether either Exception 2 or Exception 4 is satisfied. This also assumes the stair is an exit access stairway and that the occupancy falls within BC 1019.3’s stated scope (other than Groups H, I-2, and I-3).",
+        "conclusion": "Not under Exception 2 merely by adding a draft curtain. Exception 2 is a separate allowance for an exit access stair/ramp serving only between the first and second stories above grade. It requires a building equipped throughout with an automatic sprinkler system complying with BC 903.3.1.1, the minimum number of approved independent exits required by BC 1006 (and never fewer than two means of egress), no opening of those interconnected stories to other stories, and remote location of the unenclosed stair/ramp under BC 1007. A draft curtain is not one of Exception 2’s stated conditions.",
+        "supportedPoints": [
+          {
+            "heading": "Default enclosure rule",
+            "explanation": "For occupancies other than Groups H, I-2, and I-3, exit access stairways and ramps must be enclosed in a shaft enclosure constructed under Section 713, unless an applicable exception is satisfied.",
+            "sectionID": "2412",
+            "sourceIDs": [
+              "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Exception 2 does not rest on a draft curtain",
+            "explanation": "Exception 2 permits an unenclosed exit access stairway or ramp only between the first and second stories above grade, in a building equipped throughout with an automatic sprinkler system complying with Section 903.3.1.1, where both stories have the required approved independent exits under Section 1006 and at least two means of egress, the interconnected stories are not open to other stories, and the unenclosed stairway or ramp is remotely located under Section 1007. A draft curtain is not a stated Exception 2 condition.",
+            "sectionID": "2412",
+            "sourceIDs": [
+              "286b38df-d9c6-4955-b17b-998bb25b5931"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Draft-curtain allowance is Exception 4",
+            "explanation": "Exception 4 allows an exit access stairway or ramp in a building equipped throughout with an automatic sprinkler system complying with Section 903.3.1.1 when the vertical-opening area does not exceed twice the horizontal projected area of the stairway or ramp and the opening is protected by both a draft curtain and closely spaced sprinklers in accordance with NFPA 13 as modified by Appendix Q. In occupancies other than Groups B and M, the opening cannot connect more than four stories.",
+            "sectionID": "2412",
+            "sourceIDs": [
+              "f82ff2e2-6818-4569-b064-34f308f53d8c"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Required sprinkler-system basis",
+            "explanation": "Where BC 903.3.1.1 is the applicable throughout-sprinkler condition, sprinklers are to be installed throughout in accordance with NFPA 13, subject to the stated code exceptions.",
+            "sectionID": "1630",
+            "sourceIDs": [
+              "research-permitext_cross_reference-id:1630-4"
+            ],
+            "evidenceRole": "supporting"
+          }
+        ],
+        "explanation": "The draft-curtain path is Exception 4, not Exception 2. On the supplied text, the open stair may be allowed under Exception 4 only if the building is equipped throughout with a BC 903.3.1.1/NFPA 13 sprinkler system; the vertical-opening area is no more than twice the stair’s horizontal projected area; and the opening has both a draft curtain and closely spaced sprinklers in accordance with NFPA 13 as modified by Appendix Q. If the occupancy is other than Group B or M, the opening also may not connect more than four stories.\n\nAccordingly, installation of the draft curtain alone does not establish permission for the open stair shown. The stated unknowns prevent determining whether either Exception 2 or Exception 4 is satisfied. This also assumes the stair is an exit access stairway and that the occupancy falls within BC 1019.3’s stated scope (other than Groups H, I-2, and I-3).",
+        "assumptions": [],
+        "missingFacts": [
+          "The occupancy group, to confirm that the BC 1019.3 scope stated in the supplied text applies and, for Exception 4, whether the Group B/M versus other-occupancy story limitation applies.",
+          "Whether the building is equipped throughout with an automatic sprinkler system installed in accordance with BC 903.3.1.1/NFPA 13.",
+          "The number and identity of stories connected by the open stair or vertical opening.",
+          "For the Exception 2 path: whether the stair serves only between the first and second stories above grade.",
+          "For the Exception 2 path: the number and approval basis of independent exits serving each interconnected story, including whether at least two means of egress are provided.",
+          "For the Exception 2 path: whether the interconnected stories are open to any other stories.",
+          "For the Exception 2 path: the stair’s remote-location compliance under BC 1007.",
+          "For the Exception 4 path: the vertical-opening area and the horizontal projected area of the stair/ramp, to verify the maximum two-to-one area limit.",
+          "For the Exception 4 path: the draft-curtain and closely spaced-sprinkler design information demonstrating compliance with NFPA 13 as modified by Appendix Q.",
+          "Openness to other stories.",
+          "Remoteness."
+        ],
+        "followUpQuestions": [
+          "Is the design being advanced under Exception 2 (first-to-second-story allowance) or Exception 4 (draft-curtain and closely spaced-sprinkler allowance)?",
+          "Please provide the occupancy group, the stories connected, confirmation of an NFPA 13 system throughout, and the applicable egress/remote-location or opening-area calculations for the selected exception path."
+        ],
+        "evidenceLimitations": [
+          "The supplied evidence contains the text of BC 1019.3 and BC 903.3.1.1, but does not include BC 1006, BC 1007, NFPA 13 as modified by Appendix Q, or the project drawings and dimensions. It therefore does not establish compliance with the independent-exit, remoteness, closely spaced sprinkler, draft-curtain-detail, or opening-area requirements."
+        ],
+        "additionalEvidenceNeeded": [
+          "Approved or proposed sprinkler plans/specifications identifying an automatic sprinkler system throughout under BC 903.3.1.1 and NFPA 13.",
+          "Plans or calculations showing the vertical-opening area and stair/ramp horizontal projected area.",
+          "Draft-curtain and closely spaced-sprinkler details evaluated against the applicable NFPA 13/Appendix Q requirements.",
+          "For an Exception 2 claim, the egress plan showing the approved independent exits, number of means of egress, lack of openings to other stories, and remoteness basis under BC 1006 and BC 1007."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "2412",
+            "sectionNumber": "1019.3",
+            "title": "1019.3 Occupancies other than Groups H, I-2 and I-3.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+                "selectedText": "In other than Group H, I-2 and I-3 occupancies, exit access stairways or ramps shall be enclosed with a shaft enclosure constructed in accordance with Section 713.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the baseline shaft-enclosure requirement and its stated occupancy scope."
+          },
+          {
+            "sectionID": "2412",
+            "sectionNumber": "1019.3",
+            "title": "1019.3 Occupancies other than Groups H, I-2 and I-3.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "286b38df-d9c6-4955-b17b-998bb25b5931"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "286b38df-d9c6-4955-b17b-998bb25b5931",
+                "selectedText": "2. In buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, exit access stairways and ramps that serve between only the first and second stories above grade, provided the first and second stories have access to the minimum number of approved independent exits as required by Section 1006, and in no case be less than two means of egress. Such interconnected stories shall not be open to other stories. Unenclosed exit access stairways and ramps shall be remotely located in accordance with Section 1007.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Provides the referenced enacted requirements in BC 1019.3 (Occupancies other than Groups H, I-2 and I-3)."
+          },
+          {
+            "sectionID": "2412",
+            "sectionNumber": "1019.3",
+            "title": "1019.3 Occupancies other than Groups H, I-2 and I-3.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "f82ff2e2-6818-4569-b064-34f308f53d8c"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "f82ff2e2-6818-4569-b064-34f308f53d8c",
+                "selectedText": "4. Exit access stairways and ramps in buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, where the area of the vertical opening between stories does not exceed twice the horizontal projected area of the stairway or ramp and the opening is protected by a draft curtain and closely spaced sprinklers in accordance with NFPA 13 as modified by Appendix Q. In other than Group B and M occupancies, this provision is limited to openings that do not connect more than four stories.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the distinct draft-curtain and closely spaced-sprinkler allowance and its limits."
+          },
+          {
+            "sectionID": "1630",
+            "sectionNumber": "903.3.1.1",
+            "title": "903.3.1.1 NFPA 13 sprinkler systems.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_cross_reference-id:1630-4"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_cross_reference-id:1630-4",
+                "selectedText": "903.3.1.1 903.3.1.1 NFPA 13 sprinkler systems. Where the provisions of this code require that a building or portion thereof be equipped throughout with an automatic sprinkler system in accordance with this section, sprinklers shall be installed throughout in accordance with NFPA 13 except as provided in Sections 903.3.1.1.1 and 903.2 of this code. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Supplies the referenced NFPA 13 throughout-sprinkler basis."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2412",
+          "113",
+          "7826",
+          "2222",
+          "7828",
+          "1630",
+          "1632",
+          "1635"
+        ],
+        "evidenceSourceIDs": [
+          "ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+          "286b38df-d9c6-4955-b17b-998bb25b5931",
+          "f82ff2e2-6818-4569-b064-34f308f53d8c",
+          "research-permitext_discovered-id:113-2",
+          "research-permitext_discovered-id:7826-3",
+          "research-permitext_discovered-id:2222-4",
+          "research-permitext_discovered-id:7828-5",
+          "research-permitext_cross_reference-id:1630-4",
+          "research-permitext_cross_reference-id:1632-5",
+          "research-permitext_cross_reference-id:1635-6"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 8,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 1,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 6,
+          "userPinnedCount": 3,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 3,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 11,
+          "requiredClaimCount": 3,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 1019.3",
+              "summary": "BC 1019.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+              ]
+            },
+            {
+              "label": "BC 1019.3",
+              "summary": "BC 1019.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "286b38df-d9c6-4955-b17b-998bb25b5931"
+              ]
+            },
+            {
+              "label": "BC 1019.3",
+              "summary": "BC 1019.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "f82ff2e2-6818-4569-b064-34f308f53d8c"
+              ]
+            }
+          ],
+          "generalRules": [],
+          "exceptions": [
+            {
+              "label": "BC 1019.3",
+              "summary": "BC 1019.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+              ]
+            },
+            {
+              "label": "BC 1019.3",
+              "summary": "BC 1019.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "286b38df-d9c6-4955-b17b-998bb25b5931"
+              ]
+            },
+            {
+              "label": "BC 1019.3",
+              "summary": "BC 1019.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "f82ff2e2-6818-4569-b064-34f308f53d8c"
+              ]
+            },
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-2"
+              ]
+            },
+            {
+              "label": "BC 1009.3",
+              "summary": "BC 1009.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2222-4"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-2"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "BC 903.3.1.1",
+              "summary": "BC 903.3.1.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:1630-4"
+              ]
+            },
+            {
+              "label": "BC 903.3.1.2",
+              "summary": "BC 903.3.1.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:1632-5"
+              ]
+            },
+            {
+              "label": "BC 903.3.1.3",
+              "summary": "BC 903.3.1.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:1635-6"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [
+            "ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+            "286b38df-d9c6-4955-b17b-998bb25b5931",
+            "f82ff2e2-6818-4569-b064-34f308f53d8c"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:7826-3",
+            "research-permitext_discovered-id:2222-4",
+            "research-permitext_discovered-id:7828-5",
+            "research-permitext_cross_reference-id:1630-4",
+            "research-permitext_cross_reference-id:1632-5",
+            "research-permitext_cross_reference-id:1635-6"
+          ],
+          "projectFactsUsed": [
+            "Proposal: Open exit access stair represented as relying on BC 1019.3 Exception 2 with a draft curtain"
+          ],
+          "unresolvedProjectFacts": [
+            "Unknowns: occupancy",
+            "Unknowns: sprinkler system",
+            "Unknowns: stories connected",
+            "Unknowns: independent exits",
+            "Unknowns: openness to other stories",
+            "Unknowns: remoteness"
+          ],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [
+            "Proposal: Open exit access stair represented as relying on BC 1019.3 Exception 2 with a draft curtain"
+          ],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260824-topic-scoped-user-facts-v4",
+          "activeRootTopic": "Per NYC BC 1019.3, Exception 2, are we permitted to have the open stair as shown, provided that the required draft curtain is installed?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Per NYC BC 1019.3, Exception 2, are we permitted to have the open stair as shown, provided that the required draft curtain is installed?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+            "286b38df-d9c6-4955-b17b-998bb25b5931",
+            "f82ff2e2-6818-4569-b064-34f308f53d8c"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+            "286b38df-d9c6-4955-b17b-998bb25b5931",
+            "f82ff2e2-6818-4569-b064-34f308f53d8c",
+            "research-permitext_cross_reference-id:1630-4"
+          ],
+          "citedEvidenceSourceIDs": [
+            "ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+            "286b38df-d9c6-4955-b17b-998bb25b5931",
+            "f82ff2e2-6818-4569-b064-34f308f53d8c",
+            "research-permitext_cross_reference-id:1630-4"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:7826-3",
+            "research-permitext_discovered-id:2222-4",
+            "research-permitext_discovered-id:7828-5",
+            "research-permitext_cross_reference-id:1630-4",
+            "research-permitext_cross_reference-id:1632-5",
+            "research-permitext_cross_reference-id:1635-6"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+              "label": "BC 1019.3 — 1019.3 Occupancies other than Groups H, I-2 and I-3.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:286b38df-d9c6-4955-b17b-998bb25b5931",
+              "label": "BC 1019.3 — 1019.3 Occupancies other than Groups H, I-2 and I-3.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "286b38df-d9c6-4955-b17b-998bb25b5931"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:f82ff2e2-6818-4569-b064-34f308f53d8c",
+              "label": "BC 1019.3 — 1019.3 Occupancies other than Groups H, I-2 and I-3.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "f82ff2e2-6818-4569-b064-34f308f53d8c"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+            "286b38df-d9c6-4955-b17b-998bb25b5931",
+            "f82ff2e2-6818-4569-b064-34f308f53d8c",
+            "research-permitext_cross_reference-id:1630-4"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+              "label": "BC 1019.3 — 1019.3 Occupancies other than Groups H, I-2 and I-3.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "286b38df-d9c6-4955-b17b-998bb25b5931"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "f82ff2e2-6818-4569-b064-34f308f53d8c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "research-permitext_cross_reference-id:1630-4"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:286b38df-d9c6-4955-b17b-998bb25b5931",
+              "label": "BC 1019.3 — 1019.3 Occupancies other than Groups H, I-2 and I-3.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "286b38df-d9c6-4955-b17b-998bb25b5931"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "286b38df-d9c6-4955-b17b-998bb25b5931"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "286b38df-d9c6-4955-b17b-998bb25b5931"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "286b38df-d9c6-4955-b17b-998bb25b5931"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "f82ff2e2-6818-4569-b064-34f308f53d8c"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "286b38df-d9c6-4955-b17b-998bb25b5931"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "research-permitext_cross_reference-id:1630-4"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "286b38df-d9c6-4955-b17b-998bb25b5931"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:f82ff2e2-6818-4569-b064-34f308f53d8c",
+              "label": "BC 1019.3 — 1019.3 Occupancies other than Groups H, I-2 and I-3.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "f82ff2e2-6818-4569-b064-34f308f53d8c"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "f82ff2e2-6818-4569-b064-34f308f53d8c"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "ef213eae-4079-4df0-9d46-8f2c3ef7cac0"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f82ff2e2-6818-4569-b064-34f308f53d8c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "286b38df-d9c6-4955-b17b-998bb25b5931"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f82ff2e2-6818-4569-b064-34f308f53d8c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "f82ff2e2-6818-4569-b064-34f308f53d8c"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "research-permitext_cross_reference-id:1630-4"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f82ff2e2-6818-4569-b064-34f308f53d8c"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260828-prior-code-accessibility-repair-v22",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "citedSourceIDs": [
+            "ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+            "286b38df-d9c6-4955-b17b-998bb25b5931",
+            "f82ff2e2-6818-4569-b064-34f308f53d8c",
+            "research-permitext_cross_reference-id:1630-4"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:113-2",
+            "research-permitext_discovered-id:7826-3",
+            "research-permitext_discovered-id:2222-4",
+            "research-permitext_discovered-id:7828-5",
+            "research-permitext_cross_reference-id:1632-5",
+            "research-permitext_cross_reference-id:1635-6"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 4,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 1,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 6,
+            "reviewedOnlyProvisionCount": 6,
+            "assembledSourceCount": 10,
+            "assembledProvisionCount": 8
+          },
+          "sources": [
+            {
+              "sourceID": "ef213eae-4079-4df0-9d46-8f2c3ef7cac0",
+              "sectionID": "2412",
+              "reference": "BC 1019.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "In other than Group H, I-2 and I-3 occupancies, exit access stairways or ramps shall be enclosed with a shaft enclosure constructed in accordance with Section 713."
+            },
+            {
+              "sourceID": "286b38df-d9c6-4955-b17b-998bb25b5931",
+              "sectionID": "2412",
+              "reference": "BC 1019.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "2. In buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, exit access stairways and ramps that serve between only the first and second stories above grade, provided the first and second stories have access to the minimum number of approved independent exits as required by Section 1006, and in no case be less than two means of egress. Such interconnected stories shall not be open to other stories. Unenclosed exit access stairways and ramps shall be remotely located in accordance with Section 1007."
+            },
+            {
+              "sourceID": "f82ff2e2-6818-4569-b064-34f308f53d8c",
+              "sectionID": "2412",
+              "reference": "BC 1019.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "4. Exit access stairways and ramps in buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, where the area of the vertical opening between stories does not exceed twice the horizontal projected area of the stairway or ramp and the opening is protected by a draft curtain and closely spaced sprinklers in accordance with NFPA 13 as modified by Appendix Q. In other than Group B and M occupancies, this provision is limited to openings that do not connect more than four stories."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-2",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "AUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is heated to its thermal rating or above, allowing water to discharge over a specified area. DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling. EXIT ACCESS. That portion of a means of egress system that leads from any occupied portion of a building or structure to an exit. EXIT ACCESS STAIRWAY. A stairway within the exit access portion of the means of egress system. MEANS OF EGRESS. A continuous and unobstructed path of vertical and horizontal egress travel from any occupied portion of a building or structure to a public way. A means of egress consists of three separate and distinct parts: the exit access, the exit and the exit discharge. OPEN PARKING GARAGE . A structure or portion of a structure with the openings as described in Section 406 . 5 . 2 that is used for the parking or storage of private motor vehicles as described in Section 406 . 5.3 . PARKING GARAGE. A structure or portion of a structure, other than a private garage or carport, used for the parking or storage of motor vehicles. SHAFT ENCLOSURE. The walls or construction forming the boundaries of a shaft."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7826-3",
+              "sectionID": "7826",
+              "reference": "BC Q105.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q105.1 Q105.1 General. Standpipe and hose systems, where required by this code, shall be installed in accordance with NFPA 14, Standard for the Installation of Standpipe and Hose Systems , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions 3.3.3.1 Delete and replace with the following: \"Fire Department Connection (FDC).\" 3.3.3.1.1 Delete and replace with the following: \"Standpipe System Fire Department Connection (Standpipe FDC). A connection through which the fire department can pump water to a standpipe system at the required system demand. Supplemental water can also be provided into the sprinkler system or other system furnishing water for fire extinguishment to supplement existing water supplies. Unless otherwise allowed in the New York City Building Code , FDCs shall be 2-way connections.\" 3.3.3.1.2 Delete. 3.3.5.1 Delete the words 'NFPA 101' and replace with 'the New York City Building Code '. 3.3.6 Delete and replace with the following: \"Fire Department. The New York City Fire Department (FDNY).\" 3.3.7 Add at end the following: \"For the purposes of this section, a penthouse of any area with an occupant load greater than 10 shall be considered a story.\" 3.3.8 Delete the words \"or reel\". 3.3.9.1.1 Delete. 3.3.18 Delete. 3.3.19.2 Delete the words \"trained personnel\" and replace with \"building occupants\". 3.3.19.3 Delete the words \"trained personnel\" and replace with '\"building occupants\". Add at end the following: \"The hose stations shall be attached to the hose connections by a reducing coupling.\" 3.3.21 Delete the words 'and exclusive of pressure from the fire department connection'. Add 3.3.24 to read as follows: \"3.3.24 Zones\" Add 3.3.24.1 to read as follows: \"Standpipe System Zone. A vertical subdivision of a standpipe system limited or determined by the pressure limitations of the system components. Standpipe System Zones shall not exceed 300 feet (91.4 m) in height.\" Add 3.3.24.2 to read as follows: \"Fire Department Connection (FDC) Zone. A vertical subdivision of a standpipe system in buildings with more than two standpipe system zones arranged so that the Fire Department will pump through express FDC risers to upper zones.\" Chapter 4 System Components and Hardware 4.2.2 Delete and replace with the following: \"Pipe for buried portions of the standpipe system, whether inside or outside of the building, shall be red brass, ductile iron, hard tempered type \"K\" copper tubing, galvanized steel or other approved corrosion resistant material. All such pipe, other than ductile iron, shall be adequately wrapped or otherwise protected against corrosion.\" Add 4.2.2.1 as follows: \"Where ductile iron pipe is installed in accordance with Table 4.2.1, it shall be lined in accordance with AWWA C 104, Cement-Mortar Lining for Ductile-Iron Pipe and Fittings .\" 4.2.3 Add at end the following: \"Piping conforming to the specifications contained in this section may only be used in buildings with floor heights not exceeding 300 feet (91.4 m) above grade plane or in the highest 300 feet (91.4 m) portion of other buildings. Otherwise, piping conforming to the wall thicknesses specified in 4.2.4 shall be used.\" 4.4.1.2 Delete. 4.4.2.2.2 Replace \"NFPA 51B\" with \"the New York City Fire Code \". 4.4.2.2.3 Replace \"NFPA 51B\" with \"the New York City Fire Code \". 4.5.1 Add at end the following: \"6 inch (152 mm) and larger sectional and riser control valves shall have a minimum 3/4 inch (197 mm) valved bypass.\" 4.6.2.1 Delete and replace with the following: \"Class III Standpipe Hose Stations. Class III standpipe systems shall have 2 1/2 in. (64 mm) hose connections located as required for Class I standpipes. At each hose connection there shall be a hose station. The hose stations shall be equipped with a minimum of 125 feet (38.1 m), or a maximum of 150 feet (45.7 m), of 1 1/2 in. (38 mm) fire hose, connected to an adjustable fog nozzle. The hose shall be attached to the hose connection by a 2 1/2 in. x 1 1/2 in. (64 mm x 38 mm) non-swivel reducing coupling. A pressure restricting device shall be installed on the 2 1/2 in. hose connection when required by Appendix Q of the New York City Building Code . The hose shall be mounted on a rack and may be located in a cabinet, in accordance with Section 905.7 of the New York City Building Code . The hose, pressure restricting device (when required) and reducing coupling shall be installed in such a manner that they can be readily removable by the Fire Department.\" 4.6.2.2 Delete. 4.6.3.2 Delete. 4.6.4 Delete \"for Class II service\". 4.6.5 Delete and replace with the following: \"Label. Each rack or storage facility for 1 1/2-in. (40 mm) hose shall be provided with a label that shall include operating instructions.\" 4.7.2 Delete and replace with the following: \"Hose connections shall have nominal 2 1/2 inch (64 mm) threads conforming to FDNY standards.\" 4.7.3 Add at end the following: \"Caps are not required to be listed and shall be brass upon completion of construction and are permitted to be impact-resistant plastic during construction.\" 4.7.4 Delete. Add 4.7.6 to read as follows: \"Pressure-reducing valves shall not be installed as hose valves or installed downstream of hose valves.\" 4.8 Delete entire section, including all subsections and replace with the following: \"Fire Department Connections (FDCs). (See Figure A.6.4.)\" Add 4.8.1 to read as follows: \"FDCs shall be listed or approved for a working pressure equal to or greater than the pressure requirement of the system demand.\" Add 4.8.2 to read as follows: \"Each FDC shall have at least two 3-inch (76 mm) internally threaded swivel fittings having threads conforming to FDNY standards and be of a minimum size of 5 inches (127 mm) except where supplying a single 4-inch (102 mm) standpipe riser, in which case the minimum size shall be 4 inches (102 mm).\" Add 4.8.2.1 to read as follows: \"FDCs shall be provided as follows:\" \"(a) One FDC shall be provided for each 300 feet (91.4 m) of exterior building wall or fraction thereof facing upon each street or public space.\" \"(b) Where buildings face upon two parallel streets or public spaces without an intersecting street or public space, one FDC shall be provided for each 300 feet (91.4 m) of exterior building wall or fraction thereof facing upon each such parallel street or public space.\" \"(c) Where a building faces upon two intersecting streets or public spaces and the total length of the exterior building walls facing upon such streets or public spaces does not exceed 300 feet (91.4 m) only one FDC need be installed provided the FDC is located within 15 feet (4.6 m) of the corner and on the street with the longest building frontage.\" \"(d) Where a building faces on three streets or public spaces, one FDC shall be provided for each 300 feet (91.4 m) of building wall or fraction thereof facing upon such streets or public spaces provided that at least one FDC is installed on each of the parallel streets or public spaces, and further provided that the FDCs shall be located so that the distance between them does not exceed 300 feet (91.4 m).\" \"(e) Where a building faces upon four streets or public spaces, at least one FDC shall be provided on each street front or public space; however, only one FDC need be provided at the corner of two intersecting streets or public spaces if the FDC is located within 15 feet (4.6 m) of the corner and on the street with the longest building frontage or public space, and if the distances between FDCs, in all cases, do not exceed 300 feet (91.4 m).\" \"(f) In any case where the exterior building walls of a building facing a street or public space are obstructed in part by another building, one FDC shall be provided for each clear three hundred feet of exterior building wall or fraction thereof facing upon such street or public space.\" \"(g) High-rise buildings shall have at least two remotely located fire department connections. In high-rise buildings with multiple FDC zones, each FDC zone shall have two remotely located fire department connections.\" \"(h) Location.\" \"(1) FDCs shall be placed between 18 inches (457 mm) and 36 inches (914 mm) above the sidewalk level.\" \"(2) FDCs shall be of the flush, free standing or exposed type, and with the exception of the swivels, caps, and plugs, shall not project beyond the street property line. The riser pipe to a free standing FDC shall be red brass. When FDCs are installed in wall recesses, the recesses shall be of ample size to permit convenient hose attachment.\" \"(i) Check valves. Each FDC shall be provided with a swing-type check valve inside of the building or in a valve pit outside of the building.\" \"(j) FDC Express Riser Check Valves. In addition to the check valve required in (h), each FDC express riser supplying an upper FDC zone shall be provided with a swing-type check valve located at the connection between the express riser and the high zone standpipe system and located at the level of such connection.\" \"(k) Drip valves. A 3/4 inch (19 mm) automatic ball drip valve shall be placed between the FDC and the check valve, except that on a fireboat FDC, a 1/2 inch (13 mm) open drip without a shutoff may be used. Automatic ball drips shall be placed in the horizontal position.\" \"(l) Fire Department Connection Zones. FDCs shall be arranged in maximum FDC zone heights of 600 feet (15 240 mm), supplying no more than two standpipe system zones. A normally closed valved interconnect shall be provided at the highest point between each FDC zone interconnecting the zones. FDC express riser piping shall not be installed in stairway enclosures but may be installe d in any other protected shaft.\" \"(m) Sectional Valves. Sectional valves shall be provided in all standpipe risers at 100 foot (30 480 mm) vertical intervals. This does not apply to FDC express risers.\" Add 4.8.3 to read as follows: \"FDCs shall be equipped with approved plugs or caps, properly secured, and arranged for easy removal by fire departments. Caps shall be painted red, except that the caps for combination standpipe and sprinkler systems shall be painted yellow, and caps for sprinkler systems only shall be painted green.\" Add 4.8.4 to read as follows: \"FDCs shall be of an approved type.\" 4.10 Add at end the following: \"All interior signage shall have a red background with minimum 1-inch high white letters. All exterior signage shall have a white background with minimum 1 inch (25 mm) high red letters.\" Chapter 5 System Requirements 5.1.3 Add at end the following: \"and Section 905 of the New York City Building Code .\" 5.3.2.1 Delete and replace with the following: \"Class II systems are not allowed.\" 5.3.2.2 Delete. 5.3.3 Delete and replace with the following: \"Class III Systems. Class III standpipe systems shall have 2 1/2 in. (64 mm) hose connections located as required for Class I standpipes in Section 905.4 of the New York City Building Code . At each hose connection there shall be a hose station. The hose stations shall be equipped with a minimum of 125 feet (38.1 m), or a maximum of 150 feet (45.7 m), of 1 1/2 in. (38 mm) fire hose, connected to an adjustable fog nozzle. The hose shall be attached to the ho"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2222-4",
+              "sectionID": "2222",
+              "reference": "BC 1009.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1009.3 1009.3 Exit stairways. To be considered part of an accessible means of egress, a stairway between stories shall have a clear width of 48 inches (1220 mm) minimum between handrails and shall either incorporate an area of rescue assistance within an enlarged floor-level landing or shall be accessed from an area of rescue assistance complying with Section 1009.6. Exit access stairways that connect levels in the same story are not permitted as part of an accessible means of egress. Exceptions: The following exceptions apply to the requirements of clear width and area of rescue assistance, and do not supersede the other requirements of the accessible means of egress: 1. Exit access stairways providing means of egress from mezzanines are permitted as part of an accessible means of egress. 2. The clear width of 48 inches (1220 mm) between handrails and the area of rescue assistance is not required at exit access stairways as permitted by Section 1017 or exit stairways in buildings equipped throughout with an automatic sprinkler system installed in accordance with Section 903.3.1.1 or 903.3.1.2. 3. The clear width of 48 inches (1220 mm) between handrails is not required for interior exit stairways accessed from a refuge area in conjunction with a horizontal exit. 4. Areas of rescue assistance are not required at exit access stairways where two-way communication is provided at the elevator landing in accordance with Section 1009.8. 5. Areas of rescue assistance are not required at stairways in buildings equipped throughout with an automatic sprinkler system installed in accordance with Section 903.3.1.1 or 903.3.1.2. 6. Areas of rescue assistance are not required at stairways serving open parking garages. 7. Areas of rescue assistance are not required for smoke-protected assembly seating areas complying with Section 1029.6.2. 8. Areas of rescue assistance are not required in Group R-2 occupancies. 9. Areas of rescue assistance are not required for stairways accessed from a refuge area in conjunction with a horizontal exit."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7828-5",
+              "sectionID": "7828",
+              "reference": "BC Q107.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Q107.1 Q107.1 General. Fire alarm system design, installation, testing, and maintenance, where required by this code, shall be conducted and documented in accordance with NFPA 72, National Fire Alarm and Signaling Code , 2016 edition, modified for New York City as follows. Refer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to this standard in accordance with Section 28-103.19 of the Administrative Code . Chapter 1 Administration No changes. Chapter 2 Referenced Publications 2.1 Add at end the following: \"Where a referenced publication has been modified for the City of New York by the New York City Building Code or the rules of the Department of Buildings, every reference to such publication shall be deemed to include all such modifications. Where the edition of a publication referenced within this standard differs from the edition provided for the same standard in Chapter 35 of the New York City Building Code , the edition provided for in Chapter 35 of the New York City Building Code shall govern.\" Chapter 3 Definitions No changes. Chapter 4 Reserved Chapter 5 Reserved Chapter 6 Reserved Chapter 7 Documentation No changes. Chapter 8 Reserved Chapter 9 Reserved Chapter 10 Fundamentals 10.5.1.1 Delete and replace with the following: \"Fire alarm system and emergency communication system plans and specifications shall be developed in accordance with the New York City Building Code by persons licensed and registered to practice the profession of engineering under the Education Law of the State of New York, who are also experienced in the proper design, application, installation, and testing of the system.\" 10.5.1.2 Delete. 10.5.2.1 Add at beginning the following: \"Fire alarm installations shall be performed by a New York City licensed electrical contractor.\" 10.5.3.1 Add at beginning the following: \"Fire alarm inspection, testing and maintenance shall be performed by a New York City licensed electrical contractor holding a New York State registration for 'Business of Installing, Servicing or Maintaining Security or Fire Alarm Systems' or those fire alarm companies holding a New York State registration for 'Business of Installing, Servicing or Maintaining Security or Fire Alarm Systems,' and in accordance with rules and regulations promulgated by the Fire Commissioner.\" 10.6.3.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.3.4 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.4.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.3 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.5.4 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.6.1 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.6.2 Delete and replace with the following: \"Refer to the New York City Electrical Code for requirements.\" 10.6.7.2.1 Delete and replace with the following: \"The secondary power supply for fire alarm systems and supervising station facilities shall have sufficient capacity to operate the system in accordance with the New York City Electrical Code . The secondary power supply for other systems shall have sufficient capacity to operate the system under quiescent load (system operating in a nonalarm condition) for a minimum of 24 hours and, at the end of that period, shall be capable of operating all alarm notification appliances used for evacuation or to direct aid to the location of an emergency for 5 minutes, unless otherwise permitted or required by 10.6.7.2.1.1 through 10.6.7.2.2. 10.6.7.2.1.2 Reserved. 10.6.7.2.1.3 Reserved. 10.6.7.2.1.4 Delete and replace with the following: \"The secondary power supply for high-power speaker arrays used for wide-area mass notification systems shall be in accordance with 24.6.5.2.\" Add 1 0.6.7.2.1.8 to read as follows: \"The secondary power supply for two-way voice radio communication enhancement system shall be in accordance with 24.9.5.3.1.\" Chapter 11 Reserved Chapter 12 Circuits and Pathways Add 12.3.6.1 to read as follows: \"Class-N circuits shall not be installed unless approved by the Fire Department.\" Chapter 13 Reserved Chapter 14 Inspection, Testing, and Maintenance 14.1.1 Delete and replace with the following: \"The inspection, testing and maintenance of systems, their initiating devices, and notification appliances shall comply with the requirements of this chapter and the New York City Fire Code .\" 14.1.2 Delete and replace with the following: \"The inspection, testing and maintenance of single- and multiple-station smoke and heat alarms and household fire alarm systems shall comply with the requirements of this chapter and the New York City Fire Code .\" 14.4.9 Delete and replace with the following: \"In-building auxiliary radio communication systems (ARCS) shall be inspected and operationally tested in accordance with the requirements of the New York City Fire Code and rules promulgated by the Fire Department.\" 14.6.3 Delete and replace with the following: \"Supervising Station Records. For supervising station alarm systems, records pertaining to signals received at the supervising station that result from maintenance, inspection, and testing shall be maintained in accordance with the New York City Fire Code .\" 14.6.3.1 Delete. 14.6.3.2 Delete. 14.6.4 Delete. Chapter 15 Reserved Chapter 16 Reserved Chapter 17 Initiating Devices Add 17.5.3.2.1 to read as follows: \"Partial coverage smoke detection shall be located in common areas and work spaces such as corridors, lobbies, storage rooms, equipment rooms, and other tenantless spaces, where required.\" Add 17.5.3.2.2 to read as follows: \"Selective coverage smoke detection shall be located as follows:\" \"(1) In each mechanical equipment, electrical, transformer, telephone equipment or similar room, in elevator machine rooms, and in elevator lobbies.\" \"(2) In air distribution systems in accordance with Section 606 of the New York City Mechanical Code .\" 17.10.2.4 Delete and replace with the following: \"The selection and placement of the gas detectors shall be based on an engineering evaluation including, but not limited to, the following: (1) Structural features, size, and shape of the rooms and bays (2) Occupancy and uses of areas (3) Ceiling heights (4) Ceiling shape, surface, and obstructions (5) Ventilation (6) Ambient environment (7) Gas characteristics of the gases present (8) Configuration of the contents in the area to be protected (9) Response time(s)\" Chapter 18 Notification Appliances No changes. Chapter 19 Reserved Chapter 20 Reserved Chapter 21 Emergency Control Function Interfaces 21.3.3 Delete and replace with the following: \"Unless otherwise required by the authority having jurisdiction, only the elevator lobby, elevator hoistway, and elevator machine room smoke detectors, sprinkler waterflow alarm-initiating devices, or other automatic fire detection as permitted by 21.3.9, and initiating devices used to initiate shutdown of elevator power in accordance with 21.4 shall be used to recall elevators for fire fighters' service.\" 21.3.13 Delete and replace with the following: \"Separate outputs from the fire alarm systems to the elevator controller(s) shall be provided to implement elevator Phase 1 Emergency Recall Operation in accordance with ANSI/ASME A17.1a/CSA B44a, Safety Code for Elevators and Escalators.\" 21.3.13.1 Delete and replace with the following: \"See ANSI/ASME A17.1a/CSA B44a, Safety Code for Elevators and Escalators, for designated and alternate levels of elevator recall.\" 21.3.13.2 Delete and replace with the following: \"See ANSI/ASME A17.1a/CSA B44a, Safety Code for Elevators and Escalators, for designated and alternate levels of elevator recall.\" 21.3.13.3 Delete and replace with the following: \"See ANSI/ASME A17.1a/CSA B44a, Safety Code for Elevators and Escalators, for designated and alternate levels of elevator recall.\" 21.4.2 Delete and replace with the following: \"If heat detectors are used to shut down elevator power prior to sprinkler operation, they shall be placed within 24 in. (610 mm) of each sprinkler head and be installed in accordance with the requirements of Chapter 17. Upon activation of the heat detector used for elevator power shutdown, there shall be permitted to be a delay in the activation of the power shunt trip. This delay should be the time that it takes the elevator cab to travel from the top of the hoist way to the lowest recall level. Alternatively, engineering methods, such as those specified in Annex B, shall be permitted to be used to select and place heat detectors to ensure response prior to any sprinkler head operation under a variety of the growth rate scenarios.\" 21.4.3 Delete and replace with the following: \"Pressure or water flow switches shall not be used to shut down elevator power.\" 21.6 Delete section, including all subsections, and replace with the following: \"21.6 Occupant Evacuation Elevators.\" \"21.6.1 Elevator Status. Any elevator specifically designated and marked for use by occupants for evacuation during fires shall comply with all of the provisions of 21.5 and 21.6.\" \"21.6.2 Elevator Occupant Evacuation Operation (OEO). Outputs from the fire alarm system to the elevator controller(s) shall be provided to implement elevator occupant evacuation operation in accordance with section 2.27 of ASME A17.1/CSA B44 as modified by Chapter K1 of Appendix K of the New York City Building Code , as required in 21.6.2.1 and 21.6.2.2.\" \"21.6.2.1 Partial Evacuation. Where an elevator or group of elevators is designed for use by occupants for evacuation, the provisions of 21.6.2.1.1 through 21.6.2.1.4 shall apply for partial evacuation.\" \"21.6.2.1.1 Initiation. Output signal(s) shall be provided to initiate elevator occupant evacuation operation upon automatic or manual detection of a fire on a specific floor or floors as a result of either or both of the following: (1) Activation of any automatic fire alarm initiating device in the building, other than an initiating device used for elevator Phase I Emergency Recall Operation in accordance with Chapter K1 of Appendix K of the New York City Building Code . (2)* Activation of manual means at the fire command center by authorized or emergency personnel.\" \"21.6.2.1.2* Floor Identification. (A) The output signal(s) shall identify each floor to be evacuated. (B) The identified floors shall be a contiguous block of floors including the following: (1) The floor with the first activated automatic initiating device. (2) Floors with any subsequently activated automatic initiating device(s). (3) Floors identified by manual means from the fire command center. (4) One floor above the highest floor identified by 21.6.2.1.2(B)(1) through 21.6.2.1.2(B)(3). (5) One floor below the lowest floor identified by 21.6.2.1.2(B)(1) through 21.6.2.1.2(B)(3). (C) The identified floors shall be displayed on a standard emergency services interface along with the other elevator status information required by 21.6.1.\" \"21.6.2.1.3 Manual Floor Selection. (A) A means shall"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:1630-4",
+              "sectionID": "1630",
+              "reference": "BC 903.3.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "903.3.1.1 903.3.1.1 NFPA 13 sprinkler systems. Where the provisions of this code require that a building or portion thereof be equipped throughout with an automatic sprinkler system in accordance with this section, sprinklers shall be installed throughout in accordance with NFPA 13 except as provided in Sections 903.3.1.1.1 and 903.2 of this code. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:1632-5",
+              "sectionID": "1632",
+              "reference": "BC 903.3.1.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "903.3.1.2 903.3.1.2 NFPA 13R sprinkler systems. Where allowed in buildings of Group R, up to and including six stories in height, automatic sprinkler systems shall be installed throughout in accordance with NFPA 13R. The number of stories of Group R occupancies constructed in accordance with Sections 510.2 and 510.4 shall be measured from the horizontal assembly creating separate buildings."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:1635-6",
+              "sectionID": "1635",
+              "reference": "BC 903.3.1.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "903.3.1.3 903.3.1.3 NFPA 13D sprinkler systems. Where allowed, automatic sprinkler systems in one- and two-family dwellings and townhouses, up to and including six stories in height, shall be installed throughout in accordance with NFPA 13D."
+            }
+          ]
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260827-pinned-evidence-budget-v20",
+          "retrievalQuery": "Per NYC BC 1019.3, Exception 2, are we permitted to have the open stair as shown, provided that the required draft curtain is installed?\nProject facts: Proposal: Open exit access stair represented as relying on BC 1019.3 Exception 2 with a draft curtain; Unknowns: openness to other stories; Unknowns: occupancy; Unknowns: sprinkler system; Unknowns: stories connected; Unknowns: independent exits; Unknowns: remoteness",
+          "previousTopicApplied": false,
+          "projectFactsApplied": true,
+          "topicDecision": {
+            "version": "20260811-deterministic-topic-decision-v2",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Per NYC BC 1019.3, Exception 2, are we permitted to have the open stair as shown, provided that the required draft curtain is installed?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "1019.3",
+                  "referenceKind": "section",
+                  "reference": "BC § 1019.3"
+                }
+              ]
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Per NYC BC 1019.3, Exception 2, are we permitted to have the open stair as shown, provided that the required draft curtain is installed?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "1019.3",
+                  "referenceKind": "section",
+                  "reference": "BC § 1019.3"
+                }
+              ]
+            },
+            "nextCurrentTopic": {
+              "text": "Per NYC BC 1019.3, Exception 2, are we permitted to have the open stair as shown, provided that the required draft curtain is installed?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": "BC",
+                  "sectionNumber": "1019.3",
+                  "referenceKind": "section",
+                  "reference": "BC § 1019.3"
+                }
+              ]
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260824-topic-scoped-user-facts-v4",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumCandidates": 12,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 3,
+            "candidateCount": 12,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 3,
+            "characterCount": 38038,
+            "resolverFailureCount": 3,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 3,
+              "text": "3 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260824-hybrid-candidates-v17",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "construction-code cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260828-supporting-web-v10",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "projectID": "research-eval-project-9d5fad5c-597c-409b-a2f0-33a20ce8e15d",
+            "projectCodeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "projectCodeVersionRecognized": true,
+            "projectCodeVersionSupported": true,
+            "projectCodeVersionRetrieved": true,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "construction-code cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": null,
+            "resolvedAt": "2026-08-28T01:43:17.836Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-08-28T01:43:17.836Z",
+        "routing": {
+          "version": "20260827-luna-terra-hybrid-v4",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "complex_question_language",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction.",
+        "usage": {
+          "inputTokens": 29285,
+          "cachedInputTokens": 2058,
+          "outputTokens": 2126,
+          "totalTokens": 31411
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.054498,
+          "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "operationMetric": {
+        "schemaVersion": 1,
+        "id": "2702b805-a8af-4065-97c4-17765b45d2d8",
+        "createdAt": "2026-08-28T01:43:17.821Z",
+        "status": "completed",
+        "mode": "openai",
+        "charged": true,
+        "fundingSource": "included",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "modelUsage": [
+          "gpt-5.6-terra",
+          "gpt-5.6-luna"
+        ],
+        "routingVersion": "20260827-luna-terra-hybrid-v4",
+        "routingMode": "hybrid",
+        "answerTier": "accurate",
+        "escalated": false,
+        "escalationStages": [],
+        "verificationAttemptCount": 1,
+        "verificationIssueTypes": [],
+        "providerRequestCount": 2,
+        "pendingProviderRequestCount": 0,
+        "inputTokens": 29285,
+        "cachedInputTokens": 2058,
+        "outputTokens": 2126,
+        "totalTokens": 31411,
+        "estimatedCostUSD": 0.054498,
+        "actualProviderCostUSD": 0.054498,
+        "conservativeProviderCostUSD": 0.054498,
+        "durationMilliseconds": 28382,
+        "failureCode": null,
+        "webSupportRequested": false,
+        "webSupportSearched": false,
+        "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24"
+      },
+      "judgedAt": "2026-08-28T01:44:02.940Z",
+      "judge": {
+        "requestedModel": "gpt-5.6-terra",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260826-established-facts-v3",
+        "responseTimeMilliseconds": 16353,
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "httpStatus": 200,
+            "completionStatus": "completed",
+            "incompleteReason": null,
+            "usage": {
+              "inputTokens": 4811,
+              "cachedInputTokens": 0,
+              "outputTokens": 1605,
+              "totalTokens": 6416
+            }
+          }
+        ],
+        "usage": {
+          "inputTokens": 4811,
+          "cachedInputTokens": 0,
+          "outputTokens": 1605,
+          "totalTokens": 6416
+        },
+        "judgment": {
+          "citationSupport": {
+            "score": 4,
+            "rationale": "The answer attributes the baseline enclosure rule, Exception 2 conditions, and Exception 4 draft-curtain/closely-spaced-sprinkler conditions to BC 1019.3, which supports those claims. BC 903.3.1.1 is used consistently for the throughout NFPA 13 sprinkler-system basis.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer's conditions and conclusion track the supplied enacted text. It does not invent a draft-curtain condition for Exception 2 or assert compliance from the supplied facts.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "It gives the decisive correction first, then appropriately conditions either compliance pathway on unresolved project facts and the limits of the supplied evidence.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer expressly states that the unknowns prevent determining whether either exception is satisfied and identifies that the supplied evidence cannot establish the referenced independent-exit, remoteness, NFPA 13/Appendix Q, and opening-area requirements.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It directly distinguishes the two available code pathways, identifies their material conditions, and lists the drawings, calculations, and egress information needed to evaluate them.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The opening sentence directly answers that Exception 2 is not satisfied merely by adding a draft curtain, then identifies Exception 4 as the separate draft-curtain pathway.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer states the default shaft-enclosure rule and its occupancy scope in its supported-points discussion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It identifies Exception 2 as a separate allowance for an unenclosed exit access stair/ramp between the first and second stories above grade, subject to stated conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It expressly states: “A draft curtain is not one of Exception 2’s stated conditions.”",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It expressly states: “The draft-curtain path is Exception 4, not Exception 2.”",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It consistently treats Exception 2 and Exception 4 as separate alternatives with different conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "Before discussing unresolved facts, it gives the strongest supported correction: “Not under Exception 2 merely by adding a draft curtain.”",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It does not confirm compliance; instead, it states that the unknowns prevent determining whether either exception is satisfied.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects, rather than asserts, a draft-curtain requirement in Exception 2.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It expressly states that installing a draft curtain alone does not establish permission under Exception 2.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It describes Exception 2 and Exception 4 as separate pathways, not a combined pathway.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It provides no unconditional compliance conclusion and states that the supplied unknowns prevent a determination.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It correctly identifies the draft-curtain provision in the supplied BC 1019.3 Exception 4 text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It corrects the erroneous Exception 2 attribution in the first sentence before identifying missing facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "missingFacts": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "It identifies occupancy as unresolved and states the conclusion assumes the occupancy is within BC 1019.3's stated scope, outside Groups H, I-2, and I-3.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "It identifies whether the building is equipped throughout under BC 903.3.1.1/NFPA 13 as an unresolved fact.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It identifies the Exception 2 requirement that the stair serve only between the first and second stories above grade and lists this as a fact to confirm.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It identifies the required approved independent exits and at least two means of egress for each interconnected story as unresolved for Exception 2.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It identifies the need to confirm that the interconnected stories are not open to other stories.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It identifies remote-location compliance under BC 1007 as unresolved for the Exception 2 path.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.028882,
+          "pricingVersion": "openai-gpt-5.6-terra-2026-08-24"
+        }
+      },
+      "scoring": {
+        "deterministic": {
+          "passed": true,
+          "structuralValidity": {
+            "passed": true,
+            "errors": [],
+            "score": 4
+          },
+          "citationValidation": {
+            "passed": true,
+            "returnedCount": 4,
+            "canonicalCount": 4,
+            "selectedEvidenceCount": 4,
+            "malformedCount": 0,
+            "duplicateCount": 0,
+            "duplicateKeys": [],
+            "unsupportedCitationIDs": [],
+            "unsupportedCitationSourceIDs": [],
+            "invalidCitationPassageCombinations": [],
+            "conflictingCitationSourceIDs": [],
+            "unsupportedInlineSectionIDs": [],
+            "unsupportedInlineSourceIDs": [],
+            "missingRequiredCitations": [],
+            "citationCorrectnessScore": 4,
+            "citationCompletenessScore": 4
+          },
+          "operational": {
+            "responseDurationMilliseconds": 28393,
+            "inputTokens": 29285,
+            "cachedInputTokens": 2058,
+            "outputTokens": 2126,
+            "totalTokens": 31411,
+            "estimatedCostUSD": 0.054498,
+            "pricingVersion": "openai-gpt-5.6-luna-2026-08-24+openai-gpt-5.6-terra-2026-08-24",
+            "unexpectedScriptCharacters": [],
+            "forbiddenLiteralPhrases": []
+          }
+        },
+        "citationVerification": {
+          "structuralStatus": "structurally valid and bound to supplied evidence",
+          "semanticStatus": "model judge found the citations support their attributed claims",
+          "fullyVerified": true
+        },
+        "semantic": {
+          "metrics": {
+            "citationSupport": {
+              "score": 4,
+              "rationale": "The answer attributes the baseline enclosure rule, Exception 2 conditions, and Exception 4 draft-curtain/closely-spaced-sprinkler conditions to BC 1019.3, which supports those claims. BC 903.3.1.1 is used consistently for the throughout NFPA 13 sprinkler-system basis.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "requiredConceptCoverage": {
+              "score": 4,
+              "rationale": "7/7 required concepts were covered.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "unsupportedInventedClaims": {
+              "score": 4,
+              "rationale": "The answer's conditions and conclusion track the supplied enacted text. It does not invent a draft-curtain condition for Exception 2 or assert compliance from the supplied facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "offendingClaims": []
+            },
+            "forbiddenClaimCompliance": {
+              "score": 4,
+              "rationale": "0/6 semantic forbidden claims and 0 data-defined literal failures were present.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "appropriateUncertainty": {
+              "score": 4,
+              "rationale": "It gives the decisive correction first, then appropriately conditions either compliance pathway on unresolved project facts and the limits of the supplied evidence.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "missingFactRecognition": {
+              "score": 4,
+              "rationale": "6/6 required missing-fact conditions were recognized.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "evidenceInsufficiencyRecognition": {
+              "score": 4,
+              "rationale": "The answer expressly states that the unknowns prevent determining whether either exception is satisfied and identifies that the supplied evidence cannot establish the referenced independent-exit, remoteness, NFPA 13/Appendix Q, and opening-area requirements.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            },
+            "practicalUsefulness": {
+              "score": 4,
+              "rationale": "It directly distinguishes the two available code pathways, identifies their material conditions, and lists the drawings, calculations, and egress information needed to evaluate them.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "subjective"
+            },
+            "directlyAddressesQuestion": {
+              "score": 4,
+              "rationale": "The opening sentence directly answers that Exception 2 is not satisfied merely by adding a draft curtain, then identifies Exception 4 as the separate draft-curtain pathway.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective"
+            }
+          },
+          "rubricChecks": {
+            "requiredConcepts": [
+              {
+                "id": "concept-1",
+                "rationale": "The answer states the default shaft-enclosure rule and its occupancy scope in its supported-points discussion.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-2",
+                "rationale": "It identifies Exception 2 as a separate allowance for an unenclosed exit access stair/ramp between the first and second stories above grade, subject to stated conditions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-3",
+                "rationale": "It expressly states: “A draft curtain is not one of Exception 2’s stated conditions.”",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-4",
+                "rationale": "It expressly states: “The draft-curtain path is Exception 4, not Exception 2.”",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-5",
+                "rationale": "It consistently treats Exception 2 and Exception 4 as separate alternatives with different conditions.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-6",
+                "rationale": "Before discussing unresolved facts, it gives the strongest supported correction: “Not under Exception 2 merely by adding a draft curtain.”",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "concept-7",
+                "rationale": "It does not confirm compliance; instead, it states that the unknowns prevent determining whether either exception is satisfied.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ],
+            "forbiddenClaims": [
+              {
+                "id": "forbidden-1",
+                "rationale": "The answer expressly rejects, rather than asserts, a draft-curtain requirement in Exception 2.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-2",
+                "rationale": "It expressly states that installing a draft curtain alone does not establish permission under Exception 2.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-3",
+                "rationale": "It describes Exception 2 and Exception 4 as separate pathways, not a combined pathway.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-4",
+                "rationale": "It provides no unconditional compliance conclusion and states that the supplied unknowns prevent a determination.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-5",
+                "rationale": "It correctly identifies the draft-curtain provision in the supplied BC 1019.3 Exception 4 text.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              },
+              {
+                "id": "forbidden-6",
+                "rationale": "It corrects the erroneous Exception 2 attribution in the first sentence before identifying missing facts.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "violated": false
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "missing-fact-1",
+                "rationale": "It identifies occupancy as unresolved and states the conclusion assumes the occupancy is within BC 1019.3's stated scope, outside Groups H, I-2, and I-3.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-2",
+                "rationale": "It identifies whether the building is equipped throughout under BC 903.3.1.1/NFPA 13 as an unresolved fact.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-3",
+                "rationale": "It identifies the Exception 2 requirement that the stair serve only between the first and second stories above grade and lists this as a fact to confirm.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-4",
+                "rationale": "It identifies the required approved independent exits and at least two means of egress for each interconnected story as unresolved for Exception 2.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-5",
+                "rationale": "It identifies the need to confirm that the interconnected stories are not open to other stories.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              },
+              {
+                "id": "missing-fact-6",
+                "rationale": "It identifies remote-location compliance under BC 1007 as unresolved for the Exception 2 path.",
+                "failureExcerpt": "",
+                "confidence": "high",
+                "judgmentType": "objective",
+                "met": true
+              }
+            ]
+          }
+        },
+        "metrics": {
+          "structuralValidity": {
+            "score": 4,
+            "rationale": "The returned answer is present and matches Permitext's required structure."
+          },
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "4/4 returned citations are structurally canonical and bound to evidence supplied by the Research pipeline; 0 malformed, 0 duplicate, 0 unsupported sections, 0 unsupported passages, 0 invalid section/passage combinations, and 0 unsupported inline evidence IDs. This identifier check does not establish legal claim support. The answer attributes the baseline enclosure rule, Exception 2 conditions, and Exception 4 draft-curtain/closely-spaced-sprinkler conditions to BC 1019.3, which supports those claims. BC 903.3.1.1 is used consistently for the throughout NFPA 13 sprinkler-system basis.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "All 1 required citations are present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "7/7 required concepts were covered.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "unsupportedInventedClaims": {
+            "score": 4,
+            "rationale": "The answer's conditions and conclusion track the supplied enacted text. It does not invent a draft-curtain condition for Exception 2 or assert compliance from the supplied facts.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "It gives the decisive correction first, then appropriately conditions either compliance pathway on unresolved project facts and the limits of the supplied evidence.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "missingFactRecognition": {
+            "score": 4,
+            "rationale": "6/6 required missing-fact conditions were recognized.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "evidenceInsufficiencyRecognition": {
+            "score": 4,
+            "rationale": "The answer expressly states that the unknowns prevent determining whether either exception is satisfied and identifies that the supplied evidence cannot establish the referenced independent-exit, remoteness, NFPA 13/Appendix Q, and opening-area requirements.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It directly distinguishes the two available code pathways, identifies their material conditions, and lists the drawings, calculations, and egress information needed to evaluate them.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "subjective"
+          },
+          "directlyAddressesQuestion": {
+            "score": 4,
+            "rationale": "The opening sentence directly answers that Exception 2 is not satisfied merely by adding a draft curtain, then identifies Exception 4 as the separate draft-curtain pathway.",
+            "failureExcerpt": "",
+            "confidence": "high",
+            "judgmentType": "objective"
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "criticalFailures": [],
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "rationale": "The answer states the default shaft-enclosure rule and its occupancy scope in its supported-points discussion.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-2",
+              "rationale": "It identifies Exception 2 as a separate allowance for an unenclosed exit access stair/ramp between the first and second stories above grade, subject to stated conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-3",
+              "rationale": "It expressly states: “A draft curtain is not one of Exception 2’s stated conditions.”",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-4",
+              "rationale": "It expressly states: “The draft-curtain path is Exception 4, not Exception 2.”",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-5",
+              "rationale": "It consistently treats Exception 2 and Exception 4 as separate alternatives with different conditions.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-6",
+              "rationale": "Before discussing unresolved facts, it gives the strongest supported correction: “Not under Exception 2 merely by adding a draft curtain.”",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "concept-7",
+              "rationale": "It does not confirm compliance; instead, it states that the unknowns prevent determining whether either exception is satisfied.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "rationale": "The answer expressly rejects, rather than asserts, a draft-curtain requirement in Exception 2.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-2",
+              "rationale": "It expressly states that installing a draft curtain alone does not establish permission under Exception 2.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-3",
+              "rationale": "It describes Exception 2 and Exception 4 as separate pathways, not a combined pathway.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-4",
+              "rationale": "It provides no unconditional compliance conclusion and states that the supplied unknowns prevent a determination.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-5",
+              "rationale": "It correctly identifies the draft-curtain provision in the supplied BC 1019.3 Exception 4 text.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            },
+            {
+              "id": "forbidden-6",
+              "rationale": "It corrects the erroneous Exception 2 attribution in the first sentence before identifying missing facts.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "violated": false
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "rationale": "It identifies occupancy as unresolved and states the conclusion assumes the occupancy is within BC 1019.3's stated scope, outside Groups H, I-2, and I-3.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-2",
+              "rationale": "It identifies whether the building is equipped throughout under BC 903.3.1.1/NFPA 13 as an unresolved fact.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-3",
+              "rationale": "It identifies the Exception 2 requirement that the stair serve only between the first and second stories above grade and lists this as a fact to confirm.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-4",
+              "rationale": "It identifies the required approved independent exits and at least two means of egress for each interconnected story as unresolved for Exception 2.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-5",
+              "rationale": "It identifies the need to confirm that the interconnected stories are not open to other stories.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            },
+            {
+              "id": "missing-fact-6",
+              "rationale": "It identifies remote-location compliance under BC 1007 as unresolved for the Exception 2 path.",
+              "failureExcerpt": "",
+              "confidence": "high",
+              "judgmentType": "objective",
+              "met": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

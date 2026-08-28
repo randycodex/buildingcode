@@ -147,6 +147,13 @@ The first paid confirmation after credit restoration failed closed and charged z
 
 Answer-quality v22 now performs a narrow source-bound deterministic repair after declared Project uncertainty is restored. Only when the exact BC 1101.3 ancestor scope and cited BC 1101.3.1 evidence are both present, and prior-code-building status remains represented or unresolved, it conditions an otherwise categorical accessibility sentence on the prior-code-building and alteration/change scope. It does not rewrite the missing-fact request or add outside law. The saved v4 answer changes from deterministic failure to pass after this repair, and the complete no-cost repository gate passes.
 
+Both capped targeted confirmations now pass every exact rubric gate:
+
+- The repaired mercantile-to-business case passed 4.00/4 with all 11 required concepts, all 11 missing-fact conditions, and no forbidden claims. It completed on the first verification attempt in 40.138 seconds. The production turn cost $0.072414 and the complete diagnostic including its independent grader cost $0.121354. The completed user turn was charged once. Retained evidence: `permitext-sync-server/evals/results/2026-08-28T01-41-39-976Z-75658379-344d-47ab-a98a-c7233586e4d0.md`.
+- The provider-interrupted BC 1019.3 case passed 4.00/4 with all 7 required concepts, all 6 missing-fact conditions, and no forbidden claims. It completed on the first verification attempt in 28.382 seconds. The production turn cost $0.054498 and the complete diagnostic including its independent grader cost $0.083380. The completed user turn was charged once. Retained evidence: `permitext-sync-server/evals/results/2026-08-28T01-43-17-103Z-2f961482-50cb-4b2d-afa9-1a7e46c324ad.md`.
+
+These targeted passes clear the fail-fast blockers for a new immutable v5 cohort. They are not a pricing sample by themselves.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -174,4 +181,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Rerun the repaired mercantile-to-business case from the clean v22 commit under a $0.75 cap. Only if it passes, run the provider-interrupted BC 1019.3 case under the same cap. If both pass, create a new immutable v5 profile and run all 20 cases under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
+Create and commit a new immutable v5 profile from the clean v22 application state, then run all 20 cases once under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
