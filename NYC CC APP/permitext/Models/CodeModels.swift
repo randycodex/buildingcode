@@ -2599,14 +2599,19 @@ struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
             .flatMap(PermitextBackendMode.init(rawValue:))
         let defaultsBaseURL = defaults.string(forKey: apiBaseURLDefaultsKey)
         let bundleBaseURL = bundle.object(forInfoDictionaryKey: apiBaseURLInfoPlistKey) as? String
-        let trimmedDefaultsBaseURL = defaultsBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedBundleBaseURL = bundleBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let apiBaseURLString = trimmedDefaultsBaseURL?.isEmpty == false
-            ? trimmedDefaultsBaseURL
-            : (trimmedBundleBaseURL?.isEmpty == false ? trimmedBundleBaseURL : nil)
         #if DEBUG
+        let apiBaseURLString = resolvedAPIBaseURLString(
+            defaultsBaseURL: defaultsBaseURL,
+            bundleBaseURL: bundleBaseURL,
+            allowsDebugOverride: true
+        )
         let mode = apiBaseURLString == nil ? (storedMode ?? .localDev) : .http
         #else
+        let apiBaseURLString = resolvedAPIBaseURLString(
+            defaultsBaseURL: defaultsBaseURL,
+            bundleBaseURL: bundleBaseURL,
+            allowsDebugOverride: false
+        )
         let mode: PermitextBackendMode = .http
         #endif
 
@@ -2614,6 +2619,19 @@ struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
             mode: mode,
             apiBaseURLString: apiBaseURLString
         )
+    }
+
+    static func resolvedAPIBaseURLString(
+        defaultsBaseURL: String?,
+        bundleBaseURL: String?,
+        allowsDebugOverride: Bool
+    ) -> String? {
+        let trimmedDefaultsBaseURL = defaultsBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedBundleBaseURL = bundleBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if allowsDebugOverride, trimmedDefaultsBaseURL?.isEmpty == false {
+            return trimmedDefaultsBaseURL
+        }
+        return trimmedBundleBaseURL?.isEmpty == false ? trimmedBundleBaseURL : nil
     }
 
     func makeTransport() -> PermitextBackendTransport {

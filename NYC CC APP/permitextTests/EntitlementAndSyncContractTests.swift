@@ -1372,6 +1372,22 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     func testReleaseBackendURLPolicyFailsClosed() {
+        XCTAssertEqual(
+            PermitextBackendConfiguration.resolvedAPIBaseURLString(
+                defaultsBaseURL: "https://permitext-sync.vercel.app",
+                bundleBaseURL: "https://permitext-apple-sandbox.vercel.app",
+                allowsDebugOverride: false
+            ),
+            "https://permitext-apple-sandbox.vercel.app"
+        )
+        XCTAssertEqual(
+            PermitextBackendConfiguration.resolvedAPIBaseURLString(
+                defaultsBaseURL: "https://permitext-sync.vercel.app",
+                bundleBaseURL: "https://permitext-apple-sandbox.vercel.app",
+                allowsDebugOverride: true
+            ),
+            "https://permitext-sync.vercel.app"
+        )
         XCTAssertNotNil(
             PermitextBackendConfiguration.validatedHTTPBaseURL(
                 "https://permitext.com",
