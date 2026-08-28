@@ -7178,6 +7178,7 @@ async function main() {
     const stripeDeletedEvent = JSON.stringify({
       id: "evt_smoke_deleted",
       type: "customer.subscription.deleted",
+      created: Math.floor(Date.now() / 1000) + 1,
       data: {
         object: {
           id: "sub_smoke",

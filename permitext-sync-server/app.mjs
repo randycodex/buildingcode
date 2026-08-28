@@ -468,6 +468,7 @@ const emptyStore = () => ({
   lifetimeGrantAuditEvents: [],
   appleTransactionOwners: {},
   appleNotificationStates: {},
+  stripeSubscriptionEventStates: {},
   sessions: {},
   passkeyCredentials: {},
   mutationsByUserID: {},
@@ -2091,7 +2092,8 @@ async function createPostgresStoreAdapter() {
     mergeUserQueries: (sourceUserID, targetUserID) => [
       ...organizationRepository.mergeUserQueries(sourceUserID, targetUserID),
       sql`UPDATE permitext_research_credits SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
-      sql`UPDATE permitext_research_purchase_claims SET credited_user_id = ${targetUserID} WHERE credited_user_id = ${sourceUserID}`
+      sql`UPDATE permitext_research_purchase_claims SET credited_user_id = ${targetUserID} WHERE credited_user_id = ${sourceUserID}`,
+      sql`UPDATE permitext_stripe_subscription_event_states SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`
     ]
   });
   const syncRepository = createPostgresSyncRepository(sql);
@@ -2202,6 +2204,72 @@ async function createPostgresStoreAdapter() {
         notification_type TEXT NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_stripe_subscription_event_states (
+        subscription_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        package_id TEXT NOT NULL,
+        event_created_at TIMESTAMPTZ NOT NULL,
+        event_id TEXT NOT NULL,
+        event_type TEXT NOT NULL,
+        terminal BOOLEAN NOT NULL DEFAULT false,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_stripe_subscription_event_states_user_idx
+      ON permitext_stripe_subscription_event_states (user_id, event_created_at DESC)
+    `;
+    await sql`
+      INSERT INTO permitext_stripe_subscription_event_states (
+        subscription_id, user_id, package_id, event_created_at,
+        event_id, event_type, terminal
+      )
+      SELECT
+        entitlement->'provider'->>'stripeSubscriptionID',
+        user_id,
+        'pro',
+        coalesce(
+          nullif(entitlement->'provider'->>'stripeEventCreatedAt', '')::timestamptz,
+          updated_at
+        ),
+        'bootstrap:' || (entitlement->'provider'->>'stripeSubscriptionID'),
+        'permitext.entitlement.bootstrap',
+        false
+      FROM permitext_entitlements
+      WHERE source = 'webSubscription'
+        AND coalesce(entitlement->'provider'->>'stripeSubscriptionID', '') <> ''
+      ON CONFLICT (subscription_id) DO NOTHING
+    `;
+    await sql`
+      INSERT INTO permitext_stripe_subscription_event_states (
+        subscription_id, user_id, package_id, event_created_at,
+        event_id, event_type, terminal
+      )
+      SELECT
+        entitlement->'addOns'->'research'->'provider'->>'stripeSubscriptionID',
+        user_id,
+        'research',
+        coalesce(
+          nullif(
+            entitlement->'addOns'->'research'->'provider'->>'stripeEventCreatedAt',
+            ''
+          )::timestamptz,
+          updated_at
+        ),
+        'bootstrap:' || (
+          entitlement->'addOns'->'research'->'provider'->>'stripeSubscriptionID'
+        ),
+        'permitext.entitlement.bootstrap',
+        false
+      FROM permitext_entitlements
+      WHERE entitlement->'addOns'->'research'->>'source' = 'webSubscription'
+        AND coalesce(
+          entitlement->'addOns'->'research'->'provider'->>'stripeSubscriptionID',
+          ''
+        ) <> ''
+      ON CONFLICT (subscription_id) DO NOTHING
     `;
     await sql`
       INSERT INTO permitext_apple_transaction_owners (
@@ -3263,13 +3331,26 @@ async function createPostgresStoreAdapter() {
 
   async function readNormalizedStore() {
     const store = emptyStore();
-    const [users, entitlements, appleTransactionOwners, sessions, passkeyCredentials, mutations] = await Promise.all([
+    const [
+      users,
+      entitlements,
+      appleTransactionOwners,
+      stripeSubscriptionEventStates,
+      sessions,
+      passkeyCredentials,
+      mutations
+    ] = await Promise.all([
       sql`SELECT id, account FROM permitext_users ORDER BY id`,
       sql`SELECT user_id, entitlement FROM permitext_entitlements ORDER BY user_id`,
       sql`
         SELECT original_transaction_id, user_id
         FROM permitext_apple_transaction_owners
         ORDER BY original_transaction_id
+      `,
+      sql`
+        SELECT subscription_id, user_id, package_id, event_created_at, event_id, event_type, terminal
+        FROM permitext_stripe_subscription_event_states
+        ORDER BY subscription_id
       `,
       sql`SELECT user_id, session_token FROM permitext_sessions ORDER BY user_id`,
       sql`SELECT credential_id, user_id FROM permitext_passkey_credentials ORDER BY credential_id`,
@@ -3299,6 +3380,16 @@ async function createPostgresStoreAdapter() {
     }
     for (const row of appleTransactionOwners) {
       store.appleTransactionOwners[row.original_transaction_id] = row.user_id;
+    }
+    for (const row of stripeSubscriptionEventStates) {
+      store.stripeSubscriptionEventStates[row.subscription_id] = {
+        userID: row.user_id,
+        packageID: row.package_id,
+        eventCreatedAt: dateToISO(row.event_created_at),
+        eventID: row.event_id,
+        eventType: row.event_type,
+        terminal: Boolean(row.terminal)
+      };
     }
     for (const row of sessions) {
       store.sessions[row.user_id] = row.session_token;
@@ -3486,6 +3577,11 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
       return accountRepository.applyAppleNotification(notification);
+    },
+    async applyStripeSubscriptionEvent(event) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.applyStripeSubscriptionEvent(event);
     },
     async deleteEntitlement(userID, expected) {
       await ensureSchema();
@@ -21428,6 +21524,134 @@ export function stripeEventIsCurrent(provider, event) {
   return !Number.isFinite(existing) || incoming >= existing;
 }
 
+function stripeSubscriptionEntitlementAfterEvent(store, {
+  userID,
+  subscriptionID,
+  packageID,
+  terminal,
+  details
+}) {
+  const current = store.entitlements?.[userID] || null;
+  if (!terminal) {
+    return entitlementForSource(userID, "webSubscription", {
+      ...details,
+      packageID
+    }, current);
+  }
+  return entitlementWithoutPackage(current, packageID, {
+    source: "webSubscription",
+    providerKey: "stripeSubscriptionID",
+    providerValue: subscriptionID
+  }).entitlement;
+}
+
+export function applyStripeSubscriptionEventToStore(store, {
+  userID,
+  subscriptionID,
+  packageID,
+  eventCreatedAt,
+  eventID,
+  eventType,
+  terminal = false,
+  nextEntitlement
+}) {
+  const incomingCreatedAt = Date.parse(eventCreatedAt || "");
+  if (
+    !userID ||
+    !subscriptionID ||
+    !packageID ||
+    !eventID ||
+    !eventType ||
+    !Number.isFinite(incomingCreatedAt)
+  ) {
+    return { applied: false, entitlement: store.entitlements?.[userID] || null };
+  }
+  store.stripeSubscriptionEventStates ||= {};
+  store.entitlements ||= {};
+  const previous = store.stripeSubscriptionEventStates[subscriptionID];
+  const previousCreatedAt = Date.parse(previous?.eventCreatedAt || "");
+  const sameTimestamp = Number.isFinite(previousCreatedAt) && previousCreatedAt === incomingCreatedAt;
+  if (
+    (previous?.userID && previous.userID !== userID) ||
+    (Number.isFinite(previousCreatedAt) && previousCreatedAt > incomingCreatedAt) ||
+    (sameTimestamp && (previous.eventID === eventID || previous.terminal))
+  ) {
+    return { applied: false, entitlement: store.entitlements[userID] || null };
+  }
+  store.stripeSubscriptionEventStates[subscriptionID] = {
+    userID,
+    packageID,
+    eventCreatedAt: new Date(incomingCreatedAt).toISOString(),
+    eventID,
+    eventType,
+    terminal: Boolean(terminal)
+  };
+  if (nextEntitlement) store.entitlements[userID] = nextEntitlement;
+  else delete store.entitlements[userID];
+  return {
+    applied: true,
+    entitlement: nextEntitlement || null,
+    removed: !nextEntitlement
+  };
+}
+
+async function applyPersistedStripeSubscriptionEvent({
+  userID,
+  subscriptionID,
+  packageID,
+  event,
+  terminal = false,
+  details = {}
+}) {
+  const normalizedUserID = normalizedStripeAccountUserID(userID);
+  const normalizedSubscriptionID = stripeSubscriptionID(subscriptionID);
+  const normalizedPackageID = normalizedCommercialPackageID(packageID, null);
+  const eventCreatedAt = stripeEventCreatedAt(event);
+  const eventID = String(event?.id || "").trim();
+  const eventType = String(event?.type || "").trim();
+  if (
+    !normalizedUserID ||
+    !normalizedSubscriptionID ||
+    !normalizedPackageID ||
+    !eventCreatedAt ||
+    !eventID ||
+    !eventType
+  ) {
+    return { applied: false, entitlement: null, removed: false };
+  }
+
+  const inputForStore = (store) => ({
+    userID: normalizedUserID,
+    subscriptionID: normalizedSubscriptionID,
+    packageID: normalizedPackageID,
+    eventCreatedAt,
+    eventID,
+    eventType,
+    terminal,
+    nextEntitlement: stripeSubscriptionEntitlementAfterEvent(store, {
+      userID: normalizedUserID,
+      subscriptionID: normalizedSubscriptionID,
+      packageID: normalizedPackageID,
+      terminal,
+      details
+    })
+  });
+  const adapter = await storeAdapter();
+  if (typeof adapter.applyStripeSubscriptionEvent === "function") {
+    const store = await readStore();
+    return adapter.applyStripeSubscriptionEvent(inputForStore(store));
+  }
+  if (typeof adapter.withMutation === "function") {
+    return adapter.withMutation((store) =>
+      applyStripeSubscriptionEventToStore(store, inputForStore(store))
+    );
+  }
+  const store = await readStore();
+  const result = applyStripeSubscriptionEventToStore(store, inputForStore(store));
+  if (result.applied) await writeStore(store);
+  return result;
+}
+
 function stripeSearchValue(value) {
   return String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 }
@@ -24680,18 +24904,24 @@ async function handleStripeWebhook(request, response) {
       ["paid", "no_payment_required"].includes(object.payment_status);
     if (userID && completedSubscriptionCheckout && await persistedAccountExists(userID)) {
       const packageID = stripePackageIDFromObject(object);
-      await persistServerEntitlement(userID, "webSubscription", {
+      const subscriptionID = stripeSubscriptionID(object.subscription);
+      const result = await applyPersistedStripeSubscriptionEvent({
+        userID,
+        subscriptionID,
         packageID,
-        explicitPackage: stripePackageIsExplicit(object),
-        expiresAt: stripeCheckoutProvisionalExpiresAt(event),
-        provider: {
-          stripeCustomerID: stripeSubscriptionID(object.customer),
-          stripeSubscriptionID: stripeSubscriptionID(object.subscription),
-          stripeCheckoutSessionID: object.id,
-          stripeEventCreatedAt: stripeEventCreatedAt(event)
+        event,
+        details: {
+          explicitPackage: stripePackageIsExplicit(object),
+          expiresAt: stripeCheckoutProvisionalExpiresAt(event),
+          provider: {
+            stripeCustomerID: stripeSubscriptionID(object.customer),
+            stripeSubscriptionID: subscriptionID,
+            stripeCheckoutSessionID: object.id,
+            stripeEventCreatedAt: stripeEventCreatedAt(event)
+          }
         }
       });
-      changed = true;
+      changed = result.applied;
     }
     break;
   }
@@ -24701,36 +24931,47 @@ async function handleStripeWebhook(request, response) {
   }
   case "customer.subscription.created":
   case "customer.subscription.updated": {
-    const userID = stripeUserIDFromObject(object);
     const subscriptionID = stripeSubscriptionID(object);
+    const owner = subscriptionID ? await persistedStripeEntitlementOwner(subscriptionID) : null;
+    const userID = stripeUserIDFromObject(object) || owner?.userID;
     if (
       userID &&
       ["active", "trialing"].includes(object.status) &&
       await persistedAccountExists(userID)
     ) {
-      const packageID = stripePackageIDFromObject(object);
-      await persistServerEntitlement(userID, "webSubscription", {
+      const packageID = entitlementPackageForStripeSubscription(owner?.entitlement, subscriptionID) ||
+        stripePackageIDFromObject(object);
+      const result = await applyPersistedStripeSubscriptionEvent({
+        userID,
+        subscriptionID,
         packageID,
-        explicitPackage: stripePackageIsExplicit(object),
-        expiresAt: stripeSubscriptionExpiresAt(object),
-        provider: {
-          stripeCustomerID: stripeSubscriptionID(object.customer),
-          stripeSubscriptionID: subscriptionID,
-          stripeEventCreatedAt: stripeEventCreatedAt(event)
+        event,
+        details: {
+          explicitPackage: stripePackageIsExplicit(object) ||
+            Boolean(owner?.entitlement?.provider?.permitextPackage) ||
+            Boolean(owner?.entitlement?.addOns?.research?.provider?.permitextPackage),
+          expiresAt: stripeSubscriptionExpiresAt(object),
+          provider: {
+            stripeCustomerID: stripeSubscriptionID(object.customer),
+            stripeSubscriptionID: subscriptionID,
+            stripeEventCreatedAt: stripeEventCreatedAt(event)
+          }
         }
       });
-      changed = true;
+      changed = result.applied;
     } else if (subscriptionID && ["canceled", "incomplete_expired", "unpaid", "paused"].includes(object.status)) {
-      const owner = await persistedStripeEntitlementOwner(subscriptionID);
       const packageID = owner
         ? entitlementPackageForStripeSubscription(owner.entitlement, subscriptionID)
         : stripePackageIDFromObject(object);
-      changed = owner ? await deletePersistedEntitlement(owner.userID, {
+      const terminalUserID = owner?.userID || stripeUserIDFromObject(object);
+      const result = terminalUserID ? await applyPersistedStripeSubscriptionEvent({
+        userID: terminalUserID,
+        subscriptionID,
         packageID,
-        source: "webSubscription",
-        providerKey: "stripeSubscriptionID",
-        providerValue: subscriptionID
-      }) : false;
+        event,
+        terminal: true
+      }) : null;
+      changed = Boolean(result?.applied);
     }
     break;
   }
@@ -24740,12 +24981,15 @@ async function handleStripeWebhook(request, response) {
     const packageID = owner
       ? entitlementPackageForStripeSubscription(owner.entitlement, subscriptionID)
       : stripePackageIDFromObject(object);
-    changed = owner ? await deletePersistedEntitlement(owner.userID, {
+    const userID = owner?.userID || stripeUserIDFromObject(object);
+    const result = userID ? await applyPersistedStripeSubscriptionEvent({
+      userID,
+      subscriptionID,
       packageID,
-      source: "webSubscription",
-      providerKey: "stripeSubscriptionID",
-      providerValue: subscriptionID
-    }) : false;
+      event,
+      terminal: true
+    }) : null;
+    changed = Boolean(result?.applied);
     break;
   }
   case "invoice.payment_succeeded": {
@@ -24756,19 +25000,24 @@ async function handleStripeWebhook(request, response) {
       const packageID = owner
         ? entitlementPackageForStripeSubscription(owner.entitlement, subscriptionID)
         : stripePackageIDFromObject(object);
-      await persistServerEntitlement(userID, "webSubscription", {
+      const result = await applyPersistedStripeSubscriptionEvent({
+        userID,
+        subscriptionID,
         packageID,
-        explicitPackage: stripePackageIsExplicit(object) ||
-          Boolean(owner?.entitlement?.provider?.permitextPackage) ||
-          Boolean(owner?.entitlement?.addOns?.research?.provider?.permitextPackage),
-        expiresAt: stripeSubscriptionExpiresAt(object),
-        provider: {
-          stripeCustomerID: stripeSubscriptionID(object.customer),
-          stripeSubscriptionID: subscriptionID,
-          stripeEventCreatedAt: stripeEventCreatedAt(event)
+        event,
+        details: {
+          explicitPackage: stripePackageIsExplicit(object) ||
+            Boolean(owner?.entitlement?.provider?.permitextPackage) ||
+            Boolean(owner?.entitlement?.addOns?.research?.provider?.permitextPackage),
+          expiresAt: stripeSubscriptionExpiresAt(object),
+          provider: {
+            stripeCustomerID: stripeSubscriptionID(object.customer),
+            stripeSubscriptionID: subscriptionID,
+            stripeEventCreatedAt: stripeEventCreatedAt(event)
+          }
         }
       });
-      changed = true;
+      changed = result.applied;
     }
     break;
   }
@@ -24801,12 +25050,14 @@ async function handleStripeWebhook(request, response) {
           subscriptionID,
           ownerUserID: owner.userID
         });
-        changed = await deletePersistedEntitlement(owner.userID, {
+        const result = await applyPersistedStripeSubscriptionEvent({
+          userID: owner.userID,
+          subscriptionID,
           packageID,
-          source: "webSubscription",
-          providerKey: "stripeSubscriptionID",
-          providerValue: subscriptionID
-        }) || changed;
+          event,
+          terminal: true
+        });
+        changed = result.applied || changed;
       }
     }
     break;

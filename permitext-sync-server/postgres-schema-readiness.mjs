@@ -1,4 +1,4 @@
-export const postgresNormalizedSchemaReadinessVersion = "normalized-v4-20260827";
+export const postgresNormalizedSchemaReadinessVersion = "normalized-v4-20260828";
 
 export const postgresNormalizedSchemaRequiredTables = Object.freeze([
   "permitext_account_sessions",
@@ -35,6 +35,7 @@ export const postgresNormalizedSchemaRequiredTables = Object.freeze([
   "permitext_sessions",
   "permitext_sync_events",
   "permitext_sync_state",
+  "permitext_stripe_subscription_event_states",
   "permitext_user_content_records",
   "permitext_users"
 ]);
@@ -102,6 +103,7 @@ export const postgresNormalizedSchemaRequiredIndexes = Object.freeze([
   "permitext_sync_events_record_update_idx",
   "permitext_sync_events_user_event_idx",
   "permitext_sync_events_user_record_event_idx",
+  "permitext_stripe_subscription_event_states_user_idx",
   "permitext_user_content_user_updated_idx",
   "permitext_user_content_user_version_kind_idx",
   "permitext_users_auth_identity_idx",

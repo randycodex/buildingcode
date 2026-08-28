@@ -83,7 +83,11 @@ For an existing Apple account with saved work and Pro access:
 
 ## Stripe lifecycle evidence
 
-Use a dedicated production test account and a low-priced live test product approved for this exercise. Real charges and refunds require explicit approval immediately before execution.
+The August 28, 2026 local provider-simulated test-mode exercise covers authenticated Checkout creation, signed-event-only fulfillment, duplicate delivery, renewal, scheduled cancellation, failed invoices, partial and full refunds, provider cancellation, and delayed webhook delivery with zero paid provider calls. It found and fixed a defect where deletion of a fully refunded entitlement also deleted the only stale-event timestamp, allowing an older active event to restore Pro. Permitext now retains a durable per-subscription lifecycle cursor separately from the entitlement; terminal events win same-second ties, older and duplicate events are ignored, and cursor ownership cannot move between accounts. `npm run test:billing` retains the regression.
+
+That exercise uses a local Stripe API simulator and is not provider-created Stripe test data or production evidence. The current local workspace has no usable Stripe test-mode secret or Stripe CLI. When dedicated Stripe test credentials are available, repeat the no-charge exercise against Stripe-created test records before any live exercise.
+
+For final provider evidence, use a dedicated production test account and a low-priced live test product approved for this exercise. Real charges and refunds require explicit approval immediately before execution.
 
 Capture the Stripe event ID, Permitext user ID, subscription ID, entitlement before/after, and timestamp for:
 

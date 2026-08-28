@@ -56,8 +56,8 @@ The safeguards are committed and pushed, and the no-cost repository gate passes.
 
 - [x] Rerun only the previously failed cases under an explicit spend cap.
 - [x] Review the new answers for both quality and cost; do not accept an evaluator score blindly where the legal conclusion is still questionable.
-- [ ] If the targeted cases improve without regressions, run one new complete frozen cohort.
-- [ ] Compare quality, p50/p90 latency, Luna/Terra escalation rate, and projected cost per 100 turns with the first cohort.
+- [x] If the targeted cases improve without regressions, run one new complete frozen cohort.
+- [x] Compare quality, p50/p90 latency, Luna/Terra escalation rate, and projected cost per 100 turns with the first cohort.
 
 First targeted attempt: the Certificate-of-Occupancy case correctly remained uncharged but failed before grading because automatic web support routed around the intentionally disabled Zoning Research corpus and produced an attribution conflict. It cost $0.134553 in provider calls. The source-policy repair now prevents an intentionally blocked corpus from triggering automatic web support; explicit official-guidance requests remain available.
 
@@ -210,6 +210,14 @@ Evidence:
 
 This is source and Simulator evidence. It does not claim that the existing TestFlight binary contains the repair; production web and the next compatible TestFlight build still require release-stage verification.
 
+### No-cost Stripe subscription lifecycle confirmation
+
+A local provider-simulated Stripe test-mode exercise now covers the Pro subscription lifecycle without contacting Stripe or creating a charge. It verifies authenticated Checkout creation, signed-event-only fulfillment, duplicate idempotency, renewal expiration, scheduled cancellation through the prepaid period, failed-invoice non-renewal, partial-refund preservation, full-refund cancellation and revocation, and delayed-event recovery.
+
+The first exercise exposed a material ordering defect: after a full refund deleted the entitlement, a delayed older active-subscription event could restore Pro because the last provider timestamp disappeared with the entitlement. The server now retains a per-subscription lifecycle cursor independently of the entitlement in both local storage and PostgreSQL. Terminal events win same-second ties, older or duplicate events cannot mutate access, and a subscription cursor cannot transfer to another Permitext account. Existing PostgreSQL Stripe entitlements seed the cursor during schema initialization.
+
+The permanent `npm run test:billing` suite now includes this lifecycle exercise and reports zero paid provider calls. The normal Beta 1 suite also includes it. This is local provider simulation, not Stripe-created test data, production provider evidence, or a public-billing authorization. The current local workspace has no usable Stripe test-mode secret or Stripe CLI, so the provider-backed no-charge exercise remains open.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -220,6 +228,7 @@ Proceed toward paid Research only if all of the following are true:
 - [x] Subscriber-level aggregation is complete: 100 fully used turns cost $5.74 p50 and $6.06 p90 in the V6 empirical model.
 - [x] Owner-approved Beta economics retain 100 turns with a $2 minimum p90 contribution; the modeled result is $4.16 on web and $2.14 on iOS at the confirmed 15% commission.
 - [x] Complete the no-cost tax/refund/infrastructure input audit and launch-volume/refund sensitivities; low-volume p90 allocation is explicit and the missing Stripe Tax configuration is recorded.
+- [x] Complete the local no-charge Stripe Pro lifecycle exercise and retain the delayed-event/refund regression in the billing suite.
 - [ ] Verify tax treatment, refund incidence, and launch-volume infrastructure allocation, then review actual contribution after the first 25–50 customers.
 - [x] Current checked-in web and iOS clients decode and display the shared Research response contract correctly through the retained V6-shaped fixture and iOS Simulator test.
 - [ ] Confirm the same contract on production web and the next compatible TestFlight build during release verification.
@@ -241,4 +250,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Obtain tax-professional direction on Permitext's product classification, registrations, and tax-inclusive/exclusive presentation before changing Stripe tax behavior. Complete the no-charge billing lifecycle exercise to establish that refund mechanics work, then replace the refund and infrastructure planning reserves only when actual customer and Vercel billing data exist. Before deployment, set the production per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Production web and the next compatible TestFlight build must then confirm the shared response contract; additional-turn prices and public paid Research remain disabled.
+Obtain tax-professional direction on Permitext's product classification, registrations, and tax-inclusive/exclusive presentation before changing Stripe tax behavior. Configure dedicated Stripe test-mode credentials and complete the provider-backed no-charge lifecycle against Stripe-created test records; the local simulation is complete but does not replace that evidence. Replace the refund and infrastructure planning reserves only when actual customer and Vercel billing data exist. Before deployment, set the production per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Production web and the next compatible TestFlight build must then confirm the shared response contract; additional-turn prices and public paid Research remain disabled.

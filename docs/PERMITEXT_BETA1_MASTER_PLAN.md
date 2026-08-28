@@ -17,7 +17,7 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Subscriber-level aggregation places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. With the confirmed 15% App Store commission, ten support minutes at $30/hour, and explicit tax, refund, and infrastructure planning reserves, the 25-subscriber p90 full-service cost is $15.84 on web and $17.86 on iOS. Allocating the full $45 infrastructure budget across only ten fully utilized subscribers lowers contribution to $1.46 on web and -$0.56 on iOS; the accepted $2 floor first passes at 12 web or 24 iOS subscribers. The owner retained 100 turns for Beta with a later $4–$6 target. Tax configuration, actual refund/infrastructure incidence, legal, provider, operations, production, and TestFlight gates remain open.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Subscriber-level aggregation places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. With the confirmed 15% App Store commission, ten support minutes at $30/hour, and explicit tax, refund, and infrastructure planning reserves, the 25-subscriber p90 full-service cost is $15.84 on web and $17.86 on iOS. Allocating the full $45 infrastructure budget across only ten fully utilized subscribers lowers contribution to $1.46 on web and -$0.56 on iOS; the accepted $2 floor first passes at 12 web or 24 iOS subscribers. The owner retained 100 turns for Beta with a later $4–$6 target. A no-charge local Stripe lifecycle exercise now passes after fixing a delayed-event refund regression, but provider-created test records and production evidence remain open. Tax configuration, actual refund/infrastructure incidence, legal, provider, operations, production, and TestFlight gates remain open.
 
 Current development branch: `codex/research-commercialization`
 
@@ -66,8 +66,9 @@ Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEX
 - [x] The server has monthly included turns, paid-credit reservations, completion, release, refund, idempotency, and reconciliation contracts.
 - [x] Failed provider requests and internal retries do not charge additional user turns.
 - [x] Turn-pack offers are gated so incomplete configuration is not shown to users.
+- [x] Complete a local provider-simulated, no-charge Stripe Pro lifecycle exercise covering Checkout, renewal, cancellation timing, invoice failure, partial/full refunds, duplicate delivery, and delayed webhook recovery.
 - [ ] Redeploy production after final environment/configuration changes and verify the serving release uses the intended $20 price.
-- [ ] Complete controlled signup, purchase, entitlement, cancellation, full refund, partial-refund behavior, and webhook recovery exercises.
+- [ ] Complete provider-backed controlled signup, purchase, entitlement, cancellation, full refund, partial-refund behavior, and webhook recovery exercises.
 - [ ] Create/approve and end-to-end test Stripe and App Store consumables before enabling additional-turn sales.
 - [ ] Set pack prices only after p50/p90 hybrid cost, fees, tax, refund, infrastructure, support, and margin calculations are complete.
 

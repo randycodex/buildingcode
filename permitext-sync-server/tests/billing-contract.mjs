@@ -2,6 +2,7 @@ import {
   activeCommercialPackage,
   accountDeletionBillingPlan,
   applyAppleNotificationToStore,
+  applyStripeSubscriptionEventToStore,
   appleNotificationLifecycleAction,
   applePackageIDForProductID,
   cancelStripeSubscriptionAfterFullRefund,
@@ -125,6 +126,59 @@ assert(
     nextEntitlement: null
   }).applied && notificationStore.entitlements["clerk:user_contract"].marker === "newer",
   "A delayed older Apple notification corrupted the current entitlement."
+);
+const stripeLifecycleStore = {
+  entitlements: {},
+  stripeSubscriptionEventStates: {}
+};
+const stripeLifecycleInput = {
+  userID: "apple:stripe-contract-owner",
+  subscriptionID: "sub_stripe_contract",
+  packageID: "pro",
+  eventCreatedAt: "2026-08-28T12:00:00.000Z"
+};
+assert(
+  applyStripeSubscriptionEventToStore(stripeLifecycleStore, {
+    ...stripeLifecycleInput,
+    eventID: "evt_active",
+    eventType: "customer.subscription.updated",
+    nextEntitlement: {
+      plan: "pro",
+      source: "webSubscription",
+      provider: { stripeSubscriptionID: "sub_stripe_contract" }
+    }
+  }).applied,
+  "The first Stripe lifecycle event was not applied."
+);
+assert(
+  applyStripeSubscriptionEventToStore(stripeLifecycleStore, {
+    ...stripeLifecycleInput,
+    eventID: "evt_terminal",
+    eventType: "charge.refunded",
+    terminal: true,
+    nextEntitlement: null
+  }).applied && !stripeLifecycleStore.entitlements[stripeLifecycleInput.userID],
+  "A terminal Stripe event did not win a same-second event tie."
+);
+assert(
+  !applyStripeSubscriptionEventToStore(stripeLifecycleStore, {
+    ...stripeLifecycleInput,
+    eventID: "evt_delayed_active",
+    eventType: "customer.subscription.updated",
+    nextEntitlement: { plan: "pro" }
+  }).applied && !stripeLifecycleStore.entitlements[stripeLifecycleInput.userID],
+  "A same-second Stripe event restored access after a terminal event."
+);
+assert(
+  !applyStripeSubscriptionEventToStore(stripeLifecycleStore, {
+    ...stripeLifecycleInput,
+    userID: "apple:different-owner",
+    eventCreatedAt: "2026-08-28T12:01:00.000Z",
+    eventID: "evt_different_owner",
+    eventType: "customer.subscription.updated",
+    nextEntitlement: { plan: "pro" }
+  }).applied,
+  "A Stripe subscription lifecycle cursor transferred to a different account."
 );
 assert(
   appleNotificationLifecycleAction({

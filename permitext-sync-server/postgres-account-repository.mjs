@@ -1014,6 +1014,123 @@ export function createPostgresAccountRepository(sql, options = {}) {
     return { applied: stateRows.length > 0, entitlement: null, removed: deletionRows.length > 0 };
   }
 
+  async function applyStripeSubscriptionEvent({
+    userID,
+    subscriptionID,
+    packageID,
+    eventCreatedAt,
+    eventID,
+    eventType,
+    terminal,
+    nextEntitlement
+  }) {
+    if (nextEntitlement) {
+      const rows = await sql`
+        WITH applied AS (
+          INSERT INTO permitext_stripe_subscription_event_states (
+            subscription_id, user_id, package_id, event_created_at,
+            event_id, event_type, terminal, updated_at
+          )
+          VALUES (
+            ${subscriptionID}, ${userID}, ${packageID}, ${eventCreatedAt}::timestamptz,
+            ${eventID}, ${eventType}, ${terminal}, now()
+          )
+          ON CONFLICT (subscription_id) DO UPDATE SET
+            user_id = EXCLUDED.user_id,
+            package_id = EXCLUDED.package_id,
+            event_created_at = EXCLUDED.event_created_at,
+            event_id = EXCLUDED.event_id,
+            event_type = EXCLUDED.event_type,
+            terminal = EXCLUDED.terminal,
+            updated_at = now()
+          WHERE permitext_stripe_subscription_event_states.user_id = EXCLUDED.user_id
+            AND (
+              permitext_stripe_subscription_event_states.event_created_at < EXCLUDED.event_created_at
+              OR (
+                permitext_stripe_subscription_event_states.event_created_at = EXCLUDED.event_created_at
+                AND permitext_stripe_subscription_event_states.event_id <> EXCLUDED.event_id
+                AND permitext_stripe_subscription_event_states.terminal = false
+              )
+            )
+          RETURNING subscription_id
+        ), saved AS (
+          INSERT INTO permitext_entitlements (
+            user_id, plan, source, granted_user_id, entitlement, expires_at, updated_at
+          )
+          SELECT
+            ${userID}, ${nextEntitlement.plan || "free"}, ${nextEntitlement.source || "unknown"},
+            ${nextEntitlement.grantedUserID || null}, ${JSON.stringify(nextEntitlement)}::jsonb,
+            ${nextEntitlement.expiresAt || null}::timestamptz, now()
+          FROM applied
+          ON CONFLICT (user_id) DO UPDATE SET
+            plan = EXCLUDED.plan,
+            source = EXCLUDED.source,
+            granted_user_id = EXCLUDED.granted_user_id,
+            entitlement = EXCLUDED.entitlement,
+            expires_at = EXCLUDED.expires_at,
+            updated_at = now()
+          RETURNING entitlement
+        )
+        SELECT
+          EXISTS (SELECT 1 FROM applied) AS applied,
+          (SELECT entitlement FROM saved LIMIT 1) AS entitlement
+      `;
+      const row = rows[0] || {};
+      return {
+        applied: Boolean(row.applied),
+        entitlement: row.entitlement ? safeJSON(row.entitlement, nextEntitlement) : null,
+        removed: false
+      };
+    }
+
+    const rows = await sql`
+      WITH applied AS (
+        INSERT INTO permitext_stripe_subscription_event_states (
+          subscription_id, user_id, package_id, event_created_at,
+          event_id, event_type, terminal, updated_at
+        )
+        VALUES (
+          ${subscriptionID}, ${userID}, ${packageID}, ${eventCreatedAt}::timestamptz,
+          ${eventID}, ${eventType}, ${terminal}, now()
+        )
+        ON CONFLICT (subscription_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          package_id = EXCLUDED.package_id,
+          event_created_at = EXCLUDED.event_created_at,
+          event_id = EXCLUDED.event_id,
+          event_type = EXCLUDED.event_type,
+          terminal = EXCLUDED.terminal,
+          updated_at = now()
+        WHERE permitext_stripe_subscription_event_states.user_id = EXCLUDED.user_id
+          AND (
+            permitext_stripe_subscription_event_states.event_created_at < EXCLUDED.event_created_at
+            OR (
+              permitext_stripe_subscription_event_states.event_created_at = EXCLUDED.event_created_at
+              AND permitext_stripe_subscription_event_states.event_id <> EXCLUDED.event_id
+              AND permitext_stripe_subscription_event_states.terminal = false
+            )
+          )
+        RETURNING subscription_id
+      ), removed AS (
+        DELETE FROM permitext_entitlements
+        WHERE user_id = ${userID}
+          AND source = 'webSubscription'
+          AND entitlement->'provider'->>'stripeSubscriptionID' = ${subscriptionID}
+          AND EXISTS (SELECT 1 FROM applied)
+        RETURNING user_id
+      )
+      SELECT
+        EXISTS (SELECT 1 FROM applied) AS applied,
+        EXISTS (SELECT 1 FROM removed) AS removed
+    `;
+    const row = rows[0] || {};
+    return {
+      applied: Boolean(row.applied),
+      entitlement: null,
+      removed: Boolean(row.removed)
+    };
+  }
+
   async function deleteEntitlement(userID, expected = {}) {
     let rows;
     if (expected.source && expected.providerKey && expected.providerValue) {
@@ -1110,6 +1227,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
 
   return {
     applyAppleNotification,
+    applyStripeSubscriptionEvent,
     appleTransactionOwner,
     authenticate,
     claimAppleEntitlement,
