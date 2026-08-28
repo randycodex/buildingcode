@@ -17,7 +17,7 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The active work is the final Research quality and economics validation. The v2 quality remediations hold, and v3 passed the former provider-timeout point, but v3 stopped safely at case 16 after an unnecessary automatic web lookup created an attribution failure. It also exposed harmless non-Latin model noise in an otherwise correct answer. Those two product safeguards must be verified before another full cohort. After that, the remaining legal, provider, operations, production, and TestFlight gates must be closed.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The active work is the final Research quality and economics validation. In v4, 18 turns completed and 17 passed; one answer overstated BC 1101.3.1 applicability, and the next case stopped on an exhausted OpenAI API credit balance without charging the failed user turn. The applicability safeguard is implemented and locally verified, but paid confirmation and a complete frozen cohort still remain. After that, the legal, provider, operations, production, and TestFlight gates must be closed.
 
 Current development branch: `codex/research-commercialization`
 
@@ -45,6 +45,9 @@ Current development branch: `codex/research-commercialization`
 - [x] Resolve the three v2 quality failures and verify provider fail-fast behavior before a v3 cohort.
 - [x] Attempt the frozen v3 cohort; retain its 15 completed turns and fail-fast stop at case 16 as partial evidence.
 - [x] Verify section-bounded web-routing and English-answer sanitization before a v4 cohort.
+- [x] Attempt the frozen v4 cohort; retain its 18 completed turns, 17 exact passes, and fail-fast stop on exhausted provider credit as partial evidence.
+- [x] Add a deterministic BC 1101.3/1101.3.1 scope-consistency gate and no-cost regression coverage for the single v4 quality failure.
+- [ ] Restore OpenAI API credit and run capped targeted confirmations for the repaired case and the provider-interrupted case.
 - [ ] Run a new frozen full cohort only if the targeted cases improve without material regressions.
 - [ ] Confirm that p50/p90 full-service cost supports the $20 plan and 100 included turns.
 

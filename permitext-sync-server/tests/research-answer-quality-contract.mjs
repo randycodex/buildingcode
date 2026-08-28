@@ -309,6 +309,55 @@ const boundedNormalGroupBFixtureAnswer = evaluateResearchAnswerQuality({
 });
 assert.equal(boundedNormalGroupBFixtureAnswer.pass, true);
 
+const priorCodeAccessibilityEvidence = [{
+  ...source("bc-prior-code-accessibility-scope", "1101.3", "supporting", "aligned"),
+  text: "The provisions of this chapter shall apply to alterations and changes of use or occupancy to prior code buildings in accordance with Sections 1101.3.1 through 1101.3.5."
+}, {
+  ...source("bc-space-accessibility", "1101.3.1", "governing", "aligned"),
+  text: "Accessible features and construction governed by this chapter shall be provided throughout a space, including its immediate entrances, where an alteration is considered a change in occupancy classification."
+}];
+const unconditionalPriorCodeAccessibility = evaluateResearchAnswerQuality({
+  question: "Does the Group M-to-Group B change trigger BC 1101.3.1?",
+  evidence: priorCodeAccessibilityEvidence,
+  answer: {
+    answerText: "Chapter 11 accessible features and construction must therefore be provided throughout the space and its immediate entrance.",
+    supportedPoints: [{
+      explanation: "BC 1101.3.1 requires accessible features throughout the changed space.",
+      sourceIDs: ["bc-space-accessibility"]
+    }],
+    missingFacts: [
+      "Verify the represented project fact that this is an existing prior-code building."
+    ],
+    citations: [{ sourceIDs: ["bc-space-accessibility"] }]
+  }
+});
+assert.equal(unconditionalPriorCodeAccessibility.pass, false);
+assert.deepEqual(
+  unconditionalPriorCodeAccessibility.unconditionalPriorCodeAccessibilitySourceIDs,
+  ["bc-space-accessibility"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(unconditionalPriorCodeAccessibility).at(-1).type,
+  "overstated_compliance"
+);
+
+const conditionalPriorCodeAccessibility = evaluateResearchAnswerQuality({
+  question: "Does the Group M-to-Group B change trigger BC 1101.3.1?",
+  evidence: priorCodeAccessibilityEvidence,
+  answer: {
+    answerText: "If the represented prior-code-building status is confirmed and this alteration is the stated occupancy-classification change, BC 1101.3.1 requires accessible features and construction throughout the space and its immediate entrance.",
+    supportedPoints: [{
+      explanation: "If this is confirmed as an alteration to a prior-code building, BC 1101.3.1 requires accessible features throughout the changed space.",
+      sourceIDs: ["bc-space-accessibility"]
+    }],
+    missingFacts: [
+      "Verify the represented project fact that this is an existing prior-code building."
+    ],
+    citations: [{ sourceIDs: ["bc-space-accessibility"] }]
+  }
+});
+assert.equal(conditionalPriorCodeAccessibility.pass, true);
+
 const pc403MultipleOccupancyEvidence = {
   ...source("pc-multiple-occupancy-fractions", "403.1.1", "governing", "aligned"),
   codePrefix: "PC",

@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-source-bound-paraphrase-repair-v20";
+  "20260827-prior-code-accessibility-scope-v21";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -97,6 +97,42 @@ function answerApplicabilityText(answer) {
       : []),
     ...(Array.isArray(answer?.evidenceLimitations) ? answer.evidenceLimitations : [])
   ].filter(Boolean).join(" "));
+}
+
+function answerApplicabilityStatements(answer) {
+  return [
+    answer?.answerText,
+    answer?.conclusion,
+    answer?.explanation,
+    ...(Array.isArray(answer?.supportedPoints)
+      ? answer.supportedPoints.flatMap((point) => [point?.heading, point?.explanation])
+      : [])
+  ]
+    .map(compactText)
+    .filter(Boolean)
+    .flatMap((text) => text.split(/(?<=[.!?])\s+/).map(compactText).filter(Boolean));
+}
+
+function isConditionalPriorCodeAccessibilityStatement(statement) {
+  const hasPriorCodeScope = /\bprior[- ]code[- ]building\b/i.test(statement);
+  const hasConditionalLanguage =
+    /\b(?:if|assuming|provided that|subject to|once|upon|when)\b/i.test(statement) ||
+    /\b(?:applicability|applies only|limited to|must be confirmed|requires confirmation)\b/i.test(statement);
+  return hasPriorCodeScope && hasConditionalLanguage;
+}
+
+function isUnconditionalPriorCodeAccessibilityStatement(statement) {
+  const identifiesAccessibilityRule =
+    /\bBC\s*1101\.3\.1\b/i.test(statement) ||
+    /\bChapter\s+11\b[^.]{0,100}\baccessible/i.test(statement) ||
+    /\baccessible features?(?: and construction)?\b/i.test(statement);
+  const statesMandatoryConsequence = /\b(?:must|shall|required|requires)\b/i.test(statement);
+  const statesEvidenceBoundary =
+    /\b(?:does not|cannot|could not) establish\b|\bnot established\b|\bunresolved\b|\bunknown\b|\bnot documented\b/i.test(statement);
+  return identifiesAccessibilityRule &&
+    statesMandatoryConsequence &&
+    !statesEvidenceBoundary &&
+    !isConditionalPriorCodeAccessibilityStatement(statement);
 }
 
 function disclosesApplicability(source, answerText) {
@@ -258,6 +294,25 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     /\b(?:lavatory\s*[/(]\s*vanity|vanity\s*[/(]\s*lavatory)\b/i.test(applicabilityText)
       ? hcrVanitySourceIDs
       : [];
+  const priorCodeAccessibilitySourceIDs = knownCitedSourceIDs.filter((sourceID) =>
+    availableEvidence.get(sourceID)?.reference === "BC 1101.3.1"
+  );
+  const hasPriorCodeAccessibilityAncestor = Array.from(availableEvidence.values()).some((source) =>
+    source.reference === "BC 1101.3" &&
+    /\bchanges? of use or occupancy to prior[- ]code[- ]buildings\b/i.test(source.text)
+  );
+  const priorCodeBuildingStatusIsUnresolved =
+    /\b(?:verify|confirm|represented|unverified|unknown|not established|unestablished)\b[^.]{0,180}\bprior[- ]code[- ]building\b/i.test(missingFactsText) ||
+    /\bprior[- ]code[- ]building\b[^.]{0,180}\b(?:verify|confirm|represented|unverified|unknown|not established|unestablished)\b/i.test(missingFactsText);
+  const hasUnconditionalPriorCodeAccessibilityStatement =
+    answerApplicabilityStatements(answer).some(isUnconditionalPriorCodeAccessibilityStatement);
+  const unconditionalPriorCodeAccessibilitySourceIDs =
+    priorCodeAccessibilitySourceIDs.length &&
+    hasPriorCodeAccessibilityAncestor &&
+    priorCodeBuildingStatusIsUnresolved &&
+    hasUnconditionalPriorCodeAccessibilityStatement
+      ? priorCodeAccessibilitySourceIDs
+      : [];
   const cumulativeSingleExitSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
     /not exceeding six stories\s+and\s+not exceeding 2,?000 square feet/i.test(
       availableEvidence.get(sourceID)?.text
@@ -348,6 +403,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       missingMultipleOccupancyFractionSequenceSourceIDs.length === 0 &&
       missingTypeBNYCContextSourceIDs.length === 0 &&
       conflatedLavatoryVanitySourceIDs.length === 0 &&
+      unconditionalPriorCodeAccessibilitySourceIDs.length === 0 &&
       misstatedCumulativeConditionSourceIDs.length === 0 &&
       unsupportedExitAccessExpansionSourceIDs.length === 0 &&
       misboundAccessibleDiningSurfaceRuleSourceIDs.length === 0 &&
@@ -368,6 +424,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     missingMultipleOccupancyFractionSequenceSourceIDs,
     missingTypeBNYCContextSourceIDs,
     conflatedLavatoryVanitySourceIDs,
+    unconditionalPriorCodeAccessibilitySourceIDs,
     misstatedCumulativeConditionSourceIDs,
     unsupportedExitAccessExpansionSourceIDs,
     misboundAccessibleDiningSurfaceRuleSourceIDs,
@@ -494,7 +551,7 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
 
 function references(sourceIDs, sources) {
   const byID = new Map(sources.map((source) => [source.sourceID, source]));
-  return sourceIDs.map((sourceID) => byID.get(sourceID)?.reference || sourceID).join(", ");
+  return unique(sourceIDs.map((sourceID) => byID.get(sourceID)?.reference || sourceID)).join(", ");
 }
 
 export function researchAnswerQualityRevisionIssues(result) {
@@ -600,6 +657,12 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "misstated_provision",
       detail: `Keep lavatory and vanity as distinct terms. Do not join them with a slash, parentheses, or other shorthand that implies they are interchangeable; state separately what the cited Building Code text says about a lavatory and what it does not establish about a vanity. Bind that distinction to: ${references(result.conflatedLavatoryVanitySourceIDs, result.sources)}.`
+    });
+  }
+  if (result.unconditionalPriorCodeAccessibilitySourceIDs?.length) {
+    issues.push({
+      type: "overstated_compliance",
+      detail: `Do not apply BC 1101.3.1 categorically while prior-code-building status remains represented or otherwise unresolved. Make the accessibility consequence conditional on confirming the prior-code-building and alteration/change context, and preserve that applicability fact in missingFacts. Bind the conditional rule to: ${references(result.unconditionalPriorCodeAccessibilitySourceIDs, result.sources)}.`
     });
   }
   if (result.misstatedCumulativeConditionSourceIDs?.length) {

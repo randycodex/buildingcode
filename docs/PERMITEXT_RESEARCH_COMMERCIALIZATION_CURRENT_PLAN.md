@@ -128,6 +128,21 @@ Permitext now treats an express “Based on [named provisions]” question as se
 
 The targeted occupancy confirmation then passed 4.00/4 in 45.936 seconds. Telemetry confirmed that web support was neither requested nor searched, with `selected_evidence_boundary` recorded as the reason. The Research operation cost $0.119429 and the full diagnostic including the independent grader cost $0.150251. One bounded repair removed an improper request to reconfirm an established Project fact. This clears the v3 fail-fast blocker for a new frozen cohort.
 
+### Frozen v4 cohort attempt
+
+The immutable v4 cohort began from the section-bounded and English-sanitation fixes and stopped safely when the OpenAI API credit balance was exhausted:
+
+- 18 Research turns completed: 17 passed every exact rubric gate and one scored 3.47/4 because it applied BC 1101.3.1 categorically while prior-code-building status remained an unverified applicant representation.
+- All 16 cases preceding that answer passed, including every prior v2 and v3 remediation case. The next roof-recovering case also passed 4.00/4.
+- Case 19 received `credit_balance_exhausted`; the failed user turn was not charged, and case 20 was not attempted because stop-on-error was active.
+- Completed-turn operating cost was $1.108311. The recorded $1.449590 operating upper bound includes a conservative $0.341280 reservation for the failed provider request and therefore is not a valid projected cost-per-100 result.
+- Completed-turn cost was $0.046152 p50 and $0.116791 p90. Latency was 26.260 seconds p50 and 42.932 seconds p90.
+- The incomplete sample cannot decide pricing or the 100-turn allowance because it contains only 18 completed turns and one unresolved provider reservation.
+
+The retained partial evidence is `permitext-sync-server/evals/results/2026-08-28T00-17-54-753Z-e737d550-b07d-4e8d-9f7b-4bf9e8853009.md`.
+
+The BC 1101.3.1 defect is now covered by a generic deterministic consistency gate. When supplied BC 1101.3 ancestor text limits the descendant rule to prior-code buildings and that status remains represented or unresolved, every project-specific accessibility consequence must remain conditional on confirming the prior-code-building and alteration/change context. The answer prompt and independent verifier carry the same boundary. The saved v4 answer now fails that local gate, while a properly conditional answer passes. The affected case is evidence-ready through Permitext's conversation flow in mock mode without a paid model call.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -155,4 +170,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Create and commit a new immutable v4 cohort profile from the current remediated application commit, then run all 20 cases under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
+Complete the no-cost repository gate and commit the v4 evidence plus the BC 1101.3.1 safeguard. After the OpenAI API account has available credit, run one capped targeted confirmation of the repaired mercantile-to-business case and the provider-interrupted BC 1019.3 case. If both pass, create a new immutable v5 profile and run all 20 cases under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
