@@ -33,7 +33,8 @@ This is a product-specific working checklist, not legal approval or a substitute
 - Optional additional Research turn packs are one-time consumables that do not expire and are used after the included turns.
 - New York law governs. Dispute procedure and venue remain open for legal review.
 - The operator's private residential address must not appear in customer-facing pages. Provider and legal records may retain a nonpublic address where required.
-- Minimum age and confidential-data policy remain open and must not be replaced with placeholders in public documents.
+- Beta 1 users must be at least 18 years old.
+- Beta 1 is not approved for confidential, regulated, or personally identifying material. Users must redact that material before submitting content to Permitext.
 
 ## Recommended working refund policy
 

@@ -90,8 +90,8 @@ Detailed configuration: [BETA1_COMMERCIAL_CONFIGURATION.md](./BETA1_COMMERCIAL_C
 
 - [x] Product-level professional-use, authority, privacy, retention, deletion, and Research-provider disclosures are implemented and covered by contracts.
 - [x] Working commercial decisions and a working refund policy are documented.
-- [ ] Decide the minimum user age.
-- [ ] Decide whether customers may upload confidential, regulated, or personally identifying project material and document the rule.
+- [x] Set the Beta 1 minimum user age to 18 and document the rule.
+- [x] Prohibit confidential, regulated, or personally identifying material during Beta 1 and require users to redact it before submission.
 - [ ] Obtain counsel review of Terms, Privacy Policy, subscription/cancellation disclosure, refund policy, Acceptable Use Policy, and professional-use/AI notice.
 - [ ] Publish stable counsel-approved URLs and ensure web/iOS purchase screens match them.
 - [ ] Record policy-version acceptance where required.
@@ -109,7 +109,7 @@ Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_
 - [x] Add a fail-closed read-only restore comparator and complete its no-provider local end-to-end rehearsal, including deliberate missing-record detection.
 - [ ] Complete the first provider-backed isolated Neon/Blob backup/restore drill and retain the recovery-point, private-asset, timing, and cleanup evidence.
 - [x] Add the timed synthetic support-tabletop record and cross-document support-process contract.
-- [ ] Complete the first timed support tabletop and retain the operator record.
+- [x] Complete the first timed Codex-assisted support tabletop and retain the operator record.
 
 Operations runbook: [BETA1_OPERATIONS_RUNBOOK.md](./BETA1_OPERATIONS_RUNBOOK.md)
 

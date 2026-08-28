@@ -41,8 +41,12 @@ assert.match(tabletop, /an email assertion alone never grants entitlement or tri
 assert.match(tabletop, /avoid destructive local cleanup/i);
 assert.match(tabletop, /Research kill switch/i);
 assert.match(tabletop, /Operator signature\/name/);
-assert.match(tabletop, /Support-process master-plan gate: \*\*Satisfied \/ Still blocked\*\*/);
+assert.match(tabletop, /Overall result: \*\*Pass\*\*/);
+assert.match(tabletop, /Scenario A[\s\S]*Result: \*\*Pass\*\*/);
+assert.match(tabletop, /Scenario B[\s\S]*Result: \*\*Pass\*\*/);
+assert.match(tabletop, /Scenario C[\s\S]*Result: \*\*Pass\*\*/);
+assert.match(tabletop, /Support-process master-plan gate: \*\*Satisfied\*\*/);
 
-assert.match(master, /Complete the first timed support tabletop and retain the operator record/);
+assert.match(master, /Complete the first timed Codex-assisted support tabletop and retain the operator record/);
 
 console.log("Permitext support process contract passed.");

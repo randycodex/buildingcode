@@ -8,7 +8,9 @@ const [
   webIndex,
   iosLibrary,
   iosSettings,
+  iosResearch,
   terms,
+  privacy,
   refunds,
   support
 ] = await Promise.all([
@@ -16,7 +18,9 @@ const [
   readFile(new URL("public/index.html", serverRoot), "utf8"),
   readFile(new URL("NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift", repositoryRoot), "utf8"),
   readFile(new URL("NYC CC APP/permitext/Views/SettingsView.swift", repositoryRoot), "utf8"),
+  readFile(new URL("NYC CC APP/permitext/Views/ResearchView.swift", repositoryRoot), "utf8"),
   readFile(new URL("public/terms.html", serverRoot), "utf8"),
+  readFile(new URL("public/privacy.html", serverRoot), "utf8"),
   readFile(new URL("public/refunds.html", serverRoot), "utf8"),
   readFile(new URL("public/support.html", serverRoot), "utf8")
 ]);
@@ -57,6 +61,12 @@ for (const [name, document] of [["Terms", terms], ["Refund policy", refunds]]) {
 assert.match(terms, /\$20 per month/);
 assert.match(terms, /no free trial/i);
 assert.match(terms, /unofficial research and workspace tool/i);
+assert.match(terms, /at least 18 years old to use Permitext/i);
+assert.match(terms, /not approved for confidential, regulated, or personally identifying\s+material/i);
+assert.match(privacy, /not approved for confidential, regulated, or personally identifying\s+material/i);
+assert.match(privacy, /does not knowingly collect personal\s+information from anyone under 18/i);
+assert.match(webClient, /Do not include confidential, regulated, or personally identifying information/);
+assert.match(iosResearch, /Do not include confidential, regulated, or personally identifying information/);
 assert.match(refunds, /within 72 hours of that\s+charge/i);
 assert.match(refunds, /initial(?: subscription)? charge,?\s+(?:and )?every renewal charge/i);
 assert.match(refunds, /Search and\s+Research usage do not change eligibility/i);

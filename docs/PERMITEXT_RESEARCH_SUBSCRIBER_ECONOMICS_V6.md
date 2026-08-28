@@ -73,7 +73,7 @@ For iOS, Apple says its tax categorization affects proceeds and proceeds are cal
 
 ### Infrastructure
 
-Vercel currently lists Pro at $20 per month with $20 of usage credit. The $45 p90 model input is a budget ceiling consisting of that platform fee plus the runbook's $25 on-demand amount; it is not measured marginal usage. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
+Vercel currently lists Pro at $20 per month with $20 of usage credit. The $45 p90 model input preserves the earlier conservative planning case of that platform fee plus $25 of on-demand spend; it is not measured marginal usage or the current recommended live setting. The tightened live recommendation is a $10 on-demand amount, for approximately $30 plus tax and a possible small metering overrun. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
 
 The current retained dashboard evidence is still the August 21 Hobby observation, not a Pro invoice or launch workload. The volume table is therefore the correct no-cost planning evidence, while actual allocation remains open until a paid plan and representative customer traffic produce usage data.
 
@@ -92,7 +92,7 @@ The V6 cohort was deliberately difficult and all 20 answers routed directly to T
 | Cost | p50 assumption | p90 assumption | Status |
 | --- | ---: | ---: | --- |
 | V6 model usage | empirical aggregate | empirical aggregate | Measured in V6 |
-| Vercel infrastructure | $20/month | $45/month | $20 platform fee is current; $25 on-demand amount is a conservative full-budget case |
+| Vercel infrastructure | $20/month | $45/month | $20 platform fee is current; the earlier $25 on-demand amount is retained only as a conservative full-budget sensitivity |
 | Fully utilized paid subscribers | 25 | 25 | Base case; 10/25/50/100 sensitivity now modeled |
 | Infrastructure per subscriber | $0.80 | $1.80 | Derived from the preceding two rows |
 | Support time | 10 minutes | 10 minutes | Owner-approved Beta assumption; measure after launch |
@@ -104,7 +104,7 @@ Channel costs use these current public terms:
 
 - Stripe domestic online card processing: 2.9% + $0.30 per successful transaction. Stripe Tax Basic adds 0.5% on transactions where the business is registered to collect tax. Stripe says original card-processing fees are not returned on ordinary card refunds. [Stripe pricing](https://stripe.com/pricing)
 - Apple's standard digital-goods commission is 30%; approved App Store Small Business Program participants receive an 85% share, before applicable taxes. [Apple membership pricing](https://developer.apple.com/programs/whats-included/), [Apple subscriptions](https://developer.apple.com/app-store/subscriptions/), [Small Business Program](https://developer.apple.com/app-store/small-business-program/)
-- Vercel Pro has a $20 monthly platform fee with a $20 usage credit. The existing Permitext runbook adds a conservative $25 on-demand budget case. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
+- Vercel Pro has a $20 monthly platform fee with a $20 usage credit. This model retains the earlier $25 on-demand amount only as a conservative $45 full-budget sensitivity; the operations runbook now recommends $10 of on-demand spend beyond the included credit for the initial controlled Beta. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
 
 Sales tax collected from a customer is not automatically a Permitext expense. The 5% tax reserve intentionally covers unresolved tax-inclusive pricing, provider withholding, and compliance treatment until Stripe Tax and App Store tax configuration are reviewed. It is not verified as sufficient for every customer location and must be replaced rather than silently retained as a factual tax rate.
 
