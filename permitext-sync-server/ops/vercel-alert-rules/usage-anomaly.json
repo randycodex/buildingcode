@@ -1,0 +1,10 @@
+{
+  "name": "Permitext production usage anomalies",
+  "projectId": "projectId in ('prj_6rWwwb50xxxKI7qu92HzzqB5nkYs')",
+  "alertTypes": [
+    {
+      "type": "usage_anomaly"
+    }
+  ],
+  "autosubscribeOwnersInKnock": true
+}

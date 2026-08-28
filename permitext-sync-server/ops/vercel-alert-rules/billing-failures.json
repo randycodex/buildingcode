@@ -1,0 +1,16 @@
+{
+  "name": "Permitext production billing endpoint failures",
+  "projectId": "projectId in ('prj_6rWwwb50xxxKI7qu92HzzqB5nkYs')",
+  "alertTypes": [
+    {
+      "type": "custom_alert"
+    }
+  ],
+  "customAlert": {
+    "queryJsonString": "{\"event\":\"incomingRequest\",\"rollups\":{\"failures\":{\"measure\":\"count\",\"aggregation\":\"sum\",\"filter\":\"contains(requestPath, '/billing/') and httpStatus ge 400\"}},\"filter\":\"environment eq 'production'\",\"granularity\":{\"minutes\":5}}",
+    "triggerType": "threshold",
+    "triggerOperator": "gt",
+    "triggerThreshold": 0
+  },
+  "autosubscribeOwnersInKnock": true
+}

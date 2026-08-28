@@ -104,6 +104,7 @@ Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_
 - [x] Complete a no-provider local end-to-end rehearsal for redacted client errors, configured-threshold latency, billing warnings, Research spend rejection, sanitized runtime errors, and 5xx observations.
 - [x] A named support and urgent-alert owner and support address are documented.
 - [x] Upgrade the commercial production service from Vercel Hobby to Vercel Pro.
+- [x] Configure and live-verify the included Permitext-scoped Vercel 5xx-anomaly and infrastructure-usage-anomaly rules with owner email/web subscriptions.
 - [ ] Configure and exercise monitoring alerts for health, 5xx/client failures, billing webhooks, database failures, Research spend, and p95 latency.
 - [x] Configure a $20 Vercel on-demand spend amount, standard spend notifications, and automatic Production pause for all projects on the team.
 - [ ] Exercise a delivered spend notification and actual hard-stop behavior without exposing customers or incurring an uncontrolled overage.

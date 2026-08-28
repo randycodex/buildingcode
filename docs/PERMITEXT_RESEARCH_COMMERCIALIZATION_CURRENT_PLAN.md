@@ -242,7 +242,9 @@ The permanent operations suite now exercises structured monitoring through the a
 
 The exercise found and repaired a threshold mismatch: the request wrapper honored `PERMITEXT_SLOW_REQUEST_MS`, while event severity still used a hard-coded two-second threshold. Research spend-cap responses now also emit a dedicated release-identified event with hashed user and operation identifiers.
 
-Detailed evidence and boundaries are in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md). The exercise makes zero paid calls, writes no production data, delivers no external alert, and does not set `PERMITEXT_MONITORING_PROVIDER`. The Vercel Pro-plan gate is now complete. The live team also retains a $20 on-demand spend amount, standard spend notifications, and automatic Production pause for every team project. Dashboard/Drain configuration, delivered alert tests, and an exercised notification/hard-stop event remain open master-plan gates.
+Detailed evidence and boundaries are in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md). The exercise makes zero paid calls, writes no production data, delivers no external alert, and does not set `PERMITEXT_MONITORING_PROVIDER`. The Vercel Pro-plan gate is now complete. The live team also retains a $20 on-demand spend amount, standard spend notifications, and automatic Production pause for every team project. Two included Permitext-scoped Vercel rules now cover 5xx anomalies and infrastructure-usage anomalies, with owner email/web subscriptions checked. Custom threshold rules were unavailable because Vercel reported a limit of zero custom alerts; delivered alert tests, warning-level billing/Research delivery, health and p95 thresholds, and an exercised notification/hard-stop event remain open master-plan gates.
+
+Provider evidence and retained definitions are in [PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md](./PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md).
 
 ### Live Vercel cost-control confirmation
 

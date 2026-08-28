@@ -46,12 +46,13 @@ Minimum alerts:
 
 The alert destination and named on-call owner must be recorded before opening the beta. Live Vercel integration changes require explicit operator authorization.
 
+On August 28, 2026, the owner authorized and live-verified two included, Permitext-scoped Vercel rules: production 5xx anomalies and infrastructure-usage anomalies. Owner email and web subscriptions are checked; SMS remains off. Custom thresholds for health, billing, 5xx rate, and Research p95 were not applied because Vercel reported a current limit of zero custom alerts. No paid add-on was enabled. Full evidence and retained threshold definitions are in [PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md](./PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md).
+
 ## Hosting plan and spend control
 
-- Public commercial Beta 1 must not run on Vercel Hobby. Vercel reserves Hobby for personal, non-commercial use and may pause a Hobby team after it exceeds included usage.
-- On 2026-08-21 the Permitext dashboard reported **7h 8m Fluid Active CPU used against the 4h Hobby allowance**. Treat the current Hobby plan and exceeded-usage state as a launch blocker.
-- Upgrade the Permitext team to Vercel Pro before accepting public customers. The operator must approve the paid plan immediately before the upgrade.
-- After upgrading, replace Vercel's default on-demand budget with a Beta-specific amount. Initial recommendation: **$10 of on-demand infrastructure spend beyond the included Pro credit per billing cycle**, with web/email alerts at $5, $7.50, and $10, SMS at $10, and automatic Production pause at 100%. Vercel evaluates the threshold periodically, so treat approximately $30 plus tax and a possible small metering overrun—not an exact $30 ceiling—as the initial total monthly hosting exposure.
+- Public commercial Beta 1 must not run on Vercel Hobby. The owner upgraded the Permitext team to Vercel Pro on August 28, 2026 after personally approving and submitting the purchase.
+- The live plan has a fixed $20 monthly platform fee with $20 of included infrastructure credit. The billing cycle is August 28–September 28, 2026.
+- The owner selected **$20 of on-demand infrastructure spend beyond the included Pro credit per billing cycle**. Web/email spend notifications and automatic Production pause at 100% are on; SMS remains off. Vercel evaluates the threshold periodically, so treat approximately $40 plus tax and a possible small metering overrun—not an exact $40 ceiling—as the initial total monthly hosting exposure.
 - The Vercel platform fee, seats, integrations, and add-ons are outside that on-demand spend amount. Record them separately in the monthly operating-cost review.
 - A hard pause limits cost but produces a public 503. The incident checklist must include a deliberate resume decision and confirmation that the root cause is contained before unpausing.
 

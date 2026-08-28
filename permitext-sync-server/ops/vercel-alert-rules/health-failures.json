@@ -1,0 +1,16 @@
+{
+  "name": "Permitext production health failures",
+  "projectId": "projectId in ('prj_6rWwwb50xxxKI7qu92HzzqB5nkYs')",
+  "alertTypes": [
+    {
+      "type": "custom_alert"
+    }
+  ],
+  "customAlert": {
+    "queryJsonString": "{\"event\":\"incomingRequest\",\"rollups\":{\"failures\":{\"measure\":\"count\",\"aggregation\":\"sum\",\"filter\":\"requestPath eq '/health' and httpStatus ge 500\"}},\"filter\":\"environment eq 'production'\",\"granularity\":{\"minutes\":5}}",
+    "triggerType": "threshold",
+    "triggerOperator": "gte",
+    "triggerThreshold": 2
+  },
+  "autosubscribeOwnersInKnock": true
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Permitext production Research p95 above 45 seconds",
+  "projectId": "projectId in ('prj_6rWwwb50xxxKI7qu92HzzqB5nkYs')",
+  "alertTypes": [
+    {
+      "type": "custom_alert"
+    }
+  ],
+  "customAlert": {
+    "queryJsonString": "{\"event\":\"serverlessFunctionInvocation\",\"rollups\":{\"latency\":{\"measure\":\"functionDurationMs\",\"aggregation\":\"p95\"}},\"filter\":\"environment eq 'production' and requestPath eq '/research/conversations/message'\",\"granularity\":{\"hours\":1}}",
+    "triggerType": "threshold",
+    "triggerOperator": "gt",
+    "triggerThreshold": 45000
+  },
+  "autosubscribeOwnersInKnock": true
+}

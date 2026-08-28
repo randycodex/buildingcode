@@ -1,0 +1,22 @@
+{
+  "name": "Permitext production 5xx rate above 5 percent",
+  "projectId": "projectId in ('prj_6rWwwb50xxxKI7qu92HzzqB5nkYs')",
+  "alertTypes": [
+    {
+      "type": "custom_alert"
+    }
+  ],
+  "customAlert": {
+    "queryJsonString": "{\"event\":\"incomingRequest\",\"rollups\":{\"errors\":{\"measure\":\"count\",\"aggregation\":\"sum\",\"filter\":\"httpStatus ge 500\"},\"requests\":{\"measure\":\"count\",\"aggregation\":\"sum\"}},\"filter\":\"environment eq 'production'\",\"granularity\":{\"minutes\":5}}",
+    "triggerType": "threshold",
+    "triggerOperator": "gt",
+    "triggerThreshold": 0.05,
+    "formula": {
+      "operator": "divide",
+      "left": "errors",
+      "right": "requests"
+    },
+    "minThreshold": 20
+  },
+  "autosubscribeOwnersInKnock": true
+}
