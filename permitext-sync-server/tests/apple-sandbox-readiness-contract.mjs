@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import {
   appleSandboxConfigurationReadiness,
   expectedAppleSandboxBundleID,
-  expectedAppleSandboxProProductID
+  expectedAppleSandboxProProductID,
+  expectedAppleRootFingerprints
 } from "../apple-sandbox-readiness.mjs";
 
 const completeEnvironment = {
@@ -19,7 +20,7 @@ const completeEnvironment = {
   APPLE_BUNDLE_ID: expectedAppleSandboxBundleID,
   STOREKIT_PRO_PRODUCT_ID: expectedAppleSandboxProProductID,
   PERMITEXT_REQUIRE_APPLE_TRANSACTION_ROOT_PIN: "1",
-  APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS: "AA".repeat(32),
+  APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS: expectedAppleRootFingerprints.join(","),
   CLERK_PUBLISHABLE_KEY: "pk_test_contract",
   CLERK_SECRET_KEY: "sk_test_contract",
   CLERK_AUTHORIZED_PARTIES: "https://permitext-apple-sandbox.example.test",
@@ -46,6 +47,8 @@ for (const [name, environment] of [
   ["Shared Blob", { ...completeEnvironment, PERMITEXT_APPLE_SANDBOX_ISOLATED_BLOB: "0" }],
   ["Missing root pin enforcement", { ...completeEnvironment, PERMITEXT_REQUIRE_APPLE_TRANSACTION_ROOT_PIN: "0" }],
   ["Malformed root pin", { ...completeEnvironment, APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS: "AABBCC" }],
+  ["Incomplete Apple root set", { ...completeEnvironment, APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS: expectedAppleRootFingerprints[2] }],
+  ["Unknown root pin", { ...completeEnvironment, APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS: [...expectedAppleRootFingerprints.slice(0, 2), "AA".repeat(32)].join(",") }],
   ["Missing policy versions", { ...completeEnvironment, PERMITEXT_TERMS_VERSION: "" }],
   ["Paid Research enabled", { ...completeEnvironment, PERMITEXT_RESEARCH_PAID_TURNS_ENABLED: "1" }],
   ["Research provider enabled", { ...completeEnvironment, PERMITEXT_RESEARCH_KILL_SWITCH: "0" }],

@@ -4,6 +4,11 @@ import { paidResearchTurnsEnabled } from "./research-turns.mjs";
 
 export const expectedAppleSandboxBundleID = "com.randycodex.permitext";
 export const expectedAppleSandboxProProductID = "com.randycodex.permitext.pro.monthly";
+export const expectedAppleRootFingerprints = Object.freeze([
+  "B0B1730ECBC7FF4505142C49F1295E6EDA6BCAED7E2C68C5BE91B5A11001F024",
+  "C2B9B042DD57830E7D117DAC55AC8AE19407D38E41D88F3215BC3A890444A050",
+  "63343ABFB89A6A03EBB57E9B3F5FA7BE7C4F5C756F3017B3A8C488C3653E9179"
+]);
 
 const productionHosts = new Set([
   "permitext.com",
@@ -36,12 +41,17 @@ function isLiveStripeKey(value) {
   return /^(?:sk|rk)_live_/.test(String(value || "").trim());
 }
 
-function validAppleRootFingerprints(value) {
-  const fingerprints = String(value || "")
+function configuredAppleRootFingerprints(value) {
+  return String(value || "")
     .split(",")
-    .map((item) => item.replace(/[^a-fA-F0-9]/g, ""))
+    .map((item) => item.replace(/[^a-fA-F0-9]/g, "").toUpperCase())
     .filter(Boolean);
-  return fingerprints.length > 0 && fingerprints.every((item) => /^[a-fA-F0-9]{64}$/.test(item));
+}
+
+function expectedAppleRootsConfigured(value) {
+  const configured = new Set(configuredAppleRootFingerprints(value));
+  return configured.size === expectedAppleRootFingerprints.length &&
+    expectedAppleRootFingerprints.every((fingerprint) => configured.has(fingerprint));
 }
 
 function parsedPublicURL(environment) {
@@ -115,8 +125,8 @@ export function appleSandboxConfigurationReadiness(environment = process.env) {
     ),
     check(
       "apple-root-pins",
-      validAppleRootFingerprints(environment.APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS),
-      "Configure one or more verified 64-hex SHA-256 Apple App Store root certificate fingerprints on staging."
+      expectedAppleRootsConfigured(environment.APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS),
+      "Configure the complete verified Apple PKI root-certificate SHA-256 fingerprint set on staging."
     ),
     check(
       "clerk",
