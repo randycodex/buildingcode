@@ -74,7 +74,7 @@
       <p>
         Permitext uses service providers only as needed to deliver the application. These currently
         include Clerk for account authentication; Apple, Google, and Microsoft as sign-in providers;
-        Apple for in-app purchases; Stripe for web subscriptions and one-time Research turn packs; Vercel for application hosting and
+        Apple for in-app purchases; Stripe for web subscriptions; Vercel for application hosting and
         private file storage; and Neon for hosted PostgreSQL storage.
         When paid Research generation is enabled, Permitext also uses OpenAI for user-requested
         Research responses. A Research request can send the question, recent conversation messages,
@@ -91,6 +91,13 @@
         These controls and provider practices may change; see
         <a href="https://developers.openai.com/api/docs/guides/your-data" target="_blank" rel="noopener noreferrer">OpenAI's current data-controls policy</a>.
         Each provider also processes information under its own terms and privacy practices.
+      </p>
+      <p>
+        Before sending the first Research question, Permitext identifies the information that will be
+        sent to OpenAI and asks you to affirmatively choose whether to continue. You can decline and
+        continue using non-Research features. To withdraw that permission, stop submitting Research
+        requests; you may also remove saved Research conversations or delete the Permitext account as
+        described below.
       </p>
       <p>
         For Research, Permitext grounds code conclusions in applicable enacted text and cites the

@@ -1,68 +1,72 @@
 # Permitext Beta 1 legal readiness checklist
 
-This is a product-specific working checklist, not legal approval or a substitute for advice from a licensed US attorney. Do not publish placeholder answers. The final customer-facing documents must match the production product, billing configuration, and actual business practices.
+This is an owner self-review checklist, not legal advice, a legal opinion, or a guarantee that every federal, state, or local requirement has been identified. The owner has elected not to retain an attorney for Beta 1. Customer-facing documents must still match the production product, billing configuration, and actual operating practices.
 
-Professional handoff packet: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md](./PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md)
+Owner review record: [PERMITEXT_BETA1_OWNER_LEGAL_SELF_REVIEW.md](./PERMITEXT_BETA1_OWNER_LEGAL_SELF_REVIEW.md)
 
-## Documents required before public paid access
+Tax and optional professional reference: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md](./PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md)
 
-- **Terms of Service / Terms of Use.** Identify the contracting business, eligibility, account rules, permitted and prohibited use, subscription terms, intellectual-property ownership, user-content license, termination, warranty disclaimers, limits of liability, indemnity, dispute terms, governing law, and how terms may change.
-- **Subscription and cancellation disclosure.** State the price and billing interval, whether a trial exists, when recurring charges begin, automatic renewal, how to cancel on the web and through Apple, when access ends, and how price changes are communicated.
-- **Refund policy.** Explain Permitext's web-purchase refund policy and distinguish it from App Store purchases, which Apple administers. The policy and support copy must match the implemented entitlement behavior for full and partial refunds.
-- **Acceptable Use Policy.** Prohibit unlawful use, abusive automation, credential sharing, attacks on the service, attempts to bypass usage or cost limits, infringement, and use of generated material as an official agency determination.
-- **Professional-use and AI notice.** Make clear that Permitext is an unofficial research aid; enacted text and official agency materials remain authoritative; generated output may be incomplete or wrong; and licensed professionals retain responsibility for project-specific conclusions, filings, and safety decisions.
-- **Privacy Policy update.** Name Clerk, Stripe, Apple, the hosting/database providers, and AI/model providers actually used in production; describe the data each receives, retention/deletion behavior, account-linking behavior, security contact, and the US-only service boundary.
+## Confirmed owner decisions
 
-## Facts needed from the owner
-
-- Legal operator name and entity type.
-- Customer/legal-notice email address and any nonpublic address needed for provider or legal records.
-- State whose law should govern and preferred dispute process; counsel must confirm these provisions.
-- Minimum user age and whether the product will prohibit use by minors.
-- Final Free and Pro prices, billing intervals, trial decision, and web refund policy.
-- Customer support response target and cancellation/refund escalation process.
-- The production vendor list and any provider-specific retention settings.
-- Whether customers may upload confidential, regulated, or personally identifying project material; if not, the product rules must say so.
-
-## Confirmed Beta 1 commercial decisions
-
-- Contracting operator: Higinio Jimenez Manzano, acting as an individual rather than through an LLC or corporation.
-- Support, legal-notice, and urgent-alert email: `permitext@gmail.com`.
-- Higinio Jimenez Manzano owns urgent support responses.
+- Operator: Higinio Jimenez Manzano as a sole proprietor, not an LLC or corporation.
+- Income treatment: report Permitext business income and expenses through the owner's personal tax filing using the applicable sole-proprietor forms. This does not replace sales-tax registration, collection, filing, or remittance duties.
+- Support, dispute-notice, and legal-notice email: `permitext@gmail.com`.
 - Distribution and marketing: United States only.
+- Minimum age: 18.
 - Free access: code reading and code search remain available.
 - Pro: $20 per month, no trial, no annual plan, and 100 Research turns per UTC calendar month.
-- Optional additional Research turn packs are one-time consumables that do not expire and are used after the included turns.
-- New York law governs. Dispute procedure and venue remain open for legal review.
-- The operator's private residential address must not appear in customer-facing pages. Provider and legal records may retain a nonpublic address where required.
-- Beta 1 users must be at least 18 years old.
-- Beta 1 is not approved for confidential, regulated, or personally identifying material. Users must redact that material before submitting content to Permitext.
+- Additional Research turn packs: disabled and unpublished.
+- Cancellation: customers may cancel at any time; renewal stops and access normally continues through the paid period.
+- Web refunds: a full refund of an initial or renewal Stripe charge requested within 72 hours, regardless of Search or Research usage, plus remedies required by law or for a verified duplicate, unauthorized, or Permitext-error charge.
+- Apple refunds: controlled by Apple; Permitext follows verified refund or revocation events.
+- Governing law: New York, subject to nonwaivable law.
+- Disputes: 30-day good-faith informal notice, followed by a court with jurisdiction; eligible small-claims and urgent relief remain available. No mandatory arbitration or class-action waiver.
+- Beta 1 is not approved for confidential, regulated, or personally identifying material. Users must redact that material before submission.
+- The private residential address is retained only in provider, tax, and legal records where required and is not placed on customer pages.
 
-## Recommended working refund policy
+## Owner-reviewed customer documents
 
-- Customers may cancel at any time; cancellation stops renewal and Pro remains active through the already-paid period.
-- Every Stripe web charge, including the initial charge and renewals, receives a full refund when requested within 72 hours.
-- Search and Research usage do not change eligibility within that 72-hour window.
-- Duplicate charges, verified unauthorized charges, and Permitext billing errors receive a full refund.
-- Outside those cases, charges are non-refundable and are not prorated, except where law requires otherwise or Permitext grants a remedy for a material service failure.
-- Refunds return to the original payment method. A full Stripe refund ends the related Pro entitlement when the verified provider event is processed; a partial refund does not automatically revoke it.
-- Apple controls App Store purchase and refund decisions. Users request those refunds through Apple, and Permitext follows Apple's verified refund or revocation event.
-- Verified turn-pack refunds reverse the related turns; if those turns were already used, future purchased turns first settle the balance without removing the next month's included turns.
+- [x] Terms identify the individual operator, age and territory limits, account duties, acceptable use, professional and AI boundaries, paid terms, cancellation, refund reference, content license, suspension, disclaimers, liability limitation, governing law, dispute path, and change notice.
+- [x] Subscription/refund policy distinguishes Stripe and Apple, states price, monthly renewal, no trial, cancellation paths, end of access, the 72-hour web rule, and duplicate-billing handling.
+- [x] Privacy Policy names current providers, describes Research data sent to OpenAI, records the `store: false` behavior and current provider retention boundary, explains deletion, and identifies the first-Research affirmative disclosure.
+- [x] Purchase screens show the product, price, billing frequency, automatic renewal, no trial, included Research turns, cancellation deadline/mechanism, policy links, and a separate affirmative consent control.
+- [x] Web Checkout requires current recorded policy acceptance, and the iOS purchase path records the exact versions before StoreKit purchase.
+- [x] Web Checkout returns to a retainable Permitext subscription acknowledgment containing the recurring terms, cancellation route, refund rule, and policy links.
+- [x] Additional-turn promises were removed from present-tense customer documents while those sales remain disabled.
 
-This owner-approved working policy remains subject to attorney review and is not a published promise yet.
+## Tax boundary
 
-## Attorney review scope
+Permitext's owner may report net business profit on a personal return as a sole proprietor. That is separate from transactional sales tax. New York's current guidance says remotely accessed prewritten software sold to a New York purchaser is subject to state and local sales tax, and its registration page directs sellers of taxable property or services to register before beginning business.
 
-Ask counsel to review the documents together with the live signup, upgrade, checkout, cancellation, account-deletion, and Research-result screens. The review should confirm that the written promises match the software, the limitation and professional-use language fits a building-code research product, recurring-payment disclosures are presented before purchase, and US federal and applicable state requirements are addressed.
+The conservative no-professional launch path is therefore:
 
-Counsel review matters because a generic SaaS template cannot decide Permitext's actual contracting party, state-law choices, professional-liability allocation, refund promises, or whether the UI presents recurring-payment terms conspicuously enough. A working draft is useful input; calling it legally approved without that review would be inaccurate.
+1. Treat New York web subscriptions as taxable unless the New York Tax Department provides a different written answer for Permitext.
+2. Obtain the New York Certificate of Authority before the first taxable New York web subscription.
+3. Configure Stripe's product tax code, customer-location collection, registrations, and inclusive/exclusive presentation only after the registration facts are known.
+4. Keep Apple tax reporting separate because Apple controls the App Store transaction and remittance behavior.
+5. Monitor other states' nexus thresholds and digital-product rules as sales grow.
+6. Maintain records of gross receipts, Stripe and Apple fees, refunds, collected tax, provider expenses, and model/infrastructure costs for income and sales-tax filings.
 
-## Release gate
+Tax configuration is not activated by this checklist. Paying personal income or self-employment tax later does not cure a missed sales-tax registration, collection, or filing duty.
 
-Before opening paid Beta 1 to the public:
+## Remaining release gates
 
-1. Counsel-approved Terms, Privacy Policy, refund/subscription disclosure, and Acceptable Use Policy have stable public URLs.
-2. Web signup and checkout require or clearly record acceptance of the current Terms and Privacy Policy versions.
-3. iOS App Store metadata and in-app subscription copy use the same price, duration, renewal, cancellation, and professional-use language.
-4. Support can retrieve the accepted policy version and billing provider for an account without exposing sensitive credentials.
-5. A test account has completed signup, purchase, cancellation, refund, data export where offered, and account deletion against the production configuration.
+Before opening public paid Beta 1:
+
+1. The owner performs a final line-by-line review of the exact Terms, Privacy Policy, and Subscription and Refund Policy to be activated and records their version identifiers.
+2. Stable public URLs serve those exact files, and web/iOS purchase screens match them.
+3. The exact policy version variables are configured only after steps 1 and 2.
+4. The New York sales-tax registration and Stripe tax configuration decision is recorded before the first taxable New York web sale.
+5. Apple App Store metadata and the in-app subscription screen use the same price, duration, renewal, cancellation, and professional-use language.
+6. A no-charge local verification and the separately authorized production lifecycle confirm signup, purchase acknowledgment, entitlement, cancellation, refund, account export, and account deletion.
+7. The owner records acceptance of the residual risks below.
+
+## Residual risks requiring owner acceptance
+
+- A self-review cannot confirm that every state-specific consumer rule is covered or that every waiver, disclaimer, liability limitation, or dispute term will be enforced.
+- Operating as a sole proprietor does not create a separate liability shield between Permitext obligations and the owner's personal assets.
+- Building-code research can cause professional, financial, or safety losses if customers ignore the product boundary or if a court rejects a limitation.
+- A regulator, platform, payment provider, or customer may still require changes, refunds, penalties, or defense costs even when the owner acted in good faith.
+- Material product, price, provider, territory, data-use, or billing changes require a new review and may require renewed customer consent.
+
+The absence of an attorney is an owner-accepted business risk, not evidence that no law applies and not a reason to label these documents "legally approved."

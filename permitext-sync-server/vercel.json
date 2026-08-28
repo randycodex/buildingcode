@@ -130,6 +130,14 @@
       "destination": "/support.html"
     },
     {
+      "source": "/subscription-confirmation",
+      "destination": "/subscription-confirmation.html"
+    },
+    {
+      "source": "/subscription-confirmation/",
+      "destination": "/subscription-confirmation.html"
+    },
+    {
       "source": "/web/:path*",
       "destination": "/:path*"
     },

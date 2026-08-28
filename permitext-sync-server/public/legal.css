@@ -132,3 +132,38 @@ a {
 .document-links a {
   white-space: nowrap;
 }
+
+.document-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.document-actions a,
+.document-actions button {
+  appearance: none;
+  padding: 11px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 999px;
+  color: var(--accent);
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media print {
+  .document-actions,
+  .document-links {
+    display: none;
+  }
+
+  body,
+  main {
+    background: #fff;
+    color: #000;
+    box-shadow: none;
+  }
+}

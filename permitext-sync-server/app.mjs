@@ -24655,8 +24655,8 @@ async function handleWebCheckout(request, response) {
   const baseURL = configuredPublicBaseURL(request);
   const successURL = sameOriginAbsoluteURL(
     baseURL,
-    body.successURL,
-    `/?checkout=success&package=${packageID}&session_id={CHECKOUT_SESSION_ID}`
+    null,
+    `/subscription-confirmation?package=${packageID}&session_id={CHECKOUT_SESSION_ID}`
   );
   const cancelURL = sameOriginAbsoluteURL(baseURL, body.cancelURL, "/?checkout=cancel");
   if (!successURL || !cancelURL) {
@@ -30191,6 +30191,13 @@ async function handleRequestUnlocked(request, response) {
     }
     if (request.method === "GET" && (path === "support" || path === "support/")) {
       await handlePublicDocument("support", response);
+      return;
+    }
+    if (
+      request.method === "GET" &&
+      (path === "subscription-confirmation" || path === "subscription-confirmation/")
+    ) {
+      await handlePublicDocument("subscription-confirmation", response);
       return;
     }
     if (request.method === "GET" && (path === "internal" || path === "internal/" || path.startsWith("internal/"))) {

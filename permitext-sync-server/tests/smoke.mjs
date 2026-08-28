@@ -347,6 +347,21 @@ async function main() {
     );
     const privacyPolicy = await request("/privacy");
     assert(privacyPolicy.response.ok, "Privacy policy did not load.");
+    const subscriptionAcknowledgment = await request("/subscription-confirmation");
+    assert(subscriptionAcknowledgment.response.ok, "Subscription acknowledgment did not load.");
+    assert(
+      subscriptionAcknowledgment.text.includes("Web subscription acknowledgment") &&
+        subscriptionAcknowledgment.text.includes("Cancel before the next monthly renewal") &&
+        subscriptionAcknowledgment.text.includes("Print or save as PDF"),
+      "Subscription acknowledgment omitted its retainable recurring-payment terms."
+    );
+    const subscriptionAcknowledgmentClient = await request("/web/subscription-confirmation.js");
+    assert(subscriptionAcknowledgmentClient.response.ok, "Subscription acknowledgment client did not load.");
+    assert(
+      subscriptionAcknowledgmentClient.text.includes('continueURL.searchParams.set("checkout", "success")') &&
+        subscriptionAcknowledgmentClient.text.includes('continueURL.searchParams.set("session_id", sessionID)'),
+      "Subscription acknowledgment no longer carries a valid Checkout session back to Permitext."
+    );
     assert(
       privacyPolicy.response.headers.get("content-security-policy")?.includes("frame-ancestors 'none'"),
       "Privacy policy omitted the HTML security policy."

@@ -1,23 +1,23 @@
-# Permitext Beta 1 — Tax and Legal Professional Review Packet
+# Permitext Beta 1 — Tax Registration and Optional Professional Review Packet
 
 Prepared: August 28, 2026
 
-This packet organizes facts, open decisions, and implementation evidence for licensed tax and legal professionals. It is not tax or legal advice, does not approve the working policy drafts, and does not authorize a public paid launch.
+This packet organizes facts, open decisions, and implementation evidence for the owner and for any tax or legal professional the owner may later choose to consult. It is not tax or legal advice and does not authorize a public paid launch. The owner has elected not to retain an attorney for Beta 1; attorney review is optional, not a release gate.
 
-## Review outcome requested
+## Outcome needed before public billing
 
-Permitext needs written direction that answers two separate questions:
+Permitext needs a written owner record answering two separate questions:
 
-1. **Tax:** how the web and App Store offerings are classified, where registration and collection are required, what customer-location evidence must be collected, and how tax should be presented and reconciled.
-2. **Legal:** whether the Terms, Privacy Policy, subscription/refund disclosure, Acceptable Use rules, and professional-use/AI notice match the product, the operator, and applicable recurring-payment and consumer-protection requirements.
+1. **Tax:** how the web and App Store offerings are classified, where registration and collection are required, what customer-location evidence must be collected, and how tax should be presented and reconciled. In the absence of professional advice, the conservative working assumption is that New York web access is taxable remotely accessed prewritten software and registration precedes the first taxable New York web sale.
+2. **Owner legal self-review:** whether the Terms, Privacy Policy, subscription/refund disclosure, Acceptable Use rules, and professional-use/AI notice match the product, the operator, and the official-source requirements identified in [PERMITEXT_BETA1_OWNER_LEGAL_SELF_REVIEW.md](./PERMITEXT_BETA1_OWNER_LEGAL_SELF_REVIEW.md).
 
-Do not enable Stripe automatic tax, change product tax categories, publish a new customer promise, or mark the policies approved until the applicable professional answers are recorded.
+Do not enable Stripe automatic tax, change product tax categories, activate a policy version, or mark the policies legally approved merely because this packet exists.
 
 ## Product and operator snapshot
 
 | Topic | Current Beta 1 fact |
 | --- | --- |
-| Operator | Higinio Jimenez Manzano, acting as an individual rather than through an LLC or corporation |
+| Operator | Higinio Jimenez Manzano, sole proprietor; not an LLC or corporation |
 | Customer territory | United States only |
 | Free offering | Code reading and search |
 | Paid offering | Permitext Pro at $20 per month; no trial and no annual plan |
@@ -28,11 +28,11 @@ Do not enable Stripe automatic tax, change product tax categories, publish a new
 | Working web refund rule | Full refund for a Stripe charge requested within 72 hours, subject to the exceptions and provider distinctions in the working policy |
 | Minimum age | 18 |
 | Beta data restriction | Users must not submit confidential, regulated, or personally identifying material and must redact it before submission |
-| Governing-law draft | New York; dispute process and venue remain open for counsel |
+| Governing law and disputes | New York subject to nonwaivable law; 30-day informal notice followed by a court with jurisdiction; no mandatory arbitration or class waiver |
 | Support and legal-notice address | `permitext@gmail.com` |
 | Private operator address | Retained only for provider, tax, and legal records where required; not intended for customer-facing publication |
 
-## Tax-professional questions
+## Tax questions for owner resolution or optional professional confirmation
 
 ### 1. New York product classification
 
@@ -87,9 +87,9 @@ Apple's current subscription material describes App Store Connect tax categories
 
 Confirm the recommended chart of accounts and treatment for Stripe gross receipts, Apple proceeds, commissions, refunds, Vercel costs, model costs, professional fees, and customer-support labor. Also identify estimated-tax, information-return, business-registration, and record-retention obligations applicable to the individual operator.
 
-## Counsel questions
+## Optional counsel questions — not a Beta 1 release gate
 
-Counsel should review the policies together with the actual signup, upgrade, checkout, cancellation, restore, Research-result, support, export, and account-deletion flows.
+If counsel is retained later, counsel should review the policies together with the actual signup, upgrade, checkout, post-purchase acknowledgment, cancellation, restore, Research-result, support, export, and account-deletion flows.
 
 1. Is the individual operator correctly identified, and what nonpublic address or registered contact must appear in notices or records?
 2. Are United States-only access, age 18+, account security, suspension, and prohibited-data rules enforceable and presented at the right time?
@@ -98,7 +98,7 @@ Counsel should review the policies together with the actual signup, upgrade, che
 5. Is the professional-use/AI boundary appropriate for a building-code research product, including the limitation of liability and responsibility for source and project-fact verification?
 6. Are the content license, intellectual-property provisions, source-publication practices, and restrictions on confidential or regulated material adequate?
 7. Are the named providers, Research data flow, retention periods, account linking, purchase-ownership retention, deletion boundary, and official-web search redaction described accurately?
-8. What dispute process, venue, governing-law wording, warranty language, indemnity, liability cap, and change-notice procedure should replace the unresolved draft language?
+8. Are the selected New York governing-law, informal-notice, court-jurisdiction, warranty, liability-cap, and change-notice provisions enforceable and appropriately scoped?
 9. Which events require renewed affirmative acceptance rather than notice alone?
 10. Are separate Acceptable Use and professional-use documents needed, or may the current provisions remain inside the Terms?
 
@@ -110,13 +110,14 @@ Apple's [App Review Guidelines](https://developer.apple.com/app-store/review/gui
 - Working Privacy Policy: [`permitext-sync-server/public/privacy.html`](../permitext-sync-server/public/privacy.html)
 - Working subscription/refund policy: [`permitext-sync-server/public/refunds.html`](../permitext-sync-server/public/refunds.html)
 - Legal readiness checklist: [`BETA1_LEGAL_READINESS_CHECKLIST.md`](./BETA1_LEGAL_READINESS_CHECKLIST.md)
+- Owner legal self-review: [`PERMITEXT_BETA1_OWNER_LEGAL_SELF_REVIEW.md`](./PERMITEXT_BETA1_OWNER_LEGAL_SELF_REVIEW.md)
 - Commercial configuration: [`BETA1_COMMERCIAL_CONFIGURATION.md`](./BETA1_COMMERCIAL_CONFIGURATION.md)
 - Subscriber economics: [`PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md`](./PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md)
 - Billing and identity runbook: [`BETA1_BILLING_IDENTITY_RUNBOOK.md`](./BETA1_BILLING_IDENTITY_RUNBOOK.md)
 
-The professional should also receive screenshots or a supervised walkthrough of the current web and iOS flows. Source text alone cannot establish whether disclosures are conspicuous at the moment of signup or purchase.
+Any later professional should also receive screenshots or a supervised walkthrough of the current web and iOS flows. Source text alone cannot establish whether disclosures are conspicuous at the moment of signup or purchase.
 
-## Decision record to return
+## Optional professional decision record
 
 For each answer, record:
 
@@ -130,7 +131,7 @@ For each answer, record:
 
 ## Prepared technical control: policy-version acceptance
 
-The local server now has a dormant acceptance contract prepared for approved policies:
+The local server now has a dormant acceptance contract prepared for owner-approved current policies:
 
 - `GET /policies/current` returns only the configured current Terms, Privacy, and subscription/refund versions and stable URLs.
 - `POST /account/policy-acceptance` requires an authenticated account and exact current versions; stale versions fail closed.
@@ -144,12 +145,12 @@ The control remains inactive until all three approved version variables are deli
 - `PERMITEXT_PRIVACY_VERSION`
 - `PERMITEXT_SUBSCRIPTION_POLICY_VERSION`
 
-Do not configure those variables for the current drafts merely to make readiness pass. Client consent presentation and final counsel-approved versions remain release gates.
+Do not configure those variables merely to make readiness pass. The owner's final line-by-line approval, stable public URLs, matching client presentation, and exact version record remain release gates.
 
 ## Current hold points
 
 - No tax behavior or product tax category has been changed.
-- No policy draft has been labeled counsel-approved.
+- No customer document has been labeled attorney-reviewed or legally approved.
 - No approved policy version has been activated.
 - No Production deployment or paid billing exercise is authorized by this packet.
 - Additional Research-turn sales remain disabled and unpublished.

@@ -19,7 +19,8 @@ for (const source of ["/privacy", "/privacy/"]) {
 for (const [document, fileName] of [
   ["terms", "terms.html"],
   ["refunds", "refunds.html"],
-  ["support", "support.html"]
+  ["support", "support.html"],
+  ["subscription-confirmation", "subscription-confirmation.html"]
 ]) {
   for (const source of [`/${document}`, `/${document}/`]) {
     assert.equal(rewrites.get(source), `/${fileName}`, `${source} must resolve to its public document.`);

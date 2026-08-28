@@ -12,7 +12,9 @@ const [
   terms,
   privacy,
   refunds,
-  support
+  support,
+  subscriptionConfirmation,
+  subscriptionConfirmationClient
 ] = await Promise.all([
   readFile(new URL("public/app.js", serverRoot), "utf8"),
   readFile(new URL("public/index.html", serverRoot), "utf8"),
@@ -22,7 +24,9 @@ const [
   readFile(new URL("public/terms.html", serverRoot), "utf8"),
   readFile(new URL("public/privacy.html", serverRoot), "utf8"),
   readFile(new URL("public/refunds.html", serverRoot), "utf8"),
-  readFile(new URL("public/support.html", serverRoot), "utf8")
+  readFile(new URL("public/support.html", serverRoot), "utf8"),
+  readFile(new URL("public/subscription-confirmation.html", serverRoot), "utf8"),
+  readFile(new URL("public/subscription-confirmation.js", serverRoot), "utf8")
 ]);
 
 assert.match(webClient, /firmCollaboration:\s*false/);
@@ -70,7 +74,7 @@ const iosPurchase = iosLibrary.indexOf("let purchaseResult = try await purchaseA
 assert(iosPolicyAcceptance >= 0 && iosPurchase > iosPolicyAcceptance, "iOS policy acceptance must precede StoreKit purchase.");
 
 for (const [name, document] of [["Terms", terms], ["Refund policy", refunds]]) {
-  assert.match(document, /Beta 1[^.]*working draft/);
+  assert.doesNotMatch(document, /legal review remains pending|working draft/i);
   assert.match(document, /permitext@gmail\.com/);
   assert.match(document, /United States|web subscription|Web subscription/i);
   assert.match(document, /\/privacy/);
@@ -86,12 +90,20 @@ assert.match(privacy, /does not knowingly collect personal\s+information from an
 assert.match(webClient, /Do not include confidential, regulated, or personally identifying information/);
 assert.match(iosResearch, /Do not include confidential, regulated, or personally identifying information/);
 assert.match(refunds, /within 72 hours of that\s+charge/i);
-assert.match(refunds, /initial(?: subscription)? charge,?\s+(?:and )?every renewal charge/i);
+assert.match(refunds, /initial(?: subscription)? charge,?\s+(?:and )?every renewal\s+charge/i);
 assert.match(refunds, /Search and\s+Research usage do not change eligibility/i);
 assert.doesNotMatch(refunds, /seven calendar\s+days|five paid Research turns/i);
 assert.match(refunds, /reportaproblem\.apple\.com/);
 assert.match(support, /within two business days/i);
 assert.match(support, /within one business day/i);
+assert.match(subscriptionConfirmation, /Web subscription acknowledgment/);
+assert.match(subscriptionConfirmation, /\$20 per month/);
+assert.match(subscriptionConfirmation, /renews automatically each month until canceled/i);
+assert.match(subscriptionConfirmation, /cancel before the next monthly renewal/i);
+assert.match(subscriptionConfirmation, /within 72 hours/i);
+assert.match(subscriptionConfirmation, /Print or save as PDF/i);
+assert.match(subscriptionConfirmationClient, /checkout", "success"/);
+assert.match(subscriptionConfirmationClient, /session_id/);
 
 for (const path of ["/terms", "/privacy", "/refunds", "/support"]) {
   assert(webIndex.includes(`href="${path}"`), `Web Settings is missing ${path}.`);

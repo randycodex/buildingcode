@@ -230,6 +230,10 @@ async function main() {
     assert.equal(checkoutBody.get("client_reference_id"), ownerUserID);
     assert.equal(checkoutBody.get("line_items[0][price]"), testPriceID);
     assert.equal(checkoutBody.get("metadata[permitextPackage]"), "pro");
+    assert.equal(
+      checkoutBody.get("success_url"),
+      `${baseURL}/subscription-confirmation?package=pro&session_id={CHECKOUT_SESSION_ID}`
+    );
     assert.equal((await signIn()).entitlement, null, "Checkout API response granted Pro before a signed event.");
 
     const baseCreated = Math.floor(Date.now() / 1000) - 120;
