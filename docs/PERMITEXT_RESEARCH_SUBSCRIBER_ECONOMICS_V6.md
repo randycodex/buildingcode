@@ -6,31 +6,31 @@ This is a no-cost local planning model based on the immutable V6 production benc
 
 ## Decision
 
-Do not lock the current 100-turn allowance for paid release yet. If an allowance had to be fixed from the current evidence and conservative planning reserves, use **75 included turns provisionally**. Keep the product configuration unchanged until the unverified inputs below are replaced with actual operating values and the web/current-iOS response contract is checked.
+Retain **100 included turns** for Beta 1. The owner confirmed Permitext's 15% App Store commission, approved ten support minutes per subscriber at $30/hour, and accepted a **$2 minimum Beta contribution** at full p90 usage. The longer-term target remains $4–$6 after actual customer data exists.
 
 The reason is narrow:
 
 - Empirical aggregation of the 20 V6 production costs produces a 100-turn subscriber model cost of **$5.74 p50** and **$6.06 p90**. The p90 is only $0.06 above the approximate $6 model-cost objective, but it leaves no room to treat the mean as the risk case.
-- At the stated planning reserves, 100 turns cost **$18.34 p90 on web**, leaving $1.66 of monthly contribution, but **$20.36 p90 on iOS at a 15% commission**, a $0.36 loss. At the standard 30% commission the modeled p90 cost is $23.36.
-- Seventy-five turns cost **$16.86 p90 on web** and **$18.88 p90 on iOS at 15%**, leaving positive contribution in both decision channels under the same assumptions.
+- At the owner-approved support assumption and stated planning reserves, 100 turns cost **$15.84 p90 on web**, leaving $4.16 of monthly contribution, and **$17.86 p90 on iOS at the confirmed 15% commission**, leaving $2.14. At the standard 30% commission the sensitivity cost is $20.86.
+- The V6 cohort deliberately sent every difficult question through Terra answering and Luna verification, and the model assumes every subscriber uses all 100 turns. Retaining 100 is a conservative Beta decision, not a claim that every subscriber will cost the p90 amount.
 
-This is not a final price, margin target, or release authorization. It is a provisional risk boundary while the non-model inputs are unmeasured.
+This retains the existing product allowance; it does not change the $20 price or authorize release. Tax, refund, infrastructure-allocation, response-contract, and other release gates remain open.
 
 ## Fully utilized subscriber cost
 
 | Included turns | Model p50 | Model p90 | Web full p50 | Web full p90 | iOS 15% full p50 | iOS 15% full p90 | iOS 30% full p90 |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 50 | $2.87 | $3.09 | $9.65 | $15.37 | $11.67 | $17.39 | $20.39 |
-| 75 | $4.30 | $4.58 | $11.08 | $16.86 | $13.10 | $18.88 | $21.88 |
-| 100 | $5.74 | $6.06 | $12.52 | $18.34 | $14.54 | $20.36 | $23.36 |
+| 50 | $2.87 | $3.09 | $11.65 | $12.87 | $13.67 | $14.89 | $17.89 |
+| 75 | $4.30 | $4.58 | $13.08 | $14.36 | $15.10 | $16.38 | $19.38 |
+| 100 | $5.74 | $6.06 | $14.52 | $15.84 | $16.54 | $17.86 | $20.86 |
 
 At 100 turns, p90 contribution after all stated reserves is:
 
-- web through Stripe: **$1.66**, or **8.3%** of the $20 price;
-- iOS at the 15% Small Business Program rate: **-$0.36**, or **-1.8%**;
-- iOS at the standard 30% rate: **-$3.36**, or **-16.8%**.
+- web through Stripe: **$4.16**, or **20.8%** of the $20 price;
+- iOS at the confirmed 15% Small Business Program rate: **$2.14**, or **10.7%**;
+- iOS at the standard 30% rate: **-$0.86**, or **-4.3%**.
 
-The 30% iOS case is sensitivity evidence, not a decision channel. The 15% case can be used for a release decision only after Permitext's App Store Small Business Program enrollment is confirmed.
+The 30% iOS case is sensitivity evidence, not a decision channel. The owner confirmed that Permitext has the 15% App Store rate.
 
 ## Method
 
@@ -50,7 +50,7 @@ The V6 cohort was deliberately difficult and all 20 answers routed directly to T
 | Vercel infrastructure | $20/month | $45/month | $20 platform fee is current; $25 on-demand amount is a conservative full-budget case |
 | Fully utilized paid subscribers | 25 | 25 | Planning denominator, not measured |
 | Infrastructure per subscriber | $0.80 | $1.80 | Derived from the preceding two rows |
-| Support time | 6 minutes | 15 minutes | Planning reserve, not measured |
+| Support time | 10 minutes | 10 minutes | Owner-approved Beta assumption; measure after launch |
 | Owner-time rate | $30/hour | $30/hour | Planning opportunity cost, not payroll |
 | Refund reserve | 5% of price | 5% of price | Planning reserve, not measured incidence |
 | Tax reserve | 5% of price | 5% of price | Conservative reserve, not tax advice or a jurisdiction calculation |
@@ -63,16 +63,14 @@ Channel costs use these current public terms:
 
 Sales tax collected from a customer is not automatically a Permitext expense. The 5% tax reserve intentionally covers unresolved tax-inclusive pricing, provider withholding, and compliance treatment until Stripe Tax and App Store tax configuration are reviewed. It must be replaced rather than silently retained as a factual tax rate.
 
-## Inputs that still block a final allowance decision
+## Inputs that still block final commercial validation
 
-- Confirm App Store Small Business Program enrollment and the actual Pro-subscription proceeds in App Store Connect.
 - Confirm whether the advertised $20 is tax-exclusive on web and how Stripe Tax is configured for registered jurisdictions.
 - Replace the 5% refund reserve with actual/refined expected refund incidence after the lifecycle exercise.
-- Measure support minutes by category and choose an explicit owner-time cost.
 - Replace the 25-subscriber infrastructure denominator with launch-volume scenarios and measured per-turn storage/compute usage.
-- Choose a minimum acceptable contribution or gross-margin target. Positive contribution alone is not a sufficient long-term pricing standard.
+- Measure actual support minutes over the first 25–50 customers and revisit the longer-term $4–$6 contribution target.
 
-Until those inputs are verified, 75 is a provisional risk-controlled allowance, 100 remains unchanged in the product, and additional-turn prices remain unpublished.
+One hundred turns is the retained Beta allowance. Additional-turn prices remain unpublished, and the allowance must be reviewed after the first 25–50 customers provide actual usage, support, refund, and infrastructure evidence.
 
 ## Reproduce
 

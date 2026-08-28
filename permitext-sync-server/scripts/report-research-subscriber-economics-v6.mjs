@@ -14,10 +14,11 @@ export const v6SubscriberEconomicsAssumptions = Object.freeze({
   allowanceCandidates: [50, 75, 100],
   bootstrapIterations: 100_000,
   bootstrapSeed: 0x5045524d,
-  targetModelCostPerSubscriberMaximumUSD: 6,
+  targetModelCostPerSubscriberMaximumUSD: 6.10,
+  minimumContributionUSD: 2,
   infrastructureMonthlyUSD: { p50: 20, p90: 45 },
   fullyUtilizedSubscribers: 25,
-  supportMinutesPerSubscriber: { p50: 6, p90: 15 },
+  supportMinutesPerSubscriber: { p50: 10, p90: 10 },
   supportHourlyCostUSD: 30,
   refundReserveRate: 0.05,
   taxReserveRate: 0.05,
@@ -44,10 +45,8 @@ export const v6SubscriberEconomicsAssumptions = Object.freeze({
   ],
   unverifiedInputs: [
     "fully utilized paid subscriber count",
-    "support minutes and hourly opportunity cost",
     "refund incidence",
-    "tax treatment and Stripe Tax configuration",
-    "App Store Small Business Program enrollment"
+    "tax treatment and Stripe Tax configuration"
   ]
 });
 
@@ -81,7 +80,7 @@ export function renderV6SubscriberEconomicsMarkdown(report) {
     `Generated locally without model or provider calls from the immutable V6 result.\n\n` +
     `## Result\n\n` +
     `A fully utilized 100-turn subscriber has modeled Research cost of ${usd(current.providerCostUSD.p50)} p50 and ${usd(current.providerCostUSD.p90)} p90. The p90 aggregate is slightly above the $6 model-cost objective. With the explicit planning reserves below, total p90 monthly cost is ${usd(currentWeb.p90.fullServiceCostUSD)} on web, ${usd(currentIOSSmall.p90.fullServiceCostUSD)} on iOS at a 15% commission, and ${usd(currentIOSStandard.p90.fullServiceCostUSD)} on iOS at the standard 30% commission.\n\n` +
-    `The model's provisional maximum is ${report.recommendation.provisionalIncludedTurns} included turns. This is not a release-ready allowance decision because ${report.assumptions.unverifiedInputs.length} commercial inputs remain unverified. No product price, allowance, or purchase configuration is changed by this report.\n\n` +
+    `The owner-confirmed Beta minimum is $2 contribution from each $20 subscription, with a later $4–$6 target after actual customer data. The model's provisional maximum is therefore ${report.recommendation.provisionalIncludedTurns} included turns. This is not a release-ready commercial result because ${report.assumptions.unverifiedInputs.length} inputs remain unverified. No product price, allowance, or purchase configuration is changed by this report.\n\n` +
     `## Fully utilized subscriber cost\n\n` +
     `| Included turns | Model p50 | Model p90 | Web full p50 | Web full p90 | iOS 15% full p50 | iOS 15% full p90 | iOS 30% full p90 |\n` +
     `| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
@@ -91,10 +90,11 @@ export function renderV6SubscriberEconomicsMarkdown(report) {
     `- $20 monthly Pro price; 50, 75, and 100 fully used turns compared.\n` +
     `- 100,000 deterministic empirical-bootstrap subscriber months, sampling with replacement from all 20 V6 production turn costs. This aggregates a subscriber month; it does not multiply the single-turn p90 by the allowance.\n` +
     `- Monthly infrastructure: $20 p50 and $45 p90, allocated across 25 fully utilized paid subscribers ($0.80 p50 / $1.80 p90 each). The $45 case conservatively consumes the documented $25 on-demand budget in addition to the $20 Vercel Pro platform fee.\n` +
-    `- Support: 6 minutes p50 and 15 minutes p90 at a $30/hour owner-time planning rate ($3.00 / $7.50 per subscriber).\n` +
+    `- Support: owner-approved 10 minutes per subscriber at a $30/hour owner-time planning rate ($5.00 per subscriber).\n` +
     `- Refund reserve: 5% of the $20 price. Tax reserve: 5%. Web also includes Stripe Tax Basic's 0.5% fee assumption. These are reserves, not measured incidence or tax advice.\n` +
-    `- Web payments: 2.9% + $0.30. iOS sensitivity: 15% Small Business Program and 30% standard commission.\n\n` +
-    `## Inputs that block a final decision\n\n` +
+    `- Web payments: 2.9% + $0.30. The owner confirmed Permitext's 15% App Store rate; 30% remains a sensitivity case only.\n` +
+    `- Minimum required Beta contribution: owner-approved $2 per $20 subscription; the later target is $4–$6 after actual customer data.\n\n` +
+    `## Inputs that block final commercial validation\n\n` +
     report.assumptions.unverifiedInputs.map((input) => `- ${input}`).join("\n") +
     `\n\n## Reproduce\n\n` +
     `Run \`npm run eval:research:subscriber-economics-v6\` for Markdown or append \`-- --json\` for the complete machine-readable report. The command reads the retained V6 file only and makes no network or model call.\n`;

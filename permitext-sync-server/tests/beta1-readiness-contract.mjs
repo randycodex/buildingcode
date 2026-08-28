@@ -28,7 +28,7 @@ const completeEnvironment = {
   CLERK_ACCOUNT_PORTAL_URL: "https://accounts.permitext.com/sign-in",
   PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.50",
   PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "5",
-  PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "20",
+  PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "7",
   PERMITEXT_RESEARCH_DAILY_CAP_USD: "25",
   PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "100",
   PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "1",
@@ -78,6 +78,17 @@ assert(
 assert(
   !beta1ConfigurationReadiness({ ...completeEnvironment, BLOB_READ_WRITE_TOKEN: "" }).ready,
   "Beta 1 readiness accepted missing private asset storage."
+);
+const insufficientUserMonthlyBudget = beta1ConfigurationReadiness({
+  ...completeEnvironment,
+  PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "6.99"
+});
+assert(
+  !insufficientUserMonthlyBudget.ready &&
+    !insufficientUserMonthlyBudget.checks.find((item) =>
+      item.id === "research-beta1-user-monthly-budget"
+    )?.ready,
+  "Beta 1 readiness accepted a per-user monthly spend cap that cannot support the retained 100-turn allowance."
 );
 assert(
   !beta1ConfigurationReadiness({

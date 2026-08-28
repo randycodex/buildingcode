@@ -17,7 +17,7 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Subscriber-level aggregation now places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. Under explicit conservative full-service planning reserves, web costs $18.34 p90 and iOS at a 15% commission costs $20.36 p90. Seventy-five turns is therefore the provisional risk boundary, but the current allowance is unchanged until the commercial inputs and margin target are verified. The legal, provider, operations, production, and TestFlight gates also remain open.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Subscriber-level aggregation places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. With the confirmed 15% App Store commission, ten support minutes at $30/hour, and conservative tax, refund, and infrastructure reserves, the p90 full-service cost is $15.84 on web and $17.86 on iOS. The owner retained 100 turns for Beta with a $2 minimum p90 contribution and a later $4–$6 target. The legal, provider, operations, production, and TestFlight gates remain open.
 
 Current development branch: `codex/research-commercialization`
 
@@ -53,7 +53,8 @@ Current development branch: `codex/research-commercialization`
 - [x] Complete no-cost verification of the v23 filing-boundary repair and scored-quality fail-fast behavior.
 - [x] Run the separately authorized immutable v6 cohort; all 20 cases passed with no provider or charging failure.
 - [x] Build the no-cost V6 subscriber aggregation and full-service planning model.
-- [ ] Replace the model's unverified tax, refund, support, infrastructure-allocation, and App Store commission inputs; choose a margin target and lock the allowance. The provisional risk boundary is 75 turns, with no product change yet.
+- [x] Confirm the 15% App Store rate, ten-minute support assumption, $2 Beta contribution floor, and retention of 100 included turns.
+- [ ] Verify tax, refund, and infrastructure-allocation inputs and review actual economics after the first 25–50 customers.
 
 Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md)
 

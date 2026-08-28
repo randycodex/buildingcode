@@ -142,13 +142,13 @@ The initial Beta 1 values are:
 ```text
 PERMITEXT_RESEARCH_MAX_REQUEST_USD=0.50
 PERMITEXT_RESEARCH_USER_DAILY_CAP_USD=2
-PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD=5
+PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD=7
 PERMITEXT_RESEARCH_DAILY_CAP_USD=10
 PERMITEXT_RESEARCH_MONTHLY_CAP_USD=100
 PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT=100
 ```
 
-These are exposure ceilings, not spending targets. Review actual provider usage weekly and lower the request limit or disable Research before increasing the $100 system cap.
+These are exposure ceilings, not spending targets. The $7 per-user monthly ceiling provides headroom above the $6.06 V6 p90 projection for 100 fully used turns. Review actual provider usage weekly and lower the request limit or disable Research before increasing the $100 system cap.
 
 The cost safeguards remain operational controls and must not be presented as customer-facing error messages. Before enabling paid continuation, configure:
 

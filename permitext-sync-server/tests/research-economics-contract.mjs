@@ -153,6 +153,7 @@ const subscriberEconomics = researchSubscriberEconomicsReport(pricingRun, {
   bootstrapIterations: 10_000,
   bootstrapSeed: 0x5045524d,
   targetModelCostPerSubscriberMaximumUSD: 6,
+  minimumContributionUSD: 0,
   infrastructureMonthlyUSD: { p50: 20, p90: 45 },
   fullyUtilizedSubscribers: 25,
   supportMinutesPerSubscriber: { p50: 6, p90: 15 },
@@ -191,6 +192,7 @@ assert.throws(
   () => researchSubscriberEconomicsReport(pricingRun, {
     subscriptionPriceUSD: 20,
     currentIncludedTurns: 100,
+    minimumContributionUSD: 0,
     infrastructureMonthlyUSD: { p50: 20, p90: 10 },
     fullyUtilizedSubscribers: 25,
     supportMinutesPerSubscriber: { p50: 1, p90: 1 },

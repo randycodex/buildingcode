@@ -18,6 +18,8 @@ export const expectedStripeProPrice = Object.freeze({
   unitAmount: 2_000
 });
 
+export const minimumBeta1UserMonthlyResearchCapUSD = 7;
+
 function check(id, ready, detail) {
   return { id, ready: Boolean(ready), detail };
 }
@@ -83,6 +85,13 @@ export function beta1ConfigurationReadiness(environment = process.env) {
     check("apple-root-pins", Boolean(String(environment.APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS || "").trim()), "Pin the trusted Apple App Store root certificate fingerprints."),
     check("clerk", clerk.webReady, clerk.webReady ? "Clerk production identity and hosted web sign-in are configured." : clerk.webMessage),
     check("research-cost-guardrails", research.ready, research.ready ? "Research per-turn, per-user daily/monthly, and system daily/monthly caps are configured." : research.problems.join(" ")),
+    check(
+      "research-beta1-user-monthly-budget",
+      research.ready && Number(research.userMonthlyCapUSD) >= minimumBeta1UserMonthlyResearchCapUSD,
+      research.ready && Number(research.userMonthlyCapUSD) >= minimumBeta1UserMonthlyResearchCapUSD
+        ? `The Research per-user monthly cap is $${Number(research.userMonthlyCapUSD).toFixed(2)}, sufficient for the retained 100-turn Beta allowance.`
+        : `PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD must be at least $${minimumBeta1UserMonthlyResearchCapUSD.toFixed(2)} for the retained 100-turn Beta allowance.`
+    ),
     check(
       "research-beta1-monthly-budget",
       research.ready && Number(research.monthlyCapUSD) <= 100,

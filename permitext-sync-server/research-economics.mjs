@@ -427,6 +427,7 @@ function subscriberCostScenario({
   supportCostUSD,
   refundReserveRate,
   taxReserveRate,
+  minimumContributionUSD,
   channel
 }) {
   const paymentFeeUSD = fixed(
@@ -459,7 +460,8 @@ function subscriberCostScenario({
     contributionUSD,
     contributionMarginRate: fixedSigned(contributionUSD / subscriptionPriceUSD, 4),
     nonModelHeadroomUSD: fixedSigned(subscriptionPriceUSD - providerCostUSD),
-    contributionPositive: contributionUSD > 0
+    contributionPositive: contributionUSD > 0,
+    contributionTargetPass: contributionUSD >= minimumContributionUSD
   };
 }
 
@@ -531,6 +533,10 @@ export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumpti
     assumptions.targetModelCostPerSubscriberMaximumUSD ?? 6,
     "Target model cost per fully utilized subscriber"
   );
+  const minimumContributionUSD = requiredNonnegativeNumber(
+    assumptions.minimumContributionUSD,
+    "Minimum subscriber contribution"
+  );
   const channels = (Array.isArray(assumptions.channels) ? assumptions.channels : [])
     .map(normalizedSubscriberChannel);
   if (!channels.length) throw new TypeError("Research subscriber economics requires at least one sales channel.");
@@ -574,6 +580,7 @@ export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumpti
         supportCostUSD: supportCostUSD.p50,
         refundReserveRate,
         taxReserveRate,
+        minimumContributionUSD,
         channel
       }),
       p90: subscriberCostScenario({
@@ -583,12 +590,13 @@ export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumpti
         supportCostUSD: supportCostUSD.p90,
         refundReserveRate,
         taxReserveRate,
+        minimumContributionUSD,
         channel
       })
     }));
     const requiredChannelP90Pass = channelScenarios
       .filter((channel) => channel.requiredForDecision)
-      .every((channel) => channel.p90.contributionPositive);
+      .every((channel) => channel.p90.contributionTargetPass);
     const normalizedP90ModelCostPer100USD = fixed(
       providerCostUSD.p90 / includedTurns * 100,
       2
@@ -633,6 +641,7 @@ export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumpti
       bootstrapIterations,
       bootstrapSeed,
       targetModelCostPerSubscriberMaximumUSD: fixed(targetModelCostPerSubscriberMaximumUSD, 2),
+      minimumContributionUSD: fixed(minimumContributionUSD, 2),
       infrastructureMonthlyUSD: {
         p50: fixed(infrastructureMonthlyUSD.p50),
         p90: fixed(infrastructureMonthlyUSD.p90)

@@ -187,8 +187,8 @@ The result is retained at `permitext-sync-server/evals/results/2026-08-28T02-26-
 The V6 costs now have a deterministic no-cost subscriber-level model. It bootstraps complete fully utilized subscriber months from all 20 measured production-turn costs instead of multiplying a single-turn percentile by the allowance.
 
 - 100 turns: model cost $5.74 p50 and $6.06 p90.
-- With explicit planning reserves for payment, tax, refunds, infrastructure, and support: web costs $12.52 p50 / $18.34 p90; iOS at a 15% commission costs $14.54 p50 / $20.36 p90; iOS at 30% costs $23.36 p90.
-- Under those conservative assumptions, 75 turns is the provisional maximum that retains positive p90 contribution in both web and 15%-commission iOS channels. It is not a release-ready allowance because App Store Small Business Program enrollment, tax configuration, refund incidence, support effort, and launch-volume infrastructure allocation remain unverified.
+- With the owner-approved ten support minutes at $30/hour and planning reserves for payment, tax, refunds, and infrastructure: web costs $14.52 p50 / $15.84 p90; iOS at the confirmed 15% commission costs $16.54 p50 / $17.86 p90; iOS at 30% costs $20.86 p90.
+- The owner accepted a $2 minimum Beta contribution at full p90 usage. One hundred turns therefore remains the Beta allowance, leaving $4.16 p90 contribution on web and $2.14 on 15%-commission iOS. The longer-term target is $4–$6 after actual customer evidence.
 - No product price, included allowance, pack price, or purchase configuration changed.
 
 Detailed report: [PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md](./PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md)
@@ -201,7 +201,8 @@ Proceed toward paid Research only if all of the following are true:
 - [x] Exact citation and required-qualification behavior passed the complete v6 cohort.
 - [x] Provider failures and internal retries remain free to the user.
 - [x] Subscriber-level aggregation is complete: 100 fully used turns cost $5.74 p50 and $6.06 p90 in the V6 empirical model.
-- [ ] Full-service planning economics do not yet support locking 100 turns across web and iOS. Seventy-five is the provisional maximum, pending measured commercial inputs and an explicit margin target.
+- [x] Owner-approved Beta economics retain 100 turns with a $2 minimum p90 contribution; the modeled result is $4.16 on web and $2.14 on iOS at the confirmed 15% commission.
+- [ ] Verify tax treatment, refund incidence, and launch-volume infrastructure allocation, then review actual contribution after the first 25–50 customers.
 - [ ] Web and the current iOS/TestFlight client both decode and display the shared response contract correctly.
 
 If quality requires too many Terra calls to meet the cost target, reduce the included monthly allowance or create a higher Research tier. Do not silently subsidize Terra-only usage inside the current $20 plan.
@@ -221,4 +222,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Verify the five unmeasured commercial inputs in the V6 subscriber-economics report, choose a minimum acceptable contribution or gross-margin target, and then lock either the current 100 turns or the provisional 75-turn risk boundary. Do not change the product allowance, publish turn-pack prices, or enable public paid Research until that decision and the web/current-iOS response-contract check are complete.
+Complete the web/current-iOS response-contract check. Before deployment, set the production per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Tax treatment, refund incidence, and launch-volume infrastructure allocation remain commercial follow-ups; additional-turn prices and public paid Research remain disabled.

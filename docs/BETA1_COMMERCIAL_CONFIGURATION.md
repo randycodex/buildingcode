@@ -30,9 +30,10 @@ This checkpoint is an operating-cost decision, not public Research approval or a
 
 - The complete post-v23 V6 cohort replaces the six-case checkpoint for Research model-cost evidence: all 20 production turns completed and passed every fatal evaluation gate.
 - Deterministic empirical aggregation gives a fully used 100-turn subscriber model cost of $5.74 p50 and $6.06 p90.
-- With explicit conservative planning reserves for payment, tax, refunds, infrastructure, and support, 100 turns cost $18.34 p90 on web and $20.36 p90 on iOS at a 15% commission. At the standard 30% App Store rate the p90 cost is $23.36.
-- Seventy-five turns is the provisional risk boundary that retains positive p90 contribution on web and 15%-commission iOS under the stated assumptions. This does not change the current product allowance.
-- Do not lock the allowance until App Store Small Business Program enrollment, tax configuration, expected refunds, support effort, launch-volume infrastructure allocation, and a minimum contribution or gross-margin target are verified.
+- The owner confirmed Permitext's 15% App Store commission, ten support minutes per subscriber at $30/hour, and a $2 minimum Beta contribution at full p90 usage.
+- With conservative payment, tax, refund, and infrastructure reserves, 100 turns cost $15.84 p90 on web and $17.86 p90 on iOS at 15%, leaving $4.16 and $2.14 respectively. The 30% sensitivity costs $20.86.
+- Retain 100 included turns for Beta 1. Revisit the longer-term $4–$6 contribution target after the first 25–50 customers provide actual usage, support, refund, and infrastructure evidence.
+- Tax configuration, expected refunds, and launch-volume infrastructure allocation remain unverified commercial inputs.
 - Turn-pack prices and paid continuation remain unpublished and disabled.
 
 Detailed model: [PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md](./PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md)
@@ -41,7 +42,7 @@ Detailed model: [PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md](./PERMITEXT_RESE
 
 - Maximum estimated request cost: $0.50.
 - Maximum per user per day: $2.
-- Maximum per user per month: $5.
+- Maximum per user per month: $7, providing headroom above the $6.06 V6 p90 projection for 100 fully used turns.
 - Maximum across the service per day: $10.
 - Maximum across the service per month: $100.
 - Emergency control: keep `PERMITEXT_RESEARCH_KILL_SWITCH=1` until the release lifecycle exercises are complete.

@@ -12,8 +12,8 @@ assert.equal(report.benchmark.runIntegrity.pass, true);
 assert.equal(report.recommendation.benchmarkReady, true);
 assert.equal(report.recommendation.commercialDecisionReady, false);
 assert.equal(report.recommendation.currentIncludedTurns, 100);
-assert.equal(report.recommendation.provisionalIncludedTurns, 75);
-assert.equal(report.recommendation.currentAllowancePlanningP90Pass, false);
+assert.equal(report.recommendation.provisionalIncludedTurns, 100);
+assert.equal(report.recommendation.currentAllowancePlanningP90Pass, true);
 
 const fifty = report.allowanceScenarios.find((scenario) => scenario.includedTurns === 50);
 const seventyFive = report.allowanceScenarios.find((scenario) => scenario.includedTurns === 75);
@@ -28,17 +28,17 @@ assert.equal(oneHundred.providerCostUSD.p90, 6.056942);
 const web = oneHundred.channels.find((channel) => channel.id === "web-stripe");
 const iosSmall = oneHundred.channels.find((channel) => channel.id === "ios-small-business");
 const iosStandard = oneHundred.channels.find((channel) => channel.id === "ios-standard");
-assert.equal(web.p90.fullServiceCostUSD, 18.336942);
-assert.equal(web.p90.contributionUSD, 1.663058);
-assert.equal(iosSmall.p90.fullServiceCostUSD, 20.356942);
-assert.equal(iosSmall.p90.contributionUSD, -0.356942);
-assert.equal(iosStandard.p90.fullServiceCostUSD, 23.356942);
-assert.equal(iosStandard.p90.contributionUSD, -3.356942);
+assert.equal(web.p90.fullServiceCostUSD, 15.836942);
+assert.equal(web.p90.contributionUSD, 4.163058);
+assert.equal(iosSmall.p90.fullServiceCostUSD, 17.856942);
+assert.equal(iosSmall.p90.contributionUSD, 2.143058);
+assert.equal(iosStandard.p90.fullServiceCostUSD, 20.856942);
+assert.equal(iosStandard.p90.contributionUSD, -0.856942);
 
 const markdown = renderV6SubscriberEconomicsMarkdown(report);
 assert.match(markdown, /100-turn subscriber has modeled Research cost of \$5\.74 p50 and \$6\.06 p90/);
-assert.match(markdown, /provisional maximum is 75 included turns/);
-assert.match(markdown, /-\$0\.36 \(-1\.8%\)/);
+assert.match(markdown, /provisional maximum is therefore 100 included turns/);
+assert.match(markdown, /\$2\.14 \(10\.7%\)/);
 assert.match(markdown, /makes no network or model call/);
 
 console.log("permitext Research V6 subscriber economics contract passed");
