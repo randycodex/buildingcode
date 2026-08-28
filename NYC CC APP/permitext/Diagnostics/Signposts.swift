@@ -269,6 +269,26 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         return response.account
     }
 
+    func currentPolicies() async throws -> BackendCurrentPoliciesResponse {
+        try await transport.currentPolicies()
+    }
+
+    func recordPolicyAcceptance(
+        account: SignedInAccount,
+        versions: BackendPolicyVersions,
+        platform: String,
+        clientRelease: String
+    ) async throws -> BackendPolicyAcceptanceResponse {
+        try await transport.recordPolicyAcceptance(
+            BackendPolicyAcceptanceRequest(
+                auth: authContext(for: account),
+                platform: platform,
+                versions: versions,
+                clientRelease: clientRelease
+            )
+        )
+    }
+
     func appleBillingAccountToken(account: SignedInAccount) async throws -> UUID {
         try await transport.appleBillingAccountToken(
             BackendAppleBillingAccountTokenRequest(auth: authContext(for: account))

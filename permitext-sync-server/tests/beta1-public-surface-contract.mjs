@@ -47,9 +47,27 @@ assert.match(
 
 assert.match(webClient, /row\.hidden = !active;/);
 assert.match(webIndex, /aria-label="Current plan"/);
-assert.match(webIndex, /By upgrading, you agree to the/);
+assert.match(webIndex, /class="settings-policy-acceptance" type="checkbox"/);
+assert.match(webIndex, /I have reviewed and agree to the/);
+assert.match(webIndex, /data-policy-document="terms"/);
+assert.match(webIndex, /data-policy-document="privacy"/);
+assert.match(webIndex, /data-policy-document="subscriptionsAndRefunds"/);
+assert.match(webClient, /loadCurrentPolicyConfiguration\(\)/);
+assert.match(webClient, /"\/account\/policy-acceptance"/);
+assert.match(webClient, /platform: "web"/);
+assert.match(webClient, /clientRelease: release\?\.releaseID \|\| "web-unknown"/);
+const webPolicyAcceptance = webClient.indexOf('"/account/policy-acceptance"');
+const webCheckout = webClient.indexOf('"/billing/web/checkout"', webPolicyAcceptance);
+assert(webPolicyAcceptance >= 0 && webCheckout > webPolicyAcceptance, "Web policy acceptance must precede Checkout creation.");
 assert.match(iosSettings, /Text\("Current plan"\)/);
 assert.match(iosSettings, /By upgrading, you agree to the \[Terms\]/);
+assert.match(iosSettings, /Toggle\("I have reviewed and agree to the current policies\.", isOn: \$policiesAccepted\)/);
+assert.match(iosSettings, /acceptedPolicyVersions: policiesAccepted/);
+assert.match(iosLibrary, /accountBackendClient\.recordPolicyAcceptance\(/);
+assert.match(iosLibrary, /platform: "ios"/);
+const iosPolicyAcceptance = iosLibrary.indexOf("accountBackendClient.recordPolicyAcceptance(");
+const iosPurchase = iosLibrary.indexOf("let purchaseResult = try await purchaseAction(", iosPolicyAcceptance);
+assert(iosPolicyAcceptance >= 0 && iosPurchase > iosPolicyAcceptance, "iOS policy acceptance must precede StoreKit purchase.");
 
 for (const [name, document] of [["Terms", terms], ["Refund policy", refunds]]) {
   assert.match(document, /Beta 1[^.]*working draft/);
@@ -75,7 +93,7 @@ assert.match(refunds, /reportaproblem\.apple\.com/);
 assert.match(support, /within two business days/i);
 assert.match(support, /within one business day/i);
 
-for (const path of ["/terms", "/refunds", "/support"]) {
+for (const path of ["/terms", "/privacy", "/refunds", "/support"]) {
   assert(webIndex.includes(`href="${path}"`), `Web Settings is missing ${path}.`);
   assert(iosSettings.includes(`https://permitext.com${path}`), `iOS Settings is missing ${path}.`);
 }

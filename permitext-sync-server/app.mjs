@@ -31,6 +31,7 @@ import { beta1ConfigurationReadiness } from "./beta1-readiness.mjs";
 import {
   PolicyAcceptanceError,
   accountWithPolicyAcceptance,
+  currentPolicyAcceptance,
   mergedPolicyAcceptances,
   policyAcceptanceRecord,
   policyVersionConfiguration
@@ -24616,6 +24617,21 @@ async function handleWebCheckout(request, response) {
 
   const accountContext = await authenticatedUserContext(request, response, userID);
   if (!accountContext) return;
+  const policyConfiguration = policyVersionConfiguration();
+  if (!policyConfiguration.ready) {
+    sendJSON(response, 503, {
+      error: "Current approved policy versions are not configured.",
+      code: "POLICY_ACCEPTANCE_NOT_CONFIGURED"
+    });
+    return;
+  }
+  if (!currentPolicyAcceptance(accountContext.account)) {
+    sendJSON(response, 409, {
+      error: "Review and accept the current Terms, Privacy Policy, and Subscription and Refund Policy before starting checkout.",
+      code: "POLICY_ACCEPTANCE_REQUIRED"
+    });
+    return;
+  }
   const activePackage = activeCommercialPackage(accountContext.entitlement, packageID);
   if (activePackage) {
     sendJSON(response, 409, {

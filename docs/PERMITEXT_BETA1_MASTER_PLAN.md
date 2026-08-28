@@ -17,13 +17,13 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Subscriber-level aggregation places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. With the confirmed 15% App Store commission, ten support minutes at $30/hour, and explicit tax, refund, and infrastructure planning reserves, the 25-subscriber p90 full-service cost is $15.84 on web and $17.86 on iOS. Allocating the full $45 infrastructure budget across only ten fully utilized subscribers lowers contribution to $1.46 on web and -$0.56 on iOS; the accepted $2 floor first passes at 12 web or 24 iOS subscribers. The owner retained 100 turns for Beta with a later $4–$6 target. Local signed-route Stripe and Apple lifecycle simulations now pass, and a provider-backed Stripe sandbox lifecycle also passes; those exercises found and retained regressions for Stripe's current refund shape plus Apple's failed-renewal and delayed-notification behavior. Controlled production billing and Apple-created Sandbox/TestFlight evidence remain open. Tax configuration, actual refund/infrastructure incidence, legal, provider, operations, production, and TestFlight gates remain open.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Subscriber-level aggregation places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. With the confirmed 15% App Store commission, ten support minutes at $30/hour, and explicit tax, refund, and infrastructure planning reserves, the 25-subscriber p90 full-service cost is $15.84 on web and $17.86 on iOS. Allocating the full $45 infrastructure budget across only ten fully utilized subscribers lowers contribution to $1.46 on web and -$0.56 on iOS; the accepted $2 floor first passes at 12 web or 24 iOS subscribers. The owner retained 100 turns for Beta with a later $4–$6 target. Local signed-route Stripe and Apple lifecycle simulations now pass, and a provider-backed Stripe sandbox lifecycle also passes; those exercises found and retained regressions for Stripe's current refund shape plus Apple's failed-renewal and delayed-notification behavior. Web and iOS now require explicit acceptance of the exact displayed policy versions before starting a purchase, and the server rejects checkout without current acceptance; this remains dormant until approved versions are configured. Controlled production billing and Apple-created Sandbox/TestFlight evidence remain open. Tax configuration, actual refund/infrastructure incidence, legal, provider, operations, production, and TestFlight gates remain open.
 
 Current development branch: `codex/research-commercialization`
 
 ## Status dashboard
 
-Checklist snapshot: **56 completed, 26 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
+Checklist snapshot: **57 completed, 26 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -31,7 +31,7 @@ Checklist snapshot: **56 completed, 26 open**. Eleven of the open items are the 
 | Research quality and subscriber economics | Current Beta gate passed | Immutable V6 passed 20/20, and the no-cost 100-turn/full-service economics model is complete. Actual tax, refund, and infrastructure results must be reviewed after the first 25–50 customers. |
 | Billing and paid continuation | Partially complete | Server billing contracts, local Stripe/Apple exercises, and the provider-backed Stripe sandbox lifecycle pass. Apple Sandbox/TestFlight, controlled Production billing, and final serving-release verification remain. Additional-turn sales stay disabled. |
 | Authentication and account lifecycle | Partially complete | Product contracts and prior Apple-flow verification are complete. Final Production sign-in plus account export/deletion verification remain. |
-| Legal, privacy, and customer promises | Technical groundwork complete; external review and activation open | Product disclosures, working policies, age rule, Beta data restrictions, professional handoff, and dormant acceptance storage are prepared. Counsel review, stable approved versions/URLs, and final web/iOS consent activation remain. |
+| Legal, privacy, and customer promises | Technical implementation complete; external review and activation open | Product disclosures, working policies, age rule, Beta data restrictions, professional handoff, versioned acceptance storage, purchase-screen consent, and server enforcement are prepared. Counsel review, stable approved versions/URLs, and production activation remain. |
 | Hosting, monitoring, recovery, and support | Partially complete | Vercel Pro, spend controls, two included live alert rules, local operations rehearsals, support tabletop, Neon point-in-time recovery, durable-data comparison, and private Blob retrieval pass. Remaining alert delivery and isolated recovery acceptance remain open. |
 | Merge, deploy, TestFlight, and release | Not started; not authorized | All 11 release-sequence steps remain open. No merge, push, deployment, TestFlight upload, or public release is included in the current work. |
 
@@ -40,7 +40,7 @@ Checklist snapshot: **56 completed, 26 open**. Eleven of the open items are the 
 1. Complete Apple-created Sandbox and TestFlight subscription lifecycle evidence.
 2. Complete the separately approved controlled Production billing exercise.
 3. Reverify Production authentication and the account export/deletion lifecycle.
-4. Obtain counsel approval, publish stable policy URLs, and add required policy-version acceptance.
+4. Obtain counsel approval, publish stable policy URLs, and activate the implemented policy-version acceptance flow.
 5. Finish monitoring coverage and delivered-alert/hard-stop exercises.
 6. Finish isolated recovery acceptance for the recovered Neon state and a separate private Blob namespace, or explicitly accept the remaining risk.
 7. Complete the separately authorized merge, deployment, Production, TestFlight, and physical-iPhone release sequence.
@@ -118,9 +118,10 @@ Detailed configuration: [BETA1_COMMERCIAL_CONFIGURATION.md](./BETA1_COMMERCIAL_C
 - [x] Set the Beta 1 minimum user age to 18 and document the rule.
 - [x] Prohibit confidential, regulated, or personally identifying material during Beta 1 and require users to redact it before submission.
 - [x] Prepare authenticated, server-timestamped policy-version acceptance storage with stale-version rejection, idempotency, identity-merge preservation, and administrator export coverage.
+- [x] Wire explicit web/iOS purchase consent to the exact displayed policy versions and require current acceptance at web checkout; fail closed while approved current versions are unconfigured.
 - [ ] Obtain counsel review of Terms, Privacy Policy, subscription/cancellation disclosure, refund policy, Acceptable Use Policy, and professional-use/AI notice.
 - [ ] Publish stable counsel-approved URLs and ensure web/iOS purchase screens match them.
-- [ ] Activate counsel-approved policy versions and wire final web/iOS consent presentation and acceptance recording where required.
+- [ ] Configure and activate the counsel-approved current policy versions after the final documents and stable URLs are approved.
 
 Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_CHECKLIST.md)
 
@@ -166,7 +167,7 @@ The current Research quality and no-cost subscriber-economics gate has passed. B
 
 - Apple Sandbox/TestFlight and the separately approved controlled Production payment, cancellation, refund, and reconciliation lifecycles pass;
 - Production authentication plus account export/deletion are reverified;
-- counsel-approved customer documents, stable URLs, and required policy acceptance are complete;
+- counsel-approved customer documents and stable URLs are published, and the implemented policy-acceptance flow is activated with their exact current versions;
 - remaining Production alert coverage and delivery/hard-stop behavior are tested;
 - remaining isolated recovery acceptance succeeds or its residual risk is explicitly accepted; and
 - Production web and the final TestFlight build are verified against the exact intended release SHA.

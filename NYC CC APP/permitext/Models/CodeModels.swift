@@ -1437,6 +1437,74 @@ struct BackendProfileUpdateResponse: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
 
+struct BackendPolicyVersions: Codable, Hashable, Sendable {
+    let terms: String
+    let privacy: String
+    let subscriptionsAndRefunds: String
+}
+
+struct BackendPolicyDocument: Codable, Hashable, Sendable {
+    let version: String
+    let url: String
+}
+
+struct BackendPolicyDocuments: Codable, Hashable, Sendable {
+    let terms: BackendPolicyDocument
+    let privacy: BackendPolicyDocument
+    let subscriptionsAndRefunds: BackendPolicyDocument
+}
+
+struct BackendCurrentPoliciesResponse: Codable, Hashable, Sendable {
+    let configured: Bool
+    let policySetID: String?
+    let versions: BackendPolicyVersions?
+    let documents: BackendPolicyDocuments?
+
+    static let localDevelopment: BackendCurrentPoliciesResponse = {
+        let versions = BackendPolicyVersions(
+            terms: "local-dev-v1",
+            privacy: "local-dev-v1",
+            subscriptionsAndRefunds: "local-dev-v1"
+        )
+        return BackendCurrentPoliciesResponse(
+            configured: true,
+            policySetID: "local-development-policies",
+            versions: versions,
+            documents: BackendPolicyDocuments(
+                terms: BackendPolicyDocument(version: versions.terms, url: "https://permitext.com/terms"),
+                privacy: BackendPolicyDocument(version: versions.privacy, url: "https://permitext.com/privacy"),
+                subscriptionsAndRefunds: BackendPolicyDocument(
+                    version: versions.subscriptionsAndRefunds,
+                    url: "https://permitext.com/refunds"
+                )
+            )
+        )
+    }()
+}
+
+struct BackendPolicyAcceptanceRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let platform: String
+    let versions: BackendPolicyVersions
+    let clientRelease: String
+}
+
+struct BackendPolicyAcceptanceRecord: Codable, Hashable, Sendable {
+    let schemaVersion: Int
+    let id: String
+    let policySetID: String
+    let versions: BackendPolicyVersions
+    let documents: BackendPolicyDocuments
+    let acceptedAt: Date
+    let platform: String
+    let clientRelease: String?
+}
+
+struct BackendPolicyAcceptanceResponse: Codable, Hashable, Sendable {
+    let acceptance: BackendPolicyAcceptanceRecord
+    let recorded: Bool
+}
+
 struct BackendAppleTransactionVerifyRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let signedTransactionInfo: String
@@ -2464,6 +2532,8 @@ protocol PermitextBackendTransport {
     func deleteAccount(_ request: BackendAccountDeleteRequest) async throws -> BackendAccountDeleteResponse
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
+    func currentPolicies() async throws -> BackendCurrentPoliciesResponse
+    func recordPolicyAcceptance(_ request: BackendPolicyAcceptanceRequest) async throws -> BackendPolicyAcceptanceResponse
     func appleBillingAccountToken(_ request: BackendAppleBillingAccountTokenRequest) async throws -> BackendAppleBillingAccountTokenResponse
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse
     func researchUsage(_ request: BackendResearchUsageRequest) async throws -> BackendResearchUsageResponse
@@ -2703,6 +2773,14 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse {
         try await post("account/profile", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func currentPolicies() async throws -> BackendCurrentPoliciesResponse {
+        try await get("policies/current")
+    }
+
+    func recordPolicyAcceptance(_ request: BackendPolicyAcceptanceRequest) async throws -> BackendPolicyAcceptanceResponse {
+        try await post("account/policy-acceptance", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func appleBillingAccountToken(_ request: BackendAppleBillingAccountTokenRequest) async throws -> BackendAppleBillingAccountTokenResponse {
@@ -3050,6 +3128,38 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             deleted: true,
             deletedPrivateAssetCount: 0,
             billingCancellation: nil
+        )
+    }
+
+    func currentPolicies() async throws -> BackendCurrentPoliciesResponse {
+        .localDevelopment
+    }
+
+    func recordPolicyAcceptance(_ request: BackendPolicyAcceptanceRequest) async throws -> BackendPolicyAcceptanceResponse {
+        let configuration = BackendCurrentPoliciesResponse.localDevelopment
+        guard request.platform == "ios",
+              let versions = configuration.versions,
+              let documents = configuration.documents,
+              request.versions == versions
+        else {
+            throw PermitextBackendHTTPError.serverStatus(
+                409,
+                "The policy versions changed. Review the current documents before accepting them.",
+                code: "POLICY_VERSION_MISMATCH"
+            )
+        }
+        return BackendPolicyAcceptanceResponse(
+            acceptance: BackendPolicyAcceptanceRecord(
+                schemaVersion: 1,
+                id: UUID().uuidString,
+                policySetID: configuration.policySetID ?? "local-development-policies",
+                versions: versions,
+                documents: documents,
+                acceptedAt: Date(),
+                platform: request.platform,
+                clientRelease: request.clientRelease
+            ),
+            recorded: true
         )
     }
 
@@ -4845,6 +4955,13 @@ protocol AccountBackendClient {
     func deleteAccount(account: SignedInAccount) async throws -> BackendAccountDeleteResponse
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
+    func currentPolicies() async throws -> BackendCurrentPoliciesResponse
+    func recordPolicyAcceptance(
+        account: SignedInAccount,
+        versions: BackendPolicyVersions,
+        platform: String,
+        clientRelease: String
+    ) async throws -> BackendPolicyAcceptanceResponse
     func appleBillingAccountToken(account: SignedInAccount) async throws -> UUID
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?
     func verifyAppleResearchTurnPurchase(

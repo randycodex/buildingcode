@@ -1517,8 +1517,22 @@ struct ProSubscriptionStoreView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.purchase) private var purchase
     @Environment(\.colorScheme) private var colorScheme
-    private let termsURL = URL(string: "https://permitext.com/terms")!
-    private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
+    @State private var policiesAccepted = false
+    private let defaultTermsURL = URL(string: "https://permitext.com/terms")!
+    private let defaultPrivacyPolicyURL = URL(string: "https://permitext.com/privacy")!
+    private let defaultRefundsURL = URL(string: "https://permitext.com/refunds")!
+
+    private var termsURL: URL {
+        URL(string: library.currentPolicyConfiguration?.documents?.terms.url ?? "") ?? defaultTermsURL
+    }
+
+    private var privacyPolicyURL: URL {
+        URL(string: library.currentPolicyConfiguration?.documents?.privacy.url ?? "") ?? defaultPrivacyPolicyURL
+    }
+
+    private var refundsURL: URL {
+        URL(string: library.currentPolicyConfiguration?.documents?.subscriptionsAndRefunds.url ?? "") ?? defaultRefundsURL
+    }
 
     var body: some View {
         NavigationStack {
@@ -1556,9 +1570,33 @@ struct ProSubscriptionStoreView: View {
                     .padding(18)
                     .background(Color.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
 
+                    VStack(alignment: .leading, spacing: 10) {
+                        Toggle("I have reviewed and agree to the current policies.", isOn: $policiesAccepted)
+                            .font(.subheadline.weight(.medium))
+
+                        HStack(spacing: 5) {
+                            Link("Terms", destination: termsURL)
+                            Text("·")
+                                .foregroundStyle(.secondary)
+                            Link("Privacy", destination: privacyPolicyURL)
+                            Text("·")
+                                .foregroundStyle(.secondary)
+                            Link("Subscription and Refunds", destination: refundsURL)
+                        }
+                        .font(.caption)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+
                     Button {
                         Task {
-                            await library.purchasePro(using: purchase)
+                            await library.purchasePro(
+                                using: purchase,
+                                acceptedPolicyVersions: policiesAccepted
+                                    ? library.currentPolicyConfiguration?.versions
+                                    : nil
+                            )
                         }
                     } label: {
                         HStack(spacing: 10) {
@@ -1575,8 +1613,8 @@ struct ProSubscriptionStoreView: View {
                     .buttonStyle(.plain)
                     .foregroundStyle(subscribeButtonForegroundColor)
                     .background(subscribeButtonBackgroundColor, in: Capsule(style: .continuous))
-                    .disabled(library.isStoreKitBusy)
-                    .opacity(library.isStoreKitBusy ? 0.7 : 1)
+                    .disabled(library.isStoreKitBusy || !policiesAccepted)
+                    .opacity(library.isStoreKitBusy || !policiesAccepted ? 0.7 : 1)
 
                     if let operationMessage = library.storeKitOperationMessage {
                         Text(operationMessage)
@@ -1585,14 +1623,6 @@ struct ProSubscriptionStoreView: View {
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-
-                    HStack(spacing: 5) {
-                        Link("Terms of Service", destination: termsURL)
-                        Text("and")
-                            .foregroundStyle(.secondary)
-                        Link("Privacy Policy", destination: privacyPolicyURL)
-                    }
-                    .font(.caption)
 
                     Button {
                         Task {
@@ -1632,14 +1662,14 @@ struct ProSubscriptionStoreView: View {
     }
 
     private var subscribeButtonBackgroundColor: Color {
-        if library.isStoreKitBusy {
+        if library.isStoreKitBusy || !policiesAccepted {
             return Color(uiColor: .tertiarySystemGroupedBackground)
         }
         return colorScheme == .dark ? Color.white.opacity(0.96) : Color.appChrome
     }
 
     private var subscribeButtonForegroundColor: Color {
-        if library.isStoreKitBusy {
+        if library.isStoreKitBusy || !policiesAccepted {
             return Color.secondary
         }
         return colorScheme == .dark ? Color.black.opacity(0.9) : Color.white

@@ -60,6 +60,20 @@ enum ResearchProjectSyncError: LocalizedError {
     }
 }
 
+enum PurchasePolicyError: LocalizedError {
+    case acceptanceRequired
+    case unavailable
+
+    var errorDescription: String? {
+        switch self {
+        case .acceptanceRequired:
+            return "Review and accept the current policies before subscribing."
+        case .unavailable:
+            return "Purchases are temporarily unavailable while approved policy versions are being prepared."
+        }
+    }
+}
+
 enum SectionDetailLoadResult {
     case loaded(ReaderSectionDetail)
     case missing
@@ -176,6 +190,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var isStoreKitBusy = false
     @Published private(set) var isStoreKitRestoreInProgress = false
     @Published private(set) var storeKitOperationMessage: String?
+    @Published private(set) var currentPolicyConfiguration: BackendCurrentPoliciesResponse?
     @Published private(set) var researchTurnAllowance: ResearchTurnAllowance?
     @Published private(set) var researchTurnProductDisplayPrices: [String: String] = [:]
     @Published private(set) var isResearchTurnPurchaseBusy = false
@@ -2931,6 +2946,14 @@ final class CodeLibraryViewModel: ObservableObject {
         defer { isStoreKitBusy = false }
 
         do {
+            let policyConfiguration = try await accountBackendClient.currentPolicies()
+            guard policyConfiguration.configured,
+                  policyConfiguration.versions != nil,
+                  policyConfiguration.documents != nil
+            else {
+                throw PurchasePolicyError.unavailable
+            }
+            currentPolicyConfiguration = policyConfiguration
             _ = try await storeKitSubscriptionService.proProductForPurchase(refresh: true)
             Self.storeKitPurchaseLogger.info("Presenting Apple's native subscription store.")
             isProSubscriptionStorePresented = true
@@ -2945,9 +2968,17 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func purchasePro(using purchaseAction: PurchaseAction) async {
+    func purchasePro(
+        using purchaseAction: PurchaseAction,
+        acceptedPolicyVersions: BackendPolicyVersions?
+    ) async {
         guard let purchasingAccount = signedInAccount else {
             statusMessage = "Sign in or create a Permitext account before purchasing Pro."
+            storeKitOperationMessage = statusMessage
+            return
+        }
+        guard let acceptedPolicyVersions else {
+            statusMessage = PurchasePolicyError.acceptanceRequired.localizedDescription
             storeKitOperationMessage = statusMessage
             return
         }
@@ -2976,6 +3007,14 @@ final class CodeLibraryViewModel: ObservableObject {
                 // duplicate charge; explicit Restore is the recovery path.
                 return
             }
+
+            storeKitOperationMessage = "Confirming your policy acceptance..."
+            _ = try await accountBackendClient.recordPolicyAcceptance(
+                account: purchasingAccount,
+                versions: acceptedPolicyVersions,
+                platform: "ios",
+                clientRelease: policyAcceptanceClientRelease
+            )
 
             var product = try await storeKitSubscriptionService.proProductForPurchase(refresh: true)
             let appAccountToken = storeKitAppAccountToken(for: purchasingAccount.appUserID)
@@ -3093,6 +3132,12 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func dismissProSubscriptionStore() {
         isProSubscriptionStorePresented = false
+    }
+
+    private var policyAcceptanceClientRelease: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown"
+        return "ios-\(version)-\(build)"
     }
 
     func restorePurchases(clerk: Clerk? = nil) async {

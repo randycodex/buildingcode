@@ -109,6 +109,9 @@ async function main() {
       OPENAI_API_KEY: "",
       PERMITEXT_SYNC_DATA_PATH: join(tempDir, "sync-store.json"),
       PERMITEXT_PUBLIC_BASE_URL: baseURL,
+      PERMITEXT_TERMS_VERSION: "stripe-lifecycle-terms-v1",
+      PERMITEXT_PRIVACY_VERSION: "stripe-lifecycle-privacy-v1",
+      PERMITEXT_SUBSCRIPTION_POLICY_VERSION: "stripe-lifecycle-subscription-v1",
       PERMITEXT_TEST_STRIPE_API_BASE_URL: `http://127.0.0.1:${stripePort}`,
       STRIPE_SECRET_KEY: "sk_test_permitext_no_charge_lifecycle",
       STRIPE_PRO_PRICE_ID: testPriceID,
@@ -187,6 +190,31 @@ async function main() {
     ownerUserID = initial.account.appUserID;
     const token = initial.account.backendSessionToken;
     assert.equal(initial.entitlement, null);
+
+    const checkoutWithoutAcceptance = await request("/billing/web/checkout", {
+      method: "POST",
+      token,
+      body: { auth: { accountUserID: ownerUserID }, packageID: "pro" }
+    });
+    assert.equal(checkoutWithoutAcceptance.response.status, 409, checkoutWithoutAcceptance.text);
+    assert.equal(checkoutWithoutAcceptance.json.code, "POLICY_ACCEPTANCE_REQUIRED");
+    assert.equal(stripeRequests.some((entry) => entry.url === "/v1/checkout/sessions"), false);
+
+    const policyAcceptance = await request("/account/policy-acceptance", {
+      method: "POST",
+      token,
+      body: {
+        auth: { accountUserID: ownerUserID },
+        platform: "web",
+        versions: {
+          terms: "stripe-lifecycle-terms-v1",
+          privacy: "stripe-lifecycle-privacy-v1",
+          subscriptionsAndRefunds: "stripe-lifecycle-subscription-v1"
+        },
+        clientRelease: "stripe-subscription-lifecycle-e2e"
+      }
+    });
+    assert.equal(policyAcceptance.response.status, 200, policyAcceptance.text);
 
     const checkout = await request("/billing/web/checkout", {
       method: "POST",

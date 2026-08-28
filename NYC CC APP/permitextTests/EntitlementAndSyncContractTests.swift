@@ -2033,15 +2033,25 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
 
         XCTAssertTrue(settingsSource.contains("@Environment(\\.purchase) private var purchase"))
-        XCTAssertTrue(settingsSource.contains("await library.purchasePro(using: purchase)"))
+        XCTAssertTrue(settingsSource.contains("acceptedPolicyVersions: policiesAccepted"))
+        XCTAssertTrue(settingsSource.contains("Toggle(\"I have reviewed and agree to the current policies.\""))
         XCTAssertTrue(appSource.contains("ProSubscriptionStoreView()"))
         XCTAssertTrue(viewModelSource.contains("try await storeKitSubscriptionService.prepareForPurchase()"))
+        XCTAssertTrue(viewModelSource.contains("accountBackendClient.recordPolicyAcceptance("))
+        XCTAssertTrue(viewModelSource.contains("platform: \"ios\""))
         XCTAssertTrue(viewModelSource.contains("let appAccountToken = storeKitAppAccountToken(for: purchasingAccount.appUserID)"))
         XCTAssertTrue(viewModelSource.contains("let purchaseResult = try await purchaseAction("))
         XCTAssertTrue(viewModelSource.contains("options: [.appAccountToken(appAccountToken)]"))
         XCTAssertTrue(viewModelSource.contains("for attempt in 1...2"))
 
         let purchaseLoopStart = try XCTUnwrap(viewModelSource.range(of: "for attempt in 1...2"))
+        let policyAcceptanceStart = try XCTUnwrap(
+            viewModelSource.range(
+                of: "accountBackendClient.recordPolicyAcceptance(",
+                range: viewModelSource.startIndex..<purchaseLoopStart.lowerBound
+            )
+        )
+        XCTAssertLessThan(policyAcceptanceStart.lowerBound, purchaseLoopStart.lowerBound)
         let purchaseInvocationStart = try XCTUnwrap(
             viewModelSource.range(
                 of: "let purchaseResult = try await purchaseAction(",

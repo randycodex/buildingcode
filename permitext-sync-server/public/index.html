@@ -8,7 +8,7 @@
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260725-visual-inventory-v13">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/web/styles.css?v=20260827-account-allowance-parity-v12">
+    <link rel="stylesheet" href="/web/styles.css?v=20260828-policy-consent-v13">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -477,7 +477,10 @@
           </div>
           <button class="settings-primary-button account-checkout" type="button">Upgrade to Pro - $20.00/month</button>
           <p class="settings-card-copy settings-plan-details">No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.</p>
-          <p class="settings-card-copy settings-purchase-terms">By upgrading, you agree to the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms</a> and <a href="/refunds" target="_blank" rel="noopener noreferrer">Subscription and Refund Policy</a>.</p>
+          <label class="settings-purchase-consent">
+            <input class="settings-policy-acceptance" type="checkbox">
+            <span>I have reviewed and agree to the <a data-policy-document="terms" href="/terms" target="_blank" rel="noopener noreferrer">Terms</a>, <a data-policy-document="privacy" href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>, and <a data-policy-document="subscriptionsAndRefunds" href="/refunds" target="_blank" rel="noopener noreferrer">Subscription and Refund Policy</a>.</span>
+          </label>
           <button class="settings-link-button account-plan-secondary" type="button">Restore Purchases</button>
         </section>
         <section class="settings-card account-connector" aria-labelledby="settings-account-title">
@@ -544,6 +547,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260827-account-allowance-parity-v12" type="module"></script>
+    <script src="/web/app.js?v=20260828-policy-consent-v13" type="module"></script>
   </body>
 </html>

@@ -58,7 +58,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260827-account-allowance-parity-v12";
+} from "./offline-storage.js?v=20260828-policy-consent-v13";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -93,7 +93,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260827-account-allowance-parity-v12";
+} from "./research-intent-state.js?v=20260828-policy-consent-v13";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -4575,6 +4575,18 @@ async function postJSON(path, body, options = {}) {
     error.status = response.status;
     error.payload = payload;
     throw error;
+  }
+  return payload;
+}
+
+async function loadCurrentPolicyConfiguration() {
+  const response = await fetch("/policies/current", {
+    cache: "no-store",
+    headers: { accept: "application/json" }
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || `Policy request failed: ${response.status}`);
   }
   return payload;
 }
@@ -29832,6 +29844,9 @@ function renderSettings() {
   const syncConflictsSummary = panel.querySelector(".settings-sync-conflicts-summary");
   const syncConflictsList = panel.querySelector(".settings-sync-conflicts-list");
   const checkoutButton = panel.querySelector(".account-checkout");
+  const purchaseConsent = panel.querySelector(".settings-purchase-consent");
+  const policyAcceptance = panel.querySelector(".settings-policy-acceptance");
+  const policyDocumentLinks = Array.from(panel.querySelectorAll("[data-policy-document]"));
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
   const offlineCopy = panel.querySelector(".settings-offline-copy");
   const offlineStatus = panel.querySelector(".settings-offline-status");
@@ -29848,6 +29863,17 @@ function renderSettings() {
   const setStatus = (message, isError = false) => {
     status.textContent = message || "";
     status.classList.toggle("has-error", isError);
+  };
+  let currentPolicyConfiguration = null;
+  let policyConfigurationLoaded = false;
+
+  const applyPolicyConfiguration = (configuration) => {
+    currentPolicyConfiguration = configuration;
+    policyConfigurationLoaded = true;
+    policyDocumentLinks.forEach((link) => {
+      const document = configuration?.documents?.[link.dataset.policyDocument];
+      if (document?.url) link.href = document.url;
+    });
   };
   if (clerkSignInReturnNotice) {
     setStatus(clerkSignInReturnNotice.message, clerkSignInReturnNotice.isError);
@@ -30127,12 +30153,21 @@ function renderSettings() {
         if (summary) summary.textContent = activePlanCopy.summary;
       }
     });
-    checkoutButton.disabled = !account || (pro && source === "lifetimeGrant");
+    const policyAcceptanceReady = Boolean(
+      policyConfigurationLoaded &&
+      currentPolicyConfiguration?.configured &&
+      policyAcceptance?.checked
+    );
+    checkoutButton.disabled = !account ||
+      (pro && source === "lifetimeGrant") ||
+      (!pro && !policyAcceptanceReady);
     checkoutButton.classList.toggle("is-pro-active", pro);
     checkoutButton.textContent = pro
       ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
       : "Upgrade to Pro - $20.00/month";
     planDetails.hidden = pro;
+    purchaseConsent.hidden = pro;
+    policyAcceptance.disabled = pro || !account || !currentPolicyConfiguration?.configured;
     planSecondaryButton.hidden = !account || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
     accountCopy.hidden = false;
@@ -30148,6 +30183,23 @@ function renderSettings() {
   };
 
   syncAccountState();
+  policyAcceptance.addEventListener("change", syncAccountState);
+  void loadCurrentPolicyConfiguration()
+    .then((configuration) => {
+      applyPolicyConfiguration(configuration);
+      syncAccountState();
+      if (activeAccount() && !isProAccount() && !configuration.configured) {
+        setStatus("Purchases are temporarily unavailable while approved policy versions are being prepared.", true);
+      }
+    })
+    .catch((error) => {
+      policyConfigurationLoaded = true;
+      currentPolicyConfiguration = null;
+      syncAccountState();
+      if (activeAccount() && !isProAccount()) {
+        setStatus(error.message || "Could not load the current purchase policies.", true);
+      }
+    });
   wireSettingsCardCollapsing(panel);
   const researchUsageAccount = activeAccount();
   if (researchUsageAccount && hasCapability("research")) {
@@ -30529,8 +30581,33 @@ function renderSettings() {
       return;
     }
     checkoutButton.disabled = true;
-    setStatus("Opening checkout...");
+    setStatus("Confirming your policy acceptance...");
     try {
+      if (!policyAcceptance.checked) {
+        throw new Error("Review and accept the current policies before upgrading.");
+      }
+      const latestPolicyConfiguration = await loadCurrentPolicyConfiguration();
+      if (!latestPolicyConfiguration.configured || !latestPolicyConfiguration.versions) {
+        throw new Error("Purchases are temporarily unavailable while approved policy versions are being prepared.");
+      }
+      if (latestPolicyConfiguration.policySetID !== currentPolicyConfiguration?.policySetID) {
+        applyPolicyConfiguration(latestPolicyConfiguration);
+        policyAcceptance.checked = false;
+        syncAccountState();
+        throw new Error("The policies changed. Review the current documents and select the agreement again.");
+      }
+      const release = await loadReleaseIdentity();
+      await postJSON(
+        "/account/policy-acceptance",
+        {
+          auth: { accountUserID: account.userID },
+          platform: "web",
+          versions: latestPolicyConfiguration.versions,
+          clientRelease: release?.releaseID || "web-unknown"
+        },
+        { token: account.sessionToken }
+      );
+      setStatus("Opening checkout...");
       const payload = await postJSON(
         "/billing/web/checkout",
         {
@@ -30543,7 +30620,7 @@ function renderSettings() {
       window.location.href = payload.url;
     } catch (error) {
       setStatus(error.message || "Could not open checkout.", true);
-      checkoutButton.disabled = false;
+      syncAccountState();
     }
   });
   planSecondaryButton.addEventListener("click", async () => {

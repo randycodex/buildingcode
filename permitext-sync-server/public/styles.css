@@ -12517,6 +12517,29 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   justify-self: center;
 }
 
+.settings-panel .settings-purchase-consent {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 8.75pt !important;
+  line-height: 1.35;
+}
+
+.settings-panel .settings-purchase-consent input {
+  width: 16px;
+  height: 16px;
+  margin: 1px 0 0;
+  accent-color: var(--code-accent);
+}
+
+.settings-panel .settings-purchase-consent a {
+  color: inherit;
+  font-weight: 600;
+  text-underline-offset: 2px;
+}
+
 .settings-panel .settings-primary-button:disabled,
 .settings-panel .settings-secondary-button:disabled,
 .settings-panel .settings-link-button:disabled,
