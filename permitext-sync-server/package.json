@@ -23,7 +23,7 @@
     "import:specialty-codes": "python3 scripts/import-nyc-specialty-codes.py",
     "prepare:construction-sections": "node scripts/prepare-construction-section-bodies.mjs --write",
     "verify:prepared-construction": "node scripts/prepare-construction-section-bodies.mjs --check && node tests/content-integrity.mjs",
-    "test:billing": "node --check tests/billing-contract.mjs && node tests/billing-contract.mjs && node --check tests/stripe-api-fetch-shim.mjs && node --check tests/stripe-subscription-lifecycle-e2e.mjs && node tests/stripe-subscription-lifecycle-e2e.mjs",
+    "test:billing": "node --check tests/billing-contract.mjs && node tests/billing-contract.mjs && node --check tests/apple-subscription-lifecycle-e2e.mjs && node tests/apple-subscription-lifecycle-e2e.mjs && node --check tests/stripe-api-fetch-shim.mjs && node --check tests/stripe-subscription-lifecycle-e2e.mjs && node tests/stripe-subscription-lifecycle-e2e.mjs",
     "test:research-turns": "node --check research-turns.mjs && node --check tests/research-turns-contract.mjs && node tests/research-turns-contract.mjs && node --check tests/research-credit-ledger-contract.mjs && node tests/research-credit-ledger-contract.mjs && node --check tests/research-turn-idempotency-contract.mjs && node tests/research-turn-idempotency-contract.mjs && node --check tests/research-billing-lifecycle-e2e.mjs && node tests/research-billing-lifecycle-e2e.mjs",
     "test:beta1": "npm run test:billing && npm run test:auth && npm run test:lifetime-grants && npm run test:cost-guardrails && npm run test:beta1-readiness && npm run test:operations && npm run test:public-surface && npm run test:routing",
     "test:auth": "node tests/auth-policy.mjs && node tests/clerk-auth-contract.mjs",

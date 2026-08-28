@@ -189,6 +189,22 @@ assert(
   }).reason === "billing-grace-period",
   "Apple billing grace did not preserve access through the grace-period expiration."
 );
+assert(
+  appleNotificationLifecycleAction({
+    notificationType: "DID_FAIL_TO_RENEW",
+    transaction: appleSubscriptionTransaction
+  }).action === "revoke",
+  "Apple billing retry without grace preserved access from a stale future expiration."
+);
+assert(
+  appleNotificationLifecycleAction({
+    notificationType: "DID_FAIL_TO_RENEW",
+    subtype: "GRACE_PERIOD",
+    transaction: appleSubscriptionTransaction,
+    renewalInfo: { gracePeriodExpiresDate: Date.now() - 120_000 }
+  }).reason === "billing-grace-period-ended",
+  "Apple billing retry preserved access after the grace period ended."
+);
 for (const notificationType of ["REFUND", "REVOKE", "EXPIRED", "GRACE_PERIOD_EXPIRED"]) {
   assert(
     appleNotificationLifecycleAction({

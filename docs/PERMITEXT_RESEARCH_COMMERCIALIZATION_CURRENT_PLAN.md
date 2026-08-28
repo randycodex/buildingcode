@@ -228,6 +228,14 @@ The Stripe test clock extended the recorded expiration by one month, a provider-
 
 This closes the provider-backed Stripe sandbox item. It does not close controlled production billing evidence, Stripe Tax configuration, Apple Sandbox/TestFlight billing, deployment, or public-billing authorization.
 
+### No-cost Apple subscription lifecycle confirmation
+
+A permanent local exercise now sends ES256-signed App Store Server Notifications V2-shaped payloads through Permitext's actual transaction-verification and notification HTTP routes. It uses an ephemeral local certificate chain, contacts no Apple service, creates no App Store transaction, and reports zero paid provider calls. The sequence covers ownership binding, renewal, auto-renew disablement, notification ordering, failed renewal with and without grace, grace expiration, billing recovery, refund, refund reversal, duplicate delivery, and delayed delivery.
+
+The exercise found two material lifecycle defects. First, `DID_FAIL_TO_RENEW` without `GRACE_PERIOD` could preserve access from a future expiration embedded in the failed transaction; Permitext now revokes unless a signed active grace deadline exists. Second, notifications with no immediate entitlement change returned before recording their signed date, allowing an older delayed terminal event to overwrite a newer snapshot. Permitext now advances the Apple notification cursor while preserving the current entitlement.
+
+`npm run test:billing` retains both regressions and the complete signed-route sequence. Detailed results and boundaries are in [PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md](./PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md). This is local cryptographic simulation, not Apple-created Sandbox data, TestFlight evidence, production evidence, or public-billing authorization.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -240,6 +248,8 @@ Proceed toward paid Research only if all of the following are true:
 - [x] Complete the no-cost tax/refund/infrastructure input audit and launch-volume/refund sensitivities; low-volume p90 allocation is explicit and the missing Stripe Tax configuration is recorded.
 - [x] Complete the local no-charge Stripe Pro lifecycle exercise and retain the delayed-event/refund regression in the billing suite.
 - [x] Complete the provider-backed Stripe sandbox lifecycle and retain the current PaymentIntent-to-Invoice-Payment refund regression in the billing suite.
+- [x] Complete the local signed-payload Apple Pro lifecycle exercise and retain the failed-renewal and notification-ordering regressions in the billing suite.
+- [ ] Complete Apple-created Sandbox and TestFlight subscription lifecycle evidence against the compatible staging backend.
 - [ ] Verify tax treatment, refund incidence, and launch-volume infrastructure allocation, then review actual contribution after the first 25–50 customers.
 - [x] Current checked-in web and iOS clients decode and display the shared Research response contract correctly through the retained V6-shaped fixture and iOS Simulator test.
 - [ ] Confirm the same contract on production web and the next compatible TestFlight build during release verification.

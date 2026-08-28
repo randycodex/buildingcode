@@ -22030,14 +22030,13 @@ export function appleNotificationLifecycleAction({
         reason: "billing-grace-period"
       };
     }
-    return appleTransactionActive(transaction)
-      ? {
-          action: "grant",
-          packageID,
-          expiresAt: appleTransactionExpiration(transaction),
-          reason: "billing-retry-before-expiration"
-        }
-      : { action: "revoke", packageID, reason: "billing-retry-without-access" };
+    return {
+      action: "revoke",
+      packageID,
+      reason: detail === "GRACE_PERIOD"
+        ? "billing-grace-period-ended"
+        : "billing-retry-without-grace"
+    };
   }
 
   const grantTypes = new Set([
@@ -25388,7 +25387,7 @@ async function handleAppleServerNotification(request, response) {
     transaction,
     renewalInfo
   });
-  if (decision.action === "ignore") {
+  if (!decision.packageID) {
     sendJSON(response, 200, { received: true, changed: false, reason: decision.reason });
     return;
   }
@@ -25400,6 +25399,24 @@ async function handleAppleServerNotification(request, response) {
       return;
     }
     sendError(response, 503, "Apple purchase ownership is not available yet; retry this notification.");
+    return;
+  }
+
+  if (decision.action === "ignore") {
+    const result = await applyPersistedAppleNotification({
+      context,
+      originalTransactionID,
+      signedDate,
+      notificationUUID,
+      notificationType,
+      nextEntitlement: context.entitlement
+    });
+    sendJSON(response, 200, {
+      received: true,
+      changed: false,
+      recorded: result.applied,
+      reason: decision.reason
+    });
     return;
   }
 

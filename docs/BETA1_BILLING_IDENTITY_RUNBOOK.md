@@ -107,11 +107,13 @@ Capture the Stripe event ID, Permitext user ID, subscription ID, entitlement bef
 
 Perform Sandbox and TestFlight exercises first, then one controlled production purchase only after approval. Capture the Apple notification UUID, original transaction ID, product ID, environment, signed date, Permitext user ID, and entitlement before/after.
 
+The permanent local signed-payload exercise and its strict evidence boundary are recorded in [PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md](./PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md). It covers the same server routes with an ephemeral local trust chain and zero provider calls, but does not replace Apple-created Sandbox or TestFlight evidence.
+
 1. Purchase and restore bind the original transaction ID to exactly one Permitext account.
 2. `DID_RENEW` extends access.
 3. Turning off auto-renew does not remove prepaid access.
-4. `DID_FAIL_TO_RENEW` with `GRACE_PERIOD` keeps access only through `gracePeriodExpiresDate`.
-5. `GRACE_PERIOD_EXPIRED`, `EXPIRED`, `REFUND`, and `REVOKE` remove the affected package.
+4. `DID_FAIL_TO_RENEW` without `GRACE_PERIOD` removes access; with `GRACE_PERIOD`, it keeps access only through `gracePeriodExpiresDate`.
+5. An expired or missing grace-period deadline, `GRACE_PERIOD_EXPIRED`, `EXPIRED`, `REFUND`, and `REVOKE` remove the affected package.
 6. `REFUND_REVERSED` restores an active transaction.
 7. Duplicate notifications are idempotent and older delayed notifications cannot overwrite newer state.
 8. Sandbox and Xcode transactions cannot grant production Pro.
