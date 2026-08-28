@@ -35,12 +35,18 @@ const completeEnvironment = {
 const complete = appleSandboxConfigurationReadiness(completeEnvironment);
 assert.equal(complete.ready, true);
 assert.equal(
+  appleSandboxConfigurationReadiness({ ...completeEnvironment, NODE_ENV: "production" }).ready,
+  true,
+  "A Vercel Preview deployment must not be rejected solely because its bundled Node runtime is production-optimized."
+);
+assert.equal(
   complete.endpoints.appleNotifications,
   "https://permitext-apple-sandbox.example.test/billing/apple/notifications"
 );
 
 for (const [name, environment] of [
   ["Production runtime", { ...completeEnvironment, VERCEL_ENV: "production" }],
+  ["Standalone Production runtime", { ...completeEnvironment, VERCEL: "", VERCEL_ENV: "", NODE_ENV: "production" }],
   ["Production Apple enforcement", { ...completeEnvironment, PERMITEXT_REQUIRE_PRODUCTION_APPLE_TRANSACTIONS: "1" }],
   ["Production hostname", { ...completeEnvironment, PERMITEXT_PUBLIC_BASE_URL: "https://permitext.com" }],
   ["Shared database", { ...completeEnvironment, PERMITEXT_APPLE_SANDBOX_ISOLATED_DATABASE: "0" }],

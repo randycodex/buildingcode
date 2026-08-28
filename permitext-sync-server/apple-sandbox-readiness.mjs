@@ -62,6 +62,13 @@ function parsedPublicURL(environment) {
   }
 }
 
+function nonProductionRuntime(environment) {
+  if (String(environment.VERCEL || "").trim() || String(environment.VERCEL_ENV || "").trim()) {
+    return environment.VERCEL_ENV !== "production";
+  }
+  return environment.NODE_ENV !== "production";
+}
+
 export function appleSandboxConfigurationReadiness(environment = process.env) {
   const publicURL = parsedPublicURL(environment);
   const clerk = clerkConfigurationStatus(environment);
@@ -75,7 +82,7 @@ export function appleSandboxConfigurationReadiness(environment = process.env) {
     ),
     check(
       "non-production-environment",
-      environment.VERCEL_ENV !== "production" && environment.NODE_ENV !== "production",
+      nonProductionRuntime(environment),
       "Apple Sandbox transactions must never target a Production runtime."
     ),
     check(
