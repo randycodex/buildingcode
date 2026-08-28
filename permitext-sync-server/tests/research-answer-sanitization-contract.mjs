@@ -24,7 +24,7 @@ const answer = validateResearchInterpretation({
   followUpQuestions: [],
   evidenceLimitations: ["Other egress topics were not evaluated."],
   additionalEvidenceNeeded: [
-    "Confirm the measured route.】【。If the 200-foot allowance is needed, confirm the installation standard."
+    "Confirm the measured café route.】【。If the 200-foot allowance is needed, confirm the installation standard. ձեռք"
   ],
   supportingSourceUses: [],
   citations: [{
@@ -36,9 +36,11 @@ const answer = validateResearchInterpretation({
 
 assert.equal(
   answer.additionalEvidenceNeeded[0],
-  "Confirm the measured route. If the 200-foot allowance is needed, confirm the installation standard."
+  "Confirm the measured café route. If the 200-foot allowance is needed, confirm the installation standard."
 );
 assert.doesNotMatch(answer.additionalEvidenceNeeded[0], /[【】：「」『』]/);
+assert.doesNotMatch(answer.additionalEvidenceNeeded[0], /ձեռք/);
+assert.match(answer.additionalEvidenceNeeded[0], /café/);
 
 const whitespaceAnswer = validateResearchInterpretation({
   conclusion: "The selected text does not say whether furniture is a  fixture  or  equipment.",

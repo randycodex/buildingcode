@@ -113,6 +113,19 @@ After the provider health check succeeded, the three subthreshold v2 cases were 
 
 The three Research operations cost $0.164322 in total and the complete diagnostics cost $0.256197. None produced a provider error, unsupported claim, forbidden claim, or critical failure. These targeted results clear the three v2 defects for a new frozen cohort; they do not replace the required complete cohort.
 
+### Frozen v3 cohort attempt
+
+The immutable v3 cohort began from remediated application commit `ac024f04788ae7552e98198c4db9813437691c26`. It passed the former provider-timeout point and is retained as another partial operational diagnostic:
+
+- 15 Research turns completed: 14 passed and one was marked failed only because an otherwise correct English answer ended one missing-fact sentence with a stray Armenian word.
+- The three v2 remediation cases passed again: mixed plumbing 4.00/4, legacy fire alarm 3.68/4 with all required gates satisfied, and garage ventilation 4.00/4.
+- Case 16 failed safely after both the initial answer and bounded revision put an automatically retrieved web-guidance statement inside enacted-code supported points. No user answer was returned and the turn was not charged.
+- The case expressly asked for a conclusion “Based on” four named Administrative Code provisions. Automatic web support was unnecessary for that bounded question and increased cost and attribution risk.
+- Completed-turn operating cost was $0.932010. The failed verification consumed $0.121499 of provider work, bringing total operating cost to $1.053509. The incomplete sample's projected $7.02 per 100 turns is not a commercialization result because it amortizes that failed turn over only 15 completions.
+- Completed-turn latency was 24.771 seconds p50 and 36.407 seconds p90.
+
+Permitext now treats an express “Based on [named provisions]” question as section-bounded unless the user also requests an external lookup. English Research narrative sanitation also removes isolated letters from other writing systems while preserving Latin text, numbers, punctuation, symbols, and units. The partial evidence is retained at `permitext-sync-server/evals/results/2026-08-27T23-55-01-805Z-d91a79dc-85f5-4e76-9374-0d477c1cdcbe.md`.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -140,4 +153,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Create and commit a new immutable v3 cohort profile from the remediated application commit, then run the complete 20-case cohort under its hard spend cap and stop on the first provider error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
+Pass the no-cost contracts for section-bounded web routing and English-answer sanitation, freeze the v3 partial result, and run the formerly failing occupancy case once under a hard cap. If it passes without automatic web support, create a new immutable v4 cohort. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.

@@ -9233,6 +9233,10 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     .replace(/\r\n?/g, "\n")
     .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
     .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
+    // Research answers are currently English. Remove isolated model noise in
+    // other writing systems while preserving Latin letters, numbers, units,
+    // punctuation, symbols, and ordinary Unicode formatting.
+    .replace(/(?:(?!\p{Script=Latin})\p{Letter})+/gu, " ")
     .replace(/[【】：「」『』。“”]+(?=\s*[A-Za-z0-9])/g, " ")
     .replace(/[^\S\r\n]+/g, " ")
     .replace(/ *\n */g, "\n")

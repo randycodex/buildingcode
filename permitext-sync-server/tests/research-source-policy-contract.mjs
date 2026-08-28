@@ -91,6 +91,18 @@ assert.deepEqual(
   },
   "A question about the limits of selected evidence must not fail merely because an outside authority named in the question cannot be retrieved."
 );
+assert.deepEqual(
+  researchWebSupportTrigger({
+    question: "Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically?",
+    outsideLibraryRequired: true
+  }, {}),
+  {
+    useWeb: false,
+    reasons: ["selected_evidence_boundary"],
+    configuration: researchSourcePolicyConfiguration({})
+  },
+  "A question expressly bounded to named enacted provisions must not add automatic web guidance."
+);
 assert.equal(
   researchWebSupportTrigger({
     question: "Find and summarize Buildings Bulletin 2011-010 from the official DOB website."
