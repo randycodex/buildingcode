@@ -103,9 +103,10 @@ Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_
 - [x] Release identity, health endpoints, structured runtime errors, client-error redaction, billing warnings, and Research spend events exist.
 - [x] Complete a no-provider local end-to-end rehearsal for redacted client errors, configured-threshold latency, billing warnings, Research spend rejection, sanitized runtime errors, and 5xx observations.
 - [x] A named support and urgent-alert owner and support address are documented.
-- [ ] Upgrade the commercial production service from Vercel Hobby to an appropriate paid plan before accepting paying users.
+- [x] Upgrade the commercial production service from Vercel Hobby to Vercel Pro.
 - [ ] Configure and exercise monitoring alerts for health, 5xx/client failures, billing webhooks, database failures, Research spend, and p95 latency.
-- [ ] Set and test the intended infrastructure spend notifications and hard-stop behavior.
+- [x] Configure a $20 Vercel on-demand spend amount, standard spend notifications, and automatic Production pause for all projects on the team.
+- [ ] Exercise a delivered spend notification and actual hard-stop behavior without exposing customers or incurring an uncontrolled overage.
 - [x] Add a fail-closed read-only restore comparator and complete its no-provider local end-to-end rehearsal, including deliberate missing-record detection.
 - [ ] Complete the first provider-backed isolated Neon/Blob backup/restore drill and retain the recovery-point, private-asset, timing, and cleanup evidence.
 - [x] Add the timed synthetic support-tabletop record and cross-document support-process contract.

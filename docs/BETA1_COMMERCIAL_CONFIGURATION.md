@@ -79,14 +79,17 @@ Detailed model: [PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md](./PERMITEXT_RESE
 6. Confirm DNS for Clerk and all public policy/support URLs.
 7. Run sandbox lifecycle tests, then request immediate approval before any controlled live charge or refund.
 
-## Vercel production configuration recorded 2026-08-21
+## Vercel production configuration recorded 2026-08-21 and 2026-08-28
 
 - The Apple App Store JWS root-fingerprint variable is present in Vercel **Production only** and marked Sensitive. It is not attached to Preview.
 - Vercel confirmed that the environment-variable change requires a new deployment; no redeploy or Production change was made during configuration.
-- The Permitext team is still on Hobby and the dashboard reports 7h 8m Fluid Active CPU against the 4h included allowance.
-- Public launch is blocked until the team is on a commercial Vercel plan. Initial recommendation: Pro at the current $20 monthly platform fee, then a $10 on-demand spend amount beyond the included Pro credit, notifications at 50%, 75%, and 100%, SMS at 100%, and automatic Production pause at 100%. Because threshold checks are periodic and fixed fees, seats, integrations, and add-ons are excluded, approximately $30 plus tax and a possible small metering overrun is the initial exposure—not an exact hard ceiling. The earlier $45 p90 infrastructure allocation remains a conservative subscriber-economics sensitivity, not the recommended live spend setting.
+- The August 21 review found the team on Hobby with 7h 8m Fluid Active CPU against the 4h included allowance. On August 28, the owner personally submitted the Vercel upgrade and the live dashboard confirmed the team is on Pro for the August 28–September 28, 2026 billing cycle.
+- The recurring Pro platform fee is $20 per month for the included owner and includes $20 of monthly infrastructure credit. Checkout estimated $1.78 of tax, while the post-upgrade dashboard currently shows a $20 upcoming invoice; the final posted tax and invoice total remain unverified.
+- The owner increased the intended on-demand amount from the earlier $10 recommendation to $20. The live billing page now retains a $20 on-demand spend amount beyond the included credit, automatic pausing of all Production deployments on the team when that amount is reached, and spend notifications enabled. Vercel's standard web/email thresholds are 50%, 75%, and 100%; SMS enrollment was not changed.
+- The resulting initial planning exposure is approximately $40 plus tax and a possible small metering overrun: the fixed $20 Pro platform fee plus up to $20 of on-demand metered usage. It is not an exact hard ceiling because Vercel evaluates usage periodically, and seats, integrations, add-ons, and other excluded charges are outside Spend Management. The earlier $45 p90 infrastructure allocation remains a conservative subscriber-economics sensitivity, not the live spend setting.
 - The August 28 live billing review found that Speed Insights Plus on `punchlist-pwa` would have added $10 per month to the team upgrade. The owner approved downgrading that project to basic Speed Insights; Vercel confirmed its Plus renewal was canceled, while the latest PunchList Production deployment remained `READY`.
-- After the downgrade, every paid add-on was unchecked and Vercel displayed an immediate recurring Pro checkout total of $20 per month for one included owner, with $20 of usage credit. No payment method was added, the Upgrade action was not submitted, and the team remains on Hobby.
+- After the downgrade, every paid add-on remained unchecked. AI Gateway auto-reload and Vercel Agent usage billing also remain off; the existing $5 AI Gateway credit is separate from the Pro infrastructure credit. Observability Plus is included with Pro rather than a paid add-on.
+- The spend amount and automatic-pause settings were saved through Vercel's team-name confirmation and independently reloaded. The dashboard then showed `$0 / $20`, `Notifications: On`, and `Pause Projects: On`. No threshold was intentionally reached, so delivered notification and actual 503 pause behavior remain unexercised production gates.
 - Preview currently shares the Production database, so Preview is not an isolated identity, entitlement, or billing test environment.
 
 ## Stripe production configuration recorded 2026-08-21

@@ -242,7 +242,13 @@ The permanent operations suite now exercises structured monitoring through the a
 
 The exercise found and repaired a threshold mismatch: the request wrapper honored `PERMITEXT_SLOW_REQUEST_MS`, while event severity still used a hard-coded two-second threshold. Research spend-cap responses now also emit a dedicated release-identified event with hashed user and operation identifiers.
 
-Detailed evidence and boundaries are in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md). The exercise makes zero paid calls, writes no production data, delivers no external alert, and does not set `PERMITEXT_MONITORING_PROVIDER`. Production Vercel plan, dashboard/Drain configuration, delivered alert tests, and spend-notification/hard-stop testing remain open master-plan gates.
+Detailed evidence and boundaries are in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md). The exercise makes zero paid calls, writes no production data, delivers no external alert, and does not set `PERMITEXT_MONITORING_PROVIDER`. The Vercel Pro-plan gate is now complete. The live team also retains a $20 on-demand spend amount, standard spend notifications, and automatic Production pause for every team project. Dashboard/Drain configuration, delivered alert tests, and an exercised notification/hard-stop event remain open master-plan gates.
+
+### Live Vercel cost-control confirmation
+
+The owner personally submitted the Pro upgrade on August 28. The live dashboard confirmed Pro for the August 28–September 28, 2026 billing cycle, one included owner, $20 of monthly infrastructure credit, and no paid add-ons. The post-upgrade dashboard showed a $20 upcoming invoice; checkout's estimated $1.78 tax remains unverified until the final invoice posts.
+
+The owner selected a $20 on-demand amount beyond the included credit. Vercel's required team-name confirmation stated that all team deployments will pause and owner/billing members will be notified when the amount is reached. After confirmation and an independent reload, the billing summary showed `$0 / $20`, `Notifications: On`, and `Pause Projects: On`. This creates approximately $40 plus tax and possible small periodic-metering overrun of initial Vercel exposure, not an exact all-in ceiling; excluded seats, integrations, and add-ons remain outside the spend amount. No threshold was intentionally reached, no external alert was delivered, and no deployment was paused during this configuration.
 
 ## Commercial decision gate
 
