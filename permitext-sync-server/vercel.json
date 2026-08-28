@@ -190,6 +190,10 @@
       "destination": "/api/index"
     },
     {
+      "source": "/policies/:path*",
+      "destination": "/api/index"
+    },
+    {
       "source": "/organizations/:path*",
       "destination": "/api/index"
     },

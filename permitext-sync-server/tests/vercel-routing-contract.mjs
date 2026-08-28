@@ -45,6 +45,7 @@ const dynamicRoutes = [
   "/internal",
   "/internal/:path*",
   "/notebook/:path*",
+  "/policies/:path*",
   "/organizations/:path*",
   "/projects/:path*",
   "/reports/:path*",
