@@ -236,6 +236,14 @@ The exercise found two material lifecycle defects. First, `DID_FAIL_TO_RENEW` wi
 
 `npm run test:billing` retains both regressions and the complete signed-route sequence. Detailed results and boundaries are in [PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md](./PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md). This is local cryptographic simulation, not Apple-created Sandbox data, TestFlight evidence, production evidence, or public-billing authorization.
 
+### No-cost monitoring-signal confirmation
+
+The permanent operations suite now exercises structured monitoring through the actual local HTTP server. It confirms redacted client-error logging, the configured slow-request threshold, a signed synthetic failed-invoice warning, a Research spend-guardrail rejection before any provider request, a sanitized unexpected runtime error, and the corresponding 5xx route observation.
+
+The exercise found and repaired a threshold mismatch: the request wrapper honored `PERMITEXT_SLOW_REQUEST_MS`, while event severity still used a hard-coded two-second threshold. Research spend-cap responses now also emit a dedicated release-identified event with hashed user and operation identifiers.
+
+Detailed evidence and boundaries are in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md). The exercise makes zero paid calls, writes no production data, delivers no external alert, and does not set `PERMITEXT_MONITORING_PROVIDER`. Production Vercel plan, dashboard/Drain configuration, delivered alert tests, and spend-notification/hard-stop testing remain open master-plan gates.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:

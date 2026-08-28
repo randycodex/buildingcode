@@ -140,9 +140,12 @@ export function sanitizedRequestObservation(input, environment = process.env) {
     ? Math.max(0, Math.min(999, Number(input.statusCode)))
     : 0;
   const durationMilliseconds = Math.max(0, Math.round(Number(input?.durationMilliseconds) || 0));
+  const slowRequestThresholdMilliseconds = operationalMonitoringReadiness(
+    environment
+  ).slowRequestThresholdMilliseconds;
   const severity = statusCode >= 500
     ? "error"
-    : statusCode >= 400 || durationMilliseconds >= 2_000
+    : statusCode >= 400 || durationMilliseconds >= slowRequestThresholdMilliseconds
       ? "warning"
       : "info";
   return {
@@ -156,6 +159,33 @@ export function sanitizedRequestObservation(input, environment = process.env) {
     releaseID: release.releaseID,
     gitCommit: release.gitCommit,
     deploymentHost: release.deploymentHost,
+    environment: release.environment,
+    observedAt: new Date().toISOString()
+  };
+}
+
+function opaqueOperationalIdentifier(value) {
+  const normalized = compactText(value, 500);
+  return normalized
+    ? createHash("sha256").update(normalized).digest("hex").slice(0, 16)
+    : null;
+}
+
+export function sanitizedResearchSpendGuardrailReport(input, environment = process.env) {
+  const release = releaseIdentity(environment);
+  const requestedCode = compactText(input?.code, 80);
+  const code = ["RESEARCH_EVAL_SPEND_CAP", "RESEARCH_SPEND_CAP"].includes(requestedCode)
+    ? requestedCode
+    : "RESEARCH_SPEND_CAP";
+  return {
+    event: "research_spend_guardrail_rejection",
+    code,
+    route: compactText(input?.route, 120) || "research",
+    user: opaqueOperationalIdentifier(input?.userID),
+    operation: opaqueOperationalIdentifier(input?.operationID),
+    reason: redactedErrorText(input?.reason, 240) || null,
+    releaseID: release.releaseID,
+    gitCommit: release.gitCommit,
     environment: release.environment,
     observedAt: new Date().toISOString()
   };

@@ -27,6 +27,8 @@ Permitext emits structured Vercel runtime events for:
 
 Client reports remove email addresses, bearer credentials, sensitive query values, and URL query strings before logging. They contain a stable fingerprint, release ID, route, source path, and line/column where available.
 
+The no-provider end-to-end rehearsal in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md) proves these structured events through the local HTTP server, including configured-threshold latency classification and a deliberate 5xx. It makes no provider calls and delivers no external alert, so it does not satisfy the production alert gate.
+
 `GET /health` reports whether release identity and an external monitoring provider are marked configured. Before public access, configure one of these production paths:
 
 1. Vercel Observability alerts and daily runtime-log review; or

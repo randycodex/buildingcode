@@ -101,6 +101,7 @@ Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_
 ## 6. Hosting, monitoring, backup, and support
 
 - [x] Release identity, health endpoints, structured runtime errors, client-error redaction, billing warnings, and Research spend events exist.
+- [x] Complete a no-provider local end-to-end rehearsal for redacted client errors, configured-threshold latency, billing warnings, Research spend rejection, sanitized runtime errors, and 5xx observations.
 - [x] A named support and urgent-alert owner and support address are documented.
 - [ ] Upgrade the commercial production service from Vercel Hobby to an appropriate paid plan before accepting paying users.
 - [ ] Configure and exercise monitoring alerts for health, 5xx/client failures, billing webhooks, database failures, Research spend, and p95 latency.

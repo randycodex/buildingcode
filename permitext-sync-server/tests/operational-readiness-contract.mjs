@@ -5,6 +5,7 @@ import {
   releaseIdentity,
   sanitizedClientErrorReport,
   sanitizedRequestObservation,
+  sanitizedResearchSpendGuardrailReport,
   sanitizedServerErrorReport
 } from "../operational-readiness.mjs";
 
@@ -97,5 +98,45 @@ assert.equal(requestObservation.statusCode, 503);
 assert.equal(requestObservation.durationMilliseconds, 2450);
 assert.equal(requestObservation.gitCommit, "0123456789abcdef");
 assert.equal(requestObservation.deploymentHost, "permitext.example.vercel.app");
+
+const customThresholdObservation = sanitizedRequestObservation({
+  route: "client-errors",
+  method: "post",
+  statusCode: 202,
+  durationMilliseconds: 25
+}, {
+  PERMITEXT_SLOW_REQUEST_MS: "20",
+  PERMITEXT_RELEASE_ID: "beta1-monitoring"
+});
+assert.equal(customThresholdObservation.severity, "warning");
+
+const belowCustomThresholdObservation = sanitizedRequestObservation({
+  route: "client-errors",
+  method: "post",
+  statusCode: 202,
+  durationMilliseconds: 19
+}, {
+  PERMITEXT_SLOW_REQUEST_MS: "20"
+});
+assert.equal(belowCustomThresholdObservation.severity, "info");
+
+const guardrailReport = sanitizedResearchSpendGuardrailReport({
+  code: "RESEARCH_SPEND_CAP<script>",
+  route: "research/conversations/message",
+  userID: "apple:monitoring-owner@example.com",
+  operationID: "conversation-secret",
+  reason: "Guardrail blocked person@example.com?token=secret-value Bearer abc.def.ghi"
+}, {
+  PERMITEXT_RELEASE_ID: "beta1-monitoring",
+  VERCEL_ENV: "preview"
+});
+assert.equal(guardrailReport.event, "research_spend_guardrail_rejection");
+assert.equal(guardrailReport.code, "RESEARCH_SPEND_CAP");
+assert.equal(guardrailReport.user.length, 16);
+assert.equal(guardrailReport.operation.length, 16);
+assert.equal(JSON.stringify(guardrailReport).includes("monitoring-owner@example.com"), false);
+assert.equal(JSON.stringify(guardrailReport).includes("conversation-secret"), false);
+assert.equal(JSON.stringify(guardrailReport).includes("secret-value"), false);
+assert.equal(JSON.stringify(guardrailReport).includes("abc.def.ghi"), false);
 
 console.log("operational readiness contract passed");

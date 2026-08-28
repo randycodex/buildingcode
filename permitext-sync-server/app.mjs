@@ -34,6 +34,7 @@ import {
   releaseIdentity,
   sanitizedClientErrorReport,
   sanitizedRequestObservation,
+  sanitizedResearchSpendGuardrailReport,
   sanitizedServerErrorReport
 } from "./operational-readiness.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
@@ -19166,6 +19167,15 @@ async function handleResearchConversationMessage(request, response) {
           )))
         : researchOperation.verificationIssueTypes
     });
+    if (["RESEARCH_EVAL_SPEND_CAP", "RESEARCH_SPEND_CAP"].includes(error.code)) {
+      console.warn(JSON.stringify(sanitizedResearchSpendGuardrailReport({
+        code: error.code,
+        route: "research/conversations/message",
+        userID: context.userID,
+        operationID: conversation.id,
+        reason: error.message
+      })));
+    }
     if (error.code === "RESEARCH_CONVERSATION_DELETED") {
       progressResponse.failActive("failed");
       progressResponse.error(error.statusCode || 409, error.message, {
@@ -28715,6 +28725,13 @@ async function handleCodeQuestionAnalysisCreate(request, response) {
       return;
     }
     if (error.code === "RESEARCH_SPEND_CAP") {
+      console.warn(JSON.stringify(sanitizedResearchSpendGuardrailReport({
+        code: error.code,
+        route: "projects/code-questions/analysis/create",
+        userID: context.actorUserID,
+        operationID: context.body?.requestID || context.body?.idempotencyKey,
+        reason: error.message
+      })));
       sendJSON(response, 503, { error: error.message, code: "RESEARCH_SPEND_CAP" });
       return;
     }
