@@ -31,9 +31,9 @@ export const researchCommercializationBenchmarkV6 = Object.freeze({
   fastModel: "gpt-5.6-luna",
   routingMode: "hybrid",
   applicationCommit: "3071a47286bd985b42937798c943a80b973d48ee",
-  completedAt: null,
-  resultStatus: null,
-  resultFile: null
+  completedAt: "2026-08-28T02:39:40.949Z",
+  resultStatus: "complete",
+  resultFile: "evals/results/2026-08-28T02-26-08-632Z-edc69c6b-bf30-4856-859e-99667d03bd2b.json"
 });
 
 export function researchCommercializationBenchmarkV6Environment(environment = process.env) {

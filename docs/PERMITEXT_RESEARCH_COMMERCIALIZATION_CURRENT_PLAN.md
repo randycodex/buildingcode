@@ -169,14 +169,27 @@ The retained partial evidence is `permitext-sync-server/evals/results/2026-08-28
 
 Answer-quality v23 adds a source-bound guard against treating an individual-room representation as dispositive of the BC 303.7 indoor-assembly-occupancy threshold. It replaces that unsupported negative applicability conclusion with an explicit unresolved filing boundary. For an occupant-load question asking to retain an existing 1:100 basis, it also preserves the existing approved occupancy record and broader egress-design inputs as missing facts. The evaluation runner now treats a scored quality failure as a stop condition. The exact saved v5 failure changes from local deterministic failure to pass after the repair, and the complete no-cost repository gate passes. V5 will not be rerun.
 
+### Frozen v6 complete cohort
+
+The separately authorized immutable v6 cohort completed all 20 production Research turns and all 20 independent evaluations from the post-v23 implementation:
+
+- All 20 answers passed every fatal evaluation gate. Fifteen scored 4.00/4, four scored 3.84/4, and the repaired movable-seating case scored 3.79/4.
+- No provider, verification, citation, unsupported-claim, or charging failure occurred.
+- Production Research cost was $1.148132, or a projected $5.74 per 100 completed turns at this cohort's mean. The separate graders cost $0.631223, bringing the one-time evaluation total to $1.779355 under the authorized $4 cap.
+- Completed-turn cost was $0.047130 p50 and $0.096868 p90. Production latency was 20.010 seconds p50, 31.669 seconds p90, and 40.454 seconds maximum.
+- Five of 20 turns needed one bounded verifier-driven revision. Every completed user question was charged exactly once; internal revisions added no user-visible turns.
+- Every question routed directly to the accurate Terra answer tier because this deliberately difficult cohort triggered complexity or evidence-boundary rules; Luna verified every answer. There were no Luna-answer-to-Terra escalations in this sample.
+
+The result is retained at `permitext-sync-server/evals/results/2026-08-28T02-26-08-632Z-edc69c6b-bf30-4856-859e-99667d03bd2b.json` with its generated review report beside it. V6 is frozen and must not be rerun.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
 
-- [ ] No material forbidden claim or unsupported compliance conclusion remains.
-- [ ] Exact citation and required-qualification behavior is acceptable.
+- [x] No material forbidden claim or unsupported compliance conclusion appeared in the complete v6 cohort.
+- [x] Exact citation and required-qualification behavior passed the complete v6 cohort.
 - [x] Provider failures and internal retries remain free to the user.
-- [ ] Projected operating model cost is at or below the $4–$6 per 100-turn target, including realistic p90 usage.
+- [ ] Mean projected operating model cost is within the $4–$6 target at $5.74 per 100 turns; subscriber-level p90 aggregation and full non-model costs still need to be calculated before fixing the allowance or pack prices.
 - [ ] Web and the current iOS/TestFlight client both decode and display the shared response contract correctly.
 
 If quality requires too many Terra calls to meet the cost target, reduce the included monthly allowance or create a higher Research tier. Do not silently subsidize Terra-only usage inside the current $20 plan.
@@ -196,4 +209,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Freeze and publish the v5 partial result and v23 remediation. Do not make another paid run without a separately authorized immutable profile. Use only a complete future cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
+Use the complete v6 result to calculate p50 and p90 fully utilized subscriber cost, including payment fees, taxes, refunds, infrastructure, and support. Then decide whether Pro should retain 100 included turns or use a lower allowance. Do not publish turn-pack prices or enable public paid Research until that decision and the web/current-iOS response-contract check are complete.

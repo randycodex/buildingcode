@@ -17,7 +17,7 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The active work is the final Research quality and economics validation. The source-bound v22 repair passed both capped targeted confirmations at 4.00/4. The subsequent v5 cohort completed nine turns: eight passed, while the movable-seating answer made an unsupported Certificate-of-Operation threshold-unit inference and scored 3.26/4. The partial run cost $0.797555 including its independent graders and cannot decide pricing. The v23 remediation now passes the exact saved-answer replay and complete no-cost repository gate, and scored quality failures now halt the evaluator. A complete future frozen cohort is still required before deciding quality and economics. After that, the legal, provider, operations, production, and TestFlight gates must be closed.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Production model cost was $1.148132, projecting to $5.74 per 100 turns at the cohort mean; latency was 20.010 seconds p50 and 31.669 seconds p90. The quality gate is now supported by complete post-remediation evidence. Before fixing the 100-turn allowance or turn-pack prices, Permitext still needs subscriber-level p50/p90 cost aggregation and full payment, infrastructure, refund, tax, and support economics. The legal, provider, operations, production, and TestFlight gates also remain open.
 
 Current development branch: `codex/research-commercialization`
 
@@ -51,7 +51,7 @@ Current development branch: `codex/research-commercialization`
 - [x] Rerun capped targeted confirmations for the repaired case and the provider-interrupted case; both passed 4.00/4.
 - [x] Attempt the immutable v5 cohort; retain its 9 completed turns, 8 passes, quality failure, and operator stop as partial evidence.
 - [x] Complete no-cost verification of the v23 filing-boundary repair and scored-quality fail-fast behavior.
-- [ ] Run a new immutable full cohort only after separate authorization and only if the remediation has no material regression.
+- [x] Run the separately authorized immutable v6 cohort; all 20 cases passed with no provider or charging failure.
 - [ ] Confirm that p50/p90 full-service cost supports the $20 plan and 100 included turns.
 
 Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md)

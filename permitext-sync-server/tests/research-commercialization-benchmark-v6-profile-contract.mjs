@@ -11,6 +11,9 @@ import {
 const root = dirname(fileURLToPath(import.meta.url));
 const dataset = JSON.parse(await readFile(join(root, "../evals/research-cases.json"), "utf8"));
 const profile = validateResearchCommercializationBenchmarkV6();
+const frozenResult = JSON.parse(
+  await readFile(join(root, "..", profile.resultFile), "utf8")
+);
 const environment = researchCommercializationBenchmarkV6Environment({
   OPENAI_API_KEY: "not-a-real-key"
 });
@@ -28,9 +31,21 @@ assert.equal(profile.promptVersion, "20260827-material-completeness-v31");
 assert.equal(profile.sourcePolicyVersion, "20260828-supporting-web-v10");
 assert.equal(profile.answerQualityVersion, "20260828-occupant-load-filing-boundary-v23");
 assert.equal(profile.applicationCommit, "3071a47286bd985b42937798c943a80b973d48ee");
-assert.equal(profile.completedAt, null);
-assert.equal(profile.resultStatus, null);
-assert.equal(profile.resultFile, null);
+assert.equal(profile.completedAt, "2026-08-28T02:39:40.949Z");
+assert.equal(profile.resultStatus, "complete");
+assert.equal(
+  profile.resultFile,
+  "evals/results/2026-08-28T02-26-08-632Z-edc69c6b-bf30-4856-859e-99667d03bd2b.json"
+);
+assert.equal(frozenResult.configuration.gitCommit, "c1db6e4ddf9768a3de424c826529586da3f6dfaa");
+assert.equal(frozenResult.configuration.actualUSD, 1.779355);
+assert.equal(frozenResult.results.length, 20);
+assert.equal(frozenResult.results.filter((result) => result.scoring?.passed).length, 20);
+assert.equal(frozenResult.economics.sample.completedCharged, 20);
+assert.equal(frozenResult.economics.economics.totalOperatingCostUSD, 1.148132);
+assert.equal(frozenResult.economics.economics.projectedCostPer100TurnsUSD, 5.74);
+assert.equal(frozenResult.economics.charging.integrityPass, true);
+assert.equal(frozenResult.economics.readyForPricingDecision, true);
 assert.equal(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD, "4.00");
 assert.equal(environment.PERMITEXT_RESEARCH_ROUTING_MODE, "hybrid");
 assert.equal(environment.PERMITEXT_RESEARCH_FAST_MODEL, "gpt-5.6-luna");
