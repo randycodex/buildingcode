@@ -149,7 +149,7 @@ Proceed toward paid Research only if all of the following are true:
 
 - [ ] No material forbidden claim or unsupported compliance conclusion remains.
 - [ ] Exact citation and required-qualification behavior is acceptable.
-- [ ] Provider failures and internal retries remain free to the user.
+- [x] Provider failures and internal retries remain free to the user.
 - [ ] Projected operating model cost is at or below the $4–$6 per 100-turn target, including realistic p90 usage.
 - [ ] Web and the current iOS/TestFlight client both decode and display the shared response contract correctly.
 
@@ -170,4 +170,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Complete the no-cost repository gate and commit the v4 evidence plus the BC 1101.3.1 safeguard. After the OpenAI API account has available credit, run one capped targeted confirmation of the repaired mercantile-to-business case and the provider-interrupted BC 1019.3 case. If both pass, create a new immutable v5 profile and run all 20 cases under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
+Restore a positive OpenAI API credit balance, then run one capped targeted confirmation of the repaired mercantile-to-business case and the provider-interrupted BC 1019.3 case. If both pass, create a new immutable v5 profile and run all 20 cases under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
