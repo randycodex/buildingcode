@@ -341,6 +341,39 @@ assert.equal(
   "overstated_compliance"
 );
 
+const repairedPriorCodeAccessibility = applyResearchDeterministicAnswerRepairs(
+  {
+    answerText: "Chapter 11 accessible features and construction must therefore be provided throughout the space and its immediate entrance.",
+    supportedPoints: [{
+      explanation: "BC 1101.3.1 requires accessible features throughout the changed space.",
+      sourceIDs: ["bc-space-accessibility"]
+    }],
+    missingFacts: [
+      "Verify the represented project fact that this is an existing prior-code building."
+    ],
+    citations: [{ sourceIDs: ["bc-space-accessibility"] }]
+  },
+  priorCodeAccessibilityEvidence
+);
+assert.match(
+  repairedPriorCodeAccessibility.answerText,
+  /^If the represented prior-code-building status is confirmed and this alteration is within BC 1101\.3\.1's/
+);
+assert.match(
+  repairedPriorCodeAccessibility.supportedPoints[0].explanation,
+  /^If the represented prior-code-building status is confirmed and this alteration is within BC 1101\.3\.1's/
+);
+assert.deepEqual(
+  repairedPriorCodeAccessibility.missingFacts,
+  ["Verify the represented project fact that this is an existing prior-code building."],
+  "Condition repair must not rewrite the missing-fact request."
+);
+assert.equal(evaluateResearchAnswerQuality({
+  question: "Does the Group M-to-Group B change trigger BC 1101.3.1?",
+  evidence: priorCodeAccessibilityEvidence,
+  answer: repairedPriorCodeAccessibility
+}).pass, true);
+
 const conditionalPriorCodeAccessibility = evaluateResearchAnswerQuality({
   question: "Does the Group M-to-Group B change trigger BC 1101.3.1?",
   evidence: priorCodeAccessibilityEvidence,

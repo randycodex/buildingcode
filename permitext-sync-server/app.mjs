@@ -18440,8 +18440,8 @@ async function handleResearchConversationMessage(request, response) {
               assembledEvidence
             )
           };
-    result = applyDeterministicAnswerRepairs(result);
     result = preserveDeclaredProjectFactUncertainty(result);
+    result = applyDeterministicAnswerRepairs(result);
     let verificationAttempts = [];
     let evidenceBoundaryFallback = false;
     let verifierUsage = combinedResearchUsage();
@@ -18596,8 +18596,8 @@ async function handleResearchConversationMessage(request, response) {
                 )
               }
             : revised;
-          result = applyDeterministicAnswerRepairs(result);
           result = preserveDeclaredProjectFactUncertainty(result);
+          result = applyDeterministicAnswerRepairs(result);
         }
         requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
           requiredClaims,

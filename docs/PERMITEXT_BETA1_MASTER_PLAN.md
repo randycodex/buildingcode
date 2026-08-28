@@ -17,7 +17,7 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The active work is the final Research quality and economics validation. In v4, 18 turns completed and 17 passed; one answer overstated BC 1101.3.1 applicability, and the next case stopped on an exhausted OpenAI API credit balance without charging the failed user turn. The applicability safeguard is implemented and locally verified, but paid confirmation and a complete frozen cohort still remain. After that, the legal, provider, operations, production, and TestFlight gates must be closed.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The active work is the final Research quality and economics validation. In v4, 18 turns completed and 17 passed; one answer overstated BC 1101.3.1 applicability, and the next case stopped on exhausted provider credit. After credit restoration, the first targeted confirmation failed closed when a bounded revision reintroduced that overstatement; the user turn remained uncharged. The source-bound v22 repair and complete local gate now pass, but paid confirmation and a complete frozen cohort still remain. After that, the legal, provider, operations, production, and TestFlight gates must be closed.
 
 Current development branch: `codex/research-commercialization`
 
@@ -47,7 +47,8 @@ Current development branch: `codex/research-commercialization`
 - [x] Verify section-bounded web-routing and English-answer sanitization before a v4 cohort.
 - [x] Attempt the frozen v4 cohort; retain its 18 completed turns, 17 exact passes, and fail-fast stop on exhausted provider credit as partial evidence.
 - [x] Add a deterministic BC 1101.3/1101.3.1 scope-consistency gate and no-cost regression coverage for the single v4 quality failure.
-- [ ] Restore OpenAI API credit and run capped targeted confirmations for the repaired case and the provider-interrupted case.
+- [x] Restore OpenAI API credit, retain the failed first targeted confirmation, and repair its bounded-revision regression without another model call.
+- [ ] Rerun capped targeted confirmations for the repaired case and the provider-interrupted case.
 - [ ] Run a new frozen full cohort only if the targeted cases improve without material regressions.
 - [ ] Confirm that p50/p90 full-service cost supports the $20 plan and 100 included turns.
 

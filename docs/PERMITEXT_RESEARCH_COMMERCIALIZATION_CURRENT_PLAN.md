@@ -143,6 +143,10 @@ The retained partial evidence is `permitext-sync-server/evals/results/2026-08-28
 
 The BC 1101.3.1 defect is now covered by a generic deterministic consistency gate. When supplied BC 1101.3 ancestor text limits the descendant rule to prior-code buildings and that status remains represented or unresolved, every project-specific accessibility consequence must remain conditional on confirming the prior-code-building and alteration/change context. The answer prompt and independent verifier carry the same boundary. The saved v4 answer now fails that local gate, while a properly conditional answer passes. The affected case is evidence-ready through Permitext's conversation flow in mock mode without a paid model call.
 
+The first paid confirmation after credit restoration failed closed and charged zero Permitext user turns. The initial answer omitted a material AC 28-118.3.1 certification condition; the bounded Terra revision repaired that point but reintroduced the categorical BC 1101.3.1 statement. Three provider requests cost $0.138138 before the internal deterministic gate rejected the revision. The failure is retained at `permitext-sync-server/evals/results/2026-08-28T01-34-11-648Z-3e63fff2-a8e7-4092-82ac-c77a4ce5edc6.md`.
+
+Answer-quality v22 now performs a narrow source-bound deterministic repair after declared Project uncertainty is restored. Only when the exact BC 1101.3 ancestor scope and cited BC 1101.3.1 evidence are both present, and prior-code-building status remains represented or unresolved, it conditions an otherwise categorical accessibility sentence on the prior-code-building and alteration/change scope. It does not rewrite the missing-fact request or add outside law. The saved v4 answer changes from deterministic failure to pass after this repair, and the complete no-cost repository gate passes.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -170,4 +174,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Restore a positive OpenAI API credit balance, then run one capped targeted confirmation of the repaired mercantile-to-business case and the provider-interrupted BC 1019.3 case. If both pass, create a new immutable v5 profile and run all 20 cases under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
+Rerun the repaired mercantile-to-business case from the clean v22 commit under a $0.75 cap. Only if it passes, run the provider-interrupted BC 1019.3 case under the same cap. If both pass, create a new immutable v5 profile and run all 20 cases under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.

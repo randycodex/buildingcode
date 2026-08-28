@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260827-prior-code-accessibility-scope-v21";
+  "20260828-prior-code-accessibility-repair-v22";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -133,6 +133,34 @@ function isUnconditionalPriorCodeAccessibilityStatement(statement) {
     statesMandatoryConsequence &&
     !statesEvidenceBoundary &&
     !isConditionalPriorCodeAccessibilityStatement(statement);
+}
+
+function priorCodeBuildingStatusIsUnresolved(answer) {
+  const missingFactsText = compactText(
+    Array.isArray(answer?.missingFacts) ? answer.missingFacts.join(" ") : ""
+  );
+  return (
+    /\b(?:verify|confirm|represented|unverified|unknown|not established|unestablished)\b[^.]{0,180}\bprior[- ]code[- ]building\b/i.test(missingFactsText) ||
+    /\bprior[- ]code[- ]building\b[^.]{0,180}\b(?:verify|confirm|represented|unverified|unknown|not established|unestablished)\b/i.test(missingFactsText)
+  );
+}
+
+const priorCodeAccessibilityConditionalPrefix =
+  "If the represented prior-code-building status is confirmed and this alteration is within BC 1101.3.1's change-in-occupancy-classification or zoning-use-group scope, ";
+
+function conditionPriorCodeAccessibilityStatements(value) {
+  return String(value || "")
+    .split(/((?<=[.!?])\s+)/)
+    .map((segment, index) => {
+      if (index % 2 === 1 || !isUnconditionalPriorCodeAccessibilityStatement(compactText(segment))) {
+        return segment;
+      }
+      return segment.replace(
+        /^(\s*(?:-\s+)?)/,
+        `$1${priorCodeAccessibilityConditionalPrefix}`
+      );
+    })
+    .join("");
 }
 
 function disclosesApplicability(source, answerText) {
@@ -301,15 +329,13 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     source.reference === "BC 1101.3" &&
     /\bchanges? of use or occupancy to prior[- ]code[- ]buildings\b/i.test(source.text)
   );
-  const priorCodeBuildingStatusIsUnresolved =
-    /\b(?:verify|confirm|represented|unverified|unknown|not established|unestablished)\b[^.]{0,180}\bprior[- ]code[- ]building\b/i.test(missingFactsText) ||
-    /\bprior[- ]code[- ]building\b[^.]{0,180}\b(?:verify|confirm|represented|unverified|unknown|not established|unestablished)\b/i.test(missingFactsText);
+  const hasUnresolvedPriorCodeBuildingStatus = priorCodeBuildingStatusIsUnresolved(answer);
   const hasUnconditionalPriorCodeAccessibilityStatement =
     answerApplicabilityStatements(answer).some(isUnconditionalPriorCodeAccessibilityStatement);
   const unconditionalPriorCodeAccessibilitySourceIDs =
     priorCodeAccessibilitySourceIDs.length &&
     hasPriorCodeAccessibilityAncestor &&
-    priorCodeBuildingStatusIsUnresolved &&
+    hasUnresolvedPriorCodeBuildingStatus &&
     hasUnconditionalPriorCodeAccessibilityStatement
       ? priorCodeAccessibilitySourceIDs
       : [];
@@ -442,7 +468,9 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
  * the answer is already cited to the exact enacted passage. Replacements are
  * source-bound and cannot add an outside requirement. The dining calculation
  * repair also adds the exact BC 1108.2.9.1 binding to any supported point that
- * states the calculation.
+ * states the calculation. When exact BC 1101.3 ancestor scope and BC 1101.3.1
+ * evidence are both present, the repair preserves unresolved prior-code status
+ * as a condition instead of adding another model revision.
  */
 export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
   if (!answer || typeof answer !== "object") return answer;
@@ -471,7 +499,24 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
     )
     .map((source) => compactText(source?.sourceID))
     .filter(Boolean);
-  if (!diningSourceIDs.length && !obstructionSourceIDs.length && !table403AuthoritySourceIDs.length) return answer;
+  const priorCodeAccessibilitySourceIDs = (Array.isArray(evidence) ? evidence : [])
+    .filter((source) =>
+      compactText(source?.codePrefix).toUpperCase() === "BC" &&
+      compactText(source?.sectionNumber) === "1101.3.1"
+    )
+    .map((source) => compactText(source?.sourceID))
+    .filter(Boolean);
+  const hasPriorCodeAccessibilityAncestor = (Array.isArray(evidence) ? evidence : []).some((source) =>
+    compactText(source?.codePrefix).toUpperCase() === "BC" &&
+    compactText(source?.sectionNumber) === "1101.3" &&
+    /\bchanges? of use or occupancy to prior[- ]code[- ]buildings\b/i.test(compactText(source?.text))
+  );
+  if (
+    !diningSourceIDs.length &&
+    !obstructionSourceIDs.length &&
+    !table403AuthoritySourceIDs.length &&
+    !priorCodeAccessibilitySourceIDs.length
+  ) return answer;
   const citedSourceIDs = new Set(
     (Array.isArray(answer.citations) ? answer.citations : [])
       .flatMap((citation) => Array.isArray(citation?.sourceIDs) ? citation.sourceIDs : [])
@@ -481,10 +526,20 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
   const boundDiningSourceIDs = diningSourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
   const boundObstructionSourceIDs = obstructionSourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
   const boundTable403AuthoritySourceIDs = table403AuthoritySourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
-  if (!boundDiningSourceIDs.length && !boundObstructionSourceIDs.length && !boundTable403AuthoritySourceIDs.length) return answer;
+  const boundPriorCodeAccessibilitySourceIDs = priorCodeAccessibilitySourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
+  const conditionPriorCodeAccessibility =
+    boundPriorCodeAccessibilitySourceIDs.length > 0 &&
+    hasPriorCodeAccessibilityAncestor &&
+    priorCodeBuildingStatusIsUnresolved(answer);
+  if (
+    !boundDiningSourceIDs.length &&
+    !boundObstructionSourceIDs.length &&
+    !boundTable403AuthoritySourceIDs.length &&
+    !conditionPriorCodeAccessibility
+  ) return answer;
 
   const replacementPattern = new RegExp(accessibleDiningSurfaceMisstatementPattern.source, "ig");
-  const repairText = (value) => {
+  const repairText = (value, { narrative = false } = {}) => {
     let text = String(value || "");
     if (boundDiningSourceIDs.length) {
       text = text
@@ -509,18 +564,21 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
     if (boundTable403AuthoritySourceIDs.length) {
       text = text.replace(table403AuthorityMisstatementPattern, table403AuthorityCanonicalPhrase);
     }
+    if (narrative && conditionPriorCodeAccessibility) {
+      text = conditionPriorCodeAccessibilityStatements(text);
+    }
     return text;
   };
   let changed = false;
-  const repairedTextField = (value) => {
-    const repaired = repairText(value);
+  const repairedTextField = (value, options) => {
+    const repaired = repairText(value, options);
     if (repaired !== value) changed = true;
     return repaired;
   };
   const supportedPoints = (Array.isArray(answer.supportedPoints) ? answer.supportedPoints : []).map((point) => {
     const pointText = compactText([point?.heading, point?.explanation].filter(Boolean).join(" "));
     const statesCalculation = diningSurfaceCalculationPattern.test(pointText);
-    const explanation = repairedTextField(point?.explanation);
+    const explanation = repairedTextField(point?.explanation, { narrative: true });
     if (!statesCalculation) return { ...point, explanation };
     const nextSourceIDs = Array.from(new Set([
       ...(Array.isArray(point?.sourceIDs) ? point.sourceIDs : []),
@@ -531,12 +589,12 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
   });
   const result = {
     ...answer,
-    answerText: repairedTextField(answer.answerText),
+    answerText: repairedTextField(answer.answerText, { narrative: true }),
     ...(typeof answer.conclusion === "string"
-      ? { conclusion: repairedTextField(answer.conclusion) }
+      ? { conclusion: repairedTextField(answer.conclusion, { narrative: true }) }
       : {}),
     ...(typeof answer.explanation === "string"
-      ? { explanation: repairedTextField(answer.explanation) }
+      ? { explanation: repairedTextField(answer.explanation, { narrative: true }) }
       : {}),
     ...(Array.isArray(answer.missingFacts)
       ? { missingFacts: answer.missingFacts.map((value) => repairedTextField(value)) }
