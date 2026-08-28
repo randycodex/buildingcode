@@ -2068,6 +2068,15 @@ function evaluationRunTerminalStatus(results, expectedResultCount, interrupted =
   return results.some((result) => result?.answer || result?.scoring) ? "partial" : "failed";
 }
 
+function evaluationQualityFailure(testCase, scoring, stopOnError) {
+  if (!stopOnError || scoring?.passed !== false) return null;
+  return {
+    caseID: testCase.id,
+    code: "RESEARCH_EVAL_QUALITY_FAILURE",
+    message: `Quality gate failed at ${Number(scoring.overallScore || 0).toFixed(2)}/4.00.`
+  };
+}
+
 function evaluationResultKey(testCase, repetition) {
   return `${testCase.id}:${repetition}`;
 }
@@ -2173,7 +2182,7 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
   console.log(
     `${runLabel}: ${checkedCases.length} cases × ${repeat} repetition(s). ` +
     "Each case runs one production Research turn and one separate grader; internal verification or revision can add provider requests. " +
-    `The approved spend cap is checked before every paid request.${options.stopOnError ? " This run stops after the first case error." : ""}`
+    `The approved spend cap is checked before every paid request.${options.stopOnError ? " This run stops after the first case error or quality failure." : ""}`
   );
   await saveSnapshot("running");
   let haltedFailure = null;
@@ -2227,6 +2236,7 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
           scoring
         });
         console.log(`${scoring.passed ? "PASS" : "FAIL"} ${testCase.title}${repeat > 1 ? ` #${repetition}` : ""}: ${scoring.overallScore.toFixed(2)}/4, ${answer.usage?.totalTokens || 0} answer tokens`);
+        haltedFailure = evaluationQualityFailure(testCase, scoring, options.stopOnError);
       } catch (error) {
         if (awaitingOperationTelemetry && conversationID) {
           try {
@@ -2458,10 +2468,26 @@ async function runSelfTest(dataset, datasetText) {
   }
   const scoring = scoreCase(dataset, testCase, answer, 15_000, judge);
   assert(scoring.passed && scoring.overallScore === 4, "Research eval self-test did not produce a perfect passing score.");
+  assert(
+    evaluationQualityFailure(testCase, scoring, true) === null,
+    "Stop-on-error incorrectly halted a passing quality result."
+  );
   const incomplete = scoreCase(dataset, testCase, { ...answer, citations: [] }, 15_000, judge);
   assert(
     incomplete.metrics.citationCorrectness.score === 0 && incomplete.metrics.citationCompleteness.score === 0 && !incomplete.passed,
     "Research eval self-test did not reject missing citations."
+  );
+  assert(
+    JSON.stringify(evaluationQualityFailure(testCase, incomplete, true)) === JSON.stringify({
+      caseID: testCase.id,
+      code: "RESEARCH_EVAL_QUALITY_FAILURE",
+      message: `Quality gate failed at ${incomplete.overallScore.toFixed(2)}/4.00.`
+    }),
+    "Stop-on-error did not halt a below-threshold quality result."
+  );
+  assert(
+    evaluationQualityFailure(testCase, incomplete, false) === null,
+    "Quality failure halted a run that did not request stop-on-error."
   );
   const duplicateCitationAnswer = {
     ...answer,

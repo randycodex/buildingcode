@@ -18437,7 +18437,8 @@ async function handleResearchConversationMessage(request, response) {
             ...candidate,
             interpretation: applyResearchDeterministicAnswerRepairs(
               candidate.interpretation,
-              assembledEvidence
+              assembledEvidence,
+              { question }
             )
           };
     result = preserveDeclaredProjectFactUncertainty(result);

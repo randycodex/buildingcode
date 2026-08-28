@@ -31,9 +31,9 @@ export const researchCommercializationBenchmarkV5 = Object.freeze({
   fastModel: "gpt-5.6-luna",
   routingMode: "hybrid",
   applicationCommit: "db2c0e9e67f95b2b36f22912628bee457edf0468",
-  completedAt: null,
-  resultStatus: null,
-  resultFile: null
+  completedAt: "2026-08-28T01:55:13.996Z",
+  resultStatus: "partial",
+  resultFile: "evals/results/2026-08-28T01-49-25-092Z-8aaf2e22-a707-496a-ba66-5e2f5275c983.json"
 });
 
 export function researchCommercializationBenchmarkV5Environment(environment = process.env) {
@@ -61,8 +61,12 @@ export function validateResearchCommercializationBenchmarkV5() {
   assert.deepEqual(profile.excludedSafetyCaseIDs, ["nyc-018-fire-district-map-boundary"]);
   assert.equal(new Set(profile.excludedSafetyCaseIDs).size, profile.excludedSafetyCaseIDs.length);
   assert.match(profile.applicationCommit, /^[a-f0-9]{40}$/);
-  assert.equal(profile.sourcePolicyVersion, researchSourcePolicyVersion);
-  assert.equal(profile.answerQualityVersion, researchAnswerQualityVersion);
+  assert.equal(profile.sourcePolicyVersion, "20260828-supporting-web-v10");
+  assert.equal(profile.answerQualityVersion, "20260828-prior-code-accessibility-repair-v22");
+  if (!profile.completedAt) {
+    assert.equal(profile.sourcePolicyVersion, researchSourcePolicyVersion);
+    assert.equal(profile.answerQualityVersion, researchAnswerQualityVersion);
+  }
   if (profile.completedAt || profile.resultFile || profile.resultStatus) {
     assert(profile.completedAt && Number.isFinite(Date.parse(profile.completedAt)));
     assert(["complete", "partial", "failed"].includes(profile.resultStatus));
@@ -110,7 +114,7 @@ async function main() {
   const environment = researchCommercializationBenchmarkV5Environment();
   console.log(
     `Running ${profile.id}: ${profile.targetQuestionCount} distinct Research questions ` +
-    `with a $${environment.PERMITEXT_RESEARCH_EVAL_MAX_USD} paid-evaluation cap and stop-on-error enabled.`
+    `with a $${environment.PERMITEXT_RESEARCH_EVAL_MAX_USD} paid-evaluation cap and stop-on-error-or-quality-failure enabled.`
   );
   const result = await runEvaluation(profile, environment);
   if (result.signal) throw new Error(`Research benchmark stopped by ${result.signal}.`);

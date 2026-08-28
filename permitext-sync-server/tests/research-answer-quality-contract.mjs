@@ -804,4 +804,64 @@ assert.deepEqual(
   ["misstated_provision", "unsupported_requirement"]
 );
 
+const certificateOperationEvidence = [{
+  ...source("bc-certificate-operation", "303.7", "supporting", "aligned"),
+  text: "A Certificate of Operation shall be required for indoor assembly occupancies used or intended for use by 75 persons or more."
+}];
+const unsupportedRoomThresholdAnswer = {
+  answerText: "The reported overall load above 200 does not itself resolve the calculation, and the stated absence of any individual room at 75 or more does not require analysis under the supplied Certificate of Operation provision. That provision concerns indoor assembly occupancies used or intended for use by 75 persons or more; the project facts state no individual room reaches that threshold.",
+  explanation: "The absence of any individual room at 75 or more does not require Certificate of Operation analysis. That provision concerns 75 persons, while no individual room reaches the threshold.",
+  supportedPoints: [{
+    explanation: "BC 303.7 states the supplied threshold, but filing applicability remains unresolved.",
+    sourceIDs: ["bc-certificate-operation"]
+  }],
+  missingFacts: [
+    "The available egress capacity for comparison with the resulting design occupant load.",
+    "Applicable filing and posted-occupancy requirements."
+  ],
+  citations: [{ sourceIDs: ["bc-certificate-operation"] }]
+};
+const rejectedRoomThresholdInference = evaluateResearchAnswerQuality({
+  question: "May the existing 1:100 occupant load be retained for movable seats?",
+  evidence: certificateOperationEvidence,
+  answer: unsupportedRoomThresholdAnswer
+});
+assert.equal(rejectedRoomThresholdInference.pass, false);
+assert.deepEqual(
+  rejectedRoomThresholdInference.unsupportedCertificateOperationRoomThresholdSourceIDs,
+  ["bc-certificate-operation"]
+);
+assert.equal(
+  researchAnswerQualityRevisionIssues(rejectedRoomThresholdInference).at(-1).type,
+  "fact_evidence_confusion"
+);
+const repairedRoomThresholdInference = applyResearchDeterministicAnswerRepairs(
+  unsupportedRoomThresholdAnswer,
+  certificateOperationEvidence,
+  { question: "May the existing 1:100 occupant load be retained for movable seats?" }
+);
+assert.doesNotMatch(repairedRoomThresholdInference.answerText, /no individual room/i);
+assert.match(
+  repairedRoomThresholdInference.answerText,
+  /does not establish whether a Certificate of Operation or another filing or posted-occupancy requirement applies/i
+);
+assert.doesNotMatch(repairedRoomThresholdInference.explanation, /does not require Certificate of Operation analysis/i);
+assert(
+  repairedRoomThresholdInference.missingFacts.some((value) =>
+    /existing approved occupancy record and approved occupant load/i.test(value)
+  ),
+  "Occupant-load documentation repair omitted the existing approved record."
+);
+assert(
+  repairedRoomThresholdInference.missingFacts.some((value) =>
+    /egress capacity and other egress-design inputs/i.test(value)
+  ),
+  "Occupant-load documentation repair did not preserve the broader egress boundary."
+);
+assert.equal(evaluateResearchAnswerQuality({
+  question: "May the existing 1:100 occupant load be retained for movable seats?",
+  evidence: certificateOperationEvidence,
+  answer: repairedRoomThresholdInference
+}).pass, true);
+
 console.log("Permitext Research answer-quality and evidence-economy contract passed.");

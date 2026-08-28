@@ -17,7 +17,7 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The active work is the final Research quality and economics validation. In v4, 18 turns completed and 17 passed; one answer overstated BC 1101.3.1 applicability, and the next case stopped on exhausted provider credit. After credit restoration, the first targeted confirmation failed closed and remained uncharged. The source-bound v22 repair now passes the complete local gate and both capped targeted confirmations pass 4.00/4. A complete frozen cohort is still required before deciding quality and economics. After that, the legal, provider, operations, production, and TestFlight gates must be closed.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The active work is the final Research quality and economics validation. The source-bound v22 repair passed both capped targeted confirmations at 4.00/4. The subsequent v5 cohort completed nine turns: eight passed, while the movable-seating answer made an unsupported Certificate-of-Operation threshold-unit inference and scored 3.26/4. The partial run cost $0.797555 including its independent graders and cannot decide pricing. The v23 remediation now passes the exact saved-answer replay and complete no-cost repository gate, and scored quality failures now halt the evaluator. A complete future frozen cohort is still required before deciding quality and economics. After that, the legal, provider, operations, production, and TestFlight gates must be closed.
 
 Current development branch: `codex/research-commercialization`
 
@@ -49,7 +49,9 @@ Current development branch: `codex/research-commercialization`
 - [x] Add a deterministic BC 1101.3/1101.3.1 scope-consistency gate and no-cost regression coverage for the single v4 quality failure.
 - [x] Restore OpenAI API credit, retain the failed first targeted confirmation, and repair its bounded-revision regression without another model call.
 - [x] Rerun capped targeted confirmations for the repaired case and the provider-interrupted case; both passed 4.00/4.
-- [ ] Run a new frozen full cohort only if the targeted cases improve without material regressions.
+- [x] Attempt the immutable v5 cohort; retain its 9 completed turns, 8 passes, quality failure, and operator stop as partial evidence.
+- [x] Complete no-cost verification of the v23 filing-boundary repair and scored-quality fail-fast behavior.
+- [ ] Run a new immutable full cohort only after separate authorization and only if the remediation has no material regression.
 - [ ] Confirm that p50/p90 full-service cost supports the $20 plan and 100 included turns.
 
 Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md)

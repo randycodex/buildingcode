@@ -28,9 +28,12 @@ assert.equal(profile.promptVersion, "20260827-material-completeness-v31");
 assert.equal(profile.sourcePolicyVersion, "20260828-supporting-web-v10");
 assert.equal(profile.answerQualityVersion, "20260828-prior-code-accessibility-repair-v22");
 assert.equal(profile.applicationCommit, "db2c0e9e67f95b2b36f22912628bee457edf0468");
-assert.equal(profile.completedAt, null);
-assert.equal(profile.resultStatus, null);
-assert.equal(profile.resultFile, null);
+assert.equal(profile.completedAt, "2026-08-28T01:55:13.996Z");
+assert.equal(profile.resultStatus, "partial");
+assert.equal(
+  profile.resultFile,
+  "evals/results/2026-08-28T01-49-25-092Z-8aaf2e22-a707-496a-ba66-5e2f5275c983.json"
+);
 assert.equal(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD, "4.00");
 assert.equal(environment.PERMITEXT_RESEARCH_ROUTING_MODE, "hybrid");
 assert.equal(environment.PERMITEXT_RESEARCH_FAST_MODEL, "gpt-5.6-luna");

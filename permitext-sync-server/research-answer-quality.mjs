@@ -1,5 +1,5 @@
 export const researchAnswerQualityVersion =
-  "20260828-prior-code-accessibility-repair-v22";
+  "20260828-occupant-load-filing-boundary-v23";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -143,6 +143,36 @@ function priorCodeBuildingStatusIsUnresolved(answer) {
     /\b(?:verify|confirm|represented|unverified|unknown|not established|unestablished)\b[^.]{0,180}\bprior[- ]code[- ]building\b/i.test(missingFactsText) ||
     /\bprior[- ]code[- ]building\b[^.]{0,180}\b(?:verify|confirm|represented|unverified|unknown|not established|unestablished)\b/i.test(missingFactsText)
   );
+}
+
+const certificateOperationRoomThresholdBoundary =
+  "The supplied evidence does not establish whether a Certificate of Operation or another filing or posted-occupancy requirement applies; that remains to be confirmed under the applicable authority.";
+
+const unsupportedCertificateOperationRoomThresholdPattern =
+  /[^.!?\n]*\b(?:absence|lack)\b[^.!?\n]*\bindividual rooms?\b[^.!?\n]*\b(?:does not|doesn't|cannot)\b[^.!?\n]*\b(?:require|trigger|establish|resolve)\b[^.!?\n]*\bCertificate of Operation\b[^.!?\n]*[.!?]/i;
+
+const certificateOperationRoomThresholdRationalePattern =
+  /[^.!?\n]*\b(?:that|the) provision\b[^.!?\n]*\b75 persons?\b[^.!?\n]*\bindividual rooms?\b[^.!?\n]*[.!?]/i;
+
+function repairCertificateOperationRoomThresholdStatements(value) {
+  let insertedBoundary = false;
+  const repaired = String(value || "")
+    .split(/((?<=[.!?])\s+)/)
+    .map((segment, index) => {
+      if (index % 2 === 1) return segment;
+      const statement = compactText(segment);
+      if (unsupportedCertificateOperationRoomThresholdPattern.test(statement)) {
+        insertedBoundary = true;
+        return segment.replace(statement, certificateOperationRoomThresholdBoundary);
+      }
+      if (certificateOperationRoomThresholdRationalePattern.test(statement)) return "";
+      return segment;
+    })
+    .join("")
+    .replace(/\s+([.!?])/g, "$1")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n[ \t]+/g, "\n");
+  return { repaired, insertedBoundary };
 }
 
 const priorCodeAccessibilityConditionalPrefix =
@@ -357,6 +387,17 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     )
       ? cumulativeSingleExitSourceIDs
       : [];
+  const certificateOperationSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
+    availableEvidence.get(sourceID)?.reference === "BC 303.7" &&
+    /\bindoor assembly occupancies\b[^.]{0,160}\b75 persons or more\b/i.test(
+      availableEvidence.get(sourceID)?.text
+    )
+  );
+  const unsupportedCertificateOperationRoomThresholdSourceIDs =
+    certificateOperationSourceIDs.length &&
+    unsupportedCertificateOperationRoomThresholdPattern.test(applicabilityText)
+      ? certificateOperationSourceIDs
+      : [];
   const accessibleDiningSurfaceSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
     availableEvidence.get(sourceID)?.reference === "BC 1108.2.9.1" &&
     /10 percent of the total number of seating and standing spaces/i.test(
@@ -432,6 +473,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       unconditionalPriorCodeAccessibilitySourceIDs.length === 0 &&
       misstatedCumulativeConditionSourceIDs.length === 0 &&
       unsupportedExitAccessExpansionSourceIDs.length === 0 &&
+      unsupportedCertificateOperationRoomThresholdSourceIDs.length === 0 &&
       misboundAccessibleDiningSurfaceRuleSourceIDs.length === 0 &&
       misstatedAccessibleDiningSurfacePercentageSourceIDs.length === 0 &&
       misstatedTable403AuthoritySourceIDs.length === 0,
@@ -453,6 +495,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     unconditionalPriorCodeAccessibilitySourceIDs,
     misstatedCumulativeConditionSourceIDs,
     unsupportedExitAccessExpansionSourceIDs,
+    unsupportedCertificateOperationRoomThresholdSourceIDs,
     misboundAccessibleDiningSurfaceRuleSourceIDs,
     misstatedAccessibleDiningSurfacePercentageSourceIDs,
     misstatedTable403AuthoritySourceIDs,
@@ -472,7 +515,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
  * evidence are both present, the repair preserves unresolved prior-code status
  * as a condition instead of adding another model revision.
  */
-export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
+export function applyResearchDeterministicAnswerRepairs(answer, evidence = [], { question = "" } = {}) {
   if (!answer || typeof answer !== "object") return answer;
   const diningSourceIDs = (Array.isArray(evidence) ? evidence : [])
     .filter((source) =>
@@ -506,6 +549,14 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
     )
     .map((source) => compactText(source?.sourceID))
     .filter(Boolean);
+  const certificateOperationSourceIDs = (Array.isArray(evidence) ? evidence : [])
+    .filter((source) =>
+      compactText(source?.codePrefix).toUpperCase() === "BC" &&
+      compactText(source?.sectionNumber) === "303.7" &&
+      /\bindoor assembly occupancies\b[^.]{0,160}\b75 persons or more\b/i.test(compactText(source?.text))
+    )
+    .map((source) => compactText(source?.sourceID))
+    .filter(Boolean);
   const hasPriorCodeAccessibilityAncestor = (Array.isArray(evidence) ? evidence : []).some((source) =>
     compactText(source?.codePrefix).toUpperCase() === "BC" &&
     compactText(source?.sectionNumber) === "1101.3" &&
@@ -515,7 +566,8 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
     !diningSourceIDs.length &&
     !obstructionSourceIDs.length &&
     !table403AuthoritySourceIDs.length &&
-    !priorCodeAccessibilitySourceIDs.length
+    !priorCodeAccessibilitySourceIDs.length &&
+    !certificateOperationSourceIDs.length
   ) return answer;
   const citedSourceIDs = new Set(
     (Array.isArray(answer.citations) ? answer.citations : [])
@@ -527,6 +579,7 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
   const boundObstructionSourceIDs = obstructionSourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
   const boundTable403AuthoritySourceIDs = table403AuthoritySourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
   const boundPriorCodeAccessibilitySourceIDs = priorCodeAccessibilitySourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
+  const boundCertificateOperationSourceIDs = certificateOperationSourceIDs.filter((sourceID) => citedSourceIDs.has(sourceID));
   const conditionPriorCodeAccessibility =
     boundPriorCodeAccessibilitySourceIDs.length > 0 &&
     hasPriorCodeAccessibilityAncestor &&
@@ -535,7 +588,8 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
     !boundDiningSourceIDs.length &&
     !boundObstructionSourceIDs.length &&
     !boundTable403AuthoritySourceIDs.length &&
-    !conditionPriorCodeAccessibility
+    !conditionPriorCodeAccessibility &&
+    !boundCertificateOperationSourceIDs.length
   ) return answer;
 
   const replacementPattern = new RegExp(accessibleDiningSurfaceMisstatementPattern.source, "ig");
@@ -567,6 +621,9 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
     if (narrative && conditionPriorCodeAccessibility) {
       text = conditionPriorCodeAccessibilityStatements(text);
     }
+    if (narrative && boundCertificateOperationSourceIDs.length) {
+      text = repairCertificateOperationRoomThresholdStatements(text).repaired;
+    }
     return text;
   };
   let changed = false;
@@ -587,6 +644,29 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
     if (nextSourceIDs.length !== (point?.sourceIDs || []).length) changed = true;
     return { ...point, explanation, sourceIDs: nextSourceIDs };
   });
+  const missingFacts = Array.isArray(answer.missingFacts)
+    ? answer.missingFacts.map((value) => repairedTextField(value))
+    : [];
+  const occupantLoadDocumentationQuestion =
+    /\boccupant load\b/i.test(question) &&
+    /\b(?:1\s*:\s*100|existing (?:documentation|basis|load))\b/i.test(question);
+  if (
+    occupantLoadDocumentationQuestion &&
+    !missingFacts.some((value) => /\b(?:approved occupancy record|Certificate of Occupancy|approved occupant load)\b/i.test(value))
+  ) {
+    missingFacts.push(
+      "The existing approved occupancy record and approved occupant load supporting the represented 1:100 basis."
+    );
+    changed = true;
+  }
+  const egressCapacityIndex = missingFacts.findIndex((value) =>
+    /\begress capacity\b/i.test(value) && !/\bother egress[- ]design inputs\b/i.test(value)
+  );
+  if (occupantLoadDocumentationQuestion && egressCapacityIndex >= 0) {
+    missingFacts[egressCapacityIndex] =
+      "The available egress capacity and other egress-design inputs needed to evaluate the resulting design occupant load.";
+    changed = true;
+  }
   const result = {
     ...answer,
     answerText: repairedTextField(answer.answerText, { narrative: true }),
@@ -597,7 +677,7 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = []) {
       ? { explanation: repairedTextField(answer.explanation, { narrative: true }) }
       : {}),
     ...(Array.isArray(answer.missingFacts)
-      ? { missingFacts: answer.missingFacts.map((value) => repairedTextField(value)) }
+      ? { missingFacts }
       : {}),
     ...(Array.isArray(answer.additionalEvidenceNeeded)
       ? { additionalEvidenceNeeded: answer.additionalEvidenceNeeded.map((value) => repairedTextField(value)) }
@@ -733,6 +813,12 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "unsupported_requirement",
       detail: `The pinned Item 7 passage supports the one-exit allowance asked about but does not supply the phrase access to one exit. Remove that unsupported expansion and stay within: ${references(result.unsupportedExitAccessExpansionSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.unsupportedCertificateOperationRoomThresholdSourceIDs?.length) {
+    issues.push({
+      type: "fact_evidence_confusion",
+      detail: `Do not infer that a Certificate of Operation or filing requirement is inapplicable merely because no individual room is represented as reaching 75 persons. The supplied provision states a threshold for an indoor assembly occupancy and does not establish that individual rooms are the governing unit. Keep filing and posted-occupancy applicability unresolved and bind the boundary to: ${references(result.unsupportedCertificateOperationRoomThresholdSourceIDs, result.sources)}.`
     });
   }
   return issues;

@@ -154,6 +154,21 @@ Both capped targeted confirmations now pass every exact rubric gate:
 
 These targeted passes clear the fail-fast blockers for a new immutable v5 cohort. They are not a pricing sample by themselves.
 
+### Frozen v5 cohort attempt
+
+The immutable v5 cohort stopped as a partial result after a scored quality failure:
+
+- Nine production turns completed and settled; eight passed and one failed. Seven answers scored 4.00/4, and the remaining passing answer scored 3.84/4.
+- The movable-seating answer scored 3.26/4. It correctly rejected selected movable-seat counting, required function-by-function calculations, preserved the commissioner-established lower-basis requirement, and rejected an unsupported nonsimultaneous-use omission. It then improperly inferred that no Certificate-of-Operation analysis was required because no individual room was represented as reaching 75 persons. BC 303.7 did not establish that individual rooms were the governing threshold unit.
+- The answer also omitted the existing approved occupancy record from its missing-fact request and described only egress capacity rather than the broader unresolved egress-design inputs.
+- Production operating cost was $0.537829; the nine separate graders cost $0.259726; total evaluation spend was $0.797555. Production latency was 16.185 seconds p50 and 38.361 seconds p90.
+- The v5 `--stop-on-error` behavior stopped thrown provider/runtime errors but not a scored quality failure. Two later operations began before the operator interrupted the run. No case after case 9 ran, all nine operations settled, and no paid request remained pending.
+- The incomplete nine-turn sample cannot decide pricing or the 100-turn allowance.
+
+The retained partial evidence is `permitext-sync-server/evals/results/2026-08-28T01-49-25-092Z-8aaf2e22-a707-496a-ba66-5e2f5275c983.md`.
+
+Answer-quality v23 adds a source-bound guard against treating an individual-room representation as dispositive of the BC 303.7 indoor-assembly-occupancy threshold. It replaces that unsupported negative applicability conclusion with an explicit unresolved filing boundary. For an occupant-load question asking to retain an existing 1:100 basis, it also preserves the existing approved occupancy record and broader egress-design inputs as missing facts. The evaluation runner now treats a scored quality failure as a stop condition. The exact saved v5 failure changes from local deterministic failure to pass after the repair, and the complete no-cost repository gate passes. V5 will not be rerun.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -181,4 +196,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Create and commit a new immutable v5 profile from the clean v22 application state, then run all 20 cases once under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
+Freeze and publish the v5 partial result and v23 remediation. Do not make another paid run without a separately authorized immutable profile. Use only a complete future cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
