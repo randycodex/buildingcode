@@ -3,7 +3,8 @@ import {
   createResearchOperationMetric,
   researchEconomicsReport,
   researchPackPricingReport,
-  researchPercentile
+  researchPercentile,
+  researchSubscriberEconomicsReport
 } from "../research-economics.mjs";
 
 const privacySafeMetric = createResearchOperationMetric({
@@ -143,6 +144,63 @@ assert.equal(webP90.minimumListPriceUSD, 6.31);
 assert.equal(webP90.grossMarginRate >= 0.6, true);
 assert.equal(iosP90.minimumListPriceUSD, 6.89);
 assert.equal(iosP90.grossMarginRate >= 0.6, true);
+
+const subscriberEconomics = researchSubscriberEconomicsReport(pricingRun, {
+  generatedAt: "2026-08-28T03:00:00.000Z",
+  subscriptionPriceUSD: 20,
+  currentIncludedTurns: 100,
+  allowanceCandidates: [50, 75],
+  bootstrapIterations: 10_000,
+  bootstrapSeed: 0x5045524d,
+  targetModelCostPerSubscriberMaximumUSD: 6,
+  infrastructureMonthlyUSD: { p50: 20, p90: 45 },
+  fullyUtilizedSubscribers: 25,
+  supportMinutesPerSubscriber: { p50: 6, p90: 15 },
+  supportHourlyCostUSD: 30,
+  refundReserveRate: 0.05,
+  taxReserveRate: 0.05,
+  channels: [
+    {
+      id: "web-stripe",
+      percentageFeeRate: 0.029,
+      fixedFeeUSD: 0.30,
+      taxAdministrationRate: 0.005
+    },
+    {
+      id: "ios-small-business",
+      percentageFeeRate: 0.15,
+      fixedFeeUSD: 0
+    }
+  ],
+  unverifiedInputs: ["support incidence"]
+});
+assert.equal(subscriberEconomics.generatedAt, "2026-08-28T03:00:00.000Z");
+assert.equal(subscriberEconomics.benchmark.runIntegrity.pass, true);
+assert.equal(subscriberEconomics.benchmark.measuredTurnCount, 25);
+assert.equal(subscriberEconomics.allowanceScenarios.length, 3);
+assert.equal(subscriberEconomics.allowanceScenarios[2].includedTurns, 100);
+assert.equal(subscriberEconomics.allowanceScenarios[2].providerCostUSD.p50, 3.2);
+assert.equal(subscriberEconomics.allowanceScenarios[2].providerCostUSD.p90, 3.5);
+assert.equal(subscriberEconomics.allowanceScenarios[2].channels[0].p50.paymentFeeUSD, 0.88);
+assert.equal(subscriberEconomics.allowanceScenarios[2].channels[0].p50.taxAdministrationUSD, 0.1);
+assert.equal(subscriberEconomics.recommendation.provisionalIncludedTurns, 100);
+assert.equal(subscriberEconomics.recommendation.currentAllowancePlanningP90Pass, true);
+assert.equal(subscriberEconomics.recommendation.commercialDecisionReady, false);
+
+assert.throws(
+  () => researchSubscriberEconomicsReport(pricingRun, {
+    subscriptionPriceUSD: 20,
+    currentIncludedTurns: 100,
+    infrastructureMonthlyUSD: { p50: 20, p90: 10 },
+    fullyUtilizedSubscribers: 25,
+    supportMinutesPerSubscriber: { p50: 1, p90: 1 },
+    supportHourlyCostUSD: 30,
+    refundReserveRate: 0,
+    taxReserveRate: 0,
+    channels: [{ id: "web", percentageFeeRate: 0, fixedFeeUSD: 0 }]
+  }),
+  /p90 must be at least p50/
+);
 
 const illustrativePricing = researchPackPricingReport(unsafeCharging, {
   infrastructureCostPerTurnUSD: 0,

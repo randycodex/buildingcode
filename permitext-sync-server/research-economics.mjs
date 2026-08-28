@@ -44,6 +44,11 @@ function roundUp(value, increment) {
   return fixed(units * increment, 2);
 }
 
+function fixedSigned(value, places = 6) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Number(number.toFixed(places)) : 0;
+}
+
 function normalizedStatus(value) {
   const status = String(value || "").trim().toLowerCase();
   return ["completed", "failed", "cancelled", "replayed", "rejected"].includes(status)
@@ -328,6 +333,339 @@ export function researchEconomicsReport(rawOperations = [], options = {}) {
   };
 }
 
+function benchmarkRunIntegrity(benchmarkReport = {}) {
+  const snapshotProvided = Boolean(
+    benchmarkReport &&
+    typeof benchmarkReport === "object" &&
+    benchmarkReport.configuration &&
+    Array.isArray(benchmarkReport.results)
+  );
+  const configuredCaseIDs = snapshotProvided
+    ? (Array.isArray(benchmarkReport.configuration?.caseIDs)
+        ? benchmarkReport.configuration.caseIDs.map((value) => String(value || "").trim()).filter(Boolean)
+        : [])
+    : [];
+  const resultCaseIDs = snapshotProvided
+    ? benchmarkReport.results.map((result) => String(result?.testCase?.id || "").trim())
+    : [];
+  const configuredCaseIDSet = new Set(configuredCaseIDs);
+  const resultCaseIDSet = new Set(resultCaseIDs);
+  const integrity = {
+    snapshotProvided,
+    completed: snapshotProvided && benchmarkReport.status === "completed",
+    gitCommitRecorded: snapshotProvided && /^[a-f0-9]{40}$/.test(
+      String(benchmarkReport.configuration?.gitCommit || "")
+    ),
+    noPendingProviderRequests: snapshotProvided &&
+      nonnegativeInteger(benchmarkReport.configuration?.pendingPaidRequestCount) === 0,
+    exactCaseSet: snapshotProvided &&
+      configuredCaseIDs.length > 0 &&
+      configuredCaseIDs.length === configuredCaseIDSet.size &&
+      resultCaseIDs.length === configuredCaseIDs.length &&
+      resultCaseIDs.length === resultCaseIDSet.size &&
+      resultCaseIDs.every((caseID) => configuredCaseIDSet.has(caseID)),
+    allResultsComplete: snapshotProvided && benchmarkReport.results.every((result) =>
+      !result?.error && result?.operationMetric && result?.scoring
+    ),
+    allQualityCasesPassed: snapshotProvided && benchmarkReport.results.every((result) =>
+      result?.scoring?.passed === true
+    )
+  };
+  return {
+    ...integrity,
+    pass: Object.values(integrity).every(Boolean)
+  };
+}
+
+function normalizedPercentileCost(value, label) {
+  const p50 = requiredNonnegativeNumber(value?.p50, `${label} p50`);
+  const p90 = requiredNonnegativeNumber(value?.p90, `${label} p90`);
+  if (p90 < p50) throw new TypeError(`${label} p90 must be at least p50.`);
+  return { p50, p90 };
+}
+
+function normalizedSubscriberChannel(channel = {}) {
+  const normalized = normalizedPricingChannel(channel);
+  return {
+    ...normalized,
+    taxAdministrationRate: boundedRate(
+      channel.taxAdministrationRate ?? 0,
+      `${normalized.id} tax administration rate`
+    ),
+    requiredForDecision: channel.requiredForDecision !== false
+  };
+}
+
+function seededRandom(seed) {
+  let state = nonnegativeInteger(seed, 0x5045524d) >>> 0;
+  if (state === 0) state = 0x5045524d;
+  return () => {
+    state = (Math.imul(1664525, state) + 1013904223) >>> 0;
+    return state / 0x100000000;
+  };
+}
+
+function aggregateSubscriberCostDistributions(costs, turnCounts, iterations, seed) {
+  const maximumTurns = Math.max(...turnCounts);
+  const samples = new Map(turnCounts.map((turns) => [turns, []]));
+  const requestedTurns = new Set(turnCounts);
+  const random = seededRandom(seed);
+  for (let iteration = 0; iteration < iterations; iteration += 1) {
+    let aggregateCostUSD = 0;
+    for (let turn = 1; turn <= maximumTurns; turn += 1) {
+      aggregateCostUSD += costs[Math.floor(random() * costs.length)];
+      if (requestedTurns.has(turn)) samples.get(turn).push(aggregateCostUSD);
+    }
+  }
+  return new Map(turnCounts.map((turns) => [turns, distribution(samples.get(turns))]));
+}
+
+function subscriberCostScenario({
+  subscriptionPriceUSD,
+  providerCostUSD,
+  infrastructureCostUSD,
+  supportCostUSD,
+  refundReserveRate,
+  taxReserveRate,
+  channel
+}) {
+  const paymentFeeUSD = fixed(
+    subscriptionPriceUSD * channel.percentageFeeRate + channel.fixedFeeUSD
+  );
+  const taxReserveUSD = fixed(subscriptionPriceUSD * taxReserveRate);
+  const taxAdministrationUSD = fixed(
+    subscriptionPriceUSD * channel.taxAdministrationRate
+  );
+  const refundReserveUSD = fixed(subscriptionPriceUSD * refundReserveRate);
+  const fullServiceCostUSD = fixed(
+    providerCostUSD +
+    paymentFeeUSD +
+    taxReserveUSD +
+    taxAdministrationUSD +
+    refundReserveUSD +
+    infrastructureCostUSD +
+    supportCostUSD
+  );
+  const contributionUSD = fixedSigned(subscriptionPriceUSD - fullServiceCostUSD);
+  return {
+    providerCostUSD: fixed(providerCostUSD),
+    paymentFeeUSD,
+    taxReserveUSD,
+    taxAdministrationUSD,
+    refundReserveUSD,
+    infrastructureCostUSD: fixed(infrastructureCostUSD),
+    supportCostUSD: fixed(supportCostUSD),
+    fullServiceCostUSD,
+    contributionUSD,
+    contributionMarginRate: fixedSigned(contributionUSD / subscriptionPriceUSD, 4),
+    nonModelHeadroomUSD: fixedSigned(subscriptionPriceUSD - providerCostUSD),
+    contributionPositive: contributionUSD > 0
+  };
+}
+
+/**
+ * Aggregates measured per-turn costs into fully utilized subscriber-month
+ * distributions, then layers explicit channel, tax, refund, infrastructure,
+ * and support assumptions onto p50 and p90 costs. This is local decision
+ * support only; it does not call a provider or change any commercial setting.
+ */
+export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumptions = {}) {
+  const integrity = benchmarkRunIntegrity(benchmarkReport);
+  if (!integrity.snapshotProvided) {
+    throw new TypeError("Research subscriber economics requires a complete benchmark snapshot.");
+  }
+  const operationCosts = benchmarkReport.results.map((result) => {
+    const operation = normalizedOperation(result?.operationMetric || {});
+    if (operation.status !== "completed" || !operation.charged) {
+      throw new TypeError("Research subscriber economics requires every benchmark result to be completed and charged.");
+    }
+    return operationCostUSD(operation);
+  });
+  if (!operationCosts.length || operationCosts.some((cost) => !Number.isFinite(cost) || cost <= 0)) {
+    throw new TypeError("Research subscriber economics requires a positive measured cost for every result.");
+  }
+
+  const subscriptionPriceUSD = positiveNumber(
+    assumptions.subscriptionPriceUSD,
+    "Subscription price"
+  );
+  const currentIncludedTurns = Math.max(
+    1,
+    nonnegativeInteger(assumptions.currentIncludedTurns)
+  );
+  const allowanceCandidates = Array.from(new Set(
+    [...(Array.isArray(assumptions.allowanceCandidates) ? assumptions.allowanceCandidates : []), currentIncludedTurns]
+      .map((value) => nonnegativeInteger(value))
+      .filter((value) => value > 0)
+  )).sort((left, right) => left - right);
+  const bootstrapIterations = Math.max(
+    1_000,
+    nonnegativeInteger(assumptions.bootstrapIterations, 100_000)
+  );
+  const bootstrapSeed = nonnegativeInteger(assumptions.bootstrapSeed, 0x5045524d);
+  const infrastructureMonthlyUSD = normalizedPercentileCost(
+    assumptions.infrastructureMonthlyUSD,
+    "Monthly infrastructure cost"
+  );
+  const fullyUtilizedSubscribers = positiveNumber(
+    assumptions.fullyUtilizedSubscribers,
+    "Fully utilized subscriber count"
+  );
+  const supportMinutesPerSubscriber = normalizedPercentileCost(
+    assumptions.supportMinutesPerSubscriber,
+    "Support minutes per subscriber"
+  );
+  const supportHourlyCostUSD = requiredNonnegativeNumber(
+    assumptions.supportHourlyCostUSD,
+    "Support hourly cost"
+  );
+  const refundReserveRate = boundedRate(
+    assumptions.refundReserveRate,
+    "Refund reserve rate"
+  );
+  const taxReserveRate = boundedRate(
+    assumptions.taxReserveRate,
+    "Tax reserve rate"
+  );
+  const targetModelCostPerSubscriberMaximumUSD = positiveNumber(
+    assumptions.targetModelCostPerSubscriberMaximumUSD ?? 6,
+    "Target model cost per fully utilized subscriber"
+  );
+  const channels = (Array.isArray(assumptions.channels) ? assumptions.channels : [])
+    .map(normalizedSubscriberChannel);
+  if (!channels.length) throw new TypeError("Research subscriber economics requires at least one sales channel.");
+  if (new Set(channels.map((channel) => channel.id)).size !== channels.length) {
+    throw new TypeError("Research subscriber economics channel IDs must be unique.");
+  }
+  if (!channels.some((channel) => channel.requiredForDecision)) {
+    throw new TypeError("Research subscriber economics requires at least one decision channel.");
+  }
+  const unverifiedInputs = Array.from(new Set(
+    (Array.isArray(assumptions.unverifiedInputs) ? assumptions.unverifiedInputs : [])
+      .map((value) => String(value || "").trim())
+      .filter(Boolean)
+  ));
+  const generatedAt = assumptions.generatedAt
+    ? new Date(assumptions.generatedAt).toISOString()
+    : new Date().toISOString();
+  const aggregateCosts = aggregateSubscriberCostDistributions(
+    operationCosts,
+    allowanceCandidates,
+    bootstrapIterations,
+    bootstrapSeed
+  );
+  const infrastructureCostUSD = {
+    p50: infrastructureMonthlyUSD.p50 / fullyUtilizedSubscribers,
+    p90: infrastructureMonthlyUSD.p90 / fullyUtilizedSubscribers
+  };
+  const supportCostUSD = {
+    p50: supportMinutesPerSubscriber.p50 / 60 * supportHourlyCostUSD,
+    p90: supportMinutesPerSubscriber.p90 / 60 * supportHourlyCostUSD
+  };
+  const allowanceScenarios = allowanceCandidates.map((includedTurns) => {
+    const providerCostUSD = aggregateCosts.get(includedTurns);
+    const channelScenarios = channels.map((channel) => ({
+      id: channel.id,
+      requiredForDecision: channel.requiredForDecision,
+      p50: subscriberCostScenario({
+        subscriptionPriceUSD,
+        providerCostUSD: providerCostUSD.p50,
+        infrastructureCostUSD: infrastructureCostUSD.p50,
+        supportCostUSD: supportCostUSD.p50,
+        refundReserveRate,
+        taxReserveRate,
+        channel
+      }),
+      p90: subscriberCostScenario({
+        subscriptionPriceUSD,
+        providerCostUSD: providerCostUSD.p90,
+        infrastructureCostUSD: infrastructureCostUSD.p90,
+        supportCostUSD: supportCostUSD.p90,
+        refundReserveRate,
+        taxReserveRate,
+        channel
+      })
+    }));
+    const requiredChannelP90Pass = channelScenarios
+      .filter((channel) => channel.requiredForDecision)
+      .every((channel) => channel.p90.contributionPositive);
+    const normalizedP90ModelCostPer100USD = fixed(
+      providerCostUSD.p90 / includedTurns * 100,
+      2
+    );
+    return {
+      includedTurns,
+      providerCostUSD,
+      normalizedP90ModelCostPer100USD,
+      p90ModelTargetPass: providerCostUSD.p90 <= targetModelCostPerSubscriberMaximumUSD,
+      requiredChannelP90Pass,
+      channels: channelScenarios
+    };
+  });
+  const provisionalIncludedTurns = allowanceScenarios
+    .filter((scenario) => scenario.requiredChannelP90Pass && scenario.p90ModelTargetPass)
+    .map((scenario) => scenario.includedTurns)
+    .at(-1) || null;
+  const currentScenario = allowanceScenarios.find((scenario) =>
+    scenario.includedTurns === currentIncludedTurns
+  );
+  const benchmarkReady = benchmarkReport.economics?.readyForPricingDecision === true && integrity.pass;
+  const commercialDecisionReady = benchmarkReady &&
+    unverifiedInputs.length === 0 &&
+    provisionalIncludedTurns !== null;
+  return {
+    generatedAt,
+    decisionStatus: commercialDecisionReady
+      ? "commercial-inputs-verified"
+      : "planning-model-commercial-inputs-unverified",
+    benchmark: {
+      sourceCreatedAt: normalizedString(benchmarkReport.createdAt, 40),
+      sourceGitCommit: normalizedString(benchmarkReport.configuration?.gitCommit, 40),
+      measuredTurnCount: operationCosts.length,
+      measuredTurnCostUSD: distribution(operationCosts),
+      readyForPricingDecision: benchmarkReport.economics?.readyForPricingDecision === true,
+      runIntegrity: integrity
+    },
+    assumptions: {
+      subscriptionPriceUSD: fixed(subscriptionPriceUSD, 2),
+      currentIncludedTurns,
+      allowanceCandidates,
+      bootstrapIterations,
+      bootstrapSeed,
+      targetModelCostPerSubscriberMaximumUSD: fixed(targetModelCostPerSubscriberMaximumUSD, 2),
+      infrastructureMonthlyUSD: {
+        p50: fixed(infrastructureMonthlyUSD.p50),
+        p90: fixed(infrastructureMonthlyUSD.p90)
+      },
+      fullyUtilizedSubscribers,
+      infrastructureCostPerSubscriberUSD: {
+        p50: fixed(infrastructureCostUSD.p50),
+        p90: fixed(infrastructureCostUSD.p90)
+      },
+      supportMinutesPerSubscriber,
+      supportHourlyCostUSD: fixed(supportHourlyCostUSD, 2),
+      supportCostPerSubscriberUSD: {
+        p50: fixed(supportCostUSD.p50),
+        p90: fixed(supportCostUSD.p90)
+      },
+      refundReserveRate,
+      taxReserveRate,
+      channels,
+      unverifiedInputs
+    },
+    allowanceScenarios,
+    recommendation: {
+      currentIncludedTurns,
+      provisionalIncludedTurns,
+      currentAllowancePlanningP90Pass: Boolean(
+        currentScenario?.requiredChannelP90Pass && currentScenario?.p90ModelTargetPass
+      ),
+      benchmarkReady,
+      commercialDecisionReady
+    }
+  };
+}
+
 function normalizedPricingChannel(channel = {}) {
   const id = normalizedString(channel.id, 80);
   if (!id) throw new TypeError("Each Research pack pricing channel requires an ID.");
@@ -444,38 +782,8 @@ export function researchPackPricingReport(benchmarkReport = {}, assumptions = {}
   if (new Set(channels.map((channel) => channel.id)).size !== channels.length) {
     throw new TypeError("Research pack pricing channel IDs must be unique.");
   }
-  const configuredCaseIDs = hasRunSnapshot
-    ? (Array.isArray(benchmarkReport.configuration?.caseIDs)
-        ? benchmarkReport.configuration.caseIDs.map((value) => String(value || "").trim()).filter(Boolean)
-        : [])
-    : [];
-  const resultCaseIDs = hasRunSnapshot
-    ? benchmarkReport.results.map((result) => String(result?.testCase?.id || "").trim())
-    : [];
-  const configuredCaseIDSet = new Set(configuredCaseIDs);
-  const resultCaseIDSet = new Set(resultCaseIDs);
-  const runIntegrity = {
-    snapshotProvided: hasRunSnapshot,
-    completed: hasRunSnapshot && benchmarkReport.status === "completed",
-    gitCommitRecorded: hasRunSnapshot && /^[a-f0-9]{40}$/.test(
-      String(benchmarkReport.configuration?.gitCommit || "")
-    ),
-    noPendingProviderRequests: hasRunSnapshot &&
-      nonnegativeInteger(benchmarkReport.configuration?.pendingPaidRequestCount) === 0,
-    exactCaseSet: hasRunSnapshot &&
-      configuredCaseIDs.length > 0 &&
-      configuredCaseIDs.length === configuredCaseIDSet.size &&
-      resultCaseIDs.length === configuredCaseIDs.length &&
-      resultCaseIDs.length === resultCaseIDSet.size &&
-      resultCaseIDs.every((caseID) => configuredCaseIDSet.has(caseID)),
-    allResultsComplete: hasRunSnapshot && benchmarkReport.results.every((result) =>
-      !result?.error && result?.operationMetric && result?.scoring
-    ),
-    allQualityCasesPassed: hasRunSnapshot && benchmarkReport.results.every((result) =>
-      result?.scoring?.passed === true
-    )
-  };
-  const runIntegrityPass = Object.values(runIntegrity).every(Boolean);
+  const runIntegrity = benchmarkRunIntegrity(benchmarkReport);
+  const runIntegrityPass = runIntegrity.pass;
   const pricingDecisionReady = economicsReport?.readyForPricingDecision === true && runIntegrityPass;
   return {
     generatedAt: new Date().toISOString(),
@@ -489,10 +797,7 @@ export function researchPackPricingReport(benchmarkReport = {}, assumptions = {}
       targetReady: economics.targetReady === true,
       chargeIntegrityPass: economicsReport?.charging?.integrityPass === true,
       failedOperationAllowancePerTurnUSD: fixed(failedOperationAllowancePerTurnUSD),
-      runIntegrity: {
-        ...runIntegrity,
-        pass: runIntegrityPass
-      }
+      runIntegrity
     },
     assumptions: {
       infrastructureCostPerTurnUSD: fixed(infrastructureCostPerTurnUSD),

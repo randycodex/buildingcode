@@ -190,6 +190,20 @@ settled-provider-request, and all-quality-cases-passed gates. Passing only an
 economics subreport is deliberately insufficient. It is decision support only:
 it does not configure Stripe or App Store products or expose turn packs to users.
 
+`researchSubscriberEconomicsReport` instead aggregates complete fully utilized
+subscriber months from the measured per-turn distribution, then adds explicit
+channel, tax, refund, infrastructure, and support assumptions at p50 and p90.
+The retained V6 planning case is reproducible without a network or model call:
+
+```sh
+npm run eval:research:subscriber-economics-v6
+npm --silent run eval:research:subscriber-economics-v6 -- --json
+```
+
+The report remains labeled `planning-model-commercial-inputs-unverified` until
+every named commercial input is verified. It does not change the subscription
+price, included allowance, or purchase configuration.
+
 `OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, and records versioned model/token usage without logging the question or code text. Customer Account and Research views show included and purchased turns plus the monthly reset date; token totals and estimated provider cost remain owner-only operational data. The OpenAI account that owns the API key is responsible for model usage charges.
 
 ### Research evaluation set

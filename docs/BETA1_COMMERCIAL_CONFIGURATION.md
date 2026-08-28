@@ -26,6 +26,17 @@ This record captures owner decisions for implementation and provider setup. It i
 
 This checkpoint is an operating-cost decision, not public Research approval or a substitute for the evaluation-governance release gates.
 
+## V6 subscriber economics checkpoint — 2026-08-28
+
+- The complete post-v23 V6 cohort replaces the six-case checkpoint for Research model-cost evidence: all 20 production turns completed and passed every fatal evaluation gate.
+- Deterministic empirical aggregation gives a fully used 100-turn subscriber model cost of $5.74 p50 and $6.06 p90.
+- With explicit conservative planning reserves for payment, tax, refunds, infrastructure, and support, 100 turns cost $18.34 p90 on web and $20.36 p90 on iOS at a 15% commission. At the standard 30% App Store rate the p90 cost is $23.36.
+- Seventy-five turns is the provisional risk boundary that retains positive p90 contribution on web and 15%-commission iOS under the stated assumptions. This does not change the current product allowance.
+- Do not lock the allowance until App Store Small Business Program enrollment, tax configuration, expected refunds, support effort, launch-volume infrastructure allocation, and a minimum contribution or gross-margin target are verified.
+- Turn-pack prices and paid continuation remain unpublished and disabled.
+
+Detailed model: [PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md](./PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md)
+
 ## Research exposure limits
 
 - Maximum estimated request cost: $0.50.

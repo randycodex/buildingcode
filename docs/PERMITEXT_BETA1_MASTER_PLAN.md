@@ -17,7 +17,7 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Production model cost was $1.148132, projecting to $5.74 per 100 turns at the cohort mean; latency was 20.010 seconds p50 and 31.669 seconds p90. The quality gate is now supported by complete post-remediation evidence. Before fixing the 100-turn allowance or turn-pack prices, Permitext still needs subscriber-level p50/p90 cost aggregation and full payment, infrastructure, refund, tax, and support economics. The legal, provider, operations, production, and TestFlight gates also remain open.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Subscriber-level aggregation now places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. Under explicit conservative full-service planning reserves, web costs $18.34 p90 and iOS at a 15% commission costs $20.36 p90. Seventy-five turns is therefore the provisional risk boundary, but the current allowance is unchanged until the commercial inputs and margin target are verified. The legal, provider, operations, production, and TestFlight gates also remain open.
 
 Current development branch: `codex/research-commercialization`
 
@@ -52,7 +52,8 @@ Current development branch: `codex/research-commercialization`
 - [x] Attempt the immutable v5 cohort; retain its 9 completed turns, 8 passes, quality failure, and operator stop as partial evidence.
 - [x] Complete no-cost verification of the v23 filing-boundary repair and scored-quality fail-fast behavior.
 - [x] Run the separately authorized immutable v6 cohort; all 20 cases passed with no provider or charging failure.
-- [ ] Confirm that p50/p90 full-service cost supports the $20 plan and 100 included turns.
+- [x] Build the no-cost V6 subscriber aggregation and full-service planning model.
+- [ ] Replace the model's unverified tax, refund, support, infrastructure-allocation, and App Store commission inputs; choose a margin target and lock the allowance. The provisional risk boundary is 75 turns, with no product change yet.
 
 Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md)
 
