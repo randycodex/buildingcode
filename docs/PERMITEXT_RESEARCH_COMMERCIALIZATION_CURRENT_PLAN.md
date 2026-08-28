@@ -216,7 +216,17 @@ A local provider-simulated Stripe test-mode exercise now covers the Pro subscrip
 
 The first exercise exposed a material ordering defect: after a full refund deleted the entitlement, a delayed older active-subscription event could restore Pro because the last provider timestamp disappeared with the entitlement. The server now retains a per-subscription lifecycle cursor independently of the entitlement in both local storage and PostgreSQL. Terminal events win same-second ties, older or duplicate events cannot mutate access, and a subscription cursor cannot transfer to another Permitext account. Existing PostgreSQL Stripe entitlements seed the cursor during schema initialization.
 
-The permanent `npm run test:billing` suite now includes this lifecycle exercise and reports zero paid provider calls. The normal Beta 1 suite also includes it. This is local provider simulation, not Stripe-created test data, production provider evidence, or a public-billing authorization. The current local workspace has no usable Stripe test-mode secret or Stripe CLI, so the provider-backed no-charge exercise remains open.
+The permanent `npm run test:billing` suite now includes this lifecycle exercise and reports zero paid provider calls. The normal Beta 1 suite also includes it. This is local provider simulation, not Stripe-created test data, production provider evidence, or a public-billing authorization.
+
+### Provider-backed Stripe sandbox confirmation
+
+A separate provider-backed sandbox exercise now covers Stripe-created Checkout, signed-event fulfillment, duplicate delivery, owner/mismatched-owner restore, scheduled and terminal cancellation, clock-driven renewal, failed invoice, partial and full refunds, and delayed-event recovery. It used synthetic Stripe test data and moved no real money.
+
+The exercise found one material compatibility defect before release: the current Stripe `2026-06-24.dahlia` `charge.refunded` event no longer carried the older direct `invoice` field. Permitext preserved Pro after the first full-refund delivery because it could not find the subscription invoice. The server now resolves an absent direct invoice through `charge.payment_intent` and Stripe's Invoice Payments API, requires one unambiguous invoice match, and retains that event shape in the permanent lifecycle contract. Replaying the same real provider event then removed Pro and canceled the sandbox subscription.
+
+The Stripe test clock extended the recorded expiration by one month, a provider-created failed invoice granted no access and produced the operational warning, partial refund preserved Pro, full refund removed it, duplicate/stale events were inert, and restore succeeded only for the owning Permitext account. All created subscriptions ended canceled or incomplete-expired; all four exercise customers and the test clock were deleted; the temporary CLI session was revoked. Detailed IDs and boundaries are retained in [PERMITEXT_STRIPE_PROVIDER_SANDBOX_EVIDENCE_2026-08-28.md](./PERMITEXT_STRIPE_PROVIDER_SANDBOX_EVIDENCE_2026-08-28.md).
+
+This closes the provider-backed Stripe sandbox item. It does not close controlled production billing evidence, Stripe Tax configuration, Apple Sandbox/TestFlight billing, deployment, or public-billing authorization.
 
 ## Commercial decision gate
 
@@ -229,6 +239,7 @@ Proceed toward paid Research only if all of the following are true:
 - [x] Owner-approved Beta economics retain 100 turns with a $2 minimum p90 contribution; the modeled result is $4.16 on web and $2.14 on iOS at the confirmed 15% commission.
 - [x] Complete the no-cost tax/refund/infrastructure input audit and launch-volume/refund sensitivities; low-volume p90 allocation is explicit and the missing Stripe Tax configuration is recorded.
 - [x] Complete the local no-charge Stripe Pro lifecycle exercise and retain the delayed-event/refund regression in the billing suite.
+- [x] Complete the provider-backed Stripe sandbox lifecycle and retain the current PaymentIntent-to-Invoice-Payment refund regression in the billing suite.
 - [ ] Verify tax treatment, refund incidence, and launch-volume infrastructure allocation, then review actual contribution after the first 25–50 customers.
 - [x] Current checked-in web and iOS clients decode and display the shared Research response contract correctly through the retained V6-shaped fixture and iOS Simulator test.
 - [ ] Confirm the same contract on production web and the next compatible TestFlight build during release verification.
@@ -250,4 +261,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Obtain tax-professional direction on Permitext's product classification, registrations, and tax-inclusive/exclusive presentation before changing Stripe tax behavior. Configure dedicated Stripe test-mode credentials and complete the provider-backed no-charge lifecycle against Stripe-created test records; the local simulation is complete but does not replace that evidence. Replace the refund and infrastructure planning reserves only when actual customer and Vercel billing data exist. Before deployment, set the production per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Production web and the next compatible TestFlight build must then confirm the shared response contract; additional-turn prices and public paid Research remain disabled.
+Obtain tax-professional direction on Permitext's product classification, registrations, and tax-inclusive/exclusive presentation before changing Stripe tax behavior. Complete Apple Sandbox/TestFlight billing evidence and the separately approved controlled production Stripe exercise before public billing. Replace the refund and infrastructure planning reserves only when actual customer and Vercel billing data exist. Before deployment, set the production per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Production web and the next compatible TestFlight build must then confirm the shared response contract; additional-turn prices and public paid Research remain disabled.

@@ -21762,6 +21762,33 @@ export async function cancelStripeSubscriptionAfterFullRefund({
   return { status: canceled.status, alreadyInactive: false };
 }
 
+async function stripeInvoiceIDForRefundedCharge(object, requestStripe = stripeAPI) {
+  const directInvoiceID = stripeSubscriptionID(object?.invoice);
+  if (directInvoiceID) return directInvoiceID;
+
+  const paymentIntentID = stripeSubscriptionID(object?.payment_intent);
+  if (!paymentIntentID) return null;
+
+  const searchParams = new URLSearchParams({
+    "payment[type]": "payment_intent",
+    "payment[payment_intent]": paymentIntentID,
+    limit: "10"
+  });
+  const payload = await requestStripe(`/v1/invoice_payments?${searchParams.toString()}`);
+  const invoiceIDs = [...new Set((payload.data || [])
+    .filter((entry) => stripeSubscriptionID(entry?.payment?.payment_intent) === paymentIntentID)
+    .map((entry) => stripeSubscriptionID(entry?.invoice))
+    .filter(Boolean))];
+  if (invoiceIDs.length === 1) return invoiceIDs[0];
+  if (invoiceIDs.length > 1) {
+    console.error("Stripe refund PaymentIntent resolved to multiple invoices.", {
+      paymentIntentID,
+      invoiceIDs
+    });
+  }
+  return null;
+}
+
 async function activeStripeSubscriptionForUserID(userID, packageID = entitlementPackageIDs.pro) {
   if (!stripeConfigured(packageID) || !userID) {
     return null;
@@ -25034,7 +25061,13 @@ async function handleStripeWebhook(request, response) {
     changed = await reconcileStripeResearchCreditRefund(object, event);
     const amount = Number(object.amount || 0);
     const amountRefunded = Number(object.amount_refunded || 0);
-    const invoiceID = stripeSubscriptionID(object.invoice);
+    const paymentIntentID = stripeSubscriptionID(object.payment_intent);
+    const researchCreditClaim = paymentIntentID
+      ? await researchCreditPurchaseClaimByPaymentID("stripe", paymentIntentID)
+      : null;
+    const invoiceID = !researchCreditClaim && amount > 0 && amountRefunded >= amount
+      ? await stripeInvoiceIDForRefundedCharge(object)
+      : null;
     if (invoiceID && amount > 0 && amountRefunded >= amount) {
       const invoice = await stripeAPI(`/v1/invoices/${encodeURIComponent(invoiceID)}`);
       const subscriptionID = stripeSubscriptionIDFromObject(invoice);

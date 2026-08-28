@@ -14,6 +14,7 @@ const testPriceID = "price_test_permitext_pro_no_charge";
 const subscriptionID = "sub_test_permitext_pro_no_charge";
 const customerID = "cus_test_permitext_no_charge";
 const invoiceID = "in_test_permitext_no_charge";
+const paymentIntentID = "pi_test_permitext_no_charge";
 const checkoutSessionID = "cs_test_permitext_no_charge";
 
 function stripeSignature(rawBody, timestamp = Math.floor(Date.now() / 1000)) {
@@ -54,6 +55,17 @@ async function main() {
     }
     if (request.method === "GET" && request.url === `/v1/invoices/${invoiceID}`) {
       response.end(JSON.stringify({ id: invoiceID, subscription: subscriptionID }));
+      return;
+    }
+    if (request.method === "GET" && request.url.startsWith("/v1/invoice_payments?")) {
+      response.end(JSON.stringify({
+        data: [{
+          id: "inpay_test_permitext_no_charge",
+          invoice: invoiceID,
+          payment: { type: "payment_intent", payment_intent: paymentIntentID },
+          status: "paid"
+        }]
+      }));
       return;
     }
     if (request.method === "GET" && request.url === `/v1/subscriptions/${subscriptionID}`) {
@@ -291,7 +303,7 @@ async function main() {
       created: baseCreated + 50,
       data: { object: {
         id: "ch_test_subscription",
-        invoice: invoiceID,
+        payment_intent: paymentIntentID,
         amount: 2000,
         amount_refunded: 2000
       } }
@@ -302,6 +314,9 @@ async function main() {
     assert(stripeRequests.some((entry) =>
       entry.method === "DELETE" && entry.url === `/v1/subscriptions/${subscriptionID}`
     ), "Full refund did not cancel the Stripe subscription.");
+    assert(stripeRequests.some((entry) =>
+      entry.method === "GET" && entry.url.startsWith("/v1/invoice_payments?")
+    ), "A current Stripe refund shape did not resolve its invoice through the PaymentIntent.");
 
     const delayedActive = await webhook({
       id: "evt_test_delayed_active",
