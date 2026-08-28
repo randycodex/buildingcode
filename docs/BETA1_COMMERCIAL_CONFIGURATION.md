@@ -31,9 +31,12 @@ This checkpoint is an operating-cost decision, not public Research approval or a
 - The complete post-v23 V6 cohort replaces the six-case checkpoint for Research model-cost evidence: all 20 production turns completed and passed every fatal evaluation gate.
 - Deterministic empirical aggregation gives a fully used 100-turn subscriber model cost of $5.74 p50 and $6.06 p90.
 - The owner confirmed Permitext's 15% App Store commission, ten support minutes per subscriber at $30/hour, and a $2 minimum Beta contribution at full p90 usage.
-- With conservative payment, tax, refund, and infrastructure reserves, 100 turns cost $15.84 p90 on web and $17.86 p90 on iOS at 15%, leaving $4.16 and $2.14 respectively. The 30% sensitivity costs $20.86.
+- With explicit payment, tax, refund, and infrastructure planning reserves, 100 turns cost $15.84 p90 on web and $17.86 p90 on iOS at 15%, leaving $4.16 and $2.14 respectively. The 30% sensitivity costs $20.86.
+- When the full $45 p90 infrastructure budget is allocated across only 10 fully utilized subscribers, contribution falls to $1.46 on web and -$0.56 on iOS at 15%. The $2 Beta floor first passes at 12 fully utilized web subscribers and 24 fully utilized iOS subscribers; at 50 subscribers it rises to $5.06 and $3.04.
+- Refund sensitivity from 0% through 10% is now explicit. The working 5% reserve withholds $1.00 per $20 charge; at 10%, p90 contribution is $3.16 on web and $1.14 on 15%-commission iOS.
 - Retain 100 included turns for Beta 1. Revisit the longer-term $4–$6 contribution target after the first 25–50 customers provide actual usage, support, refund, and infrastructure evidence.
-- Tax configuration, expected refunds, and launch-volume infrastructure allocation remain unverified commercial inputs.
+- The no-cost source audit found that current Stripe Checkout does not enable automatic tax, declare inclusive/exclusive tax behavior, or collect/update a billing address for tax. The 5% tax line is an unresolved downside reserve, not a tax rate. Professional classification/registration direction is required before implementation.
+- Actual tax configuration, expected refunds, and measured launch-volume infrastructure allocation remain unverified commercial inputs.
 - Turn-pack prices and paid continuation remain unpublished and disabled.
 
 Detailed model: [PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md](./PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md)

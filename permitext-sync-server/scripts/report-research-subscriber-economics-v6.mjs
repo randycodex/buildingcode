@@ -18,9 +18,11 @@ export const v6SubscriberEconomicsAssumptions = Object.freeze({
   minimumContributionUSD: 2,
   infrastructureMonthlyUSD: { p50: 20, p90: 45 },
   fullyUtilizedSubscribers: 25,
+  subscriberVolumeCandidates: [10, 25, 50, 100],
   supportMinutesPerSubscriber: { p50: 10, p90: 10 },
   supportHourlyCostUSD: 30,
   refundReserveRate: 0.05,
+  refundReserveCandidates: [0, 0.01, 0.03, 0.05, 0.10],
   taxReserveRate: 0.05,
   channels: [
     {
@@ -76,6 +78,19 @@ export function renderV6SubscriberEconomicsMarkdown(report) {
   const currentWeb = channelFor(current, "web-stripe");
   const currentIOSSmall = channelFor(current, "ios-small-business");
   const currentIOSStandard = channelFor(current, "ios-standard");
+  const volumeRows = report.launchVolumeScenarios.map((scenario) => {
+    const web = channelFor(scenario, "web-stripe");
+    const iosSmall = channelFor(scenario, "ios-small-business");
+    return `| ${scenario.fullyUtilizedSubscribers} | ${usd(scenario.infrastructureCostPerSubscriberUSD.p90)} | ${usd(web.p90.contributionUSD)} | ${web.p90.contributionTargetPass ? "Pass" : "Fail"} | ${usd(iosSmall.p90.contributionUSD)} | ${iosSmall.p90.contributionTargetPass ? "Pass" : "Fail"} |`;
+  });
+  const refundRows = report.refundReserveScenarios.map((scenario) => {
+    const web = channelFor(scenario, "web-stripe");
+    const iosSmall = channelFor(scenario, "ios-small-business");
+    return `| ${percent(scenario.refundReserveRate)} | ${usd(web.p90.contributionUSD)} | ${usd(iosSmall.p90.contributionUSD)} |`;
+  });
+  const thresholdFor = (channelID) => report.recommendation
+    .minimumFullyUtilizedSubscribersForP90ContributionTarget
+    .find((channel) => channel.id === channelID)?.fullyUtilizedSubscribers;
   return `# Permitext Research subscriber economics — V6\n\n` +
     `Generated locally without model or provider calls from the immutable V6 result.\n\n` +
     `## Result\n\n` +
@@ -86,12 +101,29 @@ export function renderV6SubscriberEconomicsMarkdown(report) {
     `| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
     `${rows.join("\n")}\n\n` +
     `At 100 turns, modeled contribution after all stated reserves is ${usd(currentWeb.p90.contributionUSD)} (${percent(currentWeb.p90.contributionMarginRate)}) on web, ${usd(currentIOSSmall.p90.contributionUSD)} (${percent(currentIOSSmall.p90.contributionMarginRate)}) at the 15% App Store rate, and ${usd(currentIOSStandard.p90.contributionUSD)} (${percent(currentIOSStandard.p90.contributionMarginRate)}) at the 30% App Store rate.\n\n` +
+    `## Launch-volume sensitivity\n\n` +
+    `This table holds the 100-turn p90 model cost, support, tax, refund, and channel assumptions constant and allocates the full $45 p90 monthly infrastructure budget across the stated number of fully utilized subscribers.\n\n` +
+    `| Fully utilized subscribers | Infrastructure each | Web p90 contribution | $2 target | iOS 15% p90 contribution | $2 target |\n` +
+    `| ---: | ---: | ---: | :---: | ---: | :---: |\n` +
+    `${volumeRows.join("\n")}\n\n` +
+    `Under that deliberately conservative full-budget allocation, the $2 contribution floor first passes at ${thresholdFor("web-stripe")} fully utilized web subscribers and ${thresholdFor("ios-small-business")} fully utilized iOS subscribers. The fixed platform budget makes the earliest months less efficient; this is launch-volume sensitivity, not a claim that each subscriber causes that infrastructure spend.\n\n` +
+    `## Refund-reserve sensitivity\n\n` +
+    `This table holds the 25-subscriber infrastructure denominator and all other p90 assumptions constant. It does not predict refund incidence.\n\n` +
+    `| Assumed refunded gross revenue | Web p90 contribution | iOS 15% p90 contribution |\n` +
+    `| ---: | ---: | ---: |\n` +
+    `${refundRows.join("\n")}\n\n` +
+    `The working 5% reserve means the model withholds $1.00 from every $20 charge for expected refunds. Permitext has no launch incidence yet, and Stripe does not return the original card-processing fee on ordinary card refunds, so the reserve remains unverified until the lifecycle exercise and customer data exist.\n\n` +
+    `## Commercial-input audit\n\n` +
+    `- Tax: Permitext's current Stripe Checkout request does not enable automatic tax, state price tax behavior, or collect/update a billing address for tax. Stripe requires a business to register before collecting in a jurisdiction and to enable \`automatic_tax\` for API-created Checkout Sessions. New York guidance generally treats remotely accessed prewritten software as taxable, but Permitext's product classification, registrations, customer locations, and inclusive/exclusive presentation require professional review. The 5% line therefore remains an unresolved downside reserve, not a factual tax rate. [Stripe Tax setup](https://docs.stripe.com/tax/set-up?dashboard-or-api=api) · [New York computer-software guidance](https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/computer_software.htm)\n` +
+    `- Refunds: the public working policy permits a full refund of every Stripe initial or renewal charge requested within 72 hours regardless of usage. No customer incidence exists yet. Stripe's standard pricing retains the original payment-processing fees after an ordinary card refund. [Stripe pricing](https://stripe.com/pricing)\n` +
+    `- Infrastructure: Vercel currently lists Pro at $20 per month with $20 of usage credit. The $45 p90 case is a budget ceiling consisting of that platform fee plus the runbook's $25 on-demand allowance, not measured marginal subscriber usage. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)\n` +
+    `- App Store: the confirmed decision case uses the 15% Small Business Program commission. Apple states that proceeds can also be reduced by applicable transaction taxes, so the iOS tax reserve remains until actual financial reports exist. [Apple Small Business Program](https://developer.apple.com/app-store/small-business-program/) · [Apple tax categories](https://developer.apple.com/help/app-store-connect/manage-app-information/set-a-tax-category)\n\n` +
     `## Planning assumptions\n\n` +
     `- $20 monthly Pro price; 50, 75, and 100 fully used turns compared.\n` +
     `- 100,000 deterministic empirical-bootstrap subscriber months, sampling with replacement from all 20 V6 production turn costs. This aggregates a subscriber month; it does not multiply the single-turn p90 by the allowance.\n` +
     `- Monthly infrastructure: $20 p50 and $45 p90, allocated across 25 fully utilized paid subscribers ($0.80 p50 / $1.80 p90 each). The $45 case conservatively consumes the documented $25 on-demand budget in addition to the $20 Vercel Pro platform fee.\n` +
     `- Support: owner-approved 10 minutes per subscriber at a $30/hour owner-time planning rate ($5.00 per subscriber).\n` +
-    `- Refund reserve: 5% of the $20 price. Tax reserve: 5%. Web also includes Stripe Tax Basic's 0.5% fee assumption. These are reserves, not measured incidence or tax advice.\n` +
+    `- Refund reserve: 5% of the $20 price. Tax downside reserve: 5%. Web also includes Stripe Tax Basic's 0.5% fee assumption. These are reserves, not measured incidence or tax advice.\n` +
     `- Web payments: 2.9% + $0.30. The owner confirmed Permitext's 15% App Store rate; 30% remains a sensitivity case only.\n` +
     `- Minimum required Beta contribution: owner-approved $2 per $20 subscription; the later target is $4–$6 after actual customer data.\n\n` +
     `## Inputs that block final commercial validation\n\n` +

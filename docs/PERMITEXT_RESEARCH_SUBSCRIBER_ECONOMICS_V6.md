@@ -14,7 +14,7 @@ The reason is narrow:
 - At the owner-approved support assumption and stated planning reserves, 100 turns cost **$15.84 p90 on web**, leaving $4.16 of monthly contribution, and **$17.86 p90 on iOS at the confirmed 15% commission**, leaving $2.14. At the standard 30% commission the sensitivity cost is $20.86.
 - The V6 cohort deliberately sent every difficult question through Terra answering and Luna verification, and the model assumes every subscriber uses all 100 turns. Retaining 100 is a conservative Beta decision, not a claim that every subscriber will cost the p90 amount.
 
-This retains the existing product allowance; it does not change the $20 price or authorize release. Tax, refund, infrastructure-allocation, response-contract, and other release gates remain open.
+This retains the existing product allowance; it does not change the $20 price or authorize release. The no-cost tax/refund/infrastructure audit and sensitivities below are complete, but actual tax configuration, refund incidence, measured infrastructure allocation, and other release gates remain open.
 
 ## Fully utilized subscriber cost
 
@@ -32,6 +32,51 @@ At 100 turns, p90 contribution after all stated reserves is:
 
 The 30% iOS case is sensitivity evidence, not a decision channel. The owner confirmed that Permitext has the 15% App Store rate.
 
+## Launch-volume sensitivity
+
+The prior headline allocated the full $45 p90 monthly infrastructure budget across 25 fully utilized subscribers. That assumption matters. Holding the 100-turn p90 model cost, support, tax, refund, and channel assumptions constant gives:
+
+| Fully utilized subscribers | P90 infrastructure each | Web p90 contribution | $2 target | iOS 15% p90 contribution | $2 target |
+| ---: | ---: | ---: | :---: | ---: | :---: |
+| 10 | $4.50 | $1.46 | Fail | -$0.56 | Fail |
+| 25 | $1.80 | $4.16 | Pass | $2.14 | Pass |
+| 50 | $0.90 | $5.06 | Pass | $3.04 | Pass |
+| 100 | $0.45 | $5.51 | Pass | $3.49 | Pass |
+
+Under that deliberately conservative full-budget allocation, the $2 contribution floor first passes at **12 fully utilized web subscribers** and **24 fully utilized iOS subscribers**. This answers the low-volume concern: $20 is viable under the accepted Beta floor once roughly two dozen fully utilized subscribers share the p90 infrastructure budget, but the earliest iOS-heavy months can run below the floor. That is a fixed-cost launch effect, not evidence that each subscriber causes $4.50 of infrastructure use.
+
+## Refund-reserve sensitivity
+
+Holding the 25-subscriber infrastructure denominator and all other p90 assumptions constant:
+
+| Assumed refunded gross revenue | Web p90 contribution | iOS 15% p90 contribution |
+| ---: | ---: | ---: |
+| 0% | $5.16 | $3.14 |
+| 1% | $4.96 | $2.94 |
+| 3% | $4.56 | $2.54 |
+| 5% | $4.16 | $2.14 |
+| 10% | $3.16 | $1.14 |
+
+The working 5% reserve means the model withholds **$1.00 from every $20 charge** for expected refunds. It is not a prediction. Permitext has no launch incidence yet, and the working policy permits a full refund of every Stripe initial or renewal charge requested within 72 hours regardless of usage. Stripe's standard pricing does not return the original card-processing fee on an ordinary card refund. [Stripe pricing](https://stripe.com/pricing)
+
+## Commercial-input audit
+
+### Tax
+
+The source audit found that Permitext's current Stripe Checkout request does not enable automatic tax, state inclusive/exclusive tax behavior, or collect/update a billing address for tax. Stripe requires registrations before collection in a jurisdiction and requires API-created Checkout Sessions to enable `automatic_tax`. [Stripe Tax setup](https://docs.stripe.com/tax/set-up?dashboard-or-api=api)
+
+New York guidance generally treats remotely accessed prewritten software as taxable. Permitext still needs professional review of its product classification, registrations, customer locations, and whether web prices are presented tax-exclusive or tax-inclusive. [New York computer-software guidance](https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/computer_software.htm)
+
+Therefore the model does **not** call 5% Permitext's sales-tax rate. It remains a downside reserve for unresolved tax-inclusive pricing, withholding, or compliance treatment. If the $20 web price is confirmed tax-exclusive and tax is collected on top, the collected sales tax is not Permitext revenue or expense and this $1 reserve should be removed and replaced with the actual administration/compliance cost.
+
+For iOS, Apple says its tax categorization affects proceeds and proceeds are calculated from customer price minus applicable taxes. The 5% iOS reserve remains until the correct tax category and actual financial reports are verified. [Apple tax categories](https://developer.apple.com/help/app-store-connect/manage-app-information/set-a-tax-category)
+
+### Infrastructure
+
+Vercel currently lists Pro at $20 per month with $20 of usage credit. The $45 p90 model input is a budget ceiling consisting of that platform fee plus the runbook's $25 on-demand amount; it is not measured marginal usage. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
+
+The current retained dashboard evidence is still the August 21 Hobby observation, not a Pro invoice or launch workload. The volume table is therefore the correct no-cost planning evidence, while actual allocation remains open until a paid plan and representative customer traffic produce usage data.
+
 ## Method
 
 The model uses all 20 `conservativeProviderCostUSD` values from:
@@ -48,12 +93,12 @@ The V6 cohort was deliberately difficult and all 20 answers routed directly to T
 | --- | ---: | ---: | --- |
 | V6 model usage | empirical aggregate | empirical aggregate | Measured in V6 |
 | Vercel infrastructure | $20/month | $45/month | $20 platform fee is current; $25 on-demand amount is a conservative full-budget case |
-| Fully utilized paid subscribers | 25 | 25 | Planning denominator, not measured |
+| Fully utilized paid subscribers | 25 | 25 | Base case; 10/25/50/100 sensitivity now modeled |
 | Infrastructure per subscriber | $0.80 | $1.80 | Derived from the preceding two rows |
 | Support time | 10 minutes | 10 minutes | Owner-approved Beta assumption; measure after launch |
 | Owner-time rate | $30/hour | $30/hour | Planning opportunity cost, not payroll |
-| Refund reserve | 5% of price | 5% of price | Planning reserve, not measured incidence |
-| Tax reserve | 5% of price | 5% of price | Conservative reserve, not tax advice or a jurisdiction calculation |
+| Refund reserve | 5% of price | 5% of price | Planning reserve; 0/1/3/5/10% sensitivity now modeled |
+| Tax downside reserve | 5% of price | 5% of price | Not a tax rate; checkout configuration and treatment remain unresolved |
 
 Channel costs use these current public terms:
 
@@ -61,13 +106,13 @@ Channel costs use these current public terms:
 - Apple's standard digital-goods commission is 30%; approved App Store Small Business Program participants receive an 85% share, before applicable taxes. [Apple membership pricing](https://developer.apple.com/programs/whats-included/), [Apple subscriptions](https://developer.apple.com/app-store/subscriptions/), [Small Business Program](https://developer.apple.com/app-store/small-business-program/)
 - Vercel Pro has a $20 monthly platform fee with a $20 usage credit. The existing Permitext runbook adds a conservative $25 on-demand budget case. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
 
-Sales tax collected from a customer is not automatically a Permitext expense. The 5% tax reserve intentionally covers unresolved tax-inclusive pricing, provider withholding, and compliance treatment until Stripe Tax and App Store tax configuration are reviewed. It must be replaced rather than silently retained as a factual tax rate.
+Sales tax collected from a customer is not automatically a Permitext expense. The 5% tax reserve intentionally covers unresolved tax-inclusive pricing, provider withholding, and compliance treatment until Stripe Tax and App Store tax configuration are reviewed. It is not verified as sufficient for every customer location and must be replaced rather than silently retained as a factual tax rate.
 
 ## Inputs that still block final commercial validation
 
-- Confirm whether the advertised $20 is tax-exclusive on web and how Stripe Tax is configured for registered jurisdictions.
-- Replace the 5% refund reserve with actual/refined expected refund incidence after the lifecycle exercise.
-- Replace the 25-subscriber infrastructure denominator with launch-volume scenarios and measured per-turn storage/compute usage.
+- Obtain tax-professional guidance, record registrations and product tax codes, decide whether the advertised $20 is tax-exclusive on web, and then configure/test Stripe Tax. The source audit found that automatic tax is not currently enabled in checkout.
+- Replace the 5% refund reserve with actual/refined expected refund incidence after the lifecycle exercise and early customer data.
+- Replace the modeled launch-volume scenarios with actual Vercel invoices and measured per-turn storage/compute usage after commercial hosting is active.
 - Measure actual support minutes over the first 25–50 customers and revisit the longer-term $4–$6 contribution target.
 
 One hundred turns is the retained Beta allowance. Additional-turn prices remain unpublished, and the allowance must be reviewed after the first 25–50 customers provide actual usage, support, refund, and infrastructure evidence.

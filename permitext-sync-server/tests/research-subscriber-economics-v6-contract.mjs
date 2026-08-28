@@ -35,10 +35,34 @@ assert.equal(iosSmall.p90.contributionUSD, 2.143058);
 assert.equal(iosStandard.p90.fullServiceCostUSD, 20.856942);
 assert.equal(iosStandard.p90.contributionUSD, -0.856942);
 
+const tenSubscribers = report.launchVolumeScenarios.find((scenario) =>
+  scenario.fullyUtilizedSubscribers === 10
+);
+const twentyFiveSubscribers = report.launchVolumeScenarios.find((scenario) =>
+  scenario.fullyUtilizedSubscribers === 25
+);
+assert.equal(tenSubscribers.infrastructureCostPerSubscriberUSD.p90, 4.5);
+assert.equal(tenSubscribers.channels.find((channel) => channel.id === "web-stripe").p90.contributionUSD, 1.463058);
+assert.equal(tenSubscribers.channels.find((channel) => channel.id === "ios-small-business").p90.contributionUSD, -0.556942);
+assert.equal(twentyFiveSubscribers.channels.find((channel) => channel.id === "ios-small-business").p90.contributionUSD, 2.143058);
+assert.deepEqual(report.recommendation.minimumFullyUtilizedSubscribersForP90ContributionTarget, [
+  { id: "web-stripe", fullyUtilizedSubscribers: 12 },
+  { id: "ios-small-business", fullyUtilizedSubscribers: 24 },
+  { id: "ios-standard", fullyUtilizedSubscribers: null }
+]);
+
+const tenPercentRefunds = report.refundReserveScenarios.find((scenario) =>
+  scenario.refundReserveRate === 0.10
+);
+assert.equal(tenPercentRefunds.channels.find((channel) => channel.id === "web-stripe").p90.contributionUSD, 3.163058);
+assert.equal(tenPercentRefunds.channels.find((channel) => channel.id === "ios-small-business").p90.contributionUSD, 1.143058);
+
 const markdown = renderV6SubscriberEconomicsMarkdown(report);
 assert.match(markdown, /100-turn subscriber has modeled Research cost of \$5\.74 p50 and \$6\.06 p90/);
 assert.match(markdown, /provisional maximum is therefore 100 included turns/);
 assert.match(markdown, /\$2\.14 \(10\.7%\)/);
+assert.match(markdown, /first passes at 12 fully utilized web subscribers and 24 fully utilized iOS subscribers/);
+assert.match(markdown, /Permitext's current Stripe Checkout request does not enable automatic tax/);
 assert.match(markdown, /makes no network or model call/);
 
 console.log("permitext Research V6 subscriber economics contract passed");

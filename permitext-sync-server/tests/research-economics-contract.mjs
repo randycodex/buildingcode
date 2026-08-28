@@ -184,9 +184,18 @@ assert.equal(subscriberEconomics.allowanceScenarios[2].providerCostUSD.p50, 3.2)
 assert.equal(subscriberEconomics.allowanceScenarios[2].providerCostUSD.p90, 3.5);
 assert.equal(subscriberEconomics.allowanceScenarios[2].channels[0].p50.paymentFeeUSD, 0.88);
 assert.equal(subscriberEconomics.allowanceScenarios[2].channels[0].p50.taxAdministrationUSD, 0.1);
+assert.equal(subscriberEconomics.launchVolumeScenarios.length, 1);
+assert.equal(subscriberEconomics.launchVolumeScenarios[0].fullyUtilizedSubscribers, 25);
+assert.equal(subscriberEconomics.refundReserveScenarios.length, 1);
+assert.equal(subscriberEconomics.refundReserveScenarios[0].refundReserveRate, 0.05);
 assert.equal(subscriberEconomics.recommendation.provisionalIncludedTurns, 100);
 assert.equal(subscriberEconomics.recommendation.currentAllowancePlanningP90Pass, true);
 assert.equal(subscriberEconomics.recommendation.commercialDecisionReady, false);
+assert.equal(
+  subscriberEconomics.recommendation.minimumFullyUtilizedSubscribersForP90ContributionTarget[0]
+    .fullyUtilizedSubscribers,
+  8
+);
 
 assert.throws(
   () => researchSubscriberEconomicsReport(pricingRun, {

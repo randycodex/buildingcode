@@ -189,6 +189,9 @@ The V6 costs now have a deterministic no-cost subscriber-level model. It bootstr
 - 100 turns: model cost $5.74 p50 and $6.06 p90.
 - With the owner-approved ten support minutes at $30/hour and planning reserves for payment, tax, refunds, and infrastructure: web costs $14.52 p50 / $15.84 p90; iOS at the confirmed 15% commission costs $16.54 p50 / $17.86 p90; iOS at 30% costs $20.86 p90.
 - The owner accepted a $2 minimum Beta contribution at full p90 usage. One hundred turns therefore remains the Beta allowance, leaving $4.16 p90 contribution on web and $2.14 on 15%-commission iOS. The longer-term target is $4–$6 after actual customer evidence.
+- Launch-volume sensitivity now allocates the full $45 p90 monthly infrastructure budget across 10, 25, 50, and 100 fully utilized subscribers. At 10, p90 contribution is $1.46 on web and -$0.56 on 15%-commission iOS; at 25 it is $4.16 and $2.14. The accepted $2 floor first passes at 12 fully utilized web subscribers and 24 fully utilized iOS subscribers.
+- Refund sensitivity now covers 0%, 1%, 3%, 5%, and 10% of gross revenue. At the working 5% reserve, the model withholds $1.00 from each $20 charge; at 10%, p90 contribution falls to $3.16 on web and $1.14 on 15%-commission iOS.
+- The source audit found that current Stripe Checkout does not enable automatic tax, specify inclusive/exclusive tax behavior, or collect/update a billing address for tax. The 5% line remains a downside reserve—not a tax rate—until professional classification/registration guidance and provider configuration are complete.
 - No product price, included allowance, pack price, or purchase configuration changed.
 
 Detailed report: [PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md](./PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md)
@@ -216,6 +219,7 @@ Proceed toward paid Research only if all of the following are true:
 - [x] Provider failures and internal retries remain free to the user.
 - [x] Subscriber-level aggregation is complete: 100 fully used turns cost $5.74 p50 and $6.06 p90 in the V6 empirical model.
 - [x] Owner-approved Beta economics retain 100 turns with a $2 minimum p90 contribution; the modeled result is $4.16 on web and $2.14 on iOS at the confirmed 15% commission.
+- [x] Complete the no-cost tax/refund/infrastructure input audit and launch-volume/refund sensitivities; low-volume p90 allocation is explicit and the missing Stripe Tax configuration is recorded.
 - [ ] Verify tax treatment, refund incidence, and launch-volume infrastructure allocation, then review actual contribution after the first 25–50 customers.
 - [x] Current checked-in web and iOS clients decode and display the shared Research response contract correctly through the retained V6-shaped fixture and iOS Simulator test.
 - [ ] Confirm the same contract on production web and the next compatible TestFlight build during release verification.
@@ -237,4 +241,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Verify tax treatment, refund incidence, and launch-volume infrastructure allocation. Before deployment, set the production per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Production web and the next compatible TestFlight build must then confirm the shared response contract; additional-turn prices and public paid Research remain disabled.
+Obtain tax-professional direction on Permitext's product classification, registrations, and tax-inclusive/exclusive presentation before changing Stripe tax behavior. Complete the no-charge billing lifecycle exercise to establish that refund mechanics work, then replace the refund and infrastructure planning reserves only when actual customer and Vercel billing data exist. Before deployment, set the production per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Production web and the next compatible TestFlight build must then confirm the shared response contract; additional-turn prices and public paid Research remain disabled.

@@ -17,7 +17,7 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 
 ## Current position
 
-The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Subscriber-level aggregation places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. With the confirmed 15% App Store commission, ten support minutes at $30/hour, and conservative tax, refund, and infrastructure reserves, the p90 full-service cost is $15.84 on web and $17.86 on iOS. The owner retained 100 turns for Beta with a $2 minimum p90 contribution and a later $4–$6 target. The legal, provider, operations, production, and TestFlight gates remain open.
+The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The post-v23 immutable v6 Research cohort completed all 20 production turns without a provider or charging failure, and all 20 answers passed every fatal evaluation gate. Subscriber-level aggregation places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. With the confirmed 15% App Store commission, ten support minutes at $30/hour, and explicit tax, refund, and infrastructure planning reserves, the 25-subscriber p90 full-service cost is $15.84 on web and $17.86 on iOS. Allocating the full $45 infrastructure budget across only ten fully utilized subscribers lowers contribution to $1.46 on web and -$0.56 on iOS; the accepted $2 floor first passes at 12 web or 24 iOS subscribers. The owner retained 100 turns for Beta with a later $4–$6 target. Tax configuration, actual refund/infrastructure incidence, legal, provider, operations, production, and TestFlight gates remain open.
 
 Current development branch: `codex/research-commercialization`
 
@@ -55,6 +55,7 @@ Current development branch: `codex/research-commercialization`
 - [x] Build the no-cost V6 subscriber aggregation and full-service planning model.
 - [x] Confirm the 15% App Store rate, ten-minute support assumption, $2 Beta contribution floor, and retention of 100 included turns.
 - [x] Verify the shared Research response contract in the current web source and iOS Simulator, including corpus edition/applicability decoding, display, and copied output.
+- [x] Complete the no-cost tax/refund/infrastructure source audit and quantify 10/25/50/100-subscriber plus 0/1/3/5/10%-refund sensitivities.
 - [ ] Verify tax, refund, and infrastructure-allocation inputs and review actual economics after the first 25–50 customers.
 
 Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md)

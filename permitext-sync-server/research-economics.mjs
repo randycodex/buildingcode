@@ -513,6 +513,12 @@ export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumpti
     assumptions.fullyUtilizedSubscribers,
     "Fully utilized subscriber count"
   );
+  const subscriberVolumeCandidates = Array.from(new Set(
+    [...(Array.isArray(assumptions.subscriberVolumeCandidates)
+      ? assumptions.subscriberVolumeCandidates
+      : []), fullyUtilizedSubscribers]
+      .map((value) => positiveNumber(value, "Subscriber volume candidate"))
+  )).sort((left, right) => left - right);
   const supportMinutesPerSubscriber = normalizedPercentileCost(
     assumptions.supportMinutesPerSubscriber,
     "Support minutes per subscriber"
@@ -525,6 +531,12 @@ export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumpti
     assumptions.refundReserveRate,
     "Refund reserve rate"
   );
+  const refundReserveCandidates = Array.from(new Set(
+    [...(Array.isArray(assumptions.refundReserveCandidates)
+      ? assumptions.refundReserveCandidates
+      : []), refundReserveRate]
+      .map((value) => boundedRate(value, "Refund reserve candidate"))
+  )).sort((left, right) => left - right);
   const taxReserveRate = boundedRate(
     assumptions.taxReserveRate,
     "Tax reserve rate"
@@ -617,6 +629,79 @@ export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumpti
   const currentScenario = allowanceScenarios.find((scenario) =>
     scenario.includedTurns === currentIncludedTurns
   );
+  const launchVolumeScenarios = subscriberVolumeCandidates.map((subscriberCount) => {
+    const scenarioInfrastructureCostUSD = {
+      p50: infrastructureMonthlyUSD.p50 / subscriberCount,
+      p90: infrastructureMonthlyUSD.p90 / subscriberCount
+    };
+    return {
+      fullyUtilizedSubscribers: subscriberCount,
+      infrastructureCostPerSubscriberUSD: {
+        p50: fixed(scenarioInfrastructureCostUSD.p50),
+        p90: fixed(scenarioInfrastructureCostUSD.p90)
+      },
+      channels: channels.map((channel) => ({
+        id: channel.id,
+        requiredForDecision: channel.requiredForDecision,
+        p50: subscriberCostScenario({
+          subscriptionPriceUSD,
+          providerCostUSD: currentScenario.providerCostUSD.p50,
+          infrastructureCostUSD: scenarioInfrastructureCostUSD.p50,
+          supportCostUSD: supportCostUSD.p50,
+          refundReserveRate,
+          taxReserveRate,
+          minimumContributionUSD,
+          channel
+        }),
+        p90: subscriberCostScenario({
+          subscriptionPriceUSD,
+          providerCostUSD: currentScenario.providerCostUSD.p90,
+          infrastructureCostUSD: scenarioInfrastructureCostUSD.p90,
+          supportCostUSD: supportCostUSD.p90,
+          refundReserveRate,
+          taxReserveRate,
+          minimumContributionUSD,
+          channel
+        })
+      }))
+    };
+  });
+  const refundReserveScenarios = refundReserveCandidates.map((candidateRate) => ({
+    refundReserveRate: candidateRate,
+    channels: channels.map((channel) => ({
+      id: channel.id,
+      requiredForDecision: channel.requiredForDecision,
+      p90: subscriberCostScenario({
+        subscriptionPriceUSD,
+        providerCostUSD: currentScenario.providerCostUSD.p90,
+        infrastructureCostUSD: infrastructureCostUSD.p90,
+        supportCostUSD: supportCostUSD.p90,
+        refundReserveRate: candidateRate,
+        taxReserveRate,
+        minimumContributionUSD,
+        channel
+      })
+    }))
+  }));
+  const minimumFullyUtilizedSubscribersForP90ContributionTarget = channels.map((channel) => {
+    const withoutInfrastructure = subscriberCostScenario({
+      subscriptionPriceUSD,
+      providerCostUSD: currentScenario.providerCostUSD.p90,
+      infrastructureCostUSD: 0,
+      supportCostUSD: supportCostUSD.p90,
+      refundReserveRate,
+      taxReserveRate,
+      minimumContributionUSD,
+      channel
+    });
+    const availableInfrastructureUSD = withoutInfrastructure.contributionUSD - minimumContributionUSD;
+    return {
+      id: channel.id,
+      fullyUtilizedSubscribers: availableInfrastructureUSD > 0
+        ? Math.max(1, Math.ceil(infrastructureMonthlyUSD.p90 / availableInfrastructureUSD))
+        : null
+    };
+  });
   const benchmarkReady = benchmarkReport.economics?.readyForPricingDecision === true && integrity.pass;
   const commercialDecisionReady = benchmarkReady &&
     unverifiedInputs.length === 0 &&
@@ -647,6 +732,7 @@ export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumpti
         p90: fixed(infrastructureMonthlyUSD.p90)
       },
       fullyUtilizedSubscribers,
+      subscriberVolumeCandidates,
       infrastructureCostPerSubscriberUSD: {
         p50: fixed(infrastructureCostUSD.p50),
         p90: fixed(infrastructureCostUSD.p90)
@@ -658,17 +744,21 @@ export function researchSubscriberEconomicsReport(benchmarkReport = {}, assumpti
         p90: fixed(supportCostUSD.p90)
       },
       refundReserveRate,
+      refundReserveCandidates,
       taxReserveRate,
       channels,
       unverifiedInputs
     },
     allowanceScenarios,
+    launchVolumeScenarios,
+    refundReserveScenarios,
     recommendation: {
       currentIncludedTurns,
       provisionalIncludedTurns,
       currentAllowancePlanningP90Pass: Boolean(
         currentScenario?.requiredChannelP90Pass && currentScenario?.p90ModelTargetPass
       ),
+      minimumFullyUtilizedSubscribersForP90ContributionTarget,
       benchmarkReady,
       commercialDecisionReady
     }
