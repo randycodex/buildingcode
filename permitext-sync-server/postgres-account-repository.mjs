@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { accountMergeHasEntitlementConflict } from "./entitlement-contract.mjs";
+import { mergedPolicyAcceptances } from "./policy-acceptance.mjs";
 
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) return fallback;
@@ -246,6 +247,10 @@ export function createPostgresAccountRepository(sql, options = {}) {
       sourceContext.account,
       targetContext.account
     );
+    const mergedPolicyAcceptanceHistory = mergedPolicyAcceptances(
+      sourceContext.account?.policyAcceptances,
+      targetContext.account?.policyAcceptances
+    );
 
     const queries = [
       sql`
@@ -294,7 +299,9 @@ export function createPostgresAccountRepository(sql, options = {}) {
               ),
               'appleBillingAccountToken', ${mergedAppleBillingTokens.appleBillingAccountToken},
               'appleBillingAccountTokenAliases',
-                ${JSON.stringify(mergedAppleBillingTokens.appleBillingAccountTokenAliases)}::jsonb
+                ${JSON.stringify(mergedAppleBillingTokens.appleBillingAccountTokenAliases)}::jsonb,
+              'policyAcceptances',
+                ${JSON.stringify(mergedPolicyAcceptanceHistory)}::jsonb
             ),
             updated_at = now()
         FROM permitext_users AS source

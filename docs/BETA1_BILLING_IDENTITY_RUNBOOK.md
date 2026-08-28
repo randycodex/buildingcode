@@ -158,6 +158,8 @@ PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT=100
 
 These are exposure ceilings, not spending targets. The $7 per-user monthly ceiling provides headroom above the $6.06 V6 p90 projection for 100 fully used turns. Review actual provider usage weekly and lower the request limit or disable Research before increasing the $100 system cap.
 
+Beta readiness requires the per-user monthly value to equal exactly `$7.00`; it rejects both a lower value that cannot support the retained allowance and a higher value that exceeds the approved ceiling. See [PERMITEXT_BETA1_SEVEN_DOLLAR_GUARDRAIL_EVIDENCE_2026-08-28.md](./PERMITEXT_BETA1_SEVEN_DOLLAR_GUARDRAIL_EVIDENCE_2026-08-28.md).
+
 The cost safeguards remain operational controls and must not be presented as customer-facing error messages. Before enabling paid continuation, configure:
 
 ```text
@@ -171,6 +173,18 @@ STOREKIT_RESEARCH_TURNS_100_PRODUCT_ID=<approved consumable product ID>
 Do not enable the flag if either platform would show a pack that cannot be fulfilled and reconciled by the shared ledger.
 
 `PERMITEXT_RESEARCH_KILL_SWITCH=1` immediately prevents new paid Research requests. Each accepted turn atomically reserves its maximum exposure before a provider call, and every provider request consumes that reservation using its declared output-token ceiling.
+
+## Policy-version acceptance preparation
+
+Production readiness also remains closed until counsel-approved policy versions are assigned stable identifiers:
+
+```text
+PERMITEXT_TERMS_VERSION=<approved version>
+PERMITEXT_PRIVACY_VERSION=<approved version>
+PERMITEXT_SUBSCRIPTION_POLICY_VERSION=<approved version>
+```
+
+Do not populate these variables with the current working drafts merely to pass readiness. The authenticated acceptance endpoint rejects stale versions, timestamps acceptance on the server, and preserves the accepted set in the Permitext account export. Final web/iOS consent presentation and activation remain release-stage work after counsel approval.
 
 ## Release evidence record
 

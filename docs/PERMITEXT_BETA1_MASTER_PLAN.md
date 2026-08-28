@@ -23,7 +23,7 @@ Current development branch: `codex/research-commercialization`
 
 ## Status dashboard
 
-Checklist snapshot: **54 completed, 26 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
+Checklist snapshot: **56 completed, 26 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -31,7 +31,7 @@ Checklist snapshot: **54 completed, 26 open**. Eleven of the open items are the 
 | Research quality and subscriber economics | Current Beta gate passed | Immutable V6 passed 20/20, and the no-cost 100-turn/full-service economics model is complete. Actual tax, refund, and infrastructure results must be reviewed after the first 25–50 customers. |
 | Billing and paid continuation | Partially complete | Server billing contracts, local Stripe/Apple exercises, and the provider-backed Stripe sandbox lifecycle pass. Apple Sandbox/TestFlight, controlled Production billing, and final serving-release verification remain. Additional-turn sales stay disabled. |
 | Authentication and account lifecycle | Partially complete | Product contracts and prior Apple-flow verification are complete. Final Production sign-in plus account export/deletion verification remain. |
-| Legal, privacy, and customer promises | Product work complete; external review open | Product disclosures, working policies, age rule, and Beta data restrictions are documented. Counsel review, stable approved URLs, and policy-version acceptance remain. |
+| Legal, privacy, and customer promises | Technical groundwork complete; external review and activation open | Product disclosures, working policies, age rule, Beta data restrictions, professional handoff, and dormant acceptance storage are prepared. Counsel review, stable approved versions/URLs, and final web/iOS consent activation remain. |
 | Hosting, monitoring, recovery, and support | Partially complete | Vercel Pro, spend controls, two included live alert rules, local operations rehearsals, support tabletop, Neon point-in-time recovery, durable-data comparison, and private Blob retrieval pass. Remaining alert delivery and isolated recovery acceptance remain open. |
 | Merge, deploy, TestFlight, and release | Not started; not authorized | All 11 release-sequence steps remain open. No merge, push, deployment, TestFlight upload, or public release is included in the current work. |
 
@@ -80,6 +80,7 @@ Checklist snapshot: **54 completed, 26 open**. Eleven of the open items are the 
 - [x] Confirm the 15% App Store rate, ten-minute support assumption, $2 Beta contribution floor, and retention of 100 included turns.
 - [x] Verify the shared Research response contract in the current web source and iOS Simulator, including corpus edition/applicability decoding, display, and copied output.
 - [x] Complete the no-cost tax/refund/infrastructure source audit and quantify 10/25/50/100-subscriber plus 0/1/3/5/10%-refund sensitivities.
+- [x] Prepare the tax/legal professional-review packet and make local Beta readiness require the exact $7 per-user monthly Research-cost ceiling.
 - [ ] Verify tax, refund, and infrastructure-allocation inputs and review actual economics after the first 25–50 customers.
 
 Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md)
@@ -116,11 +117,14 @@ Detailed configuration: [BETA1_COMMERCIAL_CONFIGURATION.md](./BETA1_COMMERCIAL_C
 - [x] Working commercial decisions and a working refund policy are documented.
 - [x] Set the Beta 1 minimum user age to 18 and document the rule.
 - [x] Prohibit confidential, regulated, or personally identifying material during Beta 1 and require users to redact it before submission.
+- [x] Prepare authenticated, server-timestamped policy-version acceptance storage with stale-version rejection, idempotency, identity-merge preservation, and administrator export coverage.
 - [ ] Obtain counsel review of Terms, Privacy Policy, subscription/cancellation disclosure, refund policy, Acceptable Use Policy, and professional-use/AI notice.
 - [ ] Publish stable counsel-approved URLs and ensure web/iOS purchase screens match them.
-- [ ] Record policy-version acceptance where required.
+- [ ] Activate counsel-approved policy versions and wire final web/iOS consent presentation and acceptance recording where required.
 
 Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_CHECKLIST.md)
+
+Professional handoff: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md](./PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md)
 
 ## 6. Hosting, monitoring, backup, and support
 

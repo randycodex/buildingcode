@@ -50,6 +50,8 @@ Detailed model: [PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md](./PERMITEXT_RESE
 - Maximum across the service per month: $100.
 - Emergency control: keep `PERMITEXT_RESEARCH_KILL_SWITCH=1` until the release lifecycle exercises are complete.
 
+No-cost verification: [PERMITEXT_BETA1_SEVEN_DOLLAR_GUARDRAIL_EVIDENCE_2026-08-28.md](./PERMITEXT_BETA1_SEVEN_DOLLAR_GUARDRAIL_EVIDENCE_2026-08-28.md)
+
 ## Business and support
 
 - Owner/operator: Higinio Jimenez Manzano, acting as an individual rather than through an LLC or corporation.

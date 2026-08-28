@@ -15,6 +15,9 @@ const completeEnvironment = {
   DATABASE_URL: "postgres://contract",
   BLOB_READ_WRITE_TOKEN: "vercel_blob_contract",
   PERMITEXT_PUBLIC_BASE_URL: "https://permitext.com",
+  PERMITEXT_TERMS_VERSION: "terms-contract-v1",
+  PERMITEXT_PRIVACY_VERSION: "privacy-contract-v1",
+  PERMITEXT_SUBSCRIPTION_POLICY_VERSION: "subscriptions-contract-v1",
   STRIPE_SECRET_KEY: "sk_live_contract",
   STRIPE_PRO_PRICE_ID: "price_contract",
   STRIPE_WEBHOOK_SECRET: "whsec_contract",
@@ -79,6 +82,10 @@ assert(
   !beta1ConfigurationReadiness({ ...completeEnvironment, BLOB_READ_WRITE_TOKEN: "" }).ready,
   "Beta 1 readiness accepted missing private asset storage."
 );
+assert(
+  !beta1ConfigurationReadiness({ ...completeEnvironment, PERMITEXT_TERMS_VERSION: "" }).ready,
+  "Beta 1 readiness accepted missing approved policy-version configuration."
+);
 const insufficientUserMonthlyBudget = beta1ConfigurationReadiness({
   ...completeEnvironment,
   PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "6.99"
@@ -89,6 +96,17 @@ assert(
       item.id === "research-beta1-user-monthly-budget"
     )?.ready,
   "Beta 1 readiness accepted a per-user monthly spend cap that cannot support the retained 100-turn allowance."
+);
+const excessiveUserMonthlyBudget = beta1ConfigurationReadiness({
+  ...completeEnvironment,
+  PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "7.01"
+});
+assert(
+  !excessiveUserMonthlyBudget.ready &&
+    !excessiveUserMonthlyBudget.checks.find((item) =>
+      item.id === "research-beta1-user-monthly-budget"
+    )?.ready,
+  "Beta 1 readiness accepted a per-user monthly spend cap above the approved $7 ceiling."
 );
 assert(
   !beta1ConfigurationReadiness({

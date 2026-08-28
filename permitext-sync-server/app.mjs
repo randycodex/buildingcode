@@ -29,6 +29,13 @@ import {
 } from "./lifetime-grant-admin.mjs";
 import { beta1ConfigurationReadiness } from "./beta1-readiness.mjs";
 import {
+  PolicyAcceptanceError,
+  accountWithPolicyAcceptance,
+  mergedPolicyAcceptances,
+  policyAcceptanceRecord,
+  policyVersionConfiguration
+} from "./policy-acceptance.mjs";
+import {
   operationalMonitoringReadiness,
   productionReleaseReadiness,
   releaseIdentity,
@@ -19548,6 +19555,16 @@ async function handlePrivacyPolicy(_request, response) {
   sendHTML(response, await readFile(join(webPublicPath, "privacy.html"), "utf8"));
 }
 
+function handleCurrentPolicies(_request, response) {
+  const configuration = policyVersionConfiguration();
+  sendJSON(response, 200, {
+    configured: configuration.ready,
+    policySetID: configuration.ready ? configuration.policySetID : null,
+    versions: configuration.ready ? configuration.versions : null,
+    documents: configuration.ready ? configuration.documents : null
+  });
+}
+
 async function handlePublicDocument(documentName, response) {
   sendHTML(response, await readFile(join(webPublicPath, `${documentName}.html`), "utf8"));
 }
@@ -22809,6 +22826,10 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
   }
   targetAccount.appleBillingAccountTokenAliases =
     mergedAppleBillingTokens.appleBillingAccountTokenAliases;
+  targetAccount.policyAcceptances = mergedPolicyAcceptances(
+    sourceAccount.policyAcceptances,
+    targetAccount.policyAcceptances
+  );
   targetAccount.migrationState = "localDataAttached";
   targetAccount.mergedAccountIDs = Array.from(new Set([
     ...(Array.isArray(targetAccount.mergedAccountIDs) ? targetAccount.mergedAccountIDs : []),
@@ -23325,6 +23346,60 @@ async function handleProfileUpdate(request, response) {
   store.users[userID] = updatedAccount;
   await writeStore(store);
   sendJSON(response, 200, { account: updatedAccount });
+}
+
+async function handlePolicyAcceptance(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID || body.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID, body.auth);
+  if (!context) return;
+
+  let acceptance;
+  try {
+    acceptance = policyAcceptanceRecord({
+      platform: body.platform,
+      versions: body.versions,
+      clientRelease: body.clientRelease
+    });
+  } catch (error) {
+    if (error instanceof PolicyAcceptanceError) {
+      sendJSON(response, error.statusCode, { error: error.message, code: error.code });
+      return;
+    }
+    throw error;
+  }
+
+  const adapter = await storeAdapter();
+  let result = accountWithPolicyAcceptance(context.account, acceptance);
+  if (result.changed && typeof adapter.updateAccount === "function") {
+    const savedAccount = await adapter.updateAccount(userID, result.account);
+    if (!savedAccount) {
+      sendError(response, 404, "User not found.");
+      return;
+    }
+    result = { ...result, account: savedAccount };
+  } else if (result.changed && typeof adapter.withMutation === "function") {
+    result = await adapter.withMutation((store) => {
+      const storedAccount = store.users?.[userID];
+      if (!storedAccount) return null;
+      const storedResult = accountWithPolicyAcceptance(storedAccount, acceptance);
+      store.users[userID] = storedResult.account;
+      return storedResult;
+    });
+    if (!result) {
+      sendError(response, 404, "User not found.");
+      return;
+    }
+  }
+
+  sendJSON(response, 200, {
+    acceptance: result.acceptance,
+    recorded: result.changed
+  });
 }
 
 async function handleSignOut(request, response) {
@@ -29937,6 +30012,7 @@ const handlers = {
   "account/attach-local-data": handleAttachLocalData,
   "account/link-browser": handleBrowserAccountLink,
   "account/profile": handleProfileUpdate,
+  "account/policy-acceptance": handlePolicyAcceptance,
   "account/passkeys/link": handlePasskeyLink,
   "billing/web/checkout": handleWebCheckout,
   "billing/research/checkout": handleResearchCreditCheckout,
@@ -30091,6 +30167,10 @@ async function handleRequestUnlocked(request, response) {
     }
     if (request.method === "GET" && (path === "refunds" || path === "refunds/")) {
       await handlePublicDocument("refunds", response);
+      return;
+    }
+    if (request.method === "GET" && (path === "policies/current" || path === "policies/current/")) {
+      handleCurrentPolicies(request, response);
       return;
     }
     if (request.method === "GET" && (path === "support" || path === "support/")) {

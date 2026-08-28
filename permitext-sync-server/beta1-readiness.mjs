@@ -1,4 +1,5 @@
 import { clerkConfigurationStatus } from "./clerk-auth.mjs";
+import { policyVersionConfiguration } from "./policy-acceptance.mjs";
 import { researchSpendGuardrails } from "./research-config.mjs";
 import { paidResearchTurnsEnabled } from "./research-turns.mjs";
 
@@ -18,7 +19,7 @@ export const expectedStripeProPrice = Object.freeze({
   unitAmount: 2_000
 });
 
-export const minimumBeta1UserMonthlyResearchCapUSD = 7;
+export const expectedBeta1UserMonthlyResearchCapUSD = 7;
 
 function check(id, ready, detail) {
   return { id, ready: Boolean(ready), detail };
@@ -48,6 +49,7 @@ function privateBlobStorageConfigured(environment) {
 export function beta1ConfigurationReadiness(environment = process.env) {
   const publicBaseURL = String(environment.PERMITEXT_PUBLIC_BASE_URL || "").trim().replace(/\/+$/, "");
   const clerk = clerkConfigurationStatus(environment);
+  const policies = policyVersionConfiguration(environment);
   const research = researchSpendGuardrails(environment);
   const paidTurnsEnabled = paidResearchTurnsEnabled(environment);
   const stripeResearchPackPriceIDs = [
@@ -65,6 +67,13 @@ export function beta1ConfigurationReadiness(environment = process.env) {
     check("stripe-pro-price", String(environment.STRIPE_PRO_PRICE_ID || "").startsWith("price_"), "Configure the live recurring Pro Price ID."),
     check("stripe-webhook-secret", String(environment.STRIPE_WEBHOOK_SECRET || "").startsWith("whsec_"), "Configure the live endpoint signing secret."),
     check("public-base-url", publicBaseURL.startsWith("https://"), "Set the canonical HTTPS Permitext production URL."),
+    check(
+      "approved-policy-versions",
+      policies.ready,
+      policies.ready
+        ? "Approved Terms, Privacy, and subscription/refund policy versions are configured for acceptance tracking."
+        : policies.problems.join(" ")
+    ),
     check("apple-bundle", Boolean(String(environment.APPLE_BUNDLE_ID || "").trim()), "Configure the App Store bundle identifier."),
     check("apple-pro-product", Boolean(String(environment.STOREKIT_PRO_PRODUCT_ID || "").trim()), "Configure the App Store Pro product identifier."),
     check(
@@ -87,10 +96,10 @@ export function beta1ConfigurationReadiness(environment = process.env) {
     check("research-cost-guardrails", research.ready, research.ready ? "Research per-turn, per-user daily/monthly, and system daily/monthly caps are configured." : research.problems.join(" ")),
     check(
       "research-beta1-user-monthly-budget",
-      research.ready && Number(research.userMonthlyCapUSD) >= minimumBeta1UserMonthlyResearchCapUSD,
-      research.ready && Number(research.userMonthlyCapUSD) >= minimumBeta1UserMonthlyResearchCapUSD
-        ? `The Research per-user monthly cap is $${Number(research.userMonthlyCapUSD).toFixed(2)}, sufficient for the retained 100-turn Beta allowance.`
-        : `PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD must be at least $${minimumBeta1UserMonthlyResearchCapUSD.toFixed(2)} for the retained 100-turn Beta allowance.`
+      research.ready && Number(research.userMonthlyCapUSD) === expectedBeta1UserMonthlyResearchCapUSD,
+      research.ready && Number(research.userMonthlyCapUSD) === expectedBeta1UserMonthlyResearchCapUSD
+        ? `The Research per-user monthly cap is the approved $${expectedBeta1UserMonthlyResearchCapUSD.toFixed(2)} Beta ceiling.`
+        : `PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD must equal the approved $${expectedBeta1UserMonthlyResearchCapUSD.toFixed(2)} Beta ceiling.`
     ),
     check(
       "research-beta1-monthly-budget",

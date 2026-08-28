@@ -2,6 +2,8 @@
 
 This is a product-specific working checklist, not legal approval or a substitute for advice from a licensed US attorney. Do not publish placeholder answers. The final customer-facing documents must match the production product, billing configuration, and actual business practices.
 
+Professional handoff packet: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md](./PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md)
+
 ## Documents required before public paid access
 
 - **Terms of Service / Terms of Use.** Identify the contracting business, eligibility, account rules, permitted and prohibited use, subscription terms, intellectual-property ownership, user-content license, termination, warranty disclaimers, limits of liability, indemnity, dispute terms, governing law, and how terms may change.
