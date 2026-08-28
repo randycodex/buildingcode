@@ -2,6 +2,8 @@
 
 Complete this record for the first prelaunch restore exercise and each quarterly exercise. A dashboard claim that backups exist is not a successful drill.
 
+A local file-copy rehearsal or a passing verifier contract is preparation only. Mark this record **Pass** only for an isolated provider restore with the actual Neon recovery point, private-asset inventory and retrieval, non-production deployment, and retained cleanup evidence.
+
 ## Authorization and isolation
 
 - Operator:
@@ -42,6 +44,7 @@ Record source and restored counts. Use aggregate counts only; do not paste custo
 - Apple entitlement read without provider mutation:
 - Private asset retrieval by authenticated endpoint:
 - `/health` and `/release` result:
+- `npm run verify:restore-drill` result and evidence path:
 - Missing or corrupt records:
 - Recovery time objective observed:
 - Recovery point objective observed:

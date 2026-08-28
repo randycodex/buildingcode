@@ -89,7 +89,27 @@ A provider saying that backups exist is not a successful restore drill. Before p
 7. Record recovery-point age, elapsed recovery time, missing/corrupt records, operator, and cleanup.
 8. Delete the isolated restore only after evidence is retained and the exact branch, compute, deployment, and private asset namespace are verified. Production restore or deletion requires separate explicit approval.
 
-The public beta remains blocked until the first restore drill succeeds or a documented product decision explicitly accepts the data-recovery risk.
+After the source inventory and isolated deployment are available, run the read-only comparison tool. It refuses the same source/target origin, a target reporting `production`, missing isolation/provider-write attestations, non-HTTPS remote origins, count drift, representative-account drift, and missing private-asset inventory counts. It does not create, finalize, or delete a Neon restore and never writes to billing or customer data.
+
+```sh
+PERMITEXT_RESTORE_SOURCE_URL="https://<source-host>" \
+PERMITEXT_RESTORE_TARGET_URL="https://<isolated-restore-host>" \
+PERMITEXT_RESTORE_SOURCE_ADMIN_TOKEN="<source-admin-token>" \
+PERMITEXT_RESTORE_TARGET_ADMIN_TOKEN="<target-admin-token>" \
+PERMITEXT_RESTORE_TEST_USER_ID="<representative-test-user-id>" \
+PERMITEXT_RESTORE_TARGET_ISOLATED=1 \
+PERMITEXT_RESTORE_PROVIDER_WRITES_DISABLED=1 \
+PERMITEXT_RESTORE_SOURCE_ASSET_COUNT="<source-private-asset-count>" \
+PERMITEXT_RESTORE_TARGET_ASSET_COUNT="<restored-private-asset-count>" \
+PERMITEXT_RESTORE_SOURCE_ASSET_INVENTORY_TIMESTAMP="<UTC-timestamp>" \
+npm run verify:restore-drill
+```
+
+The verifier compares durable storage-summary counts, the sync cursor, provider-neutral entitlement state, Project/saved-item mutation counts, Research conversations and answers, Notebook/Report artifact counts, project links, and activity for the representative account. It deliberately excludes active session counts because restore acceptance requires a fresh sign-in instead of trusting a restored session. Retrieve representative private assets separately through authenticated endpoints and record the result below.
+
+The verifier's local end-to-end rehearsal and evidence boundary are recorded in [PERMITEXT_LOCAL_RESTORE_REHEARSAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_RESTORE_REHEARSAL_EVIDENCE_2026-08-28.md). The rehearsal does not satisfy the provider-backed restore gate.
+
+The public beta remains blocked until the first Neon/Blob restore drill succeeds or a documented product decision explicitly accepts the data-recovery risk.
 
 Use `docs/BETA1_RESTORE_DRILL_RECORD.md` to record the first exercise. Neon history retention and Vercel deployment retention must be checked in the live dashboards because plan limits can change.
 

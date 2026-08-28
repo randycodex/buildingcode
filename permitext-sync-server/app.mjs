@@ -25857,6 +25857,12 @@ async function handleRestoreChecklist(request, response) {
     .filter(([, ownerUserID]) => ownerUserID === userID)
     .map(([credentialID]) => credentialID);
   const continuityMutations = mutations.filter((mutation) => Object.keys(mutation)[0] === "continuity");
+  const artifacts = store.foundationArtifactsByUserID?.[userID] || [];
+  const artifactCounts = artifacts.reduce((counts, artifact) => {
+    const type = String(artifact?.envelope?.type || "other").trim() || "other";
+    counts[type] = (counts[type] || 0) + 1;
+    return counts;
+  }, {});
 
   sendJSON(response, 200, {
     userID,
@@ -25877,6 +25883,11 @@ async function handleRestoreChecklist(request, response) {
       continuity: counts.continuity || 0,
       codeVersionClear: counts.codeVersionClear || 0
     },
+    researchConversationCount: store.researchConversationsByUserID?.[userID]?.length || 0,
+    researchAnswerCount: store.researchAnswersByUserID?.[userID]?.length || 0,
+    artifactCounts,
+    projectLinkCount: store.projectLinksByUserID?.[userID]?.length || 0,
+    activityEventCount: store.activityEventsByUserID?.[userID]?.length || 0,
     latestContinuity: continuityMutations.at(-1) || null
   });
 }

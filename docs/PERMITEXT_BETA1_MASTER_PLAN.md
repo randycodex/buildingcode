@@ -105,7 +105,8 @@ Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_
 - [ ] Upgrade the commercial production service from Vercel Hobby to an appropriate paid plan before accepting paying users.
 - [ ] Configure and exercise monitoring alerts for health, 5xx/client failures, billing webhooks, database failures, Research spend, and p95 latency.
 - [ ] Set and test the intended infrastructure spend notifications and hard-stop behavior.
-- [ ] Complete the first isolated backup/restore drill and retain the evidence.
+- [x] Add a fail-closed read-only restore comparator and complete its no-provider local end-to-end rehearsal, including deliberate missing-record detection.
+- [ ] Complete the first provider-backed isolated Neon/Blob backup/restore drill and retain the recovery-point, private-asset, timing, and cleanup evidence.
 - [ ] Confirm the documented support response process can be operated.
 
 Operations runbook: [BETA1_OPERATIONS_RUNBOOK.md](./BETA1_OPERATIONS_RUNBOOK.md)
