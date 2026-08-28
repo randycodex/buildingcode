@@ -1,0 +1,154 @@
+{
+  "conversation": {
+    "id": "research-contract-v1",
+    "title": "Scissor stair review",
+    "createdAt": "2026-08-28T02:26:08.000Z",
+    "updatedAt": "2026-08-28T02:26:49.000Z",
+    "primaryProjectID": "project-contract-v1",
+    "projectContextReviewRequired": false,
+    "sourceStatus": "current",
+    "sources": [
+      {
+        "id": "passage-contract-v1",
+        "kind": "selection",
+        "relationship": "governing",
+        "sectionID": "2197",
+        "sectionNumber": "1007.1.1",
+        "title": "Two exits or exit access doorways",
+        "codePrefix": "BC",
+        "selectedText": "Synthetic contract text for decoding only."
+      }
+    ],
+    "messages": [
+      {
+        "id": "question-contract-v1",
+        "role": "user",
+        "question": "Can the two stairs be counted separately?",
+        "requestID": "request-contract-v1",
+        "createdAt": "2026-08-28T02:26:08.000Z"
+      },
+      {
+        "id": "answer-contract-v1",
+        "role": "assistant",
+        "requestID": "request-contract-v1",
+        "createdAt": "2026-08-28T02:26:49.000Z",
+        "answer": {
+          "mode": "openai",
+          "answerText": "The stairs may be counted separately only if every cited condition is established.",
+          "conclusion": "The conclusion is conditional.",
+          "explanation": "The selected enacted provision supplies the governing conditions.",
+          "authorityStatus": "conditional",
+          "authorityLabel": "Conditional on Project facts",
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260824-routed-authorized-corpora-v2",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "contract-code-version-v1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "project-default",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "contract-code-version-v1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "Project configured code basis",
+                "blockedReason": null,
+                "codePrefixes": ["AC", "BC", "MC", "PC"]
+              }
+            ],
+            "pinnedCorpora": [
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "contract-historical-version-v1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "Explicitly selected evidence",
+                "blockedReason": null,
+                "codePrefixes": ["BC68"]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes · Project default applied",
+            "limitation": "The historical source is explicit evidence, not the ordinary current-code basis.",
+            "resolvedAt": "2026-08-28T02:26:08.978Z"
+          },
+          "sourceAsOf": "2026-08-28T02:26:08.978Z",
+          "sourceSummary": {
+            "projectFactCount": 2,
+            "sourcedProjectFactCount": 1,
+            "enactedProvisionCount": 2,
+            "contextualProvisionCount": 0,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlyProvisionCount": 1,
+            "userPinnedCount": 1,
+            "permitextDiscoveredCount": 1,
+            "crossReferenceCount": 0,
+            "supportingWebSourceCount": 1,
+            "unresolvedProjectFactCount": 1
+          },
+          "factUsage": {
+            "schemaVersion": 1,
+            "projectContext": ["Occupancy: Group R-2"],
+            "conversation": ["The doors are 15 feet apart."],
+            "other": []
+          },
+          "supportedPoints": [
+            {
+              "heading": "Conditional exception",
+              "explanation": "Every enclosure and separation condition must be established.",
+              "sectionID": "2197",
+              "sourceIDs": ["passage-contract-v1"],
+              "evidenceRole": "governing"
+            }
+          ],
+          "assumptions": ["The stated occupancy is accurate."],
+          "missingFacts": ["Confirm the enclosure rating and material."],
+          "evidenceLimitations": ["The Project documents were not supplied."],
+          "followUpQuestions": ["What assemblies are specified?"],
+          "additionalEvidenceNeeded": ["Add the approved construction documents."],
+          "supportingSources": [
+            {
+              "id": "official-guidance-contract-v1",
+              "title": "Synthetic official guidance",
+              "publisher": "NYC Department of Buildings",
+              "url": "https://www.nyc.gov/site/buildings/index.page",
+              "authorityClass": "official_guidance",
+              "role": "supporting",
+              "claim": "This synthetic claim verifies client rendering only."
+            }
+          ],
+          "citations": [
+            {
+              "sectionID": "2197",
+              "sectionNumber": "1007.1.1",
+              "title": "Two exits or exit access doorways",
+              "codePrefix": "BC",
+              "codeVersion": "contract-code-version-v1",
+              "codeEdition": "2022 New York City Construction Codes",
+              "corpusID": "nyc-2022-construction-codes",
+              "corpusLabel": "2022 NYC Construction Codes",
+              "applicabilityStatus": "current-enacted-edition",
+              "sourceIDs": ["passage-contract-v1"],
+              "evidenceRole": "governing",
+              "relevance": "Establishes the conditional exception."
+            }
+          ],
+          "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying."
+        }
+      }
+    ]
+  },
+  "replayed": false,
+  "requestID": "request-contract-v1"
+}

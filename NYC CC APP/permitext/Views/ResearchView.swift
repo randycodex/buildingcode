@@ -1865,6 +1865,19 @@ private struct ResearchAnswerView: View {
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
             }
+            if !answer.researchCorpusMetadataLines.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(Array(answer.researchCorpusMetadataLines.enumerated()), id: \.offset) { _, line in
+                        Text(line)
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("Research corpus editions and applicability")
+                .accessibilityIdentifier("research-answer-corpus-metadata")
+            }
             projectFactsDisclosure
             if !answer.citations.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {

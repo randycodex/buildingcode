@@ -193,6 +193,20 @@ The V6 costs now have a deterministic no-cost subscriber-level model. It bootstr
 
 Detailed report: [PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md](./PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md)
 
+### Cross-platform response-contract confirmation
+
+The current checked-in web and iOS clients now share a retained V6-shaped Research response fixture. The no-cost contract verifies that the server removes internal usage, cost, and pricing metadata while preserving the user-visible answer, authority classification, code basis, source date, fact usage, supported points, unresolved facts, limitations, follow-up questions, supporting sources, citations, and professional-use notice.
+
+The check found and repaired one native parity gap: web already displayed the searched and explicitly pinned corpus edition and applicability metadata, but iOS decoded `codeBasis` without retaining those corpus records. The native model now decodes them, the Research answer displays them with an accessibility label, and copied answers preserve the same corpus-basis lines.
+
+Evidence:
+
+- `permitext-sync-server/tests/fixtures/research-client-response-v1.json` is the shared server/web/iOS fixture and is checked against the retained immutable V6 result shape.
+- `node tests/research-trust-boundary-contract.mjs` passes and verifies server serialization plus the web display contract.
+- Focused iOS Simulator contract tests pass against the exact shared JSON fixture, including native decode and copied-text output.
+
+This is source and Simulator evidence. It does not claim that the existing TestFlight binary contains the repair; production web and the next compatible TestFlight build still require release-stage verification.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -203,7 +217,8 @@ Proceed toward paid Research only if all of the following are true:
 - [x] Subscriber-level aggregation is complete: 100 fully used turns cost $5.74 p50 and $6.06 p90 in the V6 empirical model.
 - [x] Owner-approved Beta economics retain 100 turns with a $2 minimum p90 contribution; the modeled result is $4.16 on web and $2.14 on iOS at the confirmed 15% commission.
 - [ ] Verify tax treatment, refund incidence, and launch-volume infrastructure allocation, then review actual contribution after the first 25–50 customers.
-- [ ] Web and the current iOS/TestFlight client both decode and display the shared response contract correctly.
+- [x] Current checked-in web and iOS clients decode and display the shared Research response contract correctly through the retained V6-shaped fixture and iOS Simulator test.
+- [ ] Confirm the same contract on production web and the next compatible TestFlight build during release verification.
 
 If quality requires too many Terra calls to meet the cost target, reduce the included monthly allowance or create a higher Research tier. Do not silently subsidize Terra-only usage inside the current $20 plan.
 
@@ -222,4 +237,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Complete the web/current-iOS response-contract check. Before deployment, set the production per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Tax treatment, refund incidence, and launch-volume infrastructure allocation remain commercial follow-ups; additional-turn prices and public paid Research remain disabled.
+Verify tax treatment, refund incidence, and launch-volume infrastructure allocation. Before deployment, set the production per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Production web and the next compatible TestFlight build must then confirm the shared response contract; additional-turn prices and public paid Research remain disabled.

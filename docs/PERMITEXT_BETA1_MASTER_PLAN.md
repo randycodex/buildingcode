@@ -54,6 +54,7 @@ Current development branch: `codex/research-commercialization`
 - [x] Run the separately authorized immutable v6 cohort; all 20 cases passed with no provider or charging failure.
 - [x] Build the no-cost V6 subscriber aggregation and full-service planning model.
 - [x] Confirm the 15% App Store rate, ten-minute support assumption, $2 Beta contribution floor, and retention of 100 included turns.
+- [x] Verify the shared Research response contract in the current web source and iOS Simulator, including corpus edition/applicability decoding, display, and copied output.
 - [ ] Verify tax, refund, and infrastructure-allocation inputs and review actual economics after the first 25–50 customers.
 
 Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md)

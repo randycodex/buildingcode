@@ -4392,6 +4392,45 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testResearchConversationDecodesSharedV6ClientResponseContract() throws {
+        let repositoryRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let fixtureURL = repositoryRoot
+            .appendingPathComponent("permitext-sync-server/tests/fixtures/research-client-response-v1.json")
+        let response = try JSONDecoder().decode(
+            ResearchConversationMessageResponse.self,
+            from: Data(contentsOf: fixtureURL)
+        )
+        let answer = try XCTUnwrap(response.conversation.messages.last?.answer)
+
+        XCTAssertEqual(response.requestID, "request-contract-v1")
+        XCTAssertEqual(answer.authorityStatus, "conditional")
+        XCTAssertEqual(answer.authorityLabel, "Conditional on Project facts")
+        XCTAssertEqual(answer.sourceAsOf, "2026-08-28T02:26:08.978Z")
+        XCTAssertEqual(answer.factUsage?.projectContext, ["Occupancy: Group R-2"])
+        XCTAssertEqual(answer.supportedPoints.first?.sourceIDs, ["passage-contract-v1"])
+        XCTAssertEqual(answer.citations.first?.corpusID, "nyc-2022-construction-codes")
+        XCTAssertEqual(answer.supportingSources?.first?.authorityClass, "official_guidance")
+        XCTAssertEqual(answer.codeBasis?.searchedCorpora?.first?.applicabilityStatus, "current-enacted-edition")
+        XCTAssertEqual(answer.codeBasis?.pinnedCorpora?.first?.applicabilityStatus, "historical")
+        XCTAssertEqual(
+            answer.researchCorpusMetadataLines,
+            [
+                "Searched · 2022 NYC Construction Codes · Edition: 2022 New York City Construction Codes · Applicability: Current enacted edition",
+                "Explicit evidence · 1968 NYC Building Code · Edition: 1968 NYC Building Code — historical · Applicability: Historical"
+            ]
+        )
+
+        let copied = answer.structuredCopyText(sourceStatus: response.conversation.sourceStatus)
+        XCTAssertTrue(copied.contains("Corpus basis"))
+        XCTAssertTrue(copied.contains("Applicability: Current enacted edition"))
+        XCTAssertTrue(copied.contains("Conditional on Project facts"))
+        XCTAssertTrue(copied.contains("Confirm the enclosure rating and material."))
+        XCTAssertTrue(copied.contains("not an official interpretation"))
+    }
+
     func testResearchAnswerProjectContextBoundaryAndSupportingSourceFallbacks() throws {
         let data = Data(
             """

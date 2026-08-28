@@ -4,20 +4,67 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   researchAuthorityClassification,
-  researchFeedbackStatusForClient
+  researchFeedbackStatusForClient,
+  researchMessageForClient
 } from "../app.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const [server, web, privacy, nativeModels, nativeResearch] = await Promise.all([
+const [server, web, privacy, nativeModels, nativeResearch, sharedResponseFixture, v6ResultFixture] = await Promise.all([
   readFile(join(root, "../app.mjs"), "utf8"),
   readFile(join(root, "../public/app.js"), "utf8"),
   readFile(join(root, "../public/privacy.html"), "utf8"),
   readFile(join(root, "../../NYC CC APP/permitext/Models/ResearchNotebookModels.swift"), "utf8"),
-  readFile(join(root, "../../NYC CC APP/permitext/Views/ResearchView.swift"), "utf8")
+  readFile(join(root, "../../NYC CC APP/permitext/Views/ResearchView.swift"), "utf8"),
+  readFile(join(root, "fixtures/research-client-response-v1.json"), "utf8"),
+  readFile(join(root, "../evals/results/2026-08-28T02-26-08-632Z-edc69c6b-bf30-4856-859e-99667d03bd2b.json"), "utf8")
 ]);
+const sharedResponse = JSON.parse(sharedResponseFixture);
+const v6Result = JSON.parse(v6ResultFixture);
+const sharedAssistantMessage = sharedResponse.conversation.messages.at(-1);
+const v6Answer = v6Result.results.at(0).answer;
+const sharedAnswerFields = [
+  "authorityLabel",
+  "answerText",
+  "codeBasis",
+  "sourceAsOf",
+  "factUsage",
+  "supportedPoints",
+  "assumptions",
+  "missingFacts",
+  "evidenceLimitations",
+  "followUpQuestions",
+  "additionalEvidenceNeeded",
+  "supportingSources",
+  "citations",
+  "disclaimer"
+];
+for (const field of sharedAnswerFields) {
+  assert.ok(field in sharedAssistantMessage.answer, `The shared client fixture is missing the V6 field: ${field}`);
+  assert.ok(field in v6Answer, `The retained V6 answer is missing the shared client field: ${field}`);
+}
+const serializedAssistantMessage = researchMessageForClient({
+  ...sharedAssistantMessage,
+  researchRequestID: sharedAssistantMessage.requestID,
+  requestID: undefined,
+  answer: {
+    ...sharedAssistantMessage.answer,
+    usage: { inputTokens: 1, outputTokens: 1 },
+    estimatedCost: 1,
+    estimatedCostUSD: 1,
+    pricingVersion: "internal-only"
+  }
+});
+assert.deepEqual(serializedAssistantMessage, sharedAssistantMessage);
+assert.equal("usage" in serializedAssistantMessage.answer, false);
+assert.equal("estimatedCostUSD" in serializedAssistantMessage.answer, false);
+assert.equal("pricingVersion" in serializedAssistantMessage.answer, false);
 const webSettings = web.slice(
   web.indexOf("function renderSettings()"),
   web.indexOf("function wireChapterSelects")
+);
+const webResearchAnswerDisplay = web.slice(
+  web.indexOf("function researchAnswerNarrativeText(result)"),
+  web.indexOf("async function renderUtilityInstance(instance)")
 );
 
 for (const status of [
@@ -90,6 +137,12 @@ assert.match(web, /Edition: \$\{corpus\.codeEdition\}/);
 assert.match(web, /Applicability: \$\{researchApplicabilityStatusLabel\(corpus\.applicabilityStatus\)\}/);
 assert.match(web, /appendSection\("Corpus basis", researchCorpusMetadataLines\(codeBasis\)\)/);
 assert.match(web, /aria-label", "Research corpus editions and applicability"/);
+for (const field of sharedAnswerFields) {
+  assert.ok(
+    webResearchAnswerDisplay.includes(field),
+    `The web Research answer display is missing the shared response field: ${field}`
+  );
+}
 assert.match(web, /appendSection\("Answer classification", result\?\.authorityLabel \|\| result\?\.authorityStatus\)/);
 assert.match(web, /appendSection\("Code basis"/);
 assert.match(web, /appendSection\("Citations", citationLines\)/);
@@ -162,6 +215,9 @@ assert.match(nativeModels, /var authorityStatus: String\?/);
 assert.match(nativeModels, /var authorityLabel: String\?/);
 assert.match(nativeModels, /var sourceAsOf: String\?/);
 assert.match(nativeModels, /var codeBasis: ResearchCodeBasis\?/);
+assert.match(nativeModels, /var searchedCorpora: \[ResearchCorpusBasis\]\?/);
+assert.match(nativeModels, /var pinnedCorpora: \[ResearchCorpusBasis\]\?/);
+assert.match(nativeModels, /var researchCorpusMetadataLines: \[String\]/);
 assert.match(nativeModels, /var sourceSummary: ResearchSourceSummary\?/);
 assert.match(nativeModels, /var factUsage: ResearchFactUsage\?/);
 assert.match(nativeModels, /var supportingSources: \[ResearchSupportingSource\]\?/);
@@ -170,6 +226,8 @@ assert.match(nativeResearch, /research-answer-authority-status/);
 assert.match(nativeResearch, /research-answer-source-boundary/);
 assert.match(nativeResearch, /research-answer-facts-used/);
 assert.match(nativeResearch, /research-answer-supporting-context/);
+assert.match(nativeResearch, /research-answer-corpus-metadata/);
+assert.match(nativeResearch, /Research corpus editions and applicability/);
 assert.match(nativeModels, /authorityStatus == "official_supporting_guidance"/);
 assert.match(nativeModels, /No enacted provision cited/);
 assert.match(nativeModels, /resolved\.scheme\?\.lowercased\(\) == "https"/);

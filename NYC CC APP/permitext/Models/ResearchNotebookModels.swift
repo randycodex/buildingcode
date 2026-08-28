@@ -272,6 +272,20 @@ struct ResearchAnswer: Codable, Hashable, Sendable {
 struct ResearchCodeBasis: Codable, Hashable, Sendable {
     var disclosure: String? = nil
     var limitation: String? = nil
+    var searchedCorpora: [ResearchCorpusBasis]? = nil
+    var pinnedCorpora: [ResearchCorpusBasis]? = nil
+}
+
+struct ResearchCorpusBasis: Codable, Hashable, Sendable {
+    var id: String? = nil
+    var label: String? = nil
+    var codeEdition: String? = nil
+    var codeVersion: String? = nil
+    var codeYear: Int? = nil
+    var applicabilityStatus: String? = nil
+    var routeReason: String? = nil
+    var blockedReason: String? = nil
+    var codePrefixes: [String]? = nil
 }
 
 struct ResearchSourceSummary: Codable, Hashable, Sendable {
@@ -368,6 +382,9 @@ extension ResearchAnswer {
         if !metadata.isEmpty { sections.append(metadata) }
         if let disclosure = codeBasis?.disclosure, !disclosure.isEmpty { sections.append("Code basis\n\(disclosure)") }
         if let limitation = codeBasis?.limitation, !limitation.isEmpty { sections.append("Code-basis limitation\n\(limitation)") }
+        if !researchCorpusMetadataLines.isEmpty {
+            sections.append("Corpus basis\n" + researchCorpusMetadataLines.map { "• \($0)" }.joined(separator: "\n"))
+        }
 
         func appendList(_ title: String, _ items: [String]) {
             let cleaned = items.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
@@ -427,6 +444,45 @@ extension ResearchAnswer {
         displayFormatter.timeZone = TimeZone(secondsFromGMT: 0)
         displayFormatter.dateFormat = "yyyy-MM-dd"
         return displayFormatter.string(from: parsedDate)
+    }
+
+    var researchCorpusMetadataLines: [String] {
+        let entries = (codeBasis?.searchedCorpora ?? []).map { ("Searched", $0) }
+            + (codeBasis?.pinnedCorpora ?? []).map { ("Explicit evidence", $0) }
+        return entries.map { kind, corpus in
+            let identity = [corpus.label, corpus.id]
+                .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .first(where: { !$0.isEmpty }) ?? "Research corpus"
+            let edition = corpus.codeEdition?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let editionLabel = if let edition, !edition.isEmpty {
+                "Edition: \(edition)"
+            } else {
+                "Edition not provided"
+            }
+            return [
+                kind,
+                identity,
+                editionLabel,
+                "Applicability: \(researchApplicabilityStatusLabel(corpus.applicabilityStatus))"
+            ].joined(separator: " · ")
+        }
+    }
+
+    private func researchApplicabilityStatusLabel(_ value: String?) -> String {
+        let status = value?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+        switch status {
+        case "current-enacted-edition": return "Current enacted edition"
+        case "historical": return "Historical"
+        case "future-effective": return "Future effective"
+        case "": return "Applicability status not provided"
+        default:
+            return status
+                .replacingOccurrences(of: "-", with: " ")
+                .replacingOccurrences(of: "_", with: " ")
+                .split(separator: " ")
+                .map { $0.prefix(1).uppercased() + $0.dropFirst() }
+                .joined(separator: " ")
+        }
     }
 
     var researchSourceBoundaryText: String {
