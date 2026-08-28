@@ -38,7 +38,7 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
 }
 
 enum ResearchTrustCopy {
-    static let composerPrivacyDisclosure = "Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential, regulated, or personally identifying information."
+    static let composerPrivacyDisclosure = "Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential, regulated, or sensitive personal information. Ordinary property information may be included when needed."
     static let firstUseDisclosure = "Permitext sends your question, recent chat, selected or retrieved evidence, and assigned Project facts to OpenAI. Private notes are not included."
     static let visualEvidenceDisclosure = "Selected official images are sent to OpenAI for analysis. Private notes are not included."
     static let copyAnswerAction = "Copy answer"

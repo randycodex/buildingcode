@@ -27,7 +27,7 @@ Do not enable Stripe automatic tax, change product tax categories, activate a po
 | Additional-turn sales | Disabled and unpublished |
 | Working web refund rule | Full refund for a Stripe charge requested within 72 hours, subject to the exceptions and provider distinctions in the working policy |
 | Minimum age | 18 |
-| Beta data restriction | Users must not submit confidential, regulated, or personally identifying material and must redact it before submission |
+| Beta data restriction | Users must not submit confidential, regulated, or sensitive personal information and must redact it before submission; ordinary property/project information is permitted when needed for a requested feature |
 | Governing law and disputes | New York subject to nonwaivable law; 30-day informal notice followed by a court with jurisdiction; no mandatory arbitration or class waiver |
 | Support and legal-notice address | `permitext@gmail.com` |
 | Private operator address | Retained only for provider, tax, and legal records where required; not intended for customer-facing publication |

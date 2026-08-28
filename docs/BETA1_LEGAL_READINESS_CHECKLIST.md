@@ -21,10 +21,12 @@ Tax and optional professional reference: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PA
 - Apple refunds: controlled by Apple; Permitext follows verified refund or revocation events.
 - Governing law: New York, subject to nonwaivable law.
 - Disputes: 30-day good-faith informal notice, followed by a court with jurisdiction; eligible small-claims and urgent relief remain available. No mandatory arbitration or class-action waiver.
-- Beta 1 is not approved for confidential, regulated, or personally identifying material. Users must redact that material before submission.
+- Beta 1 is not approved for confidential, regulated, or sensitive personal information. Users must redact that material before submission; ordinary property/project information may be submitted when needed for a requested feature.
 - The private residential address is retained only in provider, tax, and legal records where required and is not placed on customer pages.
 
 ## Owner-reviewed customer documents
+
+- [x] On August 28, 2026, the owner gave final approval to `terms-2026-08-28`, `privacy-2026-08-28`, and `subscriptions-2026-08-28`; exact approved-file hashes are recorded in the owner review. These versions remain dormant until stable URLs and Production configuration are separately authorized.
 
 - [x] Terms identify the individual operator, age and territory limits, account duties, acceptable use, professional and AI boundaries, paid terms, cancellation, refund reference, content license, suspension, disclaimers, liability limitation, governing law, dispute path, and change notice.
 - [x] Subscription/refund policy distinguishes Stripe and Apple, states price, monthly renewal, no trial, cancellation paths, end of access, the 72-hour web rule, and duplicate-billing handling.
@@ -51,15 +53,14 @@ Tax configuration is not activated by this checklist. Paying personal income or 
 
 ## Remaining release gates
 
-Before opening public paid Beta 1:
+The final owner review and version record are complete. Before opening public paid Beta 1:
 
-1. The owner performs a final line-by-line review of the exact Terms, Privacy Policy, and Subscription and Refund Policy to be activated and records their version identifiers.
-2. Stable public URLs serve those exact files, and web/iOS purchase screens match them.
-3. The exact policy version variables are configured only after steps 1 and 2.
-4. The New York sales-tax registration and Stripe tax configuration decision is recorded before the first taxable New York web sale.
-5. Apple App Store metadata and the in-app subscription screen use the same price, duration, renewal, cancellation, and professional-use language.
-6. A no-charge local verification and the separately authorized production lifecycle confirm signup, purchase acknowledgment, entitlement, cancellation, refund, account export, and account deletion.
-7. The owner records acceptance of the residual risks below.
+1. Stable public URLs serve the exact approved files, and web/iOS purchase screens match them.
+2. The exact policy version variables are configured only after step 1.
+3. The newly requested New York Certificate of Authority is received and the Stripe tax configuration decision is recorded before the first taxable New York web sale. The application was submitted and its confirmation was saved on August 28, 2026.
+4. Apple App Store metadata and the in-app subscription screen use the same price, duration, renewal, cancellation, and professional-use language.
+5. A no-charge local verification and the separately authorized production lifecycle confirm signup, purchase acknowledgment, entitlement, cancellation, refund, account export, and account deletion.
+6. The owner records acceptance of the residual risks below.
 
 ## Residual risks requiring owner acceptance
 

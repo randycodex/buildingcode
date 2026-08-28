@@ -23,7 +23,7 @@ Tax is treated separately. The owner may operate as a sole proprietor and report
 | Web billing | Stripe subscription |
 | iOS billing | Apple auto-renewable subscription |
 | Web refund promise | Full refund requested within 72 hours of the initial or renewal charge, regardless of usage, subject to the complete policy |
-| Data restriction | No confidential, regulated, or personally identifying material during Beta 1 |
+| Data restriction | No confidential, regulated, or sensitive personal information during Beta 1; ordinary property/project information is permitted when needed for a requested feature |
 | Support and notices | `permitext@gmail.com` |
 
 ## Requirement-to-evidence review
@@ -70,11 +70,22 @@ Tax is treated separately. The owner may operate as a sole proprietor and report
 6. Do not activate the policy versions, deploy, or run a paid production exercise as part of this review.
 7. Treat New York sales-tax registration/configuration as a separate pre-sale gate even though Permitext profit will be reported on the owner's personal return.
 
+## Final owner approval and version record
+
+On August 28, 2026, the owner approved the exact Terms, Privacy Policy, and Subscription and Refund Policy after a final plain-language review. The approved local versions are:
+
+| Document | Version identifier | Approved-file SHA-256 |
+| --- | --- | --- |
+| `permitext-sync-server/public/terms.html` | `terms-2026-08-28` | `d15a253fd0886e9f091d0e76dfbba8ce0aa922ff57d7c84b66ab37c8d1fa8abc` |
+| `permitext-sync-server/public/privacy.html` | `privacy-2026-08-28` | `ab2a135482fe22bd02136672c37da2821fb2df5add866e02928ae284d7fdddef` |
+| `permitext-sync-server/public/refunds.html` | `subscriptions-2026-08-28` | `4e830128ba659d6074b975d8ea693ac5a4e687c80102531a8bbef422abd6ebc7` |
+
+These identifiers are a local approval record only. They have not been configured in Production, published as a new release, or activated for purchase acceptance. If any approved file changes, it requires a new identifier, hash, and owner review.
+
 ## Open before public paid access
 
-- Owner final line-by-line approval of the exact customer files and version identifiers.
 - Stable public URLs and exact web/iOS parity.
-- New York sales-tax Certificate of Authority and documented Stripe tax configuration before a taxable New York web sale, unless the Tax Department gives a different written classification.
+- Receive the newly requested New York sales-tax Certificate of Authority and document Stripe tax configuration before a taxable New York web sale, unless the Tax Department gives a different written classification. The registration application was submitted and its confirmation was saved on August 28, 2026.
 - Production verification of the retainable web confirmation, Stripe portal cancellation, refund, renewal, and policy-version records.
 - Apple-created Sandbox/TestFlight subscription and cancellation evidence.
 - Production account export/deletion and provider cleanup evidence.

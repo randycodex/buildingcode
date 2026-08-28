@@ -17771,7 +17771,7 @@ function researchComposerDisclosure() {
   const disclosure = document.createElement("p");
   disclosure.className = "research-composer-disclosure";
   disclosure.append(document.createTextNode(
-    "AI-assisted—not an official interpretation. Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential, regulated, or personally identifying information. "
+    "AI-assisted—not an official interpretation. Research sends your question, recent chat, selected or retrieved evidence, and current Project facts when assigned to OpenAI. Private notes are not included. Do not include confidential, regulated, or sensitive personal information. Ordinary property information may be included when needed. "
   ));
   const privacyLink = document.createElement("a");
   privacyLink.href = "/privacy";

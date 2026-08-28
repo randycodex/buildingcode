@@ -23,7 +23,7 @@ Current development branch: `codex/research-commercialization`
 
 ## Status dashboard
 
-Checklist snapshot: **58 completed, 25 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
+Checklist snapshot: **59 completed, 25 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -31,7 +31,7 @@ Checklist snapshot: **58 completed, 25 open**. Eleven of the open items are the 
 | Research quality and subscriber economics | Current Beta gate passed | Immutable V6 passed 20/20, and the no-cost 100-turn/full-service economics model is complete. Actual tax, refund, and infrastructure results must be reviewed after the first 25–50 customers. |
 | Billing and paid continuation | Partially complete | Server billing contracts, local Stripe/Apple exercises, and the provider-backed Stripe sandbox lifecycle pass. Apple Sandbox/TestFlight, controlled Production billing, and final serving-release verification remain. Additional-turn sales stay disabled. |
 | Authentication and account lifecycle | Partially complete | Product contracts and prior Apple-flow verification are complete. Final Production sign-in plus account export/deletion verification remain. |
-| Legal, privacy, and customer promises | Owner self-review complete; activation open | Official-source owner review, customer disclosures, age/data rules, versioned acceptance, purchase consent, server enforcement, and a retainable web post-purchase acknowledgment are prepared. Stable owner-approved versions/URLs, tax registration/configuration, and production activation remain. No attorney approval is claimed. |
+| Legal, privacy, and customer promises | Owner approval complete; activation open | Official-source owner review, final customer-document approval, stable local version identifiers, age/data rules, versioned acceptance, purchase consent, server enforcement, and a retainable web post-purchase acknowledgment are prepared. The New York registration application was submitted and its confirmation saved; the Certificate, stable public URLs, Stripe tax configuration, and Production activation remain open. No attorney approval is claimed. |
 | Hosting, monitoring, recovery, and support | Partially complete | Vercel Pro, spend controls, two included live alert rules, local operations rehearsals, support tabletop, Neon point-in-time recovery, durable-data comparison, and private Blob retrieval pass. Remaining alert delivery and isolated recovery acceptance remain open. |
 | Merge, deploy, TestFlight, and release | Not started; not authorized | All 11 release-sequence steps remain open. No merge, push, deployment, TestFlight upload, or public release is included in the current work. |
 
@@ -40,7 +40,7 @@ Checklist snapshot: **58 completed, 25 open**. Eleven of the open items are the 
 1. Complete Apple-created Sandbox and TestFlight subscription lifecycle evidence.
 2. Complete the separately approved controlled Production billing exercise.
 3. Reverify Production authentication and the account export/deletion lifecycle.
-4. Complete owner approval of the exact policy versions, publish stable URLs, record New York sales-tax registration/configuration, and activate the implemented policy-version acceptance flow.
+4. Publish the approved policy versions at stable URLs, receive the requested New York Certificate of Authority, record Stripe tax configuration, and activate the implemented policy-version acceptance flow.
 5. Finish monitoring coverage and delivered-alert/hard-stop exercises.
 6. Finish isolated recovery acceptance for the recovered Neon state and a separate private Blob namespace, or explicitly accept the remaining risk.
 7. Complete the separately authorized merge, deployment, Production, TestFlight, and physical-iPhone release sequence.
@@ -116,10 +116,11 @@ Detailed configuration: [BETA1_COMMERCIAL_CONFIGURATION.md](./BETA1_COMMERCIAL_C
 - [x] Product-level professional-use, authority, privacy, retention, deletion, and Research-provider disclosures are implemented and covered by contracts.
 - [x] Working commercial decisions and a working refund policy are documented.
 - [x] Set the Beta 1 minimum user age to 18 and document the rule.
-- [x] Prohibit confidential, regulated, or personally identifying material during Beta 1 and require users to redact it before submission.
+- [x] Prohibit confidential, regulated, or sensitive personal information during Beta 1 and require users to redact it before submission, while allowing ordinary property/project information needed for a requested feature.
 - [x] Prepare authenticated, server-timestamped policy-version acceptance storage with stale-version rejection, idempotency, identity-merge preservation, and administrator export coverage.
 - [x] Wire explicit web/iOS purchase consent to the exact displayed policy versions and require current acceptance at web checkout; fail closed while approved current versions are unconfigured.
 - [x] Complete an official-source owner legal self-review after the owner elected not to retain counsel; record sole-proprietor exposure and the residual no-attorney risk without claiming legal approval.
+- [x] Complete final owner approval of the exact customer documents and record dormant identifiers `terms-2026-08-28`, `privacy-2026-08-28`, and `subscriptions-2026-08-28` with their approved-file hashes.
 - [ ] Publish stable owner-approved URLs and ensure web/iOS purchase screens match them.
 - [ ] Configure and activate the owner-approved current policy versions after the final documents and stable URLs are approved.
 
@@ -169,7 +170,7 @@ The current Research quality and no-cost subscriber-economics gate has passed. B
 
 - Apple Sandbox/TestFlight and the separately approved controlled Production payment, cancellation, refund, and reconciliation lifecycles pass;
 - Production authentication plus account export/deletion are reverified;
-- owner-approved customer documents and stable URLs are published, New York sales-tax registration/configuration is recorded, and the implemented policy-acceptance flow is activated with their exact current versions;
+- approved customer documents are published at stable URLs, the requested New York Certificate of Authority is received, Stripe tax configuration is recorded, and the implemented policy-acceptance flow is activated with the exact current versions;
 - remaining Production alert coverage and delivery/hard-stop behavior are tested;
 - remaining isolated recovery acceptance succeeds or its residual risk is explicitly accepted; and
 - Production web and the final TestFlight build are verified against the exact intended release SHA.
