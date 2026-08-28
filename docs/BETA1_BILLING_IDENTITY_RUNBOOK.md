@@ -109,6 +109,23 @@ Perform Sandbox and TestFlight exercises first, then one controlled production p
 
 The permanent local signed-payload exercise and its strict evidence boundary are recorded in [PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md](./PERMITEXT_APPLE_LOCAL_LIFECYCLE_EVIDENCE_2026-08-28.md). It covers the same server routes with an ephemeral local trust chain and zero provider calls, but does not replace Apple-created Sandbox or TestFlight evidence.
 
+### Prepared Sandbox/TestFlight staging guard
+
+Apple documents that development-signed and TestFlight apps use the Sandbox environment, where test purchases do not charge real money. App Store Connect supports separate Production and Sandbox App Store Server Notification URLs. If the Sandbox URL is omitted, Apple sends Sandbox notifications to the Production URL; Permitext must not use that fallback because the Production server intentionally rejects Sandbox transactions.
+
+The iOS backend URL now comes from the `PERMITEXT_BACKEND_API_BASE_URL` build setting. Release builds continue to default to `https://permitext-sync.vercel.app`, while an explicitly authorized TestFlight archive can override the setting with a dedicated staging URL.
+
+Before any staging deployment or App Store Connect change, run:
+
+```sh
+cd permitext-sync-server
+npm run verify:apple-sandbox-readiness
+```
+
+The verifier fails closed unless the environment is non-Production, Sandbox transactions are allowed, the HTTPS host is dedicated and non-Production, PostgreSQL and private Blob storage are explicitly isolated from Production, the Apple bundle and product identifiers match, Apple root-certificate pinning is enforced and configured, Clerk and approved policy versions are configured, paid Research turns remain disabled, the Research kill switch remains on, and no live Stripe secret is present.
+
+The existing Vercel Preview environment is not eligible because it shares the Production database. Preparing this guard did not deploy staging, change App Store Connect, upload a build, create a transaction, deliver a notification, or write to a provider.
+
 1. Purchase and restore bind the original transaction ID to exactly one Permitext account.
 2. `DID_RENEW` extends access.
 3. Turning off auto-renew does not remove prepaid access.

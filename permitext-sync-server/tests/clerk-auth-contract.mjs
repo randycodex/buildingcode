@@ -153,6 +153,11 @@ assert(
   "iOS can start StoreKit purchase or restore before establishing its Permitext account."
 );
 assert(iosInfo.includes("PermitextClerkPublishableKey"), "iOS does not expose its Clerk publishable-key build setting.");
+assert(
+  iosInfo.includes("<string>$(PERMITEXT_BACKEND_API_BASE_URL)</string>") &&
+    iosProject.match(/PERMITEXT_BACKEND_API_BASE_URL = "https:\/\/permitext-sync\.vercel\.app";/g)?.length === 2,
+  "iOS does not keep Production as the default backend while allowing an explicit Sandbox/TestFlight archive override."
+);
 
 const networklessEnvironment = {
   ...production,

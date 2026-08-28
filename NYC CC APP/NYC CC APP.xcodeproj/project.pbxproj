@@ -638,6 +638,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				NATIVE_READER_ROLLOUT_STAGE = "isolated-table-fallback";
+				PERMITEXT_BACKEND_API_BASE_URL = "https://permitext-sync.vercel.app";
 				PRODUCT_BUNDLE_IDENTIFIER = com.randycodex.permitext;
 				PRODUCT_NAME = permitext;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -669,6 +670,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				NATIVE_READER_ROLLOUT_STAGE = "isolated-table-fallback";
+				PERMITEXT_BACKEND_API_BASE_URL = "https://permitext-sync.vercel.app";
 				PRODUCT_BUNDLE_IDENTIFIER = com.randycodex.permitext;
 				PRODUCT_NAME = permitext;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
