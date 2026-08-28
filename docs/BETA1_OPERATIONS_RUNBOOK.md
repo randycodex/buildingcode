@@ -11,6 +11,10 @@ This runbook defines the minimum operating loop for a public Beta 1. It separate
 - Beta 1 support target: acknowledge account, billing, data-loss, and access reports within one business day; acknowledge other reports within two business days. This is an operating target, not a contractual service-level agreement.
 - Do not request passwords, session tokens, provider receipts, or full database records by email.
 
+Use the same operating loop for every report: acknowledge and set the next update time; collect platform, release/build, approximate time, expected behavior, and the minimum account identifier; classify scope and severity; use read-only Permitext/provider evidence first; contain a systemic failure before attempting repair; verify recovery; and record the customer update and next owner. An email assertion alone never authorizes an entitlement grant, refund, destructive data action, or official code interpretation.
+
+Before public Beta, complete the three synthetic scenarios in [BETA1_SUPPORT_TABLETOP_RECORD.md](./BETA1_SUPPORT_TABLETOP_RECORD.md). The document contract is automated, but only a timed operator-run record can confirm the process is operable.
+
 ## Monitoring baseline
 
 Permitext emits structured Vercel runtime events for:
@@ -53,7 +57,7 @@ The alert destination and named on-call owner must be recorded before opening th
 
 - Owner: Higinio Jimenez Manzano (`permitext@gmail.com`).
 - The active Microsoft OAuth client secret for **Permitext Clerk Production** expires on **February 17, 2027**.
-- Create operator reminders for 30, 14, and 7 days before expiration. Treat the 30-day reminder as the rotation deadline, not the expiration date.
+- Operator reminders are active in the Codex heartbeat **Permitext Microsoft OAuth rotation reminders** (`permitext-microsoft-rotation-30-days`) for January 18, February 3, and February 10, 2027 at 9:00 AM in the local automation time zone. Treat the 30-day reminder as the rotation deadline, not the expiration date.
 - Rotate by creating a replacement secret in the Permitext Microsoft Entra directory, updating Clerk production, and verifying a complete Microsoft sign-in before deleting or allowing the prior secret to expire.
 - The active Sign in with Apple key is **Permitext Clerk Production**, Key ID `X2UVYL4XC7`, under Team ID `57BY95X97H` and Services ID `com.randycodex.permitext.web`. Apple keys do not expire automatically; rotate immediately if exposure or unauthorized access is suspected.
 - Apple Private Email Relay has the SPF-verified source `bounces+113080807@clkmail.permitext.com`. Reverify it in Apple after changing Clerk email delivery or the `clkmail.permitext.com` DNS configuration.

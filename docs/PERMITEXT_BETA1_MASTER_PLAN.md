@@ -84,7 +84,7 @@ Detailed configuration: [BETA1_COMMERCIAL_CONFIGURATION.md](./BETA1_COMMERCIAL_C
 - [x] Account deletion explains the destructive scope and distinguishes Permitext deletion from Apple subscription cancellation and external identity providers.
 - [ ] Reverify fresh-account and existing-account sign-in for Apple, Google, Microsoft, and email in production after the final deployment.
 - [ ] Complete one production-configured account export/deletion lifecycle and confirm provider/local cleanup results are reported accurately.
-- [ ] Record OAuth credential rotation reminders and ownership.
+- [x] Record OAuth credential ownership and activate the Microsoft secret's 30-, 14-, and 7-day rotation reminders.
 
 ## 5. Legal, privacy, and customer promises
 
@@ -107,7 +107,8 @@ Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_
 - [ ] Set and test the intended infrastructure spend notifications and hard-stop behavior.
 - [x] Add a fail-closed read-only restore comparator and complete its no-provider local end-to-end rehearsal, including deliberate missing-record detection.
 - [ ] Complete the first provider-backed isolated Neon/Blob backup/restore drill and retain the recovery-point, private-asset, timing, and cleanup evidence.
-- [ ] Confirm the documented support response process can be operated.
+- [x] Add the timed synthetic support-tabletop record and cross-document support-process contract.
+- [ ] Complete the first timed support tabletop and retain the operator record.
 
 Operations runbook: [BETA1_OPERATIONS_RUNBOOK.md](./BETA1_OPERATIONS_RUNBOOK.md)
 
