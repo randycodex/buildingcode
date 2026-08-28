@@ -120,6 +120,8 @@ The public beta remains blocked until the first Neon/Blob restore drill succeeds
 
 Use `docs/BETA1_RESTORE_DRILL_RECORD.md` to record the first exercise. Neon history retention and Vercel deployment retention must be checked in the live dashboards because plan limits can change.
 
+On August 28, 2026, an owner-authorized provider exercise successfully created and verified a point-in-time Neon child branch, matched 38 provider tables and 3,611 rows by content digest, ran the exact Production commit locally against the isolated branch, passed `npm run verify:restore-drill`, and inventoried/retrieved all used private Blob asset classes. It did not create a Vercel deployment or an isolated private Blob provider namespace because the no-deploy/no-paid boundaries remained in force. The complete restore gate therefore remains open. Evidence: [PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md](./PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md).
+
 ## Incident record
 
 Each incident record should include:

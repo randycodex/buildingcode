@@ -246,6 +246,12 @@ Detailed evidence and boundaries are in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDE
 
 Provider evidence and retained definitions are in [PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md](./PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md).
 
+### Provider recovery evidence under retained deployment and cost boundaries
+
+The owner-authorized recovery exercise created a time-limited Neon child branch from `main` at an explicit point within the live six-hour history window. Direct read-only provider checks matched all 38 Permitext tables and 3,611 rows by exact content digest, aggregate and representative-account entitlement state matched, and the exact serving Production commit returned successful health, release, storage-summary, and restore-checklist responses against the isolated database. The permanent restore verifier passed with zero mismatches. The private Blob store inventory contained 124 objects, and authenticated in-memory retrieval passed for PNG, JPG, and PDF representatives without a provider write.
+
+The public-Beta restore item remains open because the retained no-deploy/no-paid boundaries excluded an isolated Vercel deployment and a duplicate private Blob provider namespace. Detailed evidence and cleanup state are in [PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md](./PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md).
+
 ### Live Vercel cost-control confirmation
 
 The owner personally submitted the Pro upgrade on August 28. The live dashboard confirmed Pro for the August 28–September 28, 2026 billing cycle, one included owner, $20 of monthly infrastructure credit, and no paid add-ons. The post-upgrade dashboard showed a $20 upcoming invoice; checkout's estimated $1.78 tax remains unverified until the final invoice posts.

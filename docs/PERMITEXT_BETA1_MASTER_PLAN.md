@@ -109,6 +109,7 @@ Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_
 - [x] Configure a $20 Vercel on-demand spend amount, standard spend notifications, and automatic Production pause for all projects on the team.
 - [ ] Exercise a delivered spend notification and actual hard-stop behavior without exposing customers or incurring an uncontrolled overage.
 - [x] Add a fail-closed read-only restore comparator and complete its no-provider local end-to-end rehearsal, including deliberate missing-record detection.
+- [x] Complete a real point-in-time Neon child-branch recovery, exact durable-content comparison, Production-commit local compatibility check, and authenticated private Blob inventory/retrieval under the retained no-deploy/no-paid constraints.
 - [ ] Complete the first provider-backed isolated Neon/Blob backup/restore drill and retain the recovery-point, private-asset, timing, and cleanup evidence.
 - [x] Add the timed synthetic support-tabletop record and cross-document support-process contract.
 - [x] Complete the first timed Codex-assisted support tabletop and retain the operator record.
