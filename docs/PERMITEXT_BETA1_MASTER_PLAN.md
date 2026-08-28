@@ -21,6 +21,30 @@ The product foundation is substantially built, but Beta 1 is **not ready for pub
 
 Current development branch: `codex/research-commercialization`
 
+## Status dashboard
+
+Checklist snapshot: **54 completed, 26 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
+
+| Workstream | Status | What is done and what remains |
+| --- | --- | --- |
+| Core product and cross-platform foundation | Mostly complete | Shared web/iOS contracts and Research presentation are complete. Final production-web and physical-iPhone verification remains. |
+| Research quality and subscriber economics | Current Beta gate passed | Immutable V6 passed 20/20, and the no-cost 100-turn/full-service economics model is complete. Actual tax, refund, and infrastructure results must be reviewed after the first 25–50 customers. |
+| Billing and paid continuation | Partially complete | Server billing contracts, local Stripe/Apple exercises, and the provider-backed Stripe sandbox lifecycle pass. Apple Sandbox/TestFlight, controlled Production billing, and final serving-release verification remain. Additional-turn sales stay disabled. |
+| Authentication and account lifecycle | Partially complete | Product contracts and prior Apple-flow verification are complete. Final Production sign-in plus account export/deletion verification remain. |
+| Legal, privacy, and customer promises | Product work complete; external review open | Product disclosures, working policies, age rule, and Beta data restrictions are documented. Counsel review, stable approved URLs, and policy-version acceptance remain. |
+| Hosting, monitoring, recovery, and support | Partially complete | Vercel Pro, spend controls, two included live alert rules, local operations rehearsals, support tabletop, Neon point-in-time recovery, durable-data comparison, and private Blob retrieval pass. Remaining alert delivery and isolated recovery acceptance remain open. |
+| Merge, deploy, TestFlight, and release | Not started; not authorized | All 11 release-sequence steps remain open. No merge, push, deployment, TestFlight upload, or public release is included in the current work. |
+
+### What still blocks a public paid Beta
+
+1. Complete Apple-created Sandbox and TestFlight subscription lifecycle evidence.
+2. Complete the separately approved controlled Production billing exercise.
+3. Reverify Production authentication and the account export/deletion lifecycle.
+4. Obtain counsel approval, publish stable policy URLs, and add required policy-version acceptance.
+5. Finish monitoring coverage and delivered-alert/hard-stop exercises.
+6. Finish isolated recovery acceptance for the recovered Neon state and a separate private Blob namespace, or explicitly accept the remaining risk.
+7. Complete the separately authorized merge, deployment, Production, TestFlight, and physical-iPhone release sequence.
+
 ## 1. Core product and cross-platform foundation
 
 - [x] Web and iOS share the account, entitlement, Project, saved-content, and Research backend contracts.
@@ -30,7 +54,7 @@ Current development branch: `codex/research-commercialization`
 - [x] Zoning public Research remains disabled while the reader/search corpus can continue to exist separately.
 - [ ] Recheck the final merged build on both production web and the physical iPhone before release.
 
-## 2. Research quality and economics — active now
+## 2. Research quality and economics — current Beta gate passed
 
 - [x] Implemented Luna-first routing with Terra escalation or repair.
 - [x] Implemented model, cost, latency, verification, and escalation telemetry.
@@ -105,12 +129,12 @@ Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_
 - [x] A named support and urgent-alert owner and support address are documented.
 - [x] Upgrade the commercial production service from Vercel Hobby to Vercel Pro.
 - [x] Configure and live-verify the included Permitext-scoped Vercel 5xx-anomaly and infrastructure-usage-anomaly rules with owner email/web subscriptions.
-- [ ] Configure and exercise monitoring alerts for health, 5xx/client failures, billing webhooks, database failures, Research spend, and p95 latency.
+- [ ] Complete the remaining monitoring coverage and delivery exercises for health, 5xx/client failures, billing webhooks, database failures, Research spend, and p95 latency.
 - [x] Configure a $20 Vercel on-demand spend amount, standard spend notifications, and automatic Production pause for all projects on the team.
 - [ ] Exercise a delivered spend notification and actual hard-stop behavior without exposing customers or incurring an uncontrolled overage.
 - [x] Add a fail-closed read-only restore comparator and complete its no-provider local end-to-end rehearsal, including deliberate missing-record detection.
 - [x] Complete a real point-in-time Neon child-branch recovery, exact durable-content comparison, Production-commit local compatibility check, and authenticated private Blob inventory/retrieval under the retained no-deploy/no-paid constraints.
-- [ ] Complete the first provider-backed isolated Neon/Blob backup/restore drill and retain the recovery-point, private-asset, timing, and cleanup evidence.
+- [ ] Complete the remaining isolated recovery acceptance: serve the exact Production commit against the recovered Neon state in an isolated deployment and validate restore into a separate private Blob namespace, or record explicit owner risk acceptance.
 - [x] Add the timed synthetic support-tabletop record and cross-document support-process contract.
 - [x] Complete the first timed Codex-assisted support tabletop and retain the operator record.
 
@@ -118,7 +142,7 @@ Operations runbook: [BETA1_OPERATIONS_RUNBOOK.md](./BETA1_OPERATIONS_RUNBOOK.md)
 
 ## 7. Merge, deploy, and release sequence
 
-This sequence begins only after the active Research gate is acceptable.
+This sequence begins only after the remaining pre-release gates are acceptable and the owner separately authorizes release work.
 
 1. [ ] Review the full branch diff and preserve unrelated local iOS/Xcode changes.
 2. [ ] Commit and push the completed remediation and new evaluation evidence.
@@ -134,14 +158,14 @@ This sequence begins only after the active Research gate is acceptable.
 
 ## Release blockers at a glance
 
-Beta 1 remains blocked until:
+The current Research quality and no-cost subscriber-economics gate has passed. Beta 1 remains blocked until:
 
-- Research quality and p50/p90 economics pass the current gate;
-- the full payment, cancellation, refund, and reconciliation lifecycle passes;
-- counsel-approved customer documents and remaining owner policy decisions are complete;
-- production hosting and alerting are commercially appropriate and tested;
-- the first backup/restore drill succeeds or the risk is explicitly accepted;
-- production web and the final TestFlight build are verified against the exact intended release SHA.
+- Apple Sandbox/TestFlight and the separately approved controlled Production payment, cancellation, refund, and reconciliation lifecycles pass;
+- Production authentication plus account export/deletion are reverified;
+- counsel-approved customer documents, stable URLs, and required policy acceptance are complete;
+- remaining Production alert coverage and delivery/hard-stop behavior are tested;
+- remaining isolated recovery acceptance succeeds or its residual risk is explicitly accepted; and
+- Production web and the final TestFlight build are verified against the exact intended release SHA.
 
 ## Not part of this immediate Beta 1 gate
 
