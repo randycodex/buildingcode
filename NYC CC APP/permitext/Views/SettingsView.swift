@@ -1609,6 +1609,7 @@ struct ProSubscriptionStoreView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 15)
+                        .contentShape(Capsule(style: .continuous))
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(subscribeButtonForegroundColor)
@@ -1638,6 +1639,7 @@ struct ProSubscriptionStoreView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
+                        .contentShape(Capsule(style: .continuous))
                     }
                     .buttonStyle(.plain)
                     .foregroundStyle(.primary)
