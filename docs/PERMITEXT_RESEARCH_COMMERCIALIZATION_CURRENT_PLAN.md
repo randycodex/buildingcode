@@ -126,6 +126,8 @@ The immutable v3 cohort began from remediated application commit `ac024f04788ae7
 
 Permitext now treats an express “Based on [named provisions]” question as section-bounded unless the user also requests an external lookup. English Research narrative sanitation also removes isolated letters from other writing systems while preserving Latin text, numbers, punctuation, symbols, and units. The partial evidence is retained at `permitext-sync-server/evals/results/2026-08-27T23-55-01-805Z-d91a79dc-85f5-4e76-9374-0d477c1cdcbe.md`.
 
+The targeted occupancy confirmation then passed 4.00/4 in 45.936 seconds. Telemetry confirmed that web support was neither requested nor searched, with `selected_evidence_boundary` recorded as the reason. The Research operation cost $0.119429 and the full diagnostic including the independent grader cost $0.150251. One bounded repair removed an improper request to reconfirm an established Project fact. This clears the v3 fail-fast blocker for a new frozen cohort.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -153,4 +155,4 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 
 ## Immediate next action
 
-Pass the no-cost contracts for section-bounded web routing and English-answer sanitation, freeze the v3 partial result, and run the formerly failing occupancy case once under a hard cap. If it passes without automatic web support, create a new immutable v4 cohort. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.
+Create and commit a new immutable v4 cohort profile from the current remediated application commit, then run all 20 cases under the $4.00 hard cap with stop-on-error. Use only a complete cohort to decide quality, p50/p90 latency, hybrid routing behavior, and projected cost per 100 turns. Do not proceed to public paid Research while full-cohort evidence remains incomplete.

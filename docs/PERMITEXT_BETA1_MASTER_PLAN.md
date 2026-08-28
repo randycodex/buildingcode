@@ -44,7 +44,7 @@ Current development branch: `codex/research-commercialization`
 - [x] Attempt the frozen v2 cohort; retain it as partial evidence after 11 completed turns and a provider outage.
 - [x] Resolve the three v2 quality failures and verify provider fail-fast behavior before a v3 cohort.
 - [x] Attempt the frozen v3 cohort; retain its 15 completed turns and fail-fast stop at case 16 as partial evidence.
-- [ ] Verify section-bounded web-routing and English-answer sanitization before a v4 cohort.
+- [x] Verify section-bounded web-routing and English-answer sanitization before a v4 cohort.
 - [ ] Run a new frozen full cohort only if the targeted cases improve without material regressions.
 - [ ] Confirm that p50/p90 full-service cost supports the $20 plan and 100 included turns.
 
