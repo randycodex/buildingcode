@@ -27,6 +27,7 @@ Tax and optional professional reference: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PA
 ## Owner-reviewed customer documents
 
 - [x] On August 28, 2026, the owner gave final approval to `terms-2026-08-28`, `privacy-2026-08-28`, and `subscriptions-2026-08-28`; exact approved-file hashes are recorded in the owner review. These versions remain dormant until stable URLs and Production configuration are separately authorized.
+- [x] On August 28, 2026, the owner explicitly accepted all residual Beta risks listed below, including self-review gaps, sole-proprietor personal exposure, possible nonenforcement of liability limits, and potential customer, platform, provider, or regulatory costs and required changes.
 
 - [x] Terms identify the individual operator, age and territory limits, account duties, acceptable use, professional and AI boundaries, paid terms, cancellation, refund reference, content license, suspension, disclaimers, liability limitation, governing law, dispute path, and change notice.
 - [x] Subscription/refund policy distinguishes Stripe and Apple, states price, monthly renewal, no trial, cancellation paths, end of access, the 72-hour web rule, and duplicate-billing handling.
@@ -60,7 +61,6 @@ The final owner review and version record are complete. Before opening public pa
 3. The newly requested New York Certificate of Authority is received and the Stripe tax configuration decision is recorded before the first taxable New York web sale. The application was submitted and its confirmation was saved on August 28, 2026.
 4. Apple App Store metadata and the in-app subscription screen use the same price, duration, renewal, cancellation, and professional-use language.
 5. A no-charge local verification and the separately authorized production lifecycle confirm signup, purchase acknowledgment, entitlement, cancellation, refund, account export, and account deletion.
-6. The owner records acceptance of the residual risks below.
 
 ## Residual risks requiring owner acceptance
 
@@ -71,3 +71,5 @@ The final owner review and version record are complete. Before opening public pa
 - Material product, price, provider, territory, data-use, or billing changes require a new review and may require renewed customer consent.
 
 The absence of an attorney is an owner-accepted business risk, not evidence that no law applies and not a reason to label these documents "legally approved."
+
+Owner acceptance recorded: August 28, 2026. This acceptance does not remove any remaining release gate or authorize deployment, billing activation, paid testing, or public release.

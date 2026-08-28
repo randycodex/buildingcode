@@ -69,6 +69,7 @@ Tax is treated separately. The owner may operate as a sole proprietor and report
 5. Keep additional-turn sales disabled and unpublished.
 6. Do not activate the policy versions, deploy, or run a paid production exercise as part of this review.
 7. Treat New York sales-tax registration/configuration as a separate pre-sale gate even though Permitext profit will be reported on the owner's personal return.
+8. On August 28, 2026, accept all residual Beta risks recorded in this review: possible gaps in a self-review, sole-proprietor personal exposure, possible nonenforcement of liability limits, potential customer/platform/provider/regulatory costs or required changes, and the need to review material product or billing changes again.
 
 ## Final owner approval and version record
 
@@ -89,7 +90,6 @@ These identifiers are a local approval record only. They have not been configure
 - Production verification of the retainable web confirmation, Stripe portal cancellation, refund, renewal, and policy-version records.
 - Apple-created Sandbox/TestFlight subscription and cancellation evidence.
 - Production account export/deletion and provider cleanup evidence.
-- Explicit owner acceptance of sole-proprietor personal-liability and no-attorney residual risk.
 
 ## Review conclusion
 
