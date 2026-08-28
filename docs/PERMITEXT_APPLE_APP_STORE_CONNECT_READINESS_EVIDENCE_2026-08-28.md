@@ -2,7 +2,7 @@
 
 ## Scope and boundary
 
-This record captures a read-only inspection of the owner's authenticated App Store Connect account plus no-cost verification of Apple's published root certificates. The inspection did not save App Store Connect changes, create or clear a Sandbox purchase, upload a build, submit anything for review, deploy a backend, alter pricing, or make a paid call.
+This record began with a read-only inspection of the owner's authenticated App Store Connect account and no-cost verification of Apple's published root certificates. With the owner's later approval, it now also records an isolated Apple Sandbox staging deployment, the dedicated Sandbox notification URL, and a staging-targeted TestFlight build upload. No Sandbox purchase has been created or cleared, nothing was submitted for App Review, the Production notification URL and Production deployment were not changed, pricing was not changed, and no paid provider call was made.
 
 ## App Store Connect findings
 
@@ -15,11 +15,34 @@ This record captures a read-only inspection of the owner's authenticated App Sto
 | Subscription availability | One of 175 countries or regions selected. This inspection did not open or change the selection, so the selected territory still needs explicit verification against the retained United States-only Beta scope. |
 | Subscription options | Billing Grace Period is not configured; Streamlined Purchasing is on; Family Sharing is off |
 | Subscription metadata | English display name exists. The description and review notes still describe the earlier save/export/sync feature set and do not state the approved 100-Research-turn allowance. A review screenshot is not present. These are submission-readiness issues, not prerequisites for an isolated Sandbox transaction exercise. |
-| Server notifications | Both Production Server URL and Sandbox Server URL show `Set Up URL`; neither is configured |
-| TestFlight | Builds 31–41 are present. Build 41 completed processing, is `Ready to Submit`, expires in 89 days, and is associated with the Internal Testers group. No installs, sessions, crashes, or feedback are recorded for build 41. |
+| Server notifications | Production Server URL remains unset. Sandbox Server URL is `https://permitext-apple-sandbox.vercel.app/billing/apple/notifications`. |
+| TestFlight | Build 42 was uploaded on August 28, 2026 at 6:37 PM from a verified archive targeting only the isolated staging backend. Apple completed processing; build 42 is `Ready to Submit`, expires in 90 days, and is associated with the Internal Testers group. Builds 31–41 remain present. |
 | Sandbox accounts | Two United States test accounts exist. `permitext+storekit1@gmail.com` records a last purchase on August 23, 2026; the second account records no last purchase. No purchase history was cleared. |
 
-The latest uploaded build is 41, while the checked-in iOS project also currently uses build number 41. Build 41 predates the build-time staging-backend override and therefore retains the Production backend. Permitext Production intentionally rejects Sandbox transactions, so the existing build cannot close the Apple Sandbox lifecycle gate.
+Build 41 predates the build-time staging-backend override and retains the Production backend. Build 42 is the first uploaded build archived with `PERMITEXT_BACKEND_API_BASE_URL=https://permitext-apple-sandbox.vercel.app`; it is intentionally a Sandbox-evidence build, not the final Production release build. The Apple-created lifecycle gate remains open until the owner completes the physical-iPhone Sandbox exercise.
+
+## Isolated Apple Sandbox staging evidence
+
+The owner authorized creation of an isolated no-cost staging environment. The resulting provider state is separate from Permitext Production:
+
+| Item | Verified state |
+| --- | --- |
+| Vercel project | `permitext-apple-sandbox`, project ID `prj_81ZgJez2jeN9un5yZVJMQhJ3GvJj` |
+| Vercel environment | `apple-sandbox`, environment ID `env_lWJa0VVvILVEuNxUMU6ayrg6OUpy`, type Preview |
+| Deployment | `dpl_CnVCdQFCi4FdNQCRUsGJbGT3Yqrb`, release commit `50a7b6bfa900a2909401786f5704951a11bcdac5` |
+| Public staging host | `https://permitext-apple-sandbox.vercel.app` |
+| Database | Dedicated Neon resource `permitext-apple-sandbox-db`, Vercel resource ID `store_AMMH148rniT3zAjY`, Neon project `proud-mountain-82366605`, free plan, `iad1` |
+| Blob | Dedicated private store `permitext-apple-sandbox-blob`, store ID `store_Ek7ns0ZW3BJZn2i3`, `iad1` |
+| Guardrails | All 17 staging-readiness checks pass; paid Research turns are zero, the Research kill switch is on, root-pin enforcement is on, storage-isolation flags are on, and no Stripe secret or OpenAI key is present |
+| Health | Public `/health` returned HTTP 200 with PostgreSQL storage, normalized-v4 schema, PostgreSQL rate limiting, Preview environment, and the exact release commit above |
+
+The Blob credential differs from Production, and the isolated Neon and Blob resources are connected only to the dedicated staging project. The successful deployment verified the complete construction, zoning, enacted-code, and specialty-code content required by the application. Vercel authentication protection was disabled only for this separate staging project so the physical iPhone can reach it; Production protection and the Production deployment were not changed.
+
+## Build 42 archive and upload evidence
+
+The archive completed with Xcode 27.0 (`27A5252f`) and was uploaded successfully through App Store Connect export. Before upload, the archived application was inspected and confirmed as version `1.0`, build `42`, bundle ID `com.randycodex.permitext`, team `57BY95X97H`, non-exempt encryption disabled, and backend `https://permitext-apple-sandbox.vercel.app`. The upload reported `Uploading permitext.ipa is complete`, `Uploaded package is processing`, `Upload succeeded`, and `** EXPORT SUCCEEDED **`.
+
+This proves archive configuration and upload acceptance only. It is not Apple-created purchase evidence, physical-device acceptance, Production release evidence, or App Review submission.
 
 ## Official Apple environment and notification behavior
 
@@ -50,10 +73,11 @@ Sources:
 
 ## Remaining safe sequence
 
-1. Separately authorize an isolated non-Production database, private Blob store, and staging deployment. The existing Preview environment is ineligible because it shares Production storage.
-2. Run `npm run verify:apple-sandbox-readiness` against that deployment and require every check to pass.
-3. Increment the iOS build number and separately authorize a TestFlight archive whose `PERMITEXT_BACKEND_API_BASE_URL` points only to the isolated staging host.
-4. Separately authorize setting App Store Connect's Sandbox Server URL to the staging `/billing/apple/notifications` endpoint. Leave the Production URL unchanged until the Production release is ready.
-5. Use an existing Sandbox account to exercise purchase, ownership, renewal, cancellation, billing failure/recovery, refund, duplicate delivery, delayed delivery, and restore. Capture Apple-created transaction and notification identifiers.
+1. [x] Create an isolated non-Production database, private Blob store, and staging deployment.
+2. [x] Run `npm run verify:apple-sandbox-readiness` and require every check to pass.
+3. [x] Archive and upload build 42 with `PERMITEXT_BACKEND_API_BASE_URL` pointing only to the isolated staging host.
+4. [x] Set only App Store Connect's Sandbox Server URL to the staging `/billing/apple/notifications` endpoint and leave the Production URL unchanged.
+5. [x] Confirm build 42 completed processing, is `Ready to Submit`, and is associated with Internal Testers.
+6. [ ] On the owner's physical iPhone, use an existing Sandbox account to exercise purchase, ownership, renewal, cancellation, billing failure/recovery, refund, duplicate delivery, delayed delivery, and restore. Capture Apple-created transaction and notification identifiers.
 
-Steps 1, 3, 4, and 5 are not authorized by this evidence record. A controlled Production purchase remains separately approval-gated.
+The remaining exercise uses Apple's Sandbox and must create no real charge. A controlled Production purchase remains a separate approval gate.
