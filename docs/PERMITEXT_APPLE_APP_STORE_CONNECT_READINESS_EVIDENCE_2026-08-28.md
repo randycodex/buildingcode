@@ -16,10 +16,10 @@ This record began with a read-only inspection of the owner's authenticated App S
 | Subscription options | Billing Grace Period is not configured; Streamlined Purchasing is on; Family Sharing is off |
 | Subscription metadata | English display name exists. The description and review notes still describe the earlier save/export/sync feature set and do not state the approved 100-Research-turn allowance. A review screenshot is not present. These are submission-readiness issues, not prerequisites for an isolated Sandbox transaction exercise. |
 | Server notifications | Production Server URL remains unset. Sandbox Server URL is `https://permitext-apple-sandbox.vercel.app/billing/apple/notifications`. |
-| TestFlight | Staging-targeted builds 42–46 were uploaded from verified archives. Build 45 is `Complete`, `Ready to Submit`, and associated with Internal Testers, but its refund button did not present Apple's sheet on the physical iPhone. Build 46 contains the direct-StoreKit replacement, became available to the owner in TestFlight, and completed the Apple refund form and submission. A verified staging-targeted build 47 archive is ready locally; upload is blocked only because Xcode is signed out of Apple Accounts. |
+| TestFlight | Staging-targeted builds 42–47 were uploaded from verified archives. Build 45 is `Complete`, `Ready to Submit`, and associated with Internal Testers, but its refund button did not present Apple's sheet on the physical iPhone. Build 46 contains the direct-StoreKit replacement, became available to the owner in TestFlight, and completed the Apple refund form and submission. Apple accepted the build 47 upload and reported that the package was processing; TestFlight availability, installation, and physical refund-revocation acceptance are not yet claimed. |
 | Sandbox accounts | Two United States test accounts exist. The dedicated `permitext+storekit1@gmail.com` tester completed the no-charge physical-iPhone purchase and restore exercise described below. Its App Store Connect subscription renewal rate is `Monthly renewal every hour`. |
 
-Build 41 predates the build-time staging-backend override and retains the Production backend. Builds 42–46 were archived with `PERMITEXT_BACKEND_API_BASE_URL=https://permitext-apple-sandbox.vercel.app`; they are intentionally Sandbox-evidence builds, not final Production release builds. The Apple-created lifecycle gate remains open for renewal, billing failure/recovery, refund, duplicate-delivery, and delayed-delivery evidence.
+Build 41 predates the build-time staging-backend override and retains the Production backend. Builds 42–47 were archived with `PERMITEXT_BACKEND_API_BASE_URL=https://permitext-apple-sandbox.vercel.app`; they are intentionally Sandbox-evidence builds, not final Production release builds. The Apple-created lifecycle gate remains open for renewal, billing failure/recovery, refund, duplicate-delivery, and delayed-delivery evidence.
 
 ## Isolated Apple Sandbox staging evidence
 
@@ -29,7 +29,7 @@ The owner authorized creation of an isolated no-cost staging environment. The re
 | --- | --- |
 | Vercel project | `permitext-apple-sandbox`, project ID `prj_81ZgJez2jeN9un5yZVJMQhJ3GvJj` |
 | Vercel environment | `apple-sandbox`, environment ID `env_lWJa0VVvILVEuNxUMU6ayrg6OUpy`, type Preview |
-| Deployment | `dpl_AzwQ59A2XRcXe91QDyB2tNnuU1mM`, release commit `1f58764fced918a28f8b3987b27de51e977b7f84` |
+| Deployment | `dpl_H87B75LADqeSc93AP9N3WksY9gjq`, repair commit `658c1264d6bcb57440e590d0bbf91b274e3b765d` |
 | Public staging host | `https://permitext-apple-sandbox.vercel.app` |
 | Database | Dedicated Neon resource `permitext-apple-sandbox-db`, Vercel resource ID `store_AMMH148rniT3zAjY`, Neon project `proud-mountain-82366605`, free plan, `iad1` |
 | Blob | Dedicated private store `permitext-apple-sandbox-blob`, store ID `store_Ek7ns0ZW3BJZn2i3`, `iad1` |
@@ -38,7 +38,7 @@ The owner authorized creation of an isolated no-cost staging environment. The re
 
 The Blob credential differs from Production, and the isolated Neon and Blob resources are connected only to the dedicated staging project. The successful deployment verified the complete construction, zoning, enacted-code, and specialty-code content required by the application. Vercel authentication protection was disabled only for this separate staging project so the physical iPhone can reach it; Production protection and the Production deployment were not changed.
 
-## Builds 42–45 archive and upload evidence
+## Builds 42–47 archive and upload evidence
 
 Build 42 established the isolated archive path. Build 43 repaired a Release-only stale debug-backend override and presented the working App Store subscription sheet. Build 44 added fail-closed Sandbox account linking only when the embedded backend is exactly `https://permitext-apple-sandbox.vercel.app`; Production and lookalike hosts remain ineligible. The complete entitlement/sync contract suite passed 111 tests with zero failures before the build 44 commit `24717d609`.
 
@@ -66,7 +66,7 @@ On build 46, Apple's first refund-sheet load returned `Cannot Connect`. After re
 
 The failed physical revocation exposed two source defects. First, `/billing/apple/transactions/verify` could persist an older active transaction after a newer Apple notification had removed the entitlement. Second, the iOS backend-verification path did not clear its cached Pro entitlement when the server returned no entitlement. The repair compares Apple's signed transaction date with the persisted notification date, makes the newer notification authoritative, prevents the PostgreSQL claim from racing that cursor, and applies a nil backend response before iOS resolves its StoreKit snapshot. `npm run test:billing` retains a purchase → refund → stale relaunch-verification regression, rejects a mismatched-account replay without disclosing entitlement data, and proves that the stale replay remains Free while a genuinely newer repurchase can activate Pro; it made zero paid provider calls. The complete isolated iOS entitlement/sync suite passes 112 tests with zero failures in `Test-permitext-2026.08.29_00-02-13--0400.xcresult`.
 
-Commit `658c1264d6bcb57440e590d0bbf91b274e3b765d` is now deployed only to the isolated `permitext-apple-sandbox` project. The stable Sandbox host returns HTTP 200 with PostgreSQL storage and identifies that exact commit; Production was not deployed or reconfigured. A clean build 47 archive succeeded and was independently verified as version `1.0`, build `47`, bundle ID `com.randycodex.permitext`, team `57BY95X97H`, non-exempt encryption disabled, and backend `https://permitext-apple-sandbox.vercel.app`. App Store Connect upload did not begin because Xcode's Apple Accounts screen is signed out and `xcodebuild -exportArchive` stopped with `App Store Connect access for “57BY95X97H” is required`. The archive remains ready locally; the refund lifecycle remains open until Xcode sign-in, upload/processing, installation, and physical Free-state confirmation.
+Commit `658c1264d6bcb57440e590d0bbf91b274e3b765d` is now deployed only to the isolated `permitext-apple-sandbox` project. The stable Sandbox host returns HTTP 200 with PostgreSQL storage and identifies that exact commit; Production was not deployed or reconfigured. A clean build 47 archive succeeded and was independently verified as version `1.0`, build `47`, bundle ID `com.randycodex.permitext`, team `57BY95X97H`, non-exempt encryption disabled, and backend `https://permitext-apple-sandbox.vercel.app`. After the owner signed back into Xcode Apple Accounts, the same archive was exported and uploaded without rebuilding. Apple created build-upload record `30c6f0ce-bdc7-4fd3-a324-77e07c82dbf8`, accepted the complete package at approximately `2026-08-29 6:50:28 AM EDT`, reported no upload errors, and moved it to `PROCESSING`; Xcode reported `Upload succeeded`. The refund lifecycle remains open until TestFlight availability, installation, and physical Free-state confirmation.
 
 ## Official Apple environment and notification behavior
 
@@ -99,10 +99,11 @@ Sources:
 
 1. [x] Create an isolated non-Production database, private Blob store, and staging deployment.
 2. [x] Run `npm run verify:apple-sandbox-readiness` and require every check to pass.
-3. [x] Archive and upload staging-targeted builds through build 46 with `PERMITEXT_BACKEND_API_BASE_URL` pointing only to the isolated staging host.
+3. [x] Archive and upload staging-targeted builds through build 47 with `PERMITEXT_BACKEND_API_BASE_URL` pointing only to the isolated staging host.
 4. [x] Set only App Store Connect's Sandbox Server URL to the staging `/billing/apple/notifications` endpoint and leave the Production URL unchanged.
 5. [x] Confirm build 46 completes processing, is available in TestFlight, and installs on the physical iPhone.
-6. [ ] Upload the already-verified staging-targeted build 47 after Xcode Apple Accounts sign-in, then confirm that the already-submitted Sandbox refund resolves to Free on the physical iPhone. The backend repair is already live only on isolated staging.
-7. [ ] Complete the remaining physical-iPhone lifecycle. Purchase, ownership binding, Restore, failed-delivery retry, post-cancellation notification delivery, cancellation-period access retention, canceled-period expiration, and refund-form submission pass. Refund revocation, renewal, billing failure/recovery, duplicate delivery, and delayed delivery remain.
+6. [x] Sign into Xcode Apple Accounts and upload the already-verified staging-targeted build 47; Apple accepted the package and began processing it.
+7. [ ] Confirm build 47 becomes available in TestFlight, install it, do not purchase or Restore, and confirm that the already-submitted Sandbox refund resolves to Free on the physical iPhone. The backend repair is already live only on isolated staging.
+8. [ ] Complete the remaining physical-iPhone lifecycle. Purchase, ownership binding, Restore, failed-delivery retry, post-cancellation notification delivery, cancellation-period access retention, canceled-period expiration, and refund-form submission pass. Refund revocation, renewal, billing failure/recovery, duplicate delivery, and delayed delivery remain.
 
 The remaining exercise uses Apple's Sandbox and must create no real charge. A controlled Production purchase remains a separate approval gate.
