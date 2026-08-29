@@ -933,8 +933,8 @@ export function createPostgresAccountRepository(sql, options = {}) {
             FROM permitext_apple_notification_states
             WHERE original_transaction_id = ${originalTransactionID}
               AND (
-                ${transactionSignedDate} <= 0
-                OR signed_date >= ${transactionSignedDate}
+                ${transactionSignedDate}::bigint <= 0
+                OR signed_date >= ${transactionSignedDate}::bigint
               )
           )
         ON CONFLICT (user_id) DO UPDATE SET

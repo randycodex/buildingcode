@@ -90,6 +90,10 @@ assert(
     /'appleBillingAccountTokenAliases'/.test(postgresAccountSource),
   "PostgreSQL account merge does not persist Apple billing-token aliases."
 );
+assert(
+  /\$\{transactionSignedDate\}::bigint <= 0[\s\S]*signed_date >= \$\{transactionSignedDate\}::bigint/.test(postgresAccountSource),
+  "Apple transaction verification does not explicitly bind millisecond signed dates as BIGINT."
+);
 
 const appleSubscriptionTransaction = {
   productId: "com.randycodex.permitext.pro.monthly",
