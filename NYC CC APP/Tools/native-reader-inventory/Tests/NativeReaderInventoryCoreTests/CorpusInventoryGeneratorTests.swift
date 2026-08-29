@@ -460,6 +460,74 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         XCTAssertTrue(document.validation.tableStructuresMatch)
     }
 
+    func testLegacyPresentationHeaderTableIsNotRenderedTwice() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("package/chapters/table.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try """
+        <html><body><ScrollTable>
+          <div class="xsl-table xsl-table--header">
+            <table><tr><th>Material</th><th>Class</th></tr></table>
+          </div>
+          <div class="xsl-table xsl-table--body">
+            <table>
+              <tr><th>Material</th><th>Class</th></tr>
+              <tr><td>Combustible liquid</td><td>II</td></tr>
+            </table>
+          </div>
+        </ScrollTable></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+
+        XCTAssertEqual(inventory.tables.count, 1)
+        XCTAssertEqual(document.blocks.compactMap(\.table).count, 1)
+        XCTAssertEqual(document.blocks.compactMap(\.table).first?.rowCount, 2)
+        XCTAssertTrue(document.validation.normalizedTextMatches)
+        XCTAssertTrue(document.validation.tableStructuresMatch)
+    }
+
+    func testLegacyFormattingWhitespaceIsCollapsedWithoutLosingAuthoredLineBreaks() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("package/chapters/spacing.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try """
+        <html><body>
+          <div>Printing; area not exceeding 2,000 square feet (185.8 m
+            <span style="vertical-align: super">2</span>
+            )</div>
+          <div>Table 307.1(1)<br></br>Maximum Allowable Quantity</div>
+          <div>For SI: 1 cubic foot = 0.028 m
+            <span style="vertical-align: super">3</span>
+            , 1 pound = 0.454 kg.</div>
+        </body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+        let renderedText = document.blocks.map { $0.runs.map(\.text).joined() }
+
+        XCTAssertEqual(renderedText[0], "Printing; area not exceeding 2,000 square feet (185.8 m2)")
+        XCTAssertEqual(renderedText[1], "Table 307.1(1)\nMaximum Allowable Quantity")
+        XCTAssertEqual(renderedText[2], "For SI: 1 cubic foot = 0.028 m3, 1 pound = 0.454 kg.")
+        XCTAssertTrue(document.validation.normalizedTextMatches)
+    }
+
     func testUTF8AuthoredPunctuationSurvivesDOMRecovery() throws {
         let root = try makeTemporaryDirectory()
         let chapterURL = root.appendingPathComponent("package/chapters/utf8.html")

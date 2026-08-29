@@ -10,7 +10,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 24"
+        "isolatedHTMLTableCount: 15"
       ],
       "relativePath" : "2022-construction-codes/chapters/10.html",
       "sourceSHA256" : "4fd0fc8a3f660169cc57543509e861f4872c905932965e1eb75eaf9738a0f193",
@@ -18,7 +18,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 12"
+        "isolatedHTMLTableCount: 8"
       ],
       "relativePath" : "2022-construction-codes/chapters/11.html",
       "sourceSHA256" : "692ec25dd8edbc6c1a36394f4902d75765540d12e55a3b7321bfb0d4d2d875ab",
@@ -26,7 +26,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 7"
+        "isolatedHTMLTableCount: 4"
       ],
       "relativePath" : "2022-construction-codes/chapters/12.html",
       "sourceSHA256" : "75e244f730d9ec6c3d5532f55279ac29569c060d6eb9ec43889a958627dc0ee3",
@@ -42,7 +42,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 4"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/chapters/14.html",
       "sourceSHA256" : "cf44bb32a571c3d02b1fa1df266da049d64271ca1589ed5a9dde6c4e08031df0",
@@ -50,7 +50,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 22"
+        "isolatedHTMLTableCount: 15"
       ],
       "relativePath" : "2022-construction-codes/chapters/15.html",
       "sourceSHA256" : "85332a18b5e820942716ee2e0bf8194e4d2c570f79f950a3c435c3156eb602db",
@@ -58,7 +58,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 37"
+        "isolatedHTMLTableCount: 29"
       ],
       "relativePath" : "2022-construction-codes/chapters/16.html",
       "sourceSHA256" : "216dc8c6716b3eef10964e2ea0af640a4d3b51d9a11e1d9829409ee46f859930",
@@ -66,7 +66,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 22"
+        "isolatedHTMLTableCount: 14"
       ],
       "relativePath" : "2022-construction-codes/chapters/17.html",
       "sourceSHA256" : "1408771baf4e6d8f5538f1938047dc0aba368be4bab6dd8c9d4738d2939bc3a5",
@@ -74,7 +74,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 13"
+        "isolatedHTMLTableCount: 8"
       ],
       "relativePath" : "2022-construction-codes/chapters/18.html",
       "sourceSHA256" : "7920ebe767cf353a28799158284eac29016761a7488763bd35c06f627ea8d67e",
@@ -106,7 +106,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 10"
+        "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2022-construction-codes/chapters/21.html",
       "sourceSHA256" : "fc11cae5ebefd37f337d8de722263d76bb16a42a6d0fe612753156203e593554",
@@ -122,7 +122,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 83"
+        "isolatedHTMLTableCount: 50"
       ],
       "relativePath" : "2022-construction-codes/chapters/23.html",
       "sourceSHA256" : "25a6caf728a7e0013cfad6b1621f4e48214751b06c863eac7dd89664c82fa892",
@@ -138,7 +138,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 10"
+        "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2022-construction-codes/chapters/25.html",
       "sourceSHA256" : "80b9f96c081769827649d95a0e20901fed1d4e42676b133d22e83d2ae0940212",
@@ -146,7 +146,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 7"
+        "isolatedHTMLTableCount: 4"
       ],
       "relativePath" : "2022-construction-codes/chapters/26.html",
       "sourceSHA256" : "7aa75ec56923b60638333cf24a8111e8de847d843cb325d1420761f0f3f15f17",
@@ -178,7 +178,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/chapters/3.html",
       "sourceSHA256" : "3d3cbd7ffcea8b43cc1962e35ec41a4808550f7c366fa006b2fe6659bf8b2984",
@@ -210,7 +210,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 22"
+        "isolatedHTMLTableCount: 14"
       ],
       "relativePath" : "2022-construction-codes/chapters/33.html",
       "sourceSHA256" : "659f1a7bdd959776b43659e436e14919e1387d2d714c85ef839b7abb3c4c13c3",
@@ -226,7 +226,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 74"
+        "isolatedHTMLTableCount: 62"
       ],
       "relativePath" : "2022-construction-codes/chapters/35.html",
       "sourceSHA256" : "f1d3d273da361a0bb228ff56655ac5b4b6110cb2f972db67d3db22765f677ba8",
@@ -234,7 +234,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 19"
+        "isolatedHTMLTableCount: 12"
       ],
       "relativePath" : "2022-construction-codes/chapters/4.html",
       "sourceSHA256" : "6063dbe9fa9179c795ee0d912dc41cd576dfa1eb307a4212bbf8ef0d377cb7d6",
@@ -242,7 +242,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 13"
+        "isolatedHTMLTableCount: 8"
       ],
       "relativePath" : "2022-construction-codes/chapters/5.html",
       "sourceSHA256" : "6562530cfcb211c3f58582cff7723119233c9f29392ae941ec2e5ced2e647fab",
@@ -250,7 +250,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/chapters/6.html",
       "sourceSHA256" : "38d14455bf298079738d668f3f5c05b4d032d1de4171f76278a11b6e70e27c52",
@@ -258,7 +258,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 68"
+        "isolatedHTMLTableCount: 47"
       ],
       "relativePath" : "2022-construction-codes/chapters/7.html",
       "sourceSHA256" : "c6c023d433a5e445b461cf90fe6e0ddd8213c937e562bfdb48cc130e85674b97",
@@ -266,7 +266,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 2"
+        "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2022-construction-codes/chapters/8.html",
       "sourceSHA256" : "e6fe86675f8afaff92823110bc1ee2c6a7803b934f0ffe85dc41bbdcaabb9967",
@@ -274,7 +274,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 5"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/chapters/9.html",
       "sourceSHA256" : "b4a6e90d7961d9a3a597a7af06d78871c5ce0ce0f4bdb4730cc1163ea999cee8",
@@ -314,7 +314,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 4"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/chapters/E.html",
       "sourceSHA256" : "15390104a54eb39408de478411ada0970a81c941bd69cf4a893fc5f9894d7b17",
@@ -330,7 +330,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 8"
+        "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2022-construction-codes/chapters/G.html",
       "sourceSHA256" : "34ce0e653cca922df51f64c085e1d363485ed3cda478d4a9eb261e33d6d16c1e",
@@ -362,7 +362,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 5"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/chapters/K.html",
       "sourceSHA256" : "c70c0c070012d80770942dd760239f874c131912e0058f21fcc8ebc5e598506b",
@@ -370,7 +370,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 5"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/chapters/K1.html",
       "sourceSHA256" : "c70c0c070012d80770942dd760239f874c131912e0058f21fcc8ebc5e598506b",
@@ -378,7 +378,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 5"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/chapters/K2.html",
       "sourceSHA256" : "c70c0c070012d80770942dd760239f874c131912e0058f21fcc8ebc5e598506b",
@@ -386,7 +386,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 5"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/chapters/K3.html",
       "sourceSHA256" : "c70c0c070012d80770942dd760239f874c131912e0058f21fcc8ebc5e598506b",
@@ -434,7 +434,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/chapters/Q.html",
       "sourceSHA256" : "56cd829ce0b96972ac7b5469a3b2e89c54bc51064301f4f4cbdbcd5da10b41b3",
@@ -474,7 +474,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 24"
+        "isolatedHTMLTableCount: 15"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/10.html",
       "sourceSHA256" : "bcd0144f59fce3902beff150683b665769367cfcc81e27a2555c6b615333e23f",
@@ -482,7 +482,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 12"
+        "isolatedHTMLTableCount: 8"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/11.html",
       "sourceSHA256" : "bf004b8f4dd9dfc69e1e3f672bbdb0a4d99cf5166284480c56a2aa3f6d867d96",
@@ -490,7 +490,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 7"
+        "isolatedHTMLTableCount: 4"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/12.html",
       "sourceSHA256" : "a71385f66d2008c0d5dced2c7b45ef6c042f32e3831cd45760e91929c973c5a2",
@@ -506,7 +506,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 4"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/14.html",
       "sourceSHA256" : "eb031d425a6cb7cf09d7090a00c8371d7e8c7e2e11677f4ae15eed3d65050c9e",
@@ -514,7 +514,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 22"
+        "isolatedHTMLTableCount: 15"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/15.html",
       "sourceSHA256" : "fcdc0f8913c23d34d2cfd9803318682e5a76ae4615c2e438587d59dbe6c6828c",
@@ -522,7 +522,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 37"
+        "isolatedHTMLTableCount: 29"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/16.html",
       "sourceSHA256" : "352dc482792897e172b737677bd02007ddd7f505f8ec2016691a911f57d2dbac",
@@ -530,7 +530,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 22"
+        "isolatedHTMLTableCount: 14"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/17.html",
       "sourceSHA256" : "ed591a675906939695fd07332fdb4634c311b1a4ff8acc378cb37297019410c5",
@@ -538,7 +538,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 13"
+        "isolatedHTMLTableCount: 8"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/18.html",
       "sourceSHA256" : "4e1738c8861a94a0c92b187384f1031648624146c30c8e0c473ff5c90fe7d225",
@@ -570,7 +570,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 10"
+        "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/21.html",
       "sourceSHA256" : "b54f8bc2961b133878703a5fb37733b4150ef876ecef35e5e77cf11359e38493",
@@ -586,7 +586,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 83"
+        "isolatedHTMLTableCount: 50"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/23.html",
       "sourceSHA256" : "07039cd8e1daa941abc5215a4b135f226e271eba4100e409f8529ded55802b5d",
@@ -602,7 +602,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 10"
+        "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/25.html",
       "sourceSHA256" : "8ca2dcfc416e78a3b5df4659765a075da7da134445727048951ef2a800921426",
@@ -610,7 +610,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 7"
+        "isolatedHTMLTableCount: 4"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/26.html",
       "sourceSHA256" : "2525647744d9627d0615cf47969683e5030c945cddf598167711086b6038fc08",
@@ -642,7 +642,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/3.html",
       "sourceSHA256" : "c4cff72fc1a6532d82f62969922bb6116b698253a87897c82af4c2dbb7a974ce",
@@ -674,7 +674,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 22"
+        "isolatedHTMLTableCount: 14"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/33.html",
       "sourceSHA256" : "d8d7c56ec7de33c6ab8f81c495b646247061cfe1b77ddd8b21d66387a6dc2505",
@@ -690,7 +690,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 74"
+        "isolatedHTMLTableCount: 62"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/35.html",
       "sourceSHA256" : "a495ab6fd15581c0d22af3dd9f5783bd2a3066e9f5ca0af39fa4d200243d4daa",
@@ -698,7 +698,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 19"
+        "isolatedHTMLTableCount: 12"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/4.html",
       "sourceSHA256" : "e82c0e1e3b4c5ccfd36d4097b009ab71759ef6496b23e9d1f60c339456d32bde",
@@ -706,7 +706,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 13"
+        "isolatedHTMLTableCount: 8"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/5.html",
       "sourceSHA256" : "8be1c74764933f929f408fc1435bc5380007a7d2813907555c70f4d399bbf9fd",
@@ -714,7 +714,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/6.html",
       "sourceSHA256" : "669cc602dbe1e5015bc9b2b15925070dbaeed56e811b7caec7e51b8ab4690e77",
@@ -722,7 +722,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 68"
+        "isolatedHTMLTableCount: 47"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/7.html",
       "sourceSHA256" : "fec6f1eacbce0707f16e2f4eae24b1001e5e312c577d8e180b549b937d62ef51",
@@ -730,7 +730,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 2"
+        "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/8.html",
       "sourceSHA256" : "0ad395a685999f3fc380f5400736ec19da47740ca4c2be7b791cca75332d53a1",
@@ -738,7 +738,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 5"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/9.html",
       "sourceSHA256" : "88d0b3180d4e535df4013fa144cd5c4e41ab24d025c66a91c3cbe70f35b0e1ff",
@@ -778,7 +778,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 4"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/E.html",
       "sourceSHA256" : "2bd36dbb09dcb70bd17145f78281075de8f65e6f5d090bd81f57147025c0f175",
@@ -794,7 +794,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 8"
+        "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/G.html",
       "sourceSHA256" : "45b4fac13859d74694245b1407873555b6ef24351ee537562640667911b3495e",
@@ -826,7 +826,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 5"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/K.html",
       "sourceSHA256" : "59bdb0ab7abd731cfd2a3fab0ff90a4ef632bdb4e8a3b90ce251e33287ba15ef",
@@ -874,7 +874,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/building-code/chapters/Q.html",
       "sourceSHA256" : "27361c0d2410936a4fc128088e1f058784b2f7c0ddd7f9b5d6742609280982bf",
@@ -930,7 +930,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 3.html",
       "sourceSHA256" : "6d7604d86fdb114d298ee755f64bca8691b564bd49a4b8a6f655d0378a8d42c1",
@@ -938,7 +938,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 23"
+        "isolatedHTMLTableCount: 15"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 4.html",
       "sourceSHA256" : "92bd39bff2bc12d3de6222e1676fb59e75d1186282145902de555f7f373529f2",
@@ -946,7 +946,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 76"
+        "isolatedHTMLTableCount: 49"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 5.html",
       "sourceSHA256" : "59410139a4ce7a9e910d8b582b4eafdcccc75d9bb4301a689b5dd6959359a726",
@@ -954,7 +954,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 2"
+        "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 6.html",
       "sourceSHA256" : "f5d86bc21452a5a69e24c938f211aa41c1e5ee72c7b8a5f32bbd45907025d344",
@@ -970,7 +970,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 13"
+        "isolatedHTMLTableCount: 9"
       ],
       "relativePath" : "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 8.html",
       "sourceSHA256" : "4ead405702e5ab2e63c65dee192f28864ea084fcda0d75f2336a85c42f6d6c38",
@@ -978,7 +978,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 14"
+        "isolatedHTMLTableCount: 11"
       ],
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 1.html",
       "sourceSHA256" : "ca8188132a0300c58cbe0945a5df15a7eb07221a3b51f0b9d4cba7ada6c5e738",
@@ -1002,7 +1002,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 2"
+        "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/general-administrative-provisions/chapters/Chapter 4.html",
       "sourceSHA256" : "bc488baee3a986c5b4d5039eab233adbc2c23181823b6f59f2f6615df1db979c",
@@ -1034,7 +1034,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 7"
+        "isolatedHTMLTableCount: 5"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 10.html",
       "sourceSHA256" : "f3808ee0a331eea569841bea13f0bc9b791468203108ad8873e5ce3dd78d4ed4",
@@ -1042,7 +1042,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 4"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 11.html",
       "sourceSHA256" : "a4902064a65ef25640d91444499b166e02b7146c13d8458e47613017c942dedb",
@@ -1050,7 +1050,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 9"
+        "isolatedHTMLTableCount: 5"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 12.html",
       "sourceSHA256" : "a652971e4e608887a716c9365c92742407d34b33c3a09f1716866a6291b95af7",
@@ -1074,7 +1074,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 30"
+        "isolatedHTMLTableCount: 24"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 15.html",
       "sourceSHA256" : "b66ce87f9df8d3281c030ac23a60e554352d3f5685a2c0da77c7910effea1eb0",
@@ -1090,7 +1090,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 5"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 3.html",
       "sourceSHA256" : "efe381e5d059fcfc45a8edfb98667e210d986eb2ad13e5c99f157d728049030c",
@@ -1098,7 +1098,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 20"
+        "isolatedHTMLTableCount: 18"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 4.html",
       "sourceSHA256" : "aa987a57bc2d68b95016e8e5fae77e5e4982ce7e80f6fb92081c850075bda40d",
@@ -1106,7 +1106,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 12"
+        "isolatedHTMLTableCount: 11"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 5.html",
       "sourceSHA256" : "28f46999f485048d8c06e1410e4b00c9442f1fe90b8dc8643081434274579fbe",
@@ -1114,7 +1114,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 6.html",
       "sourceSHA256" : "42e85c923a0a99c78726c2aebf70929d2b7e3037e369653fcfd4e0e0c5c554c9",
@@ -1130,7 +1130,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 10"
+        "isolatedHTMLTableCount: 9"
       ],
       "relativePath" : "2022-construction-codes/code-sections/mechanical-code/chapters/Chapter 8.html",
       "sourceSHA256" : "4b085c7e523cd28b54692695c482e8de2a797d0b3b5a59eb77e489d83f7615b9",
@@ -1146,7 +1146,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 17"
+        "isolatedHTMLTableCount: 9"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Appendices.html",
       "sourceSHA256" : "58bb32662feb39f1454f2422b65ee7bcbaaa82dfb139710c8ec21fd890d9f3b6",
@@ -1170,7 +1170,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 12"
+        "isolatedHTMLTableCount: 6"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 11.html",
       "sourceSHA256" : "a4be09ada1250f543c43a4e6779112ec1e7134d539dd03ae3410c99ca876b70d",
@@ -1186,7 +1186,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 5"
+        "isolatedHTMLTableCount: 3"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 13.html",
       "sourceSHA256" : "d43ba3ac8d75e225a7d70bb73184b71afe445112625362b8fedf20bd9244bf26",
@@ -1194,7 +1194,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 6"
+        "isolatedHTMLTableCount: 4"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 14.html",
       "sourceSHA256" : "e72b7a247a57cc5fc69542080b44b7f7c0f5ae94de56141900e734996bf6d243",
@@ -1202,7 +1202,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 29"
+        "isolatedHTMLTableCount: 21"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 15.html",
       "sourceSHA256" : "a43c08ec934e47393928551045a472637afaa54e05840882a7050499b357da4b",
@@ -1218,7 +1218,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 3"
+        "isolatedHTMLTableCount: 2"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 3.html",
       "sourceSHA256" : "219d1015e05530a5da54a8fe61c9c87f5ddd929d6af52b82316ede92e77c5f72",
@@ -1226,7 +1226,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 2"
+        "isolatedHTMLTableCount: 1"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 4.html",
       "sourceSHA256" : "e24b3242e8e14af6fe95a8876bd57fe6500a3f8d04f0ecf85f183c7cc19d66cc",
@@ -1242,7 +1242,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 20"
+        "isolatedHTMLTableCount: 14"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 6.html",
       "sourceSHA256" : "b2c38a2562f235b73c7b8bdb546bd602e6a482ebeced87f93aaac7c943f81ea7",
@@ -1250,7 +1250,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 24"
+        "isolatedHTMLTableCount: 15"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 7.html",
       "sourceSHA256" : "b8667ab777f7c9ec5584e75d4513026d649e9d5f9e8e64d6590b8cafb35b157b",
@@ -1266,7 +1266,7 @@
     },
     {
       "reasons" : [
-        "isolatedHTMLTableCount: 11"
+        "isolatedHTMLTableCount: 7"
       ],
       "relativePath" : "2022-construction-codes/code-sections/plumbing-code/chapters/Chapter 9.html",
       "sourceSHA256" : "26021bd9e00af5f59c2f16b0944645d69e82050d79d4da20ee92924fef887edf",

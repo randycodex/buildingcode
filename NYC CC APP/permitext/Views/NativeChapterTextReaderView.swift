@@ -1665,6 +1665,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.leading, block.kind == .heading ? 0 : hierarchyIndentation)
         .padding(.bottom, bottomSpacing)
+        .accessibilityIdentifier("native-reader-block-\(block.id)")
         .overlay {
             if !searchMatches.isEmpty,
                [.table, .image, .figure].contains(block.kind) {

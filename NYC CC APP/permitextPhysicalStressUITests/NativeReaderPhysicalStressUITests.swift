@@ -77,6 +77,45 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(attachment)
     }
 
+    func testBuildingCodeChapterThreeReaderLayoutRegression() {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--native-reader-phase9-source",
+            "2022-construction-codes/code-sections/building-code/chapters/3.html",
+            "--native-reader-phase9-width",
+            "402"
+        ]
+        app.launch()
+
+        XCTAssertTrue(
+            element(in: app, identifier: "phase9-snapshot-ready").waitForExistence(timeout: 45),
+            "BC Chapter 3 did not load in the native-reader snapshot harness."
+        )
+
+        let printing = element(
+            in: app,
+            identifier: "native-reader-block-5ffec5828fc084e16a8fdbefa3d744f98e384d9720071b5e691232100da64286"
+        )
+        scrollToHittable(printing, in: app)
+        XCTAssertFalse(printing.label.contains("\n"), "The compact use line contains formatting line breaks.")
+        keepScreenshot(named: "BC Chapter 3 compact use text", from: app)
+
+        let table = element(
+            in: app,
+            identifier: "native-reader-block-6160c549e63ae24a17ea54463e5eb804682063b9731b05b5bf0c6adf553429bf"
+        )
+        scrollToHittable(table, in: app)
+        keepScreenshot(named: "BC Table 307.1(1) single header", from: app)
+
+        let siConversion = element(
+            in: app,
+            identifier: "native-reader-block-772423bbeca6fef89665b5b1d9585f6c0cc615e643ec509f1191d00a7f3ef1f0"
+        )
+        scrollToHittable(siConversion, in: app, maximumSwipes: 80)
+        XCTAssertFalse(siConversion.label.contains("\n"), "The SI conversion note contains formatting line breaks.")
+        keepScreenshot(named: "BC Table 307.1(1) compact notes", from: app)
+    }
+
     func testFuelGasChapterOneCrossCodeLinkOpensTitle28() {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -484,6 +523,27 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             waitForValueContaining(sectionNumber, on: jumpButton),
             "Fuel Gas \(sectionNumber) did not settle after selecting it in the jump picker."
         )
+    }
+
+    private func scrollToHittable(
+        _ target: XCUIElement,
+        in app: XCUIApplication,
+        maximumSwipes: Int = 40
+    ) {
+        for _ in 0..<maximumSwipes {
+            if target.exists, target.isHittable {
+                return
+            }
+            app.swipeUp()
+        }
+        XCTAssertTrue(target.exists && target.isHittable, "The requested Reader content was not reachable.")
+    }
+
+    private func keepScreenshot(named name: String, from app: XCUIApplication) {
+        let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .original)
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
 
     private func element(in app: XCUIApplication, identifier: String) -> XCUIElement {

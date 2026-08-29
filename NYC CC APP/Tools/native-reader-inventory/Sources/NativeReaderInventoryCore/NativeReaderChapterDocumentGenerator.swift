@@ -45,7 +45,10 @@ public struct NativeReaderChapterDocumentGenerator {
         // every otherwise-unrepresented table as its own ordered block. Text
         // run construction excludes nested tables to avoid duplicating their
         // content in both the surrounding block and the table block.
-        let structuralTableElements = contentElements.filter { normalizedName($0) == "table" }
+        let structuralTableElements = contentElements.filter {
+            normalizedName($0) == "table"
+                && !AuthoredHTMLSemantics.isInsidePresentationalTableHeader($0)
+        }
         var representedTableIDs = Set(
             drafts.compactMap(\.table).map(\.id)
                 + drafts.flatMap { $0.listItems.flatMap(embeddedTables) }.map(\.id)
@@ -73,6 +76,7 @@ public struct NativeReaderChapterDocumentGenerator {
         }
 
         let structuralMediaPairs = contentElements
+            .filter { !AuthoredHTMLSemantics.isInsidePresentationalTableHeader($0) }
             .filter(isTopLevelMediaElement)
             .compactMap { element -> (element: XMLElement, media: NativeReaderMedia)? in
                 guard let media = makeMedia(
@@ -114,12 +118,20 @@ public struct NativeReaderChapterDocumentGenerator {
         let blocks = drafts.map { draft in
             draft.block(anchorIDs: anchorIDsByBlockID[draft.id] ?? [])
         }
-        let links = makeLinks(elements: contentElements, sourceOrderByElement: sourceOrderByElement)
+        let links = makeLinks(
+            elements: contentElements.filter {
+                !AuthoredHTMLSemantics.isInsidePresentationalTableHeader($0)
+            },
+            sourceOrderByElement: sourceOrderByElement
+        )
         // Validation inventories every table and media element independently of
         // render blocks. A full-HTML fallback block may intentionally wrap several
         // rich elements, but those structures must still be proven accounted for.
         let structuralTables = contentElements
-            .filter { normalizedName($0) == "table" }
+            .filter {
+                normalizedName($0) == "table"
+                    && !AuthoredHTMLSemantics.isInsidePresentationalTableHeader($0)
+            }
             .map { makeTable(element: $0, inventory: inventory, sourceOrderByElement: sourceOrderByElement) }
         let structuralMedia = structuralMediaPairs.map(\.media)
         let validation = validate(
@@ -284,6 +296,9 @@ public struct NativeReaderChapterDocumentGenerator {
 
             let name = normalizedName(element)
             let currentSectionID = sectionID(for: element) ?? containerSectionID
+            if AuthoredHTMLSemantics.isInsidePresentationalTableHeader(element) {
+                continue
+            }
             if shouldIgnore(element), normalizeText(element.stringValue ?? "").isEmpty {
                 continue
             }
@@ -593,7 +608,7 @@ public struct NativeReaderChapterDocumentGenerator {
         var pendingRuns: [NativeReaderTextRun] = []
 
         func flushText() {
-            let mergedRuns = mergeTextRuns(pendingRuns)
+            let mergedRuns = normalizeTextRuns(mergeTextRuns(pendingRuns))
             let text = normalizeText(mergedRuns.map(\.text).joined())
             pendingRuns.removeAll(keepingCapacity: true)
             guard !text.isEmpty else { return }
@@ -812,7 +827,7 @@ public struct NativeReaderChapterDocumentGenerator {
         structuralTables: [NativeReaderTable],
         structuralMedia: [NativeReaderMedia]
     ) -> NativeReaderDocumentValidation {
-        let sourceText = normalizeText(body.stringValue ?? "")
+        let sourceText = normalizeText(AuthoredHTMLSemantics.visibleText(in: body))
         let documentText = normalizeText(blocks.flatMap(validationText).joined(separator: " "))
         // HTML element boundaries may carry semantic word separation even when the
         // source has no literal whitespace between closing and opening tags. Compare
@@ -914,7 +929,7 @@ public struct NativeReaderChapterDocumentGenerator {
             isRoot: true,
             runs: &runs
         )
-        return mergeTextRuns(runs)
+        return normalizeTextRuns(mergeTextRuns(runs))
     }
 
     private func appendTextRuns(
@@ -935,7 +950,13 @@ public struct NativeReaderChapterDocumentGenerator {
         if excludingNestedLists && !isRoot && ["ol", "ul"].contains(name) { return }
         if !isRoot && name == "table" { return }
         if name == "br" {
-            runs.append(NativeReaderTextRun(text: "\n", styles: styles.sorted { $0.rawValue < $1.rawValue }, linkTarget: linkTarget))
+            runs.append(
+                NativeReaderTextRun(
+                    text: Self.authoredLineBreakMarker,
+                    styles: styles.sorted { $0.rawValue < $1.rawValue },
+                    linkTarget: linkTarget
+                )
+            )
             return
         }
         if shouldIgnore(element) { return }
@@ -985,6 +1006,109 @@ public struct NativeReaderChapterDocumentGenerator {
         }
         return result
     }
+
+    private func normalizeTextRuns(_ runs: [NativeReaderTextRun]) -> [NativeReaderTextRun] {
+        enum PendingSeparator {
+            case space(styles: [NativeReaderTextStyle], linkTarget: String?)
+            case lineBreak(styles: [NativeReaderTextStyle], linkTarget: String?)
+        }
+
+        var result: [NativeReaderTextRun] = []
+        var pendingSeparator: PendingSeparator?
+        var lastCharacter: Character?
+
+        func append(_ text: String, styles: [NativeReaderTextStyle], linkTarget: String?) {
+            guard !text.isEmpty else { return }
+            if let last = result.last,
+               last.styles == styles,
+               last.linkTarget == linkTarget {
+                result.removeLast()
+                result.append(
+                    NativeReaderTextRun(
+                        text: last.text + text,
+                        styles: styles,
+                        linkTarget: linkTarget
+                    )
+                )
+            } else {
+                result.append(
+                    NativeReaderTextRun(text: text, styles: styles, linkTarget: linkTarget)
+                )
+            }
+            lastCharacter = text.last
+        }
+
+        for run in runs {
+            for character in run.text {
+                if character == Self.authoredLineBreakCharacter {
+                    pendingSeparator = .lineBreak(styles: run.styles, linkTarget: run.linkTarget)
+                    continue
+                }
+                if character.isWhitespace || character == "\u{00A0}" {
+                    if case .lineBreak = pendingSeparator {
+                        continue
+                    }
+                    pendingSeparator = .space(styles: run.styles, linkTarget: run.linkTarget)
+                    continue
+                }
+
+                if let separator = pendingSeparator, lastCharacter != nil {
+                    switch separator {
+                    case .lineBreak(let styles, let linkTarget):
+                        if lastCharacter != "\n" {
+                            append("\n", styles: styles, linkTarget: linkTarget)
+                        }
+                    case .space(let styles, let linkTarget):
+                        if shouldInsertSpace(
+                            after: lastCharacter,
+                            before: character,
+                            nextStyles: run.styles
+                        ) {
+                            append(" ", styles: styles, linkTarget: linkTarget)
+                        }
+                    }
+                }
+                pendingSeparator = nil
+                append(String(character), styles: run.styles, linkTarget: run.linkTarget)
+            }
+        }
+
+        while result.last?.text.last == "\n" || result.last?.text.last == " " {
+            guard let last = result.popLast() else { break }
+            let trimmed = last.text.dropLast()
+            if !trimmed.isEmpty {
+                result.append(
+                    NativeReaderTextRun(
+                        text: String(trimmed),
+                        styles: last.styles,
+                        linkTarget: last.linkTarget
+                    )
+                )
+            }
+        }
+        return result
+    }
+
+    private func shouldInsertSpace(
+        after previous: Character?,
+        before next: Character,
+        nextStyles: [NativeReaderTextStyle]
+    ) -> Bool {
+        guard let previous, previous != "\n" else { return false }
+        if nextStyles.contains(.superscript) || nextStyles.contains(.subscript) {
+            return false
+        }
+        if ",.;:!?%)]}\u{201D}\u{2019}".contains(next) {
+            return false
+        }
+        if "([{\u{201C}\u{2018}".contains(previous) {
+            return false
+        }
+        return true
+    }
+
+    private static let authoredLineBreakCharacter: Character = "\u{2028}"
+    private static let authoredLineBreakMarker = String(authoredLineBreakCharacter)
 
     private func resolvedLinkTarget(for element: XMLElement) -> String? {
         if let target = nonEmpty(attribute("href", in: element))

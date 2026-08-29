@@ -62,6 +62,85 @@ enum AuthoredHTMLParserInput {
     }
 }
 
+enum AuthoredHTMLSemantics {
+    static func isInsidePresentationalTableHeader(_ element: XMLElement) -> Bool {
+        var candidate: XMLElement? = element
+        while let current = candidate {
+            if isPresentationalTableHeaderContainer(current) {
+                return true
+            }
+            candidate = current.parent as? XMLElement
+        }
+        return false
+    }
+
+    static func visibleText(in root: XMLElement) -> String {
+        var fragments: [String] = []
+
+        func visit(_ node: XMLNode) {
+            if node.kind == .text {
+                if let text = node.stringValue {
+                    fragments.append(text)
+                }
+                return
+            }
+            guard let element = node as? XMLElement,
+                  !isPresentationalTableHeaderContainer(element) else {
+                return
+            }
+            for child in element.children ?? [] {
+                visit(child)
+            }
+        }
+
+        visit(root)
+        return fragments.joined()
+    }
+
+    private static func isPresentationalTableHeaderContainer(_ element: XMLElement) -> Bool {
+        guard classTokens(element).contains("xsl-table--header"),
+              let parent = element.parent as? XMLElement else {
+            return false
+        }
+        return (parent.children ?? []).contains { sibling in
+            guard let siblingElement = sibling as? XMLElement,
+                  siblingElement !== element,
+                  classTokens(siblingElement).contains("xsl-table--body") else {
+                return false
+            }
+            return flattenedElements(from: siblingElement).contains {
+                normalizedName($0) == "table"
+            }
+        }
+    }
+
+    private static func classTokens(_ element: XMLElement) -> Set<String> {
+        Set(
+            (element.attribute(forName: "class")?.stringValue ?? "")
+                .split(whereSeparator: { $0.isWhitespace })
+                .map { $0.lowercased() }
+        )
+    }
+
+    private static func flattenedElements(from root: XMLElement) -> [XMLElement] {
+        var result: [XMLElement] = []
+        func visit(_ element: XMLElement) {
+            result.append(element)
+            for child in element.children ?? [] {
+                if let childElement = child as? XMLElement {
+                    visit(childElement)
+                }
+            }
+        }
+        visit(root)
+        return result
+    }
+
+    private static func normalizedName(_ element: XMLElement) -> String {
+        (element.localName ?? element.name ?? "").lowercased()
+    }
+}
+
 public enum CorpusInventoryError: LocalizedError {
     case sourceRootMissing(String)
     case noChapterFiles(String)
@@ -192,25 +271,28 @@ public struct CorpusInventoryGenerator {
         let allElements = flattenedElements(from: root)
         let body = allElements.first { normalizedName($0) == "body" } ?? root
         let contentElements = flattenedElements(from: body)
+        let semanticContentElements = contentElements.filter {
+            !AuthoredHTMLSemantics.isInsidePresentationalTableHeader($0)
+        }
         let sourceOrderByElement = Dictionary(
             uniqueKeysWithValues: contentElements.enumerated().map { (ObjectIdentifier($0.element), $0.offset) }
         )
         let packageRoot = sourceRoot.appendingPathComponent(packageID, isDirectory: true)
         let imageManifest = loadImageManifest(packageRoot: packageRoot)
 
-        let stableAnchorResult = makeAnchors(elements: contentElements, sourceOrderByElement: sourceOrderByElement)
-        let headings = makeHeadings(elements: contentElements, sourceOrderByElement: sourceOrderByElement)
-        let sectionCount = contentElements.filter(isSectionBoundary).count
-        let normalizedText = normalizeText(body.stringValue ?? "")
-        let lists = makeListInventory(elements: contentElements)
-        let tableElements = contentElements.filter { normalizedName($0) == "table" }
+        let stableAnchorResult = makeAnchors(elements: semanticContentElements, sourceOrderByElement: sourceOrderByElement)
+        let headings = makeHeadings(elements: semanticContentElements, sourceOrderByElement: sourceOrderByElement)
+        let sectionCount = semanticContentElements.filter(isSectionBoundary).count
+        let normalizedText = normalizeText(AuthoredHTMLSemantics.visibleText(in: body))
+        let lists = makeListInventory(elements: semanticContentElements)
+        let tableElements = semanticContentElements.filter { normalizedName($0) == "table" }
         let tables = tableElements.map {
             tableInventory(for: $0, sourceOrderByElement: sourceOrderByElement)
         }
         let isolatedTableElements = Set(zip(tableElements, tables).compactMap { element, table in
             table.renderingClassification == .isolatedHTML ? ObjectIdentifier(element) : nil
         })
-        let images = contentElements
+        let images = semanticContentElements
             .filter { ["img", "svg"].contains(normalizedName($0)) && nearestAncestor(named: "svg", from: $0) == nil }
             .map {
                 imageInventory(
@@ -222,8 +304,8 @@ public struct CorpusInventoryGenerator {
                     sourceOrderByElement: sourceOrderByElement
                 )
             }
-        let links = makeLinks(elements: contentElements)
-        let textBlockCount = contentElements.filter(isTextBlock).count
+        let links = makeLinks(elements: semanticContentElements)
+        let textBlockCount = semanticContentElements.filter(isTextBlock).count
 
         let elementNames = sortedUnique(contentElements.map(normalizedName))
         let classNames = sortedUnique(contentElements.flatMap(classTokens))
@@ -235,7 +317,7 @@ public struct CorpusInventoryGenerator {
         // chapter-level blocker. The original table fragment is rendered by the
         // existing table WebView, while the complete chapter still falls back if
         // the same construct appears anywhere outside that boundary.
-        let chapterLevelElements = contentElements.filter {
+        let chapterLevelElements = semanticContentElements.filter {
             !isInsideIsolatedTable($0, isolatedTableElements: isolatedTableElements)
         }
         let blockingUnknownElements = sortedUnique(chapterLevelElements.map(normalizedName))
