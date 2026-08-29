@@ -16,10 +16,10 @@ This record began with a read-only inspection of the owner's authenticated App S
 | Subscription options | Billing Grace Period is not configured; Streamlined Purchasing is on; Family Sharing is off |
 | Subscription metadata | English display name exists. The description and review notes still describe the earlier save/export/sync feature set and do not state the approved 100-Research-turn allowance. A review screenshot is not present. These are submission-readiness issues, not prerequisites for an isolated Sandbox transaction exercise. |
 | Server notifications | Production Server URL remains unset. Sandbox Server URL is `https://permitext-apple-sandbox.vercel.app/billing/apple/notifications`. |
-| TestFlight | Staging-targeted builds 42–44 were uploaded from verified archives. Apple completed build 44 processing; it is `Ready to Submit`, expires in 90 days, and is associated with Internal Testers. Build 44 contains the isolated account-link repair and expanded subscription-button hit targets. |
+| TestFlight | Staging-targeted builds 42–45 were uploaded from verified archives. Apple completed build 44 processing; it is `Ready to Submit`, expires in 90 days, and is associated with Internal Testers. Build 45 contains the native Apple refund-request entry point and is currently processing. |
 | Sandbox accounts | Two United States test accounts exist. The dedicated `permitext+storekit1@gmail.com` tester completed the no-charge physical-iPhone purchase and restore exercise described below. Its App Store Connect subscription renewal rate is `Monthly renewal every hour`. |
 
-Build 41 predates the build-time staging-backend override and retains the Production backend. Builds 42–44 were archived with `PERMITEXT_BACKEND_API_BASE_URL=https://permitext-apple-sandbox.vercel.app`; they are intentionally Sandbox-evidence builds, not final Production release builds. The Apple-created lifecycle gate remains open for notification retry, renewal, cancellation, billing failure/recovery, refund, duplicate-delivery, and delayed-delivery evidence.
+Build 41 predates the build-time staging-backend override and retains the Production backend. Builds 42–45 were archived with `PERMITEXT_BACKEND_API_BASE_URL=https://permitext-apple-sandbox.vercel.app`; they are intentionally Sandbox-evidence builds, not final Production release builds. The Apple-created lifecycle gate remains open for expiration, renewal, billing failure/recovery, refund, duplicate-delivery, and delayed-delivery evidence.
 
 ## Isolated Apple Sandbox staging evidence
 
@@ -38,11 +38,13 @@ The owner authorized creation of an isolated no-cost staging environment. The re
 
 The Blob credential differs from Production, and the isolated Neon and Blob resources are connected only to the dedicated staging project. The successful deployment verified the complete construction, zoning, enacted-code, and specialty-code content required by the application. Vercel authentication protection was disabled only for this separate staging project so the physical iPhone can reach it; Production protection and the Production deployment were not changed.
 
-## Builds 42–44 archive and upload evidence
+## Builds 42–45 archive and upload evidence
 
 Build 42 established the isolated archive path. Build 43 repaired a Release-only stale debug-backend override and presented the working App Store subscription sheet. Build 44 added fail-closed Sandbox account linking only when the embedded backend is exactly `https://permitext-apple-sandbox.vercel.app`; Production and lookalike hosts remain ineligible. The complete entitlement/sync contract suite passed 111 tests with zero failures before the build 44 commit `24717d609`.
 
 Build 44 archived successfully with Xcode 27.0 (`27A5252f`). Before upload, the archived application was inspected and confirmed as version `1.0`, build `44`, bundle ID `com.randycodex.permitext`, team `57BY95X97H`, non-exempt encryption disabled, and backend `https://permitext-apple-sandbox.vercel.app`. The upload reported `Upload succeeded` and `** EXPORT SUCCEEDED **`; App Store Connect subsequently reported `Complete`, `Ready to Submit`, and association with Internal Testers.
+
+Build 45 adds `Request Refund from Apple` only when Permitext has a verified active Apple Pro transaction. The control opens StoreKit's native refund-request sheet and handles Apple's submitted, cancelled, and error results without claiming that Permitext decides eligibility. The complete entitlement/sync suite passed 112 tests with zero failures. Before upload, the archive was inspected and confirmed as version `1.0`, build `45`, bundle ID `com.randycodex.permitext`, team `57BY95X97H`, non-exempt encryption disabled, and backend `https://permitext-apple-sandbox.vercel.app`. The upload reported `Upload succeeded` and `** EXPORT SUCCEEDED **`; App Store Connect currently reports build 45 as processing. No physical-device refund request has been submitted, so this is preparation evidence rather than refund-lifecycle acceptance.
 
 These archive observations prove configuration and upload acceptance. The following section separately records the physical-device and Apple-created evidence. Neither is Production release evidence or an App Review submission.
 
@@ -87,7 +89,7 @@ Sources:
 
 1. [x] Create an isolated non-Production database, private Blob store, and staging deployment.
 2. [x] Run `npm run verify:apple-sandbox-readiness` and require every check to pass.
-3. [x] Archive and upload staging-targeted builds through build 44 with `PERMITEXT_BACKEND_API_BASE_URL` pointing only to the isolated staging host.
+3. [x] Archive and upload staging-targeted builds through build 45 with `PERMITEXT_BACKEND_API_BASE_URL` pointing only to the isolated staging host.
 4. [x] Set only App Store Connect's Sandbox Server URL to the staging `/billing/apple/notifications` endpoint and leave the Production URL unchanged.
 5. [x] Confirm build 44 completed processing, is `Ready to Submit`, and is associated with Internal Testers.
 6. [ ] Complete the physical-iPhone lifecycle. Purchase, ownership binding, Restore, failed-delivery retry, post-cancellation notification delivery, and cancellation-period access retention pass. Expiration, renewal, billing failure/recovery, refund, duplicate delivery, and delayed delivery remain.
