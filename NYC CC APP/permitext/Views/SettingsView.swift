@@ -628,6 +628,9 @@ struct SettingsView: View {
 
     private var planSummaryText: String {
         if library.currentPlan == .pro {
+            if library.isStoreKitTestBackendLinked {
+                return "Pro (Test) is linked to this Permitext account in isolated Apple Sandbox staging. No real charge was made."
+            }
             if library.isStoreKitTestProActive {
                 return "Pro (Test) is active only on this device. Use an account grant to test Pro across iOS and web."
             }
@@ -641,7 +644,7 @@ struct SettingsView: View {
 
     private var currentPlanTitle: String {
         guard library.currentPlan == .pro else { return "Free" }
-        if library.isStoreKitTestProActive { return "Pro (Test)" }
+        if library.isStoreKitTestTransaction { return "Pro (Test)" }
         if library.currentEntitlementSource == .lifetimeGrant { return "Lifetime Pro" }
         return "Pro"
     }

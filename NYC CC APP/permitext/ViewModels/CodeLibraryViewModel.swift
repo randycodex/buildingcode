@@ -2808,6 +2808,11 @@ final class CodeLibraryViewModel: ObservableObject {
 
     var isStoreKitTestProActive: Bool {
         guard accountAuthorizedStoreKitPlan == .pro, !hasActiveBackendProEntitlement else { return false }
+        return isStoreKitTestTransaction
+    }
+
+    var isStoreKitTestTransaction: Bool {
+        guard accountAuthorizedStoreKitPlan == .pro else { return false }
         switch storeKitTransactionEnvironment?.lowercased() {
         case "xcode", "sandbox":
             return true
@@ -2816,8 +2821,12 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    var isStoreKitTestBackendLinked: Bool {
+        isStoreKitTestTransaction && hasActiveBackendProEntitlement
+    }
+
     var planBillingLabel: String {
-        guard isStoreKitTestProActive else { return currentEntitlementSource.label }
+        guard isStoreKitTestTransaction else { return currentEntitlementSource.label }
         switch storeKitTransactionEnvironment?.lowercased() {
         case "xcode":
             return "Apple subscription (Xcode test)"
@@ -3159,9 +3168,14 @@ final class CodeLibraryViewModel: ObservableObject {
             )
             if authorized, currentPlan == .pro {
                 await storeKitSubscriptionService.finishActiveProTransactions()
-                if isStoreKitTestProActive {
-                    statusMessage = "Pro (Test), including Research, was restored on this device. Test purchases cannot activate production web access."
-                    storeKitOperationMessage = "Apple restored Pro (Test) on this device."
+                if isStoreKitTestTransaction {
+                    if isStoreKitTestBackendLinked {
+                        statusMessage = "Pro (Test), including Research, was linked to this Permitext staging account. No real charge was made."
+                        storeKitOperationMessage = "Apple restored and linked Pro (Test) in isolated staging."
+                    } else {
+                        statusMessage = "Pro (Test), including Research, was restored on this device. Test purchases cannot activate production web access."
+                        storeKitOperationMessage = "Apple restored Pro (Test) on this device."
+                    }
                 } else {
                     statusMessage = "Pro, including Research, was restored."
                     storeKitOperationMessage = "Apple restored your Pro subscription."
@@ -4397,7 +4411,13 @@ final class CodeLibraryViewModel: ObservableObject {
             hasSignedTransactionInfo: !(snapshot.signedTransactionInfo ?? "").isEmpty,
             signedInUserID: account?.appUserID,
             boundTestUserID: boundTestUserID,
-            allowsNewTestBinding: allowsNewTestBinding
+            allowsNewTestBinding: allowsNewTestBinding,
+            allowsSandboxBackendVerification: PermitextBackendConfiguration
+                .allowsAppleSandboxBackendVerification(
+                    apiBaseURLString: PermitextBackendConfiguration
+                        .load(defaults: preferencesDefaults)
+                        .apiBaseURLString
+                )
         )
 
         switch decision {

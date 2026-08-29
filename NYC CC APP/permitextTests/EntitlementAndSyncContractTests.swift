@@ -1340,6 +1340,30 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(
             StoreKitAccountBindingPolicy.decision(
                 snapshotPlan: .pro,
+                transactionEnvironment: "sandbox",
+                hasSignedTransactionInfo: true,
+                signedInUserID: "user-a",
+                boundTestUserID: "user-a",
+                allowsNewTestBinding: false,
+                allowsSandboxBackendVerification: true
+            ),
+            .requiresBackendVerification
+        )
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .pro,
+                transactionEnvironment: "sandbox",
+                hasSignedTransactionInfo: false,
+                signedInUserID: "user-a",
+                boundTestUserID: nil,
+                allowsNewTestBinding: true,
+                allowsSandboxBackendVerification: true
+            ),
+            .missingTransactionEvidence
+        )
+        XCTAssertEqual(
+            StoreKitAccountBindingPolicy.decision(
+                snapshotPlan: .pro,
                 transactionEnvironment: nil,
                 hasSignedTransactionInfo: false,
                 signedInUserID: "user-a",
@@ -1387,6 +1411,26 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 allowsDebugOverride: true
             ),
             "https://permitext-sync.vercel.app"
+        )
+        XCTAssertTrue(
+            PermitextBackendConfiguration.allowsAppleSandboxBackendVerification(
+                apiBaseURLString: "https://permitext-apple-sandbox.vercel.app"
+            )
+        )
+        XCTAssertFalse(
+            PermitextBackendConfiguration.allowsAppleSandboxBackendVerification(
+                apiBaseURLString: "https://permitext-sync.vercel.app"
+            )
+        )
+        XCTAssertFalse(
+            PermitextBackendConfiguration.allowsAppleSandboxBackendVerification(
+                apiBaseURLString: "https://permitext-apple-sandbox.vercel.app.evil.example"
+            )
+        )
+        XCTAssertFalse(
+            PermitextBackendConfiguration.allowsAppleSandboxBackendVerification(
+                apiBaseURLString: "http://permitext-apple-sandbox.vercel.app"
+            )
         )
         XCTAssertNotNil(
             PermitextBackendConfiguration.validatedHTTPBaseURL(

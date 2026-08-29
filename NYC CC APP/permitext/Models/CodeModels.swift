@@ -2587,6 +2587,7 @@ struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
     static let modeDefaultsKey = "permitext.backend.mode"
     static let apiBaseURLDefaultsKey = "permitext.backend.apiBaseURL"
     static let apiBaseURLInfoPlistKey = "PermitextBackendAPIBaseURL"
+    static let appleSandboxStagingHost = "permitext-apple-sandbox.vercel.app"
 
     let mode: PermitextBackendMode
     let apiBaseURLString: String?
@@ -2632,6 +2633,17 @@ struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
             return trimmedDefaultsBaseURL
         }
         return trimmedBundleBaseURL?.isEmpty == false ? trimmedBundleBaseURL : nil
+    }
+
+    static func allowsAppleSandboxBackendVerification(apiBaseURLString: String?) -> Bool {
+        guard let apiBaseURLString,
+              let components = URLComponents(string: apiBaseURLString),
+              components.scheme?.lowercased() == "https",
+              components.host?.lowercased() == appleSandboxStagingHost,
+              components.user == nil,
+              components.password == nil
+        else { return false }
+        return true
     }
 
     func makeTransport() -> PermitextBackendTransport {
@@ -5550,12 +5562,17 @@ enum StoreKitAccountBindingPolicy {
         hasSignedTransactionInfo: Bool,
         signedInUserID: String?,
         boundTestUserID: String?,
-        allowsNewTestBinding: Bool
+        allowsNewTestBinding: Bool,
+        allowsSandboxBackendVerification: Bool = false
     ) -> StoreKitAccountBindingDecision {
         guard snapshotPlan == .pro else { return .inactive }
         guard let signedInUserID, !signedInUserID.isEmpty else { return .signInRequired }
 
         switch transactionEnvironment?.lowercased() {
+        case "sandbox" where allowsSandboxBackendVerification:
+            return hasSignedTransactionInfo
+                ? .requiresBackendVerification
+                : .missingTransactionEvidence
         case "xcode", "sandbox":
             if let boundTestUserID, !boundTestUserID.isEmpty {
                 return boundTestUserID == signedInUserID
