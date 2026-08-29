@@ -2104,6 +2104,26 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(viewModelSource.contains("options: [.appAccountToken(appAccountToken)]"))
         XCTAssertTrue(viewModelSource.contains("for attempt in 1...2"))
 
+        let backendVerificationStart = try XCTUnwrap(
+            viewModelSource.range(of: "case .requiresBackendVerification:")
+        )
+        let backendVerificationEnd = try XCTUnwrap(
+            viewModelSource.range(
+                of: "private func storeKitAppAccountToken",
+                range: backendVerificationStart.upperBound..<viewModelSource.endIndex
+            )
+        )
+        let backendVerificationSource = String(
+            viewModelSource[backendVerificationStart.lowerBound..<backendVerificationEnd.lowerBound]
+        )
+        let clearOrApplyBackendResult = try XCTUnwrap(
+            backendVerificationSource.range(of: "applyBackendEntitlement(entitlement)")
+        )
+        let requireActiveBackendPro = try XCTUnwrap(
+            backendVerificationSource.range(of: "guard let entitlement, entitlement.grantsPro()")
+        )
+        XCTAssertLessThan(clearOrApplyBackendResult.lowerBound, requireActiveBackendPro.lowerBound)
+
         let purchaseLoopStart = try XCTUnwrap(viewModelSource.range(of: "for attempt in 1...2"))
         let policyAcceptanceStart = try XCTUnwrap(
             viewModelSource.range(

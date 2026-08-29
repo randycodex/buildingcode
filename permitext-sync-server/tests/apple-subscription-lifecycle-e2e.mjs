@@ -140,13 +140,13 @@ async function main() {
     throw new Error(`Permitext server did not start.\n${serverOutput.join("")}`);
   }
 
-  async function signIn() {
+  async function signIn(providerUserID = "apple-subscription-lifecycle-owner") {
     const result = await request("/account/sign-in", {
       method: "POST",
       body: {
         credential: {
           provider: "apple",
-          providerUserID: "apple-subscription-lifecycle-owner",
+          providerUserID,
           displayName: "Apple Subscription Lifecycle Owner"
         }
       }
@@ -209,16 +209,17 @@ async function main() {
     const userID = initial.account.appUserID;
     const token = initial.account.backendSessionToken;
     const initialExpiration = Date.now() + 60 * 60 * 1_000;
+    const initialSignedTransactionInfo = signApplePayload(transaction({
+      suffix: "001",
+      signedDate: baseSignedDate,
+      expiresDate: initialExpiration
+    }));
     const verified = await request("/billing/apple/transactions/verify", {
       method: "POST",
       token,
       body: {
         auth: { accountUserID: userID },
-        signedTransactionInfo: signApplePayload(transaction({
-          suffix: "001",
-          signedDate: baseSignedDate,
-          expiresDate: initialExpiration
-        }))
+        signedTransactionInfo: initialSignedTransactionInfo
       }
     });
     assert.equal(verified.response.status, 200, verified.text);
@@ -352,7 +353,58 @@ async function main() {
     });
     assert.equal(refund.response.status, 200, refund.text);
     assert.equal(refund.json.action, "revoke");
-    assert.equal((await signIn()).entitlement, null);
+    const postRefundAccount = await signIn();
+    assert.equal(postRefundAccount.entitlement, null);
+
+    const staleRelaunchVerification = await request("/billing/apple/transactions/verify", {
+      method: "POST",
+      token: postRefundAccount.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        signedTransactionInfo: initialSignedTransactionInfo
+      }
+    });
+    assert.equal(staleRelaunchVerification.response.status, 200, staleRelaunchVerification.text);
+    assert.equal(staleRelaunchVerification.json.transaction.active, false);
+    assert.equal(staleRelaunchVerification.json.entitlement, null);
+    const postStaleVerificationAccount = await signIn();
+    assert.equal(
+      postStaleVerificationAccount.entitlement,
+      null,
+      "A stale active transaction replay restored access after a newer refund notification."
+    );
+
+    const otherAccount = await signIn("apple-subscription-lifecycle-other");
+    const mismatchedPostRefundVerification = await request(
+      "/billing/apple/transactions/verify",
+      {
+        method: "POST",
+        token: otherAccount.account.backendSessionToken,
+        body: {
+          auth: { accountUserID: otherAccount.account.appUserID },
+          signedTransactionInfo: initialSignedTransactionInfo
+        }
+      }
+    );
+    assert.equal(mismatchedPostRefundVerification.response.status, 409);
+    assert.equal(mismatchedPostRefundVerification.json.entitlement, undefined);
+
+    const repurchaseExpiration = Date.now() + 6 * 60 * 60 * 1_000;
+    const repurchase = await request("/billing/apple/transactions/verify", {
+      method: "POST",
+      token: postStaleVerificationAccount.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        signedTransactionInfo: signApplePayload(transaction({
+          suffix: "090",
+          signedDate: baseSignedDate + 90_000,
+          expiresDate: repurchaseExpiration
+        }))
+      }
+    });
+    assert.equal(repurchase.response.status, 200, repurchase.text);
+    assert.equal(repurchase.json.transaction.active, true);
+    assert.equal((await signIn()).entitlement.plan, "pro");
 
     process.stdout.write(`${JSON.stringify({
       environment: "local-signed-apple-sandbox-simulation",
@@ -368,6 +420,8 @@ async function main() {
       graceExpirationRevokedAccess: true,
       refundReversalRestoredAccess: true,
       refundRevokedAccess: true,
+      staleVerificationAfterRefundWasInert: true,
+      newerRepurchaseRestoredAccess: true,
       paidProviderCalls: 0,
       pass: true
     }, null, 2)}\n`);

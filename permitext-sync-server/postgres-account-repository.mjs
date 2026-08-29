@@ -895,7 +895,12 @@ export function createPostgresAccountRepository(sql, options = {}) {
     return safeJSON(rows[0]?.entitlement, entitlement);
   }
 
-  async function claimAppleEntitlement(userID, originalTransactionID, entitlement) {
+  async function claimAppleEntitlement(
+    userID,
+    originalTransactionID,
+    entitlement,
+    transactionSignedDate = 0
+  ) {
     const [ownerRows, entitlementRows] = await sql.transaction([
       sql`
         INSERT INTO permitext_apple_transaction_owners (
@@ -923,6 +928,15 @@ export function createPostgresAccountRepository(sql, options = {}) {
           WHERE original_transaction_id = ${originalTransactionID}
             AND user_id = ${userID}
         )
+          AND NOT EXISTS (
+            SELECT 1
+            FROM permitext_apple_notification_states
+            WHERE original_transaction_id = ${originalTransactionID}
+              AND (
+                ${transactionSignedDate} <= 0
+                OR signed_date >= ${transactionSignedDate}
+              )
+          )
         ON CONFLICT (user_id) DO UPDATE SET
           plan = EXCLUDED.plan,
           source = EXCLUDED.source,
@@ -945,6 +959,21 @@ export function createPostgresAccountRepository(sql, options = {}) {
       LIMIT 1
     `;
     return rows[0]?.user_id || null;
+  }
+
+  async function appleNotificationState(originalTransactionID) {
+    const rows = await sql`
+      SELECT signed_date, notification_uuid, notification_type
+      FROM permitext_apple_notification_states
+      WHERE original_transaction_id = ${originalTransactionID}
+      LIMIT 1
+    `;
+    if (!rows.length) return null;
+    return {
+      signedDate: Number(rows[0].signed_date),
+      notificationUUID: rows[0].notification_uuid,
+      notificationType: rows[0].notification_type
+    };
   }
 
   async function applyAppleNotification({
@@ -1235,6 +1264,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
   return {
     applyAppleNotification,
     applyStripeSubscriptionEvent,
+    appleNotificationState,
     appleTransactionOwner,
     authenticate,
     claimAppleEntitlement,

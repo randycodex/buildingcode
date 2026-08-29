@@ -3572,10 +3572,25 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return accountRepository.saveEntitlement(userID, entitlement);
     },
-    async claimAppleEntitlement(userID, originalTransactionID, entitlement) {
+    async claimAppleEntitlement(
+      userID,
+      originalTransactionID,
+      entitlement,
+      transactionSignedDate = 0
+    ) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
-      return accountRepository.claimAppleEntitlement(userID, originalTransactionID, entitlement);
+      return accountRepository.claimAppleEntitlement(
+        userID,
+        originalTransactionID,
+        entitlement,
+        transactionSignedDate
+      );
+    },
+    async appleNotificationState(originalTransactionID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.appleNotificationState(originalTransactionID);
     },
     async appleTransactionOwner(originalTransactionID) {
       await ensureSchema();
@@ -20926,7 +20941,19 @@ async function persistAppleServerEntitlement(userID, originalTransactionID, deta
   );
   const adapter = await storeAdapter();
   if (typeof adapter.claimAppleEntitlement === "function") {
-    return adapter.claimAppleEntitlement(userID, originalTransactionID, entitlement);
+    return adapter.claimAppleEntitlement(
+      userID,
+      originalTransactionID,
+      entitlement,
+      Number(details.transactionSignedDate || 0)
+    );
+  }
+
+  if (appleNotificationSupersedesTransactionVerification(
+    currentStore.appleNotificationStates?.[originalTransactionID],
+    details.transactionSignedDate
+  )) {
+    return null;
   }
 
   if (!claimAppleTransactionOwner(currentStore, originalTransactionID, userID)) {
@@ -22030,6 +22057,59 @@ function appleTransactionActive(payload) {
   }
   const expiresDate = Number(payload?.expiresDate || 0);
   return !Number.isFinite(expiresDate) || expiresDate === 0 || expiresDate > Date.now();
+}
+
+export function appleNotificationSupersedesTransactionVerification(
+  notificationState,
+  transactionSignedDate
+) {
+  const notificationDate = Number(notificationState?.signedDate || 0);
+  const transactionDate = Number(transactionSignedDate || 0);
+  return Number.isSafeInteger(notificationDate) && notificationDate > 0 &&
+    (!Number.isSafeInteger(transactionDate) || transactionDate <= 0 || notificationDate >= transactionDate);
+}
+
+function appleNotificationRevokesEntitlement(notificationType) {
+  return ["REFUND", "REVOKE", "EXPIRED", "GRACE_PERIOD_EXPIRED"]
+    .includes(String(notificationType || "").trim().toUpperCase());
+}
+
+async function persistedAppleNotificationState(originalTransactionID) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.appleNotificationState === "function") {
+    return adapter.appleNotificationState(originalTransactionID);
+  }
+  const store = await readStore();
+  return store.appleNotificationStates?.[originalTransactionID] || null;
+}
+
+async function appleTransactionStateAfterNewerNotification({
+  userID,
+  originalTransactionID,
+  packageID,
+  notificationState
+}) {
+  let currentContext = await appleTransactionOwnerContext(originalTransactionID);
+  if (currentContext.claimedUserID && currentContext.claimedUserID !== userID) {
+    return { ownershipConflict: true, entitlement: null, active: false };
+  }
+  if (appleNotificationRevokesEntitlement(notificationState.notificationType)) {
+    await deletePersistedEntitlement(userID, {
+      packageID,
+      source: "appleSubscription",
+      providerKey: "appleOriginalTransactionID",
+      providerValue: originalTransactionID
+    });
+    currentContext = await appleTransactionOwnerContext(originalTransactionID);
+  }
+  const entitlement = currentContext.entitlement;
+  const currentPackage = activeCommercialPackage(entitlement, packageID);
+  return {
+    ownershipConflict: false,
+    entitlement,
+    active: currentPackage?.source === "appleSubscription" &&
+      currentPackage.provider?.appleOriginalTransactionID === originalTransactionID
+  };
 }
 
 export function appleNotificationLifecycleAction({
@@ -25301,6 +25381,39 @@ async function handleAppleTransactionVerify(request, response) {
     appleEnvironment: payload.environment || null
   };
 
+  const transactionSignedDate = Number(payload.signedDate || 0);
+  const notificationState = await persistedAppleNotificationState(originalTransactionID);
+  if (appleNotificationSupersedesTransactionVerification(
+    notificationState,
+    transactionSignedDate
+  )) {
+    const authoritativeState = await appleTransactionStateAfterNewerNotification({
+      userID,
+      originalTransactionID,
+      packageID,
+      notificationState
+    });
+    if (authoritativeState.ownershipConflict) {
+      sendError(response, 409, "This Apple purchase is already linked to another Permitext account.");
+      return;
+    }
+    console.info("Apple transaction verification used newer notification state.", {
+      notificationType: notificationState.notificationType,
+      notificationSignedDate: notificationState.signedDate,
+      transactionSignedDate,
+      active: authoritativeState.active
+    });
+    sendJSON(response, 200, {
+      entitlement: authoritativeState.entitlement,
+      transaction: {
+        active: authoritativeState.active,
+        productID: payload.productId,
+        packageID
+      }
+    });
+    return;
+  }
+
   if (!appleTransactionActive(payload)) {
     const removalExpectation = {
       packageID,
@@ -25345,9 +25458,35 @@ async function handleAppleTransactionVerify(request, response) {
   const entitlement = await persistAppleServerEntitlement(userID, originalTransactionID, {
     packageID,
     expiresAt: appleTransactionExpiration(payload),
-    provider
+    provider,
+    transactionSignedDate
   });
   if (!entitlement) {
+    const currentNotificationState = await persistedAppleNotificationState(originalTransactionID);
+    if (appleNotificationSupersedesTransactionVerification(
+      currentNotificationState,
+      transactionSignedDate
+    )) {
+      const authoritativeState = await appleTransactionStateAfterNewerNotification({
+        userID,
+        originalTransactionID,
+        packageID,
+        notificationState: currentNotificationState
+      });
+      if (authoritativeState.ownershipConflict) {
+        sendError(response, 409, "This Apple purchase is already linked to another Permitext account.");
+        return;
+      }
+      sendJSON(response, 200, {
+        entitlement: authoritativeState.entitlement,
+        transaction: {
+          active: authoritativeState.active,
+          productID: payload.productId,
+          packageID
+        }
+      });
+      return;
+    }
     sendError(response, 409, "This Apple purchase is already linked to another Permitext account.");
     return;
   }

@@ -4537,6 +4537,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 guard signedInAccount?.appUserID == account.appUserID else {
                     throw CancellationError()
                 }
+                applyBackendEntitlement(entitlement)
                 guard let entitlement, entitlement.grantsPro() else {
                     applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
                     let message = "Apple confirmed the transaction, but Pro is not active for this Permitext account."
@@ -4544,7 +4545,6 @@ final class CodeLibraryViewModel: ObservableObject {
                     storeKitOperationMessage = message
                     return false
                 }
-                applyBackendEntitlement(entitlement)
                 applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: true)
                 await storeKitSubscriptionService.finishActiveProTransactions()
                 return true

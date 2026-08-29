@@ -4,6 +4,7 @@ import {
   applyAppleNotificationToStore,
   applyStripeSubscriptionEventToStore,
   appleNotificationLifecycleAction,
+  appleNotificationSupersedesTransactionVerification,
   applePackageIDForProductID,
   cancelStripeSubscriptionAfterFullRefund,
   cancelStripeSubscriptionsForAccount,
@@ -105,6 +106,20 @@ const notificationStore = {
   entitlements: { "clerk:user_contract": { plan: "pro", marker: "current" } },
   appleNotificationStates: {}
 };
+assert(
+  appleNotificationSupersedesTransactionVerification(
+    { signedDate: 200, notificationType: "REFUND" },
+    100
+  ),
+  "A newer Apple refund snapshot did not supersede a stale transaction verification."
+);
+assert(
+  !appleNotificationSupersedesTransactionVerification(
+    { signedDate: 100, notificationType: "REFUND" },
+    200
+  ),
+  "An older Apple notification superseded a newer transaction verification."
+);
 assert(
   applyAppleNotificationToStore(notificationStore, {
     userID: "clerk:user_contract",
