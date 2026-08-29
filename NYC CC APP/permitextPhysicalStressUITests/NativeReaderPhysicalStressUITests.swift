@@ -113,6 +113,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
         scrollToHittable(siConversion, in: app, maximumSwipes: 80)
         XCTAssertFalse(siConversion.label.contains("\n"), "The SI conversion note contains formatting line breaks.")
+        app.swipeUp()
         keepScreenshot(named: "BC Table 307.1(1) compact notes", from: app)
     }
 
