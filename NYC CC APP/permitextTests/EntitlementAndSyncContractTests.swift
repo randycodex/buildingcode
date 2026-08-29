@@ -2202,7 +2202,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(storeKitActorSource.contains("LocalEntitlementService.setVerifiedPlan"))
     }
 
-    func testAppleRefundRequestUsesVerifiedActiveTransactionAndNativeSheet() throws {
+    func testAppleRefundRequestUsesVerifiedActiveTransactionAndNativePresentation() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
@@ -2220,12 +2220,16 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
 
         XCTAssertTrue(settingsSource.contains("Text(\"Request Refund from Apple\")"))
-        XCTAssertTrue(settingsSource.contains(".refundRequestSheet("))
+        XCTAssertTrue(settingsSource.contains("StoreKit.Transaction.beginRefundRequest("))
+        XCTAssertTrue(settingsSource.contains("$0.activationState == .foregroundActive"))
+        XCTAssertTrue(settingsSource.contains(".accessibilityIdentifier(\"request-apple-refund\")"))
+        XCTAssertTrue(settingsSource.contains("Capsule(style: .continuous)"))
         XCTAssertTrue(settingsSource.contains("library.prepareAppleRefundRequest()"))
         XCTAssertTrue(settingsSource.contains("Opening the form does not cancel the subscription or issue a refund"))
         XCTAssertTrue(viewModelSource.contains("currentPlan == .pro && accountAuthorizedStoreKitPlan == .pro"))
         XCTAssertTrue(viewModelSource.contains("storeKitSubscriptionService.activeProTransactionIDForRefund()"))
         XCTAssertTrue(viewModelSource.contains("Apple received the refund request"))
+        XCTAssertTrue(viewModelSource.contains("handleAppleRefundRequestPresentationFailure"))
 
         let refundLookupStart = try XCTUnwrap(
             storeKitSource.range(of: "func activeProTransactionIDForRefund()")

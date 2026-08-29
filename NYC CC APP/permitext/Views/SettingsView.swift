@@ -62,8 +62,6 @@ struct SettingsView: View {
     @State private var showsSignOutWarning = false
     @State private var didScrollToInitialSection = false
     @State private var pendingSyncConflictResolution: PendingSyncConflictResolution?
-    @State private var refundRequestTransactionID: StoreKit.Transaction.ID?
-    @State private var showsRefundRequestSheet = false
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
     private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
@@ -319,20 +317,42 @@ struct SettingsView: View {
 
             if library.canRequestAppleRefund {
                 Button {
-                    Task {
+                    Task { @MainActor in
                         guard let transactionID = await library.prepareAppleRefundRequest() else { return }
-                        refundRequestTransactionID = transactionID
-                        showsRefundRequestSheet = true
+                        guard let windowScene = UIApplication.shared.connectedScenes
+                            .compactMap({ $0 as? UIWindowScene })
+                            .first(where: { $0.activationState == .foregroundActive })
+                        else {
+                            library.handleAppleRefundRequestPresentationFailure()
+                            return
+                        }
+                        do {
+                            let status = try await StoreKit.Transaction.beginRefundRequest(
+                                for: transactionID,
+                                in: windowScene
+                            )
+                            library.handleAppleRefundRequestStatus(status)
+                        } catch {
+                            library.handleAppleRefundRequestError(error)
+                        }
                     }
                 } label: {
                     Text("Request Refund from Apple")
                         .font(.footnote.weight(.semibold))
                         .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(.secondary.opacity(0.12))
+                        )
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
+                .contentShape(Rectangle())
                 .disabled(library.isStoreKitBusy)
+                .opacity(library.isStoreKitBusy ? 0.55 : 1)
+                .accessibilityIdentifier("request-apple-refund")
 
                 Text("Apple reviews refund eligibility. Opening the form does not cancel the subscription or issue a refund; a request is sent only if you submit Apple's form.")
                     .font(.caption)
@@ -390,13 +410,6 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .task {
             await library.refreshStoreKitEntitlements()
-        }
-        .refundRequestSheet(
-            for: refundRequestTransactionID ?? 0,
-            isPresented: $showsRefundRequestSheet
-        ) { result in
-            library.handleAppleRefundRequestResult(result)
-            refundRequestTransactionID = nil
         }
     }
 

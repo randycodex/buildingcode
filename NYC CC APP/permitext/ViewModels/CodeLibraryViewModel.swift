@@ -3217,20 +3217,14 @@ final class CodeLibraryViewModel: ObservableObject {
         return transactionID
     }
 
-    func handleAppleRefundRequestResult(
-        _ result: Result<StoreKit.Transaction.RefundRequestStatus, StoreKit.Transaction.RefundRequestError>
-    ) {
-        switch result {
-        case .success(.success):
+    func handleAppleRefundRequestStatus(_ status: StoreKit.Transaction.RefundRequestStatus) {
+        switch status {
+        case .success:
             let message = "Apple received the refund request. Permitext will update access after Apple sends the result."
             statusMessage = message
             storeKitOperationMessage = message
-        case .success(.userCancelled):
+        case .userCancelled:
             let message = "The Apple refund form was closed. No refund request was submitted."
-            statusMessage = message
-            storeKitOperationMessage = message
-        case .failure(let error):
-            let message = "Apple could not start the refund request: \(error.localizedDescription)"
             statusMessage = message
             storeKitOperationMessage = message
         @unknown default:
@@ -3238,6 +3232,18 @@ final class CodeLibraryViewModel: ObservableObject {
             statusMessage = message
             storeKitOperationMessage = message
         }
+    }
+
+    func handleAppleRefundRequestError(_ error: Error) {
+        let message = "Apple could not start the refund request: \(error.localizedDescription)"
+        statusMessage = message
+        storeKitOperationMessage = message
+    }
+
+    func handleAppleRefundRequestPresentationFailure() {
+        let message = "Apple's refund form could not open because Permitext could not find the active app window. Close and reopen Permitext, then try again."
+        statusMessage = message
+        storeKitOperationMessage = message
     }
 
     func refreshResearchTurnAllowance(
