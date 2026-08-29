@@ -54,7 +54,7 @@ Apple delivered a real Sandbox notification to `/billing/apple/notifications` at
 
 Build 44 repaired that gap without expanding Production behavior. After the owner installed build 44 and selected Restore Purchases with the same Sandbox tester, Permitext restored the existing transaction without another purchase. The staging backend received four concurrent `POST /billing/apple/transactions/verify` requests at approximately `2026-08-29T00:38:15Z`; all returned HTTP 200. This is provider-backed evidence that the Apple transaction is now bound to the signed-in Permitext staging account. No real charge, new purchase, Production write, or App Review submission occurred.
 
-The earlier Apple notification has not yet been retried. Purchase presentation, no-charge confirmation, on-device Pro activation, the 100-turn allowance, authenticated ownership binding, and Restore therefore pass. Notification retry and the remaining renewal, cancellation, billing-failure/recovery, refund, duplicate-delivery, and delayed-delivery cases remain open.
+Apple retried the original failed notification at approximately `2026-08-29T01:13:31Z`, almost exactly one hour after the HTTP 503, and staging returned HTTP 200. After the owner disabled automatic renewal for the Sandbox subscription, Apple delivered another notification at approximately `2026-08-29T01:15:47Z`; staging also returned HTTP 200. The route log does not expose the signed notification type, so this record does not claim an independently decoded type for the second delivery. Purchase presentation, no-charge confirmation, on-device Pro activation, the 100-turn allowance, authenticated ownership binding, Restore, failed-delivery retry, and post-cancellation notification delivery now pass. Access retention through the cancellation period and expiration, plus renewal, billing-failure/recovery, refund, duplicate-delivery, and delayed-delivery cases remain open.
 
 ## Official Apple environment and notification behavior
 
@@ -90,6 +90,6 @@ Sources:
 3. [x] Archive and upload staging-targeted builds through build 44 with `PERMITEXT_BACKEND_API_BASE_URL` pointing only to the isolated staging host.
 4. [x] Set only App Store Connect's Sandbox Server URL to the staging `/billing/apple/notifications` endpoint and leave the Production URL unchanged.
 5. [x] Confirm build 44 completed processing, is `Ready to Submit`, and is associated with Internal Testers.
-6. [ ] Complete the physical-iPhone lifecycle. Purchase, ownership binding, and restore pass; notification retry, renewal, cancellation, billing failure/recovery, refund, duplicate delivery, and delayed delivery remain.
+6. [ ] Complete the physical-iPhone lifecycle. Purchase, ownership binding, Restore, failed-delivery retry, and post-cancellation notification delivery pass. Cancellation-period access/expiration, renewal, billing failure/recovery, refund, duplicate delivery, and delayed delivery remain.
 
 The remaining exercise uses Apple's Sandbox and must create no real charge. A controlled Production purchase remains a separate approval gate.
