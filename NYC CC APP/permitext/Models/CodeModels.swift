@@ -5588,6 +5588,28 @@ enum StoreKitAccountBindingPolicy {
     }
 }
 
+enum StoreKitBackendVerificationContinuityPolicy {
+    static func preservesAuthorizedTestState(
+        snapshotPlan: AppPlan,
+        transactionEnvironment: String?,
+        hasActiveBackendProEntitlement: Bool,
+        backendEntitlementSource: EntitlementSource
+    ) -> Bool {
+        guard snapshotPlan == .pro,
+              hasActiveBackendProEntitlement,
+              backendEntitlementSource.isAppleManagedSubscription
+        else {
+            return false
+        }
+        switch transactionEnvironment?.lowercased() {
+        case "xcode", "sandbox":
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 struct StoreKitSubscriptionSnapshot: Sendable {
     let plan: AppPlan
     let researchActive: Bool

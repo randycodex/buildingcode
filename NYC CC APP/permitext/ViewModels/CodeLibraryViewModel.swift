@@ -4549,8 +4549,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 await storeKitSubscriptionService.finishActiveProTransactions()
                 return true
             } catch {
-                applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
                 if Self.isApplePurchaseOwnershipConflict(error) {
+                    applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
                     await storeKitSubscriptionService.finishActiveProTransactions()
                     let message = "This Apple subscription is already linked to another Permitext account. Sign into that account to use Pro."
                     statusMessage = message
@@ -4558,9 +4558,21 @@ final class CodeLibraryViewModel: ObservableObject {
                     return false
                 }
                 if handleBackendSessionFailureIfNeeded(error) {
+                    applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
                     storeKitOperationMessage = "Permitext sign-in expired before the Apple transaction could be linked. Sign in and restore the subscription."
                     return false
                 }
+                if StoreKitBackendVerificationContinuityPolicy.preservesAuthorizedTestState(
+                    snapshotPlan: snapshot.plan,
+                    transactionEnvironment: snapshot.transactionEnvironment,
+                    hasActiveBackendProEntitlement: hasActiveBackendProEntitlement,
+                    backendEntitlementSource: currentEntitlementSource
+                ) {
+                    applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: true)
+                    storeKitOperationMessage = "Permitext kept the verified Apple test subscription active while account verification retries automatically."
+                    return true
+                }
+                applyStoreKitSnapshot(snapshot, authorizedForCurrentAccount: false)
                 let message = "Apple confirmed the purchase, but Permitext could not link it yet: \(error.localizedDescription) Select Restore Subscription to retry."
                 statusMessage = message
                 storeKitOperationMessage = message

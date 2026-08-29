@@ -1374,6 +1374,57 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testStoreKitBackendVerificationContinuityPreservesOnlyLinkedTestAccess() {
+        XCTAssertTrue(
+            StoreKitBackendVerificationContinuityPolicy.preservesAuthorizedTestState(
+                snapshotPlan: .pro,
+                transactionEnvironment: "sandbox",
+                hasActiveBackendProEntitlement: true,
+                backendEntitlementSource: .appleSubscription
+            )
+        )
+        XCTAssertTrue(
+            StoreKitBackendVerificationContinuityPolicy.preservesAuthorizedTestState(
+                snapshotPlan: .pro,
+                transactionEnvironment: "xcode",
+                hasActiveBackendProEntitlement: true,
+                backendEntitlementSource: .subscription
+            )
+        )
+        XCTAssertFalse(
+            StoreKitBackendVerificationContinuityPolicy.preservesAuthorizedTestState(
+                snapshotPlan: .pro,
+                transactionEnvironment: "sandbox",
+                hasActiveBackendProEntitlement: false,
+                backendEntitlementSource: .appleSubscription
+            )
+        )
+        XCTAssertFalse(
+            StoreKitBackendVerificationContinuityPolicy.preservesAuthorizedTestState(
+                snapshotPlan: .pro,
+                transactionEnvironment: "sandbox",
+                hasActiveBackendProEntitlement: true,
+                backendEntitlementSource: .webSubscription
+            )
+        )
+        XCTAssertFalse(
+            StoreKitBackendVerificationContinuityPolicy.preservesAuthorizedTestState(
+                snapshotPlan: .pro,
+                transactionEnvironment: "production",
+                hasActiveBackendProEntitlement: true,
+                backendEntitlementSource: .appleSubscription
+            )
+        )
+        XCTAssertFalse(
+            StoreKitBackendVerificationContinuityPolicy.preservesAuthorizedTestState(
+                snapshotPlan: .free,
+                transactionEnvironment: "sandbox",
+                hasActiveBackendProEntitlement: true,
+                backendEntitlementSource: .appleSubscription
+            )
+        )
+    }
+
     func testSignedInAccountPersistenceRemovesLegacySessionToken() {
         let account = SignedInAccount(
             appUserID: "apple:persistence-test",
