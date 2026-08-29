@@ -80,6 +80,9 @@ const [billingAppSource, postgresAccountSource] = await Promise.all([
   readFile(new URL("../app.mjs", import.meta.url), "utf8"),
   readFile(new URL("../postgres-account-repository.mjs", import.meta.url), "utf8")
 ]);
+const postgresAppleNotificationSource = postgresAccountSource.match(
+  /async function applyAppleNotification\([\s\S]*?async function applyStripeSubscriptionEvent\(/
+)?.[0] || "";
 assert(
   /acceptedAccountTokens = appleBillingAccountTokens\(accountContext\.account\)/.test(billingAppSource) &&
     /acceptedAccountTokens\.has\(transactionAccountToken\)/.test(billingAppSource),
@@ -93,6 +96,10 @@ assert(
 assert(
   /\$\{transactionSignedDate\}::bigint <= 0[\s\S]*signed_date >= \$\{transactionSignedDate\}::bigint/.test(postgresAccountSource),
   "Apple transaction verification does not explicitly bind millisecond signed dates as BIGINT."
+);
+assert(
+  /WITH applied AS \([\s\S]*INSERT INTO permitext_apple_notification_states[\s\S]*INSERT INTO permitext_entitlements[\s\S]*FROM applied[\s\S]*EXISTS \(SELECT 1 FROM applied\)/.test(postgresAppleNotificationSource),
+  "PostgreSQL Apple notification side effects are not gated by the newly applied ordering cursor."
 );
 
 const appleSubscriptionTransaction = {

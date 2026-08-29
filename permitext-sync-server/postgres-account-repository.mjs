@@ -984,70 +984,77 @@ export function createPostgresAccountRepository(sql, options = {}) {
     notificationType,
     nextEntitlement
   }) {
-    const stateSQL = sql`
-      INSERT INTO permitext_apple_notification_states (
-        original_transaction_id, signed_date, notification_uuid, notification_type, updated_at
-      )
-      VALUES (
-        ${originalTransactionID}, ${signedDate}, ${notificationUUID}, ${notificationType}, now()
-      )
-      ON CONFLICT (original_transaction_id) DO UPDATE SET
-        signed_date = EXCLUDED.signed_date,
-        notification_uuid = EXCLUDED.notification_uuid,
-        notification_type = EXCLUDED.notification_type,
-        updated_at = now()
-      WHERE permitext_apple_notification_states.signed_date < EXCLUDED.signed_date
-      RETURNING original_transaction_id
-    `;
     if (nextEntitlement) {
-      const [stateRows, entitlementRows] = await sql.transaction([
-        stateSQL,
-        sql`
-          INSERT INTO permitext_entitlements (
-            user_id, plan, source, granted_user_id, entitlement, expires_at, updated_at
+      const entitlementRows = await sql`
+        WITH applied AS (
+          INSERT INTO permitext_apple_notification_states (
+            original_transaction_id, signed_date, notification_uuid, notification_type, updated_at
           )
-          SELECT
-            ${userID}, ${nextEntitlement.plan || "free"}, ${nextEntitlement.source || "unknown"},
-            ${nextEntitlement.grantedUserID || null}, ${JSON.stringify(nextEntitlement)}::jsonb,
-            ${nextEntitlement.expiresAt || null}::timestamptz, now()
-          WHERE EXISTS (
-            SELECT 1 FROM permitext_apple_notification_states
-            WHERE original_transaction_id = ${originalTransactionID}
-              AND signed_date = ${signedDate}
-              AND notification_uuid = ${notificationUUID}
+          VALUES (
+            ${originalTransactionID}, ${signedDate}, ${notificationUUID}, ${notificationType}, now()
           )
-          ON CONFLICT (user_id) DO UPDATE SET
-            plan = EXCLUDED.plan,
-            source = EXCLUDED.source,
-            granted_user_id = EXCLUDED.granted_user_id,
-            entitlement = EXCLUDED.entitlement,
-            expires_at = EXCLUDED.expires_at,
+          ON CONFLICT (original_transaction_id) DO UPDATE SET
+            signed_date = EXCLUDED.signed_date,
+            notification_uuid = EXCLUDED.notification_uuid,
+            notification_type = EXCLUDED.notification_type,
             updated_at = now()
-          RETURNING entitlement
-        `
-      ]);
+          WHERE permitext_apple_notification_states.signed_date < EXCLUDED.signed_date
+          RETURNING original_transaction_id
+        )
+        INSERT INTO permitext_entitlements (
+          user_id, plan, source, granted_user_id, entitlement, expires_at, updated_at
+        )
+        SELECT
+          ${userID}, ${nextEntitlement.plan || "free"}, ${nextEntitlement.source || "unknown"},
+          ${nextEntitlement.grantedUserID || null}, ${JSON.stringify(nextEntitlement)}::jsonb,
+          ${nextEntitlement.expiresAt || null}::timestamptz, now()
+        FROM applied
+        ON CONFLICT (user_id) DO UPDATE SET
+          plan = EXCLUDED.plan,
+          source = EXCLUDED.source,
+          granted_user_id = EXCLUDED.granted_user_id,
+          entitlement = EXCLUDED.entitlement,
+          expires_at = EXCLUDED.expires_at,
+          updated_at = now()
+        RETURNING entitlement
+      `;
       return {
-        applied: stateRows.length > 0,
-        entitlement: stateRows.length && entitlementRows[0]?.entitlement
+        applied: entitlementRows.length > 0,
+        entitlement: entitlementRows[0]?.entitlement
           ? safeJSON(entitlementRows[0].entitlement, nextEntitlement)
           : null
       };
     }
-    const [stateRows, deletionRows] = await sql.transaction([
-      stateSQL,
-      sql`
+    const rows = await sql`
+      WITH applied AS (
+        INSERT INTO permitext_apple_notification_states (
+          original_transaction_id, signed_date, notification_uuid, notification_type, updated_at
+        )
+        VALUES (
+          ${originalTransactionID}, ${signedDate}, ${notificationUUID}, ${notificationType}, now()
+        )
+        ON CONFLICT (original_transaction_id) DO UPDATE SET
+          signed_date = EXCLUDED.signed_date,
+          notification_uuid = EXCLUDED.notification_uuid,
+          notification_type = EXCLUDED.notification_type,
+          updated_at = now()
+        WHERE permitext_apple_notification_states.signed_date < EXCLUDED.signed_date
+        RETURNING original_transaction_id
+      ), removed AS (
         DELETE FROM permitext_entitlements
         WHERE user_id = ${userID}
-          AND EXISTS (
-            SELECT 1 FROM permitext_apple_notification_states
-            WHERE original_transaction_id = ${originalTransactionID}
-              AND signed_date = ${signedDate}
-              AND notification_uuid = ${notificationUUID}
-          )
+          AND EXISTS (SELECT 1 FROM applied)
         RETURNING user_id
-      `
-    ]);
-    return { applied: stateRows.length > 0, entitlement: null, removed: deletionRows.length > 0 };
+      )
+      SELECT
+        EXISTS (SELECT 1 FROM applied) AS applied,
+        EXISTS (SELECT 1 FROM removed) AS removed
+    `;
+    return {
+      applied: Boolean(rows[0]?.applied),
+      entitlement: null,
+      removed: Boolean(rows[0]?.removed)
+    };
   }
 
   async function applyStripeSubscriptionEvent({
