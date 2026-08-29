@@ -2202,6 +2202,49 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertFalse(storeKitActorSource.contains("LocalEntitlementService.setVerifiedPlan"))
     }
 
+    func testAppleRefundRequestUsesVerifiedActiveTransactionAndNativeSheet() throws {
+        let projectRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let settingsSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Views/SettingsView.swift"),
+            encoding: .utf8
+        )
+        let storeKitSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/Models/CodeModels.swift"),
+            encoding: .utf8
+        )
+        let viewModelSource = try String(
+            contentsOf: projectRoot.appendingPathComponent("permitext/ViewModels/CodeLibraryViewModel.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(settingsSource.contains("Text(\"Request Refund from Apple\")"))
+        XCTAssertTrue(settingsSource.contains(".refundRequestSheet("))
+        XCTAssertTrue(settingsSource.contains("library.prepareAppleRefundRequest()"))
+        XCTAssertTrue(settingsSource.contains("Opening the form does not cancel the subscription or issue a refund"))
+        XCTAssertTrue(viewModelSource.contains("currentPlan == .pro && accountAuthorizedStoreKitPlan == .pro"))
+        XCTAssertTrue(viewModelSource.contains("storeKitSubscriptionService.activeProTransactionIDForRefund()"))
+        XCTAssertTrue(viewModelSource.contains("Apple received the refund request"))
+
+        let refundLookupStart = try XCTUnwrap(
+            storeKitSource.range(of: "func activeProTransactionIDForRefund()")
+        )
+        let updatesStart = try XCTUnwrap(
+            storeKitSource.range(
+                of: "func transactionUpdates()",
+                range: refundLookupStart.upperBound..<storeKitSource.endIndex
+            )
+        )
+        let refundLookupSource = String(
+            storeKitSource[refundLookupStart.lowerBound..<updatesStart.lowerBound]
+        )
+        XCTAssertTrue(refundLookupSource.contains("Transaction.currentEntitlements"))
+        XCTAssertTrue(refundLookupSource.contains("case .verified(let transaction)"))
+        XCTAssertTrue(refundLookupSource.contains("isActiveProTransaction(transaction)"))
+        XCTAssertFalse(refundLookupSource.contains("case .unverified"))
+    }
+
     func testClerkAuthenticationRequiresFreshSessionAndSignsOutLocallyFirst() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

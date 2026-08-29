@@ -5771,6 +5771,21 @@ actor StoreKitSubscriptionService {
         return await snapshot()
     }
 
+    func activeProTransactionIDForRefund() async -> Transaction.ID? {
+        for await verification in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = verification,
+                  isActiveProTransaction(transaction)
+            else { continue }
+            return transaction.id
+        }
+        if let verification = await Transaction.latest(for: proProductID),
+           case .verified(let transaction) = verification,
+           isActiveProTransaction(transaction) {
+            return transaction.id
+        }
+        return nil
+    }
+
     func transactionUpdates() -> AsyncStream<StoreKitSubscriptionSnapshot> {
         AsyncStream { continuation in
             let task = Task {

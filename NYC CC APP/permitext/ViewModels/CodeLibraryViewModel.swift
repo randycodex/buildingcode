@@ -2837,6 +2837,10 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    var canRequestAppleRefund: Bool {
+        currentPlan == .pro && accountAuthorizedStoreKitPlan == .pro
+    }
+
     var hasProjectAccess: Bool {
         hasCapability(.projects)
     }
@@ -3186,6 +3190,51 @@ final class CodeLibraryViewModel: ObservableObject {
             }
         } catch {
             let message = "Apple could not restore purchases: \(error.localizedDescription)"
+            statusMessage = message
+            storeKitOperationMessage = message
+        }
+    }
+
+    func prepareAppleRefundRequest() async -> StoreKit.Transaction.ID? {
+        guard canRequestAppleRefund else {
+            let message = "Restore the active Apple subscription on this device before requesting a refund."
+            statusMessage = message
+            storeKitOperationMessage = message
+            return nil
+        }
+        guard !isStoreKitBusy else { return nil }
+        isStoreKitBusy = true
+        defer { isStoreKitBusy = false }
+
+        guard let transactionID = await storeKitSubscriptionService.activeProTransactionIDForRefund() else {
+            let message = "Apple did not find an active Pro transaction on this device. Select Restore Purchases, then try again."
+            statusMessage = message
+            storeKitOperationMessage = message
+            return nil
+        }
+
+        storeKitOperationMessage = "Choose the purchase and refund reason in Apple's secure form."
+        return transactionID
+    }
+
+    func handleAppleRefundRequestResult(
+        _ result: Result<StoreKit.Transaction.RefundRequestStatus, StoreKit.Transaction.RefundRequestError>
+    ) {
+        switch result {
+        case .success(.success):
+            let message = "Apple received the refund request. Permitext will update access after Apple sends the result."
+            statusMessage = message
+            storeKitOperationMessage = message
+        case .success(.userCancelled):
+            let message = "The Apple refund form was closed. No refund request was submitted."
+            statusMessage = message
+            storeKitOperationMessage = message
+        case .failure(let error):
+            let message = "Apple could not start the refund request: \(error.localizedDescription)"
+            statusMessage = message
+            storeKitOperationMessage = message
+        @unknown default:
+            let message = "Apple returned an unknown refund-request result. No Permitext access change was made."
             statusMessage = message
             storeKitOperationMessage = message
         }
