@@ -16,6 +16,8 @@ for (const requiredBoundary of [
   /intentionally left untouched, unstaged, and uncommitted/,
   /`npm run check` passed/,
   /no paid model calls were made/,
+  /audit:release-branch/,
+  /never emits matched credential values or diff content/,
   /not a semantic, line-by-line human review/,
   /Master-plan release-sequence step 1 remains open/
 ]) {

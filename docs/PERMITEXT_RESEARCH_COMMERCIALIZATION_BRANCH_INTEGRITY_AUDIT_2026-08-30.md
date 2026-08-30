@@ -49,3 +49,14 @@ Their presence keeps the final release-sequence requirement to preserve unrelate
 ## Required final recheck
 
 When the owner later authorizes release work, repeat the full branch review against the exact selected commit, reconcile every dirty path, rerun the complete local checks, perform the protected Production/manual gates, and retain commit-bound evidence before any go decision. Master-plan release-sequence step 1 remains open until that happens.
+
+The repeatable source-integrity portion is now available as:
+
+```sh
+npm run --silent audit:release-branch -- \
+  --base <commit-or-ref> \
+  --expected-branch <branch> \
+  --allow-dirty <explicitly-reviewed-path>
+```
+
+The command reports only aggregate checks, paths, line numbers, and rule names. It never emits matched credential values or diff content. Every allowed dirty path must be supplied explicitly; directory allowances cover only descendants of that exact directory. A passing `sourceIntegrityReady` result still leaves `manualSemanticReviewRequired: true` and `releaseAuthorized: false`.

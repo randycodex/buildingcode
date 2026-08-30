@@ -113,7 +113,7 @@ async function main() {
       PERMITEXT_PRIVACY_VERSION: "stripe-lifecycle-privacy-v1",
       PERMITEXT_SUBSCRIPTION_POLICY_VERSION: "stripe-lifecycle-subscription-v1",
       PERMITEXT_TEST_STRIPE_API_BASE_URL: `http://127.0.0.1:${stripePort}`,
-      STRIPE_SECRET_KEY: "sk_test_permitext_no_charge_lifecycle",
+      STRIPE_SECRET_KEY: "sk_test_permitext_no_charge_lifecycle", // permitext-secret-scan-allow: synthetic no-charge test key
       STRIPE_PRO_PRICE_ID: testPriceID,
       STRIPE_WEBHOOK_SECRET: webhookSecret,
       PERMITEXT_STRIPE_TAX_MODE: "automatic",

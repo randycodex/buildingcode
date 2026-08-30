@@ -163,7 +163,7 @@ Operations runbook: [BETA1_OPERATIONS_RUNBOOK.md](./BETA1_OPERATIONS_RUNBOOK.md)
 
 - [x] Add a fail-closed, secret-free post-deployment public-Beta activation audit that binds every manual evidence record to the exact selected Git commit and keeps additional-turn sales disabled.
 - [x] Prepare the corresponding redacted [operator acceptance record](./BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md) with every launch gate explicitly open and its destructive, paid, privacy, and evidence boundaries stated.
-- [x] Complete a no-input [interim branch-integrity checkpoint](./PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30.md) across the requested 70-commit range, including a clean diff check, redacted credential scan, and full no-cost repository check. This does not close the final full-diff review against the eventual selected release commit.
+- [x] Complete a no-input [interim branch-integrity checkpoint](./PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30.md) across the requested 70-commit range, including a clean diff check, redacted credential scan, full no-cost repository check, and a permanent fail-closed `audit:release-branch` preflight. This does not close the final full-diff review against the eventual selected release commit.
 
 This sequence begins only after the remaining pre-release gates are acceptable and the owner separately authorizes release work.
 
