@@ -64,6 +64,8 @@ assert.match(markdown, /\$2\.14 \(10\.7%\)/);
 assert.match(markdown, /first passes at 12 fully utilized web subscribers and 24 fully utilized iOS subscribers/);
 assert.match(markdown, /dormant automatic-tax Checkout path/);
 assert.match(markdown, /already includes Stripe Tax Basic's 0\.5% web fee separately/);
+assert.match(markdown, /Stripe automatic tax therefore stays web-only/);
+assert.match(markdown, /customer price as inclusive of applicable taxes/);
 assert.match(markdown, /approximately \$40 plus tax/);
 assert.match(markdown, /makes no network or model call/);
 

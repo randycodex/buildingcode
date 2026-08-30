@@ -6,6 +6,8 @@ Owner review record: [PERMITEXT_BETA1_OWNER_LEGAL_SELF_REVIEW.md](./PERMITEXT_BE
 
 Tax and optional professional reference: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md](./PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PACKET.md)
 
+Separate Apple transaction boundary: [BETA1_APPLE_TAX_HANDLING_RECORD.md](./BETA1_APPLE_TAX_HANDLING_RECORD.md)
+
 ## Confirmed owner decisions
 
 - Operator: Higinio Jimenez Manzano as a sole proprietor, not an LLC or corporation.
@@ -46,7 +48,7 @@ The conservative no-professional launch path is therefore:
 1. Treat New York web subscriptions as taxable unless the New York Tax Department provides a different written answer for Permitext.
 2. Obtain the New York Certificate of Authority before the first taxable New York web subscription.
 3. Configure Stripe's product tax code, customer-location collection, registrations, and inclusive/exclusive presentation only after the registration facts are known.
-4. Keep Apple tax reporting separate because Apple controls the App Store transaction and remittance behavior.
+4. Keep Apple tax reporting separate because Apple controls the App Store transaction and remittance behavior; Stripe automatic tax is web-only.
 5. Monitor other states' nexus thresholds and digital-product rules as sales grow.
 6. Maintain records of gross receipts, Stripe and Apple fees, refunds, collected tax, provider expenses, and model/infrastructure costs for income and sales-tax filings.
 

@@ -344,6 +344,8 @@ The server now has a dormant, fail-closed Stripe automatic-tax path. Explicit co
 
 An August 30 read-only live Stripe recheck confirmed that the $20 Price uses `Default (inferred by currency)` tax behavior. Stripe's official setup documentation resolves that behavior to exclusive for USD, so the readiness audit now compares the explicit owner choice with the resolved provider behavior and does not force a replacement Price. The Product currently carries preset code `txcd_10000000` (`General - Electronically Supplied Services`), which Stripe itself flags for review. The collecting-locations view showed no live transactions and no collecting-location row, but expressly excludes the home jurisdiction from monitoring; it therefore does not prove the New York registration state. Stripe Tax Basic currently lists a 0.5% fee on tax-enabled Billing/Checkout transactions, approximately $0.10 on a $20 base transaction. The V6 subscriber model already includes that fee separately from its $1 tax downside reserve, so the $15.84 p90 web cost and $4.16 contribution remain unchanged. No Stripe field was edited.
 
+Apple's transaction boundary is now recorded separately in [BETA1_APPLE_TAX_HANDLING_RECORD.md](./BETA1_APPLE_TAX_HANDLING_RECORD.md). Apple documents the App Store customer price as inclusive of applicable taxes it collects and remits, and developer proceeds as customer price minus applicable taxes and commission. Stripe automatic tax therefore applies only to web Checkout and must not be added to App Store purchases. An August 30 authenticated read-only attempt reached the correct Permitext app route, but a Chrome-extension JavaScript conflict prevented the detail module from rendering; the live app category and subscription match-or-override state are not claimed and remain an owner verification item. No Apple field or browser extension was changed. The 5% iOS downside reserve remains until the category and real financial reports are verified.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:
@@ -355,6 +357,7 @@ Proceed toward paid Research only if all of the following are true:
 - [x] Owner-approved Beta economics retain 100 turns with a $2 minimum p90 contribution; the modeled result is $4.16 on web and $2.14 on iOS at the confirmed 15% commission.
 - [x] Complete the no-cost tax/refund/infrastructure input audit and launch-volume/refund sensitivities; low-volume p90 allocation is explicit and the missing Stripe Tax configuration is recorded.
 - [x] Prepare a dormant Stripe automatic-tax Checkout path and fail-closed Production readiness guard without selecting tax presentation or changing the live provider.
+- [x] Record the separate Apple tax/proceeds boundary without changing App Store Connect; leave the live category and first real financial report open.
 - [x] Complete the local no-charge Stripe Pro lifecycle exercise and retain the delayed-event/refund regression in the billing suite.
 - [x] Complete the provider-backed Stripe sandbox lifecycle and retain the current PaymentIntent-to-Invoice-Payment refund regression in the billing suite.
 - [x] Complete the local signed-payload Apple Pro lifecycle exercise and retain the failed-renewal and notification-ordering regressions in the billing suite.
