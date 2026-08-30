@@ -1258,13 +1258,23 @@ async function createEvaluationConversation(baseURL, account, testCase) {
       ...(passages.length ? {
         selections: passages.map((passage) => ({
           sectionID: passage.source.sectionID,
-          selectedText: passage.selectedText
+          selectedText: passage.selectedText,
+          ...(passage.source.richSourceIDs?.length
+            ? { richSourceIDs: passage.source.richSourceIDs }
+            : {}),
+          ...(passage.source.visualReviewDisposition
+            ? { visualReviewDisposition: passage.source.visualReviewDisposition }
+            : {})
         }))
       } : {})
     }
   });
+  const requestedRichSourceCount = new Set(
+    passages.flatMap((passage) => passage.source.richSourceIDs || [])
+  ).size;
   assert(
-    created.conversation.sources.filter((source) => source.kind === "selection").length === passages.length,
+    created.conversation.sources.filter((source) => source.kind === "selection").length ===
+      passages.length + requestedRichSourceCount,
     `${testCase.id} did not preserve every passage supplied through the multi-selection request contract.`
   );
   if (passages.length) {

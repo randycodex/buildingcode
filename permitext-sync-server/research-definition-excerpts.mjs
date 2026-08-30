@@ -66,10 +66,56 @@ function isDefinitionLabel(value) {
 }
 
 function richHTML(section) {
-  return (Array.isArray(section?.body?.blocks) ? section.body.blocks : [])
+  const blocks = Array.isArray(section?.body?.blocks)
+    ? section.body.blocks
+    : (Array.isArray(section?.blocks) ? section.blocks : []);
+  return blocks
     .map((block) => String(block?.html || ""))
     .filter(Boolean)
     .join("\n");
+}
+
+function zoningDefinitionEntriesFromHTML(section, html) {
+  const markers = Array.from(html.matchAll(
+    /<article\b[^>]*\bclass=["'][^"']*\bdefined-term\b[^"']*["'][^>]*>/gi
+  ));
+  const htmlEntries = markers.map((marker, index) => {
+    const segment = html.slice(marker.index, markers[index + 1]?.index ?? html.length);
+    const labelMatch = segment.match(
+      /<h2\b[^>]*\bclass=["'][^"']*\bdefinition__title\b[^"']*["'][^>]*>([\s\S]*?)<\/h2>/i
+    );
+    return {
+      label: definitionLabel(plainTextFromHTML(labelMatch?.[1])),
+      text: plainTextFromHTML(segment),
+      order: index
+    };
+  }).filter((entry) => entry.label && entry.text);
+  const canonicalText = compactText(
+    ((Array.isArray(section?.body?.blocks) ? section.body.blocks : section?.blocks) || [])
+      .map((block) => block?.plainText)
+      .filter(Boolean)
+      .join("\n\n")
+  );
+  if (!canonicalText || !htmlEntries.length) return htmlEntries;
+  const comparableCanonical = comparableText(canonicalText);
+  const starts = [];
+  let cursor = 0;
+  for (const entry of htmlEntries) {
+    const label = comparableText(entry.label);
+    let start = comparableCanonical.indexOf(label, cursor);
+    while (start >= 0) {
+      const following = comparableCanonical.slice(start + label.length, start + label.length + 280);
+      if (/\b(?:general definition|applicable to|applicable from|last amended)\b/i.test(following)) break;
+      start = comparableCanonical.indexOf(label, start + Math.max(1, label.length));
+    }
+    if (start < 0) return htmlEntries;
+    starts.push(start);
+    cursor = start + label.length;
+  }
+  return htmlEntries.map((entry, index) => ({
+    ...entry,
+    text: canonicalText.slice(starts[index], starts[index + 1] ?? canonicalText.length).trim()
+  }));
 }
 
 function definitionEntriesFromHTML(section) {
@@ -88,7 +134,7 @@ function definitionEntriesFromHTML(section) {
     if (!isDefinitionLabel(labelText)) continue;
     labels.push({ label: definitionLabel(labelText), segmentIndex: index });
   }
-  return labels.map((entry, index) => ({
+  const entries = labels.map((entry, index) => ({
     label: entry.label,
     text: compactText(segments.slice(
       entry.segmentIndex,
@@ -96,6 +142,7 @@ function definitionEntriesFromHTML(section) {
     ).join("\n")),
     order: index
   })).filter((entry) => entry.text);
+  return entries.length ? entries : zoningDefinitionEntriesFromHTML(section, html);
 }
 
 function definitionEntriesFromText(section) {
@@ -152,12 +199,62 @@ function positiveBound(value, fallback, maximum) {
   return Math.min(parsed, maximum);
 }
 
+function comparableText(value) {
+  return compactText(value).normalize("NFKC").toLocaleLowerCase("en-US");
+}
+
+function requiredTermSelection(entries, requiredTextTerms) {
+  const requiredTerms = Array.from(new Set((requiredTextTerms || [])
+    .map((term) => compactText(term))
+    .filter(Boolean)));
+  if (!requiredTerms.length) return null;
+  const selected = new Map();
+  for (const term of requiredTerms) {
+    const comparableTerm = comparableText(term);
+    const entry = entries.find((candidate) => comparableText(candidate.label) === comparableTerm) ||
+      entries.find((candidate) => comparableText(candidate.text).includes(comparableTerm));
+    if (!entry) return null;
+    const record = selected.get(entry.order) || { ...entry, requiredTextTerms: [] };
+    record.requiredTextTerms.push(term);
+    selected.set(entry.order, record);
+  }
+  return Array.from(selected.values()).sort((left, right) => left.order - right.order);
+}
+
+function boundedRequiredTermEntry(entry, maximumCharacters) {
+  if (entry.text.length <= maximumCharacters) return entry.text;
+  const comparableEntry = comparableText(entry.text);
+  const ranges = entry.requiredTextTerms.map((term) => {
+    const index = comparableEntry.indexOf(comparableText(term));
+    const perTermAllowance = Math.max(800, Math.floor((maximumCharacters - entry.label.length - 4) /
+      Math.max(1, entry.requiredTextTerms.length)));
+    const before = Math.min(1_500, Math.floor(perTermAllowance * 0.3));
+    const after = Math.max(400, perTermAllowance - before);
+    return {
+      start: Math.max(0, index - before),
+      end: Math.min(entry.text.length, index + term.length + after)
+    };
+  }).sort((left, right) => left.start - right.start);
+  const merged = [];
+  for (const range of ranges) {
+    const previous = merged.at(-1);
+    if (previous && range.start <= previous.end) previous.end = Math.max(previous.end, range.end);
+    else merged.push({ ...range });
+  }
+  const excerpt = `${entry.label}\n${merged.map((range) => entry.text.slice(range.start, range.end).trim()).join("\n\n")}`
+    .slice(0, maximumCharacters)
+    .trim();
+  return entry.requiredTextTerms.every((term) => comparableText(excerpt).includes(comparableText(term)))
+    ? excerpt
+    : null;
+}
+
 export function targetedDefinitionExcerpt(section, query, options = {}) {
   const canonicalText = compactText(section?.canonicalText || section?.text ||
-    (Array.isArray(section?.body?.blocks) ? section.body.blocks
+    ((Array.isArray(section?.body?.blocks) ? section.body.blocks : section?.blocks) || [])
       .map((block) => compactText(block?.plainText))
       .filter(Boolean)
-      .join("\n\n") : ""));
+      .join("\n\n"));
   if (
     canonicalText.length < researchDefinitionExcerptLimits.minimumSectionCharacters ||
     !isDefinitionSection(section, canonicalText)
@@ -176,7 +273,9 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     researchDefinitionExcerptLimits.maximumCharacters,
     researchDefinitionExcerptLimits.maximumCharacters
   );
-  const ranked = definitionEntries(section)
+  const entries = definitionEntries(section);
+  const requiredEntries = requiredTermSelection(entries, options.requiredTextTerms);
+  const ranked = requiredEntries || entries
     .map((entry) => entryScore(entry, queryTerms, normalizedQuery))
     .filter(Boolean)
     .sort((left, right) =>
@@ -187,14 +286,26 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     );
   const selected = [];
   let characterCount = 0;
-  for (const entry of ranked) {
+  const candidates = requiredEntries
+    ? ranked.slice(0, maximumDefinitions).sort((left, right) => left.text.length - right.text.length)
+    : ranked;
+  for (const [index, entry] of candidates.entries()) {
     if (selected.length >= maximumDefinitions) break;
     const separatorLength = selected.length ? 2 : 0;
-    if (characterCount + separatorLength + entry.text.length > maximumCharacters) continue;
-    selected.push(entry);
-    characterCount += separatorLength + entry.text.length;
+    const remainingCharacters = maximumCharacters - characterCount - separatorLength;
+    const remainingEntries = candidates.length - index;
+    const entryBudget = requiredEntries
+      ? Math.max(800, remainingCharacters - Math.max(0, remainingEntries - 1) * 800)
+      : remainingCharacters;
+    const selectedText = requiredEntries
+      ? boundedRequiredTermEntry(entry, Math.min(remainingCharacters, entryBudget))
+      : entry.text;
+    if (!selectedText || selectedText.length > remainingCharacters) continue;
+    selected.push({ ...entry, text: selectedText });
+    characterCount += separatorLength + selectedText.length;
   }
   if (!selected.length) return null;
+  if (requiredEntries && selected.length !== candidates.length) return null;
   selected.sort((left, right) => left.order - right.order);
   const text = selected.map((entry) => entry.text).join("\n\n");
   return {
@@ -208,6 +319,7 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     codeVersion: compactText(section?.codeVersion),
     jurisdiction: compactText(section?.jurisdiction),
     labels: selected.map((entry) => entry.label),
+    passages: selected.map((entry) => entry.text),
     text,
     canonicalSectionCharacterCount: canonicalText.length,
     excerptCharacterCount: text.length,

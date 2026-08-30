@@ -1065,6 +1065,59 @@ export function structuredRichSources(body) {
       });
     }
   }
+  const amendmentHistory = Array.isArray(body?.zoning?.amendmentHistory)
+    ? body.zoning.amendmentHistory
+    : [];
+  if (amendmentHistory.length) {
+    const sectionNumber = String(body?.sectionNumber || "").trim();
+    const reference = `Official NYC Planning amendment history${sectionNumber ? ` for ZR ${sectionNumber}` : ""}`;
+    const sourceURL = String(body?.zoning?.amendmentHistorySourceURL || "").trim();
+    const rows = amendmentHistory.map((event) => [
+      String(event?.effectiveDate || ""),
+      String(event?.reportNumber || ""),
+      String(event?.action || ""),
+      String(event?.projectName || ""),
+      String(event?.notes || ""),
+      String(event?.reportURL || "")
+    ]);
+    const text = [
+      reference,
+      sourceURL ? `Metadata source: ${sourceURL}` : "",
+      "This official metadata identifies amendment events and report links. It accompanies the current section text but does not reproduce every historical version of that section.",
+      ...amendmentHistory.map((event) => [
+        `Effective ${event?.effectiveDate || "date unavailable"}`,
+        event?.reportNumber ? `CPC report ${event.reportNumber}` : "report number unavailable",
+        event?.action || "action unavailable",
+        event?.projectName || "project name unavailable",
+        event?.notes || "",
+        event?.reportURL || ""
+      ].filter(Boolean).join(" — "))
+    ].filter(Boolean).join("\n");
+    const grids = [{
+      rows: [
+        ["Effective date", "CPC report", "Action", "Project", "Notes", "Report URL"],
+        ...rows
+      ]
+    }];
+    const contentHash = createHash("sha256")
+      .update(JSON.stringify({ reference, sourceURL, text, grids }))
+      .digest("hex");
+    sources.push({
+      id: `zoning-amendment-history-${createHash("sha256")
+        .update([sectionNumber, sourceURL, contentHash].join("\u001f"))
+        .digest("hex")
+        .slice(0, 24)}`,
+      kind: "amendment-history",
+      reference,
+      blockID: null,
+      sourceURL: sourceURL || null,
+      contentHash,
+      text,
+      textLength: text.length,
+      rowCount: rows.length,
+      grids
+    });
+  }
   return sources;
 }
 

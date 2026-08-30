@@ -10452,7 +10452,12 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     options.visualSourceIDs,
     options.visualReviewConfirmed
   );
-  if (primary.visualSources.length && !visualSourceIDs.length) {
+  const diagnosticStructuredTextOnly =
+    unapprovedZoningDiagnosticEnabled() &&
+    primary.codePrefix === "ZR" &&
+    options.visualReviewDisposition === "diagnostic-structured-text-only" &&
+    requestedRichSources.every((source) => source.kind === "table");
+  if (primary.visualSources.length && !visualSourceIDs.length && !diagnosticStructuredTextOnly) {
     const error = new Error(
       "Permitext detected official visual evidence elsewhere in this enacted section. " +
       "Use Find Relevant Evidence to review and explicitly select any applicable visuals before analysis; " +
@@ -10491,6 +10496,8 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
       kind: "selection",
       relationship: requestedVisualSources.length
         ? `${requestedVisualSources.length} official visual ${requestedVisualSources.length === 1 ? "source" : "sources"} reviewed and selected by you`
+        : diagnosticStructuredTextOnly
+        ? "Structured official text selected for a bounded Zoning diagnostic; unselected visuals remain excluded"
         : exactRichSource
         ? `Structured official ${exactRichSource.reference} selected by you`
         : "Passage selected by you",
@@ -10537,6 +10544,8 @@ function requestedResearchSelections(body) {
       visualSourceIDs: selection.visualSourceIDs ?? (body.selections.length === 1 ? body.visualSourceIDs : undefined),
       visualReviewConfirmed: selection.visualReviewConfirmed ??
         (body.selections.length === 1 ? body.visualReviewConfirmed : undefined),
+      visualReviewDisposition: selection.visualReviewDisposition ??
+        (body.selections.length === 1 ? body.visualReviewDisposition : undefined),
       savedItemID: String(
         selection.savedItemID || (body.selections.length === 1 ? body.savedItemID : "") || ""
       ).trim()
@@ -10584,7 +10593,8 @@ async function researchSourcesForSelections(selections, existingSources = []) {
       {
         richSourceIDs: selection.richSourceIDs,
         visualSourceIDs: selection.visualSourceIDs,
-        visualReviewConfirmed: selection.visualReviewConfirmed
+        visualReviewConfirmed: selection.visualReviewConfirmed,
+        visualReviewDisposition: selection.visualReviewDisposition
       }
     ));
   }

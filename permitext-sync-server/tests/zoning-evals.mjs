@@ -209,7 +209,8 @@ assert.match(useGroupTable?.text || "", /M2/);
 assert.match(useGroupTable?.text || "", /M3/);
 
 const manufacturingParkingBody = await zoningSection(20017449);
-const manufacturingParkingTables = structuredRichSources(manufacturingParkingBody);
+const manufacturingParkingSources = structuredRichSources(manufacturingParkingBody);
+const manufacturingParkingTables = manufacturingParkingSources.filter((source) => source.kind === "table");
 assert.equal(manufacturingParkingTables.length, 5);
 assert.deepEqual(
   manufacturingParkingTables.map((table) => table.id),
@@ -225,6 +226,9 @@ assert(
   ),
   "Every imported Zoning Resolution table must retain its stable source identity, hash, order, and non-empty structured grid."
 );
+const manufacturingParkingHistory = manufacturingParkingSources.filter((source) => source.kind === "amendment-history");
+assert.equal(manufacturingParkingHistory.length, 1);
+assert.match(manufacturingParkingHistory[0]?.text || "", /does not reproduce every historical version/i);
 
 console.log("zoning evaluation review cases passed", {
   total: dataset.cases.length,

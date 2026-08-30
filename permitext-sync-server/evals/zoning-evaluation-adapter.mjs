@@ -1,3 +1,6 @@
+import { targetedDefinitionExcerpt } from "../research-definition-excerpts.mjs";
+import { structuredRichSources } from "../evidence-discovery.mjs";
+
 const maximumSelectedPassageCharacters = 11_800;
 const selectedPassageContextBefore = 700;
 const selectedPassageContextAfter = 3_800;
@@ -15,42 +18,70 @@ function canonicalBodyText(section) {
 }
 
 function hasVisualReferences(section) {
-  return (section?.blocks || []).some((block) => /<img\b[^>]*\bsrc=["'][^"']+["']/i.test(String(block?.html || "")));
+  return (section?.blocks || []).some((block) =>
+    /<img\b[^>]*\bsrc=["'][^"']+["']/i.test(String(block?.html || ""))
+  );
 }
 
 function evidenceTerms(testCase, sectionID) {
-  return Array.from(new Set([
-    ...(testCase.evidenceReviewTermsBySection?.[String(sectionID)] || []),
-    ...(testCase.evidenceReviewTerms || [])
-  ].map((term) => String(term || "").trim()).filter(Boolean)));
+  const sectionTerms = testCase.evidenceReviewTermsBySection?.[String(sectionID)] || [];
+  const terms = sectionTerms.length ? sectionTerms : (testCase.evidenceReviewTerms || []);
+  return Array.from(new Set(terms.map((term) => String(term || "").trim()).filter(Boolean)));
 }
 
-function passageAroundTerm(text, term) {
+function passageRangeAroundTerm(text, term) {
   const index = text.toLocaleLowerCase("en-US").indexOf(term.toLocaleLowerCase("en-US"));
   if (index < 0) return null;
-  const start = Math.max(0, index - selectedPassageContextBefore);
-  const end = Math.min(text.length, index + term.length + selectedPassageContextAfter);
-  return text.slice(start, end).trim();
+  return {
+    start: Math.max(0, index - selectedPassageContextBefore),
+    end: Math.min(text.length, index + term.length + selectedPassageContextAfter)
+  };
 }
 
 function selectedPassages(testCase, sectionID, section) {
   const text = canonicalBodyText(section);
   assert(text, `${testCase.id} section ${sectionID} has no canonical Zoning text.`);
-  if (text.length <= maximumSelectedPassageCharacters) return [text];
-
   const terms = evidenceTerms(testCase, sectionID);
+  if (
+    terms.length &&
+    text.length >= 20_000 &&
+    /\bdefinitions?\b/i.test(String(section?.title || ""))
+  ) {
+    const excerpt = targetedDefinitionExcerpt({
+      ...section,
+      body: { blocks: section.blocks || [] },
+      canonicalText: text,
+      codePrefix: "ZR"
+    }, testCase.question, {
+      maximumDefinitions: 4,
+      maximumCharacters: maximumSelectedPassageCharacters,
+      requiredTextTerms: terms
+    });
+    assert(excerpt, `${testCase.id} could not resolve its reviewed definition terms in section ${sectionID}.`);
+    return excerpt.passages;
+  }
+  if (!terms.length && text.length <= maximumSelectedPassageCharacters) return [text];
   assert(
     terms.length > 0,
     `${testCase.id} section ${sectionID} exceeds the passage limit and needs reviewed evidence terms.`
   );
-  const passages = terms
-    .map((term) => passageAroundTerm(text, term))
-    .filter(Boolean);
+  const ranges = terms.map((term) => passageRangeAroundTerm(text, term));
   assert(
-    passages.length > 0,
-    `${testCase.id} has no reviewed evidence term in long section ${sectionID}.`
+    ranges.every(Boolean),
+    `${testCase.id} has a reviewed evidence term missing from section ${sectionID}.`
   );
-  return Array.from(new Set(passages));
+  const mergedRanges = [];
+  for (const range of ranges.sort((left, right) => left.start - right.start)) {
+    const previous = mergedRanges.at(-1);
+    if (previous && range.start <= previous.end) previous.end = Math.max(previous.end, range.end);
+    else mergedRanges.push({ ...range });
+  }
+  const uniquePassages = mergedRanges.map((range) => text.slice(range.start, range.end).trim());
+  assert(
+    uniquePassages.reduce((sum, passage) => sum + passage.length, 0) <= maximumSelectedPassageCharacters,
+    `${testCase.id} section ${sectionID} reviewed passages exceed the bounded evidence limit.`
+  );
+  return uniquePassages;
 }
 
 function expectedUncertainty(testCase) {
@@ -120,13 +151,39 @@ export async function adaptZoningEvaluationDataset({
         sectionReader(sectionID)
       ]);
       assert(summary && section, `${testCase.id} references unknown Zoning section ${sectionID}.`);
+      const richSources = structuredRichSources(section);
+      const amendmentHistorySource = testCase.category === "amendment-history"
+        ? richSources.find((source) => source.kind === "amendment-history")
+        : null;
+      if (testCase.category === "amendment-history") {
+        assert(amendmentHistorySource, `${testCase.id} has no official amendment-history metadata source.`);
+      }
+      const visualReferencesPresent = hasVisualReferences(section);
+      const appendixVisualIndex = visualReferencesPresent && /^APPENDIX\b/i.test(String(summary.sectionNumber));
+      const reviewedTableSourceIDs = appendixVisualIndex
+        ? richSources.filter((source) => source.kind === "table").map((source) => source.id)
+        : [];
+      if (appendixVisualIndex) {
+        assert(
+          reviewedTableSourceIDs.length > 0,
+          `${testCase.id} cannot use a visual-bearing section without reviewed structured text evidence.`
+        );
+      }
+      const richSourceIDs = [
+        ...(amendmentHistorySource ? [amendmentHistorySource.id] : []),
+        ...reviewedTableSourceIDs
+      ];
       selectedEvidence.push({
         sectionID: String(sectionID),
         reference: `ZR ${summary.sectionNumber}`,
         codePrefix: "ZR",
         sectionNumber: String(summary.sectionNumber),
         exactPassages: selectedPassages(testCase, sectionID, section),
-        pinDuringBenchmark: !hasVisualReferences(section)
+        pinDuringBenchmark: true,
+        ...(visualReferencesPresent
+          ? { visualReviewDisposition: "diagnostic-structured-text-only" }
+          : {}),
+        ...(richSourceIDs.length ? { richSourceIDs } : {})
       });
     }
     const requiredCitations = selectedEvidence.map((source) => source.reference);
