@@ -25,6 +25,8 @@ This is the human evidence record for `BETA1_PUBLIC_RELEASE_GATE_RECORD.json`. I
 
 Do not populate `expectedGitCommit` in the JSON gate record until this exact commit is selected for both Production web/backend and the final TestFlight build.
 
+Interim no-input evidence: [PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30.md). That checkpoint covers the requested 70-commit implementation range but does not select a release commit, close the final semantic full-diff review, or satisfy any manual/Production gate below.
+
 ## Production deployment
 
 Gate ID: `production-deployment`
