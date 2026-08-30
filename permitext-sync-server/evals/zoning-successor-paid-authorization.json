@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor.json",
     "sha256": "d07063fa12ec993fde8802e6b58971d5cc1873a52fbefbe9e538b81acb94d30f",
@@ -19,14 +19,14 @@
     "exactAuthorizationPhrase": "I authorize"
   },
   "consumption": {
-    "status": "not_started",
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "runID": "5480ed8f-6d0c-46b1-a108-d12e8e13b7da",
+    "consumedAt": "2026-08-30T20:00:05.917Z"
   },
   "publicResearchReleaseAuthorized": false,
   "professionalZoningSignoff": false,
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "The owner explicitly authorized the prepared one-time scope: all 30 successor cases, one repetition, with a $5 maximum cumulative spend cap. This does not authorize public release, deployment, pricing changes, or the disabled evidence-budget candidate."
+  "notes": "One-time authorization consumed by 2026-08-30T19-40-50-171Z-5480ed8f-6d0c-46b1-a108-d12e8e13b7da.json. The result still requires quality, cost, and release-gate review."
 }

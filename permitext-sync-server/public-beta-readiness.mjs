@@ -44,6 +44,12 @@ export const publicBetaReleaseGateDefinitions = Object.freeze([
     detail: "Delivered spend notification and accepted hard-stop/recovery evidence must be retained without uncontrolled usage."
   }),
   Object.freeze({
+    key: "zoningResearch",
+    id: "zoning-research-semantic-cost-clients",
+    releaseBound: true,
+    detail: "The exact owner-approved Zoning successor must pass clean semantic and accepted cost gates, then pass enabled web/TestFlight physical-iPhone acceptance against the selected release commit."
+  }),
+  Object.freeze({
     key: "productionClients",
     id: "production-web-testflight-iphone",
     releaseBound: true,

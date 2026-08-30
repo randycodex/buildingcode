@@ -44,6 +44,12 @@
       "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#spend-notification-and-hard-stop",
       "gitCommit": null
     },
+    "zoningResearch": {
+      "complete": false,
+      "observedAt": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#zoning-research-semantic-cost-and-clients",
+      "gitCommit": null
+    },
     "productionClients": {
       "complete": false,
       "observedAt": null,

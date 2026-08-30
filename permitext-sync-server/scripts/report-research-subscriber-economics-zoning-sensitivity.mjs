@@ -11,12 +11,12 @@ const v6ResultURL = new URL(
   import.meta.url
 );
 const zoningResultURL = new URL(
-  "../evals/results/2026-08-30T17-54-11-252Z-5e394dd0-fce2-4fd7-8c5a-cb05dcb29e53.json",
+  "../evals/results/2026-08-30T19-40-50-171Z-5480ed8f-6d0c-46b1-a108-d12e8e13b7da.json",
   import.meta.url
 );
 
 export const zoningSubscriberSensitivityAssumptions = Object.freeze({
-  generatedAt: "2026-08-30T18:30:00.000Z",
+  generatedAt: "2026-08-30T20:00:05.839Z",
   includedTurns: 100,
   zoningTurnShares: [0, 0.25, 0.50, 1],
   bootstrapIterations: 100_000,
@@ -175,7 +175,7 @@ export async function createZoningSubscriberSensitivityReport() {
     recommendation: {
       pricingOrAllowanceChangeAuthorized: false,
       zoningPublicEnablementReady: false,
-      nextGate: "Reduce Zoning evidence cost, correct the two invalid answer keys through owner review, resolve the remaining failed cases, and obtain a clean frozen rerun before using this sensitivity for a commercial decision."
+      nextGate: "Resolve the three execution failures and nine graded quality failures, reduce Zoning evidence cost, and obtain a clean newly authorized frozen rerun before using this sensitivity for a commercial decision."
     }
   };
 }
@@ -196,7 +196,7 @@ export function renderZoningSubscriberSensitivityMarkdown(report) {
     `| Zoning share | V6 turns | Zoning turns | Provider p50 | Provider p90 | Web p90 contribution | iOS 15% p90 contribution |\n` +
     `| ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
     `${rows.join("\n")}\n\n` +
-    `No price or allowance change is authorized. Public Zoning Research remains disabled. Next, reduce evidence cost, complete owner review of the two invalid answer keys, and resolve the remaining failed cases before a clean frozen rerun.\n`;
+    `No price or allowance change is authorized. Public Zoning Research remains disabled. Next, resolve the three execution failures and nine graded quality failures, reduce evidence cost, and obtain a clean newly authorized frozen rerun.\n`;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

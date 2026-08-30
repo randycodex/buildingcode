@@ -159,6 +159,28 @@ Release-bound: **no**
 
 Do not spend or lower the team budget merely to force this gate.
 
+## Zoning Research semantic, cost, and clients
+
+Gate ID: `zoning-research-semantic-cost-clients`
+Status: **OPEN**
+Release-bound: **yes**
+
+The retained owner-approved successor is SHA-256 `d07063fa12ec993fde8802e6b58971d5cc1873a52fbefbe9e538b81acb94d30f`. Its first one-time semantic run is retained as partial evidence only: 30 case slots, 27 graded answers, 18 passes, nine quality failures, three fail-closed execution errors, and a $10.01 failed-work-amortized projection per 100 all-Zoning turns. This result does not satisfy this gate.
+
+- Exact successor lineage, case order, source edition, selected evidence, and safety boundaries reverified:
+- Newly authorized clean semantic run completed every case without execution failure and passed every required fatal quality gate:
+- Settled Zoning cost and mixed-month sensitivity accepted against the $20/100-turn commercial boundary:
+- Any proposed evidence-budget change passed complete no-cost preservation and newly authorized semantic confirmation before enablement:
+- Zoning `researchEligibility` and public Research routing changed only in the selected release commit after the preceding checks passed:
+- Enabled Production web and final TestFlight build returned the same governed Zoning Research contract on a physical iPhone:
+- Zoning citations reopened the exact enacted ZR source and edition; structured tables, maps/visual limits, amendment state, and applicability unknowns remained explicit:
+- Project context, turn accounting, fail-closed recovery, unofficial-aid wording, privacy disclosure, and no-professional-signoff boundary passed:
+- Redacted evidence and timestamp:
+
+Detailed retained failure evidence: [PERMITEXT_ZONING_SUCCESSOR_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_SUCCESSOR_SEMANTIC_RESULT_2026-08-30.md).
+
+Do not enable public Zoning Research, change pricing or allowances, deploy, or mark this gate complete from no-cost tests or a partial paid run.
+
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`

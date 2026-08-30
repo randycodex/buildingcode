@@ -4,7 +4,7 @@ Date: August 30, 2026
 
 Working branch: `codex/zoning-research-beta1`
 
-Status: **SEPARATELY FROZEN; NO-COST GATE PASSED; PAID AND PUBLIC USE LOCKED**
+Status: **SEPARATELY FROZEN; NO-COST GATE PASSED; PAID RESULT PARTIAL; PUBLIC USE LOCKED**
 
 ## Owner decision
 
@@ -61,15 +61,21 @@ Results:
 - Average pinned evidence was 13,941 characters and average supplemental evidence was 20,879 characters.
 - No paid model calls were made.
 
+## Paid semantic result
+
+The owner later separately replied `I authorize` for exactly one complete 30-case successor run, one repetition, with a $5 maximum cumulative cap. Run `5480ed8f-6d0c-46b1-a108-d12e8e13b7da` is bound to the exact successor SHA and source commit `c62a32c1b6736015e0bef32862cbb846df853659`.
+
+The run spent $3.333192 across 106 settled answer/grader requests, completed 27 production operations, failed three without a user charge, and passed 18 of 27 graded answers. Failed-work-amortized operating cost projects $10.01 per 100 all-Zoning turns. The semantic, reliability, and cost gates failed. The authorization was automatically consumed against the retained run ID and cannot be reused. Detailed evidence: [PERMITEXT_ZONING_SUCCESSOR_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_SUCCESSOR_SEMANTIC_RESULT_2026-08-30.md).
+
 ## Remaining boundary
 
 The 24,000-character candidate remains disabled by default and no Production configuration changed. The successor records `paidEvaluationAllowed: false`, no cumulative spend cap, `publicResearchReleaseAuthorized: false`, and `professionalZoningSignoff: false`.
 
-A clean semantic confirmation requires a new explicit owner authorization for exactly one stated run and a new cumulative spend cap. Public Zoning Research still requires the later web/iOS, exact release-commit, cost, and manual acceptance gates.
+A later clean semantic confirmation requires new remediation, a new exact frozen successor, a new explicit owner authorization for exactly one stated run, and a new cumulative spend cap. Public Zoning Research still requires the later web/iOS, exact release-commit, cost, and manual acceptance gates.
 
 ## Paid-run guard preparation
 
-A separate `zoning-successor-paid-authorization.json` record is bound to the exact successor SHA-256 and remains checked in as `locked`. The dedicated successor runner and the general evaluation entry point both require that same record to contain an explicit owner decision before they can enter live mode.
+A separate `zoning-successor-paid-authorization.json` record is bound to the exact successor SHA-256 and is checked in as `consumed` for the retained run. The dedicated successor runner and the general evaluation entry point both reject reuse without a new explicit owner decision.
 
 The permanent contract proves that:
 
@@ -80,4 +86,4 @@ The permanent contract proves that:
 - the 24,000-character candidate remains disabled; and
 - the authorization cannot deploy, enable public Research, change pricing or allowances, or claim professional sign-off.
 
-This preparation makes no provider call and is not itself an authorization.
+The preparation itself made no provider call. The later owner authorization was separate, bounded, executed once, and consumed.
