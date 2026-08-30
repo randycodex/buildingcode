@@ -179,7 +179,7 @@ export async function adaptZoningEvaluationDataset({
       }
       const visualReferencesPresent = hasVisualReferences(section);
       const appendixVisualIndex = visualReferencesPresent && /^APPENDIX\b/i.test(String(summary.sectionNumber));
-      const reviewedTableSourceIDs = appendixVisualIndex
+      const reviewedTableSourceIDs = appendixVisualIndex || testCase.category === "table"
         ? richSources.filter((source) => source.kind === "table").map((source) => source.id)
         : [];
       if (appendixVisualIndex) {

@@ -11,12 +11,12 @@ const v6ResultURL = new URL(
   import.meta.url
 );
 const zoningResultURL = new URL(
-  "../evals/results/2026-08-30T16-28-27-054Z-5b54b6cf-2a04-4a4a-a920-edb2d65bf4f6.json",
+  "../evals/results/2026-08-30T17-54-11-252Z-5e394dd0-fce2-4fd7-8c5a-cb05dcb29e53.json",
   import.meta.url
 );
 
 export const zoningSubscriberSensitivityAssumptions = Object.freeze({
-  generatedAt: "2026-08-30T16:45:00.000Z",
+  generatedAt: "2026-08-30T18:30:00.000Z",
   includedTurns: 100,
   zoningTurnShares: [0, 0.25, 0.50, 1],
   bootstrapIterations: 100_000,
@@ -175,7 +175,7 @@ export async function createZoningSubscriberSensitivityReport() {
     recommendation: {
       pricingOrAllowanceChangeAuthorized: false,
       zoningPublicEnablementReady: false,
-      nextGate: "Narrow Zoning passage assembly, resolve the failed cases, and obtain a clean frozen rerun before using this sensitivity for a commercial decision."
+      nextGate: "Reduce Zoning evidence cost, correct the two invalid answer keys through owner review, resolve the remaining failed cases, and obtain a clean frozen rerun before using this sensitivity for a commercial decision."
     }
   };
 }
@@ -192,11 +192,11 @@ export function renderZoningSubscriberSensitivityMarkdown(report) {
   });
   return `# Permitext Research subscriber economics — preliminary Zoning sensitivity\n\n` +
     `Generated locally from immutable V6 and Zoning benchmark results without provider calls.\n\n` +
-    `The first Zoning diagnostic spent ${usd(report.source.zoningActualPaidEvaluationUSD)} including independent grading. Production operations projected ${usd(report.zoningMeasurement.amortizedTurnCostUSD.mean * 100)} per 100 Zoning turns after amortizing the failed operation. Only ${report.zoningMeasurement.qualityPasses}/${report.zoningMeasurement.qualityEvaluatedCases} graded answers passed and the source sample has only ${report.zoningMeasurement.completedChargedTurns} completed charged turns, so this is a sensitivity—not a pricing result.\n\n` +
+    `The latest expanded Zoning diagnostic spent ${usd(report.source.zoningActualPaidEvaluationUSD)} including independent grading. Production operations projected ${usd(report.zoningMeasurement.amortizedTurnCostUSD.mean * 100)} per 100 Zoning turns after amortizing failed operations. Only ${report.zoningMeasurement.qualityPasses}/${report.zoningMeasurement.qualityEvaluatedCases} graded answers passed and the source sample has only ${report.zoningMeasurement.completedChargedTurns} completed charged turns, so this is a sensitivity—not a pricing result.\n\n` +
     `| Zoning share | V6 turns | Zoning turns | Provider p50 | Provider p90 | Web p90 contribution | iOS 15% p90 contribution |\n` +
     `| ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
     `${rows.join("\n")}\n\n` +
-    `No price or allowance change is authorized. Public Zoning Research remains disabled. Next, narrow Zoning passage assembly and resolve the failed cases before a clean frozen rerun.\n`;
+    `No price or allowance change is authorized. Public Zoning Research remains disabled. Next, reduce evidence cost, complete owner review of the two invalid answer keys, and resolve the remaining failed cases before a clean frozen rerun.\n`;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

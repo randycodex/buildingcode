@@ -1072,14 +1072,21 @@ export function structuredRichSources(body) {
     const sectionNumber = String(body?.sectionNumber || "").trim();
     const reference = `Official NYC Planning amendment history${sectionNumber ? ` for ZR ${sectionNumber}` : ""}`;
     const sourceURL = String(body?.zoning?.amendmentHistorySourceURL || "").trim();
-    const rows = amendmentHistory.map((event) => [
-      String(event?.effectiveDate || ""),
-      String(event?.reportNumber || ""),
-      String(event?.action || ""),
-      String(event?.projectName || ""),
-      String(event?.notes || ""),
-      String(event?.reportURL || "")
-    ]);
+    const amendmentCell = (value, fallback) => ({
+      text: String(value || fallback),
+      rowSpan: 1,
+      columnSpan: 1
+    });
+    const rows = amendmentHistory.map((event) => ({
+      cells: [
+        amendmentCell(event?.effectiveDate, "date unavailable"),
+        amendmentCell(event?.reportNumber, "report number unavailable"),
+        amendmentCell(event?.action, "action unavailable"),
+        amendmentCell(event?.projectName, "project name unavailable"),
+        amendmentCell(event?.notes, "notes unavailable"),
+        amendmentCell(event?.reportURL, "report URL unavailable")
+      ]
+    }));
     const text = [
       reference,
       sourceURL ? `Metadata source: ${sourceURL}` : "",
@@ -1094,13 +1101,19 @@ export function structuredRichSources(body) {
       ].filter(Boolean).join(" — "))
     ].filter(Boolean).join("\n");
     const grids = [{
-      rows: [
-        ["Effective date", "CPC report", "Action", "Project", "Notes", "Report URL"],
-        ...rows
-      ]
+      rows: [{
+        cells: [
+          "Effective date",
+          "CPC report",
+          "Action",
+          "Project",
+          "Notes",
+          "Report URL"
+        ].map((text) => ({ text, rowSpan: 1, columnSpan: 1 }))
+      }, ...rows]
     }];
     const contentHash = createHash("sha256")
-      .update(JSON.stringify({ reference, sourceURL, text, grids }))
+      .update(JSON.stringify({ reference, text, grids }))
       .digest("hex");
     sources.push({
       id: `zoning-amendment-history-${createHash("sha256")
@@ -1114,7 +1127,7 @@ export function structuredRichSources(body) {
       contentHash,
       text,
       textLength: text.length,
-      rowCount: rows.length,
+      rowCount: grids[0].rows.length,
       grids
     });
   }

@@ -68,6 +68,7 @@ assert.doesNotMatch(serverSource, /write conclusion and explanation so they read
 assert.match(serverSource, /Do not target a fixed number of paragraphs or sentences/);
 assert.match(serverSource, /Use the shortest answer that fully and reliably resolves the question/);
 assert.match(serverSource, /Never omit a material qualification, applicability issue, conflicting provision, or evidence limitation/);
+assert.match(serverSource, /Do not silently correct or normalize enacted wording/);
 assert.match(serverSource, /RELATIONSHIP: \$\{section\.relationship/);
 assert.match(serverSource, /USER_SELECTED_TEXT is the exact model-visible focus and citation target/);
 assert.doesNotMatch(serverSource, /`CANONICAL_SECTION_CONTEXT:/);

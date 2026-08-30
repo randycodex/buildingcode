@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { adaptZoningEvaluationDataset } from "../evals/zoning-evaluation-adapter.mjs";
 import { structuredRichSources } from "../evidence-discovery.mjs";
+import { immutableEvidenceSnapshot } from "../project-foundation-contract.mjs";
 import { zoningSection, zoningSectionSummary } from "../zoning-content.mjs";
 
 const maximumSelectedPassageCharacters = 11_800;
@@ -87,6 +88,12 @@ for (const expected of [
   "Cellar space used for retailing"
 ]) assert.match(cellarText, new RegExp(expected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
 
+const standardHeightCase = adapted.cases.find((testCase) => testCase.id === "zr-r7a-standard-height");
+assert(
+  standardHeightCase.selectedEvidence.every((source) => source.richSourceIDs?.length === 1),
+  "Reviewed table cases must carry their exact structured official grids into the diagnostic."
+);
+
 const historyCase = adapted.cases.find((testCase) => testCase.id === "zr-amendment-history");
 const historyEvidence = historyCase.selectedEvidence[0];
 assert.equal(historyEvidence.richSourceIDs.length, 1);
@@ -100,5 +107,32 @@ assert.match(historySource.text, /N240290ZRY/);
 assert.match(historySource.text, /N240011ZRY/);
 assert.match(historySource.text, /N240010ZRY/);
 assert.match(historySource.text, /does not reproduce every historical version/i);
+assert.equal(historySource.rowCount, historySource.grids[0].rows.length);
+assert(
+  historySource.grids[0].rows.every((row) =>
+    row.cells.every((cell) => cell.text && cell.rowSpan === 1 && cell.columnSpan === 1)
+  ),
+  "The amendment-history evidence must use the immutable structured-row schema."
+);
+const historySnapshot = immutableEvidenceSnapshot({
+  id: "zoning-amendment-history-snapshot",
+  source: {
+    sourceID: "zoning-amendment-history-passage",
+    sectionID: historyEvidence.sectionID,
+    sectionNumber: "42-00",
+    chapterNumber: "IV-2",
+    codePrefix: "ZR",
+    codeEdition: zoningDataset.codeVersion,
+    codeVersion: zoningDataset.codeVersion,
+    text: historySource.text,
+    richSourceID: historySource.id,
+    richSourceKind: historySource.kind,
+    richSourceReference: historySource.reference,
+    richSourceContentHash: historySource.contentHash,
+    richSourceRowCount: historySource.rowCount,
+    richSourceGrids: historySource.grids
+  }
+});
+assert.equal(historySnapshot.structuredSource.rowCount, historySource.rowCount);
 
 console.log("zoning evaluation adapter contract passed");

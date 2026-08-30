@@ -4,7 +4,7 @@ Date: August 30, 2026
 
 Working branch: `codex/zoning-research-beta1`
 
-Status: **30/30 NO-COST PREFLIGHT PASSED; PAID EVALUATION LOCKED; PUBLIC ACCESS DISABLED**
+Status: **30/30 NO-COST PREFLIGHT PASSED; PARTIAL PAID RESULT RETAINED; PUBLIC ACCESS DISABLED**
 
 ## Owner disposition
 
@@ -23,7 +23,7 @@ This disposition is not professional zoning sign-off, public Zoning Research rel
 - `permitext-sync-server/evals/zoning-cases.json` remains the unchanged 21-case parent. Its SHA-256 is `90b9cf4c5c3ea40522103d42a9b8ec052b044cf42be019cae53eed61cfa008a6`.
 - `permitext-sync-server/evals/zoning-cases-expanded-batch-1.json` is a separate frozen 30-case cohort: the original 21 cases followed by the nine approved Batch 1 cases.
 - The generated cohort records the exact parent, intake, and source-document hashes and fails closed if the parent changes.
-- The paid authorization state is `locked`; no cumulative spend cap exists. A future paid run requires a new explicit owner authorization and a new explicit cumulative cap.
+- The paid authorization state is `consumed`. The one authorized 30-case run is bound to result `5e394dd0-fce2-4fd7-8c5a-cb05dcb29e53`, and no further cumulative spend cap exists. A future paid run requires a new explicit owner authorization and a new explicit cumulative cap.
 - `researchEligibility`, professional sign-off, and public-release authorization all remain false.
 
 ## No-cost verification
@@ -38,8 +38,8 @@ The three deliberate fact-gap cases adapt to `insufficient evidence`. Every sele
 
 ## What this proves and does not prove
 
-This proves that the separate cohort is reproducible, owner-governed, canonically mapped, passage-bounded, and usable by Permitext's Research conversation-creation path without enabling Zoning or spending money. It does not prove that the model answers all 30 cases correctly, does not repair the retained first paid run retroactively, and does not authorize another paid run.
+This proves that the separate cohort is reproducible, owner-governed, canonically mapped, passage-bounded, and usable by Permitext's Research conversation-creation path without enabling Zoning or spending money. The subsequently authorized one-repetition semantic run spent $3.247980 under its $5 cap, completed 28 operations, failed two operations without charging a user, and passed 12 of 28 graded answers. It is retained as partial diagnostic evidence in [PERMITEXT_ZONING_EXPANDED_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_SEMANTIC_RESULT_2026-08-30.md). It does not prove that the model answers all 30 cases correctly and does not authorize another paid run.
 
 ## Next gate
 
-Commit the exact frozen cohort and its contracts. After that, decide the scope of a clean semantic confirmation and set a new cumulative spend cap before any paid request. Public Zoning Research must remain disabled until semantic quality, updated cost evidence, and web/iOS acceptance all pass.
+Complete owner re-review of the two answer keys that conflict with the selected enacted evidence, finish the no-cost regression and cost-reduction work, and only then decide whether to authorize a clean semantic confirmation with a new cumulative spend cap. Public Zoning Research must remain disabled until semantic quality, updated cost evidence, and web/iOS acceptance all pass.

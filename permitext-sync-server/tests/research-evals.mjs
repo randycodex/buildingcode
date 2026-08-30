@@ -676,7 +676,8 @@ function explicitInlineEvidenceIDs(answer) {
 }
 
 function deterministicChecks(testCase, answer, answerTimeMilliseconds, options = {}) {
-  const requiredStringFields = ["conclusion", "explanation"];
+  const requiredStringFields = ["conclusion"];
+  const stringFields = ["explanation"];
   const requiredArrayFields = [
     "assumptions",
     "missingFacts",
@@ -688,6 +689,9 @@ function deterministicChecks(testCase, answer, answerTimeMilliseconds, options =
     ...requiredStringFields
       .filter((field) => typeof answer?.[field] !== "string" || !answer[field].trim())
       .map((field) => `${field} must be a nonempty string.`),
+    ...stringFields
+      .filter((field) => typeof answer?.[field] !== "string")
+      .map((field) => `${field} must be a string.`),
     ...requiredArrayFields
       .filter((field) => !Array.isArray(answer?.[field]))
       .map((field) => `${field} must be an array.`),
@@ -2499,6 +2503,11 @@ async function runSelfTest(dataset, datasetText) {
   }
   const scoring = scoreCase(dataset, testCase, answer, 15_000, judge);
   assert(scoring.passed && scoring.overallScore === 4, "Research eval self-test did not produce a perfect passing score.");
+  const conciseScoring = scoreCase(dataset, testCase, { ...answer, explanation: "" }, 15_000, judge);
+  assert(
+    conciseScoring.deterministic.structuralValidity.passed && conciseScoring.passed,
+    "Research eval self-test rejected Permitext's valid concise-answer structure."
+  );
   assert(
     evaluationQualityFailure(testCase, scoring, true) === null,
     "Stop-on-error incorrectly halted a passing quality result."
@@ -2578,6 +2587,17 @@ async function runSelfTest(dataset, datasetText) {
   assert(
     !invalidStructure.deterministic.structuralValidity.passed && !invalidStructure.passed,
     "Research eval self-test did not reject an invalid answer structure."
+  );
+  const invalidExplanationType = scoreCase(
+    dataset,
+    testCase,
+    { ...answer, explanation: null },
+    15_000,
+    judge
+  );
+  assert(
+    !invalidExplanationType.deterministic.structuralValidity.passed && !invalidExplanationType.passed,
+    "Research eval self-test accepted a non-string compatibility explanation."
   );
   const incompleteUncertaintyJudge = structuredClone(judge);
   incompleteUncertaintyJudge.judgment.missingFacts[0].met = false;

@@ -4,11 +4,11 @@ Date: August 30, 2026
 
 Working branch: `codex/zoning-research-beta1`
 
-Status: **NO-COST REMEDIATION COMPLETE; PAID SEMANTIC CONFIRMATION NOT AUTHORIZED**
+Status: **SECOND NO-COST REMEDIATION COMPLETE; NEW PAID SEMANTIC CONFIRMATION NOT AUTHORIZED**
 
 ## Boundary
 
-This work responds to frozen diagnostic run `5b54b6cf-2a04-4a4a-a920-edb2d65bf4f6`. It does not rewrite that retained result, approve public Zoning Research, promote any candidate case, authorize another paid run, change the $20 price or 100-turn allowance, merge, deploy, or change Production configuration.
+The first part of this work responds to frozen diagnostic run `5b54b6cf-2a04-4a4a-a920-edb2d65bf4f6`. The follow-up responds to expanded run `5e394dd0-fce2-4fd7-8c5a-cb05dcb29e53`. It does not rewrite either retained result, approve public Zoning Research, silently change an owner-reviewed answer key, authorize another paid run, change the $20 price or 100-turn allowance, merge, deploy, or change Production configuration.
 
 ## What changed
 
@@ -49,10 +49,24 @@ The unchanged sizes are intentional. Their frozen failures were answer omissions
 
 These results prove source assembly, canonical matching, structured-source continuity, and fail-closed workflow behavior. They do **not** prove that the nine prior scored failures or the one prior failed operation will pass semantic model grading.
 
+## Expanded-run follow-up
+
+The one authorized expanded run completed under its $5 cap and is retained separately. It exposed four additional no-cost defects or precision gaps that are now repaired:
+
+- the evaluation structure contract now accepts the product's valid concise-answer form with an empty string explanation while still requiring a nonempty conclusion;
+- amendment-history grids now use the immutable row/cell schema and survive an immutable-evidence snapshot round trip;
+- table-category Zoning cases now explicitly select their structured table evidence; and
+- the answer prompt now preserves unusual enacted legal wording before paraphrase instead of silently normalizing it.
+
+The result also showed that source Cases 2 and 4 from the candidate batch have invalid answer keys: one requires a UAP increment rule absent from the selected evidence, and the other ignores the controlling R7A-specific through-lot rule. Those keys remain unchanged pending owner disposition in [PERMITEXT_ZONING_BATCH1_RUBRIC_REVIEW_2026-08-30.md](./PERMITEXT_ZONING_BATCH1_RUBRIC_REVIEW_2026-08-30.md).
+
+The expanded result, including its $8.87-per-100 all-Zoning operating projection and updated subscriber sensitivity, is retained in [PERMITEXT_ZONING_EXPANDED_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_SEMANTIC_RESULT_2026-08-30.md).
+
 ## Remaining gate
 
 1. **Complete:** the owner approved nine source-checked candidate cases for evaluation testing only; Cases 1, 3, and 11 remain outside the cohort pending narrowing, duplication review, and incorporated-map evidence respectively.
 2. **Complete:** the unchanged original 21 cases and the nine approvals are frozen as a separate 30-case successor; 30/30 no-cost conversation creation passes. See [PERMITEXT_ZONING_EXPANDED_COHORT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_COHORT_2026-08-30.md).
-3. Commit the exact expanded cohort and contracts.
-4. Only with a new explicit owner authorization and cumulative spend cap, run one clean paid semantic confirmation.
-5. Keep public Zoning Research disabled until that run passes, the updated cost distribution is accepted, and web/iOS release acceptance is complete.
+3. **Complete:** the exact expanded cohort and its one-run $5 authorization were committed before execution; the run is retained and the authorization is consumed.
+4. Obtain owner disposition on the two proposed answer-key corrections and complete the remaining no-cost scope/cost work.
+5. Only with a new explicit owner authorization and cumulative spend cap, run one clean paid semantic confirmation.
+6. Keep public Zoning Research disabled until that run passes, the updated cost distribution is accepted, and web/iOS release acceptance is complete.
