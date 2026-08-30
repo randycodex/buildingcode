@@ -30,6 +30,10 @@ import {
 import { requestResearchProvider } from "../research-provider-client.mjs";
 import { rateLimitPolicies } from "../rate-limit.mjs";
 import { zoningSection, zoningSectionSummary } from "../zoning-content.mjs";
+import {
+  requireActiveZoningSuccessorPaidAuthorization,
+  validateZoningSuccessorPaidAuthorization
+} from "../evals/zoning-successor-paid-authorization.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
@@ -3498,7 +3502,7 @@ async function main() {
       automaticScoring: baseDataset.automaticScoring,
       sectionReader: zoningSection,
       sectionSummaryReader: zoningSectionSummary,
-      paidExecution: liveMode
+      paidExecution: liveMode && !zoningSuccessorMode
     });
   }
   validateDataset(dataset);
@@ -3592,12 +3596,18 @@ async function main() {
 
   if (liveMode) {
     if (zoningMode) {
-      const authorized = sourceZoningDataset.governance.paidEvaluationAuthorization;
+      const authorized = zoningSuccessorMode
+        ? requireActiveZoningSuccessorPaidAuthorization(
+            await validateZoningSuccessorPaidAuthorization()
+          ).authorization.scope
+        : sourceZoningDataset.governance.paidEvaluationAuthorization;
       const requestedCap = Number(process.env.PERMITEXT_RESEARCH_EVAL_MAX_USD);
-      assert(
-        sourceZoningDataset.governance.paidEvaluationAllowed === true && authorized.status === "authorized",
-        "No unconsumed paid Zoning evaluation authorization is active. A new run requires new explicit owner authorization and a new cumulative cap."
-      );
+      if (!zoningSuccessorMode) {
+        assert(
+          sourceZoningDataset.governance.paidEvaluationAllowed === true && authorized.status === "authorized",
+          "No unconsumed paid Zoning evaluation authorization is active. A new run requires new explicit owner authorization and a new cumulative cap."
+        );
+      }
       assert(repeat === authorized.repetitions, `The Zoning authorization permits exactly ${authorized.repetitions} repetition.`);
       assert(
         selectedCases.length === authorized.caseCount && !requestedCaseID && !filtered && !includeDrafts,

@@ -23,7 +23,7 @@ Current development branch: `codex/zoning-research-beta1`
 
 ## Status dashboard
 
-Checklist snapshot: **92 completed, 25 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
+Checklist snapshot: **93 completed, 25 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -104,6 +104,7 @@ Checklist snapshot: **92 completed, 25 open**. Eleven of the open items are the 
 - [x] Complete the six-case secondary rubric-scope audit; isolate collateral concepts, duplicate arithmetic, and over-specific evidence prescriptions without changing the frozen cohort.
 - [x] Upgrade the generic Zoning material-completeness contract for mapped-location identifiers, transition-history boundaries, material definition clauses, date-specific paths, decision-relevant arithmetic, and stated-scenario application; pass the full no-cost repository gate.
 - [x] Obtain owner disposition on the two source-bound replacement answer keys and six scope dispositions; freeze a [separately versioned 30-case successor](./PERMITEXT_ZONING_OWNER_APPROVED_SUCCESSOR_2026-08-30.md) from only those eight approved changes, keep the parent/result unchanged, and pass the 30/30 no-cost evidence and conversation gates.
+- [x] Add a separate exact-successor-SHA paid-run authorization record and dedicated fail-closed runner; keep it locked, require all 30 cases/one repetition/a cap no higher than $5, and prove that direct live execution cannot bypass the owner decision.
 - [ ] Confirm the repaired cohort in a clean semantic run only under a new explicit owner authorization and cumulative spend cap before enablement.
 - [ ] Verify enabled Zoning Research on web and iOS against the exact approved corpus and release commit before any public release.
 

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "status": "locked",
+  "cohort": {
+    "file": "zoning-cases-expanded-batch-1-successor.json",
+    "sha256": "d07063fa12ec993fde8802e6b58971d5cc1873a52fbefbe9e538b81acb94d30f",
+    "caseCount": 30
+  },
+  "scope": {
+    "purpose": "one complete 30-case owner-approved successor semantic run",
+    "caseCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
+  },
+  "ownerDecision": {
+    "required": true,
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null
+  },
+  "consumption": {
+    "status": "not_started",
+    "runID": null,
+    "consumedAt": null
+  },
+  "publicResearchReleaseAuthorized": false,
+  "professionalZoningSignoff": false,
+  "deploymentAuthorized": false,
+  "pricingOrAllowanceChangeAuthorized": false,
+  "evidenceBudgetCandidateEnabled": false,
+  "notes": "This record is intentionally locked. Successor creation and no-cost verification do not authorize provider spend."
+}

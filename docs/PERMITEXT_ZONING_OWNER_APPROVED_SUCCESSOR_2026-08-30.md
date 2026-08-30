@@ -66,3 +66,18 @@ Results:
 The 24,000-character candidate remains disabled by default and no Production configuration changed. The successor records `paidEvaluationAllowed: false`, no cumulative spend cap, `publicResearchReleaseAuthorized: false`, and `professionalZoningSignoff: false`.
 
 A clean semantic confirmation requires a new explicit owner authorization for exactly one stated run and a new cumulative spend cap. Public Zoning Research still requires the later web/iOS, exact release-commit, cost, and manual acceptance gates.
+
+## Paid-run guard preparation
+
+A separate `zoning-successor-paid-authorization.json` record is bound to the exact successor SHA-256 and remains checked in as `locked`. The dedicated successor runner and the general evaluation entry point both require that same record to contain an explicit owner decision before they can enter live mode.
+
+The permanent contract proves that:
+
+- a direct `--zoning-successor --run-live` attempt fails before any provider request while the record is locked;
+- an active record must cover all 30 cases and exactly one repetition;
+- the cumulative cap must be positive and no higher than $5;
+- a consumed record cannot be reused;
+- the 24,000-character candidate remains disabled; and
+- the authorization cannot deploy, enable public Research, change pricing or allowances, or claim professional sign-off.
+
+This preparation makes no provider call and is not itself an authorization.
