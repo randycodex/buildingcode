@@ -342,6 +342,8 @@ Sole-proprietor income treatment and transactional sales tax remain separate. Th
 
 The server now has a dormant, fail-closed Stripe automatic-tax path. Explicit configuration adds Stripe automatic tax and required billing-address collection to subscription Checkout; Production readiness also requires an explicit inclusive/exclusive Price decision and verifies that the live Price reports the same behavior. This closes only the source-preparation item. No Production environment variable, Stripe registration, Product tax code, Price, deployment, or charge changed, and the Certificate/provider/owner acceptance gate remains open. The inclusive-versus-exclusive choice is deliberately deferred until the owner returns because it determines whether tax is added above $20 or absorbed inside it.
 
+An August 30 read-only live Stripe recheck confirmed that the $20 Price still uses `Default (inferred by currency)` tax behavior, so it does not satisfy the new explicit guard. The Product currently carries preset code `txcd_10000000` (`General - Electronically Supplied Services`), which Stripe itself flags for review. The collecting-locations view showed no live transactions and no collecting-location row, but expressly excludes the home jurisdiction from monitoring; it therefore does not prove the New York registration state. No Stripe field was edited.
+
 ## Commercial decision gate
 
 Proceed toward paid Research only if all of the following are true:

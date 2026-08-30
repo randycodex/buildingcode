@@ -104,6 +104,9 @@ No-cost verification: [PERMITEXT_BETA1_SEVEN_DOLLAR_GUARDRAIL_EVIDENCE_2026-08-2
 - The former USD $15 monthly price is archived and had no active subscriptions when archived.
 - Trials remain disabled.
 - Product checkout description includes the 100-Research-turn monthly allowance.
+- An August 30 read-only dashboard recheck found that the active $20 Price still reports `Tax behavior: Default (inferred by currency)`, not an explicit inclusive or exclusive behavior. The new source guard therefore correctly keeps Production deployment blocked until an owner decision and a matching explicit live Price exist.
+- The Product currently uses Stripe tax code `txcd_10000000`, shown as `General - Electronically Supplied Services`. Stripe displays its own warning to review that preset category against what Permitext sells; the code is recorded as current provider state, not accepted tax classification.
+- The Stripe Tax collecting-locations view showed no live transactions and no collecting-location row. That view also states it does not track the home jurisdiction, so it is not treated as proof that New York registration is absent or complete. Certificate receipt, provider registration, and a real taxed Checkout remain open.
 - Production webhook destination: `we_1TxWAMEp1wz0lmSdzOZWhqLG` at `https://permitext.com/billing/stripe/webhook`.
 - Webhook event coverage: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, `invoice.payment_failed`, and `charge.refunded`.
 - Vercel Production `STRIPE_PRO_PRICE_ID` was updated to the new $20 price. A new deployment is still required before the serving application uses the updated environment value.
