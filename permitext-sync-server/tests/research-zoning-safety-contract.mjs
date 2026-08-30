@@ -71,6 +71,7 @@ assert.match(mapPrompt, new RegExp(zoningResearchSafetyVersion));
 assert.match(mapPrompt, /missing-location/);
 assert.match(mapPrompt, /mapped-applicability/);
 assert.match(mapPrompt, /Do not infer a parcel's mapped district/);
+assert.match(mapPrompt, /property identifier such as the address or BBL/);
 
 const modelInput = researchInputForEvidence(mapQuestion, [{ ...mapEvidence[0], visualSources: [] }]);
 assert.match(modelInput, /ZONING RESEARCH SAFETY CONTRACT/);
@@ -113,6 +114,19 @@ const safeMapBoundary = evaluateZoningResearchSafety({
   )
 });
 assert.equal(safeMapBoundary.pass, true, JSON.stringify(safeMapBoundary.issues));
+
+const missingLocationIdentifier = evaluateZoningResearchSafety({
+  question: mapQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    "The official Appendix J map must be reviewed before reaching a parcel-specific conclusion.",
+    ["zr-map"],
+    ["The controlling Appendix J map and mapped district are not established."]
+  )
+});
+assert(missingLocationIdentifier.issues.some((issue) =>
+  issue.type === "zoning_missing_location_identifier"
+));
 
 const inferredMap = evaluateZoningResearchSafety({
   question: mapQuestion,
@@ -235,6 +249,48 @@ const tiedDate = evaluateZoningResearchSafety({
 });
 assert.equal(tiedDate.pass, true, JSON.stringify(tiedDate.issues));
 
+const oldRulesQuestion = "May this project continue under the old zoning rules through the City of Yes transition?";
+const oldRulesPrompt = zoningResearchSafetyPromptContext({
+  question: oldRulesQuestion,
+  evidence: [transitionEvidence[0]]
+});
+assert.match(oldRulesPrompt, /historical-substantive-text/);
+assert.match(oldRulesPrompt, /official archived substantive text/);
+const missingOldRules = evaluateZoningResearchSafety({
+  question: oldRulesQuestion,
+  evidence: [transitionEvidence[0]],
+  answer: answer(
+    "The current transition provision permits continued work under the old rules if its stated conditions are met.",
+    ["zr-transition"]
+  )
+});
+assert(missingOldRules.issues.some((issue) =>
+  issue.type === "zoning_historical_substantive_text"
+));
+const boundedOldRules = evaluateZoningResearchSafety({
+  question: oldRulesQuestion,
+  evidence: [transitionEvidence[0]],
+  answer: answer(
+    "If the current transition conditions are met, the project may continue under the preserved prior rules, but the verified official archived pre-City-of-Yes zoning text must be reviewed to determine the substantive requirements preserved.",
+    ["zr-transition"]
+  )
+});
+assert.equal(boundedOldRules.pass, true, JSON.stringify(boundedOldRules.issues));
+
+const cellarDefinitionEvidence = [source({
+  sourceID: "zr-cellar-definition",
+  sectionNumber: "12-10",
+  title: "Definitions",
+  text: "Cellar is a defined term with special measurement rules and a retail-only parking consequence."
+})];
+const cellarPrompt = zoningResearchSafetyPromptContext({
+  question: "Does this cellar count as zoning floor area?",
+  evidence: cellarDefinitionEvidence
+});
+assert.match(cellarPrompt, /"definition"/);
+assert.match(cellarPrompt, /special measurement clause/);
+assert.match(cellarPrompt, /Do not generalize a consequence listed only for parking/);
+
 console.log("Zoning Research safety contract passed", {
   version: zoningResearchSafetyVersion,
   categories: [
@@ -246,8 +302,10 @@ console.log("Zoning Research safety contract passed", {
     "special-district",
     "table",
     "arithmetic",
+    "definition",
     "amendment",
-    "effective-date"
+    "effective-date",
+    "historical-substantive-text"
   ],
   publicResearchEnabled: false
 });

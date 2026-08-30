@@ -1,5 +1,5 @@
 export const zoningResearchSafetyVersion =
-  "20260830-zoning-evidence-boundary-v1";
+  "20260830-zoning-material-completeness-v2";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -107,9 +107,18 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
   const tableSymbols = table && /\b(?:symbol|symbols|footnote|footnotes|asterisk|dagger|blank cell)\b/i.test(questionText);
   const arithmetic = /\b(?:how many|calculate|calculation|fit the (?:basic )?maximum|maximum permitted|square feet|FAR|floor area ratio|lot coverage|parking spaces?)\b/i.test(questionText) &&
     /\d/.test(questionText);
+  const definition = /\b(?:definition|defined|means|zoning lot|floor area|cellar)\b/i.test(questionText) &&
+    sources.some((source) =>
+      /\b(?:definition|defined terms?)\b/i.test(compactText(`${source?.title} ${source?.text}`)) ||
+      source?.evidencePriority?.primaryFunction === "definition" ||
+      (Array.isArray(source?.evidencePriority?.functions) &&
+        source.evidencePriority.functions.includes("definition"))
+    );
   const amendment = /\b(?:amendment|amended|history|historical text|text in force|as[- ]of)\b/i.test(`${questionText} ${sourceText}`);
   const effectiveDate = /\b(?:effective date|effective on|issued after|issued before|transition|continuation|grandfather|vested|certificate of occupancy)\b/i.test(`${questionText} ${sourceText}`) ||
     (amendment && /\b(?:particular|specific) date\b/i.test(questionText));
+  const historicalSubstantiveText = effectiveDate &&
+    /\b(?:old|prior|previous|pre[- ](?:amendment|city of yes|december))\b[^.]{0,100}\b(?:zoning|rules?|text|provisions?)\b/i.test(questionText);
   const map = /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea)\b/i.test(`${questionText} ${sourceText}`) ||
     sources.some((source) => Array.isArray(source?.visualSources) && source.visualSources.length > 0);
   const categories = [
@@ -122,8 +131,10 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     ...(table ? ["table"] : []),
     ...(tableSymbols ? ["table-symbols"] : []),
     ...(arithmetic ? ["arithmetic"] : []),
+    ...(definition ? ["definition"] : []),
     ...(amendment ? ["amendment"] : []),
-    ...(effectiveDate ? ["effective-date"] : [])
+    ...(effectiveDate ? ["effective-date"] : []),
+    ...(historicalSubstantiveText ? ["historical-substantive-text"] : [])
   ];
   return {
     applies: true,
@@ -148,7 +159,7 @@ export function zoningResearchSafetyPromptContext(options = {}) {
     "Bind every Zoning conclusion to the exact supplied PASSAGE_ID and preserve that passage's corpus, edition, applicability status, and text hash.",
     "Do not infer a parcel's mapped district, special district, subdistrict, Appendix area, transit-zone status, or map position from unselected evidence or general geography.",
     profile.missingMappedLocation
-      ? "The supplied facts do not establish the mapped location needed for a parcel-specific conclusion. State that boundary, name the missing mapped fact, and keep the result conditional."
+      ? "The supplied facts do not establish the mapped location needed for a parcel-specific conclusion. State that boundary, separately request a usable property identifier such as the address or BBL and the controlling official map or mapped-district evidence, and keep the result conditional."
       : "Use only mapped-location facts expressly supplied for this question; do not broaden them.",
     profile.specialDistrictLabels.length
       ? `Preserve the exact special-purpose scope named in the evidence: ${profile.specialDistrictLabels.join("; ")}.`
@@ -157,20 +168,27 @@ export function zoningResearchSafetyPromptContext(options = {}) {
       ? "Read structured table cells together with their headings, symbols, notes, and footnotes. Do not reconstruct a row from prose or silently ignore a conditional category."
       : "",
     profile.categories.includes("arithmetic")
-      ? "Show the material numeric inputs, units, operation, and result. Distinguish a numerical comparison from an overall zoning entitlement or compliance conclusion."
+      ? "Show each distinct decision-relevant calculation expressly needed to answer the question, including the proposed ratio or existing-condition comparison when it changes the result. Include inputs, units, operation, and result, but do not repeat an equivalent proof or add an unused margin merely to show more arithmetic. Distinguish every numerical comparison from overall zoning entitlement or compliance."
+      : "",
+    profile.categories.includes("definition")
+      ? "When applying a Zoning definition, preserve every supplied special measurement clause that could change the classification and every expressly limited downstream consequence that the question implicates. Do not generalize a consequence listed only for parking, loading, or another named calculation into the definition for all purposes."
       : "",
     profile.categories.includes("amendment")
       ? "Distinguish current amendment metadata from the enacted text actually in force on a requested historical date; metadata alone cannot reconstruct historical text."
       : "",
     profile.categories.includes("effective-date")
-      ? "Apply an effective-date or transition provision only after tying its exact date and triggering project fact to the cited passage."
-      : ""
+      ? "Apply an effective-date or transition provision only after tying its exact date and triggering project fact to the cited passage. Analyze each materially different date-specific route separately and identify the facts needed for any route that could change the conclusion."
+      : "",
+    profile.categories.includes("historical-substantive-text")
+      ? "A current transition provision may preserve prior rules without reproducing their substantive requirements. Distinguish the current transition text from the verified dated enacted or official archived substantive text needed to determine exactly what prior rules or rights are preserved."
+      : "",
+    "Apply facts expressly stated in the scenario to the governing general rule. Do not weaken that supported result by treating the unasserted facts of a separate exception as missing; identify the exception as unestablished unless the question asks whether that exception applies."
   ].filter(Boolean).join("\n");
 }
 
 export function zoningResearchSafetyInstruction(evidence = []) {
   if (!zoningEvidence(evidence).length) return "";
-  return "For Zoning Resolution evidence, enforce the server-generated ZONING RESEARCH SAFETY CONTRACT: exact passage binding, no inferred mapped location, preserved special-district scope, structured-table fidelity, explicit arithmetic inputs and units, and a clear distinction between current amendment metadata, historical text, and effective-date or transition applicability.";
+  return "For Zoning Resolution evidence, enforce the server-generated ZONING RESEARCH SAFETY CONTRACT: exact passage binding, no inferred mapped location, material definition clauses, preserved special-district scope, structured-table fidelity, decision-relevant arithmetic without duplicate proof, and a clear distinction between current transition or amendment text and historical substantive law.";
 }
 
 export function evaluateZoningResearchSafety({
@@ -210,6 +228,15 @@ export function evaluateZoningResearchSafety({
     issues.push({
       type: "zoning_missing_mapped_location",
       detail: "Do not make a parcel-specific Zoning conclusion while mapped applicability is unresolved. State the boundary, keep the conclusion conditional, and name the missing address/BBL, mapped district, map area, or special-district fact in missingFacts."
+    });
+  }
+  if (
+    profile.missingMappedLocation &&
+    !/\b(?:address|BBL|block(?: and |\/)?\s*lot|property (?:identifier|location)|parcel (?:identifier|location))\b/i.test(missingFacts)
+  ) {
+    issues.push({
+      type: "zoning_missing_location_identifier",
+      detail: "Mapped applicability cannot be resolved from a map name alone. Separately request a usable property identifier such as the address or BBL/block and lot, as well as the controlling official map or mapped-district evidence."
     });
   }
   if (
@@ -270,6 +297,18 @@ export function evaluateZoningResearchSafety({
     issues.push({
       type: "zoning_effective_date_omission",
       detail: `Tie the effective-date or transition analysis to the exact project date(s) stated in the question: ${missingQuestionDates.join("; ")}.`
+    });
+  }
+  const historicalTextVerification =
+    /\b(?:verify|review|retrieve|obtain|need|require|must)\b[^.]{0,220}\b(?:historical|archived|prior|pre[- ](?:amendment|city of yes|december))\b[^.]{0,120}\b(?:zoning|text|rules?|provisions?)\b/i.test(narrative) ||
+    /\b(?:historical|archived|prior|pre[- ](?:amendment|city of yes|december))\b[^.]{0,120}\b(?:zoning|text|rules?|provisions?)\b[^.]{0,180}\b(?:verify|review|retrieve|obtain|need|required?|must)\b/i.test(narrative);
+  if (
+    profile.categories.includes("historical-substantive-text") &&
+    !historicalTextVerification
+  ) {
+    issues.push({
+      type: "zoning_historical_substantive_text",
+      detail: "A current transition provision does not reproduce the prior substantive Zoning rules it may preserve. Identify the verified dated enacted or official archived substantive text needed to determine the preserved rights."
     });
   }
   return {

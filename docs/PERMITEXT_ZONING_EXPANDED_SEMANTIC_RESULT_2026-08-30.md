@@ -76,6 +76,8 @@ The remaining failed answers identify useful engineering targets. They include o
 
 The six-case no-cost scope review is now complete without changing the frozen result. It removes an unrelated rules-of-construction concept, two duplicate arithmetic checks, two unused threshold margins, and an over-specific historical-record formulation; it merges overlapping transition-history concepts and preserves the real 6.00 FAR, verified historical-text, and historical-map/lot omissions. Proposed dispositions: [PERMITEXT_ZONING_EXPANDED_RUBRIC_SCOPE_AUDIT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_RUBRIC_SCOPE_AUDIT_2026-08-30.md).
 
+The general no-cost Zoning material-completeness contract is also upgraded. It now requires a separate property identifier for unresolved mapped applicability, historical substantive text for prior-rule transition conclusions, material definition clauses, distinct date-specific paths, and decision-relevant arithmetic without duplicate proof. It also prevents an unasserted exception from weakening a supported general-rule result. The complete repository gate and the 30-case evidence-package prototype pass without provider calls. Evidence: [PERMITEXT_ZONING_MATERIAL_COMPLETENESS_REMEDIATION_2026-08-30.md](./PERMITEXT_ZONING_MATERIAL_COMPLETENESS_REMEDIATION_2026-08-30.md).
+
 ## Boundary and next gate
 
 - Public Zoning Research remains disabled.
