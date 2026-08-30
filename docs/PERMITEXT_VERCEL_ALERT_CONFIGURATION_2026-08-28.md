@@ -41,3 +41,15 @@ npx --yes vercel@latest alerts rules inspect ar_01a048be-20d4-774d-8361-8f6e1dbe
 The CLI list and both independent inspections returned the intended project scope, type/filter, and owner auto-subscription. The dashboard independently displayed both rules, and **My Notifications** displayed checked email and web subscriptions for each.
 
 No alert was deliberately triggered, no notification delivery was exercised, no application was deployed, no environment variable was changed, no production application data was written, and no paid model or billing-provider call was made. `PERMITEXT_MONITORING_PROVIDER` remains unset until a real notification is safely delivered and observed.
+
+## August 29 no-cost follow-up
+
+A fresh authenticated dashboard and CLI review confirmed that both Permitext anomaly rules remain active, scoped to `permitext-sync`, and subscribed to the owner. The owner's personal web and email channels remain checked for each rule. The team-level 75% included-credit, Spend Management, and deployment-failure web/email notifications are also checked. Push remains unavailable because no device is subscribed.
+
+The Vercel notification inbox contains the failed isolated recovery deployment, which verifies that the generic Vercel web-notification path can reach the owner. This is not evidence that either anomaly rule has triggered, and it does not independently prove email delivery. Vercel exposes no no-cost test-send control for these anomaly rules, so no synthetic alert was created.
+
+The team has no Log Drain. Vercel currently documents Drains as metered at $0.50/GB with no included allowance, so no Drain or third-party endpoint was configured under the retained no-paid-monitoring boundary.
+
+A permanent privacy-bounded log auditor now covers the remaining observable Production categories without printing raw messages or customer/provider identifiers. Its first live read-only 24-hour run parsed 10 Production log entries, observed a successful `/health` request, found no 5xx, billing endpoint failure, client/request/database error, failed invoice, Research spend rejection, Research conversation failure, or actionable p95 sample, and exited successfully. This small quiet-period sample verifies the audit path, not future event delivery or full traffic coverage. The live environment still does not contain `PERMITEXT_MONITORING_PROVIDER`.
+
+Evidence and the exact operator command are retained in [PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md](./PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md) and the operations runbook.

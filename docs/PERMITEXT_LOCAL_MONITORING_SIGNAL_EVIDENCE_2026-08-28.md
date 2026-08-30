@@ -49,4 +49,4 @@ node tests/monitoring-signals-local-e2e.mjs
 npm run test:operations
 ```
 
-The local rehearsal closes the source-to-structured-log verification gap. Public Beta 1 still requires a commercially appropriate Vercel plan, configured external alerts, a delivered test notification, spend notifications/hard-stop testing, and recorded operator ownership before `PERMITEXT_MONITORING_PROVIDER` can truthfully be set.
+The local rehearsal closes the source-to-structured-log verification gap. The follow-up [Production monitoring audit evidence](./PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md) adds a permanent no-cost, aggregate-only review of the live Vercel log stream. Public Beta 1 still requires anomaly-specific delivered evidence, warning-level immediate delivery or a documented operating acceptance of periodic review, and spend-notification/hard-stop testing before `PERMITEXT_MONITORING_PROVIDER` can truthfully be set.

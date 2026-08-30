@@ -27,7 +27,7 @@ Permitext emits structured Vercel runtime events for:
 
 Client reports remove email addresses, bearer credentials, sensitive query values, and URL query strings before logging. They contain a stable fingerprint, release ID, route, source path, and line/column where available.
 
-The no-provider end-to-end rehearsal in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md) proves these structured events through the local HTTP server, including configured-threshold latency classification and a deliberate 5xx. It makes no provider calls and delivers no external alert, so it does not satisfy the production alert gate.
+The no-provider end-to-end rehearsal in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md) proves these structured events through the local HTTP server, including configured-threshold latency classification and a deliberate 5xx. The privacy-bounded live-log review in [PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md](./PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md) then checks observed Production health, errors, billing, database, Research spend, and p95 signals without emitting raw log or customer/provider identifiers. Neither is immediate external delivery, so anomaly-specific delivery remains an open production-alert gate.
 
 `GET /health` reports whether release identity and an external monitoring provider are marked configured. Before public access, configure one of these production paths:
 
@@ -47,6 +47,23 @@ Minimum alerts:
 The alert destination and named on-call owner must be recorded before opening the beta. Live Vercel integration changes require explicit operator authorization.
 
 On August 28, 2026, the owner authorized and live-verified two included, Permitext-scoped Vercel rules: production 5xx anomalies and infrastructure-usage anomalies. Owner email and web subscriptions are checked; SMS remains off. Custom thresholds for health, billing, 5xx rate, and Research p95 were not applied because Vercel reported a current limit of zero custom alerts. No paid add-on was enabled. Full evidence and retained threshold definitions are in [PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md](./PERMITEXT_VERCEL_ALERT_CONFIGURATION_2026-08-28.md).
+
+Until immediate warning-level delivery is separately approved, run this bounded review from the repository root at least daily and after every Production release or incident report:
+
+```sh
+npx --yes vercel@latest logs \
+  --project permitext-sync \
+  --environment production \
+  --since 24h \
+  --limit 1000 \
+  --json \
+  2>/dev/null \
+  | node permitext-sync-server/scripts/audit-production-monitoring.mjs \
+      --require-health \
+      --fail-on-actionable
+```
+
+Exit `0` means the parsed window contained a health request and no covered actionable category; `1` means covered findings require review; `2` means no health request was observed and the operator must verify `/health`; `3` means invalid/partial JSON input and the run must be repeated. A clean result is bounded to the sampled log window and is never proof that future delivery works.
 
 ## Hosting plan and spend control
 
@@ -116,11 +133,11 @@ The verifier compares durable storage-summary counts, the sync cursor, provider-
 
 The verifier's local end-to-end rehearsal and evidence boundary are recorded in [PERMITEXT_LOCAL_RESTORE_REHEARSAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_RESTORE_REHEARSAL_EVIDENCE_2026-08-28.md). The rehearsal does not satisfy the provider-backed restore gate.
 
-The public beta remains blocked until the first Neon/Blob restore drill succeeds or a documented product decision explicitly accepts the data-recovery risk.
+The first provider-backed Neon/Blob restore acceptance passed on August 29, 2026. Repeat the exercise at least quarterly and after a material storage migration.
 
 Use `docs/BETA1_RESTORE_DRILL_RECORD.md` to record the first exercise. Neon history retention and Vercel deployment retention must be checked in the live dashboards because plan limits can change.
 
-On August 28, 2026, an owner-authorized provider exercise successfully created and verified a point-in-time Neon child branch, matched 38 provider tables and 3,611 rows by content digest, ran the exact Production commit locally against the isolated branch, passed `npm run verify:restore-drill`, and inventoried/retrieved all used private Blob asset classes. It did not create a Vercel deployment or an isolated private Blob provider namespace because the no-deploy/no-paid boundaries remained in force. The complete restore gate therefore remains open. Evidence: [PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md](./PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md).
+On August 28–29, 2026, the owner-authorized provider exercise created and verified a point-in-time Neon child branch, matched 38 Permitext tables and 3,611 rows by content digest, and inventoried/retrieved all used private Blob asset classes. The follow-up acceptance deployed the exact serving Production commit only as an SSO-protected Preview against a fresh isolated Neon restore and separately copied all 124 private Blob objects / 5,248,939 bytes into an isolated namespace. Health, release, aggregate, representative-account, and byte-for-byte Blob checks passed; provider writes and Production resources remained untouched. Evidence: [PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md](./PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md).
 
 ## Incident record
 

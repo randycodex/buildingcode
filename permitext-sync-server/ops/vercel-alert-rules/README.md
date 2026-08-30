@@ -18,10 +18,27 @@ The live included rules auto-subscribe Vercel owners. Personal web and email del
 
 These rules do not provide a synthetic health-check scheduler and cannot threshold structured warning text such as `stripe_invoice_payment_failed` or `research_spend_guardrail_rejection`. The default Vercel error rule covers error-level runtime logs, including redacted client reports and server/database failures. Warning-specific delivery still requires a Vercel Drain or another explicit monitoring endpoint.
 
+Until a paid Drain or another external destination is separately approved, perform the no-cost bounded runtime-log audit from the repository root:
+
+```sh
+npx --yes vercel@latest logs \
+  --project permitext-sync \
+  --environment production \
+  --since 24h \
+  --limit 1000 \
+  --json \
+  2>/dev/null \
+  | node permitext-sync-server/scripts/audit-production-monitoring.mjs \
+      --require-health \
+      --fail-on-actionable
+```
+
+The audit consumes Vercel's JSON-lines output and emits aggregate counts only. It never prints raw log messages, request identifiers, customer identifiers, fingerprints, or provider identifiers. It covers observed health failures, all 5xx responses, billing endpoint 4xx/5xx responses, redacted client and server errors, database-failure signals, Stripe failed-invoice warnings, Research spend rejections, Research conversation failures, and the observed Research-duration p95. Exit status `1` means actionable findings, `2` means the window contained no health request, and `3` means an input line was not valid JSON. Invalid input takes precedence so a malformed or partial log stream cannot be mistaken for a complete review. This is a review fallback, not immediate external delivery.
+
 List the live project-scoped rules without changing provider state:
 
 ```sh
 npx --yes vercel@latest alerts rules ls --format json
 ```
 
-The checked-in definitions are not applied automatically by a deployment. Provider changes must remain an explicit operator action and must be verified against the live rule list. A delivered notification has not yet been exercised, so `PERMITEXT_MONITORING_PROVIDER` must remain unset.
+The checked-in definitions are not applied automatically by a deployment. Provider changes must remain an explicit operator action and must be verified against the live rule list. Generic Vercel web delivery has been observed for an isolated deployment failure, but neither included anomaly rule has produced a delivered event and email delivery has not been independently observed. `PERMITEXT_MONITORING_PROVIDER` must therefore remain unset.
