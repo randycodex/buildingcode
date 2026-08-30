@@ -8,6 +8,10 @@ import {
   validateZoningSuccessorPaidAuthorization
 } from "../evals/zoning-successor-paid-authorization.mjs";
 import {
+  requireActiveZoningRemediationSuccessor2PaidAuthorization,
+  validateZoningRemediationSuccessor2PaidAuthorization
+} from "../evals/zoning-successor-remediation-2-paid-authorization.mjs";
+import {
   researchCommercializationBenchmark,
   researchCommercializationBenchmarkEnvironment
 } from "./run-research-commercialization-benchmark.mjs";
@@ -19,15 +23,20 @@ import {
 const serverRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const repositoryRoot = resolve(serverRoot, "..");
 const resultsDirectory = resolve(serverRoot, "evals", "results");
+const remediationSuccessor2Mode = process.argv.includes("--remediation-2");
 const authorizationPath = resolve(
   serverRoot,
   "evals",
-  "zoning-successor-paid-authorization.json"
+  remediationSuccessor2Mode
+    ? "zoning-successor-remediation-2-paid-authorization.json"
+    : "zoning-successor-paid-authorization.json"
 );
 const runLockPath = resolve(
   serverRoot,
   "evals",
-  ".zoning-successor-paid-run.lock"
+  remediationSuccessor2Mode
+    ? ".zoning-successor-remediation-2-paid-run.lock"
+    : ".zoning-successor-paid-run.lock"
 );
 
 async function acquireRunLock() {
@@ -94,7 +103,9 @@ function runEvaluation(environment, repetitions) {
   return new Promise((resolveRun, rejectRun) => {
     const child = spawn(process.execPath, [
       "tests/research-evals.mjs",
-      "--zoning-successor",
+      remediationSuccessor2Mode
+        ? "--zoning-successor-remediation-2"
+        : "--zoning-successor",
       "--run-live",
       "--repeat",
       String(repetitions)
@@ -109,9 +120,13 @@ function runEvaluation(environment, repetitions) {
 }
 
 async function main() {
-  const validation = requireActiveZoningSuccessorPaidAuthorization(
-    await validateZoningSuccessorPaidAuthorization()
-  );
+  const validation = remediationSuccessor2Mode
+    ? requireActiveZoningRemediationSuccessor2PaidAuthorization(
+        await validateZoningRemediationSuccessor2PaidAuthorization()
+      )
+    : requireActiveZoningSuccessorPaidAuthorization(
+        await validateZoningSuccessorPaidAuthorization()
+      );
   const { authorization, cohort } = validation;
   assert.equal(cohort.cases.length, authorization.scope.caseCount,
     "Frozen successor case count does not match the authorization.");
@@ -154,7 +169,8 @@ async function main() {
   try {
     const beforeResults = await resultFiles();
     console.log(
-      `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning successor ` +
+      `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning ` +
+      `${remediationSuccessor2Mode ? "remediation successor 2" : "successor"} ` +
       `once with a $${paidEnvironment.approvedSpendCapUSD.toFixed(2)} maximum cumulative cap. ` +
       "The 24,000-character candidate remains disabled."
     );

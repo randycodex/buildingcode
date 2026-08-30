@@ -37,6 +37,10 @@ import {
   requireActiveZoningSuccessorPaidAuthorization,
   validateZoningSuccessorPaidAuthorization
 } from "../evals/zoning-successor-paid-authorization.mjs";
+import {
+  requireActiveZoningRemediationSuccessor2PaidAuthorization,
+  validateZoningRemediationSuccessor2PaidAuthorization
+} from "../evals/zoning-successor-remediation-2-paid-authorization.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
@@ -83,11 +87,6 @@ const zoningSuccessorAdvisoryImplementationPaths = [
 if (zoningRemediationSuccessor2Mode &&
   (zoningSuccessorMode || zoningExpandedMode || process.argv.includes("--zoning"))) {
   throw new Error("Choose exactly one Zoning evaluation dataset mode.");
-}
-if (zoningRemediationSuccessor2Mode && liveMode) {
-  throw new Error(
-    "The Zoning remediation successor 2 has no paid authorization or cumulative spend cap. No provider request was made."
-  );
 }
 if (zoningSuccessorEvidenceBudgetAdvisoryMode) {
   for (const key of [
@@ -4157,13 +4156,17 @@ async function main() {
 
   if (liveMode) {
     if (zoningMode) {
-      const authorized = zoningSuccessorMode
-        ? requireActiveZoningSuccessorPaidAuthorization(
+      const authorized = zoningRemediationSuccessor2Mode
+        ? requireActiveZoningRemediationSuccessor2PaidAuthorization(
+            await validateZoningRemediationSuccessor2PaidAuthorization()
+          ).authorization.scope
+        : zoningSuccessorMode
+          ? requireActiveZoningSuccessorPaidAuthorization(
             await validateZoningSuccessorPaidAuthorization()
           ).authorization.scope
         : sourceZoningDataset.governance.paidEvaluationAuthorization;
       const requestedCap = Number(process.env.PERMITEXT_RESEARCH_EVAL_MAX_USD);
-      if (!zoningSuccessorMode) {
+      if (!zoningSuccessorFamilyMode) {
         assert(
           sourceZoningDataset.governance.paidEvaluationAllowed === true && authorized.status === "authorized",
           "No unconsumed paid Zoning evaluation authorization is active. A new run requires new explicit owner authorization and a new cumulative cap."

@@ -183,7 +183,7 @@ const directLiveAttempt = spawnSync(process.execPath, [
 });
 assert.equal(directLiveAttempt.status, 1);
 assert.match(`${directLiveAttempt.stdout}\n${directLiveAttempt.stderr}`,
-  /has no paid authorization.*No provider request was made/i);
+  /requires a new explicit owner authorization and cumulative spend cap/i);
 
 console.log("Zoning remediation successor 2 governance contract passed", {
   decisions: manifest.decisions.length,

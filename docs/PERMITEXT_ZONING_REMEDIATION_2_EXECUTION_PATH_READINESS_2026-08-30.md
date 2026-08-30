@@ -59,6 +59,7 @@ All verification was run with paid-evaluation variables removed.
 - Complete 30-case mock conversation path: 30/30 ready, zero provider tokens, zero provider cost.
 - Disabled 24,000-character evidence-budget prototype: 30/30 ready; 28,712 average and 38,896 maximum assembled characters; 6,352 average pinned and 22,360 average supplemental characters; 87 exact pinned sources, eight structured sources, 117 discovered sources, and 29 cross-references; all exact pinned sources preserved.
 - Complete repository `npm run check`: recorded after the final implementation and documentation pass.
+- A separate exact-SHA remediation-successor-2 paid-authorization record and runner are prepared in the locked state. Direct live evaluation and the runner both fail before a provider request unless that new record contains an explicit owner decision, all 30 cases, one repetition, and a cumulative cap no higher than `$5`. The consumed first-successor authorization remains separate and unusable.
 
 ## Remaining gate
 

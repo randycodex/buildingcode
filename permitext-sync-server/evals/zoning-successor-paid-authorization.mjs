@@ -26,6 +26,24 @@ function hasRecordedOwnerDecision(record) {
     record.ownerDecision.exactAuthorizationPhrase.length > 0;
 }
 
+const paidPurposeByCohortFile = new Map([
+  [
+    "zoning-cases-expanded-batch-1-successor.json",
+    "one complete 30-case owner-approved successor semantic run"
+  ],
+  [
+    "zoning-cases-expanded-batch-1-successor-remediation-2.json",
+    "one complete 30-case owner-approved remediation successor 2 semantic run"
+  ]
+]);
+
+function validatePurpose(record) {
+  const expectedPurpose = paidPurposeByCohortFile.get(record.cohort?.file);
+  assert(expectedPurpose, "The paid authorization names an unsupported Zoning cohort.");
+  assert(record.scope?.purpose === expectedPurpose,
+    "The paid authorization purpose changed for its frozen Zoning cohort.");
+}
+
 function validateLockedState(record) {
   assert(record.scope?.caseCount === null, "Locked authorization may not set a case count.");
   assert(record.scope?.repetitions === null, "Locked authorization may not set repetitions.");
@@ -44,8 +62,6 @@ function validateLockedState(record) {
 }
 
 function validateAuthorizedScope(record) {
-  assert(record.scope?.purpose === "one complete 30-case owner-approved successor semantic run",
-    "The paid authorization purpose changed.");
   assert(record.scope?.caseCount === 30,
     "Successor paid authorization must cover all 30 cases.");
   assert(record.scope?.repetitions === 1,
@@ -69,6 +85,7 @@ export async function validateZoningSuccessorPaidAuthorization({
     "Invalid Zoning successor paid-authorization status.");
   assert(authorization.cohort?.caseCount === 30,
     "The authorization must remain bound to the 30-case successor.");
+  validatePurpose(authorization);
 
   const cohortPath = resolve(evalsDirectory, authorization.cohort.file);
   const cohortText = await readFile(cohortPath, "utf8");
