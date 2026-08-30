@@ -217,7 +217,7 @@ export async function adaptZoningEvaluationDataset({
       projectContext: {},
       selectedEvidence,
       question: testCase.question,
-      expectedConclusion: testCase.requiredConcepts.join(" "),
+      expectedConclusion: testCase.expectedConclusion || testCase.requiredConcepts.join(" "),
       expectedUncertainty: expectedUncertainty(testCase),
       sourceType: "deliberately constructed edge case",
       sourceReference: zoningDataset.name || "Permitext owner-approved Zoning Resolution evaluation set.",

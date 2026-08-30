@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "status": "owner_approved",
+  "createdAt": "2026-08-30T19:07:38.000Z",
+  "sourceCohort": {
+    "file": "zoning-cases-expanded-batch-1.json",
+    "caseCount": 30,
+    "sha256": "9bbc828896882a441d3f26bab865af2f0f1b2ca12a5fc606bab76ffcf894b24c",
+    "mutationAuthorized": false
+  },
+  "reviewEvidence": [
+    {
+      "file": "../../docs/PERMITEXT_ZONING_BATCH1_RUBRIC_REVIEW_2026-08-30.md",
+      "sha256": "5dc8bec7885a704997c17b95c42b890504c0bd1b74c81ec94dddbe911acc2ba8"
+    },
+    {
+      "file": "../../docs/PERMITEXT_ZONING_EXPANDED_RUBRIC_SCOPE_AUDIT_2026-08-30.md",
+      "sha256": "e3d2a7cd5e85335cd3bd3ae7be8af425ef60a88d7a048c2062cd08e7a8526d5a"
+    }
+  ],
+  "ownerDecision": {
+    "required": true,
+    "recordedAt": "2026-08-30T19:09:05.000Z",
+    "recordedBy": "Permitext owner",
+    "acceptedDecisionIDs": [
+      "replace-uap-insufficient-affordable-area-key",
+      "replace-deep-through-lot-key",
+      "trim-rules-of-construction-collateral-concept",
+      "trim-warehouse-duplicate-margin",
+      "trim-weighted-far-duplicate-proof",
+      "retain-office-conversion-existing-far",
+      "trim-transition-duplicate-history-and-arithmetic",
+      "trim-mih-unused-margins-and-record-prescription"
+    ],
+    "exactApprovalPhrase": "I approve"
+  },
+  "decisions": [
+    {
+      "id": "replace-uap-insufficient-affordable-area-key",
+      "kind": "answer_key_replacement",
+      "caseID": "zr-candidate-b1-r6a-uap-insufficient-affordable-area",
+      "status": "approved",
+      "summary": "Replace the unsupported one-for-one UAP increment key with an evidence-insufficiency conclusion that preserves the 3.875 FAR, 3.00 standard ceiling, 3.90 table ceiling, and missing eligibility/linkage evidence.",
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "replace-deep-through-lot-key",
+      "kind": "answer_key_replacement",
+      "caseID": "zr-candidate-b1-deep-through-lot-vertical-yard",
+      "status": "approved",
+      "summary": "Replace the conflicting general height-tier key with the selected R7A-specific at-least-180-foot rule requiring a 60-foot midblock open area and a conditional 30-foot deficiency.",
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "trim-rules-of-construction-collateral-concept",
+      "kind": "rubric_scope_disposition",
+      "caseID": "zr-rules-of-construction",
+      "status": "approved",
+      "summary": "Remove the unrelated particular-controls-general concept while retaining the text-controls-illustration rule and ZR 12-01 citation.",
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "trim-warehouse-duplicate-margin",
+      "kind": "rubric_scope_disposition",
+      "caseID": "zr-candidate-b1-nonconforming-warehouse-enlargement",
+      "status": "approved",
+      "summary": "Retain the material 5,000 divided by 20,000 equals 25 percent calculation and remove only the duplicate 9,000 minus 5,000 margin requirement.",
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "trim-weighted-far-duplicate-proof",
+      "kind": "rubric_scope_disposition",
+      "caseID": "zr-candidate-b1-r7a-r8a-weighted-far",
+      "status": "approved",
+      "summary": "Retain weighted FAR, proposed 5.50 FAR, 104,240-square-foot maximum, and 5,760-square-foot excess while removing the equivalent direct-area proof.",
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "retain-office-conversion-existing-far",
+      "kind": "rubric_scope_disposition",
+      "caseID": "zr-candidate-b1-c6-2-office-residential-conversion",
+      "status": "approved",
+      "summary": "Retain the 90,000 divided by 15,000 equals 6.00 FAR requirement because it is material to the no-enlargement conversion comparison; make no rubric trim for this case.",
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "trim-transition-duplicate-history-and-arithmetic",
+      "kind": "rubric_scope_disposition",
+      "caseID": "zr-candidate-b1-city-of-yes-transition",
+      "status": "approved",
+      "summary": "Merge overlapping historical-text requirements, retain DOB-record and verified prior-substantive-text boundaries, and remove the duplicate 40 percent arithmetic and unsupported free-standing date recital.",
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "trim-mih-unused-margins-and-record-prescription",
+      "kind": "rubric_scope_disposition",
+      "caseID": "zr-candidate-b1-mih-historical-zoning-lot",
+      "status": "approved",
+      "summary": "Retain both numerical thresholds and the historical zoning-lot/map inquiry while removing unused threshold margins and allowing equivalent official historical lot evidence instead of one exclusive record formulation.",
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    }
+  ],
+  "successor": {
+    "outputFile": "zoning-cases-expanded-batch-1-successor.json",
+    "generationAllowed": true,
+    "paidEvaluationAllowed": false,
+    "publicResearchReleaseAuthorized": false,
+    "professionalZoningSignoff": false,
+    "requiresSeparatePaidAuthorization": true,
+    "requiresSeparateCumulativeSpendCap": true
+  }
+}
