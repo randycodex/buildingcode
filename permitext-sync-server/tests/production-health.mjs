@@ -29,6 +29,12 @@ async function main() {
     json?.commercialReadiness?.configured === true,
     "Production health did not confirm complete commercial configuration."
   );
+  assert(
+    json?.commercialReadiness?.authentication?.configured === true &&
+      json?.commercialReadiness?.authentication?.livePublishableKey === true &&
+      json?.commercialReadiness?.authentication?.authorizedPartyCount === 2,
+    "Production health did not confirm the fail-closed Clerk configuration."
+  );
 
   console.log(`permitext production health passed: ${baseURL} uses ${json.storage}${json.schema ? ` (${json.schema})` : ""}`);
 }

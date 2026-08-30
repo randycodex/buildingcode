@@ -26,7 +26,7 @@ const completeEnvironment = {
   APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS: "AABBCC",
   CLERK_PUBLISHABLE_KEY: "pk_live_contract",
   CLERK_SECRET_KEY: "sk_live_contract",
-  CLERK_AUTHORIZED_PARTIES: "https://permitext.com",
+  CLERK_AUTHORIZED_PARTIES: "https://permitext.com,https://www.permitext.com",
   CLERK_FRONTEND_API_URL: "https://clerk.permitext.com",
   CLERK_ACCOUNT_PORTAL_URL: "https://accounts.permitext.com/sign-in",
   PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.50",

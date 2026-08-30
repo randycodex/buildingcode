@@ -16,6 +16,11 @@ function productionEnvironment(environment) {
   return environment.VERCEL_ENV === "production" || environment.CLERK_REQUIRE_LIVE === "1";
 }
 
+export const productionClerkAuthorizedParties = Object.freeze([
+  "https://permitext.com",
+  "https://www.permitext.com"
+]);
+
 function normalizedPEM(value) {
   return String(value || "").trim().replace(/\\n/g, "\n");
 }
@@ -99,6 +104,14 @@ export function clerkConfigurationStatus(environment = process.env) {
   if (productionEnvironment(environment)) {
     if (publishableKeyMode === "test") problems.push("Production Clerk is still using a test publishable key.");
     if (!jwtKey && secretKeyMode === "test") problems.push("Production Clerk is still using a test secret key.");
+    if (
+      authorizedParties.length !== productionClerkAuthorizedParties.length ||
+      !productionClerkAuthorizedParties.every((party) => authorizedParties.includes(party))
+    ) {
+      problems.push(
+        `Production CLERK_AUTHORIZED_PARTIES must contain only ${productionClerkAuthorizedParties.join(", ")}.`
+      );
+    }
   }
   if (!authorizedParties.length) {
     problems.push("CLERK_AUTHORIZED_PARTIES must list the permitted web origins.");

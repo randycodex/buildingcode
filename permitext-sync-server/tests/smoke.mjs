@@ -1363,7 +1363,7 @@ async function main() {
         workspaceScript.text.includes("function refreshVisiblePlanUsage") &&
         workspaceScript.text.includes("scheduleAnnotationPush(record);\n  refreshVisiblePlanUsage();") &&
         workspaceScript.text.includes('card.style.removeProperty("--settings-card-content-height");') &&
-        workspaceScript.text.includes("syncAccountState();\n  wireSettingsCardCollapsing(panel);") &&
+        workspaceScript.text.includes("wireSettingsCardCollapsing(panel);") &&
         workspaceScript.text.includes("function presentWorkspaceIssue"),
       "Hidden plan usage tracking or persistent workspace failure feedback is no longer preserved."
     );
@@ -1916,7 +1916,7 @@ async function main() {
         !workspaceScript.text.includes("account-plan-detail") &&
         webRoot.text.includes("Reading and search are available anytime, with recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
         webRoot.text.includes("Pro is active. Projects, Notebook, Report, professional exports, offline access, and AI-assisted Research are unlocked.") &&
-        webRoot.text.includes("No trial. Renews monthly until canceled. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.") &&
+        webRoot.text.includes("No trial. Renews monthly until canceled. To stop the next charge, cancel before the next monthly renewal using Manage Subscription on web or Apple subscription settings on iOS. Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 AI-assisted Research turns each month. Code reading and search remain free.") &&
         workspaceScript.text.includes("New users create an account during sign-in, then saved sections, notes, and Projects can sync across devices.") &&
         workspaceScript.text.includes("settingsAccountSummary(account ? state.account : null)") &&
         workspaceScript.text.includes("settingsPlanCopy({ pro, source })") &&

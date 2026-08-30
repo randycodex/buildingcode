@@ -61,6 +61,13 @@ const production = {
 assert(clerkConfigurationStatus(production).ready, "A complete production Clerk configuration was rejected.");
 assert(clerkConfigurationStatus(production).webReady, "A complete Clerk web configuration was rejected.");
 assert(
+  !clerkConfigurationStatus({
+    ...production,
+    CLERK_AUTHORIZED_PARTIES: `${production.CLERK_AUTHORIZED_PARTIES},https://unexpected.example`
+  }).ready,
+  "Production Clerk accepted an extra browser origin."
+);
+assert(
   !clerkConfigurationStatus({ ...production, CLERK_FRONTEND_API_URL: "https://different.clerk.accounts.dev" }).webReady,
   "Production Clerk web readiness accepted a frontend domain blocked by Permitext's CSP."
 );

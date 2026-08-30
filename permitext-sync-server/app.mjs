@@ -30388,13 +30388,21 @@ async function handleRequestUnlocked(request, response) {
       if (typeof adapter.initialize === "function") {
         await adapter.initialize();
       }
+      const commercialReadiness = beta1ConfigurationReadiness();
+      const authenticationReadiness = clerkConfigurationStatus();
       sendJSON(response, 200, {
         ok: true,
         storage: await storageKind(),
         schema: await storageSchema(),
         rateLimit: adapter.rateLimitMode,
         commercialReadiness: {
-          configured: beta1ConfigurationReadiness().ready
+          configured: commercialReadiness.ready,
+          authentication: {
+            configured: authenticationReadiness.webReady,
+            livePublishableKey: authenticationReadiness.publishableKeyMode === "live",
+            verificationMode: authenticationReadiness.verificationMode,
+            authorizedPartyCount: authenticationReadiness.authorizedParties.length
+          }
         },
         operations: {
           releaseIdentityConfigured: productionReleaseReadiness().ready,
