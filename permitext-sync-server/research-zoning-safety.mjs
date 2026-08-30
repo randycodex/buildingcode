@@ -1,5 +1,5 @@
 export const zoningResearchSafetyVersion =
-  "20260830-zoning-material-completeness-v4";
+  "20260830-zoning-material-completeness-v5";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -399,24 +399,72 @@ export function evaluateZoningResearchSafety({
     });
   }
   if (profile.mihHistoricalZoningLotException) {
-    const categoricalException =
-      /\b(?:project|development|property|it)\b[^.]{0,100}\b(?:qualifies|is exempt|meets the exception)\b/i.test(narrative) ||
-      /\b(?:the )?exception (?:applies|is satisfied)\b/i.test(narrative);
+    const sentenceList = (value) => compactText(value)
+      .split(/(?<=[.!?;])\s+/)
+      .map((sentence) => sentence.trim())
+      .filter(Boolean);
+    const narrativeSentences = sentenceList(narrative);
+    const directConclusionSentence = sentenceList(conclusion)[0] || "";
+    const conditionalGrantInSentence = (sentence) =>
+      /\b(?:project|development|property|it)\b[^.]{0,80}\b(?:(?:may|could|can|would) qualify|qualifies|is exempt|is eligible|meets the exception)(?:,?\s+but)?\s+only if\b/i.test(sentence) ||
+      /\b(?:the )?exception (?:applies|is satisfied)(?:,?\s+but)?\s+only if\b/i.test(sentence);
+    const scopedNumericalDenialInSentence = (sentence) =>
+      /\b(?:does(?: not|n['’]t)|cannot) qualify\b[^.]{0,120}\b(?:based (?:only )?on|on|from|using)\b[^.]{0,120}\b(?:unit|dwelling[- ]unit|floor[- ]area|numerical|threshold)\b[^.]{0,100}\balone\b/i.test(sentence);
+    const bareCategoricalGrant = /^yes\b/i.test(conclusion);
+    const directNamedGrant =
+      /^(?:the )?(?:project|development|property|it) (?:qualifies|is exempt|is eligible|meets the exception)\b/i.test(directConclusionSentence) &&
+      !conditionalGrantInSentence(directConclusionSentence);
+    const narrativeCategoricalGrant = narrativeSentences.some((sentence) =>
+      !conditionalGrantInSentence(sentence) && (
+        /\b(?:project|development|property|it)\b[^.]{0,100}\b(?:qualifies|is exempt|meets the exception)\b/i.test(sentence) ||
+        /\b(?:the )?exception (?:applies|is satisfied)\b/i.test(sentence)
+      )
+    );
+    const bareCategoricalDenial = /^no\b/i.test(conclusion);
+    const directNamedDenial =
+      /^(?:the )?(?:project|development|property|it) (?:does(?: not|n['’]t) qualify|cannot qualify|is not exempt|is ineligible|does(?: not|n['’]t) meet the exception|fails the exception)\b/i.test(directConclusionSentence) &&
+      !scopedNumericalDenialInSentence(directConclusionSentence);
+    const narrativeCategoricalDenial = narrativeSentences.some((sentence) =>
+      !scopedNumericalDenialInSentence(sentence) && (
+        /\b(?:project|development|property|it)\b[^.]{0,100}\b(?:does(?: not|n['’]t) qualify|cannot qualify|is not exempt|is ineligible|does(?: not|n['’]t) meet the exception|fails the exception)\b/i.test(sentence) ||
+        /\b(?:the )?exception (?:does not apply|is not satisfied)\b/i.test(sentence)
+      )
+    );
+    const conditionalHistoricalGrant = narrativeSentences.some((sentence) =>
+      conditionalGrantInSentence(sentence) && /\bzoning[- ]lot\b/i.test(sentence)
+    );
+    const conditionalHistoricalLotRequirement = narrativeSentences.some((sentence) =>
+      conditionalGrantInSentence(sentence) &&
+      /\b(?:already (?:a )?zoning[- ]lot|zoning[- ]lot\b[^.]{0,80}\b(?:existed|existence|already))\b/i.test(sentence) &&
+      /\b(?:MIH|Mandatory Inclusionary Housing|area)[- ]?\b[^.]{0,120}\b(?:establish|establishment|effective)\b/i.test(sentence)
+    );
     const numericalOnlyBoundary =
-      /\b(?:numerical|unit|dwelling[- ]unit|floor[- ]area)\b[^.]{0,160}\b(?:not enough|not sufficient|does not (?:establish|prove)|alone (?:does not|cannot))\b/i.test(narrative) ||
-      /\b(?:not enough|not sufficient|does not (?:establish|prove)|alone (?:does not|cannot))\b[^.]{0,160}\b(?:numerical|unit|dwelling[- ]unit|floor[- ]area|threshold)\b/i.test(narrative);
-    if (categoricalException && !numericalOnlyBoundary) {
+      /\b(?:numerical|unit|dwelling[- ]unit|floor[- ]area|threshold)\b[^.]{0,180}\b(?:not enough|not sufficient|(?:does|do) not (?:establish|prove)|alone (?:does|do) not|alone cannot)\b/i.test(narrative) ||
+      /\b(?:not enough|not sufficient|(?:does|do) not (?:establish|prove)|alone (?:does|do) not|alone cannot)\b[^.]{0,180}\b(?:numerical|unit|dwelling[- ]unit|floor[- ]area|threshold)\b/i.test(narrative) ||
+      conditionalHistoricalGrant;
+    const unresolvedHistoricalLot =
+      /\bzoning[- ]lot\b[^.]{0,180}\b(?:not established|cannot be (?:determined|established|confirmed)|unknown|unresolved|must be (?:verified|established)|requires? (?:verification|evidence))\b/i.test(narrative) ||
+      /\b(?:not established|cannot be (?:determined|established|confirmed)|unknown|unresolved|must be (?:verified|established)|requires? (?:verification|evidence))\b[^.]{0,180}\bzoning[- ]lot\b/i.test(narrative) ||
+      conditionalHistoricalGrant;
+    if (
+      ((bareCategoricalGrant || directNamedGrant || narrativeCategoricalGrant) && unresolvedHistoricalLot) ||
+      (narrativeCategoricalGrant && !numericalOnlyBoundary) ||
+      (bareCategoricalDenial && unresolvedHistoricalLot) ||
+      (directNamedDenial && unresolvedHistoricalLot) ||
+      (narrativeCategoricalDenial && unresolvedHistoricalLot)
+    ) {
       issues.push({
         type: "zoning_mih_numerical_only_conclusion",
-        detail: "Do not grant the MIH small-development exception from the unit and floor-area thresholds alone; the historical zoning-lot element must also be established."
+        detail: "Do not grant or deny the MIH small-development exception while relying only on the unit and floor-area thresholds or while the historical zoning-lot element remains unresolved."
       });
     }
     const historicalLotRequirement =
-      /\bzoning lot\b[^.]{0,220}\b(?:existed|existence)\b[^.]{0,160}\b(?:MIH|Mandatory Inclusionary Housing|area)\b[^.]{0,120}\b(?:establish|establishment|effective date)\b/i.test(narrative) ||
-      /\b(?:MIH|Mandatory Inclusionary Housing|area)\b[^.]{0,160}\b(?:establish|establishment|effective date)\b[^.]{0,220}\bzoning lot\b[^.]{0,100}\b(?:existed|existence)\b/i.test(narrative);
+      /\bzoning[- ]lot\b[^.]{0,220}\b(?:existed|existence)\b[^.]{0,160}\b(?:MIH|Mandatory Inclusionary Housing|area)[- ]?\b[^.]{0,120}\b(?:establish|establishment|effective)\b/i.test(narrative) ||
+      /\b(?:MIH|Mandatory Inclusionary Housing|area)[- ]?\b[^.]{0,160}\b(?:establish|establishment|effective)\b[^.]{0,220}\bzoning[- ]lot\b[^.]{0,100}\b(?:existed|existence)\b/i.test(narrative) ||
+      conditionalHistoricalLotRequirement;
     const taxLotDistinction =
-      /\btax lots?\b[^.]{0,180}\b(?:not (?:the )?same|may differ|does not (?:establish|prove)|not proof|distinct)\b[^.]{0,120}\bzoning lot\b/i.test(narrative) ||
-      /\bzoning lot\b[^.]{0,180}\b(?:not (?:the )?same|may differ|does not (?:necessarily )?(?:match|coincide)|distinct)\b[^.]{0,120}\btax lots?\b/i.test(narrative);
+      /\btax[- ]lots?\b[^.]{0,180}\b(?:not (?:the )?same|may differ|does not (?:establish|prove)|not proof|distinct|may or may not coincide)\b[^.]{0,120}\bzoning[- ]lot\b/i.test(narrative) ||
+      /\bzoning[- ]lot\b[^.]{0,180}\b(?:not (?:the )?same|may differ|does not (?:necessarily )?(?:match|coincide)|distinct|may or may not coincide)\b[^.]{0,120}\btax[- ]lots?\b/i.test(narrative);
     if (!historicalLotRequirement || !taxLotDistinction) {
       issues.push({
         type: "zoning_mih_historical_lot_requirement",
@@ -425,10 +473,12 @@ export function evaluateZoningResearchSafety({
     }
     const officialEstablishmentDate =
       /\b(?:official|verify|verified|record|historical)\b[^.]{0,180}\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,120}\b(?:establishment|effective) date\b/i.test(evidenceNeeded) ||
-      /\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,180}\b(?:establishment|effective) date\b[^.]{0,120}\b(?:official|verify|verified|record|historical)\b/i.test(evidenceNeeded);
+      /\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,180}\b(?:establishment|effective) date\b[^.]{0,120}\b(?:official|verify|verified|record|historical)\b/i.test(evidenceNeeded) ||
+      /\b(?:enacted|official|historical)\b[^.]{0,120}\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,160}\b(?:establishment amendment|effective date)\b/i.test(evidenceNeeded);
     const officialHistoricalLot =
-      /\b(?:official|recorded|historical)\b[^.]{0,180}\bzoning[- ]lot\b[^.]{0,160}\b(?:record|configuration|declaration|legal description|ownership|evidence)\b/i.test(evidenceNeeded) ||
-      /\bzoning[- ]lot\b[^.]{0,180}\b(?:record|configuration|declaration|legal description|ownership|evidence)\b[^.]{0,120}\b(?:official|recorded|historical|verify)\b/i.test(evidenceNeeded);
+      /\b(?:official|recorded|historic|historical)\b[^.]{0,220}\bzoning[- ]lot\b[^.]{0,160}\b(?:record|configuration|declaration|legal description|ownership|evidence)\b/i.test(evidenceNeeded) ||
+      /\bzoning[- ]lot\b[^.]{0,180}\b(?:record|configuration|declaration|legal description|ownership|evidence)\b[^.]{0,120}\b(?:official|recorded|historic|historical|verify)\b/i.test(evidenceNeeded) ||
+      /\b(?:historic|historical)\b[^.]{0,180}\b(?:title|survey)\b[^.]{0,180}\b(?:recorded )?zoning[- ]lot declaration\b/i.test(evidenceNeeded);
     if (!officialEstablishmentDate || !officialHistoricalLot) {
       issues.push({
         type: "zoning_mih_historical_records",

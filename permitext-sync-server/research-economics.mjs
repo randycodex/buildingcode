@@ -1,5 +1,15 @@
 const completedStatuses = new Set(["completed"]);
 const failureStatuses = new Set(["failed", "cancelled"]);
+const structuredAttemptFailureStageValues = new Set([
+  "provider_incomplete",
+  "structured_output_parse",
+  "interpretation_validation",
+  "evidence_binding_validation"
+]);
+const providerIncompleteReasonValues = new Set([
+  "max_output_tokens",
+  "content_filter"
+]);
 
 function nonnegativeNumber(value, fallback = 0) {
   const number = Number(value);
@@ -56,7 +66,44 @@ function normalizedStatus(value) {
     : "unknown";
 }
 
+function allowlistedValue(value, allowedValues) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return allowedValues.has(normalized) ? normalized : null;
+}
+
+function normalizedStructuredAttemptFailureStages(value) {
+  return (Array.isArray(value) ? value : [])
+    .map((stage) => allowlistedValue(stage, structuredAttemptFailureStageValues))
+    .filter(Boolean)
+    .slice(0, 2);
+}
+
+export function createResearchStructuredAttemptDiagnostics({
+  retryCount = 0,
+  failureStages = [],
+  providerIncompleteReasons = []
+} = {}) {
+  const structuredAttemptFailureStages = normalizedStructuredAttemptFailureStages(
+    failureStages
+  );
+  const boundedReasons = (Array.isArray(providerIncompleteReasons)
+    ? providerIncompleteReasons
+    : [providerIncompleteReasons])
+    .map((reason) => allowlistedValue(reason, providerIncompleteReasonValues))
+    .filter(Boolean)
+    .slice(0, 2);
+  return {
+    structuredResponseRetryCount: Math.min(1, nonnegativeInteger(retryCount)),
+    structuredAttemptFailureCount: structuredAttemptFailureStages.length,
+    structuredAttemptFailureStages,
+    providerIncompleteReason: boundedReasons.at(-1) || null
+  };
+}
+
 function normalizedOperation(operation = {}) {
+  const structuredAttemptFailureStages = normalizedStructuredAttemptFailureStages(
+    operation.structuredAttemptFailureStages
+  );
   return {
     ...operation,
     status: normalizedStatus(operation.status),
@@ -76,6 +123,12 @@ function normalizedOperation(operation = {}) {
     providerRequestCount: nonnegativeInteger(operation.providerRequestCount),
     pendingProviderRequestCount: nonnegativeInteger(operation.pendingProviderRequestCount),
     verificationAttemptCount: nonnegativeInteger(operation.verificationAttemptCount),
+    structuredResponseRetryCount: Math.min(
+      1,
+      nonnegativeInteger(operation.structuredResponseRetryCount)
+    ),
+    structuredAttemptFailureCount: structuredAttemptFailureStages.length,
+    structuredAttemptFailureStages,
     inputTokens: nonnegativeInteger(operation.inputTokens),
     cachedInputTokens: nonnegativeInteger(operation.cachedInputTokens),
     outputTokens: nonnegativeInteger(operation.outputTokens),
@@ -94,7 +147,14 @@ function normalizedOperation(operation = {}) {
         .filter(Boolean)
     )),
     failureCode: String(operation.failureCode || "").trim() || null,
-    failureStage: String(operation.failureStage || "").trim() || null
+    failureStage: allowlistedValue(
+      operation.failureStage,
+      structuredAttemptFailureStageValues
+    ),
+    providerIncompleteReason: allowlistedValue(
+      operation.providerIncompleteReason,
+      providerIncompleteReasonValues
+    )
   };
 }
 
@@ -136,6 +196,9 @@ export function createResearchOperationMetric(operation = {}) {
       ))
     })),
     verificationAttemptCount: normalized.verificationAttemptCount,
+    structuredResponseRetryCount: normalized.structuredResponseRetryCount,
+    structuredAttemptFailureCount: normalized.structuredAttemptFailureCount,
+    structuredAttemptFailureStages: normalized.structuredAttemptFailureStages,
     verificationIssueTypes: normalized.verificationIssueTypes,
     providerRequestCount: normalized.providerRequestCount,
     pendingProviderRequestCount: normalized.pendingProviderRequestCount,
@@ -148,7 +211,8 @@ export function createResearchOperationMetric(operation = {}) {
     conservativeProviderCostUSD: normalized.conservativeProviderCostUSD,
     durationMilliseconds: normalized.durationMilliseconds,
     failureCode: normalized.failureCode,
-    failureStage: normalizedString(normalized.failureStage, 120),
+    failureStage: normalized.failureStage,
+    providerIncompleteReason: normalized.providerIncompleteReason,
     webSupportRequested: operation.webSupportRequested === true,
     webSupportSearched: operation.webSupportSearched === true,
     pricingVersion: normalizedString(operation.pricingVersion, 240)

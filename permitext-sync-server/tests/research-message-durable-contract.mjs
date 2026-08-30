@@ -55,8 +55,28 @@ assert.match(
 );
 assert.match(
   appSource,
-  /async function openAIResearchInterpretationWithStructuredRetry\([\s\S]*retryableResearchInterpretationCodes\.has\(error\?\.code\)[\s\S]*structuredResponseRetry: true[\s\S]*structuredResponseRetryCount: 1/,
+  /async function openAIResearchInterpretationWithStructuredRetry\([\s\S]*retryableResearchInterpretationCodes\.has\(error\?\.code\)[\s\S]*structuredResponseRetry: true[\s\S]*usage: combinedResearchUsage\(firstUsage, retried\.usage\)[\s\S]*createResearchStructuredAttemptDiagnostics\(\{[\s\S]*retryCount: 1/,
   "A malformed model response does not receive one bounded schema retry with combined provider usage."
+);
+assert.match(
+  appSource,
+  /const firstFailureStage = error\.failureStage \|\| null;[\s\S]*createResearchStructuredAttemptDiagnostics\(\{[\s\S]*retryCount: 1,[\s\S]*failureStages: \[firstFailureStage\]/,
+  "A recovered structured-output retry does not retain its ordered, bounded first-attempt failure diagnostic."
+);
+assert.match(
+  appSource,
+  /Object\.assign\(retryError, createResearchStructuredAttemptDiagnostics\(\{[\s\S]*retryCount: 1,[\s\S]*failureStages: \[firstFailureStage, retryError\.failureStage \|\| null\]/,
+  "A failed structured-output retry does not retain both ordered attempt diagnostics."
+);
+assert.match(
+  appSource,
+  /invalidResponse\.failureStage = payload\?\.status === "incomplete"[\s\S]*\? "provider_incomplete"[\s\S]*: "structured_output_parse"/,
+  "Provider-incomplete output that cannot be parsed is not classified at the provider-incomplete stage."
+);
+assert.match(
+  appSource,
+  /error\.failureStage = \["INVALID_RESEARCH_CITATION", "INVALID_RESEARCH_WEB_CITATION"\][\s\S]*\? "evidence_binding_validation"[\s\S]*: "interpretation_validation"/,
+  "A parseable incomplete payload can obscure the actual interpretation or evidence-binding validation stage."
 );
 assert.match(
   appSource,
@@ -67,6 +87,16 @@ assert.match(
   messageHandlerSlice,
   /escalationStages: modelEscalationStages[\s\S]*verificationAttemptCount: verificationAttempts\.length[\s\S]*verificationIssueTypes/,
   "Completed Research telemetry does not retain escalation stages and verification issue types."
+);
+assert.match(
+  messageHandlerSlice,
+  /structuredResponseRetryCount: result\.structuredResponseRetryCount \|\| 0,[\s\S]*structuredAttemptFailureCount: result\.structuredAttemptFailureCount \|\| 0,[\s\S]*structuredAttemptFailureStages: result\.structuredAttemptFailureStages \|\| \[\],[\s\S]*providerIncompleteReason: result\.providerIncompleteReason \|\| null/,
+  "Completed Research telemetry drops bounded structured-attempt diagnostics."
+);
+assert.match(
+  messageHandlerSlice,
+  /structuredResponseRetryCount: error\.structuredResponseRetryCount \|\| 0,[\s\S]*structuredAttemptFailureCount: error\.structuredAttemptFailureCount \|\| 0,[\s\S]*structuredAttemptFailureStages: error\.structuredAttemptFailureStages \|\| \[\],[\s\S]*providerIncompleteReason: error\.providerIncompleteReason \|\| error\.incompleteReason \|\| null/,
+  "Failed Research telemetry drops bounded structured-attempt diagnostics."
 );
 assert.match(
   messageHandlerSlice,

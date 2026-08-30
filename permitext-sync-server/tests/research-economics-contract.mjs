@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   createResearchOperationMetric,
+  createResearchStructuredAttemptDiagnostics,
   researchEconomicsReport,
   researchPackPricingReport,
   researchPercentile,
@@ -14,16 +15,96 @@ const privacySafeMetric = createResearchOperationMetric({
   charged: true,
   model: "gpt-5.6-luna",
   failureStage: "structured_output_parse",
+  structuredResponseRetryCount: 1,
+  structuredAttemptFailureCount: 2,
+  structuredAttemptFailureStages: [
+    "structured_output_parse",
+    "provider_incomplete"
+  ],
+  providerIncompleteReason: "max_output_tokens",
   question: "Private question",
   answer: "Private answer",
-  projectFacts: ["Private address"]
+  projectFacts: ["Private address"],
+  rawResponse: { output: "Private provider output" },
+  providerRequestID: "private-provider-request-id",
+  prompt: "Private prompt",
+  evidence: ["Private evidence"]
 });
 assert.equal(privacySafeMetric.id, "operation-1");
 assert.equal(privacySafeMetric.model, "gpt-5.6-luna");
 assert.equal(privacySafeMetric.failureStage, "structured_output_parse");
+assert.equal(privacySafeMetric.structuredResponseRetryCount, 1);
+assert.equal(privacySafeMetric.structuredAttemptFailureCount, 2);
+assert.deepEqual(privacySafeMetric.structuredAttemptFailureStages, [
+  "structured_output_parse",
+  "provider_incomplete"
+]);
+assert.equal(privacySafeMetric.providerIncompleteReason, "max_output_tokens");
 assert.equal("question" in privacySafeMetric, false);
 assert.equal("answer" in privacySafeMetric, false);
 assert.equal("projectFacts" in privacySafeMetric, false);
+assert.equal("rawResponse" in privacySafeMetric, false);
+assert.equal("providerRequestID" in privacySafeMetric, false);
+assert.equal("prompt" in privacySafeMetric, false);
+assert.equal("evidence" in privacySafeMetric, false);
+
+const boundedDiagnosticMetric = createResearchOperationMetric({
+  id: "operation-2",
+  createdAt: "2026-08-26T12:01:00.000Z",
+  status: "failed",
+  failureStage: "private free-form failure stage",
+  structuredResponseRetryCount: 99,
+  structuredAttemptFailureCount: 99,
+  structuredAttemptFailureStages: [
+    "interpretation_validation",
+    "private address embedded in a stage",
+    "provider_incomplete",
+    "structured_output_parse"
+  ],
+  providerIncompleteReason: "private provider explanation"
+});
+assert.equal(boundedDiagnosticMetric.failureStage, null);
+assert.equal(boundedDiagnosticMetric.structuredResponseRetryCount, 1);
+assert.equal(boundedDiagnosticMetric.structuredAttemptFailureCount, 2);
+assert.deepEqual(boundedDiagnosticMetric.structuredAttemptFailureStages, [
+  "interpretation_validation",
+  "provider_incomplete"
+]);
+assert.equal(boundedDiagnosticMetric.providerIncompleteReason, null);
+
+assert.deepEqual(createResearchStructuredAttemptDiagnostics({
+  retryCount: 1,
+  failureStages: ["structured_output_parse"],
+  providerIncompleteReasons: ["max_output_tokens"]
+}), {
+  structuredResponseRetryCount: 1,
+  structuredAttemptFailureCount: 1,
+  structuredAttemptFailureStages: ["structured_output_parse"],
+  providerIncompleteReason: "max_output_tokens"
+});
+assert.deepEqual(createResearchStructuredAttemptDiagnostics({
+  retryCount: 1,
+  failureStages: ["structured_output_parse", "interpretation_validation"],
+  providerIncompleteReasons: [null, "content_filter"]
+}), {
+  structuredResponseRetryCount: 1,
+  structuredAttemptFailureCount: 2,
+  structuredAttemptFailureStages: [
+    "structured_output_parse",
+    "interpretation_validation"
+  ],
+  providerIncompleteReason: "content_filter"
+});
+assert.deepEqual(createResearchStructuredAttemptDiagnostics({
+  retryCount: 1,
+  failureStages: ["structured_output_parse", null],
+  providerIncompleteReasons: [null, "private timeout detail"]
+}), {
+  structuredResponseRetryCount: 1,
+  structuredAttemptFailureCount: 1,
+  structuredAttemptFailureStages: ["structured_output_parse"],
+  providerIncompleteReason: null
+});
 
 assert.equal(researchPercentile([], 0.5), null);
 assert.equal(researchPercentile([1], 0.9), 1);

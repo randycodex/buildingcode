@@ -202,6 +202,7 @@ import {
 } from "./research-config.mjs";
 import {
   createResearchOperationMetric,
+  createResearchStructuredAttemptDiagnostics,
   researchEconomicsReport
 } from "./research-economics.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
@@ -9834,6 +9835,8 @@ async function openAIResearchInterpretationWithStructuredRetry(
   } catch (error) {
     if (!retryableResearchInterpretationCodes.has(error?.code)) throw error;
     const firstUsage = error.providerUsage || combinedResearchUsage();
+    const firstFailureStage = error.failureStage || null;
+    const firstProviderIncompleteReason = error.incompleteReason || null;
     try {
       const retried = await openAIResearchInterpretation(question, evidence, userID, {
         ...options,
@@ -9842,10 +9845,22 @@ async function openAIResearchInterpretationWithStructuredRetry(
       return {
         ...retried,
         usage: combinedResearchUsage(firstUsage, retried.usage),
-        structuredResponseRetryCount: 1
+        ...createResearchStructuredAttemptDiagnostics({
+          retryCount: 1,
+          failureStages: [firstFailureStage],
+          providerIncompleteReasons: [firstProviderIncompleteReason]
+        })
       };
     } catch (retryError) {
       retryError.providerUsage = combinedResearchUsage(firstUsage, retryError.providerUsage);
+      Object.assign(retryError, createResearchStructuredAttemptDiagnostics({
+        retryCount: 1,
+        failureStages: [firstFailureStage, retryError.failureStage || null],
+        providerIncompleteReasons: [
+          firstProviderIncompleteReason,
+          retryError.incompleteReason || null
+        ]
+      }));
       throw retryError;
     }
   }
@@ -19202,6 +19217,10 @@ async function handleResearchConversationMessage(request, response) {
       escalated: evidenceAnalysisEscalated || answerEscalated,
       escalationStages: modelEscalationStages,
       verificationAttemptCount: verificationAttempts.length,
+      structuredResponseRetryCount: result.structuredResponseRetryCount || 0,
+      structuredAttemptFailureCount: result.structuredAttemptFailureCount || 0,
+      structuredAttemptFailureStages: result.structuredAttemptFailureStages || [],
+      providerIncompleteReason: result.providerIncompleteReason || null,
       verificationIssueTypes,
       providerRequestCount: result.usage.providerRequestCount,
       inputTokens: result.usage.inputTokens,
@@ -19292,7 +19311,11 @@ async function handleResearchConversationMessage(request, response) {
             (attempt.issues || []).map((issue) => issue?.type).filter(Boolean)
           )))
         : researchOperation.verificationIssueTypes,
-      failureStage: error.failureStage || null
+      failureStage: error.failureStage || null,
+      structuredResponseRetryCount: error.structuredResponseRetryCount || 0,
+      structuredAttemptFailureCount: error.structuredAttemptFailureCount || 0,
+      structuredAttemptFailureStages: error.structuredAttemptFailureStages || [],
+      providerIncompleteReason: error.providerIncompleteReason || error.incompleteReason || null
     });
     if (["RESEARCH_EVAL_SPEND_CAP", "RESEARCH_SPEND_CAP"].includes(error.code)) {
       console.warn(JSON.stringify(sanitizedResearchSpendGuardrailReport({

@@ -292,6 +292,65 @@ assert.equal(evaluateZoningResearchSafety({
   answer: repairedOldRulesAnswer
 }).pass, true);
 
+const exactCityOfYesQuestion = "We filed a new-building application for one building on November 20, 2024, and DOB issued the permit on December 4, 2024. By December 5, 2024, about 60 percent of the foundation work was complete. The design complies with the zoning rules that existed before City of Yes but not with the new rules. Can we keep building under the old zoning?";
+const exactCityOfYesEvidence = [source({
+  sourceID: "zr-city-of-yes-11-31",
+  sectionNumber: "11-31",
+  title: "General Provisions",
+  text: "A lawfully issued building permit and complete plans are required for the applicable right to continue construction."
+}), source({
+  sourceID: "zr-city-of-yes-11-331",
+  sectionNumber: "11-331",
+  title: "Right to construct if foundations completed",
+  text: "For a minor development, all foundation work must have been completed before the effective date of the applicable amendment."
+}), source({
+  sourceID: "zr-city-of-yes-11-333",
+  sectionNumber: "11-333",
+  title: "Special allowances for building permits issued prior to certain dates",
+  text: "A City of Yes application filed by December 5, 2024 may continue under the prior rules if DOB approved a qualifying application based on a complete zoning analysis by December 5, 2025 and the other stated requirements are met."
+})];
+const exactCityOfYesUnrepaired = answer(
+  "The November 20, 2024 filing and December 4, 2024 permit do not alone decide the result. Sixty percent foundation completion by December 5, 2024 does not satisfy the general minor-development rule in ZR 11-331, which requires all foundation work. A separate ZR 11-333 route may apply if DOB approved the qualifying application based on a complete zoning analysis by its stated deadline, so the DOB records must be reviewed before deciding whether work may continue under the old rules.",
+  exactCityOfYesEvidence.map((item) => item.sourceID)
+);
+const exactCityBeforeRepair = evaluateZoningResearchSafety({
+  question: exactCityOfYesQuestion,
+  evidence: exactCityOfYesEvidence,
+  answer: exactCityOfYesUnrepaired
+});
+assert.deepEqual(
+  exactCityBeforeRepair.issues.map((issue) => issue.type),
+  ["zoning_historical_substantive_text"]
+);
+const exactCityConclusionBeforeRepair = exactCityOfYesUnrepaired.conclusion;
+const exactCityCitationsBeforeRepair = structuredClone(exactCityOfYesUnrepaired.citations);
+const exactCityRepaired = applyZoningResearchDeterministicRepairs(
+  exactCityOfYesUnrepaired,
+  exactCityOfYesEvidence,
+  { question: exactCityOfYesQuestion }
+);
+assert.equal(evaluateZoningResearchSafety({
+  question: exactCityOfYesQuestion,
+  evidence: exactCityOfYesEvidence,
+  answer: exactCityRepaired
+}).pass, true);
+assert.equal(exactCityRepaired.conclusion, exactCityConclusionBeforeRepair);
+assert.deepEqual(exactCityRepaired.citations, exactCityCitationsBeforeRepair);
+assert.equal(exactCityRepaired.evidenceLimitations.filter((item) =>
+  item === "The current transition provision may preserve prior rules but does not reproduce their substantive requirements."
+).length, 1);
+assert.equal(exactCityRepaired.additionalEvidenceNeeded.filter((item) =>
+  item === "Verify the dated enacted or official archived pre-amendment Zoning text to determine the substantive rules preserved for the project."
+).length, 1);
+assert.deepEqual(
+  applyZoningResearchDeterministicRepairs(
+    exactCityRepaired,
+    exactCityOfYesEvidence,
+    { question: exactCityOfYesQuestion }
+  ),
+  exactCityRepaired
+);
+
 const cellarDefinitionEvidence = [source({
   sourceID: "zr-cellar-definition",
   sectionNumber: "12-10",
@@ -503,6 +562,184 @@ const boundedMIH = evaluateZoningResearchSafety({
   }
 });
 assert.equal(boundedMIH.pass, true, JSON.stringify(boundedMIH.issues));
+
+const retainedEquivalentMIH = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts alone. The numerical elements are satisfied: 8 dwelling units is no more than 10, and 10,000 square feet of residential floor area is no more than 12,500. But those numerical elements do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project may qualify only if the development tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: [
+      "The exact MIH establishment amendment and effective date remain to be verified.",
+      "Whether the tract was a zoning lot on that establishment date is not established."
+    ],
+    additionalEvidenceNeeded: [
+      "The enacted MIH establishment amendment, including its effective date.",
+      "Historic title, survey, and any recorded zoning-lot declaration materials showing the tract's status on that date."
+    ]
+  }
+});
+assert.equal(retainedEquivalentMIH.pass, true, JSON.stringify(retainedEquivalentMIH.issues));
+
+const numericalOnlyMIHWithoutHistoricalBoundary = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "The project qualifies because it has eight units and 10,000 square feet of residential floor area. The current tax lots differ from the zoning lot.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: [
+      "Verify the official MIH establishment date.",
+      "Obtain official historical zoning-lot configuration evidence."
+    ]
+  }
+});
+assert(numericalOnlyMIHWithoutHistoricalBoundary.issues.some((issue) =>
+  issue.type === "zoning_mih_numerical_only_conclusion"
+));
+
+const unjustifiedCategoricalMIHDenial = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "The project does not qualify for the exception. The unit and floor-area thresholds do not establish the historical element. A zoning lot may or may not coincide with a tax lot, and whether this zoning lot existed on the MIH-area establishment date is not established.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: [
+      "Verify the official MIH establishment date.",
+      "Obtain official historical zoning-lot configuration evidence."
+    ]
+  }
+});
+assert(unjustifiedCategoricalMIHDenial.issues.some((issue) =>
+  issue.type === "zoning_mih_numerical_only_conclusion"
+));
+
+const bareNoWithUnresolvedMIHHistory = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "The numerical thresholds do not establish the exception. A zoning-lot may or may not coincide with a tax-lot, and whether this zoning-lot existed on the MIH-area establishment date is not established.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    conclusion: "No.",
+    missingFacts: [
+      "Verify the official MIH establishment date.",
+      "Obtain official historical zoning-lot configuration evidence."
+    ]
+  }
+});
+assert(bareNoWithUnresolvedMIHHistory.issues.some((issue) =>
+  issue.type === "zoning_mih_numerical_only_conclusion"
+));
+
+const scopedNumericalMIHDenial = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts. The project does not qualify based on the 8-unit and 10,000-square-foot thresholds alone; whether the historical zoning-lot existed on the MIH-area establishment date is unresolved. A zoning-lot may or may not coincide with a tax-lot.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: [
+      "Verify the official MIH establishment date.",
+      "Obtain official historical zoning-lot configuration evidence."
+    ]
+  }
+});
+assert.equal(scopedNumericalMIHDenial.pass, true, JSON.stringify(scopedNumericalMIHDenial.issues));
+
+const scopedDirectNumericalMIHDenial = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts. The 8-unit and 10,000-square-foot figures satisfy the numerical thresholds but do not establish the historical element. A zoning-lot may or may not coincide with a tax-lot, and the tract must have existed as a zoning-lot on the MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    conclusion: "The project does not qualify based on those numerical thresholds alone.",
+    missingFacts: [
+      "Verify the official MIH establishment date.",
+      "Obtain official historical zoning-lot configuration evidence."
+    ]
+  }
+});
+assert.equal(scopedDirectNumericalMIHDenial.pass, true, JSON.stringify(scopedDirectNumericalMIHDenial.issues));
+
+const conditionalMIHGrant = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts. The 8-unit and 10,000-square-foot figures satisfy the numerical thresholds but do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project qualifies only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: [
+      "Verify the official MIH establishment date.",
+      "Whether the tract was a zoning-lot on that date is not established."
+    ],
+    additionalEvidenceNeeded: [
+      "Obtain official historical zoning-lot configuration evidence."
+    ]
+  }
+});
+assert.equal(conditionalMIHGrant.pass, true, JSON.stringify(conditionalMIHGrant.issues));
+
+const contradictoryMixedMIHGrant = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "The project qualifies for the exception. The 8-unit and 10,000-square-foot figures satisfy the numerical thresholds, but whether this zoning-lot existed on the MIH-area establishment date is unresolved. A zoning-lot may or may not coincide with a tax-lot. The project could qualify only if official historical zoning-lot records establish that element.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    conclusion: "Not established.",
+    missingFacts: ["Verify the official MIH establishment date."],
+    additionalEvidenceNeeded: ["Obtain official historical zoning-lot configuration evidence."]
+  }
+});
+assert(contradictoryMixedMIHGrant.issues.some((issue) =>
+  issue.type === "zoning_mih_numerical_only_conclusion"
+));
+
+const conditionalMIHExceptionApplies = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts. The 8-unit and 10,000-square-foot figures satisfy the numerical thresholds but do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The exception applies only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: ["Verify the official MIH establishment date."],
+    additionalEvidenceNeeded: ["Obtain official historical zoning-lot configuration evidence."]
+  }
+});
+assert.equal(
+  conditionalMIHExceptionApplies.pass,
+  true,
+  JSON.stringify(conditionalMIHExceptionApplies.issues)
+);
+
+const vagueHistoricalStatusRequest = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts alone. The numerical thresholds do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project may qualify only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: ["Verify the official MIH establishment date."],
+    additionalEvidenceNeeded: ["Verify historical zoning-lot status."]
+  }
+});
+assert(vagueHistoricalStatusRequest.issues.some((issue) =>
+  issue.type === "zoning_mih_historical_records"
+));
 
 console.log("Zoning Research safety contract passed", {
   version: zoningResearchSafetyVersion,
