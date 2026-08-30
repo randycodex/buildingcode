@@ -22,6 +22,8 @@ The first live run used the authenticated Vercel CLI against `permitext-sync`, P
 
 This was a small quiet-period sample. It proves that the log stream can be read and classified safely; it does not prove future anomaly delivery or absence of problems outside the sampled window.
 
+An August 30 refresh parsed 12 valid Production entries with no invalid lines. It observed two successful `/health` requests, two structured dynamic-route observations, and zero health failures, server errors, billing endpoint failures, client/request/database errors, failed invoices, Research spend rejections, Research failures, or other actionable categories. No Research duration sample existed in that quiet window, so no live p95 latency claim is made. The strict command exited `0`.
+
 A separate key-presence-only environment check confirmed that `PERMITEXT_MONITORING_PROVIDER` remains unset. No environment value was read or printed.
 
 ## Delivery and provider boundary
