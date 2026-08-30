@@ -1,6 +1,12 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
-import { auditReleaseBranchIntegrity, parseGitPorcelainPaths } from "../release-branch-integrity.mjs";
+import {
+  auditReleaseBranchIntegrity,
+  parseGitPorcelainPaths,
+  scanTextFilesForCredentials
+} from "../release-branch-integrity.mjs";
+
+const textPathPattern = /\.(?:mjs|js|json|md|swift|plist|yml|yaml|toml|sh|html|css|sql|py|ts|tsx)$/i;
 
 function argumentValues(name) {
   const values = [];
@@ -43,6 +49,14 @@ const dirtyPaths = parseGitPorcelainPaths(
 const changedPaths = git(repositoryRoot, ["diff", "--name-only", "-z", `${baseCommit}...${headCommit}`]).stdout
   .split("\0")
   .filter(Boolean);
+const changedTextFiles = changedPaths
+  .filter((path) => textPathPattern.test(path))
+  .filter((path) => !path.startsWith("NYC CC APP/permitext/Resources/CodeContent/"))
+  .flatMap((path) => {
+    const result = git(repositoryRoot, ["show", `${headCommit}:${path}`], { allowFailure: true });
+    return result.status === 0 ? [{ path, content: result.stdout }] : [];
+  });
+const headFileCredentialFindings = scanTextFilesForCredentials(changedTextFiles);
 const diffCheck = git(repositoryRoot, ["diff", "--check", `${baseCommit}...${headCommit}`], { allowFailure: true });
 const addedLineDiff = git(repositoryRoot, [
   "diff",
@@ -81,7 +95,8 @@ const report = auditReleaseBranchIntegrity({
   dirtyPaths,
   allowedDirtyPaths,
   changedPaths,
-  addedLineDiff
+  addedLineDiff,
+  headFileCredentialFindings
 });
 
 process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);

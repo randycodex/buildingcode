@@ -266,7 +266,7 @@ vercel env ls production --json | npm run --silent audit:production-env-keys
 
 This audit reads names and Production targets only. It exits nonzero when a required key group is absent, but it cannot prove that a hidden value is correct. Follow it with `npm run verify:beta1-readiness` in a protected environment containing the real approved values. Do not treat Vercel's `[SENSITIVE]` pull placeholders as the live values.
 
-Run `npm run --silent audit:release-branch -- --base <commit-or-ref> --expected-branch <branch> [--allow-dirty <path>]...` before the final human branch review. The preflight fails closed on ancestry, branch, whitespace, unexpected dirty paths, credential-like filenames, and redacted credential-pattern findings. It never emits matched values or diff content and never substitutes for semantic review or release authorization.
+Run `npm run --silent audit:release-branch -- --base <commit-or-ref> --expected-branch <branch> [--allow-dirty <path>]...` before the final human branch review. The preflight fails closed on ancestry, branch, whitespace, unexpected dirty paths, credential-like filenames, redacted added-line findings, and redacted full-content findings in changed text files at `HEAD`. It never emits matched values, file contents, or diff content and never substitutes for semantic review or release authorization.
 
 ## Deploy To Vercel
 

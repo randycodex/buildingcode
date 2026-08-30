@@ -89,6 +89,24 @@ export function scanAddedLinesForCredentials(source) {
   return findings;
 }
 
+export function scanTextFilesForCredentials(files = []) {
+  const findings = [];
+  for (const file of Array.isArray(files) ? files : []) {
+    const path = normalizeRepositoryPath(file?.path);
+    if (!path) continue;
+    const lines = String(file?.content || "").split("\n");
+    for (let index = 0; index < lines.length; index += 1) {
+      const value = lines[index];
+      const previous = index > 0 ? lines[index - 1] : "";
+      if (value.includes(allowanceMarker) || previous.includes(allowanceMarker)) continue;
+      for (const [kind, pattern] of addedLineRules) {
+        if (pattern.test(value)) findings.push({ path, lineNumber: index + 1, kind });
+      }
+    }
+  }
+  return findings;
+}
+
 export function auditReleaseBranchIntegrity(input = {}) {
   const expectedBranch = String(input.expectedBranch || "").trim();
   const actualBranch = String(input.actualBranch || "").trim();
@@ -104,6 +122,13 @@ export function auditReleaseBranchIntegrity(input = {}) {
   const allowedDirtyPathsPresent = dirtyPaths.filter((path) => pathAllowed(path, allowedDirtyPaths));
   const credentialLikePaths = changedPaths.filter((path) => credentialPathPattern.test(path));
   const credentialFindings = scanAddedLinesForCredentials(input.addedLineDiff);
+  const headFileCredentialFindings = Array.isArray(input.headFileCredentialFindings)
+    ? input.headFileCredentialFindings.map((finding) => ({
+        path: normalizeRepositoryPath(finding?.path),
+        lineNumber: Number(finding?.lineNumber) || 0,
+        kind: String(finding?.kind || "unknown")
+      }))
+    : [];
   const checks = [
     { id: "valid-base-commit", passed: validCommit(baseCommit) },
     { id: "valid-head-commit", passed: validCommit(headCommit) },
@@ -114,7 +139,8 @@ export function auditReleaseBranchIntegrity(input = {}) {
     { id: "diff-check", passed: input.diffCheckPassed === true },
     { id: "dirty-scope", passed: unexpectedDirtyPaths.length === 0 },
     { id: "credential-like-paths", passed: credentialLikePaths.length === 0 },
-    { id: "redacted-added-line-scan", passed: credentialFindings.length === 0 }
+    { id: "redacted-added-line-scan", passed: credentialFindings.length === 0 },
+    { id: "redacted-head-file-scan", passed: headFileCredentialFindings.length === 0 }
   ];
 
   return {
@@ -136,9 +162,11 @@ export function auditReleaseBranchIntegrity(input = {}) {
     unexpectedDirtyPaths,
     credentialLikePaths,
     credentialFindings,
+    headFileCredentialFindings,
     privacy: {
       secretValuesEmitted: false,
-      diffContentEmitted: false
+      diffContentEmitted: false,
+      fileContentsEmitted: false
     },
     remainingBoundaries: [
       "This automated preflight is not a semantic, line-by-line human review.",

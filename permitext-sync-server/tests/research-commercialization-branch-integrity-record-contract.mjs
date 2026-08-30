@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [record, master, currentPlan, acceptance] = await Promise.all([
+const [record, semanticReview, master, currentPlan, acceptance] = await Promise.all([
   readFile(new URL("../../docs/PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30.md", import.meta.url), "utf8"),
+  readFile(new URL("../../docs/PERMITEXT_RESEARCH_COMMERCIALIZATION_SEMANTIC_REVIEW_2026-08-30.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/PERMITEXT_BETA1_MASTER_PLAN.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md", import.meta.url), "utf8")
@@ -17,7 +18,7 @@ for (const requiredBoundary of [
   /`npm run check` passed/,
   /no paid model calls were made/,
   /audit:release-branch/,
-  /never emits matched credential values or diff content/,
+  /never emits matched credential values, file contents, or diff content/,
   /not a semantic, line-by-line human review/,
   /Master-plan release-sequence step 1 remains open/
 ]) {
@@ -25,8 +26,23 @@ for (const requiredBoundary of [
 }
 
 assert.match(master, /PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30\.md/);
+assert.match(master, /PERMITEXT_RESEARCH_COMMERCIALIZATION_SEMANTIC_REVIEW_2026-08-30\.md/);
 assert.match(master, /1\. \[ \] Review the full branch diff/);
 assert.match(currentPlan, /PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30\.md/);
+assert.match(currentPlan, /PERMITEXT_RESEARCH_COMMERCIALIZATION_SEMANTIC_REVIEW_2026-08-30\.md/);
 assert.match(acceptance, /PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30\.md/);
+assert.match(acceptance, /PERMITEXT_RESEARCH_COMMERCIALIZATION_SEMANTIC_REVIEW_2026-08-30\.md/);
+
+for (const requiredBoundary of [
+  /No blocking source defect found in reviewed paths; final release review remains open/,
+  /Commit count in the reviewed range: 72/,
+  /Changed paths: 452/,
+  /Compressed generated code-content files: 321/,
+  /commercialDecisionReady` false/,
+  /Additional-turn purchase code remains behind the disabled feature gate/,
+  /Master-plan release step 1 remains open/
+]) {
+  assert.match(semanticReview, requiredBoundary);
+}
 
 console.log("Permitext Research commercialization interim branch-integrity record contract passed.");

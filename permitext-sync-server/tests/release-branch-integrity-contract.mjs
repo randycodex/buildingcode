@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
-import { auditReleaseBranchIntegrity, parseGitPorcelainPaths, scanAddedLinesForCredentials } from "../release-branch-integrity.mjs";
+import {
+  auditReleaseBranchIntegrity,
+  parseGitPorcelainPaths,
+  scanAddedLinesForCredentials,
+  scanTextFilesForCredentials
+} from "../release-branch-integrity.mjs";
 
 const baseCommit = "a".repeat(40);
 const headCommit = "b".repeat(40);
@@ -16,7 +21,8 @@ const clean = auditReleaseBranchIntegrity({
   dirtyPaths: ["NYC CC APP/permitext/Info.plist", "NYC CC APP/project-data/file.xcuserstate"],
   allowedDirtyPaths: ["NYC CC APP/permitext/Info.plist", "NYC CC APP/project-data"],
   changedPaths: ["docs/plan.md", "permitext-sync-server/app.mjs"],
-  addedLineDiff: "diff --git a/docs/plan.md b/docs/plan.md\n+++ b/docs/plan.md\n@@ -0,0 +1 @@\n+safe line\n"
+  addedLineDiff: "diff --git a/docs/plan.md b/docs/plan.md\n+++ b/docs/plan.md\n@@ -0,0 +1 @@\n+safe line\n",
+  headFileCredentialFindings: []
 });
 assert.equal(clean.sourceIntegrityReady, true);
 assert.equal(clean.releaseAuthorized, false);
@@ -42,12 +48,18 @@ const unsafe = auditReleaseBranchIntegrity({
   dirtyPaths: ["unexpected.txt"],
   allowedDirtyPaths: [],
   changedPaths: ["credentials.json", "app.mjs"],
-  addedLineDiff: `diff --git a/app.mjs b/app.mjs\n+++ b/app.mjs\n@@ -0,0 +1 @@\n+const value = "${fakeSecret}";\n`
+  addedLineDiff: `diff --git a/app.mjs b/app.mjs\n+++ b/app.mjs\n@@ -0,0 +1 @@\n+const value = "${fakeSecret}";\n`,
+  headFileCredentialFindings: [{ path: "existing.mjs", lineNumber: 4, kind: "provider-secret-key" }]
 });
 assert.equal(unsafe.sourceIntegrityReady, false);
 assert.deepEqual(unsafe.unexpectedDirtyPaths, ["unexpected.txt"]);
 assert.deepEqual(unsafe.credentialLikePaths, ["credentials.json"]);
 assert.deepEqual(unsafe.credentialFindings, [{ path: "app.mjs", lineNumber: 1, kind: "provider-secret-key" }]);
+assert.deepEqual(unsafe.headFileCredentialFindings, [{
+  path: "existing.mjs",
+  lineNumber: 4,
+  kind: "provider-secret-key"
+}]);
 assert.equal(JSON.stringify(unsafe).includes(fakeSecret), false);
 
 assert.deepEqual(
@@ -59,5 +71,17 @@ assert.deepEqual(
   scanAddedLinesForCredentials(`+++ b/test.mjs\n@@ -0,0 +1 @@\n+const key = "${fakeSecret}"; // permitext-secret-scan-allow: synthetic contract fixture\n`),
   []
 );
+assert.deepEqual(scanTextFilesForCredentials([
+  { path: "unsafe.mjs", content: `const token = "${fakeSecret}";` }
+]), [
+  { path: "unsafe.mjs", lineNumber: 1, kind: "provider-secret-key" },
+  { path: "unsafe.mjs", lineNumber: 1, kind: "credential-assignment" }
+]);
+assert.deepEqual(scanTextFilesForCredentials([
+  {
+    path: "safe-test.mjs",
+    content: `const key = "${fakeSecret}"; // permitext-secret-scan-allow: synthetic contract fixture`
+  }
+]), []);
 
 console.log("Permitext release branch-integrity contract passed.");

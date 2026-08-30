@@ -59,4 +59,6 @@ npm run --silent audit:release-branch -- \
   --allow-dirty <explicitly-reviewed-path>
 ```
 
-The command reports only aggregate checks, paths, line numbers, and rule names. It never emits matched credential values or diff content. Every allowed dirty path must be supplied explicitly; directory allowances cover only descendants of that exact directory. A passing `sourceIntegrityReady` result still leaves `manualSemanticReviewRequired: true` and `releaseAuthorized: false`.
+The command reports only aggregate checks, paths, line numbers, and rule names. It scans both branch-added lines and the full `HEAD` contents of changed text files, while excluding the generated compressed code corpus. It never emits matched credential values, file contents, or diff content. Every allowed dirty path must be supplied explicitly; directory allowances cover only descendants of that exact directory. A passing `sourceIntegrityReady` result still leaves `manualSemanticReviewRequired: true` and `releaseAuthorized: false`.
+
+Risk-prioritized human-readable review evidence is separate: [PERMITEXT_RESEARCH_COMMERCIALIZATION_SEMANTIC_REVIEW_2026-08-30.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_SEMANTIC_REVIEW_2026-08-30.md).
