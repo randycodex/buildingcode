@@ -63,19 +63,19 @@ The working 5% reserve means the model withholds **$1.00 from every $20 charge**
 
 ### Tax
 
-The source audit found that Permitext's current Stripe Checkout request does not enable automatic tax, state inclusive/exclusive tax behavior, or collect/update a billing address for tax. Stripe requires registrations before collection in a jurisdiction and requires API-created Checkout Sessions to enable `automatic_tax`. [Stripe Tax setup](https://docs.stripe.com/tax/set-up?dashboard-or-api=api)
+Permitext now has a dormant automatic-tax Checkout path with required billing-address collection and a fail-closed Production guard. The live USD $20 Price uses Stripe's `Default (inferred by currency)` behavior, which Stripe currently documents as exclusive; the verifier resolves that behavior before comparing it with the required owner decision. Certificate receipt, product-code review, registration, Production configuration, and a real taxed Checkout remain open. [Stripe Tax setup](https://docs.stripe.com/tax/set-up)
 
 New York guidance generally treats remotely accessed prewritten software as taxable. Permitext still needs professional review of its product classification, registrations, customer locations, and whether web prices are presented tax-exclusive or tax-inclusive. [New York computer-software guidance](https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/computer_software.htm)
 
-Therefore the model does **not** call 5% Permitext's sales-tax rate. It remains a downside reserve for unresolved tax-inclusive pricing, withholding, or compliance treatment. If the $20 web price is confirmed tax-exclusive and tax is collected on top, the collected sales tax is not Permitext revenue or expense and this $1 reserve should be removed and replaced with the actual administration/compliance cost.
+Therefore the model does **not** call 5% Permitext's sales-tax rate. It remains a downside reserve for unresolved tax-inclusive pricing, withholding, or compliance treatment. The model already adds Stripe Tax Basic's 0.5% web fee separately—$0.10 on the $20 base—so the newly verified provider fee does not change the $15.84 p90 web cost or $4.16 contribution. If the $20 web price is confirmed tax-exclusive and tax is collected on top, the collected sales tax is not Permitext revenue or expense and the separate $1 downside reserve should eventually be removed or replaced with measured administration/compliance cost. [Stripe Tax pricing](https://stripe.com/tax/pricing)
 
 For iOS, Apple says its tax categorization affects proceeds and proceeds are calculated from customer price minus applicable taxes. The 5% iOS reserve remains until the correct tax category and actual financial reports are verified. [Apple tax categories](https://developer.apple.com/help/app-store-connect/manage-app-information/set-a-tax-category)
 
 ### Infrastructure
 
-Vercel currently lists Pro at $20 per month with $20 of usage credit. The $45 p90 model input preserves the earlier conservative planning case of that platform fee plus $25 of on-demand spend; it is not measured marginal usage or the current recommended live setting. The tightened live recommendation is a $10 on-demand amount, for approximately $30 plus tax and a possible small metering overrun. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
+Vercel currently lists Pro at $20 per month with $20 of usage credit. The owner configured a $20 on-demand amount, for approximately $40 plus tax and a possible small metering overrun. The $45 p90 model input remains a deliberately higher conservative sensitivity; it is not measured marginal usage or the current live spend setting. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
 
-The current retained dashboard evidence is still the August 21 Hobby observation, not a Pro invoice or launch workload. The volume table is therefore the correct no-cost planning evidence, while actual allocation remains open until a paid plan and representative customer traffic produce usage data.
+The August 28 live dashboard evidence confirms Vercel Pro for the current billing cycle, one included owner, $20 of monthly infrastructure credit, and the configured $20 on-demand amount. It is still not a final posted invoice or representative launch workload. The volume table therefore remains the correct no-cost planning evidence, while actual allocation stays open until customer traffic and invoices exist.
 
 ## Method
 
@@ -92,7 +92,7 @@ The V6 cohort was deliberately difficult and all 20 answers routed directly to T
 | Cost | p50 assumption | p90 assumption | Status |
 | --- | ---: | ---: | --- |
 | V6 model usage | empirical aggregate | empirical aggregate | Measured in V6 |
-| Vercel infrastructure | $20/month | $45/month | $20 platform fee is current; the earlier $25 on-demand amount is retained only as a conservative full-budget sensitivity |
+| Vercel infrastructure | $20/month | $45/month | $20 platform fee is current; the live $20 on-demand amount produces about $40 of initial exposure, while $45 remains the conservative sensitivity |
 | Fully utilized paid subscribers | 25 | 25 | Base case; 10/25/50/100 sensitivity now modeled |
 | Infrastructure per subscriber | $0.80 | $1.80 | Derived from the preceding two rows |
 | Support time | 10 minutes | 10 minutes | Owner-approved Beta assumption; measure after launch |
@@ -104,13 +104,13 @@ Channel costs use these current public terms:
 
 - Stripe domestic online card processing: 2.9% + $0.30 per successful transaction. Stripe Tax Basic adds 0.5% on transactions where the business is registered to collect tax. Stripe says original card-processing fees are not returned on ordinary card refunds. [Stripe pricing](https://stripe.com/pricing)
 - Apple's standard digital-goods commission is 30%; approved App Store Small Business Program participants receive an 85% share, before applicable taxes. [Apple membership pricing](https://developer.apple.com/programs/whats-included/), [Apple subscriptions](https://developer.apple.com/app-store/subscriptions/), [Small Business Program](https://developer.apple.com/app-store/small-business-program/)
-- Vercel Pro has a $20 monthly platform fee with a $20 usage credit. This model retains the earlier $25 on-demand amount only as a conservative $45 full-budget sensitivity; the operations runbook now recommends $10 of on-demand spend beyond the included credit for the initial controlled Beta. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
+- Vercel Pro has a $20 monthly platform fee with a $20 usage credit. The owner configured a $20 on-demand amount beyond the credit. This model retains $45 only as a deliberately higher full-budget sensitivity. [Vercel Pro plan](https://vercel.com/docs/plans/pro-plan)
 
 Sales tax collected from a customer is not automatically a Permitext expense. The 5% tax reserve intentionally covers unresolved tax-inclusive pricing, provider withholding, and compliance treatment until Stripe Tax and App Store tax configuration are reviewed. It is not verified as sufficient for every customer location and must be replaced rather than silently retained as a factual tax rate.
 
 ## Inputs that still block final commercial validation
 
-- Obtain tax-professional guidance, record registrations and product tax codes, decide whether the advertised $20 is tax-exclusive on web, and then configure/test Stripe Tax. The source audit found that automatic tax is not currently enabled in checkout.
+- Confirm Certificate receipt, review the current Product tax code, record the applicable registration, approve exclusive or inclusive web presentation, configure the prepared automatic-tax path, and verify a real taxed Checkout. No professional approval is claimed.
 - Replace the 5% refund reserve with actual/refined expected refund incidence after the lifecycle exercise and early customer data.
 - Replace the modeled launch-volume scenarios with actual Vercel invoices and measured per-turn storage/compute usage after commercial hosting is active.
 - Measure actual support minutes over the first 25–50 customers and revisit the longer-term $4–$6 contribution target.
