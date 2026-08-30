@@ -51,6 +51,10 @@ assert.match(
 
 assert.match(webClient, /row\.hidden = !active;/);
 assert.match(webIndex, /aria-label="Current plan"/);
+assert.match(webIndex, /\$20\/month plus applicable taxes shown by Stripe\./);
+assert.match(webIndex, /aria-describedby="settings-stripe-tax-disclosure settings-plan-details"/);
+assert.match(webClient, /stripeTaxDisclosure\.hidden = pro/);
+assert.doesNotMatch(iosSettings, /plus applicable taxes shown by Stripe/i);
 assert.match(webIndex, /class="settings-policy-acceptance" type="checkbox"/);
 assert.match(webIndex, /I have reviewed and agree to the/);
 assert.match(webIndex, /data-policy-document="terms"/);

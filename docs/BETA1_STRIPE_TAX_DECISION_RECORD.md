@@ -1,8 +1,8 @@
 # Permitext Beta 1 Stripe tax decision record
 
-Status: **PREPARED — owner and provider activation remain open**
+Status: **OWNER APPROVED — automatic/exclusive selected; Certificate and provider activation remain open**
 
-This record makes tomorrow's decision small and explicit. It does not determine Permitext's legal tax obligations, activate Stripe Tax, change the $20 Price, change customer copy, set Production variables, deploy, or authorize a taxable sale.
+This record documents the owner's August 30, 2026 approval of the Beta 1 Stripe tax presentation. It does not determine Permitext's legal tax obligations, activate Stripe Tax, change the live $20 Price, set Production variables, deploy, or authorize a taxable sale. The matching web purchase disclosure is prepared locally only.
 
 ## Verified current state
 
@@ -13,7 +13,7 @@ This record makes tomorrow's decision small and explicit. It does not determine 
 - The Stripe Tax collecting-locations view showed no live transactions and no collecting-location row. Stripe states that this monitor excludes the home jurisdiction, so that view does not prove the New York registration state.
 - The local Checkout implementation can request automatic tax and require a billing address. Production now fails closed until an explicit local tax decision exists, and the live readiness audit resolves the documented USD default to `exclusive` before comparing it with that decision.
 
-## Recommendation for owner approval
+## Approved Beta 1 decision
 
 Use Stripe automatic tax with **exclusive** presentation for Beta 1:
 
@@ -22,7 +22,7 @@ PERMITEXT_STRIPE_TAX_MODE=automatic
 PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive
 ```
 
-This keeps Permitext Pro's base price at $20 and adds applicable sales tax at Checkout. It better preserves the already-thin Beta contribution than absorbing sales tax inside $20. Customer-facing purchase copy must clearly say **$20/month plus applicable taxes** before activation.
+This keeps Permitext Pro's base price at $20 and adds applicable sales tax at Checkout. It better preserves the already-thin Beta contribution than absorbing sales tax inside $20. The owner approved the exact web purchase disclosure **$20/month plus applicable taxes shown by Stripe.** Apple purchases remain separate and do not use this Stripe disclosure.
 
 The alternative is `inclusive`: the customer total remains $20, but the tax portion comes out of that $20 and reduces Permitext's retained revenue. Do not select it without rerunning the contribution model for the applicable rates.
 
@@ -34,12 +34,22 @@ Official provider references:
 - [Stripe Tax pricing](https://stripe.com/tax/pricing)
 - [Stripe Checkout automatic-tax integration](https://docs.stripe.com/tax/checkout)
 
-## What the owner needs to confirm tomorrow
+## Owner confirmation — August 30, 2026
 
-1. Whether the new New York Certificate of Authority has arrived and, if so, its effective date and assigned filing frequency. Do not place the certificate image, taxpayer ID, or home address in source control.
-2. Approval or rejection of the recommended `automatic` + `exclusive` presentation.
-3. Approval or adjustment of the customer copy: `$20/month plus applicable taxes`.
-4. Whether to retain Stripe's current Product tax code after reviewing its description against Permitext's actual service.
+The owner approved:
+
+- `PERMITEXT_STRIPE_TAX_MODE=automatic`;
+- `PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive`;
+- web purchase copy: `$20/month plus applicable taxes shown by Stripe.`
+
+The matching disclosure is now prepared in the local web purchase screen. The approved policy files were not changed. No Production environment variable, Stripe registration, Product tax code, Price, provider setting, deployment, or charge changed.
+
+## What remains open
+
+1. Confirm whether the new New York Certificate of Authority has arrived and, if so, privately record its effective date and assigned filing frequency. Do not place the certificate image, taxpayer ID, or home address in source control.
+2. Review whether to retain Stripe's current Product tax code against Permitext's actual service.
+3. Confirm the applicable New York registration in Stripe Tax.
+4. Separately authorize Production activation only after the Certificate and provider facts pass review.
 
 ## Provider activation sequence after approval
 

@@ -30,7 +30,7 @@ Tax is treated separately. The owner may operate as a sole proprietor and report
 
 | Area | Evidence and result | Status |
 | --- | --- | --- |
-| Online recurring-payment disclosure | Web and iOS show product, $20/month, monthly renewal, no trial, 100 Research turns, and the cancellation deadline/mechanism beside the purchase action. | Prepared locally |
+| Online recurring-payment disclosure | Web and iOS show product, $20/month, monthly renewal, no trial, 100 Research turns, and the cancellation deadline/mechanism beside the purchase action. Web separately says `$20/month plus applicable taxes shown by Stripe.` Apple tax handling remains separate. | Prepared locally |
 | Affirmative consent | A separate checkbox/toggle links the exact Terms, Privacy, and subscription/refund versions; the backend records exact versions and web Checkout rejects missing or stale acceptance. | Prepared locally; activation open |
 | Simple cancellation | Stripe subscribers open Manage Subscription from web Settings; Apple subscribers use Apple subscription settings. Account deletion does not falsely promise to cancel Apple. | Implemented; production exercise open |
 | Retainable post-purchase notice | Web Checkout now returns to a printable Permitext confirmation page containing amount, frequency, automatic renewal, deadline, cancellation mechanism, refund rule, and policy links before returning to the app. | Prepared locally; production exercise open |

@@ -4,7 +4,8 @@ import {
   settingsAccountSummary,
   settingsCopy,
   settingsPlanCopy,
-  settingsResearchAllowanceSummary
+  settingsResearchAllowanceSummary,
+  webStripePriceDisclosure
 } from "../public/settings-copy.js";
 
 const iosSettings = await readFile(
@@ -116,5 +117,8 @@ assert(iosViewModel.includes("Continued access is available."));
 assert(webApp.includes("settingsResearchAllowanceSummary(researchUsage)"));
 assert(webApp.includes("function hasAvailableWebResearchTurnPack"));
 assert(webApp.includes("hasAvailableWebResearchTurnPack(researchUsage)"));
+assert(webIndex.includes(webStripePriceDisclosure));
+assert(webApp.includes("stripeTaxDisclosure.textContent = webStripePriceDisclosure"));
+assert(!iosSettings.includes(webStripePriceDisclosure));
 
 console.log("permitext settings wording parity contract passed");

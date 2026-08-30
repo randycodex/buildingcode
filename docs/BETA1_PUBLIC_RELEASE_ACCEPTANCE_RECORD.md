@@ -112,8 +112,8 @@ Release-bound: **no**
 - Registration effective date and assigned filing frequency recorded:
 - No taxable New York sale accepted before authorization:
 - Stripe customer-location and billing-address behavior reviewed:
-- Stripe automatic/manual tax decision and inclusive/exclusive behavior recorded:
-- Source guard confirmed: Production Checkout rejects an unconfigured tax mode, configured automatic mode requests Stripe automatic tax and a billing address, and live readiness verifies the resolved Price tax behavior:
+- Stripe automatic/manual tax decision and inclusive/exclusive behavior recorded: `automatic` + `exclusive` approved August 30, 2026; exact local web disclosure is `$20/month plus applicable taxes shown by Stripe.` The Production keys remain absent.
+- Source guard confirmed: yes locally. Production Checkout rejects an unconfigured tax mode, configured automatic mode requests Stripe automatic tax and a billing address, and live readiness verifies the resolved Price tax behavior. This is not provider activation or real taxed-Checkout evidence.
 - Stripe Product tax code and active provider registration reviewed after the Certificate arrives:
 - Apple tax-handling boundary recorded separately: [BETA1_APPLE_TAX_HANDLING_RECORD.md](./BETA1_APPLE_TAX_HANDLING_RECORD.md). Stripe automatic tax is web-only. Read-only App Store Connect evidence shows parent category `App Store software` and subscription `Match to parent app`, and the owner approved leaving that classification unchanged for Beta 1. First real financial-report evidence remains open.
 - First sales-tax filing deadline and persistent reminder verified:

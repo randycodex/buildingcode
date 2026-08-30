@@ -63,7 +63,7 @@ The working 5% reserve means the model withholds **$1.00 from every $20 charge**
 
 ### Tax
 
-Permitext now has a dormant automatic-tax Checkout path with required billing-address collection and a fail-closed Production guard. The live USD $20 Price uses Stripe's `Default (inferred by currency)` behavior, which Stripe currently documents as exclusive; the verifier resolves that behavior before comparing it with the required owner decision. Certificate receipt, product-code review, registration, Production configuration, and a real taxed Checkout remain open. [Stripe Tax setup](https://docs.stripe.com/tax/set-up)
+Permitext now has a dormant automatic-tax Checkout path with required billing-address collection and a fail-closed Production guard. The owner approved `automatic` + `exclusive` on August 30, 2026, with the exact web disclosure `$20/month plus applicable taxes shown by Stripe.` The live USD $20 Price uses Stripe's `Default (inferred by currency)` behavior, which Stripe currently documents as exclusive; the verifier resolves that behavior before comparing it with the approved decision. Certificate receipt, Product tax-code review, registration, Production configuration, and a real taxed Checkout remain open. [Stripe Tax setup](https://docs.stripe.com/tax/set-up)
 
 New York guidance generally treats remotely accessed prewritten software as taxable. Permitext still needs professional review of its product classification, registrations, customer locations, and whether web prices are presented tax-exclusive or tax-inclusive. [New York computer-software guidance](https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/computer_software.htm)
 

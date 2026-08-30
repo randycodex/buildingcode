@@ -6,8 +6,9 @@ import {
 import {
   settingsAccountSummary,
   settingsPlanCopy,
-  settingsResearchAllowanceSummary
-} from "./settings-copy.js?v=20260827-account-allowance-parity-v3";
+  settingsResearchAllowanceSummary,
+  webStripePriceDisclosure
+} from "./settings-copy.js?v=20260830-stripe-tax-copy-v4";
 import {
   clearResearchRequestRecoveries,
   readResearchRequestRecovery,
@@ -58,7 +59,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260828-policy-consent-v13";
+} from "./offline-storage.js?v=20260830-stripe-tax-copy-v14";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -93,7 +94,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260828-policy-consent-v13";
+} from "./research-intent-state.js?v=20260830-stripe-tax-copy-v14";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -29837,6 +29838,7 @@ function renderSettings() {
   const researchPacks = panel.querySelector(".settings-research-packs");
   const researchPackActions = panel.querySelector(".settings-research-pack-actions");
   const planDetails = panel.querySelector(".settings-plan-details");
+  const stripeTaxDisclosure = panel.querySelector(".settings-stripe-tax-disclosure");
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
   const deleteAccountButton = panel.querySelector(".account-delete");
@@ -30166,6 +30168,8 @@ function renderSettings() {
       ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
       : "Upgrade to Pro - $20.00/month";
     planDetails.hidden = pro;
+    stripeTaxDisclosure.hidden = pro;
+    stripeTaxDisclosure.textContent = webStripePriceDisclosure;
     purchaseConsent.hidden = pro;
     policyAcceptance.disabled = pro || !account || !currentPolicyConfiguration?.configured;
     planSecondaryButton.hidden = !account || source === "lifetimeGrant";

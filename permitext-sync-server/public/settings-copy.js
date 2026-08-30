@@ -7,6 +7,8 @@ export const settingsCopy = Object.freeze({
   signedInAccountSuffix: "Saved sections, notes, and Projects can sync across your devices."
 });
 
+export const webStripePriceDisclosure = "$20/month plus applicable taxes shown by Stripe.";
+
 export function settingsPlanCopy({ pro = false, source = null } = {}) {
   if (!pro) {
     return {
