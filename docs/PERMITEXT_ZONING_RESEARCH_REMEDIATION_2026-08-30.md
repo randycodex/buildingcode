@@ -51,7 +51,8 @@ These results prove source assembly, canonical matching, structured-source conti
 
 ## Remaining gate
 
-1. Obtain explicit owner dispositions for the nine source-checked candidate cases; keep Cases 1, 3, and 11 out of the cohort pending narrowing, duplication review, and incorporated-map evidence respectively.
-2. Freeze the remediated cohort and exact commit.
-3. Only with a new explicit cumulative spend cap, run one clean paid semantic confirmation.
-4. Keep public Zoning Research disabled until that run passes, the updated cost distribution is accepted, and web/iOS release acceptance is complete.
+1. **Complete:** the owner approved nine source-checked candidate cases for evaluation testing only; Cases 1, 3, and 11 remain outside the cohort pending narrowing, duplication review, and incorporated-map evidence respectively.
+2. **Complete:** the unchanged original 21 cases and the nine approvals are frozen as a separate 30-case successor; 30/30 no-cost conversation creation passes. See [PERMITEXT_ZONING_EXPANDED_COHORT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_COHORT_2026-08-30.md).
+3. Commit the exact expanded cohort and contracts.
+4. Only with a new explicit owner authorization and cumulative spend cap, run one clean paid semantic confirmation.
+5. Keep public Zoning Research disabled until that run passes, the updated cost distribution is accepted, and web/iOS release acceptance is complete.

@@ -253,6 +253,105 @@
       "notes": "I accept this revised case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the current official provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
       "reviewer": "Permitext owner",
       "reviewedAt": "2026-08-30T15:26:45.000Z"
+    },
+    {
+      "id": "ba4a0496-9ed5-49ed-8224-0fe5202b1c88",
+      "kind": "zoning-case",
+      "caseID": "zr-candidate-b1-r6a-uap-insufficient-affordable-area",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "Approved for evaluation testing only after source and calculation review; not professional zoning sign-off, public Zoning Research release, paid-run authorization, pricing authorization, deployment authorization, or permission to alter the original 21-case benchmark.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T17:34:16.000Z"
+    },
+    {
+      "id": "e8f03092-dd20-49ef-980d-cb16bf9f46be",
+      "kind": "zoning-case",
+      "caseID": "zr-candidate-b1-deep-through-lot-vertical-yard",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "Approved for evaluation testing only after source and calculation review; not professional zoning sign-off, public Zoning Research release, paid-run authorization, pricing authorization, deployment authorization, or permission to alter the original 21-case benchmark.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T17:34:16.000Z"
+    },
+    {
+      "id": "6dd4c065-bc0c-4499-9c4b-9cef9eb56c16",
+      "kind": "zoning-case",
+      "caseID": "zr-candidate-b1-r6-parking-unverified-transit-zone",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "Approved as an explicit-uncertainty evaluation case after source and calculation review; not professional zoning sign-off, public Zoning Research release, paid-run authorization, pricing authorization, deployment authorization, or permission to alter the original 21-case benchmark.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T17:34:16.000Z"
+    },
+    {
+      "id": "367a87bd-6653-471b-b8eb-7927c5926d0e",
+      "kind": "zoning-case",
+      "caseID": "zr-candidate-b1-mx-nonadditive-far",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "Approved for evaluation testing only after source and calculation review; not professional zoning sign-off, public Zoning Research release, paid-run authorization, pricing authorization, deployment authorization, or permission to alter the original 21-case benchmark.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T17:34:16.000Z"
+    },
+    {
+      "id": "2b801fce-9501-4dd5-8b8d-b0d86ff7d1e2",
+      "kind": "zoning-case",
+      "caseID": "zr-candidate-b1-nonconforming-warehouse-enlargement",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "Approved for evaluation testing only after source and calculation review; not professional zoning sign-off, public Zoning Research release, paid-run authorization, pricing authorization, deployment authorization, or permission to alter the original 21-case benchmark.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T17:34:16.000Z"
+    },
+    {
+      "id": "74fedd22-0a26-42a7-a557-206a28568de3",
+      "kind": "zoning-case",
+      "caseID": "zr-candidate-b1-r7a-r8a-weighted-far",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "Approved for evaluation testing only after source and calculation review; not professional zoning sign-off, public Zoning Research release, paid-run authorization, pricing authorization, deployment authorization, or permission to alter the original 21-case benchmark.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T17:34:16.000Z"
+    },
+    {
+      "id": "2fea5e6b-9503-4a18-ae07-22b6c45c9ee3",
+      "kind": "zoning-case",
+      "caseID": "zr-candidate-b1-c6-2-office-residential-conversion",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "Approved for evaluation testing only after source and calculation review; not professional zoning sign-off, public Zoning Research release, paid-run authorization, pricing authorization, deployment authorization, or permission to alter the original 21-case benchmark.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T17:34:16.000Z"
+    },
+    {
+      "id": "152d4596-d144-4333-ae48-1b40b26828d7",
+      "kind": "zoning-case",
+      "caseID": "zr-candidate-b1-city-of-yes-transition",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "Approved as an explicit-uncertainty evaluation case after source and calculation review; not professional zoning sign-off, public Zoning Research release, paid-run authorization, pricing authorization, deployment authorization, or permission to alter the original 21-case benchmark.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T17:34:16.000Z"
+    },
+    {
+      "id": "cd7ff7cb-6228-4213-a0ff-03dbf89e87cc",
+      "kind": "zoning-case",
+      "caseID": "zr-candidate-b1-mih-historical-zoning-lot",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "Approved as an explicit-uncertainty evaluation case after source and calculation review; not professional zoning sign-off, public Zoning Research release, paid-run authorization, pricing authorization, deployment authorization, or permission to alter the original 21-case benchmark.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T17:34:16.000Z"
     }
   ]
 }

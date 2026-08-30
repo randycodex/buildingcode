@@ -34,13 +34,15 @@ const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
 const casesPath = join(serverRoot, "evals", "research-cases.json");
 const zoningCasesPath = join(serverRoot, "evals", "zoning-cases.json");
+const zoningExpandedCasesPath = join(serverRoot, "evals", "zoning-cases-expanded-batch-1.json");
 const resultsDirectory = join(serverRoot, "evals", "results");
 const baselinesDirectory = join(serverRoot, "evals", "baselines");
 const comparisonsDirectory = join(serverRoot, "evals", "comparisons");
 const reviewsPath = join(serverRoot, "evals", "reviews.json");
 const liveMode = process.argv.includes("--run-live");
 const selfTestMode = process.argv.includes("--self-test");
-const zoningMode = process.argv.includes("--zoning");
+const zoningExpandedMode = process.argv.includes("--zoning-expanded-batch-1");
+const zoningMode = process.argv.includes("--zoning") || zoningExpandedMode;
 const execFileAsync = promisify(execFile);
 const judgePromptVersion =
   process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION || "20260826-established-facts-v3";
@@ -3381,7 +3383,7 @@ async function runSelfTest(dataset, datasetText) {
 async function main() {
   if (process.argv.includes("--help")) {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
-    console.log("Dataset: --zoning uses the frozen owner-approved 21-case Zoning diagnostic set; it is never baseline-eligible.");
+    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses its separately frozen 30-case successor. Neither is baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error]");
@@ -3414,7 +3416,8 @@ async function main() {
   let sourceZoningDataset = null;
   let dataset = baseDataset;
   if (zoningMode) {
-    datasetText = await readFile(zoningCasesPath, "utf8");
+    const selectedZoningCasesPath = zoningExpandedMode ? zoningExpandedCasesPath : zoningCasesPath;
+    datasetText = await readFile(selectedZoningCasesPath, "utf8");
     sourceZoningDataset = JSON.parse(datasetText);
     dataset = await adaptZoningEvaluationDataset({
       zoningDataset: sourceZoningDataset,

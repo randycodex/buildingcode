@@ -23,13 +23,16 @@ const catalogByNumber = new Map(catalog.map((section) => [section.sectionNumber,
 assert.equal(intake.schemaVersion, 1);
 assert.equal(intake.libraryID, "nyc-zoning-resolution");
 assert.equal(intake.researchEligibility, false);
-assert.equal(intake.governance.status, "draft");
+assert.equal(intake.governance.status, "owner-reviewed-partial");
 assert.equal(intake.governance.humanOwnerReviewRequired, true);
 assert.equal(intake.governance.automaticApprovalAllowed, false);
 assert.equal(intake.governance.paidEvaluationAllowed, false);
 assert.equal(intake.governance.professionalZoningSignoff, false);
 assert.equal(intake.governance.publicResearchReleaseAuthorized, false);
 assert.equal(intake.governance.mergeIntoFrozenBenchmarkAuthorized, false);
+assert.equal(intake.governance.createSeparateExpandedCohortAuthorized, true);
+assert.deepEqual(intake.governance.ownerReview.approvedSourceCaseNumbers, [2, 4, 5, 6, 7, 8, 9, 10, 12]);
+assert.deepEqual(intake.governance.ownerReview.heldSourceCaseNumbers, [1, 3, 11]);
 assert.equal(sourceManifest.researchEligibility, false);
 assert.equal(frozenDataset.cases.length, 21, "Candidate intake must not change the frozen benchmark.");
 
@@ -58,6 +61,8 @@ assert.equal(intake.verification.calculationChecksPassedCount, 12);
 const caseIDs = new Set();
 const sourceCaseNumbers = new Set();
 const statusCounts = { ready: 0, "blocked-for-source-verification": 0 };
+const approvedSourceCaseNumbers = new Set(intake.governance.ownerReview.approvedSourceCaseNumbers);
+const heldSourceCaseNumbers = new Set(intake.governance.ownerReview.heldSourceCaseNumbers);
 const allowedRecommendations = new Set([
   "advance-to-owner-review",
   "advance-as-explicit-uncertainty",
@@ -71,7 +76,15 @@ for (const testCase of intake.cases) {
   assert(!sourceCaseNumbers.has(testCase.sourceCaseNumber), `Duplicate source case ${testCase.sourceCaseNumber}.`);
   caseIDs.add(testCase.id);
   sourceCaseNumbers.add(testCase.sourceCaseNumber);
-  assert.equal(testCase.status, "draft");
+  assert.equal(testCase.status, approvedSourceCaseNumbers.has(testCase.sourceCaseNumber) ? "approved" : "draft");
+  if (approvedSourceCaseNumbers.has(testCase.sourceCaseNumber)) {
+    assert.equal(testCase.reviewer, "Permitext owner");
+    assert.match(testCase.reviewedAt, /^2026-08-30T/);
+    assert.match(testCase.approvalScope, /Evaluation testing only/);
+  } else {
+    assert(heldSourceCaseNumbers.has(testCase.sourceCaseNumber));
+    assert.equal(testCase.reviewer, undefined);
+  }
   assert(allowedRecommendations.has(testCase.recommendation));
   assert(testCase.reason.length >= 60);
   assert(testCase.selectedEvidenceSectionIDs.length > 0);
@@ -116,6 +129,8 @@ assert.equal(intake.cases[0].recommendation, "revise-before-owner-review");
 assert.equal(intake.cases[2].recommendation, "hold-as-near-duplicate");
 assert.equal(intake.cases[10].recommendation, "hold-for-visual-map-evidence");
 assert.equal(intake.cases[10].evidenceMode, "visual-map-dependent");
+assert.equal(intake.cases.filter((testCase) => testCase.status === "approved").length, 9);
+assert.equal(intake.cases.filter((testCase) => testCase.status === "draft").length, 3);
 
 function close(actual, expected) {
   assert(Math.abs(actual - expected) < 0.000_001, `Expected ${expected}; received ${actual}.`);
@@ -148,7 +163,11 @@ console.log("zoning candidate batch 1 intake passed", {
   cases: intake.cases.length,
   sourceDeclaredReady: statusCounts.ready,
   sourceDeclaredBlocked: statusCounts["blocked-for-source-verification"],
+  ownerApproved: intake.cases.filter((testCase) => testCase.status === "approved").length,
+  held: intake.cases.filter((testCase) => testCase.status === "draft").length,
   officialSectionsMapped: officialSectionNumbers.size,
   frozenBenchmarkCases: frozenDataset.cases.length,
   publicResearchReleaseAuthorized: intake.governance.publicResearchReleaseAuthorized
 });
+
+await import("./zoning-expanded-batch-1-contract.mjs");

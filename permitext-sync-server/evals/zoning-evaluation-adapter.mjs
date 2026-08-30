@@ -85,7 +85,10 @@ function selectedPassages(testCase, sectionID, section) {
 }
 
 function expectedUncertainty(testCase) {
-  if (["explicit-uncertainty", "mapped-applicability"].includes(testCase.category)) {
+  if (
+    ["explicit-uncertainty", "mapped-applicability"].includes(testCase.category) ||
+    /missing/.test(String(testCase.evidenceMode || ""))
+  ) {
     return {
       level: "insufficient evidence",
       description: "The answer must identify the missing applicability facts and must not make a property-specific determination from the reviewed evidence alone."
@@ -134,11 +137,18 @@ export async function adaptZoningEvaluationDataset({
   assert(zoningDataset?.schemaVersion === 1, "Zoning evaluation dataset must use schemaVersion 1.");
   assert(zoningDataset.libraryID === "nyc-zoning-resolution", "Unexpected Zoning evaluation library.");
   assert(zoningDataset.researchEligibility === false, "Zoning public Research eligibility must remain disabled.");
-  assert(zoningDataset.governance?.paidEvaluationAllowed === false, "Completed Zoning authorization must be closed before reuse.");
-  assert(zoningDataset.governance?.paidEvaluationAuthorization?.status === "consumed", "Completed Zoning authorization must be recorded as consumed.");
+  assert(zoningDataset.governance?.paidEvaluationAllowed === false, "Paid Zoning evaluation must be locked before no-cost reuse.");
+  assert(
+    ["consumed", "locked"].includes(zoningDataset.governance?.paidEvaluationAuthorization?.status),
+    "Zoning paid authorization must be consumed or explicitly locked."
+  );
   assert(zoningDataset.governance?.professionalZoningSignoff === false, "This benchmark cannot represent professional Zoning sign-off.");
   assert(zoningDataset.governance?.publicResearchReleaseAuthorized === false, "This benchmark cannot authorize public Zoning Research.");
-  assert(zoningDataset.cases?.length === 21, "The frozen Zoning benchmark must contain exactly 21 cases.");
+  const expectedCaseCount = zoningDataset.governance?.frozenCaseCount || 21;
+  assert(
+    zoningDataset.cases?.length === expectedCaseCount,
+    `The frozen Zoning benchmark must contain exactly ${expectedCaseCount} cases.`
+  );
 
   const cases = [];
   for (const testCase of zoningDataset.cases) {
@@ -189,7 +199,7 @@ export async function adaptZoningEvaluationDataset({
     const requiredCitations = selectedEvidence.map((source) => source.reference);
     cases.push({
       id: testCase.id,
-      title: caseTitle(testCase),
+      title: testCase.title || caseTitle(testCase),
       status: "approved",
       difficulty: "advanced",
       topics: ["NYC Zoning Resolution", testCase.category],
@@ -201,10 +211,10 @@ export async function adaptZoningEvaluationDataset({
       expectedConclusion: testCase.requiredConcepts.join(" "),
       expectedUncertainty: expectedUncertainty(testCase),
       sourceType: "deliberately constructed edge case",
-      sourceReference: "Permitext owner-approved Zoning Resolution evaluation set.",
+      sourceReference: zoningDataset.name || "Permitext owner-approved Zoning Resolution evaluation set.",
       reviewer: testCase.reviewer,
       reviewedAt: testCase.reviewedAt,
-      notes: "Diagnostic paid benchmark only; not professional Zoning sign-off or public-release authorization.",
+      notes: "Diagnostic evaluation only; paid execution requires separate authorization and this is not professional Zoning sign-off or public-release authorization.",
       requiredConcepts: testCase.requiredConcepts,
       missingFacts: missingFacts(testCase),
       forbiddenClaims: testCase.forbiddenClaims,
@@ -214,8 +224,8 @@ export async function adaptZoningEvaluationDataset({
 
   return {
     schemaVersion: 3,
-    name: "Permitext owner-approved Zoning diagnostic benchmark",
-    description: "A diagnostic adapter over the frozen 21-case Zoning set. Public Zoning Research remains disabled.",
+    name: zoningDataset.name || "Permitext owner-approved Zoning diagnostic benchmark",
+    description: `A diagnostic adapter over the frozen ${cases.length}-case Zoning set. Public Zoning Research remains disabled.`,
     responseLanguage: "en",
     automaticScoring,
     cases
