@@ -222,4 +222,26 @@ assert.deepEqual(
   "The current successor must fail closed on every bare or prefixed answer-key provision absent from selected evidence."
 );
 
+const remediationSuccessor2Dataset = JSON.parse(await readFile(
+  new URL("../evals/zoning-cases-expanded-batch-1-successor-remediation-2.json", import.meta.url),
+  "utf8"
+));
+const remediationSuccessor2Adapted = await adaptZoningEvaluationDataset({
+  zoningDataset: remediationSuccessor2Dataset,
+  automaticScoring: {},
+  sectionReader: zoningSection,
+  sectionSummaryReader: zoningSectionSummary
+});
+assert.equal(remediationSuccessor2Adapted.cases.length, 30);
+assert.deepEqual(
+  remediationSuccessor2Adapted.cases
+    .filter((testCase) => testCase.answerKeyEvidenceMismatches.length)
+    .map((testCase) => ({
+      id: testCase.id,
+      answerKeyEvidenceMismatches: testCase.answerKeyEvidenceMismatches
+    })),
+  [],
+  "The separately frozen remediation successor 2 must contain no answer-key reference absent from selected evidence."
+);
+
 console.log("zoning evaluation adapter contract passed");

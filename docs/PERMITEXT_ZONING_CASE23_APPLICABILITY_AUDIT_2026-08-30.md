@@ -2,9 +2,9 @@
 
 Date: August 30, 2026
 
-Status: **NO-COST OFFICIAL-SOURCE RE-AUDIT COMPLETE; NEW OWNER SCOPE DECISION REQUIRED**
+Status: **NO-COST OFFICIAL-SOURCE RE-AUDIT COMPLETE; NARROW RESIDENTIAL DISPOSITION APPROVED AND APPLIED ONLY IN REMEDIATION SUCCESSOR 2**
 
-This audit corrects the earlier recommendation for `zr-candidate-b1-deep-through-lot-vertical-yard`. It changes no frozen cohort, retained result, price, allowance, deployment, or public setting. It used current official NYC Zoning Resolution text and the already imported governed corpus. No provider call was made.
+This audit corrects the earlier recommendation for `zr-candidate-b1-deep-through-lot-vertical-yard`. It changes no historical frozen cohort, retained result, price, allowance, deployment, or public setting. It used current official NYC Zoning Resolution text and the already imported governed corpus. No provider call was made. The owner later selected the recommended narrow residential disposition; that choice is recorded at the end without rewriting the historical question or result discussed here.
 
 ## Stated facts
 
@@ -50,4 +50,17 @@ Two internally coherent dispositions are available:
 
 The existing forbidden claim against saying the same depth applies at every height is coherent in the recommended ZR 23-343 residential case, but it can conflict with the single-depth Chapter 4 branch. That is why the mixed-use boundary cannot simply be added to the old key while all forbidden claims remain unchanged.
 
-Either option is a substantive case correction and requires a new explicit owner approval. No correction has been applied. This is not professional zoning sign-off, public enablement, deployment authorization, or paid-run authorization.
+Either option is a substantive case correction and required a new explicit owner approval. At the time of this audit, no correction had been applied. This is not professional zoning sign-off, public enablement, deployment authorization, or paid-run authorization.
+
+## Disposition resolution
+
+The owner subsequently approved the recommended narrow residential case. The exact decision is retained in [the remediation-successor-2 owner disposition](./PERMITEXT_ZONING_SUCCESSOR_REMEDIATION_2_OWNER_DISPOSITION_2026-08-30.md).
+
+The separately versioned remediation successor 2:
+
+- appends exactly `The building and zoning lot contain no community-facility use.` to this case;
+- preserves selected ZR 12-10 and ZR 23-343 and all existing forbidden claims;
+- replaces only the expected conclusion and required concepts with the 190-foot threshold, 40/60-foot height tiers, 10/30-foot conditional deficiencies, upper 25-foot tier, and midpoint-within-10-feet result above; and
+- preserves dimensional orientation, qualifying through-lot geometry, listed-exception, obstruction, and special-district uncertainty.
+
+The historical parent successor remains fail-closed at 27/30. The new remediation successor passes 30/30 canonical-evidence and no-cost conversation creation, while its paid, semantic, cost, Production, and public-release gates remain locked. Evidence: [PERMITEXT_ZONING_SUCCESSOR_REMEDIATION_2_2026-08-30.md](./PERMITEXT_ZONING_SUCCESSOR_REMEDIATION_2_2026-08-30.md).

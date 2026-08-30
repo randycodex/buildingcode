@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 2,
+  "status": "owner_approved",
+  "createdAt": "2026-08-30T21:40:28.000Z",
+  "sourceCohort": {
+    "file": "zoning-cases-expanded-batch-1-successor.json",
+    "caseCount": 30,
+    "sha256": "d07063fa12ec993fde8802e6b58971d5cc1873a52fbefbe9e538b81acb94d30f",
+    "mutationAuthorized": false
+  },
+  "reviewEvidence": [
+    {
+      "file": "../../docs/PERMITEXT_ZONING_SUCCESSOR_REMEDIATION_2_OWNER_DISPOSITION_2026-08-30.md",
+      "sha256": "004c91355b2b54a28781d8a2a06804f33ee1cdc2526701c366a8aefd3a9907f7"
+    },
+    {
+      "file": "../../docs/PERMITEXT_ZONING_CASE23_APPLICABILITY_AUDIT_2026-08-30.md",
+      "sha256": "b231ec43d54709042126485de09db9bec6f3d747bb6da8bcd55ca547bbeb43c5"
+    },
+    {
+      "file": "../../docs/PERMITEXT_ZONING_SUCCESSOR_FAILURE_TRIAGE_2026-08-30.md",
+      "sha256": "9db8fe4ce609870685af86d47a053f6e260c50fba53f185c1d9adef59c08d68a"
+    }
+  ],
+  "ownerDecision": {
+    "required": true,
+    "recordedAt": "2026-08-30T21:40:28.000Z",
+    "recordedBy": "Permitext owner",
+    "acceptedDecisionIDs": [
+      "rephrase-special-district-selected-applicability",
+      "rephrase-narrow-rear-yard-selected-exceptions",
+      "correct-deep-through-lot-residential-branch"
+    ],
+    "exactApprovalPhrase": "go ahead - non stop, im here if you need me",
+    "approvalContextFile": "../../docs/PERMITEXT_ZONING_SUCCESSOR_REMEDIATION_2_OWNER_DISPOSITION_2026-08-30.md"
+  },
+  "decisions": [
+    {
+      "id": "rephrase-special-district-selected-applicability",
+      "kind": "answer_key_evidence_alignment",
+      "caseID": "zr-special-district-demolition",
+      "status": "approved",
+      "summary": "Rephrase only the applicability concept so selected ZR 101-04 establishes that selected ZR 101-75 applies, without naming unselected ZR 101-70.",
+      "allowedSubstantiveFields": [
+        "requiredConcepts"
+      ],
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "rephrase-narrow-rear-yard-selected-exceptions",
+      "kind": "answer_key_evidence_alignment",
+      "caseID": "zr-narrow-attached-rear-yard",
+      "status": "approved",
+      "summary": "Rephrase only the exception boundary so selected ZR 23-342 supplies the shallow-lot modification and any other exception requires separate evidence, without naming unselected ZR 23-34.",
+      "allowedSubstantiveFields": [
+        "requiredConcepts"
+      ],
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "correct-deep-through-lot-residential-branch",
+      "kind": "answer_key_replacement",
+      "caseID": "zr-candidate-b1-deep-through-lot-vertical-yard",
+      "status": "approved",
+      "summary": "Add the explicit absence of community-facility use and replace only the key with the selected ZR 23-343 residential branch, including its height tiers, deficiencies, and midpoint tolerance.",
+      "allowedSubstantiveFields": [
+        "question",
+        "expectedConclusion",
+        "requiredConcepts"
+      ],
+      "changesQuestion": true,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    }
+  ],
+  "successor": {
+    "outputFile": "zoning-cases-expanded-batch-1-successor-remediation-2.json",
+    "generationAllowed": true,
+    "paidEvaluationAllowed": false,
+    "publicResearchReleaseAuthorized": false,
+    "professionalZoningSignoff": false,
+    "requiresSeparatePaidAuthorization": true,
+    "requiresSeparateCumulativeSpendCap": true
+  }
+}

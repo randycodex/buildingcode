@@ -2,7 +2,7 @@
 
 Date: August 30, 2026
 
-Status: **NO-COST TRIAGE COMPLETE; THREE OWNER CASE DISPOSITIONS AND SEMANTIC CONFIRMATION OPEN**
+Status: **NO-COST TRIAGE COMPLETE; THREE CASE DISPOSITIONS APPLIED ONLY IN REMEDIATION SUCCESSOR 2; SEMANTIC CONFIRMATION OPEN**
 
 This record classifies every failure in retained run `5480ed8f-6d0c-46b1-a108-d12e8e13b7da` without changing that immutable result. It records only no-cost code, source, and contract analysis. No model call, new paid authorization, price or allowance change, merge, push, deployment, or public Zoning enablement occurred.
 
@@ -30,7 +30,7 @@ The regression keeps forged-passage checks intact: a structured citation passes 
 
 The retained answers for all five cases reproduce the new issue types in a no-cost post-run check. That check is diagnostic only and does not rescore the frozen paid result.
 
-### Answer-key/evidence blockers — owner dispositions required
+### Answer-key/evidence blockers — owner dispositions implemented in a new successor
 
 The strengthened adapter now recognizes bare `Section`, grouped `Sections`, section-symbol, ranged, suffix, and Appendix forms, not only references explicitly prefixed by `ZR`. That exposes two additional frozen-key mismatches:
 
@@ -39,13 +39,13 @@ The strengthened adapter now recognizes bare `Section`, grouped `Sections`, sect
 | `zr-special-district-demolition` | A required concept names unselected ZR 101-70 while the selected ZR 101-04 passage already establishes that ZR 101-75 applies in the Atlantic Avenue Subdistrict. | Rephrase only that scope concept to say selected ZR 101-04 establishes the applicability of selected ZR 101-75. Preserve the question, selected evidence, substantive prerequisites, exception, and forbidden claims. |
 | `zr-narrow-attached-rear-yard` | A required concept names unselected ZR 23-34 while selected ZR 23-342 itself states the shallow-lot modification and preserves other exceptions. | Rephrase only the exception concept to preserve the selected shallow-lot modification and separately evidenced exceptions without naming unselected ZR 23-34. Preserve the question, 30-foot rule, 10-foot deficiency, selected evidence, and forbidden claims. |
 
-These are not product-answer failures. They are frozen answer-key/evidence inconsistencies and require explicit owner approval before a separately versioned successor changes either concept.
+These are not product-answer failures. They are frozen answer-key/evidence inconsistencies. The owner subsequently approved both narrow concept rephrasings for a separately versioned successor; the historical successor remains unchanged.
 
 Case `zr-candidate-b1-deep-through-lot-vertical-yard` has the third, substantive applicability blocker. The selected `ZR 23-343` supplies the residential branch's 190-foot threshold, 40-foot requirement at or below 75 feet, 60-foot requirement above 75 feet, and midpoint tolerance of 10 feet. The frozen successor key instead imports unselected Chapter 4 rule `ZR 24-382`, so it cannot be substantiated from the supplied record. A later official-source re-audit also found that the frozen question never says whether the zoning lot contains a community-facility use; under `ZR 24-31`, that missing fact can make the Chapter 4 path material. The record therefore supports the selected residential branch but does not establish it as the only possible branch. Full source audit: [PERMITEXT_ZONING_CASE23_APPLICABILITY_AUDIT_2026-08-30.md](./PERMITEXT_ZONING_CASE23_APPLICABILITY_AUDIT_2026-08-30.md).
 
 The no-cost preflight reports all three cases `BLOCKED` and stops a future live run before its first model request. Current successor preflight is therefore intentionally 27/30, not 30/30.
 
-Recommended owner disposition: keep this a narrow residential case by adding the explicit fact that the building and zoning lot contain no community-facility use, then replace only its expected conclusion and required concepts with the ZR 23-343 result—40 feet at or below 75 feet, 60 feet above 75 feet, respective 10-foot and 30-foot deficiencies if the supplied dimension is the regulated depth, 25 vertical feet in the upper tier, and midpoint or within 10 feet. Preserve the selected evidence, existing forbidden claims, every other question fact, geometry/exception/obstruction uncertainty, and all other cases. The broader alternative would require adding the Chapter 3/4 applicability sections and revising the missing-fact and forbidden-claim fields to evaluate both branches. Do not change the frozen run or prior successor in place; create a separately versioned remediation successor only after explicit approval of one coherent scope.
+The owner selected the recommended narrow residential disposition: add the explicit fact that the building and zoning lot contain no community-facility use, then replace only its expected conclusion and required concepts with the ZR 23-343 result—40 feet at or below 75 feet, 60 feet above 75 feet, respective 10-foot and 30-foot deficiencies if the supplied dimension is the regulated depth, 25 vertical feet in the upper tier, and midpoint or within 10 feet. The separately versioned remediation successor preserves selected evidence, existing forbidden claims, every other question fact, geometry/exception/obstruction uncertainty, and all other cases. The frozen run and prior successor remain unchanged. Decision evidence: [PERMITEXT_ZONING_SUCCESSOR_REMEDIATION_2_OWNER_DISPOSITION_2026-08-30.md](./PERMITEXT_ZONING_SUCCESSOR_REMEDIATION_2_OWNER_DISPOSITION_2026-08-30.md).
 
 ## Execution failures
 
@@ -63,13 +63,15 @@ Recommended owner disposition: keep this a narrow residential case by adding the
 - The broader Research safety suite passes with no paid calls.
 - Current successor preflight stops at 27/30 because three keys name unselected ZR 101-70, 23-34, or 24-382; current Case 23 applicability review confirms the selected ZR 23-343 residential branch while recording community-facility status as an unresolved material fact in the frozen question.
 - The separate no-cost 27/30 ready-case evidence-budget advisory preserves every exact selected and deterministic required section at the disabled 24,000-character candidate, binds counted stored passage text to its content hashes and the implementation source state, records a 28.8% average evidence-character reduction plus identity and passage-hash differences, and makes no semantic or cost-acceptance claim.
+- The separately frozen remediation successor 2 changes exactly those three cases, preserves every selected evidence section and forbidden claim, has zero answer-key/evidence mismatches, passes 30/30 canonical-evidence and no-cost conversation creation, and rejects direct live execution because no paid authorization or cumulative cap exists.
+- Its full 30-case disabled 24,000-character evidence prototype preserves all 87 exact selected sources and eight reviewed structured sources, averaging 28,712 stored passage characters with zero provider usage. This is evidence-package readiness, not semantic acceptance.
 - Future invalid-answer operations distinguish the structured failure stage in aggregate-only telemetry; the retained office operation cannot be retroactively classified.
 - Public Zoning Research remains disabled and the prior one-time authorization remains consumed.
 
 ## Next gate
 
-1. Obtain the owner's exact approval for all three source-bound case dispositions: the two narrow concept rephrasings above and one coherent Case 23 scope—preferably the narrow residential-only fact plus ZR 23-343 replacement recorded in the applicability audit; do not infer professional Zoning approval.
+1. Retain the exact remediation-successor-2 lineage and its complete no-cost 30/30 evidence result; do not mutate either historical successor.
 2. Retain the office aggregate diagnostic improvement; the three execution-failure paths still need a later authorized semantic confirmation, and the office historical subcause cannot be recovered from the frozen result.
-3. Retain the 24,000-character evidence-budget candidate as disabled; its ready-case advisory is complete, but the corrected full successor and semantic comparison remain open.
-4. Freeze a new exact remediation successor only after all three case corrections are approved.
-5. Require a new explicit one-run authorization and cumulative cap for any semantic confirmation.
+3. Keep the 24,000-character evidence-budget candidate disabled until a clean semantic comparison establishes that its changed supplemental passages preserve answer quality.
+4. Require a new explicit one-run authorization and cumulative cap before any remediation-successor-2 semantic confirmation.
+5. Continue to require a clean semantic result, accepted economics, and exact-release web/iOS acceptance before public Zoning Research.
