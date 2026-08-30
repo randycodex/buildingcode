@@ -134,6 +134,39 @@ The model option uses the production configuration boundary. Prompt selection is
 
 Every run uses an isolated temporary local store and synthetic eval account. It never writes a normal user's conversations or consumes a production user's monthly allowance. Pricing is never guessed; each paid request reserves a conservative maximum before dispatch and stops at the approved cap.
 
+### Zoning diagnostic benchmark
+
+The frozen owner-approved Zoning set runs through the same production answer and separate-grader path by adapting `zoning-cases.json` to the general evaluation contract at runtime. It uses only the reviewed canonical Zoning sections and remains diagnostic: it cannot create a baseline, represent professional Zoning sign-off, or enable public Zoning Research.
+
+No-cost evidence and production-path preflight:
+
+```sh
+npm run eval:zoning
+```
+
+Paid execution requires the ordinary live environment plus the separately recorded authorization in `zoning-cases.json`:
+
+```sh
+PERMITEXT_RUN_PAID_RESEARCH_EVALS=1 \
+OPENAI_API_KEY=... \
+PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS=... \
+PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS=... \
+PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS=... \
+PERMITEXT_RESEARCH_PRICING_VERSION=... \
+PERMITEXT_RESEARCH_EVAL_MAX_USD=... \
+npm run eval:zoning:live
+```
+
+The runner rejects a filtered, repeated, over-cap, or already-consumed live Zoning command. The completed August 30 authorization is recorded as consumed, so another paid command fails before dispatch. A new run requires a new explicit owner authorization and cumulative ceiling.
+
+The separately supplied `Permitext_NYC_Zoning_Research_Evaluation_Cases_Batch_1.md` is governed by `zoning-candidate-batch-1-intake.json`. It contains 12 draft candidates and is not part of the frozen 21-case benchmark. The intake maps every cited ZR section to canonical content, verifies the stated calculations, and records a recommendation without adopting the source document's READY labels. Validate it without model calls:
+
+```sh
+npm run test:zoning-candidate-batch
+```
+
+That command does not approve a case, authorize spend, enable public Zoning Research, or alter the frozen cohort.
+
 ## Scoring
 
 Quality uses a transparent 0–4 scale:

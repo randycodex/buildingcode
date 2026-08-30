@@ -7,6 +7,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { approvedEvaluationCases, validateEvaluationDataset } from "../evals/evaluation-schema.mjs";
+import { adaptZoningEvaluationDataset } from "../evals/zoning-evaluation-adapter.mjs";
 import {
   normalizeResearchInterpretationEvidenceBindings,
   researchInputForEvidence,
@@ -27,16 +28,19 @@ import {
   validatePaidResearchEvaluationEnvironment
 } from "../research-config.mjs";
 import { requestResearchProvider } from "../research-provider-client.mjs";
+import { zoningSection, zoningSectionSummary } from "../zoning-content.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
 const casesPath = join(serverRoot, "evals", "research-cases.json");
+const zoningCasesPath = join(serverRoot, "evals", "zoning-cases.json");
 const resultsDirectory = join(serverRoot, "evals", "results");
 const baselinesDirectory = join(serverRoot, "evals", "baselines");
 const comparisonsDirectory = join(serverRoot, "evals", "comparisons");
 const reviewsPath = join(serverRoot, "evals", "reviews.json");
 const liveMode = process.argv.includes("--run-live");
 const selfTestMode = process.argv.includes("--self-test");
+const zoningMode = process.argv.includes("--zoning");
 const execFileAsync = promisify(execFile);
 const judgePromptVersion =
   process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION || "20260826-established-facts-v3";
@@ -1193,14 +1197,14 @@ function reviewMarkdown(dataset, results, createdAt, configuration) {
     "| --- | --- | ---: | ---: | ---: |",
     ...summaryRows,
     "",
-    "Automatic scoring is a regression signal, not a substitute for periodic review by a building-code professional.",
+    "Automatic scoring is a regression signal, not a substitute for periodic review by an appropriate code or zoning professional.",
     "",
     ...sections
   ].join("\n");
 }
 
 function selectedPassages(testCase) {
-  return testCase.selectedEvidence.flatMap((source) =>
+  return testCase.selectedEvidence.filter((source) => source.pinDuringBenchmark !== false).flatMap((source) =>
     source.exactPassages.map((selectedText) => ({ source, selectedText }))
   );
 }
@@ -1251,21 +1255,30 @@ async function createEvaluationConversation(baseURL, account, testCase) {
     body: {
       auth: { accountUserID: account.appUserID },
       ...(projectID ? { projectID } : {}),
-      selections: passages.map((passage) => ({
-        sectionID: passage.source.sectionID,
-        selectedText: passage.selectedText
-      }))
+      ...(passages.length ? {
+        selections: passages.map((passage) => ({
+          sectionID: passage.source.sectionID,
+          selectedText: passage.selectedText
+        }))
+      } : {})
     }
   });
   assert(
     created.conversation.sources.filter((source) => source.kind === "selection").length === passages.length,
     `${testCase.id} did not preserve every passage supplied through the multi-selection request contract.`
   );
-  assert(
-    created.conversation.title.length <= 120 &&
-      passageTitleSource.startsWith(created.conversation.title.replace(/…$/, "")),
-    `${testCase.id} did not receive a title based on its first selected passage.`
-  );
+  if (passages.length) {
+    assert(
+      created.conversation.title.length <= 120 &&
+        passageTitleSource.startsWith(created.conversation.title.replace(/…$/, "")),
+      `${testCase.id} did not receive a title based on its first selected passage.`
+    );
+  } else {
+    assert(
+      created.conversation.sources.length === 0 && created.conversation.origin?.kind === "chat",
+      `${testCase.id} did not create a clean automatic-evidence conversation.`
+    );
+  }
   if (projectID) {
     const savedContext = await jsonRequest(baseURL, "/research/conversations/project-context", {
       method: "POST",
@@ -1551,7 +1564,7 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases, w
   );
 }
 
-async function runMockConversationCases(baseURL, checkedCases, workflowFixtureCase) {
+async function runMockConversationCases(baseURL, checkedCases, workflowFixtureCase, options = {}) {
   const account = await signInEvalUser(baseURL);
   await verifyResearchWorkflowContracts(baseURL, account, checkedCases, workflowFixtureCase);
   const emptyChat = await jsonRequest(baseURL, "/research/conversations/create", {
@@ -1613,6 +1626,7 @@ async function runMockConversationCases(baseURL, checkedCases, workflowFixtureCa
   );
   for (const testCase of checkedCases) {
     const conversationID = await createEvaluationConversation(baseURL, account, testCase);
+    if (options.createOnly === true) continue;
     const { answer, conversation } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
     assert(answer.mode === "mock" && answer.model === "permitext-mock", `${testCase.id} unexpectedly called a live model during preflight.`);
     const selectedSourceIDs = conversation.sources
@@ -1632,7 +1646,9 @@ async function runMockConversationCases(baseURL, checkedCases, workflowFixtureCa
       `${testCase.id} did not preserve pinned evidence inside the verified automatic evidence package.`
     );
   }
-  console.log(`Verified legacy pinned-evidence compatibility, automatic enacted-corpus assembly, current Project context, and ${checkedCases.length}/${checkedCases.length} cases through Permitext's conversation flow in mock mode.`);
+  console.log(options.createOnly === true
+    ? `Verified legacy pinned-evidence compatibility, automatic enacted-corpus assembly, current Project context, and ${checkedCases.length}/${checkedCases.length} Zoning evidence sets through Permitext's conversation-creation flow without semantic mock scoring.`
+    : `Verified legacy pinned-evidence compatibility, automatic enacted-corpus assembly, current Project context, and ${checkedCases.length}/${checkedCases.length} cases through Permitext's conversation flow in mock mode.`);
 }
 
 async function currentGitCommit() {
@@ -2111,13 +2127,14 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
   const baseConfiguration = {
     runID: randomUUID(),
     datasetSHA256: createHash("sha256").update(datasetText).digest("hex"),
+    datasetKind: options.datasetKind || "construction-code",
     codeEditions: Array.from(new Set(checkedCases.map((testCase) => testCase.codeEdition))),
     jurisdictions: Array.from(new Set(checkedCases.map((testCase) => testCase.jurisdiction))),
     answerModel: answerConfiguration.model,
     answerReasoningEffort: answerConfiguration.reasoningEffort,
     promptVersion: answerConfiguration.promptVersion,
     evidenceVersion: answerConfiguration.evidenceVersion,
-    retrievalVersion: "automatic-enacted-corpus-with-pinned-evidence",
+    retrievalVersion: options.retrievalVersion || "automatic-enacted-corpus-with-pinned-evidence",
     suiteScope: options.suiteScope || "full",
     repeat,
     caseIDs: checkedCases.map((testCase) => testCase.id),
@@ -2128,7 +2145,9 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
     pricingVersion: estimatedResearchCost({ inputTokens: 0, outputTokens: 0 }).pricingVersion,
     gitCommit: await currentGitCommit()
   };
-  const priorBaseline = options.suiteScope === "diagnostic" ? null : await latestBaseline();
+  const priorBaseline = options.suiteScope === "diagnostic" || options.datasetKind === "zoning-resolution"
+    ? null
+    : await latestBaseline();
   await mkdir(resultsDirectory, { recursive: true });
   const resultName = `${stamp}-${baseConfiguration.runID}`;
   const jsonPath = join(resultsDirectory, `${resultName}.json`);
@@ -3352,6 +3371,7 @@ async function runSelfTest(dataset, datasetText) {
 async function main() {
   if (process.argv.includes("--help")) {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
+    console.log("Dataset: --zoning uses the frozen owner-approved 21-case Zoning diagnostic set; it is never baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error]");
@@ -3378,8 +3398,21 @@ async function main() {
   if (argumentValue("--cases")) {
     throw new Error("Custom case files are not supported yet; review and commit changes to evals/research-cases.json.");
   }
-  const datasetText = await readFile(casesPath, "utf8");
-  const dataset = JSON.parse(datasetText);
+  const baseDatasetText = await readFile(casesPath, "utf8");
+  const baseDataset = JSON.parse(baseDatasetText);
+  let datasetText = baseDatasetText;
+  let sourceZoningDataset = null;
+  let dataset = baseDataset;
+  if (zoningMode) {
+    datasetText = await readFile(zoningCasesPath, "utf8");
+    sourceZoningDataset = JSON.parse(datasetText);
+    dataset = await adaptZoningEvaluationDataset({
+      zoningDataset: sourceZoningDataset,
+      automaticScoring: baseDataset.automaticScoring,
+      sectionReader: zoningSection,
+      sectionSummaryReader: zoningSectionSummary
+    });
+  }
   validateDataset(dataset);
   if (process.argv.includes("--list")) {
     dataset.cases.forEach((testCase) => {
@@ -3450,7 +3483,9 @@ async function main() {
   }
   assert(selectedCases.length > 0, "No approved evaluation cases match the requested filters.");
   const filtered = Boolean(excludedCaseID || requestedTopic || requestedDifficulty || requestedCodeEdition);
-  const suiteScope = includeDrafts ? "diagnostic" : requestedCaseID ? "targeted" : filtered ? "filtered" : "full";
+  const suiteScope = zoningMode
+    ? "diagnostic"
+    : includeDrafts ? "diagnostic" : requestedCaseID ? "targeted" : filtered ? "filtered" : "full";
   const selectedDataset = { ...dataset, cases: selectedCases };
   if (selfTestMode) {
     await runSelfTest(selectedDataset, datasetText);
@@ -3458,6 +3493,23 @@ async function main() {
   }
 
   if (liveMode) {
+    if (zoningMode) {
+      const authorized = sourceZoningDataset.governance.paidEvaluationAuthorization;
+      const requestedCap = Number(process.env.PERMITEXT_RESEARCH_EVAL_MAX_USD);
+      assert(
+        sourceZoningDataset.governance.paidEvaluationAllowed === true && authorized.status === "authorized",
+        "No unconsumed paid Zoning evaluation authorization is active. A new run requires new explicit owner authorization and a new cumulative cap."
+      );
+      assert(repeat === authorized.repetitions, `The Zoning authorization permits exactly ${authorized.repetitions} repetition.`);
+      assert(
+        selectedCases.length === authorized.caseCount && !requestedCaseID && !filtered && !includeDrafts,
+        `The Zoning authorization applies only to the complete frozen ${authorized.caseCount}-case set.`
+      );
+      assert(
+        Number.isFinite(requestedCap) && requestedCap > 0 && requestedCap <= authorized.maximumCumulativeSpendUSD,
+        `The Zoning evaluation cap must be positive and no more than the authorized $${authorized.maximumCumulativeSpendUSD.toFixed(2)}.`
+      );
+    }
     assert(
       supportedResearchPromptVersions.includes(researchModelConfiguration().promptVersion),
       `The configured prompt version is not available in this application build: ${researchModelConfiguration().promptVersion}.`
@@ -3478,6 +3530,7 @@ async function main() {
     process.env.VERCEL = "";
     process.env.VERCEL_ENV = "";
     process.env.PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN = "1";
+    if (zoningMode) process.env.PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS = "1";
     process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN = "research-eval-local-grant";
     process.env.NODE_ENV = liveMode ? (originalEnvironment.NODE_ENV || "") : "test";
     process.env.PERMITEXT_TEST_RESEARCH_MOCK = liveMode ? "" : "1";
@@ -3505,15 +3558,22 @@ async function main() {
       await runLiveCases(baseURL, selectedDataset, checkedCases, datasetText, {
         suiteScope,
         repeat,
-        stopOnError
+        stopOnError,
+        datasetKind: zoningMode ? "zoning-resolution" : "construction-code",
+        retrievalVersion: zoningMode
+          ? "owner-reviewed-zoning-pinned-evidence-diagnostic"
+          : "automatic-enacted-corpus-with-pinned-evidence"
       });
     } else {
       await runMockConversationCases(
         baseURL,
         checkedCases,
-        approvedCases.find((testCase) => testCase.id === "scissor-stair-two-exits")
+        approvedEvaluationCases(baseDataset).find((testCase) => testCase.id === "scissor-stair-two-exits"),
+        { createOnly: zoningMode }
       );
-      console.log("All cases are ready. Paid evals remain locked until explicitly approved.");
+      console.log(zoningMode
+        ? "All frozen Zoning cases are ready. Public Zoning Research remains disabled."
+        : "All cases are ready. Paid evals remain locked until explicitly approved.");
     }
   } finally {
     if (server) await new Promise((resolveClose) => server.close(resolveClose));

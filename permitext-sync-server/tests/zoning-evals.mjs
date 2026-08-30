@@ -29,6 +29,26 @@ assert.equal(dataset.governance.status, "draft");
 assert.equal(dataset.governance.humanReviewRequired, true);
 assert.equal(dataset.governance.automaticApprovalAllowed, false);
 assert.equal(dataset.governance.paidEvaluationAllowed, false);
+assert.deepEqual(dataset.governance.paidEvaluationAuthorization, {
+  authorizedAt: "2026-08-30T16:20:33Z",
+  authorizedBy: "Permitext owner",
+  status: "consumed",
+  consumedAt: "2026-08-30T16:39:48.437Z",
+  completedRunID: "5b54b6cf-2a04-4a4a-a920-edb2d65bf4f6",
+  actualSpendUSD: 1.857548,
+  caseCount: 21,
+  repetitions: 1,
+  maximumCumulativeSpendUSD: 5,
+  scope: "One local diagnostic run of the frozen owner-approved Zoning cases through the production Research answer path and separate evaluator.",
+  doesNotAuthorize: [
+    "public Zoning Research",
+    "professional Zoning sign-off",
+    "deployment",
+    "merging",
+    "customer pricing changes",
+    "spend above the cumulative cap"
+  ]
+});
 assert.equal(dataset.governance.approvedCaseUse, "Terra answer-key testing only");
 assert.equal(dataset.governance.professionalZoningSignoff, false);
 assert.equal(dataset.governance.publicResearchReleaseAuthorized, false);
