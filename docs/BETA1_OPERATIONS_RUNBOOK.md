@@ -74,6 +74,8 @@ Exit `0` means the parsed window contained a health request and no covered actio
 - A hard pause limits cost but produces a public 503. The incident checklist must include a deliberate resume decision and confirmation that the root cause is contained before unpausing.
 - The August 29 [backend provider capacity audit](./PERMITEXT_BACKEND_PROVIDER_CAPACITY_AUDIT_2026-08-29.md) found no additional upgrade required today. Review Neon Free capacity/recovery and the OpenAI credit/spend controls before the first paid public customer; all plan, recharge, add-on, and limit increases still require explicit owner approval.
 
+Use [BETA1_SPEND_CONTROL_ACCEPTANCE_RECORD.md](./BETA1_SPEND_CONTROL_ACCEPTANCE_RECORD.md) for the remaining notification and pause exercise. The record separates three claims that must not be conflated: a delivered threshold notification, a verified 503-and-resume drill, and proof that the configured Spend Management threshold automatically caused the pause. Do not manufacture on-demand usage or lower the team spend amount merely to make the gate pass. Vercel states that lowering the amount below current spend can immediately trigger configured actions, its spend check runs every few minutes, and every paused project must be resumed individually.
+
 ## Identity credential rotation
 
 - Owner: Higinio Jimenez Manzano (`permitext@gmail.com`).
