@@ -18,6 +18,10 @@ The checked-in Vercel routing contract maps both slash variants of each public r
 
 This guard does not configure environment values or activate acceptance. It prevents a later deployment from silently labeling edited content with the August 28 approval identifiers.
 
+## August 30 Production observation
+
+A read-only live audit found that all three canonical URLs respond directly with HTTP 200 HTML, but their body hashes do not match the approved/local hashes. The URLs exist; the exact approved August 28 documents are not yet published there. A permanent live-publication verifier now fails closed on stale content, redirects, non-HTML responses, network failures, local drift, and noncanonical origins. Detailed hashes and the retained command are in [PERMITEXT_POLICY_PUBLICATION_AUDIT_2026-08-30.md](./PERMITEXT_POLICY_PUBLICATION_AUDIT_2026-08-30.md).
+
 ## Verification
 
 From `permitext-sync-server`:
@@ -27,10 +31,11 @@ npm run test:auth
 npm run test:routing
 npm run test:public-surface
 npm run test:beta1-readiness
+npm run audit:policy-publication -- --require-live
 ```
 
-The policy artifact integrity contract, route contract, local acceptance lifecycle, public purchase-ordering contract, and Beta readiness contract pass without a network call, provider charge, or Production write.
+The policy artifact integrity contract, route contract, local acceptance lifecycle, public purchase-ordering contract, and Beta readiness contract pass without a provider charge or Production write. The strict live-publication command is intentionally failing until Production serves the exact approved bytes.
 
 ## Remaining Production gate
 
-Stable local routes and exact artifact integrity are complete. The public URLs are not claimed live for these new versions until the intended commit is separately deployed and each URL is fetched from Production. Only after that independent verification may the three approved version variables be configured and the already-wired purchase-consent flow be activated. No deployment or Production environment change occurred in this task.
+Stable local routes and exact artifact integrity are complete. Production currently serves older/different content at all three URLs, so publication remains open. Only after a separately authorized deployment and a passing strict live audit may the three approved version variables be configured and the already-wired purchase-consent flow be activated. No deployment or Production environment change occurred in this task.
