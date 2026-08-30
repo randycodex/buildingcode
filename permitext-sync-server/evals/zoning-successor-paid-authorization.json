@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "locked",
+  "status": "authorized",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor.json",
     "sha256": "d07063fa12ec993fde8802e6b58971d5cc1873a52fbefbe9e538b81acb94d30f",
@@ -8,15 +8,15 @@
   },
   "scope": {
     "purpose": "one complete 30-case owner-approved successor semantic run",
-    "caseCount": null,
-    "repetitions": null,
-    "maximumCumulativeSpendUSD": null
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": null,
-    "authorizedBy": null,
-    "exactAuthorizationPhrase": null
+    "authorizedAt": "2026-08-30T19:38:30Z",
+    "authorizedBy": "Permitext owner",
+    "exactAuthorizationPhrase": "I authorize"
   },
   "consumption": {
     "status": "not_started",
@@ -28,5 +28,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "This record is intentionally locked. Successor creation and no-cost verification do not authorize provider spend."
+  "notes": "The owner explicitly authorized the prepared one-time scope: all 30 successor cases, one repetition, with a $5 maximum cumulative spend cap. This does not authorize public release, deployment, pricing changes, or the disabled evidence-budget candidate."
 }

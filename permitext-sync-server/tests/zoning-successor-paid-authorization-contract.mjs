@@ -16,30 +16,39 @@ const defaultAuthorizationPath = resolve(
   "evals/zoning-successor-paid-authorization.json"
 );
 
-const locked = await validateZoningSuccessorPaidAuthorization();
-assert.equal(locked.authorization.status, "locked");
-assert.equal(locked.active, false);
-assert.equal(locked.cohort.cases.length, 30);
-assert.equal(locked.authorization.scope.maximumCumulativeSpendUSD, null);
-assert.throws(
-  () => requireActiveZoningSuccessorPaidAuthorization(locked),
-  /requires a new explicit owner authorization and cumulative spend cap/
-);
+const current = await validateZoningSuccessorPaidAuthorization();
+assert.equal(current.cohort.cases.length, 30);
+if (current.authorization.status === "authorized") {
+  assert.equal(current.active, true);
+  assert.equal(current.authorization.scope.caseCount, 30);
+  assert.equal(current.authorization.scope.repetitions, 1);
+  assert(current.authorization.scope.maximumCumulativeSpendUSD <= 5);
+  assert.equal(
+    requireActiveZoningSuccessorPaidAuthorization(current),
+    current
+  );
+} else {
+  assert.equal(current.active, false);
+  assert.throws(
+    () => requireActiveZoningSuccessorPaidAuthorization(current),
+    /requires a new explicit owner authorization and cumulative spend cap/
+  );
 
-const directLiveAttempt = spawnSync(process.execPath, [
-  "tests/research-evals.mjs",
-  "--zoning-successor",
-  "--run-live"
-], {
-  cwd: serverRoot,
-  encoding: "utf8",
-  env: { ...process.env, OPENAI_API_KEY: "" }
-});
-assert.equal(directLiveAttempt.status, 1);
-assert.match(
-  `${directLiveAttempt.stdout}\n${directLiveAttempt.stderr}`,
-  /requires a new explicit owner authorization and cumulative spend cap/
-);
+  const directLiveAttempt = spawnSync(process.execPath, [
+    "tests/research-evals.mjs",
+    "--zoning-successor",
+    "--run-live"
+  ], {
+    cwd: serverRoot,
+    encoding: "utf8",
+    env: { ...process.env, OPENAI_API_KEY: "" }
+  });
+  assert.equal(directLiveAttempt.status, 1);
+  assert.match(
+    `${directLiveAttempt.stdout}\n${directLiveAttempt.stderr}`,
+    /requires a new explicit owner authorization and cumulative spend cap/
+  );
+}
 
 const temporaryDirectory = await mkdtemp(
   join(tmpdir(), "permitext-zoning-successor-authorization-")
@@ -55,6 +64,9 @@ try {
   fixture.ownerDecision.authorizedBy = "Permitext owner";
   fixture.ownerDecision.exactAuthorizationPhrase =
     "Test fixture only: authorize one run with a $5 cap.";
+  fixture.consumption.status = "not_started";
+  fixture.consumption.runID = null;
+  fixture.consumption.consumedAt = null;
   await writeFile(fixturePath, `${JSON.stringify(fixture, null, 2)}\n`, "utf8");
   const authorizedFixture = await validateZoningSuccessorPaidAuthorization({
     authorizationPath: fixturePath
@@ -76,10 +88,10 @@ try {
 }
 
 console.log("Zoning successor paid-authorization guard contract passed", {
-  defaultStatus: locked.authorization.status,
-  exactCohortCases: locked.cohort.cases.length,
-  directLiveAttemptBlocked: true,
+  defaultStatus: current.authorization.status,
+  exactCohortCases: current.cohort.cases.length,
+  directLiveAttemptBlocked: current.authorization.status !== "authorized",
   maximumAllowedCapUSD: 5,
   publicResearchReleaseAuthorized:
-    locked.authorization.publicResearchReleaseAuthorized
+    current.authorization.publicResearchReleaseAuthorized
 });

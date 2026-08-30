@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
+import { open, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -17,6 +18,77 @@ import {
 
 const serverRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const repositoryRoot = resolve(serverRoot, "..");
+const resultsDirectory = resolve(serverRoot, "evals", "results");
+const authorizationPath = resolve(
+  serverRoot,
+  "evals",
+  "zoning-successor-paid-authorization.json"
+);
+const runLockPath = resolve(
+  serverRoot,
+  "evals",
+  ".zoning-successor-paid-run.lock"
+);
+
+async function acquireRunLock() {
+  let handle;
+  try {
+    handle = await open(runLockPath, "wx");
+  } catch (error) {
+    if (error.code === "EEXIST") {
+      throw new Error(
+        "A Zoning successor paid run is already active or its fail-closed lock requires review."
+      );
+    }
+    throw error;
+  }
+  await handle.writeFile(`${process.pid}\n`, "utf8");
+  return async () => {
+    await handle.close();
+    await rm(runLockPath, { force: true });
+  };
+}
+
+async function resultFiles() {
+  return new Set(
+    (await readdir(resultsDirectory))
+      .filter((name) => name.endsWith(".json"))
+  );
+}
+
+async function consumeAuthorization({ beforeResults, cohort, cohortSHA256 }) {
+  const afterResults = await resultFiles();
+  const newFiles = [...afterResults].filter((name) => !beforeResults.has(name));
+  assert.equal(newFiles.length, 1,
+    "The paid run did not produce exactly one new machine-result file; authorization remains active for manual review.");
+  const resultFile = resolve(resultsDirectory, newFiles[0]);
+  const result = JSON.parse(await readFile(resultFile, "utf8"));
+  assert.equal(result.configuration?.datasetSHA256, cohortSHA256,
+    "The new result is not bound to the authorized successor SHA.");
+  assert.equal(result.configuration?.repeat, 1,
+    "The new result does not record the authorized one repetition.");
+  assert.deepEqual(result.configuration?.caseIDs, cohort.cases.map((item) => item.id),
+    "The new result does not contain the exact authorized case order.");
+  assert.match(result.configuration?.runID || "", /^[0-9a-f-]{36}$/i,
+    "The new result has no valid run ID.");
+
+  const authorization = JSON.parse(await readFile(authorizationPath, "utf8"));
+  assert.equal(authorization.status, "authorized",
+    "The one-time authorization was not active when the run completed.");
+  authorization.status = "consumed";
+  authorization.consumption = {
+    status: "consumed",
+    runID: result.configuration.runID,
+    consumedAt: new Date().toISOString()
+  };
+  authorization.notes =
+    `One-time authorization consumed by ${newFiles[0]}. ` +
+    "The result still requires quality, cost, and release-gate review.";
+  const temporaryPath = `${authorizationPath}.tmp-${process.pid}`;
+  await writeFile(temporaryPath, `${JSON.stringify(authorization, null, 2)}\n`, "utf8");
+  await rename(temporaryPath, authorizationPath);
+  return { resultFile, result };
+}
 
 function runEvaluation(environment, repetitions) {
   return new Promise((resolveRun, rejectRun) => {
@@ -76,12 +148,28 @@ async function main() {
     paidEnvironment.approvedSpendCapUSD,
     authorization.scope.maximumCumulativeSpendUSD
   );
-  console.log(
-    `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning successor ` +
-    `once with a $${paidEnvironment.approvedSpendCapUSD.toFixed(2)} maximum cumulative cap. ` +
-    "The 24,000-character candidate remains disabled."
-  );
-  const result = await runEvaluation(environment, authorization.scope.repetitions);
+  const releaseRunLock = await acquireRunLock();
+  let result;
+  let consumed;
+  try {
+    const beforeResults = await resultFiles();
+    console.log(
+      `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning successor ` +
+      `once with a $${paidEnvironment.approvedSpendCapUSD.toFixed(2)} maximum cumulative cap. ` +
+      "The 24,000-character candidate remains disabled."
+    );
+    result = await runEvaluation(environment, authorization.scope.repetitions);
+    consumed = await consumeAuthorization({
+      beforeResults,
+      cohort,
+      cohortSHA256: authorization.cohort.sha256
+    });
+    console.log(
+      `Consumed the one-time authorization for run ${consumed.result.configuration.runID}.`
+    );
+  } finally {
+    await releaseRunLock();
+  }
   if (result.signal) throw new Error(`Zoning successor diagnostic stopped by ${result.signal}.`);
   if (![0, 3].includes(result.code)) {
     throw new Error(`Zoning successor diagnostic exited with status ${result.code}.`);
