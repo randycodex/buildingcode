@@ -22,6 +22,16 @@ export const expectedStripeProPrice = Object.freeze({
 
 export const expectedBeta1UserMonthlyResearchCapUSD = 7;
 
+export function resolvedStripePriceTaxBehavior(price = {}) {
+  const providerBehavior = String(price.tax_behavior || "").trim().toLowerCase();
+  if (["exclusive", "inclusive"].includes(providerBehavior)) return providerBehavior;
+  const currency = String(price.currency || "").trim().toLowerCase();
+  if ((!providerBehavior || providerBehavior === "unspecified") && currency === "usd") {
+    return "exclusive";
+  }
+  return null;
+}
+
 function check(id, ready, detail) {
   return { id, ready: Boolean(ready), detail };
 }
@@ -158,6 +168,7 @@ export async function verifyLiveStripeReadiness(
   const expectedURL = `${baseURL}/billing/stripe/webhook`;
   const endpoint = (endpointList.data || []).find((candidate) => candidate.url === expectedURL);
   const enabledEvents = new Set(endpoint?.enabled_events || []);
+  const resolvedPriceTaxBehavior = resolvedStripePriceTaxBehavior(price);
   const receivesAllEvents = enabledEvents.has("*");
   const missingEvents = receivesAllEvents
     ? []
@@ -171,7 +182,7 @@ export async function verifyLiveStripeReadiness(
       price.unit_amount === expectedStripeProPrice.unitAmount &&
       price.recurring?.interval === expectedStripeProPrice.interval &&
       stripeTax.ready &&
-      price.tax_behavior === stripeTax.taxBehavior &&
+      resolvedPriceTaxBehavior === stripeTax.taxBehavior &&
       endpoint?.status === "enabled" &&
       missingEvents.length === 0
     ),
@@ -186,10 +197,11 @@ export async function verifyLiveStripeReadiness(
       taxBehavior: price.tax_behavior || null
     },
     tax: {
-      ready: stripeTax.ready && price.tax_behavior === stripeTax.taxBehavior,
+      ready: stripeTax.ready && resolvedPriceTaxBehavior === stripeTax.taxBehavior,
       mode: stripeTax.mode,
       configuredPriceBehavior: stripeTax.taxBehavior,
-      providerPriceBehavior: price.tax_behavior || null
+      providerPriceBehavior: price.tax_behavior || null,
+      resolvedPriceBehavior: resolvedPriceTaxBehavior
     },
     webhook: {
       configured: Boolean(endpoint),

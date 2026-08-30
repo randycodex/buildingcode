@@ -2,6 +2,7 @@ import {
   beta1ConfigurationReadiness,
   expectedStripeProPrice,
   requiredStripeWebhookEvents,
+  resolvedStripePriceTaxBehavior,
   verifyLiveStripeReadiness
 } from "../beta1-readiness.mjs";
 import { readFile } from "node:fs/promises";
@@ -100,6 +101,18 @@ assert(
   "Beta 1 readiness accepted an unspecified Stripe Price tax behavior."
 );
 assert(
+  resolvedStripePriceTaxBehavior({ currency: "usd", tax_behavior: "unspecified" }) === "exclusive",
+  "Stripe's documented USD inferred tax behavior did not resolve to exclusive."
+);
+assert(
+  resolvedStripePriceTaxBehavior({ currency: "usd", tax_behavior: "inclusive" }) === "inclusive",
+  "An explicit inclusive Stripe Price behavior was not preserved."
+);
+assert(
+  resolvedStripePriceTaxBehavior({ currency: "eur", tax_behavior: "unspecified" }) === null,
+  "A non-USD inferred tax behavior was accepted without an explicit contract."
+);
+assert(
   !beta1ConfigurationReadiness({ ...completeEnvironment, PERMITEXT_TERMS_VERSION: "" }).ready,
   "Beta 1 readiness accepted missing approved policy-version configuration."
 );
@@ -144,7 +157,7 @@ const liveStripe = await verifyLiveStripeReadiness(completeEnvironment, {
         currency: expectedStripeProPrice.currency,
         unit_amount: expectedStripeProPrice.unitAmount,
         recurring: { interval: expectedStripeProPrice.interval },
-        tax_behavior: "exclusive"
+        tax_behavior: "unspecified"
       }), { status: 200 });
     }
     return new Response(JSON.stringify({
@@ -160,7 +173,9 @@ assert(liveStripe.ready, "Valid live Stripe price and webhook configuration was 
 assert(
   liveStripe.price.currency === "usd" &&
     liveStripe.price.unitAmount === 2_000 &&
-    liveStripe.tax.ready,
+    liveStripe.tax.ready &&
+    liveStripe.tax.providerPriceBehavior === "unspecified" &&
+    liveStripe.tax.resolvedPriceBehavior === "exclusive",
   "Live Stripe readiness did not preserve the expected USD $20 price and tax evidence."
 );
 

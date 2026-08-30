@@ -79,7 +79,7 @@ Checklist snapshot: **72 completed, 23 open**. Eleven of the open items are the 
 - [x] Verify the shared Research response contract in the current web source and iOS Simulator, including corpus edition/applicability decoding, display, and copied output.
 - [x] Complete the no-cost tax/refund/infrastructure source audit and quantify 10/25/50/100-subscriber plus 0/1/3/5/10%-refund sensitivities.
 - [x] Prepare the tax-registration and optional professional-reference packet and make local Beta readiness require the exact $7 per-user monthly Research-cost ceiling.
-- [x] Prepare a dormant Stripe automatic-tax Checkout path and fail-closed Production guard that requires an explicit inclusive/exclusive live Price match; leave the Certificate, Stripe registration/tax code, presentation choice, and real taxed Checkout open.
+- [x] Prepare a dormant Stripe automatic-tax Checkout path, a fail-closed Production guard that matches an explicit owner decision to the resolved live Price behavior, and a [Stripe tax decision record](./BETA1_STRIPE_TAX_DECISION_RECORD.md); leave the Certificate, Stripe registration/tax code, presentation choice, and real taxed Checkout open.
 - [ ] Verify tax, refund, and infrastructure-allocation inputs and review actual economics after the first 25–50 customers.
 
 Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md)
