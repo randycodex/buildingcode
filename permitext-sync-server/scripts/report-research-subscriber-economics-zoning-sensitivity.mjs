@@ -11,12 +11,13 @@ const v6ResultURL = new URL(
   import.meta.url
 );
 const zoningResultURL = new URL(
-  "../evals/results/2026-08-30T19-40-50-171Z-5480ed8f-6d0c-46b1-a108-d12e8e13b7da.json",
+  "../evals/results/2026-08-30T22-42-25-264Z-f35eed33-cb4e-4b7b-a719-86b072271660.json",
   import.meta.url
 );
+const POST_RUN_NO_COST_TRIGGER_REPAIR_OPERATIONS = 10;
 
 export const zoningSubscriberSensitivityAssumptions = Object.freeze({
-  generatedAt: "2026-08-30T20:00:05.839Z",
+  generatedAt: "2026-08-30T22:58:14.087Z",
   includedTurns: 100,
   zoningTurnShares: [0, 0.25, 0.50, 1],
   bootstrapIterations: 100_000,
@@ -159,6 +160,11 @@ export async function createZoningSubscriberSensitivityReport() {
       operations: zoningResult.economics.sample.operations,
       completedChargedTurns: rawZoningCosts.length,
       failedOperations: zoningResult.economics.sample.failed,
+      postRunNoCostTriggerRepairOperations: POST_RUN_NO_COST_TRIGGER_REPAIR_OPERATIONS,
+      unresolvedExecutionPaths: Math.max(
+        0,
+        zoningResult.economics.sample.failed - POST_RUN_NO_COST_TRIGGER_REPAIR_OPERATIONS
+      ),
       qualityPasses,
       qualityEvaluatedCases: scored.length,
       failedOperatingCostUSD,
@@ -175,13 +181,16 @@ export async function createZoningSubscriberSensitivityReport() {
     recommendation: {
       pricingOrAllowanceChangeAuthorized: false,
       zoningPublicEnablementReady: false,
-      nextGate: "Resolve the three execution failures and nine graded quality failures, reduce Zoning evidence cost, and obtain a clean newly authorized frozen rerun before using this sensitivity for a commercial decision."
+      nextGate: `Retain the current v7 no-cost safety repair, including trigger narrowing implicated in ${POST_RUN_NO_COST_TRIGGER_REPAIR_OPERATIONS} failed operations; review ${Math.max(0, zoningResult.economics.sample.failed - POST_RUN_NO_COST_TRIGGER_REPAIR_OPERATIONS)} remaining execution paths and ${scored.length - qualityPasses} graded quality failures, correct the two identified frozen case/evidence defects only through owner-approved successor governance, reduce Zoning evidence cost, and obtain a clean newly authorized frozen successor run before using this sensitivity for a commercial decision.`
     }
   };
 }
 
 function usd(value) {
-  return `$${Number(value).toFixed(2)}`;
+  const amount = Number(value);
+  return amount < 0
+    ? `-$${Math.abs(amount).toFixed(2)}`
+    : `$${amount.toFixed(2)}`;
 }
 
 export function renderZoningSubscriberSensitivityMarkdown(report) {
@@ -192,11 +201,11 @@ export function renderZoningSubscriberSensitivityMarkdown(report) {
   });
   return `# Permitext Research subscriber economics — preliminary Zoning sensitivity\n\n` +
     `Generated locally from immutable V6 and Zoning benchmark results without provider calls.\n\n` +
-    `The latest expanded Zoning diagnostic spent ${usd(report.source.zoningActualPaidEvaluationUSD)} including independent grading. Production operations projected ${usd(report.zoningMeasurement.amortizedTurnCostUSD.mean * 100)} per 100 Zoning turns after amortizing failed operations. Only ${report.zoningMeasurement.qualityPasses}/${report.zoningMeasurement.qualityEvaluatedCases} graded answers passed and the source sample has only ${report.zoningMeasurement.completedChargedTurns} completed charged turns, so this is a sensitivity—not a pricing result.\n\n` +
+    `The latest remediation-successor-2 Zoning diagnostic spent ${usd(report.source.zoningActualPaidEvaluationUSD)} including independent grading. Production operations projected ${usd(report.zoningMeasurement.amortizedTurnCostUSD.mean * 100)} per 100 Zoning turns after amortizing failed operations. Only ${report.zoningMeasurement.qualityPasses}/${report.zoningMeasurement.qualityEvaluatedCases} graded answers passed and the source sample has only ${report.zoningMeasurement.completedChargedTurns} completed charged turns, so this is a sensitivity—not a pricing result.\n\n` +
     `| Zoning share | V6 turns | Zoning turns | Provider p50 | Provider p90 | Web p90 contribution | iOS 15% p90 contribution |\n` +
     `| ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n` +
     `${rows.join("\n")}\n\n` +
-    `No price or allowance change is authorized. Public Zoning Research remains disabled. Next, resolve the three execution failures and nine graded quality failures, reduce evidence cost, and obtain a clean newly authorized frozen rerun.\n`;
+    `No price or allowance change is authorized. Public Zoning Research remains disabled. The current v7 no-cost safety repair includes trigger narrowing implicated in ${report.zoningMeasurement.postRunNoCostTriggerRepairOperations} failed operations without rescoring them. Next, review ${report.zoningMeasurement.unresolvedExecutionPaths} remaining execution paths and ${report.zoningMeasurement.qualityEvaluatedCases - report.zoningMeasurement.qualityPasses} graded quality failures, correct the two identified frozen case/evidence defects only through owner-approved successor governance, reduce evidence cost, and obtain a clean newly authorized frozen successor run.\n`;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -116,6 +116,115 @@ const safeMapBoundary = evaluateZoningResearchSafety({
 });
 assert.equal(safeMapBoundary.pass, true, JSON.stringify(safeMapBoundary.issues));
 
+const positiveFormMapBoundary = evaluateZoningResearchSafety({
+  question: "What FAR applies to this property in the mapped district?",
+  evidence: mapEvidence,
+  answer: answer(
+    "The property location and mapped district are required before FAR can be determined.",
+    ["zr-map"],
+    ["The property's address or BBL and mapped zoning district are required."]
+  )
+});
+assert.equal(positiveFormMapBoundary.pass, true, JSON.stringify(positiveFormMapBoundary.issues));
+
+const contradictoryMapBoundary = evaluateZoningResearchSafety({
+  question: mapQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    "This property is within the Appendix J designated area. Separately, the selected passage cannot establish a property-specific result without the applicable official map.",
+    ["zr-map"],
+    ["The property's address or BBL and mapped location are not established."]
+  )
+});
+assert(contradictoryMapBoundary.issues.some((issue) =>
+  issue.type === "zoning_missing_mapped_location"));
+
+const commonUnsafeMappedConclusion = evaluateZoningResearchSafety({
+  question: mapQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    "Residential use is permitted as-of-right in the mapped district.",
+    ["zr-map"],
+    ["The property's address or BBL and mapped location are not established."]
+  )
+});
+assert(commonUnsafeMappedConclusion.issues.some((issue) =>
+  issue.type === "zoning_missing_mapped_location"));
+
+for (const commonMappedGrant of [
+  "Residential use would be permitted as-of-right.",
+  "Residential use qualifies as-of-right.",
+  "Residential use may proceed as-of-right.",
+  "Residential use is lawful as-of-right.",
+  "Residential use is authorized as-of-right.",
+  "The proposed project can go forward as-of-right."
+]) {
+  const commonMappedGrantResult = evaluateZoningResearchSafety({
+    question: mapQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      commonMappedGrant,
+      ["zr-map"],
+      ["The property's address or BBL and mapped location are not established."]
+    )
+  });
+  assert(commonMappedGrantResult.issues.some((issue) =>
+    issue.type === "zoning_missing_mapped_location"));
+}
+
+const adversativeMappedContradiction = evaluateZoningResearchSafety({
+  question: mapQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    "Residential use is permitted as-of-right, but the mapped district is required before a final determination can be made.",
+    ["zr-map"],
+    ["The property's address or BBL and mapped location are not established."]
+  )
+});
+assert(adversativeMappedContradiction.issues.some((issue) =>
+  issue.type === "zoning_missing_mapped_location"));
+for (const adversative of ["although", "whereas"]) {
+  const alternateAdversativeMappedContradiction = evaluateZoningResearchSafety({
+    question: mapQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `Residential use is permitted as-of-right, ${adversative} the mapped district is required before a final determination can be made.`,
+      ["zr-map"],
+      ["The property's address or BBL and mapped location are not established."]
+    )
+  });
+  assert(alternateAdversativeMappedContradiction.issues.some((issue) =>
+    issue.type === "zoning_missing_mapped_location"));
+}
+
+const addressOnlyMappedQuestion = evaluateZoningResearchSafety({
+  question: "What residential use applies at 123 Main Street when the mapped zoning district has not been established?",
+  evidence: mapEvidence,
+  answer: answer(
+    "Residential use is permitted as-of-right in the mapped district.",
+    ["zr-map"],
+    ["The mapped zoning district and controlling official map are not established."]
+  )
+});
+assert(addressOnlyMappedQuestion.issues.some((issue) =>
+  issue.type === "zoning_missing_mapped_location"));
+assert(!addressOnlyMappedQuestion.issues.some((issue) =>
+  issue.type === "zoning_missing_location_identifier"));
+
+const compactBBLMappedQuestion = evaluateZoningResearchSafety({
+  question: "What residential use applies to BBL 1001230001 when the mapped zoning district has not been established?",
+  evidence: mapEvidence,
+  answer: answer(
+    "Residential use is permitted as-of-right in the mapped district.",
+    ["zr-map"],
+    ["The mapped zoning district and controlling official map are not established."]
+  )
+});
+assert(compactBBLMappedQuestion.issues.some((issue) =>
+  issue.type === "zoning_missing_mapped_location"));
+assert(!compactBBLMappedQuestion.issues.some((issue) =>
+  issue.type === "zoning_missing_location_identifier"));
+
 const missingLocationIdentifier = evaluateZoningResearchSafety({
   question: mapQuestion,
   evidence: mapEvidence,
@@ -249,6 +358,82 @@ const tiedDate = evaluateZoningResearchSafety({
   answer: answer("Because the certificate is issued after December 5, 2024, the cited post-transition rule applies to the stated scenario.", ["zr-transition"])
 });
 assert.equal(tiedDate.pass, true, JSON.stringify(tiedDate.issues));
+const tiedAbbreviatedDate = evaluateZoningResearchSafety({
+  question: transitionQuestion,
+  evidence: transitionEvidence,
+  answer: answer(
+    "Because the certificate is issued after Dec. 5, 2024, the cited post-transition rule applies to the stated scenario.",
+    ["zr-transition"]
+  )
+});
+assert.equal(tiedAbbreviatedDate.pass, true, JSON.stringify(tiedAbbreviatedDate.issues));
+const dateWithoutEventLink = evaluateZoningResearchSafety({
+  question: transitionQuestion,
+  evidence: transitionEvidence,
+  answer: answer(
+    "An unrelated application was filed on Dec. 5, 2024, but the answer does not tie the certificate date to the transition.",
+    ["zr-transition"]
+  )
+});
+assert(dateWithoutEventLink.issues.some((issue) =>
+  issue.type === "zoning_effective_date_omission"));
+const permitDateCannotSubstituteForCertificateDate = evaluateZoningResearchSafety({
+  question: transitionQuestion,
+  evidence: transitionEvidence,
+  answer: answer(
+    "A permit was issued after December 5, 2024, but the answer does not establish when the certificate of occupancy was issued.",
+    ["zr-transition"]
+  )
+});
+assert(permitDateCannotSubstituteForCertificateDate.issues.some((issue) =>
+  issue.type === "zoning_effective_date_omission"));
+const reversedDateRelation = evaluateZoningResearchSafety({
+  question: transitionQuestion,
+  evidence: transitionEvidence,
+  answer: answer(
+    "Because the certificate is issued before December 5, 2024, the cited pre-transition rule applies.",
+    ["zr-transition"]
+  )
+});
+assert(reversedDateRelation.issues.some((issue) =>
+  issue.type === "zoning_effective_date_omission"));
+for (const incompatibleDateStatement of [
+  "The certificate was issued on December 5, 2024.",
+  "The certificate was issued December 5, 2024.",
+  "The certificate was not issued after December 5, 2024.",
+  "No certificate was issued after December 5, 2024.",
+  "The certificate wasn't issued after December 5, 2024.",
+  "The certificate was issued prior to December 5, 2024."
+]) {
+  const incompatibleDateRelation = evaluateZoningResearchSafety({
+    question: transitionQuestion,
+    evidence: transitionEvidence,
+    answer: answer(incompatibleDateStatement, ["zr-transition"])
+  });
+  assert(incompatibleDateRelation.issues.some((issue) =>
+    issue.type === "zoning_effective_date_omission"));
+}
+const certificateAliasDate = evaluateZoningResearchSafety({
+  question: transitionQuestion,
+  evidence: transitionEvidence,
+  answer: answer(
+    "Because the CO was issued after December 5, 2024, the cited post-transition rule applies.",
+    ["zr-transition"]
+  )
+});
+assert.equal(certificateAliasDate.pass, true, JSON.stringify(certificateAliasDate.issues));
+for (const unrelatedCompanyDate of [
+  "Acme Co filed after December 5, 2024.",
+  "The co-applicant filed after December 5, 2024."
+]) {
+  const unrelatedCompanyDateResult = evaluateZoningResearchSafety({
+    question: transitionQuestion,
+    evidence: transitionEvidence,
+    answer: answer(unrelatedCompanyDate, ["zr-transition"])
+  });
+  assert(unrelatedCompanyDateResult.issues.some((issue) =>
+    issue.type === "zoning_effective_date_omission"));
+}
 
 const oldRulesQuestion = "May this project continue under the old zoning rules through the City of Yes transition?";
 const oldRulesPrompt = zoningResearchSafetyPromptContext({
@@ -350,6 +535,32 @@ assert.deepEqual(
   ),
   exactCityRepaired
 );
+const abbreviatedCityDates = applyZoningResearchDeterministicRepairs(
+  answer(
+    "The Nov. 20, 2024 filing and Dec. 4, 2024 permit do not alone decide the result. Sixty percent foundation completion by Dec. 5, 2024 does not satisfy the general minor-development rule. The separate transition may apply only after the qualifying DOB record is verified.",
+    exactCityOfYesEvidence.map((item) => item.sourceID)
+  ),
+  exactCityOfYesEvidence,
+  { question: exactCityOfYesQuestion }
+);
+assert.equal(evaluateZoningResearchSafety({
+  question: exactCityOfYesQuestion,
+  evidence: exactCityOfYesEvidence,
+  answer: abbreviatedCityDates
+}).pass, true);
+const swappedCityDateEvents = applyZoningResearchDeterministicRepairs(
+  answer(
+    "The Nov. 20, 2024 permit and Dec. 4, 2024 filing do not alone decide the result. Sixty percent foundation completion by Dec. 5, 2024 does not satisfy the general minor-development rule. The separate transition may apply only after the qualifying DOB record is verified.",
+    exactCityOfYesEvidence.map((item) => item.sourceID)
+  ),
+  exactCityOfYesEvidence,
+  { question: exactCityOfYesQuestion }
+);
+assert(evaluateZoningResearchSafety({
+  question: exactCityOfYesQuestion,
+  evidence: exactCityOfYesEvidence,
+  answer: swappedCityDateEvents
+}).issues.some((issue) => issue.type === "zoning_effective_date_omission"));
 
 const cellarDefinitionEvidence = [source({
   sourceID: "zr-cellar-definition",
@@ -397,6 +608,137 @@ const preservedLoweredYard = evaluateZoningResearchSafety({
   )
 });
 assert(!preservedLoweredYard.issues.some((issue) => issue.type === "zoning_definition_lowered_yard_fact"));
+const repairedLoweredYard = applyZoningResearchDeterministicRepairs(
+  answer(
+    "No final classification can be made because the result depends on whether the relevant yard was lowered after December 5, 1990.",
+    ["zr-cellar-lowered-yard"]
+  ),
+  loweredYardEvidence,
+  { question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?" }
+);
+assert(repairedLoweredYard.missingFacts.some((fact) =>
+  /yard was lowered after December 5, 1990/i.test(fact)));
+assert.equal(evaluateZoningResearchSafety({
+  question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?",
+  evidence: loweredYardEvidence,
+  answer: repairedLoweredYard
+}).pass, true);
+assert.deepEqual(
+  applyZoningResearchDeterministicRepairs(
+    repairedLoweredYard,
+    loweredYardEvidence,
+    { question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?" }
+  ),
+  repairedLoweredYard
+);
+const unconditionalLoweredYard = applyZoningResearchDeterministicRepairs(
+  answer("No, the stated level is excluded as a cellar.", ["zr-cellar-lowered-yard"]),
+  loweredYardEvidence,
+  { question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?" }
+);
+assert(unconditionalLoweredYard.missingFacts.length === 0);
+assert(evaluateZoningResearchSafety({
+  question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?",
+  evidence: loweredYardEvidence,
+  answer: unconditionalLoweredYard
+}).issues.some((issue) => issue.type === "zoning_definition_lowered_yard_fact"));
+const buriedLoweredYardBoundary = applyZoningResearchDeterministicRepairs(
+  {
+    ...answer("No, the stated level is excluded as a cellar.", ["zr-cellar-lowered-yard"]),
+    evidenceLimitations: [
+      "The result depends on whether the relevant yard was lowered after December 5, 1990."
+    ]
+  },
+  loweredYardEvidence,
+  { question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?" }
+);
+assert.equal(buriedLoweredYardBoundary.missingFacts.length, 0);
+assert(evaluateZoningResearchSafety({
+  question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?",
+  evidence: loweredYardEvidence,
+  answer: buriedLoweredYardBoundary
+}).issues.some((issue) => issue.type === "zoning_definition_lowered_yard_fact"));
+const unconditionalLoweredYardWithMissingFact = evaluateZoningResearchSafety({
+  question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?",
+  evidence: loweredYardEvidence,
+  answer: answer(
+    "No, the stated level is excluded as a cellar.",
+    ["zr-cellar-lowered-yard"],
+    ["Whether the relevant yard was lowered after December 5, 1990 remains unknown and must be verified."]
+  )
+});
+assert(unconditionalLoweredYardWithMissingFact.issues.some((issue) =>
+  issue.type === "zoning_definition_lowered_yard_fact"));
+const conciseCautiousCellarConclusion = evaluateZoningResearchSafety({
+  question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?",
+  evidence: loweredYardEvidence,
+  answer: {
+    ...answer(
+      "The classification depends on whether the relevant yard was lowered after December 5, 1990, which remains unresolved.",
+      ["zr-cellar-lowered-yard"],
+      ["Whether the relevant yard was lowered after December 5, 1990 remains unknown and must be verified."]
+    ),
+    conclusion: "No final classification can be made."
+  }
+});
+assert.equal(conciseCautiousCellarConclusion.pass, true, JSON.stringify(conciseCautiousCellarConclusion.issues));
+const contradictoryCellarSupportedPoint = evaluateZoningResearchSafety({
+  question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?",
+  evidence: loweredYardEvidence,
+  answer: {
+    ...answer(
+      "The classification depends on whether the relevant yard was lowered after December 5, 1990, which remains unresolved.",
+      ["zr-cellar-lowered-yard"],
+      ["Whether the relevant yard was lowered after December 5, 1990 remains unknown and must be verified."]
+    ),
+    conclusion: "No final classification can be made.",
+    supportedPoints: [{
+      heading: "Cellar classification",
+      explanation: "No, the stated level is excluded as a cellar.",
+      sourceIDs: ["zr-cellar-lowered-yard"]
+    }]
+  }
+});
+assert(contradictoryCellarSupportedPoint.issues.some((issue) =>
+  issue.type === "zoning_definition_lowered_yard_fact"));
+for (const safeConditionalCellarAnswer of [
+  "It cannot be determined whether the level is a cellar because the result depends on whether the yard was lowered after December 5, 1990.",
+  "If the yard was not lowered after December 5, 1990, the level is a cellar; if it was lowered, the classification may differ."
+]) {
+  const safeConditionalCellar = evaluateZoningResearchSafety({
+    question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?",
+    evidence: loweredYardEvidence,
+    answer: answer(
+      safeConditionalCellarAnswer,
+      ["zr-cellar-lowered-yard"],
+      ["Whether the relevant yard was lowered after December 5, 1990 remains unknown and must be verified."]
+    )
+  });
+  assert.equal(
+    safeConditionalCellar.pass,
+    true,
+    `${safeConditionalCellarAnswer}: ${JSON.stringify(safeConditionalCellar.issues)}`
+  );
+}
+const contradictoryCellarFloorAreaDisposition = evaluateZoningResearchSafety({
+  question: "A below-grade storage level is below the base plane. Does it count as zoning floor area?",
+  evidence: loweredYardEvidence,
+  answer: {
+    ...answer(
+      "The classification depends on whether the relevant yard was lowered after December 5, 1990, which remains unresolved.",
+      ["zr-cellar-lowered-yard"],
+      ["Whether the relevant yard was lowered after December 5, 1990 remains unknown and must be verified."]
+    ),
+    conclusion: "No final classification can be made.",
+    supportedPoints: [{
+      heading: "Floor-area treatment",
+      explanation: "The area must be omitted from zoning floor area.",
+      sourceIDs: ["zr-cellar-lowered-yard"]
+    }]
+  }
+});
+assert(contradictoryCellarFloorAreaDisposition.issues.some((issue) =>
+  issue.type === "zoning_definition_lowered_yard_fact"));
 
 const lotCoverageEvidence = [source({
   sourceID: "zr-lot-coverage",
@@ -425,7 +767,7 @@ const zoningLotDefinitionEvidence = [source({
   sourceID: "zr-zoning-lot-definition",
   sectionNumber: "12-10",
   title: "Definitions — zoning lot",
-  text: "(a) a lot of record existing on December 15, 1961; (b) a tract of land in single ownership on December 15, 1961; (c) contiguous lots of record; or (d) contiguous lots subject to a Declaration of Restrictions."
+  text: "(a) a lot of record existing on December 15, 1961; (b) a tract of land in single ownership on December 15, 1961; (c) contiguous lots of record; or (d) contiguous lots subject to a Declaration of Restrictions. A zoning lot may or may not coincide with a lot shown on the official tax map."
 })];
 const zoningLotQuestion = "Can two tax lots now be treated as one zoning lot merely because they share ownership?";
 const omittedHistoricalBranch = evaluateZoningResearchSafety({
@@ -437,15 +779,106 @@ const omittedHistoricalBranch = evaluateZoningResearchSafety({
   )
 });
 assert(omittedHistoricalBranch.issues.some((issue) => issue.type === "zoning_definition_branch_omission"));
+assert(omittedHistoricalBranch.issues.some((issue) =>
+  issue.type === "zoning_definition_tax_map_distinction_omission"));
 const completeDefinitionBranches = evaluateZoningResearchSafety({
   question: zoningLotQuestion,
   evidence: zoningLotDefinitionEvidence,
   answer: answer(
-    "No. Separately, paragraph (a) asks whether either was a lot of record existing on December 15, 1961; paragraph (b) addresses historical single ownership; and the current contiguous-lot and Declaration routes have their own conditions.",
+    "No. Separately, paragraph (a) asks whether either was a lot of record existing on December 15, 1961; paragraph (b) addresses historical single ownership; and the current contiguous-lot and Declaration routes have their own conditions. A zoning lot may or may not coincide with a lot shown on the official tax map.",
     ["zr-zoning-lot-definition"]
   )
 });
 assert(!completeDefinitionBranches.issues.some((issue) => issue.type === "zoning_definition_branch_omission"));
+assert(!completeDefinitionBranches.issues.some((issue) =>
+  issue.type === "zoning_definition_tax_map_distinction_omission"));
+assert.equal(completeDefinitionBranches.pass, true, JSON.stringify(completeDefinitionBranches.issues));
+
+const overstrongTaxMapDistinction = evaluateZoningResearchSafety({
+  question: zoningLotQuestion,
+  evidence: zoningLotDefinitionEvidence,
+  answer: answer(
+    "No. Paragraph (a) addresses a lot of record existing on December 15, 1961; paragraph (b) addresses historical single ownership; and paragraphs (c) and (d) address the current contiguous-lot and Declaration routes. A zoning lot is distinct from a tax lot.",
+    ["zr-zoning-lot-definition"]
+  )
+});
+assert(overstrongTaxMapDistinction.issues.some((issue) =>
+  issue.type === "zoning_definition_tax_map_distinction_omission"));
+const maskedTaxMapOverstatement = evaluateZoningResearchSafety({
+  question: zoningLotQuestion,
+  evidence: zoningLotDefinitionEvidence,
+  answer: answer(
+    "No. Paragraph (a) addresses a lot of record existing on December 15, 1961; paragraph (b) addresses historical single ownership; and paragraphs (c) and (d) address the current contiguous-lot and Declaration routes. A zoning lot may or may not coincide with a tax lot. Zoning lots are always distinct from tax lots.",
+    ["zr-zoning-lot-definition"]
+  )
+});
+assert(maskedTaxMapOverstatement.issues.some((issue) =>
+  issue.type === "zoning_definition_tax_map_distinction_omission"));
+for (const maskedOverstatement of [
+  "A zoning lot may or may not coincide with a tax lot. They are always distinct.",
+  "A zoning lot may or may not coincide with a tax lot. Zoning lots and tax lots are always different.",
+  "A zoning lot may or may not coincide with a tax lot. The two never coincide.",
+  "A zoning lot may or may not coincide with a tax lot. A zoning lot is always different from a tax lot.",
+  "A zoning lot may or may not coincide with a tax lot. These two are always different.",
+  "A zoning lot may or may not coincide with a tax lot. Zoning and tax lots are always different.",
+  "A zoning lot may or may not coincide with a tax lot. A zoning lot and a tax lot can never be the same."
+]) {
+  const maskedEquivalentOverstatement = evaluateZoningResearchSafety({
+    question: zoningLotQuestion,
+    evidence: zoningLotDefinitionEvidence,
+    answer: answer(
+      `No. Paragraph (a) addresses a lot of record existing on December 15, 1961; paragraph (b) addresses historical single ownership; and paragraphs (c) and (d) address the current contiguous-lot and Declaration routes. ${maskedOverstatement}`,
+      ["zr-zoning-lot-definition"]
+    )
+  });
+  assert(maskedEquivalentOverstatement.issues.some((issue) =>
+    issue.type === "zoning_definition_tax_map_distinction_omission"));
+}
+
+for (const supportedTaxMapDistinction of [
+  "A zoning lot and a tax lot are not necessarily the same.",
+  "Tax-lot and zoning-lot identity is not automatic.",
+  "A tax lot is not automatically the same as a zoning lot."
+]) {
+  const equivalentTaxMapDistinction = evaluateZoningResearchSafety({
+    question: zoningLotQuestion,
+    evidence: zoningLotDefinitionEvidence,
+    answer: answer(
+      `No. Paragraph (a) addresses a lot of record existing on December 15, 1961; paragraph (b) addresses historical single ownership; and paragraphs (c) and (d) address the current contiguous-lot and Declaration routes. ${supportedTaxMapDistinction}`,
+      ["zr-zoning-lot-definition"]
+    )
+  });
+  assert.equal(equivalentTaxMapDistinction.pass, true, JSON.stringify(equivalentTaxMapDistinction.issues));
+}
+
+const hyphenatedZoningLotQuestion = evaluateZoningResearchSafety({
+  question: "Can two tax-lots now be treated as one zoning-lot merely because they share ownership?",
+  evidence: zoningLotDefinitionEvidence,
+  answer: answer(
+    "No. Paragraph (a) asks whether either was a lot of record existing on December 15, 1961; paragraph (b) addresses historical single ownership; and the current contiguous-lot and Declaration routes have their own conditions. A zoning-lot may or may not coincide with a lot shown on the official tax map.",
+    ["zr-zoning-lot-definition"]
+  )
+});
+assert.equal(hyphenatedZoningLotQuestion.pass, true, JSON.stringify(hyphenatedZoningLotQuestion.issues));
+
+for (const incidentalQuestion of [
+  "Does 42,000 square feet of residential floor area fit the basic FAR on a 10,000-square-foot R7A zoning lot?",
+  "Can a standard development cover 8,500 square feet of a 10,000-square-foot R7A zoning lot?",
+  "Are two apartment buildings 30 feet apart on the same zoning lot?",
+  "Can a C4-4 zoning lot contain apartments under the underlying use rules?"
+]) {
+  const incidentalDefinition = evaluateZoningResearchSafety({
+    question: incidentalQuestion,
+    evidence: zoningLotDefinitionEvidence,
+    answer: answer(
+      "The supplied project rule answers the stated dimensional or use question; the question does not ask whether separate tax lots form one zoning lot.",
+      ["zr-zoning-lot-definition"]
+    )
+  });
+  assert(!incidentalDefinition.issues.some((issue) =>
+    issue.type === "zoning_definition_branch_omission"),
+  `Incidental zoning-lot wording incorrectly triggered all definition branches: ${incidentalQuestion}`);
+}
 
 const parkingGeographyEvidence = [source({
   sourceID: "zr-parking-geography",
@@ -469,6 +902,101 @@ const completeParkingGeography = evaluateZoningResearchSafety({
   )
 });
 assert(!completeParkingGeography.issues.some((issue) => issue.type === "zoning_parking_geography_omission"));
+
+const weakSpecialParkingEvidence = [source({
+  sourceID: "zr-special-parking-geography-only",
+  sectionNumber: "12-10",
+  title: "Definitions — Greater Transit Zone",
+  text: "The Greater Transit Zone includes special parking areas."
+})];
+const unsupportedSpecialParkingAlternative = evaluateZoningResearchSafety({
+  question: parkingQuestion,
+  evidence: weakSpecialParkingEvidence,
+  answer: answer(
+    "The special parking area may supply another path.",
+    ["zr-special-parking-geography-only"]
+  )
+});
+assert(unsupportedSpecialParkingAlternative.issues.some((issue) =>
+  issue.type === "zoning_parking_geography_evidence_boundary"));
+const maskedUnsupportedSpecialParkingAlternative = evaluateZoningResearchSafety({
+  question: parkingQuestion,
+  evidence: weakSpecialParkingEvidence,
+  answer: {
+    ...answer(
+      "A special parking area may supply another path. The selected evidence does not supply the special parking area rule, so no alternative result can be stated from it.",
+      ["zr-special-parking-geography-only"]
+    ),
+    additionalEvidenceNeeded: [
+      "Obtain the controlling enacted special parking area provision."
+    ]
+  }
+});
+assert(maskedUnsupportedSpecialParkingAlternative.issues.some((issue) =>
+  issue.type === "zoning_parking_geography_evidence_boundary"));
+for (const unsupportedClaim of [
+  "The result may differ in a special parking area.",
+  "Different requirements may apply in a special parking area.",
+  "A special parking area is subject to a different result.",
+  "A special parking area could lead to a different outcome.",
+  "Special parking areas have different requirements.",
+  "Different parking rules govern special parking areas."
+]) {
+  const mixedUnsupportedClaim = evaluateZoningResearchSafety({
+    question: parkingQuestion,
+    evidence: weakSpecialParkingEvidence,
+    answer: {
+      ...answer(
+        `${unsupportedClaim} The selected evidence does not supply the special parking area rule, so no alternative result can be stated from it.`,
+        ["zr-special-parking-geography-only"]
+      ),
+      additionalEvidenceNeeded: [
+        "Obtain the controlling enacted special parking area provision."
+      ]
+    }
+  });
+  assert(mixedUnsupportedClaim.issues.some((issue) =>
+    issue.type === "zoning_parking_geography_evidence_boundary"));
+}
+const boundedSpecialParkingEvidence = evaluateZoningResearchSafety({
+  question: parkingQuestion,
+  evidence: weakSpecialParkingEvidence,
+  answer: {
+    ...answer(
+      "The selected evidence does not supply the special parking area rule, so no alternative result can be stated from it.",
+      ["zr-special-parking-geography-only"]
+    ),
+    additionalEvidenceNeeded: [
+      "Obtain the controlling enacted special parking area provision."
+    ]
+  }
+});
+assert.equal(boundedSpecialParkingEvidence.pass, true, JSON.stringify(boundedSpecialParkingEvidence.issues));
+
+const negativeSpecialParkingEvidence = [source({
+  sourceID: "zr-special-parking-negative-source",
+  sectionNumber: "12-10",
+  title: "Definitions — Greater Transit Zone",
+  text: "No unique parking regulations for special parking areas are supplied in this passage."
+})];
+const boundedNegativeSpecialParkingEvidence = evaluateZoningResearchSafety({
+  question: parkingQuestion,
+  evidence: negativeSpecialParkingEvidence,
+  answer: {
+    ...answer(
+      "The selected evidence does not supply the special parking area rule, so no alternative result can be stated from it.",
+      ["zr-special-parking-negative-source"]
+    ),
+    additionalEvidenceNeeded: [
+      "Obtain the controlling enacted special parking area provision."
+    ]
+  }
+});
+assert.equal(
+  boundedNegativeSpecialParkingEvidence.pass,
+  true,
+  JSON.stringify(boundedNegativeSpecialParkingEvidence.issues)
+);
 
 const existingFacilityQuestion = "Can this unidentified property qualify when any December 19, 2017 existing-facility facts have not been provided?";
 const missingExistingFacility = evaluateZoningResearchSafety({
@@ -533,6 +1061,23 @@ const mihHistoricalPrompt = zoningResearchSafetyPromptContext({
 assert.match(mihHistoricalPrompt, /mih-historical-zoning-lot/);
 assert.doesNotMatch(mihHistoricalPrompt, /"missing-location"/);
 assert.match(mihHistoricalPrompt, /satisfying the unit and residential-floor-area thresholds is not enough/i);
+const unrelatedAffordableQuestion =
+  "My R6A lot is outside an MIH area. Does 31,000 square feet fit a 3.90 FAR when 6,200 square feet is intended to be affordable?";
+const unrelatedAffordablePrompt = zoningResearchSafetyPromptContext({
+  question: unrelatedAffordableQuestion,
+  evidence: mihHistoricalEvidence
+});
+assert.doesNotMatch(unrelatedAffordablePrompt, /mih-historical-zoning-lot/);
+const unrelatedAffordableAnswer = evaluateZoningResearchSafety({
+  question: unrelatedAffordableQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: answer(
+    "The stated project is outside an MIH area, so this answer does not rely on the MIH small-development exception.",
+    ["zr-mih-historical-lot"]
+  )
+});
+assert(!unrelatedAffordableAnswer.issues.some((issue) =>
+  issue.type.startsWith("zoning_mih_")));
 const numericalOnlyMIH = evaluateZoningResearchSafety({
   question: mihHistoricalQuestion,
   evidence: mihHistoricalEvidence,
@@ -593,7 +1138,7 @@ const numericalOnlyMIHWithoutHistoricalBoundary = evaluateZoningResearchSafety({
     ),
     missingFacts: [
       "Verify the official MIH establishment date.",
-      "Obtain official historical zoning-lot configuration evidence."
+      "Obtain official historical title, survey, or recorded zoning-lot declaration materials."
     ]
   }
 });
@@ -611,7 +1156,7 @@ const unjustifiedCategoricalMIHDenial = evaluateZoningResearchSafety({
     ),
     missingFacts: [
       "Verify the official MIH establishment date.",
-      "Obtain official historical zoning-lot configuration evidence."
+      "Obtain official historical title, survey, or recorded zoning-lot declaration materials."
     ]
   }
 });
@@ -630,7 +1175,7 @@ const bareNoWithUnresolvedMIHHistory = evaluateZoningResearchSafety({
     conclusion: "No.",
     missingFacts: [
       "Verify the official MIH establishment date.",
-      "Obtain official historical zoning-lot configuration evidence."
+      "Obtain official historical title, survey, or recorded zoning-lot declaration materials."
     ]
   }
 });
@@ -648,7 +1193,7 @@ const scopedNumericalMIHDenial = evaluateZoningResearchSafety({
     ),
     missingFacts: [
       "Verify the official MIH establishment date.",
-      "Obtain official historical zoning-lot configuration evidence."
+      "Obtain official historical title, survey, or recorded zoning-lot declaration materials."
     ]
   }
 });
@@ -665,7 +1210,7 @@ const scopedDirectNumericalMIHDenial = evaluateZoningResearchSafety({
     conclusion: "The project does not qualify based on those numerical thresholds alone.",
     missingFacts: [
       "Verify the official MIH establishment date.",
-      "Obtain official historical zoning-lot configuration evidence."
+      "Obtain official historical title, survey, or recorded zoning-lot declaration materials."
     ]
   }
 });
@@ -684,7 +1229,7 @@ const conditionalMIHGrant = evaluateZoningResearchSafety({
       "Whether the tract was a zoning-lot on that date is not established."
     ],
     additionalEvidenceNeeded: [
-      "Obtain official historical zoning-lot configuration evidence."
+      "Obtain official historical title, survey, or recorded zoning-lot declaration materials."
     ]
   }
 });
@@ -700,7 +1245,9 @@ const contradictoryMixedMIHGrant = evaluateZoningResearchSafety({
     ),
     conclusion: "Not established.",
     missingFacts: ["Verify the official MIH establishment date."],
-    additionalEvidenceNeeded: ["Obtain official historical zoning-lot configuration evidence."]
+    additionalEvidenceNeeded: [
+      "Obtain official historical title, survey, or recorded zoning-lot declaration materials."
+    ]
   }
 });
 assert(contradictoryMixedMIHGrant.issues.some((issue) =>
@@ -716,7 +1263,9 @@ const conditionalMIHExceptionApplies = evaluateZoningResearchSafety({
       ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
     ),
     missingFacts: ["Verify the official MIH establishment date."],
-    additionalEvidenceNeeded: ["Obtain official historical zoning-lot configuration evidence."]
+    additionalEvidenceNeeded: [
+      "Obtain official historical title, survey, or recorded zoning-lot declaration materials."
+    ]
   }
 });
 assert.equal(
@@ -724,6 +1273,67 @@ assert.equal(
   true,
   JSON.stringify(conditionalMIHExceptionApplies.issues)
 );
+
+const cautiousNoFinalDetermination = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "No final qualification determination can be made. Eight units is no more than 10, and 10,000 square feet is no more than 12,500 square feet, but those thresholds do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project qualifies only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    conclusion: "No final qualification determination can be made.",
+    missingFacts: ["Verify the official MIH establishment date."],
+    additionalEvidenceNeeded: [
+      "Obtain official historical title, survey, or recorded zoning-lot declaration materials."
+    ]
+  }
+});
+assert.equal(
+  cautiousNoFinalDetermination.pass,
+  true,
+  JSON.stringify(cautiousNoFinalDetermination.issues)
+);
+
+const crossSentenceHistoricalLotBoundary = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established. Eight units is no more than 10, and 10,000 square feet is no more than 12,500 square feet, but those comparisons do not prove the exception. The official MIH establishment date must be verified. The tract also must have been a zoning-lot on that date. The 2025 combination involved tax-lots. That later event does not prove the legal zoning-lot configuration in 2017.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    conclusion: "Not established.",
+    missingFacts: [
+      "Verify the official MIH establishment date.",
+      "Whether the tract was already the relevant zoning-lot then remains unresolved."
+    ],
+    additionalEvidenceNeeded: [
+      "Obtain historical title and survey records and any recorded Declaration of Restrictions showing the tract configuration and ownership in 2017."
+    ]
+  }
+});
+assert.equal(
+  crossSentenceHistoricalLotBoundary.pass,
+  true,
+  JSON.stringify(crossSentenceHistoricalLotBoundary.issues)
+);
+
+const vagueHistoricalEvidenceRequest = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts alone. Eight units is no more than 10, and 10,000 square feet is no more than 12,500 square feet, but those numerical thresholds do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project may qualify only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: ["Verify the official MIH establishment date."],
+    additionalEvidenceNeeded: ["Obtain official historical zoning-lot evidence."]
+  }
+});
+assert(vagueHistoricalEvidenceRequest.issues.some((issue) =>
+  issue.type === "zoning_mih_historical_records"
+));
 
 const vagueHistoricalStatusRequest = evaluateZoningResearchSafety({
   question: mihHistoricalQuestion,
@@ -740,6 +1350,96 @@ const vagueHistoricalStatusRequest = evaluateZoningResearchSafety({
 assert(vagueHistoricalStatusRequest.issues.some((issue) =>
   issue.type === "zoning_mih_historical_records"
 ));
+
+const crossItemHistoricalRecordContamination = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts alone. The numerical thresholds do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project may qualify only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: ["Verify the official MIH establishment date."],
+    additionalEvidenceNeeded: [
+      "Obtain official historical zoning-lot evidence.",
+      "Obtain a current site survey."
+    ]
+  }
+});
+assert(crossItemHistoricalRecordContamination.issues.some((issue) =>
+  issue.type === "zoning_mih_historical_records"
+));
+
+const sameItemHistoricalRecordContamination = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts alone. The numerical thresholds do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project may qualify only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: ["Verify the official MIH establishment date."],
+    additionalEvidenceNeeded: [
+      "Obtain official historical zoning-lot evidence. Obtain a current site survey."
+    ]
+  }
+});
+assert(sameItemHistoricalRecordContamination.issues.some((issue) =>
+  issue.type === "zoning_mih_historical_records"
+));
+
+for (const contaminatedHistoricalRequest of [
+  "Obtain official historical zoning-lot evidence, and obtain a current site survey.",
+  "Obtain official historical zoning-lot evidence while a current site survey covers dimensions.",
+  "Obtain official historical zoning-lot evidence, not the current site survey.",
+  "Obtain official historical zoning-lot evidence and a current site survey.",
+  "Obtain official historical zoning-lot evidence with a current site survey."
+]) {
+  const boundedHistoricalRecordContamination = evaluateZoningResearchSafety({
+    question: mihHistoricalQuestion,
+    evidence: mihHistoricalEvidence,
+    answer: {
+      ...answer(
+        "Not established on the stated facts alone. The numerical thresholds do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project may qualify only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+        ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+      ),
+      missingFacts: ["Verify the official MIH establishment date."],
+      additionalEvidenceNeeded: [contaminatedHistoricalRequest]
+    }
+  });
+  assert(boundedHistoricalRecordContamination.issues.some((issue) =>
+    issue.type === "zoning_mih_historical_records"));
+}
+
+const historicalDeedChainRequest = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts alone. Eight units is no more than 10, and 10,000 square feet is no more than 12,500 square feet, but those numerical thresholds do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project may qualify only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: ["Verify the official MIH establishment date."],
+    additionalEvidenceNeeded: [
+      "Obtain the recorded historical deed chain for the tract as of the establishment date."
+    ]
+  }
+});
+assert.equal(historicalDeedChainRequest.pass, true, JSON.stringify(historicalDeedChainRequest.issues));
+
+const datedSurveyRequest = evaluateZoningResearchSafety({
+  question: mihHistoricalQuestion,
+  evidence: mihHistoricalEvidence,
+  answer: {
+    ...answer(
+      "Not established on the stated facts alone. Eight units is no more than 10, and 10,000 square feet is no more than 12,500 square feet, but those numerical thresholds do not establish the exception. A zoning-lot may or may not coincide with a tax-lot. The project may qualify only if the tract was already a zoning-lot on the applicable MIH-area establishment date.",
+      ["zr-mih-historical-lot", "zr-zoning-lot-definition-mih"]
+    ),
+    missingFacts: ["Verify the official MIH establishment date."],
+    additionalEvidenceNeeded: ["Obtain the recorded 2017 survey for the tract."]
+  }
+});
+assert.equal(datedSurveyRequest.pass, true, JSON.stringify(datedSurveyRequest.issues));
 
 console.log("Zoning Research safety contract passed", {
   version: zoningResearchSafetyVersion,

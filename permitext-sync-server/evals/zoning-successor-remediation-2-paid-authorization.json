@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-2.json",
     "sha256": "459b2273b7ebd209d4519bf9206b6135dc2fc7706052fa9b333c4bf5e63e8a8b",
@@ -19,14 +19,14 @@
     "exactAuthorizationPhrase": "I authorize one paid semantic confirmation run for remediation successor 2 SHA 459b2273b7ebd209d4519bf9206b6135dc2fc7706052fa9b333c4bf5e63e8a8b, all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
-    "status": "not_started",
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "runID": "f35eed33-cb4e-4b7b-a719-86b072271660",
+    "consumedAt": "2026-08-30T22:58:14.408Z"
   },
   "publicResearchReleaseAuthorized": false,
   "professionalZoningSignoff": false,
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "One-time owner authorization recorded for this exact remediation-successor-2 cohort, all 30 ordered cases, one repetition, and a $5 maximum cumulative API spend. It does not authorize deployment, public access, pricing or allowance changes, or the disabled evidence-budget candidate."
+  "notes": "One-time authorization consumed by 2026-08-30T22-42-25-264Z-f35eed33-cb4e-4b7b-a719-86b072271660.json. The result still requires quality, cost, and release-gate review."
 }

@@ -1,5 +1,5 @@
 export const zoningResearchSafetyVersion =
-  "20260830-zoning-material-completeness-v5";
+  "20260830-zoning-material-completeness-v7";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -9,6 +9,128 @@ function compactText(value) {
 
 function unique(values) {
   return Array.from(new Set((Array.isArray(values) ? values : []).map(compactText).filter(Boolean)));
+}
+
+const calendarMonthNumbers = new Map([
+  ["january", "01"], ["jan", "01"],
+  ["february", "02"], ["feb", "02"],
+  ["march", "03"], ["mar", "03"],
+  ["april", "04"], ["apr", "04"],
+  ["may", "05"],
+  ["june", "06"], ["jun", "06"],
+  ["july", "07"], ["jul", "07"],
+  ["august", "08"], ["aug", "08"],
+  ["september", "09"], ["sep", "09"], ["sept", "09"],
+  ["october", "10"], ["oct", "10"],
+  ["november", "11"], ["nov", "11"],
+  ["december", "12"], ["dec", "12"]
+]);
+
+const calendarDatePattern = /\b(January|Jan\.?|February|Feb\.?|March|Mar\.?|April|Apr\.?|May|June|Jun\.?|July|Jul\.?|August|Aug\.?|September|Sept?\.?|October|Oct\.?|November|Nov\.?|December|Dec\.?)\s+(\d{1,2})(?:st|nd|rd|th)?\s*,?\s*(\d{4})\b/gi;
+
+const datedEventPatterns = [
+  ["filing", /\b(?:application|applied|filed|filing)\b/i],
+  ["permit", /\b(?:permit|permitted)\b/i],
+  ["approval", /\b(?:approval|approved)\b/i],
+  ["foundation", /\b(?:foundation|foundations|excavation)\b/i],
+  ["certificate", /\b(?:certificate|occupancy|C\s+of\s+O)\b/i],
+  ["certificate", /\bCO\b(?=\s+(?:(?:was|is|has been|had been)\s+)?(?:issued|granted|obtained)\b)/],
+  ["amendment", /\b(?:adoption|adopted|amendment|effective)\b/i]
+];
+
+function calendarDateRelation(value) {
+  const prefix = String(value || "").slice(-80);
+  const relation = prefix.match(
+    /\b(on\s+(?:or|and)\s+after|on\s+(?:or|and)\s+before|no\s+later\s+than|no\s+earlier\s+than|subsequent\s+to|later\s+than|prior\s+to|earlier\s+than|after|before|by|as[- ]of|on)\s*$/i
+  )?.[1]?.toLowerCase().replace(/\s+/g, " ");
+  if (!relation) return null;
+  const normalized = relation === "by" || relation === "no later than" || /on (?:or|and) before/.test(relation)
+    ? "on-or-before"
+    : relation === "no earlier than" || /on (?:or|and) after/.test(relation)
+      ? "on-or-after"
+      : relation === "prior to" || relation === "earlier than"
+        ? "before"
+        : relation === "subsequent to" || relation === "later than"
+          ? "after"
+          : relation;
+  const negated = new RegExp(
+    `(?:\\b(?:not|never|no)\\b|\\b(?:wasn['’]t|isn['’]t|didn['’]t|hasn['’]t|hadn['’]t)\\b)[^.!?;]{0,60}\\b${relation.replace(/\s+/g, "\\s+")}\\s*$`,
+    "i"
+  ).test(prefix);
+  return negated ? `not-${normalized}` : normalized;
+}
+
+function calendarDateRelationCompatible(required, observed) {
+  if (!required) return true;
+  if (!observed) return false;
+  const allowed = {
+    after: new Set(["after"]),
+    before: new Set(["before"]),
+    "on-or-after": new Set(["on-or-after", "after", "on"]),
+    "on-or-before": new Set(["on-or-before", "before", "on"]),
+    on: new Set(["on"]),
+    "as-of": new Set(["as-of", "on"])
+  };
+  return allowed[required]?.has(observed) || required === observed;
+}
+
+function calendarDateMentions(value) {
+  const text = String(value || "");
+  const dateMatches = Array.from(text.matchAll(calendarDatePattern), (match) => ({
+    raw: match[0],
+    monthName: match[1].replace(/\.$/, "").toLowerCase(),
+    day: match[2],
+    year: match[3],
+    start: match.index,
+    end: match.index + match[0].length
+  }));
+  const clauseBoundaries = Array.from(
+    text.matchAll(/(?:[.!?;]\s+|,\s+(?:and|but|while|whereas)\s+)/gi)
+  ).map((match) => ({ start: match.index, end: match.index + match[0].length }));
+  const distanceBetween = (leftStart, leftEnd, rightStart, rightEnd) => {
+    if (leftEnd <= rightStart) return rightStart - leftEnd;
+    if (rightEnd <= leftStart) return leftStart - rightEnd;
+    return 0;
+  };
+  return dateMatches.map((dateMatch) => {
+    const month = calendarMonthNumbers.get(dateMatch.monthName);
+    const day = String(Number(dateMatch.day)).padStart(2, "0");
+    const previousBoundary = clauseBoundaries
+      .filter((boundary) => boundary.end <= dateMatch.start)
+      .at(-1);
+    const nextBoundary = clauseBoundaries.find((boundary) => boundary.start >= dateMatch.end);
+    const clauseStart = previousBoundary?.end || 0;
+    const clauseEnd = nextBoundary?.start || text.length;
+    const clause = text.slice(clauseStart, clauseEnd);
+    const datePrefix = text.slice(clauseStart, dateMatch.start);
+    const clauseDates = dateMatches.filter((candidate) =>
+      candidate.start >= clauseStart && candidate.end <= clauseEnd
+    );
+    const eventClasses = datedEventPatterns
+        .filter(([, pattern]) => Array.from(
+          clause.matchAll(new RegExp(pattern.source, `${pattern.flags.replace(/g/g, "")}g`))
+        ).some((eventMatch) => {
+          const eventStart = clauseStart + eventMatch.index;
+          const eventEnd = eventStart + eventMatch[0].length;
+          const currentDistance = distanceBetween(
+            dateMatch.start,
+            dateMatch.end,
+            eventStart,
+            eventEnd
+          );
+          const closestDistance = Math.min(...clauseDates.map((candidate) =>
+            distanceBetween(candidate.start, candidate.end, eventStart, eventEnd)
+          ));
+          return currentDistance === closestDistance;
+        }))
+        .map(([eventClass]) => eventClass);
+    return {
+      raw: dateMatch.raw,
+      key: `${dateMatch.year}-${month}-${day}`,
+      relation: calendarDateRelation(datePrefix) || (eventClasses.length ? "on" : null),
+      eventClasses
+    };
+  });
 }
 
 function zoningEvidence(evidence) {
@@ -45,10 +167,16 @@ function negativeLocationStatement(value) {
     /\b(?:unknown|not (?:provided|established|identified|verified)|missing|unresolved)\b[^.]{0,120}\b(?:address|BBL|block(?: and |\/)lot|tax lot|mapped zoning district|zoning map|special[- ]district status|subdistrict|Appendix [A-Z] (?:map|subarea))\b/i.test(value);
 }
 
+function hasConcretePropertyIdentifier(value) {
+  return /\bBBL\s*[:#-]?\s*[1-5]\d{9}\b/i.test(value) ||
+    /\bBBL\s*[:#-]?\s*\d{1,10}[-\s]\d{1,5}[-\s]\d{1,5}\b/i.test(value) ||
+    /\bBlock\s+\d{1,10}\s*(?:,|\/|and)\s*Lot\s+\d{1,5}\b/i.test(value) ||
+    /\b\d{1,6}\s+[A-Za-z0-9.'’ -]{1,80}\s+(?:Street|St\.?|Avenue|Ave\.?|Boulevard|Blvd\.?|Road|Rd\.?|Drive|Dr\.?|Lane|Ln\.?|Place|Pl\.?|Court|Ct\.?|Parkway|Pkwy\.?|Highway|Hwy\.?)\b/i.test(value);
+}
+
 function hasConcreteMappedLocation(value) {
   if (negativeLocationStatement(value)) return false;
-  return /\bBBL\s*[:#-]?\s*\d{1,10}[-\s]\d{1,5}[-\s]\d{1,5}\b/i.test(value) ||
-    /\b(?:Zoning District|mapped district)\s*[:—-]\s*(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)(?:\b|\s)/i.test(value) ||
+  return /\b(?:Zoning District|mapped district)\s*[:—-]\s*(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)(?:\b|\s)/i.test(value) ||
     /\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i.test(value) ||
     /\b(?:within|in)\s+(?:the\s+)?(?:Inner|Outer)\s+Transit\s+Zone\b/i.test(value) ||
     /\b(?:property|site|lot|project)\s+(?:is\s+)?(?:confirmed|verified|established)\s+to\s+be\s+(?:within|in)\s+(?:an?\s+|the\s+)?(?:MIH|Mandatory Inclusionary Housing)\s+area\b/i.test(value) ||
@@ -61,13 +189,63 @@ function citedSourceIDs(answer) {
 }
 
 function categoricalProjectConclusion(value) {
-  return /\b(?:is|are|will be|can be|may be)\s+(?:permitted|allowed|compliant|as[- ]of[- ]right|within|outside|subject to|required)\b/i.test(value) ||
-    /\b(?:the (?:site|property|lot|project|development)|this (?:site|property|lot|project|development))\b[^.]{0,140}\b(?:falls|lies|qualifies|complies|satisfies|is permitted)\b/i.test(value);
+  return /\b(?:it|the (?:site|property|lot|project|development|building|use)|this (?:site|property|lot|project|development|building|use))\b[^.]{0,140}\b(?:is|are|will be|would be|can be|may be)\s+(?:permitted|allowed|compliant|lawful|as[- ]of[- ]right|within|outside|subject to|required)\b/i.test(value) ||
+    /\b(?:the (?:site|property|lot|project|development)|this (?:site|property|lot|project|development))\b[^.]{0,140}\b(?:falls|lies|qualifies|complies|satisfies|is permitted)\b/i.test(value) ||
+    /\b(?:(?:the|this|that|a|an)\s+)?(?:proposed\s+)?(?:residential|commercial|manufacturing|community[- ]facility|self[- ]service storage|office|parking|use|building|development|project|proposal)\b[^.]{0,100}\b(?:is|are|will be|would be|can be|may be)\s+(?:permitted|allowed|authorized|compliant|lawful|as[- ]of[- ]right|within|outside|subject to)\b/i.test(value) ||
+    /\b(?:(?:the|this|that|a|an)\s+)?(?:proposed\s+)?(?:residential|commercial|manufacturing|community[- ]facility|self[- ]service storage|office|parking|use|building|development|project|proposal)\b[^.]{0,100}\b(?:qualifies|may proceed|can proceed|would proceed|may go forward|can go forward|would go forward)\b[^.]{0,50}\bas[- ]of[- ]right\b/i.test(value);
 }
 
 function statesLocationBoundary(value) {
   return /\b(?:cannot|could not|does not|not enough|insufficient|unable to)\b[^.]{0,180}\b(?:determine|establish|conclude|confirm|place|locate|map|apply)\b/i.test(value) ||
-    /\b(?:site-specific|property-specific|parcel-specific)\b[^.]{0,140}\b(?:cannot|not|unknown|unresolved|requires?)\b/i.test(value);
+    /\b(?:site-specific|property-specific|parcel-specific)\b[^.]{0,140}\b(?:cannot|not|unknown|unresolved|requires?)\b/i.test(value) ||
+    /\b(?:address|BBL|block(?: and |\/)lot|property location|mapped district|zoning district|official map|mapped status)\b[^.]{0,140}\b(?:is|are)\s+(?:required|needed)\b[^.]{0,120}\bbefore\b[^.]{0,100}\b(?:determin|calculat|conclud|confirm|apply)\w*/i.test(value);
+}
+
+function statesLoweredYardBoundary(value) {
+  return /\b(?:lowered yard|yard (?:was|is|had been) lowered|yard-lowering)\b[^.]{0,180}\b(?:unknown|not (?:provided|established|verified)|missing|unresolved|must be (?:confirmed|verified|established)|depends?|subject to|conditional)\b/i.test(value) ||
+    /\b(?:depends?|subject to|conditional|cannot be (?:determined|confirmed)|no final (?:classification|determination))\b[^.]{0,180}\b(?:lowered yard|yard (?:was|is|had been) lowered|yard-lowering)\b/i.test(value) ||
+    /\bif\b[^.]{0,180}\byard\b[^.]{0,100}\blowered\b[^.]{0,180}\b(?:classification|result)\b[^.]{0,80}\b(?:may|could|can)\s+(?:differ|change)\b/i.test(value);
+}
+
+function statesUnconditionalCellarClassification(value) {
+  return compactText(value).split(/(?<=[.!?;])\s+/).some((clause) => {
+    if (/^(?:yes|no)[.!]?$/i.test(clause)) return true;
+    if (/\b(?:whether|cannot be determined|could not be determined|depends? on)\b/i.test(clause) ||
+      /\b(?:if|only if|unless|when)\b/i.test(clause)) return false;
+    return /\b(?:level|space|area|floor|storage|it|this)\b[^.]{0,120}\b(?:is|are)\s+(?:excluded|included|a cellar|not a cellar)\b/i.test(clause) ||
+      /\b(?:level|space|area|floor|storage|it|this)\b[^.]{0,120}\b(?:does not|does|will not|will)\s+count\b/i.test(clause) ||
+      /\b(?:level|space|area|floor|storage|it|this)\b[^.]{0,120}\b(?:must|shall|will)\s+be\s+(?:omitted|excluded|included)\b[^.]{0,80}\b(?:zoning )?floor area\b/i.test(clause) ||
+      /\b(?:counts?|qualifies)\s+as\s+(?:zoning )?floor area\b/i.test(clause);
+  });
+}
+
+function statesOverstatedTaxMapDistinction(value) {
+  const text = compactText(value);
+  const hasTaxAndZoningAntecedent = /\bzoning[- ]lots?\b/i.test(text) && /\btax[- ]lots?\b/i.test(text);
+  return text.split(/(?<=[.!?;])\s+/).some((sentence) => {
+    const explicitPair =
+      /\bzoning(?:[- ]lots?)?\b[^.]{0,120}\btax[- ]lots?\b/i.test(sentence) ||
+      /\btax[- ]lots?\b[^.]{0,120}\bzoning(?:[- ]lots?)?\b/i.test(sentence);
+    const boundedCoreference = hasTaxAndZoningAntecedent &&
+      /\b(?:they|these two|the two)\b/i.test(sentence);
+    const categoricalNonidentity =
+      /\b(?:is|are)\s+(?:always\s+)?(?:distinct|different|separate)(?:\s+from)?\b/i.test(sentence) ||
+      /\b(?:always\s+(?:distinct|different|separate)|(?:can\s+)?never\s+(?:coincide|be\s+(?:the\s+)?same|be\s+identical)|cannot\s+(?:coincide|be\s+(?:the\s+)?same|be\s+identical))\b/i.test(sentence);
+    return (explicitPair || boundedCoreference) && categoricalNonidentity;
+  });
+}
+
+function statesUnsupportedParkingAlternative(value) {
+  return compactText(value).split(/(?<=[.!?;])\s+/).some((sentence) => {
+    if (!/\b(?:special parking areas?|special district)\b/i.test(sentence)) return false;
+    if (/\b(?:does not|do not|cannot|can't|fails? to|without)\b|\bno\b[^.]{0,100}\b(?:alternative|different|unique|separate|result|outcome|rules?|requirements?)\b|\bnot\b[^.]{0,80}\b(?:supplied|provided|established|stated)\b/i.test(sentence)) return false;
+    return /\b(?:different|unique|separate|alternative)\b[^.]{0,100}\b(?:result|outcome|path|rules?|requirements?|regulations?|standards?)\b/i.test(sentence) ||
+      /\b(?:result|outcome|path|rules?|requirements?|regulations?|standards?)\b[^.]{0,100}\b(?:different|unique|separate|alternative)\b/i.test(sentence) ||
+      /\b(?:may|could|can|will)\b[^.]{0,100}\b(?:differ|apply|produce|supply|control|modify|change|lead)\b/i.test(sentence) ||
+      /\b(?:has|have|govern|governs|applies?|subject to)\b[^.]{0,100}\b(?:different|unique|separate|alternative)\b/i.test(sentence) ||
+      /\b(?:different|unique|separate|alternative)\b[^.]{0,100}\b(?:govern|governs|applies?)\b/i.test(sentence) ||
+      /\b(?:another|other)\s+(?:path|result|outcome|rule|requirement)\b/i.test(sentence);
+  });
 }
 
 function exactSpecialDistrictLabels(value) {
@@ -95,10 +273,13 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     source?.text,
     source?.richSourceCanonicalReference
   ].filter(Boolean).join(" ")).join(" "));
-  const propertySpecific = /\b(?:specific property|property|parcel|site|zoning lot|tax lot|this lot|this project|proposed|proposal|development|building)\b/i.test(questionText);
+  const sourceTextWithoutDefinitionalTaxMap = sourceText.replace(/\btax map\b/gi, "");
+  const propertyIdentifierKnown = hasConcretePropertyIdentifier(facts);
+  const propertySpecific = propertyIdentifierKnown ||
+    /\b(?:specific property|property|parcel|site|zoning lot|tax lot|this lot|this project|proposed|proposal|development|building)\b/i.test(questionText);
   const mappedApplicability =
     /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea|zoning district|special[- ]district|subdistrict|transit zone)\b/i.test(questionText) ||
-    /\b(?:map|Appendix [A-Z]|designated area|subarea|special[- ]district|subdistrict|transit zone)\b/i.test(sourceText);
+    /\b(?:map|Appendix [A-Z]|designated area|subarea|special[- ]district|subdistrict|transit zone)\b/i.test(sourceTextWithoutDefinitionalTaxMap);
   const missingMappedLocation = propertySpecific && mappedApplicability && !hasConcreteMappedLocation(facts);
   const specialDistrictLabels = exactSpecialDistrictLabels(questionText);
   const table = /\btable\b/i.test(questionText) || sources.some((source) =>
@@ -120,13 +301,32 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     (amendment && /\b(?:particular|specific) date\b/i.test(questionText));
   const historicalSubstantiveText = effectiveDate &&
     /\b(?:old|prior|previous|pre[- ](?:amendment|city of yes|december))\b[^.]{0,100}\b(?:zoning|rules?|text|provisions?)\b/i.test(questionText);
-  const map = /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea)\b/i.test(`${questionText} ${sourceText}`) ||
+  const map = /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea)\b/i.test(`${questionText} ${sourceTextWithoutDefinitionalTaxMap}`) ||
     sources.some((source) => Array.isArray(source?.visualSources) && source.visualSources.length > 0);
   const basicLotCoverage = /\bbasic\b[^?]{0,100}\blot[- ]coverage\b|\blot[- ]coverage\b[^?]{0,100}\bbasic\b/i.test(questionText);
   const parkingGeography = /\bparking\b/i.test(questionText) &&
     /\b(?:transit zone|Greater Transit Zone|special parking areas?|special district)\b/i.test(`${questionText} ${sourceText}`);
-  const definitionBranchReview = definition && /\bzoning lot\b/i.test(questionText) &&
+  const parkingAlternativeMentioned = parkingGeography &&
+    /\b(?:special parking areas?|special district)\b/i.test(sourceText);
+  const parkingAlternativeRuleSupplied = parkingAlternativeMentioned && sources.some((source) =>
+    compactText(`${source?.title} ${source?.text}`).split(/(?<=[.!?;])\s+/).some((sentence) =>
+      /\b(?:special parking areas?|special district)\b/i.test(sentence) &&
+      (
+        /\b(?:different|unique|separate|alternative)\b[^.]{0,140}\b(?:parking )?(?:requirements?|rules?|regulations?|standards?)\b/i.test(sentence) ||
+        /\b(?:parking )?(?:requirements?|rules?|regulations?|standards?)\b[^.]{0,140}\b(?:different|unique|separate|alternative)\b/i.test(sentence)
+      ) &&
+      !/\b(?:no|not|without|cannot|does not|fails? to)\b[^.]{0,180}\b(?:unique|different|separate|alternative|special parking|special district|requirements?|rules?|regulations?|standards?)\b/i.test(sentence)
+    )
+  );
+  const zoningLotFormationQuestion =
+    /\b(?:definition of|what (?:is|constitutes|qualifies as))\b[^?]{0,120}\bzoning[- ]lot\b/i.test(questionText) ||
+    /\b(?:tax[- ]lots?|lots? of record)\b[^?]{0,180}\b(?:treated|considered|combined|constitute|formed)\b[^?]{0,100}\b(?:one|single|a)\s+zoning[- ]lot\b/i.test(questionText) ||
+    /\b(?:treated|considered)\b[^?]{0,100}\b(?:one|single|a)\s+zoning[- ]lot\b[^?]{0,120}\b(?:ownership|contigu|declaration|lot of record)\b/i.test(questionText);
+  const definitionBranchReview = definition && zoningLotFormationQuestion &&
     /\(a\)[\s\S]*\(b\)[\s\S]*\(c\)[\s\S]*\(d\)/i.test(sourceText);
+  const zoningLotTaxMapDistinction = definitionBranchReview &&
+    /\bmay or may not coincide\b/i.test(sourceText) &&
+    /\btax map\b/i.test(sourceText);
   const loweredYardClause = definition &&
     /\bDecember\s+5,\s+1990\b/i.test(sourceText) &&
     /\byard\b[^.]{0,220}\blowered\b|\blowered\b[^.]{0,220}\byard\b/i.test(sourceText) &&
@@ -135,10 +335,12 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     /\b(?:existing|existed|existence)[- ]?(?:facility|building|use)?\b[^?]{0,180}\b(?:not (?:been )?(?:provided|established|identified|verified)|missing|unknown)\b/i.test(questionText) ||
     /\b(?:not (?:been )?(?:provided|established|identified|verified)|missing|unknown)\b[^?]{0,180}\b(?:existing|existed|existence)[- ]?(?:facility|building|use)?\b/i.test(questionText);
   const mihHistoricalZoningLotException =
-    /\b(?:Mandatory Inclusionary Housing|MIH)\b/i.test(`${questionText} ${sourceText}`) &&
+    /\b(?:Mandatory Inclusionary Housing|MIH)\b/i.test(questionText) &&
+    /\b(?:small[- ]development exception|not more than 10 (?:dwelling )?units?|12,500 square feet)\b/i.test(questionText) &&
     /\bnot more than 10 dwelling units\b/i.test(sourceText) &&
     /\b12,500 square feet\b/i.test(sourceText) &&
     /\bzoning lot that existed on the date of establishment\b/i.test(sourceText);
+  const questionDateMentions = calendarDateMentions(questionText);
   const categories = [
     "citation-boundary",
     "stable-passage",
@@ -151,6 +353,7 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     ...(arithmetic ? ["arithmetic"] : []),
     ...(definition ? ["definition"] : []),
     ...(definitionBranchReview ? ["definition-branches"] : []),
+    ...(zoningLotTaxMapDistinction ? ["definition-tax-map-distinction"] : []),
     ...(loweredYardClause ? ["definition-lowered-yard"] : []),
     ...(basicLotCoverage ? ["basic-lot-coverage"] : []),
     ...(parkingGeography ? ["parking-geography"] : []),
@@ -165,10 +368,14 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     categories: unique(categories),
     zoningSourceIDs: unique(sources.map((source) => source?.sourceID)),
     missingMappedLocation,
+    propertyIdentifierKnown,
     specialDistrictLabels,
     basicLotCoverage,
     parkingGeography,
+    parkingAlternativeMentioned,
+    parkingAlternativeRuleSupplied,
     definitionBranchReview,
+    zoningLotTaxMapDistinction,
     loweredYardClause,
     missingExistingCondition,
     mihHistoricalZoningLotException,
@@ -176,7 +383,8 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     tableSourceIDs: table ? unique(sources.filter((source) =>
       Array.isArray(source?.richSourceGrids) && source.richSourceGrids.length > 0
     ).map((source) => source?.sourceID)) : [],
-    questionDates: unique(questionText.match(/\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b/g) || [])
+    questionDates: unique(questionDateMentions.map((mention) => mention.raw)),
+    questionDateMentions
   };
 }
 
@@ -190,7 +398,9 @@ export function zoningResearchSafetyPromptContext(options = {}) {
     "Bind every Zoning conclusion to the exact supplied PASSAGE_ID and preserve that passage's corpus, edition, applicability status, and text hash.",
     "Do not infer a parcel's mapped district, special district, subdistrict, Appendix area, transit-zone status, or map position from unselected evidence or general geography.",
     profile.missingMappedLocation
-      ? "The supplied facts do not establish the mapped location needed for a parcel-specific conclusion. State that boundary, separately request a usable property identifier such as the address or BBL and the controlling official map or mapped-district evidence, and keep the result conditional."
+      ? profile.propertyIdentifierKnown
+        ? "The supplied address or property identifier does not itself establish mapped status. State that boundary, request the controlling official map or mapped-district evidence, and keep the result conditional."
+        : "The supplied facts do not establish the mapped location needed for a parcel-specific conclusion. State that boundary, separately request a usable property identifier such as the address or BBL and the controlling official map or mapped-district evidence, and keep the result conditional."
       : "Use only mapped-location facts expressly supplied for this question; do not broaden them.",
     profile.specialDistrictLabels.length
       ? `Preserve the exact special-purpose scope named in the evidence: ${profile.specialDistrictLabels.join("; ")}.`
@@ -207,6 +417,9 @@ export function zoningResearchSafetyPromptContext(options = {}) {
     profile.definitionBranchReview
       ? "The supplied definition contains alternative branches. Address every branch that could decide the stated facts separately; do not treat one historical or current branch as a substitute for another."
       : "",
+    profile.zoningLotTaxMapDistinction
+      ? "Preserve the supplied distinction that a zoning lot may or may not coincide with a lot shown on the official tax map; do not treat tax-lot and zoning-lot identity as automatic."
+      : "",
     profile.loweredYardClause
       ? "The supplied definition contains a post-December 5, 1990 lowered-yard measurement clause that the scenario does not resolve. Identify that fact as unresolved before giving a conclusive classification."
       : "",
@@ -214,7 +427,9 @@ export function zoningResearchSafetyPromptContext(options = {}) {
       ? "A basic lot-coverage percentage is only that numerical cap. Do not call the calculated area an entitled or permitted footprint; state that independently applicable yard, open-area, or other bulk rules may be more restrictive."
       : "",
     profile.parkingGeography
-      ? "For parking geography, analyze the supplied Inner, Outer, and Greater Transit Zone paths separately and preserve any supplied special-parking-area or special-district alternative. General proximity to transit is not mapped status."
+      ? profile.parkingAlternativeRuleSupplied
+        ? "For parking geography, analyze the supplied Inner, Outer, and Greater Transit Zone paths separately and preserve the supplied special-parking-area or special-district alternative. General proximity to transit is not mapped status."
+        : "For parking geography, analyze only the supplied Inner, Outer, and Greater Transit Zone paths. If the evidence merely identifies a special parking area or special district without supplying its unique rule, state that limitation and request the controlling enacted provision rather than inventing an alternative result. General proximity to transit is not mapped status."
       : "",
     profile.missingExistingCondition
       ? "The question expressly leaves an existing facility, building, or use condition unresolved. Name that dated existence/status fact separately from lot size, filing date, or other historical facts."
@@ -261,14 +476,21 @@ export function evaluateZoningResearchSafety({
   const narrative = answerText(answer);
   const questionText = compactText(question);
   const conclusion = compactText(answer?.conclusion);
+  const directAnswerFields = [answer?.answerText, answer?.conclusion]
+    .map(compactText)
+    .filter(Boolean);
   const citations = citedSourceIDs(answer);
   const citationSet = new Set(citations);
   const missingFacts = compactText(Array.isArray(answer?.missingFacts) ? answer.missingFacts.join(" ") : "");
-  const evidenceNeeded = compactText([
+  const evidenceNeededItems = [
     ...(Array.isArray(answer?.missingFacts) ? answer.missingFacts : []),
     ...(Array.isArray(answer?.additionalEvidenceNeeded) ? answer.additionalEvidenceNeeded : [])
-  ].join(" "));
+  ].map(compactText).filter(Boolean);
+  const evidenceNeeded = compactText(evidenceNeededItems.join(" "));
   const issues = [];
+  const unboundedMappedConclusion = compactText(narrative)
+    .split(/(?:[.!?;]\s+|,\s+(?:but|however|yet|although|whereas)\s+)/i)
+    .some((sentence) => categoricalProjectConclusion(sentence) && !statesLocationBoundary(sentence));
   const countPredicate = questionText.match(/\bDoes\b[^?]*?\b(count(?:\s+as\s+[^?]+)?)\?$/i)?.[1];
   if (
     countPredicate &&
@@ -288,8 +510,7 @@ export function evaluateZoningResearchSafety({
   }
   if (
     profile.missingMappedLocation &&
-    categoricalProjectConclusion(narrative) &&
-    (!statesLocationBoundary(narrative) || !/\b(?:address|BBL|block|lot|mapped|zoning district|map|special district|subdistrict|Appendix)\b/i.test(missingFacts))
+    unboundedMappedConclusion
   ) {
     issues.push({
       type: "zoning_missing_mapped_location",
@@ -298,6 +519,7 @@ export function evaluateZoningResearchSafety({
   }
   if (
     profile.missingMappedLocation &&
+    !profile.propertyIdentifierKnown &&
     !/\b(?:address|BBL|block(?: and |\/)?\s*lot|property (?:identifier|location)|parcel (?:identifier|location))\b/i.test(missingFacts)
   ) {
     issues.push({
@@ -367,18 +589,42 @@ export function evaluateZoningResearchSafety({
       detail: "The Zoning Lot definition has a separate historical lot-of-record branch. Address it independently from the historical single-ownership and current filing or declaration branches."
     });
   }
+  const overstatedTaxMapDistinction = statesOverstatedTaxMapDistinction(narrative);
   if (
-    profile.loweredYardClause &&
-    !/\b(?:lowered yard|yard (?:was|is|had been) lowered)\b[^.]{0,180}\b(?:unknown|not (?:provided|established|verified)|missing|unresolved|must be (?:confirmed|verified|established))\b/i.test(missingFacts)
+    profile.zoningLotTaxMapDistinction &&
+    (
+      overstatedTaxMapDistinction ||
+      !(
+      /\bzoning[- ]lots?\b[^.]{0,180}\b(?:may or may not coincide|does not (?:necessarily )?(?:match|coincide)|is not necessarily (?:the same as|identical to)|identity (?:is|remains) not automatic)\b[^.]{0,140}\b(?:tax[- ]lots?|lots? shown on the (?:official )?tax map)\b/i.test(narrative) ||
+      /\b(?:tax[- ]lots?|lots? shown on the (?:official )?tax map)\b[^.]{0,180}\b(?:may or may not coincide|does not (?:necessarily )?(?:match|coincide)|is not necessarily (?:the same as|identical to)|identity (?:is|remains) not automatic)\b[^.]{0,140}\bzoning[- ]lots?\b/i.test(narrative) ||
+      /\bzoning[- ]lots?\b\s+(?:and|or)\s+(?:an? |the )?(?:tax[- ]lots?|lots? shown on the (?:official )?tax map)\b[^.]{0,120}\b(?:are not necessarily (?:the same|identical)|need not coincide|do not necessarily coincide)\b/i.test(narrative) ||
+      /\b(?:tax[- ]lots?|lots? shown on the (?:official )?tax map)\b\s+(?:and|or)\s+(?:an? |the )?zoning[- ]lots?\b[^.]{0,120}\b(?:are not necessarily (?:the same|identical)|need not coincide|do not necessarily coincide)\b/i.test(narrative) ||
+      /\b(?:tax[- ]lot|zoning[- ]lot)\s+and\s+(?:an? |the )?(?:zoning[- ]lot|tax[- ]lot)\s+identity\b[^.]{0,80}\b(?:is|remains) not automatic\b/i.test(narrative) ||
+      /\b(?:tax[- ]lots?|zoning[- ]lots?)\b[^.]{0,100}\bis not automatically\s+(?:the same as|identical to)\b[^.]{0,100}\b(?:zoning[- ]lots?|tax[- ]lots?)\b/i.test(narrative)
+      )
+    )
   ) {
     issues.push({
-      type: "zoning_definition_lowered_yard_fact",
-      detail: "The supplied definition's post-December 5, 1990 lowered-yard condition is unresolved. Name that measurement fact in missingFacts before treating the classification as conclusive."
+      type: "zoning_definition_tax_map_distinction_omission",
+      detail: "Preserve the supplied distinction that a zoning lot may or may not coincide with a lot shown on the official tax map."
     });
   }
   if (
-    profile.parkingGeography &&
-    /\b(?:special parking areas?|special district)\b/i.test(profile.sourceText || "") &&
+    profile.loweredYardClause &&
+    (
+      !/\b(?:lowered yard|yard (?:was|is|had been) lowered)\b[^.]{0,180}\b(?:unknown|not (?:provided|established|verified)|missing|unresolved|must be (?:confirmed|verified|established))\b/i.test(missingFacts) ||
+      !directAnswerFields.length ||
+      !directAnswerFields.some(statesLoweredYardBoundary) ||
+      statesUnconditionalCellarClassification(narrative)
+    )
+  ) {
+    issues.push({
+      type: "zoning_definition_lowered_yard_fact",
+      detail: "The supplied definition's post-December 5, 1990 lowered-yard condition is unresolved. Keep the direct answer and conclusion conditional, and name that measurement fact in missingFacts."
+    });
+  }
+  if (
+    profile.parkingAlternativeRuleSupplied &&
     !(
       /\b(?:special parking areas?|special district)\b[^.]{0,180}\b(?:may|could|can)\b[^.]{0,100}\b(?:differ|apply|produce|supply|control|modify|change)\b/i.test(narrative) ||
       /\b(?:different|separate|alternative)\b[^.]{0,120}\b(?:special parking areas?|special district)\b/i.test(narrative)
@@ -387,6 +633,23 @@ export function evaluateZoningResearchSafety({
     issues.push({
       type: "zoning_parking_geography_omission",
       detail: "Preserve the supplied special-parking-area or special-district path as a possible alternative to the ordinary transit-zone calculation."
+    });
+  }
+  const unsupportedParkingAlternativeClaim = statesUnsupportedParkingAlternative(narrative);
+  if (
+    profile.parkingAlternativeMentioned &&
+    !profile.parkingAlternativeRuleSupplied &&
+    (
+      unsupportedParkingAlternativeClaim ||
+      !(
+        /\b(?:selected|supplied|cited)\b[^.]{0,160}\b(?:evidence|passage|text)\b[^.]{0,160}\b(?:does not|cannot|fails to)\b[^.]{0,100}\b(?:supply|provide|establish|state)\b[^.]{0,120}\b(?:special parking|special[- ]district)\b[^.]{0,100}\b(?:rule|requirement|regulation|result)\b/i.test(narrative) &&
+        /\b(?:obtain|verify|review|need|require)\b[^.]{0,180}\b(?:controlling|applicable|enacted|official)\b[^.]{0,100}\b(?:special parking|special[- ]district)\b[^.]{0,100}\b(?:rule|requirement|regulation|provision)\b/i.test(evidenceNeeded)
+      )
+    )
+  ) {
+    issues.push({
+      type: "zoning_parking_geography_evidence_boundary",
+      detail: "The selected evidence identifies special parking geography but does not supply its unique rule. State that limitation and request the controlling enacted provision instead of inventing an alternative result."
     });
   }
   if (
@@ -420,7 +683,7 @@ export function evaluateZoningResearchSafety({
         /\b(?:the )?exception (?:applies|is satisfied)\b/i.test(sentence)
       )
     );
-    const bareCategoricalDenial = /^no\b/i.test(conclusion);
+    const bareCategoricalDenial = /^no(?:[.!?]+)?$/i.test(directConclusionSentence);
     const directNamedDenial =
       /^(?:the )?(?:project|development|property|it) (?:does(?: not|n['’]t) qualify|cannot qualify|is not exempt|is ineligible|does(?: not|n['’]t) meet the exception|fails the exception)\b/i.test(directConclusionSentence) &&
       !scopedNumericalDenialInSentence(directConclusionSentence);
@@ -437,6 +700,14 @@ export function evaluateZoningResearchSafety({
       conditionalGrantInSentence(sentence) &&
       /\b(?:already (?:a )?zoning[- ]lot|zoning[- ]lot\b[^.]{0,80}\b(?:existed|existence|already))\b/i.test(sentence) &&
       /\b(?:MIH|Mandatory Inclusionary Housing|area)[- ]?\b[^.]{0,120}\b(?:establish|establishment|effective)\b/i.test(sentence)
+    );
+    const establishmentDateReference =
+      /\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,140}\b(?:establishment|effective) date\b/i.test(narrative) ||
+      /\b(?:establishment|effective) date\b[^.]{0,140}\b(?:MIH|Mandatory Inclusionary Housing)\b/i.test(narrative);
+    const referentialHistoricalLotRequirement = establishmentDateReference && (
+      /\b(?:tract|property|site|development)\b[^.]{0,160}\b(?:must|needs? to|is required to)\b[^.]{0,80}\b(?:have been|be|exist(?:ed)? as)\b[^.]{0,80}\b(?:a )?zoning[- ]lot\b[^.]{0,100}\b(?:on|at|as of)\s+(?:that|the applicable|the relevant|such)\s+(?:date|time)\b/i.test(narrative) ||
+      /\b(?:tract|property|site|development)\b[^.]{0,160}\b(?:already )?existed as\b[^.]{0,60}\b(?:a )?zoning[- ]lot\b[^.]{0,100}\b(?:on|at|as of)\s+(?:that|the applicable|the relevant|such)\s+(?:date|time)\b/i.test(narrative) ||
+      /\bzoning[- ]lot\b[^.]{0,100}\b(?:on|at|as of)\s+(?:that|the applicable|the relevant|such)\s+(?:date|time)\b[^.]{0,100}\b(?:must be|remains?)\b[^.]{0,60}\b(?:established|verified|confirmed|unresolved)\b/i.test(narrative)
     );
     const numericalOnlyBoundary =
       /\b(?:numerical|unit|dwelling[- ]unit|floor[- ]area|threshold)\b[^.]{0,180}\b(?:not enough|not sufficient|(?:does|do) not (?:establish|prove)|alone (?:does|do) not|alone cannot)\b/i.test(narrative) ||
@@ -461,10 +732,17 @@ export function evaluateZoningResearchSafety({
     const historicalLotRequirement =
       /\bzoning[- ]lot\b[^.]{0,220}\b(?:existed|existence)\b[^.]{0,160}\b(?:MIH|Mandatory Inclusionary Housing|area)[- ]?\b[^.]{0,120}\b(?:establish|establishment|effective)\b/i.test(narrative) ||
       /\b(?:MIH|Mandatory Inclusionary Housing|area)[- ]?\b[^.]{0,160}\b(?:establish|establishment|effective)\b[^.]{0,220}\bzoning[- ]lot\b[^.]{0,100}\b(?:existed|existence)\b/i.test(narrative) ||
-      conditionalHistoricalLotRequirement;
+      conditionalHistoricalLotRequirement ||
+      referentialHistoricalLotRequirement;
+    const laterTaxLotEvent =
+      /\btax[- ]lots?\b[^.]{0,160}\b(?:combin|current|later|change|2025)\w*/i.test(narrative) ||
+      /\b(?:combination|combined|current|later|change|2025)\b[^.]{0,160}\btax[- ]lots?\b/i.test(narrative);
+    const referentialTaxLotDistinction = laterTaxLotEvent &&
+      /\b(?:that|this|the)\s+(?:later\s+)?(?:event|combination|change|action)\b[^.]{0,160}\b(?:does not|cannot|is not enough to)\b[^.]{0,80}\b(?:prove|establish|show)\b[^.]{0,160}\bzoning[- ]lot\b/i.test(narrative);
     const taxLotDistinction =
-      /\btax[- ]lots?\b[^.]{0,180}\b(?:not (?:the )?same|may differ|does not (?:establish|prove)|not proof|distinct|may or may not coincide)\b[^.]{0,120}\bzoning[- ]lot\b/i.test(narrative) ||
-      /\bzoning[- ]lot\b[^.]{0,180}\b(?:not (?:the )?same|may differ|does not (?:necessarily )?(?:match|coincide)|distinct|may or may not coincide)\b[^.]{0,120}\btax[- ]lots?\b/i.test(narrative);
+      /\btax[- ]lots?\b[^.]{0,180}\b(?:not necessarily (?:the )?same|may differ|does not (?:establish|prove)|not proof|may or may not coincide)\b[^.]{0,120}\bzoning[- ]lot\b/i.test(narrative) ||
+      /\bzoning[- ]lot\b[^.]{0,180}\b(?:not necessarily (?:the )?same|may differ|does not (?:necessarily )?(?:match|coincide)|may or may not coincide)\b[^.]{0,120}\btax[- ]lots?\b/i.test(narrative) ||
+      referentialTaxLotDistinction;
     if (!historicalLotRequirement || !taxLotDistinction) {
       issues.push({
         type: "zoning_mih_historical_lot_requirement",
@@ -475,10 +753,13 @@ export function evaluateZoningResearchSafety({
       /\b(?:official|verify|verified|record|historical)\b[^.]{0,180}\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,120}\b(?:establishment|effective) date\b/i.test(evidenceNeeded) ||
       /\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,180}\b(?:establishment|effective) date\b[^.]{0,120}\b(?:official|verify|verified|record|historical)\b/i.test(evidenceNeeded) ||
       /\b(?:enacted|official|historical)\b[^.]{0,120}\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,160}\b(?:establishment amendment|effective date)\b/i.test(evidenceNeeded);
-    const officialHistoricalLot =
-      /\b(?:official|recorded|historic|historical)\b[^.]{0,220}\bzoning[- ]lot\b[^.]{0,160}\b(?:record|configuration|declaration|legal description|ownership|evidence)\b/i.test(evidenceNeeded) ||
-      /\bzoning[- ]lot\b[^.]{0,180}\b(?:record|configuration|declaration|legal description|ownership|evidence)\b[^.]{0,120}\b(?:official|recorded|historic|historical|verify)\b/i.test(evidenceNeeded) ||
-      /\b(?:historic|historical)\b[^.]{0,180}\b(?:title|survey)\b[^.]{0,180}\b(?:recorded )?zoning[- ]lot declaration\b/i.test(evidenceNeeded);
+    const officialHistoricalLot = evidenceNeededItems.some((item) =>
+      item.split(/(?:[.!?;]\s+|,\s+(?:and\s+(?:obtain|review|use|rely)\b|not\b)|\s+(?:while|whereas|but)\s+|\s+(?:and|with)\s+(?=(?:an?\s+|the\s+)?current\b))/i).some((clause) =>
+        /\b(?:title(?: report| records?)?|chain of title|deed(?: records?| chain)?|survey(?: records?)?|declaration(?: of restrictions)?|legal description|metes and bounds|ownership (?:history|records?)|configuration (?:history|records?))\b/i.test(clause) &&
+        /\b(?:historic|historical|dated|establishment date|as[- ]of|on (?:that|the applicable|the relevant) date|(?:19|20)\d{2})\b/i.test(clause) &&
+        /\b(?:zoning[- ]lot|tax[- ]lot|tract|property|site|parcel)\b/i.test(clause)
+      )
+    );
     if (!officialEstablishmentDate || !officialHistoricalLot) {
       issues.push({
         type: "zoning_mih_historical_records",
@@ -496,8 +777,20 @@ export function evaluateZoningResearchSafety({
       detail: "Current amendment-history metadata does not by itself reconstruct the Zoning text in force on a historical date. State that limitation and identify the dated enacted or archived text that must be verified."
     });
   }
+  const answerDateMentions = calendarDateMentions(narrative);
   const missingQuestionDates = profile.categories.includes("effective-date")
-    ? profile.questionDates.filter((date) => !narrative.includes(date))
+    ? profile.questionDateMentions.filter((questionDate) =>
+        !answerDateMentions.some((answerDate) =>
+          answerDate.key === questionDate.key &&
+          calendarDateRelationCompatible(questionDate.relation, answerDate.relation) &&
+          (
+            !questionDate.eventClasses.length ||
+            questionDate.eventClasses.some((eventClass) =>
+              answerDate.eventClasses.includes(eventClass)
+            )
+          )
+        )
+      ).map((mention) => mention.raw)
     : [];
   if (missingQuestionDates.length) {
     issues.push({
@@ -532,25 +825,46 @@ export function applyZoningResearchDeterministicRepairs(answer, evidence = [], {
   if (!answer || typeof answer !== "object") return answer;
   const profile = riskProfile({ question, evidence });
   const narrative = answerText(answer);
-  const historicalTextVerification =
-    /\b(?:verify|review|retrieve|obtain|need|require|must)\b[^.]{0,220}\b(?:historical|archived|prior|pre[- ](?:amendment|city of yes|december))\b[^.]{0,120}\b(?:zoning|text|rules?|provisions?)\b/i.test(narrative) ||
-    /\b(?:historical|archived|prior|pre[- ](?:amendment|city of yes|december))\b[^.]{0,120}\b(?:zoning|text|rules?|provisions?)\b[^.]{0,180}\b(?:verify|review|retrieve|obtain|need|required?|must)\b/i.test(narrative);
-  if (!profile.categories.includes("historical-substantive-text") || historicalTextVerification) return answer;
-  const limitation = "The current transition provision may preserve prior rules but does not reproduce their substantive requirements.";
-  const needed = "Verify the dated enacted or official archived pre-amendment Zoning text to determine the substantive rules preserved for the project.";
   const appendParagraph = (value, paragraph) => {
     const text = String(value || "").trim();
     return text ? `${text}\n\n${paragraph}` : paragraph;
   };
-  return {
-    ...answer,
-    answerText: appendParagraph(answer.answerText, `${limitation} ${needed}`),
-    ...(typeof answer.explanation === "string"
-      ? { explanation: appendParagraph(answer.explanation, `${limitation} ${needed}`) }
-      : {}),
-    evidenceLimitations: unique([...(answer.evidenceLimitations || []), limitation]),
-    additionalEvidenceNeeded: unique([...(answer.additionalEvidenceNeeded || []), needed])
-  };
+  let repaired = answer;
+  const historicalTextVerification =
+    /\b(?:verify|review|retrieve|obtain|need|require|must)\b[^.]{0,220}\b(?:historical|archived|prior|pre[- ](?:amendment|city of yes|december))\b[^.]{0,120}\b(?:zoning|text|rules?|provisions?)\b/i.test(narrative) ||
+    /\b(?:historical|archived|prior|pre[- ](?:amendment|city of yes|december))\b[^.]{0,120}\b(?:zoning|text|rules?|provisions?)\b[^.]{0,180}\b(?:verify|review|retrieve|obtain|need|required?|must)\b/i.test(narrative);
+  if (profile.categories.includes("historical-substantive-text") && !historicalTextVerification) {
+    const limitation = "The current transition provision may preserve prior rules but does not reproduce their substantive requirements.";
+    const needed = "Verify the dated enacted or official archived pre-amendment Zoning text to determine the substantive rules preserved for the project.";
+    repaired = {
+      ...repaired,
+      answerText: appendParagraph(repaired.answerText, `${limitation} ${needed}`),
+      ...(typeof repaired.explanation === "string"
+        ? { explanation: appendParagraph(repaired.explanation, `${limitation} ${needed}`) }
+        : {}),
+      evidenceLimitations: unique([...(repaired.evidenceLimitations || []), limitation]),
+      additionalEvidenceNeeded: unique([...(repaired.additionalEvidenceNeeded || []), needed])
+    };
+  }
+  const loweredYardMissingFact = "Whether the relevant yard was lowered after December 5, 1990 remains unknown and must be verified.";
+  const existingMissingFacts = Array.isArray(repaired.missingFacts) ? repaired.missingFacts : [];
+  const repairDirectAnswerFields = [repaired?.answerText, repaired?.conclusion]
+    .map(compactText)
+    .filter(Boolean);
+  const narrativeRecognizesLoweredYardBoundary = repairDirectAnswerFields.length > 0 &&
+    repairDirectAnswerFields.some(statesLoweredYardBoundary) &&
+    !statesUnconditionalCellarClassification(answerText(repaired));
+  if (
+    profile.loweredYardClause &&
+    narrativeRecognizesLoweredYardBoundary &&
+    !/\b(?:lowered yard|yard (?:was|is|had been) lowered)\b[^.]{0,180}\b(?:unknown|not (?:provided|established|verified)|missing|unresolved|must be (?:confirmed|verified|established))\b/i.test(compactText(existingMissingFacts.join(" ")))
+  ) {
+    repaired = {
+      ...repaired,
+      missingFacts: unique([...existingMissingFacts, loweredYardMissingFact])
+    };
+  }
+  return repaired;
 }
 
 export function zoningResearchSafetyRevisionIssues(result) {

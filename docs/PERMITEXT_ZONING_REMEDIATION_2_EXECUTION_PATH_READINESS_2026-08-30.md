@@ -9,7 +9,7 @@ Exact remediation-successor-2 SHA-256: `459b2273b7ebd209d4519bf9206b6135dc2fc770
 
 This record closes the remaining **no-cost engineering work** justified by the three execution failures in the historical first-successor run. It does not alter that run, authorize another paid evaluation, enable the disabled 24,000-character candidate, enable public Zoning Research, change pricing or the 100-turn allowance, deploy, push, or merge.
 
-The historical first-successor run remains the controlling semantic, reliability, and cost evidence until remediation successor 2 receives a newly authorized run. Its three failed paths were the office-conversion structured response, City of Yes historical-text boundary, and MIH historical-zoning-lot scenario.
+At the time of this pre-run record, the historical first-successor run remained the controlling semantic, reliability, and cost evidence. Its three failed paths were the office-conversion structured response, City of Yes historical-text boundary, and MIH historical-zoning-lot scenario. The later exact remediation-successor-2 result is recorded below and now controls.
 
 ## No-cost result
 
@@ -27,7 +27,7 @@ No additional City-of-Yes runtime repair or retry was justified.
 
 ### MIH historical zoning lot
 
-The Zoning material-completeness contract is now version `20260830-zoning-material-completeness-v5`.
+The pre-run Zoning material-completeness contract was version `20260830-zoning-material-completeness-v5`.
 
 - The previously retained substantively safe MIH answer now passes without changing its conclusion or evidence boundary.
 - Equivalent cautious wording is recognized, including plural “do not establish,” conditional “may qualify only if,” “may or may not coincide,” and hyphenated `zoning-lot` / `tax-lot` wording.
@@ -59,10 +59,16 @@ All verification was run with paid-evaluation variables removed.
 - Complete 30-case mock conversation path: 30/30 ready, zero provider tokens, zero provider cost.
 - Disabled 24,000-character evidence-budget prototype: 30/30 ready; 28,712 average and 38,896 maximum assembled characters; 6,352 average pinned and 22,360 average supplemental characters; 87 exact pinned sources, eight structured sources, 117 discovered sources, and 29 cross-references; all exact pinned sources preserved.
 - Complete repository `npm run check`: recorded after the final implementation and documentation pass.
-- A separate exact-SHA remediation-successor-2 paid-authorization record and runner are prepared in the locked state. Direct live evaluation and the runner both fail before a provider request unless that new record contains an explicit owner decision, all 30 cases, one repetition, and a cumulative cap no higher than `$5`. The consumed first-successor authorization remains separate and unusable.
+- Before the later run, a separate exact-SHA remediation-successor-2 paid-authorization record and runner were prepared in the locked state. Direct live evaluation and the runner both failed before a provider request unless that new record contained an explicit owner decision, all 30 cases, one repetition, and a cumulative cap no higher than `$5`. The consumed first-successor authorization remained separate and unusable. The later exact authorization was consumed after the retained run.
+
+## Subsequent semantic result
+
+The owner later supplied a new exact one-run authorization for this SHA, all 30 ordered cases, one repetition, and a `$5` maximum cap. Run `f35eed33-cb4e-4b7b-a719-86b072271660` spent `$3.357895`, completed 15 operations, failed 15 closed without charging a user, and passed 13 of 15 graded answers. The authorization is consumed. The [immutable semantic result](./PERMITEXT_ZONING_REMEDIATION_2_SEMANTIC_RESULT_2026-08-30.md) is the controlling evidence.
+
+Post-run no-cost analysis found that v5 applied the complete Zoning Lot definition branch review to nine unrelated questions and the MIH historical-lot exception to two unrelated affordable-housing questions. Zoning safety v6 narrowed both triggers to their actual subject matter and added direct counterexamples. That checkpoint addressed false-positive triggers implicated in ten failed operations without rescoring the run.
+
+Independent no-cost review then produced Zoning safety v7. It binds equivalent dates to the same event and compatible date relationship; accepts cautious MIH conclusions and bounded cross-sentence historical-lot/tax-lot wording while requiring a concrete record tied to historical context; recognizes positive-form mapped boundaries but rejects clause-local grants when address, compact BBL, or mapped status is unresolved; moves an already-acknowledged lowered-yard uncertainty into `missingFacts` idempotently while leaving contradictory direct or supporting cellar conclusions failed; prevents mere special-parking geography from becoming an unsupported alternative rule; and requires the supplied tax-map distinction without allowing a correct sentence to mask a categorical overstatement. Two frozen case/evidence defects were also identified but not changed: the missing-location rubric asks for existing-facility law absent from its selected evidence, and the parking rubric demands a special alternative not established by its selected evidence. Both require owner-approved successor governance. None of the v7 work proves completion, authorizes another paid run, or clears a release gate.
 
 ## Remaining gate
 
-No paid semantic claim is made. The next honest evidence is one complete run of the exact remediation-successor-2 SHA above, all 30 ordered cases, one repetition, under a new one-time owner authorization and cumulative cap no higher than `$5`. The prior authorization is consumed and cannot be reused.
-
-Even a clean run would not by itself enable public Zoning Research. The result must also establish acceptable quality, execution reliability, and measured cost, followed by exact-release web and TestFlight physical-iPhone acceptance and the owner's final public-release decision.
+Semantic, reliability, and cost acceptance remain open. Any later paid run requires a new exact frozen successor, independent review of the remaining failure paths, a new explicit owner authorization, and a new cumulative cap. Even a clean future run would not by itself enable public Zoning Research; exact-release web and TestFlight physical-iPhone acceptance and the owner's final public-release decision would still remain.
