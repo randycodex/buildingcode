@@ -1,6 +1,6 @@
 # Permitext Beta 1 Apple tax-handling record
 
-Status: **Live tax-category state verified read-only; owner classification and real financial evidence remain open**
+Status: **Live tax-category state verified read-only and owner classification confirmed; real financial evidence remains open**
 
 Last updated: August 30, 2026
 
@@ -35,7 +35,7 @@ Official sources:
 - Stripe automatic tax applies only to a Stripe web Checkout. It must not be applied to an App Store purchase, renewal, or refund.
 - Permitext's Apple server path verifies entitlement and processes Apple-signed lifecycle events; it does not create a second Stripe transaction or separately collect customer tax.
 - New York Certificate and Stripe Tax activation remain a web-sales gate. They do not by themselves prove the App Store category or Apple's transaction treatment.
-- The V6 iOS economics model keeps its 5% tax downside reserve until the owner confirms the observed category and a real Apple financial report provides actual proceeds and tax evidence. The current $17.86 p90 iOS cost and $2.14 contribution remain planning figures, not a guaranteed payout.
+- The V6 iOS economics model keeps its 5% tax downside reserve until a real Apple financial report provides actual proceeds and tax evidence. The current $17.86 p90 iOS cost and $2.14 contribution remain planning figures, not a guaranteed payout.
 
 ## August 30 read-only provider observations
 
@@ -52,9 +52,9 @@ The current official App Store Connect OpenAPI specification was also downloaded
 
 The previous no-charge Sandbox/TestFlight purchase and refund lifecycle proves StoreKit entitlement behavior only. Sandbox displays and zero-charge test transactions are not evidence of real tax collection, remittance, proceeds, or a Production customer price.
 
-## Owner classification confirmation still required
+## Owner classification confirmation
 
-Permitext is principally a software research workspace, and the observed parent category is the prior working candidate, `App Store software`. This is still not a final tax classification. Before App Review or the first real App Store sale, the owner should confirm that this category accurately describes the actual subscription. Any proposed category change requires separate approval before it is saved.
+Permitext is principally a software research workspace, and the observed parent category is the prior working candidate, `App Store software`. On August 30, 2026, the owner accepted the recommendation to leave that category unchanged and retain `Match to parent app` for Permitext Pro Monthly. This records the owner's product-classification decision; it is not legal or tax-professional advice and does not prove Apple's treatment of a real transaction. Any later proposed category change requires separate approval before it is saved.
 
 The two locations and their current displayed states are preserved above so this classification decision does not depend on repeating the dashboard inspection.
 
@@ -62,6 +62,6 @@ The two locations and their current displayed states are preserved above so this
 
 - [x] Observe and record the live parent-app tax category: `App Store software`.
 - [x] Observe and record that `Permitext Pro Monthly` is `Match to parent app`.
-- [ ] Confirm the selected category accurately describes Permitext before App Review or a real sale.
+- [x] Owner confirmed that the selected `App Store software` category accurately describes Permitext for Beta 1 and should remain unchanged.
 - [ ] After the first fiscal period with a real App Store purchase or refund, save the Payments and Financial Reports evidence and transaction-tax report when available.
 - [ ] Replace the 5% iOS reserve with measured taxes, commission, refunds, and proceeds only after sufficient real evidence exists.

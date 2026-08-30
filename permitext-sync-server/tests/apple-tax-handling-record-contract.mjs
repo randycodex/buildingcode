@@ -11,17 +11,18 @@ const [record, acceptance, master, commercial, economics, semanticReview] = awai
 ]);
 
 for (const requiredBoundary of [
-  /Status: \*\*Live tax-category state verified read-only; owner classification and real financial evidence remain open\*\*/,
+  /Status: \*\*Live tax-category state verified read-only and owner classification confirmed; real financial evidence remains open\*\*/,
   /Stripe automatic tax applies only to a Stripe web Checkout/,
   /must not be applied to an App Store purchase, renewal, or refund/,
   /customer price includes applicable taxes Apple collects and remits/,
   /customer price minus applicable taxes and Apple's commission/,
   /Category: App Store software/,
   /Match to parent app/,
+  /owner accepted the recommendation to leave that category unchanged/,
   /does not independently establish that the category is legally or tax-professionally correct/,
   /official App Store Connect OpenAPI specification/,
   /supported public API therefore cannot replace the dashboard observation/,
-  /Any proposed category change requires separate approval before it is saved/,
+  /Any later proposed category change requires separate approval before it is saved/,
   /5% tax downside reserve/
 ]) {
   assert.match(record, requiredBoundary);
@@ -34,6 +35,7 @@ assert.match(commercial, /BETA1_APPLE_TAX_HANDLING_RECORD\.md/);
 for (const synchronizedRecord of [acceptance, master, commercial, economics, semanticReview]) {
   assert.match(synchronizedRecord, /App Store software/);
   assert.match(synchronizedRecord, /Match to parent app/);
+  assert.match(synchronizedRecord, /owner (?:accepted|approved|approval to).*leav(?:e|ing) that classification unchanged/i);
 }
 
 console.log("Permitext Apple tax-handling record contract passed.");
