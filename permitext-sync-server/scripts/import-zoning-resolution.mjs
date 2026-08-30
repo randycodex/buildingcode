@@ -562,6 +562,7 @@ async function main() {
   await writeJSON(join(stagingOutput, "bundle.json"), bundle);
 
   const manifestChapters = [];
+  const chapterCatalog = [];
   for (const chapter of allChapters) {
     const chapterSections = (sectionsByChapterID.get(chapter.id) || []).sort((left, right) =>
       String(left.sectionNumber).localeCompare(String(right.sectionNumber), undefined, {
@@ -571,6 +572,22 @@ async function main() {
     );
     const prepared = preparedChapter(chapter, chapterSections);
     await writeJSON(join(stagingOutput, "prepared", "chapters", `${chapter.id}.json`), prepared, { compact: true });
+    chapterCatalog.push([
+      chapter.id,
+      prepared.groups.map((group) => [
+        group.id,
+        group.headerLine,
+        group.headingLine,
+        null,
+        null,
+        group.sections.map((section) => [
+          section.id,
+          section.sectionNumber,
+          section.title,
+          section.kind
+        ])
+      ])
+    ]);
     await mkdir(join(stagingOutput, "chapters"), { recursive: true });
     await writeFile(
       join(stagingOutput, "chapters", `${chapter.canonicalChapterNumber}.html`),
@@ -599,6 +616,10 @@ async function main() {
     textChangesThrough: homepage.textChangesThrough,
     chapters: manifestChapters
   });
+  await writeJSON(join(stagingOutput, "prepared", "chapterCatalog.json"), {
+    schemaVersion: 1,
+    chapters: chapterCatalog
+  }, { compact: true });
   await writeJSON(join(stagingOutput, "prepared", "searchIndex.json"), buildSearchIndex(sections), { compact: true });
   await writeJSON(join(stagingOutput, "prepared", "images.json"), {
     schemaVersion: 1,

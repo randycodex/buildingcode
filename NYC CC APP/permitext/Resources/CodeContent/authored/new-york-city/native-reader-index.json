@@ -1,6 +1,6 @@
 {
   "compression" : "lzfse",
-  "corpusSHA256" : "57166ea4cf999e2c223e2da07a826dfc312ea342a662cc797a22b51fac0d7cda",
+  "corpusSHA256" : "0f77198f02581c45a205cd5d9c10bc643cc6bb58e3fd58940ab6376c79ccb89b",
   "documentSchemaVersion" : 1,
   "entries" : [
     {
@@ -6579,11 +6579,11 @@
     },
     {
       "blockCount" : 12,
-      "compressedByteCount" : 33986,
-      "compressedSHA256" : "b3ef1addb7c3605f4580ec000106437c0db389d33e33d6137641c15f50eddb8a",
+      "compressedByteCount" : 33982,
+      "compressedSHA256" : "fb88a932fbd4a09e6bc8fcbaf28f83376e662e4c8b4d0199f6943b27828c946a",
       "documentID" : "03fa1f1529dda8c9fb594ff7a9a5a27e29fd85e8d4e5814276e6d25ec131fcc2",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/03fa1f1529dda8c9fb594ff7a9a5a27e29fd85e8d4e5814276e6d25ec131fcc2.json.lzfse",
-      "documentSHA256" : "ae227de0ec7b5d3652dea4ab42f9cc3c5ac58a9526b63481259caa4111b809ef",
+      "documentSHA256" : "705f84f44661a256a27a60d10e68d5fe7a5a14229391503beb1f6ca772955a07",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -6593,16 +6593,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-B-21239.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "a5303ea8351e73a57549324c75bfd97d5c30a7f59dc37ee2bb69dc400ab4fd5c",
+      "sourceSHA256" : "7ea418505c9c8e615651309329cc62b62c92693e28e89d97eabfc9c971aeb3b3",
       "uncompressedByteCount" : 1301532
     },
     {
       "blockCount" : 13,
-      "compressedByteCount" : 445275,
-      "compressedSHA256" : "0459aa73763471417f50f3c3eefea64fc45549a8d6868c1394d5ce43844348d4",
+      "compressedByteCount" : 445242,
+      "compressedSHA256" : "f1e13ed2a54ffafcdad8070080ef0d8896d1d1b1fc6eb046fd6cbe1d24c67487",
       "documentID" : "bd7409537976128bf70dbeb2226a153ced1b929aafc24bcb82eb161e78ad1072",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/bd7409537976128bf70dbeb2226a153ced1b929aafc24bcb82eb161e78ad1072.json.lzfse",
-      "documentSHA256" : "ded74cd126acbb4c3d81c42957981b0a8f862e305dbea645dbafd55e25b990a5",
+      "documentSHA256" : "b1016eacd4e6fc54bd60d3b5fe58d10d828f4c158c553fffb0099bd8a86ea632",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -6612,16 +6612,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21242.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "98d11ca7996f8a196ba898b45def3193ea973b427027eb54d846601fd0141dc1",
+      "sourceSHA256" : "4e4006596984f80ceff23919dfe64a5c983f18a67cff7430059c4489e5ac8d39",
       "uncompressedByteCount" : 7643238
     },
     {
       "blockCount" : 13,
-      "compressedByteCount" : 56791,
-      "compressedSHA256" : "b75145048f830b38e2c1e642a5b813cc723f59efb0cdb05a49b1aeac5aa426f6",
+      "compressedByteCount" : 56780,
+      "compressedSHA256" : "3f12f260e02d9ece94c4d23abe874ec0a60d51c7ae80c26e6e020f36a3946d93",
       "documentID" : "476ce738e7ce1729a9dc86b67470dd902862a7304575926abf33fbb8cea304b4",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/476ce738e7ce1729a9dc86b67470dd902862a7304575926abf33fbb8cea304b4.json.lzfse",
-      "documentSHA256" : "3856d52e234ab303c9317ef8c77b96030f89536189968cb7609b6921b83a8b0d",
+      "documentSHA256" : "c57d07af0af038d9f4606539da86abf5f771215df8bd0ddcd25fbe7d5aef1bbe",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -6631,16 +6631,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-C-21243.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "c858942cad347812bd640f6d75acf04242aff2ce6808dd6dc22295524f31c0ee",
+      "sourceSHA256" : "17d7957125d0d46d219e21fb1138f8fdee61513415fe022fadd48f86b7551346",
       "uncompressedByteCount" : 683401
     },
     {
       "blockCount" : 8,
-      "compressedByteCount" : 24148,
-      "compressedSHA256" : "21c778d77d78392a71a42700e2978b8a899afd1f5c58d77163332cd03e377add",
+      "compressedByteCount" : 24154,
+      "compressedSHA256" : "5bde574bb8a1a0d53ae3a34d6f3ea543eaee4bd98d21a389a28192332d588ea3",
       "documentID" : "94693c79b14c6a5c8888848a949cc091b621a749fe7089a82ab721cec55175fa",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/94693c79b14c6a5c8888848a949cc091b621a749fe7089a82ab721cec55175fa.json.lzfse",
-      "documentSHA256" : "812bcb95add6b4f765cbca380615b06080c34b1cedb63688389ea51aa5a0b597",
+      "documentSHA256" : "1049538d36777df4f81392f4fd367f4be309592a7f021ce4e6f23d320bdc144b",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -6650,16 +6650,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-D-21241.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "2898db2c55e0bfa6ac466bc10e01e150adadff5ab54d9d86099717a36022bcf6",
+      "sourceSHA256" : "d281c07002ceaaf6603f95b4e2109fd4514adaa61980dc6ed82bc071a49744e8",
       "uncompressedByteCount" : 1200921
     },
     {
       "blockCount" : 480,
-      "compressedByteCount" : 56024,
-      "compressedSHA256" : "83cbde280d0c4445bf614f37f8c7d8c288cbf891536d941271a7bc42b171c18f",
+      "compressedByteCount" : 56010,
+      "compressedSHA256" : "c1f367f5b8ca4cdfec2591eaece2ef00413bbf8acd433b68d144e2fccb9142ea",
       "documentID" : "6abdeac08c11d227365f372787b8f34e043c64a4fdd9ff3b171b8131a4d5307a",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/6abdeac08c11d227365f372787b8f34e043c64a4fdd9ff3b171b8131a4d5307a.json.lzfse",
-      "documentSHA256" : "470442348acfe83eb2dcc82307e60c824d9990f882995765e352490ac83e9a6c",
+      "documentSHA256" : "47f90607eefa7265d1ebe94113ee7cea196d832cd9486ec56e7d1c59b0362d5d",
       "eligibility" : {
         "reasons" : [
 
@@ -6669,16 +6669,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-E-21240.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "a775e688fd9d000419cf7fd732316605675ce8c631f3827d578be22b9e4632a0",
+      "sourceSHA256" : "26441a8a9303b327781ec922b63a39148b7440cf0516210197d9d20803ca6a87",
       "uncompressedByteCount" : 385532
     },
     {
       "blockCount" : 9,
-      "compressedByteCount" : 14298,
-      "compressedSHA256" : "e5dea6a33593b19ae45779f06d42fc2742a67c388d41455fa07bbd842d0f25f0",
+      "compressedByteCount" : 14752,
+      "compressedSHA256" : "091f58a69d843aaced6ba966520ed5fa2ce3773dfbae987a6d27391436431485",
       "documentID" : "3e94b67bfc260210ea6df741eace7c63597a0df178595a89751054e5a1557267",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/3e94b67bfc260210ea6df741eace7c63597a0df178595a89751054e5a1557267.json.lzfse",
-      "documentSHA256" : "e2c5c9329090dba4aff348920e5507be06713ef2c478e6feb071140cf4d982ff",
+      "documentSHA256" : "e47d60ca2df489eb49eb127ad6be8b704128d13ecabe47c36542c83a21d5232b",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -6688,16 +6688,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21424.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "543e65d83d51661197f14703c553629bba982a44d7babc36266ac7916a21c4a3",
-      "uncompressedByteCount" : 768699
+      "sourceSHA256" : "ed9f67442f917d8ebb646d8dea9eadbe874c8b1e97777d3c454ff73ecd39ca89",
+      "uncompressedByteCount" : 789324
     },
     {
       "blockCount" : 177,
-      "compressedByteCount" : 16852,
-      "compressedSHA256" : "2ae69b2aadb44a6930d5c77b0212d61cc9702b60b1f7e31d86fc07ed6f2facc0",
+      "compressedByteCount" : 16851,
+      "compressedSHA256" : "2db293bc5d2b23b95db1800fa1c6df6c7c4fed58b138a895011107a846b431ee",
       "documentID" : "2c0b994fd834b5931c178a7f3be78c87541e6865ce516c7e4dca6f810a59684c",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/2c0b994fd834b5931c178a7f3be78c87541e6865ce516c7e4dca6f810a59684c.json.lzfse",
-      "documentSHA256" : "cf46c7632da69c5593609f049a6f54cc79e1f6f0c3f2b69644c381aefc6ce227",
+      "documentSHA256" : "cef781d5af129698de6ddce2ed2f6e56a02a8fd6734e600b7cbb388c7d5a59ee",
       "eligibility" : {
         "reasons" : [
 
@@ -6707,16 +6707,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21765.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "d6b3cc18a5062870bec943f3411fbd1d4811dd167ba2b5bb4b6f09b4a7fc5027",
+      "sourceSHA256" : "ec79022d1a1b93248a82cd22d12be469aac61cdd78db62fee5b2a2da064c8656",
       "uncompressedByteCount" : 97225
     },
     {
       "blockCount" : 289,
-      "compressedByteCount" : 29258,
-      "compressedSHA256" : "1228e6e19affbd8909e797f5e9240a9f3583a7ffb674b7e1788f6ca1bffaed59",
+      "compressedByteCount" : 29268,
+      "compressedSHA256" : "927e92dd80a17d7a5fd8284de1b8a861e0327d6994cd5b570b97d6c23089666e",
       "documentID" : "9c99c8aceeffdc04c2f8352401d821424fa69a35a332dbf16208c5034eb28fec",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/9c99c8aceeffdc04c2f8352401d821424fa69a35a332dbf16208c5034eb28fec.json.lzfse",
-      "documentSHA256" : "145e83e415f672271de743f0cd4c187c16a99f6b9159f83c430b3e3cdb178139",
+      "documentSHA256" : "7532ae1b91d0d40395583a2f84f0df4efd794bedcaa455e3fc6b64cd2ef9a492",
       "eligibility" : {
         "reasons" : [
 
@@ -6726,16 +6726,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21766.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "54ef475f2609d4db8870803ba47b0b120e29f40712c232628dde46fd1a540b0d",
+      "sourceSHA256" : "04d00f15650f5da741ba0b4594f93a6a8165c5c3561f2507490db23bbe9560cf",
       "uncompressedByteCount" : 167449
     },
     {
       "blockCount" : 135,
-      "compressedByteCount" : 13225,
-      "compressedSHA256" : "614e93ac294dabe40f44c06bebde90edcde4ca31477d71018d83d4bfa3978487",
+      "compressedByteCount" : 13221,
+      "compressedSHA256" : "46bad8e574f9405023dab5451701e65333cebe3601bd3b3ebe7de99377f0ce37",
       "documentID" : "b7285d780d5b89a21499e4b396d10294471757fe0d99e065b7d21cf5283bda76",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/b7285d780d5b89a21499e4b396d10294471757fe0d99e065b7d21cf5283bda76.json.lzfse",
-      "documentSHA256" : "44241c9e82c498ed16bd23a4ace26e0e33c11f2fbb710c47fb4ec501308170f9",
+      "documentSHA256" : "48a7c920065142ab40e871a43d45ec52c3dd1c17566110238bf707ad252ebcd3",
       "eligibility" : {
         "reasons" : [
 
@@ -6745,16 +6745,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21767.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "203f69ca468c370f233c78fded836dc1e4cb8a1029541ab5d82c2c96e0eaf376",
+      "sourceSHA256" : "8cd2cb5d17e1595e1b97326c2c78917c1b7fb4202e6e9368c5b637509b960506",
       "uncompressedByteCount" : 74501
     },
     {
-      "blockCount" : 165,
-      "compressedByteCount" : 309310,
-      "compressedSHA256" : "e326ba28bf1c86ae1dc47efeb6f033e798481a56ce9101be6f160414ae671c2a",
+      "blockCount" : 172,
+      "compressedByteCount" : 310081,
+      "compressedSHA256" : "9339548b56020074f4b6c6f85639d7102133328c17c282563dba6997656fcd52",
       "documentID" : "fc2750f9c9be342c32d32239e9589a9ecf217a3945b686176b8ee0b294cc8a0d",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/fc2750f9c9be342c32d32239e9589a9ecf217a3945b686176b8ee0b294cc8a0d.json.lzfse",
-      "documentSHA256" : "b2ca9c06c7ac18a907b12dd7c81047a6cd334bd536fdd313c0bfa2422f8b601d",
+      "documentSHA256" : "0b7b4e1848ea0ef7e4d663608115a3ae9f30630a38be0f73899f2fea3a8691cf",
       "eligibility" : {
         "reasons" : [
 
@@ -6764,16 +6764,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21768.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "d344ee75ab62736fbf9deddf7c94143c860304c89d4b8e0ba829177eb897c3ea",
-      "uncompressedByteCount" : 528590
+      "sourceSHA256" : "7cd656232cef627bbfeb26ddc6342fc2ec9c69ce57c10a9816325cd99bd8662f",
+      "uncompressedByteCount" : 532860
     },
     {
       "blockCount" : 15,
-      "compressedByteCount" : 2545,
-      "compressedSHA256" : "7b5e1e795f047d5ea04f07324c867c9367b8c2c581220de9d30af6dad2ede772",
+      "compressedByteCount" : 2542,
+      "compressedSHA256" : "13e73d47823a7dea189d980100e95efe09e84edcc1937723075ff61c7fa61bd1",
       "documentID" : "3eba98384006a2b383d55d35988241bef137bf723eba7ad30549ebe774912066",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/3eba98384006a2b383d55d35988241bef137bf723eba7ad30549ebe774912066.json.lzfse",
-      "documentSHA256" : "d3400c9167fa4b9d0ffe555963a3c61f5642d1604321073c82a174b55978d125",
+      "documentSHA256" : "dbdddbe79b571c890ad489827cba3c0a4a31fd44fdcf553e700a9aca1dbfa16a",
       "eligibility" : {
         "reasons" : [
 
@@ -6783,16 +6783,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-F-21769.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "73db16950fa50789f4b6adc02a881b85a6d8fa560e28c982535e3ef5d83e3dfd",
+      "sourceSHA256" : "3304042a15cec6c74df99d98b9c1f8fab1b5f6a4b08089c4e772b491652f5c85",
       "uncompressedByteCount" : 9639
     },
     {
       "blockCount" : 13,
-      "compressedByteCount" : 5908,
-      "compressedSHA256" : "9371fadf9d53fd7b0070201554ecbf92665821871e4f007f10aa6cd7496c27bc",
+      "compressedByteCount" : 5906,
+      "compressedSHA256" : "497ce801c17ff0460aa7bb95e1056e3e216bddbf1b7431b1876735244b883065",
       "documentID" : "0efb5c6b94fec96d10fa938db6ad4b92c8ebc534b99ef1b4bc17cb0205c5d66c",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/0efb5c6b94fec96d10fa938db6ad4b92c8ebc534b99ef1b4bc17cb0205c5d66c.json.lzfse",
-      "documentSHA256" : "200715d19c05ea227dbacd0127723433b351afe922aa18b2dfee74f9c71a4176",
+      "documentSHA256" : "5aae3965689fbc3fc285702b9a4f8945e113a209ef60bfe8c87a46bf760bbd4e",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -6802,16 +6802,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-G-21235.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "1eeac3ec544120588a0c1bf6a211816d42aec1a22df21e74208e75f498cecb63",
+      "sourceSHA256" : "16b564c8202d1ed6fa23381db0a6b6adfc19393ae86a85cd6f8d3f35d2c36e18",
       "uncompressedByteCount" : 255456
     },
     {
       "blockCount" : 81,
-      "compressedByteCount" : 7248,
-      "compressedSHA256" : "f8d09b802ab6e8183d17578122e4a29d31d4936464396f19bfb28818d92fa285",
+      "compressedByteCount" : 7257,
+      "compressedSHA256" : "45d214f8bcdab3ed7866abdd699d44fb63505cdc4abb805c3fb4affaa5cb4c4d",
       "documentID" : "09b3320d004a01855184a867b1a8257a3b67a971f8d5c26f9928aad2c5adf5a0",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/09b3320d004a01855184a867b1a8257a3b67a971f8d5c26f9928aad2c5adf5a0.json.lzfse",
-      "documentSHA256" : "0ff754b2b5e400e5b08c81b5532cff377d5f3152c5be00db8404470a352fff65",
+      "documentSHA256" : "a5db4f27a4b582bc9c050be60be76e288d835a4f4796ebad1d393887795e80a0",
       "eligibility" : {
         "reasons" : [
 
@@ -6821,16 +6821,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-H-21233.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "aa73ca975ee5ffae323c809425830d057e9cf9d9a6e1b042b28da87678f4e6cd",
+      "sourceSHA256" : "4482e8bd1cefc889c1707e112f49272847d1a5e9cc0f08db805649b69930c2e8",
       "uncompressedByteCount" : 44939
     },
     {
       "blockCount" : 80,
-      "compressedByteCount" : 7318,
-      "compressedSHA256" : "42260685bba2aa8267db4ac357d9988806ed85d82ebb0be63f7720ec078d1e05",
+      "compressedByteCount" : 7301,
+      "compressedSHA256" : "bcba730360ba4fef4e48180e9378ba0ac4ee811d53be9df7200201d6780740f2",
       "documentID" : "a7eff4c707d3c7358961681df863ef64e1ebe2db724a2a9a13e5330ae2b0e579",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/a7eff4c707d3c7358961681df863ef64e1ebe2db724a2a9a13e5330ae2b0e579.json.lzfse",
-      "documentSHA256" : "c598933c87000d51e0874601e5a6e17120036b02f840b2ebbbae1a3acc6195a6",
+      "documentSHA256" : "1fc77d10323f4f420938a463ab566dabda1487ce2fc442444aa2501fa6c4f586",
       "eligibility" : {
         "reasons" : [
 
@@ -6840,16 +6840,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-I-21238.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "5ce3744d5a016f95f4a184269d760d6720e1b48299ab555d967a7fda3adea218",
+      "sourceSHA256" : "9c2b062f4e9a3dd58c2b76056a5fcc38b2875b9250f2859ec547b649010f828b",
       "uncompressedByteCount" : 42404
     },
     {
       "blockCount" : 128,
-      "compressedByteCount" : 17512,
-      "compressedSHA256" : "4c952fecd1ba2bcb038cc507f4f226dafaa44135d90942c53350c725c21b9713",
+      "compressedByteCount" : 17501,
+      "compressedSHA256" : "49b3774ca6dc05b4064a8bdb75a2c8b87397e0d790a1a06fb85f549b77c587df",
       "documentID" : "14242370248e860730e99a5ae9c9d1406e0efafa0c50606243468aef5597ce9a",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/14242370248e860730e99a5ae9c9d1406e0efafa0c50606243468aef5597ce9a.json.lzfse",
-      "documentSHA256" : "d57d78ab4903ec719d8f99ffdef19165e5f7e80bc3a7c80b5a1eb07308bbae9c",
+      "documentSHA256" : "1e942c1848169b579b38a7cbd022431dfade7a9bae82172ce278c7bf3661d8d1",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -6859,16 +6859,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-J-21237.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "33d12da063f30b4b1487d27399129b999d04644c8130eaa7c3e94e88b9e853de",
+      "sourceSHA256" : "45afe380fe95bfaf0d15cf06ed746eeba5177f69d39d8782977cb2bac3333434",
       "uncompressedByteCount" : 265066
     },
     {
       "blockCount" : 41,
-      "compressedByteCount" : 4601,
-      "compressedSHA256" : "a715d366e78bde2b963b71a94aa77fa771fe6752d1515fff607ba0b97132adba",
+      "compressedByteCount" : 4602,
+      "compressedSHA256" : "96ee21d4314109245dcb69399c33524dc301c050c9afb23f51351f312c7284af",
       "documentID" : "c3b567754d5775b080cd32dfb012112499978b6e55920761f8cb1320ccd8fd0f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/c3b567754d5775b080cd32dfb012112499978b6e55920761f8cb1320ccd8fd0f.json.lzfse",
-      "documentSHA256" : "ec9412d2d93abac4c7b2f96d3b8bf07f1a501064073835b6fa8e2c2de8edd52c",
+      "documentSHA256" : "7e6b8f601184631078a7f024c46501573f888d217d0e5d4b2707016a1f44dad8",
       "eligibility" : {
         "reasons" : [
 
@@ -6878,16 +6878,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/APP-K-21498.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "ffc86aa7c3ccd07a627f3a27c86e256e396b57921aed9cd812ace16629130f8e",
+      "sourceSHA256" : "1daf9d9985d35ace157f32f9160f491cefb6bf8946bbafd1a69443048a086c77",
       "uncompressedByteCount" : 25365
     },
     {
       "blockCount" : 543,
-      "compressedByteCount" : 61622,
-      "compressedSHA256" : "71565df2228c56757cefae20fe26482efb870551ae0afb66889c33531a18f771",
+      "compressedByteCount" : 61612,
+      "compressedSHA256" : "832df6ee3accd541e1fe733285a0773a354dbf6aae55bf41771ec0341a10d12c",
       "documentID" : "638d127e3992cc0e51a72dffab8f87a1b0c1c476c1a5ecb0c89e988cce709577",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/638d127e3992cc0e51a72dffab8f87a1b0c1c476c1a5ecb0c89e988cce709577.json.lzfse",
-      "documentSHA256" : "d7cc385e92d9b4e58c89bebc04a5a3e1ed3a25600c88fd9ee92a62322e217c5a",
+      "documentSHA256" : "cb840ca2db33f60dd07637fd0ba4e991d601902d9d2d9178f0e8c707cc265af4",
       "eligibility" : {
         "reasons" : [
 
@@ -6897,16 +6897,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-1.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "c6b02d1addf11062d55358da4ac972567519d42658be6383c1f68181cffa2eff",
+      "sourceSHA256" : "4c79393cbdf27ae004219449e4ecd689edeb0f9c235e08e648f9bae269f55050",
       "uncompressedByteCount" : 502581
     },
     {
       "blockCount" : 2615,
-      "compressedByteCount" : 546331,
-      "compressedSHA256" : "0749fadd35f92f57458531a05bcd1639de41153d15cbb2aa08314914cba594e3",
+      "compressedByteCount" : 546259,
+      "compressedSHA256" : "ff8d3e8de86a00b60ac8b8be4db6e6b9c28fed31beced3354ee230da73425834",
       "documentID" : "7303fc7b3a61d2b4d2758c4239a37aa343fd5d51a8bec8003ba4aea1ae9306a5",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/7303fc7b3a61d2b4d2758c4239a37aa343fd5d51a8bec8003ba4aea1ae9306a5.json.lzfse",
-      "documentSHA256" : "1d2c4e074663409a50d6d008a526d51817e35933064ed2deacacc35344a5553d",
+      "documentSHA256" : "c95382b60fda81a1a1a06c67dec607d74e466223a38ff3a16609b00eef413247",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 8"
@@ -6916,16 +6916,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-2.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "0b0cdde386c1b528283801feafeb7be07bc21d4dc90a1b5926da63738a8e0075",
+      "sourceSHA256" : "e7707f4f9b5c705832d42d7320101f6ded124658f2a6f356f6bdd4f690f48cf7",
       "uncompressedByteCount" : 2749531
     },
     {
       "blockCount" : 358,
-      "compressedByteCount" : 52493,
-      "compressedSHA256" : "fe6ba49455b5499ee0d78bcf58224c40f3f0d79ea51280ab25ec6816afbeb8d3",
+      "compressedByteCount" : 52522,
+      "compressedSHA256" : "d7da7b17fbbd8025a1006dfb4b892bc8eb63e12cf592a2a10964f20c25639d91",
       "documentID" : "898734186e7841a2139f029a052697d67d4f9b5f83ce713e77548c36366ebeed",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/898734186e7841a2139f029a052697d67d4f9b5f83ce713e77548c36366ebeed.json.lzfse",
-      "documentSHA256" : "9c295986f6a35911e53261e9936dc51d78dfca5e4bed578d44ca9bc1a2f22bd1",
+      "documentSHA256" : "1617d7aec22707b8698c021b62959a347a2eff8412340b6c003fdd54b6096c17",
       "eligibility" : {
         "reasons" : [
 
@@ -6935,16 +6935,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-3.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "7a08333daab30bcf00cb2c07d07c03aa3e8f41839a8c7976188aefde651fb214",
+      "sourceSHA256" : "c0100cfcf08aa87b0c40758b02c9e385d68e3d095190bd38895729d07f776f5f",
       "uncompressedByteCount" : 442286
     },
     {
       "blockCount" : 92,
-      "compressedByteCount" : 18753,
-      "compressedSHA256" : "15b849994f3887ed6e12dc62a77e48139f74370e8e199a2a3f6a99bf55546c30",
+      "compressedByteCount" : 18747,
+      "compressedSHA256" : "cb24b89116e6500825338669a6023784bc7038738211c8ec26167c7996e764f3",
       "documentID" : "895b44b25cfe4306ca1dde8d670eea803e9e65c497ac0a7374cf83ab786a34a5",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/895b44b25cfe4306ca1dde8d670eea803e9e65c497ac0a7374cf83ab786a34a5.json.lzfse",
-      "documentSHA256" : "cb5867262bf446c0a26d386df3e47b25bca38a1d9c23ad3c256a902dd9c57b55",
+      "documentSHA256" : "527aaa636a51afce2ac85866242b6e74d7bdbbc6788bbe0d05305f24e5d0818e",
       "eligibility" : {
         "reasons" : [
 
@@ -6954,16 +6954,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-5.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "8789beafc1746c189c7fc386975119c9abbe0634fd6c98685ed848d61518198b",
+      "sourceSHA256" : "eb068207f72d24d935a757cb6fac2ef17ba1dea54a246734418f7ad908253ce4",
       "uncompressedByteCount" : 143929
     },
     {
       "blockCount" : 171,
-      "compressedByteCount" : 25784,
-      "compressedSHA256" : "d58bd357072d29f3196e881fe2511479667fd8c3f3f8e4e738d69ff7e82a9ff8",
+      "compressedByteCount" : 25772,
+      "compressedSHA256" : "6cd30527939037f341192dbc96191aacd824e5815b62c1b9fb8ee00aee99070e",
       "documentID" : "51b065d56d6cca1b2ab134e5b1a9c32ac808cd582d3e82f4fa7c775b10890662",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/51b065d56d6cca1b2ab134e5b1a9c32ac808cd582d3e82f4fa7c775b10890662.json.lzfse",
-      "documentSHA256" : "33448a6762092f37a02bd51e1cf25a537af3cb274ab5b600e4f7ecee7a720daa",
+      "documentSHA256" : "ab561a9ce21133339b10b545c627a371c3bb0f44e9f26bd4e2dcff1ccec13e25",
       "eligibility" : {
         "reasons" : [
 
@@ -6973,16 +6973,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/I-6.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "cb6a4a14ec15cc90165167d9fd99f3e7007eae94a43b1db72ac01b84f88b1754",
+      "sourceSHA256" : "cb896717ec6e2b05b4c06ff6ebac0aa0f3f5a08433764c4e19643accfc34ddfb",
       "uncompressedByteCount" : 215393
     },
     {
       "blockCount" : 37,
-      "compressedByteCount" : 5167,
-      "compressedSHA256" : "e3ad5713d6778a3036f145743b98bc1629e14611818993f636b0799a2b332d48",
+      "compressedByteCount" : 5171,
+      "compressedSHA256" : "e624a9ce707ed0998d4da5810f51c2ddb74d6fb989f001aac85ced4f1b31e8a7",
       "documentID" : "79b9779f9eba828e8ef92252d46a74348a8b5ba6db31825055dd17b31a646f74",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/79b9779f9eba828e8ef92252d46a74348a8b5ba6db31825055dd17b31a646f74.json.lzfse",
-      "documentSHA256" : "66c7849cd605310dd311cb2ebff8373cacc93b0e8ef8f31ae7c1957f8718f10c",
+      "documentSHA256" : "8c8029c0e58878a4dbd7a25c7b8538000118fed94b9e491a625e101c9e55baa6",
       "eligibility" : {
         "reasons" : [
 
@@ -6992,16 +6992,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-1.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "c98cd142235189041073d457b3d19035f7b2682b11cefd81b5ab03e48e52f2a1",
+      "sourceSHA256" : "2311c8f6cbc9709b9fa316d95bb20ddc77febaa1331b234ef5a0d951ad26f3aa",
       "uncompressedByteCount" : 28782
     },
     {
       "blockCount" : 219,
-      "compressedByteCount" : 61962,
-      "compressedSHA256" : "f76e30e1d55112e53e6c008de145c55030479a6210ae964faa8750258b09f03b",
+      "compressedByteCount" : 61452,
+      "compressedSHA256" : "35d389846a750c7b5da4888eb8d9834078b72d24dbb9295f651638229b772b48",
       "documentID" : "fe7a149dc5ec581f1b3d854b3e2b55f517ada2807f6dd115c0e0557c00035269",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/fe7a149dc5ec581f1b3d854b3e2b55f517ada2807f6dd115c0e0557c00035269.json.lzfse",
-      "documentSHA256" : "57aaf867e3cc91077fcb8a7d04ab5ef2b1ca3b045b9673776c25772f7c0735e0",
+      "documentSHA256" : "275146202bfff1b32b1caaa3f92739aa6c5f01e52375e0d411c98c539f9a464e",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 7"
@@ -7011,16 +7011,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-2.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "645bf96b88a69b1c5451b84358ddfdf9840a4fc1e9ac6dd1babe796b30f5bcb8",
-      "uncompressedByteCount" : 2035177
+      "sourceSHA256" : "8fd8a17628c9d9434b2f2f32526c22f665c01c7de8dfbf870bcfb693d9605020",
+      "uncompressedByteCount" : 1926089
     },
     {
       "blockCount" : 661,
-      "compressedByteCount" : 660807,
-      "compressedSHA256" : "add53cd2c09555d74cefb488b7fe6c8ccff1470c1e6068a87ed96d40faf24215",
+      "compressedByteCount" : 660784,
+      "compressedSHA256" : "271587b14d68270c5e58f63d519ac9c6814c05dc33cae1b91870b1fd8aa7e579",
       "documentID" : "d3c6f2528ee16aac76318f384436c8dc0d24280bd2a7ac3b66ce08802e7b35c0",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/d3c6f2528ee16aac76318f384436c8dc0d24280bd2a7ac3b66ce08802e7b35c0.json.lzfse",
-      "documentSHA256" : "77b90b501d5ab053af93a6688865426a81f8669d1b825b5cea7b97c124db62c1",
+      "documentSHA256" : "b4f15bc20bd5a25068e937b58eb5b11a4a4fa9993a53806760e4272710a3fd84",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 23"
@@ -7030,16 +7030,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-3.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "7e7bea321dc809d2777ceaac6af1a53d41f10f55c71b0c8c0bac8df171cc87c4",
+      "sourceSHA256" : "1d319b4f9d1c94cfe416d5b97ba529774ae0d22582c311e700a8016a1c719b83",
       "uncompressedByteCount" : 2922262
     },
     {
       "blockCount" : 584,
-      "compressedByteCount" : 89437,
-      "compressedSHA256" : "80610fc447a34b776e362e399459f6ba60b14768e22cf5358280a025f27f61bb",
+      "compressedByteCount" : 89486,
+      "compressedSHA256" : "1137ecc946e078e3c72166c9359fb896b1dfdd481805e04cc878ffd7106ac513",
       "documentID" : "27c4a4245a55741426eeaef6086ee5bcadd06abd4561ddbc6c16604e342343bb",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/27c4a4245a55741426eeaef6086ee5bcadd06abd4561ddbc6c16604e342343bb.json.lzfse",
-      "documentSHA256" : "94289d2cb89b3dfaeac02472b99e0a9757e0b375081c65f0a5bcca878f2f7435",
+      "documentSHA256" : "aff0ea336039943ee2321453d6f1a1915e7545f4e491522ff26642296636283f",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 12"
@@ -7049,16 +7049,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-4.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "269c27017d281b92bc26e19734399da4fd33edda0ec8b7a00579ed445c60248e",
+      "sourceSHA256" : "c5278ecbf58014f68b04a993dc1bb56949e4d04b9250f685387f3687a3806d34",
       "uncompressedByteCount" : 1208806
     },
     {
       "blockCount" : 703,
-      "compressedByteCount" : 109654,
-      "compressedSHA256" : "27e10440149b0a7d84a1425b0ff3eb77302924a482435406243949aa1974c0af",
+      "compressedByteCount" : 109487,
+      "compressedSHA256" : "d3f222077166e9c7541837d8cb76463847990427426f565c97fb1fc69befdf1c",
       "documentID" : "c84573b0215d44e4a890451016963e456758506a7b95ec51df8a16939c3ddad7",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/c84573b0215d44e4a890451016963e456758506a7b95ec51df8a16939c3ddad7.json.lzfse",
-      "documentSHA256" : "6a2456fbfceeb6fb45b712eac4bf80ceab30cf718ef7e53d675c14a82b758cf9",
+      "documentSHA256" : "5b59e4dc3761a827e88c66ab93ed0217d632aa1ddb20bccfaf65e757988ab8ed",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 15"
@@ -7068,16 +7068,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-5.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "d98ff7d4469889b2fdcfb9d6087e6e3b7e29e44569c79569bd5dc65b980528cb",
-      "uncompressedByteCount" : 1367380
+      "sourceSHA256" : "10663f46595a8e89ecfb4cc9e9db9a43c3c5c3a7df8169effa2cc0f4e19a36a2",
+      "uncompressedByteCount" : 1347792
     },
     {
       "blockCount" : 200,
-      "compressedByteCount" : 26264,
-      "compressedSHA256" : "420658fae49112f8dc11ee3e12b571cc787c8cc2f7144d7c3caba73fc8e15e14",
+      "compressedByteCount" : 26257,
+      "compressedSHA256" : "0a7c59e3b5695a833f36ffabf29353493ff59f52785535b7348f0849931fd1e6",
       "documentID" : "0df0f8a419b1a7d652ec78e48b9617726f6b5fb2e1531f065570d4677aadd71f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/0df0f8a419b1a7d652ec78e48b9617726f6b5fb2e1531f065570d4677aadd71f.json.lzfse",
-      "documentSHA256" : "ae291be0d3696e992b745d48393fc45e8fdc56aac6ec205ede214c78fcde41ee",
+      "documentSHA256" : "7d4c58ec12ddb1487b78226d8ae7b3b32184fe8aaee894405b1ae4ea47c21c3b",
       "eligibility" : {
         "reasons" : [
 
@@ -7087,16 +7087,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-6.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "c5d41c23e251710b258b2d64d51920b9aa66cbf3d01f6b6c8c5b1509f797a607",
+      "sourceSHA256" : "f0dbeb10128e235551fdd8efa7d56960b1129440a0b0657ded2849d4bf7fc829",
       "uncompressedByteCount" : 183988
     },
     {
       "blockCount" : 227,
-      "compressedByteCount" : 60541,
-      "compressedSHA256" : "a6df647b90c417563a99e9e68e8323bb0063ba4c68f7f6f4c626dad7e941ee1e",
+      "compressedByteCount" : 60523,
+      "compressedSHA256" : "946dcf383b5b93c92681530ee90f4c3fb4d6cafccf368093d677f8dc14d34bbd",
       "documentID" : "36b6c84263f77c3ef6516d392ccc5c04236a4c1f26902e22054146323ad1bcac",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/36b6c84263f77c3ef6516d392ccc5c04236a4c1f26902e22054146323ad1bcac.json.lzfse",
-      "documentSHA256" : "dda53081e192135f0719f476002a54878a1b39028d50efbf9e05a9024892288a",
+      "documentSHA256" : "62d8b0b1db563c8804e288bc626a4bea6d0d31f6e1160b0da3d94e8c8a4378d1",
       "eligibility" : {
         "reasons" : [
 
@@ -7106,16 +7106,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/II-7.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "2ca5b9adf9bed2b3b90ed985ee551ee94d544181c4cfb2e4291df0fd420ddb63",
+      "sourceSHA256" : "7b6113cd63a66b204ae15f5bdae51aff75b7ee4876094beb87c95178afaf5b1f",
       "uncompressedByteCount" : 650069
     },
     {
       "blockCount" : 57,
-      "compressedByteCount" : 6890,
-      "compressedSHA256" : "5b20b52aba68ca6b53732929e87ad4f97cec97c2c4b42784a3deaa94495f39bd",
+      "compressedByteCount" : 6899,
+      "compressedSHA256" : "a18bd61f87c191182529c5312a887a4f672f26ab43cc0d19e643b4153ab9f5c6",
       "documentID" : "b35e4d39acb37c7cfd96d6d828e7f5240645cc64b12d0e751b39a5cdce49a59f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/b35e4d39acb37c7cfd96d6d828e7f5240645cc64b12d0e751b39a5cdce49a59f.json.lzfse",
-      "documentSHA256" : "3ea30a501a5dbf00dfca31830173f1d67a110cf77f493ffeb8a97647cbf3fa34",
+      "documentSHA256" : "23ba0d92fc6e54ea25812e162a633417484a2ed032aa8a157873d5723f90b6cc",
       "eligibility" : {
         "reasons" : [
 
@@ -7125,16 +7125,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-1.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "8f65b2f1fcb452a2ac8c3e84d925e869f33365bc8f29d71005b315c99749e109",
+      "sourceSHA256" : "b9ddb99a675228d71caf719cbec2b846781ceed28f2e1ff512f8589c61b3f379",
       "uncompressedByteCount" : 44403
     },
     {
       "blockCount" : 705,
-      "compressedByteCount" : 200942,
-      "compressedSHA256" : "f38577baadbdcbddc4e41e1e09916a033f6b61aff03b6adcee9b1c98291f24e2",
+      "compressedByteCount" : 200969,
+      "compressedSHA256" : "1aac5bd3b4eb1dfedf26a125fde1ffa29b1e762e430fafd49b0ea82e82b71ee9",
       "documentID" : "1e510ebaf7eef43817867ee76f364ad7394f369bd77486ad9cd5c5be6435d2eb",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1e510ebaf7eef43817867ee76f364ad7394f369bd77486ad9cd5c5be6435d2eb.json.lzfse",
-      "documentSHA256" : "82bbc3f8cb55511e93bbc1eec6efd225bb3f7d0229be2494b48132a6b05dc72f",
+      "documentSHA256" : "7c59150a4d904f765a66ce99035b4b3a5cc1c2566f59943bfff820bcdab366e9",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 19"
@@ -7144,16 +7144,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-2.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "e28f2859301cc7bc4781db5469895e2b0cc4fe298148636f74d64a8954ec5132",
+      "sourceSHA256" : "51cff2cf7482acde7fff82067a77acd2c33fedac8f6770b71465ae4f4fdb19f4",
       "uncompressedByteCount" : 5270059
     },
     {
       "blockCount" : 570,
-      "compressedByteCount" : 85751,
-      "compressedSHA256" : "5c001e7da1349f2fd631ffc648de2fbde4a14bb691b09f6c0ec7234dcbafbfaa",
+      "compressedByteCount" : 85749,
+      "compressedSHA256" : "09de274985124c3c6d2ca32370e6de8bd2f8ff8b70f71d3db1a2b569c4f1c200",
       "documentID" : "89c667c99ad6b5b9ae06cc0e5eeb7e96bc71954500fd8108b2d2b5cc1c6ed4d2",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/89c667c99ad6b5b9ae06cc0e5eeb7e96bc71954500fd8108b2d2b5cc1c6ed4d2.json.lzfse",
-      "documentSHA256" : "dd680cb4ed3285300a3e5a46cecb2542dcfc0d484ce58aee25aaab0297d4c3db",
+      "documentSHA256" : "718aad1b5777cef2e43b671a23e2c2afbb17b21fc13f8dd7209ababaaac49daa",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 21"
@@ -7163,16 +7163,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-3.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "e8de405283a15dacc888b0bf85ece878f70672bad6ec661002e5fee4eee2eea5",
+      "sourceSHA256" : "90c70012b23f5e0244693a20e165594ec73d6f003ea84020b401db13e482824e",
       "uncompressedByteCount" : 1403239
     },
     {
       "blockCount" : 118,
-      "compressedByteCount" : 16140,
-      "compressedSHA256" : "43bb1240b86bf0990ed3c465b52dfcf0cf7bb4156666f965556fc65697013229",
+      "compressedByteCount" : 16143,
+      "compressedSHA256" : "b7986ad2f2ceecb7f6fdca7069a5b3c0843a64ff770f246f60b4846e0cbf4e08",
       "documentID" : "b95945729cf0ddf49f3d3a7ba4c9e2c2f43f07db72329a593823eca477e11cb1",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/b95945729cf0ddf49f3d3a7ba4c9e2c2f43f07db72329a593823eca477e11cb1.json.lzfse",
-      "documentSHA256" : "ec65c940747db447d0edccd9e73063c0a6054ff69c90ce1ffa21adf02e34c16d",
+      "documentSHA256" : "2476ed8b0103f9ac7f2849f3d714e8cf7cab7cd2beac4f855e3c836d8a9c11b5",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -7182,16 +7182,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-4.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "06946026ae72c74688aba007a6f0c145a2bc9947f10979dec5f4803bb0f3e0ba",
+      "sourceSHA256" : "22648f45662ffe9c4d7555c35146bd7dc5422e78cb173ff50ceaa201db784ee0",
       "uncompressedByteCount" : 191996
     },
     {
       "blockCount" : 256,
-      "compressedByteCount" : 44592,
-      "compressedSHA256" : "316458844b5ce2265a4019fbefadd56452908f9904a30a959bbe4c9ac2345975",
+      "compressedByteCount" : 44594,
+      "compressedSHA256" : "110f7f04c03b14155b35a33d1bcbeb374475febbf18b657e8058a3b4f774fe88",
       "documentID" : "7aafe7b5a13bd2edddbdf3992c894f32415f19672e9ff06224d35f5ad77458d4",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/7aafe7b5a13bd2edddbdf3992c894f32415f19672e9ff06224d35f5ad77458d4.json.lzfse",
-      "documentSHA256" : "8f696b3234854da9bf79fe1e1fd4d4a1013991f8d547d1ff0b41b0f3fdf2c5db",
+      "documentSHA256" : "85a0cd3cd833022e93ab0a6820a7968e637d44f58f11b92a4b0b41768f65250c",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -7201,16 +7201,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-5.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "169e27750be4f1a9b0ac39650b990a700e294d0a8b2faab45791f4160dfeb400",
+      "sourceSHA256" : "b2f9426cc01e13bc8c26eb5c11fd0e22853580e86f9d62410c62804cbe5eef00",
       "uncompressedByteCount" : 426046
     },
     {
       "blockCount" : 634,
-      "compressedByteCount" : 107363,
-      "compressedSHA256" : "b3c85e7b8b17ff395583fe03215ee57add420682f7749aea1df61f155fb56970",
+      "compressedByteCount" : 107188,
+      "compressedSHA256" : "e21776e3ecaeece243fc1d38c9794e4a68e23e02826ff2444e08c7a6e2468e9f",
       "documentID" : "f9b467f9a7029b230c485680516699efcee45985fdbcf034eca3dacb4f64c129",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/f9b467f9a7029b230c485680516699efcee45985fdbcf034eca3dacb4f64c129.json.lzfse",
-      "documentSHA256" : "137a0e8da9b41cec326d6758d994e6ee860a5465722b134f3c680af889c8bb4b",
+      "documentSHA256" : "9f0e78998d902c4a36511c61730ba405287661fa1961c83da6d301b87e3eb667",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 13"
@@ -7220,16 +7220,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-6.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "7311a5b2447f38777e0eb14cf5ee5882b5f93d365a126c04bfa8af3cc0683656",
+      "sourceSHA256" : "c1b5d49e73fd9702f0388b3f6134560efcc0116bc0215df6a12224addcdc6b5f",
       "uncompressedByteCount" : 1283080
     },
     {
       "blockCount" : 833,
-      "compressedByteCount" : 133095,
-      "compressedSHA256" : "3162cab6b3942fa4fe29826b3f276b991ce84248b1cba8c05786f8edad431de3",
+      "compressedByteCount" : 133087,
+      "compressedSHA256" : "4596dc65b9a3498558ba4685494aa9a7f89616b8be975ffda179bc592fdc7556",
       "documentID" : "c730e00243c9b27788bfa890dd3fb2f5a628a4ed757f8548066b407266450648",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/c730e00243c9b27788bfa890dd3fb2f5a628a4ed757f8548066b407266450648.json.lzfse",
-      "documentSHA256" : "e807811fbcead809ac1b450144789aa149c0c08f001cc5a1adfa6d5d3ea4e809",
+      "documentSHA256" : "1e20984054a75683fe5c6477c67d6f79866dc5c4fda4665f913d1e9423cb01a1",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 7"
@@ -7239,16 +7239,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/III-7.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "60d997e649cbc24e91b741c9cd13af1b53bf7667fb4fadfcd84f4b0804ef571f",
+      "sourceSHA256" : "7cf42d452b3e165450c70660f154138c6ae117ed3e334ec62100dd5b2cc2a19a",
       "uncompressedByteCount" : 1595016
     },
     {
       "blockCount" : 37,
-      "compressedByteCount" : 5121,
-      "compressedSHA256" : "e54aa651e56e6c9eed1b7f9b35963060c910a81ba27f4272378c830f6bac1a14",
+      "compressedByteCount" : 5118,
+      "compressedSHA256" : "aec19b666a98caa63f44da800ced2b29a73f088edbb1cd6dd9c4d0dfb93e4aa9",
       "documentID" : "8f60bb2ade78e965eb41f02086deb2e4393e549b748ac675814997a427cad4ea",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/8f60bb2ade78e965eb41f02086deb2e4393e549b748ac675814997a427cad4ea.json.lzfse",
-      "documentSHA256" : "725f47e34ea17ab39e1d0d99e7fbbd37ff4fd1ab78e2cc41cea22c840a7580b4",
+      "documentSHA256" : "6fe101db1f61d4481a09a7d314825c6f760dae8b70c1bf06741cd26763d7c7e7",
       "eligibility" : {
         "reasons" : [
 
@@ -7258,16 +7258,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-1.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "ecd86a7459926af4779ff4dc7f372c20beddce67703cfed0addeaa734f050572",
+      "sourceSHA256" : "74405a0e4fd939e2e62170f142bfd0c2ac8aeb324011916b47190ac6e960e362",
       "uncompressedByteCount" : 27268
     },
     {
       "blockCount" : 806,
-      "compressedByteCount" : 173685,
-      "compressedSHA256" : "17c0ca12158f264105d9586e5b35b79679948f11acc2cf2c236b8bd24d598b03",
+      "compressedByteCount" : 173628,
+      "compressedSHA256" : "151eb42bc73b2568aeed7a87373e4ec0fd6ba75f0c1bb942290ad87327e400ca",
       "documentID" : "4171563dac0e5e6f8c75f20e8360308daaae1355f46857669cdc94063e6292fa",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/4171563dac0e5e6f8c75f20e8360308daaae1355f46857669cdc94063e6292fa.json.lzfse",
-      "documentSHA256" : "ec42c79a892bda620649826ea21baef86e2768e9d2058f004103d09ef1b6df3e",
+      "documentSHA256" : "774e1a7d3dfa3ac38481fa9644519d46c3552114a4c0ad9588f29c70f99f1bba",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 19"
@@ -7277,16 +7277,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-2.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "d4572c54cf1dcb92480d961d5c482aa03e0cc206a26547c95605bd6713cf3422",
+      "sourceSHA256" : "8c4e62a9eac6c81e3ebe006a57889ad99f1e36cedeb7cab0315e38dffb8c8d11",
       "uncompressedByteCount" : 3449042
     },
     {
       "blockCount" : 386,
-      "compressedByteCount" : 61220,
-      "compressedSHA256" : "c0a2d814d5ea59af896bb3b4a255de01fb37212d6bcbed3441006ab512710dd2",
+      "compressedByteCount" : 61187,
+      "compressedSHA256" : "4d66bd08a638cb98f7b107b0531a0ae409ec5a0ab2bfe4ea1aff68909ea4ba11",
       "documentID" : "29161b62bc8e5c241be71969b03fbdb3018f99dbd0b98ca332257987175cc5e7",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/29161b62bc8e5c241be71969b03fbdb3018f99dbd0b98ca332257987175cc5e7.json.lzfse",
-      "documentSHA256" : "087e5a8134f0c28ddde02dfa67e6119f506eddd6ddf4cb49659b4c615cee8be9",
+      "documentSHA256" : "87408ce4bf70288f90b2d8ababe0322272495fa07b03189e894ec1db06be0a1e",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 10"
@@ -7296,16 +7296,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-3.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "9c38dd2851ea53647fcbfae7c8ce47b4304113ea07211b30dcbee60032cb1850",
+      "sourceSHA256" : "5784e58c96c89f644b4658f0af088eab38eaee933b769ce43ff8809a499c45c5",
       "uncompressedByteCount" : 684710
     },
     {
       "blockCount" : 402,
-      "compressedByteCount" : 60070,
-      "compressedSHA256" : "ae4e92c5152c3875723d00555d34cc00261fafcde85c4eea4045f07ffbf7873a",
+      "compressedByteCount" : 59993,
+      "compressedSHA256" : "b858179c5b1140b141162689b36daa404a5328f8772ebdac91ce4c8641fb64c7",
       "documentID" : "4c58134de154aa07a30ac8e316630c1d34f3e1b557c81ee57388ae41eca66365",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/4c58134de154aa07a30ac8e316630c1d34f3e1b557c81ee57388ae41eca66365.json.lzfse",
-      "documentSHA256" : "fe11c03500dcdcb179bc6c9c6c37efec11bc29c080d014bb28eca88c2c5b56c7",
+      "documentSHA256" : "4d20455ac744dcbfe353366d8b6e0b11e4f5d7ccc23f1122c59c313efb6eee4d",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 10"
@@ -7315,16 +7315,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IV-4.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "ec9c8821302bdfa0cebf84efd37dd931673ca76635ab1c96c2a97148b9b006e8",
-      "uncompressedByteCount" : 666464
+      "sourceSHA256" : "8fa1a99efc4807a41267aecb4c08c8332d07caef69b0dd5428a6858925e23bfa",
+      "uncompressedByteCount" : 656552
     },
     {
       "blockCount" : 693,
-      "compressedByteCount" : 102486,
-      "compressedSHA256" : "d13386bd866aa515923975842aca2303922a4a4ab21b3a9e1a37a7b9495806af",
+      "compressedByteCount" : 102443,
+      "compressedSHA256" : "c07b8b205ece1d85c87bd54948167735df133f91500ff4574b1cc5229914d3a3",
       "documentID" : "aa1703d96c92f40172818a231b28dd62712a7d8835a5f38200d0ef817a1c3113",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/aa1703d96c92f40172818a231b28dd62712a7d8835a5f38200d0ef817a1c3113.json.lzfse",
-      "documentSHA256" : "b8350f1c00c83deb28da96800579e3ab517333a582fcbdf9aa57e96ecd32f856",
+      "documentSHA256" : "87b7e8de46cf179bc9537cdce3e8891c3f615c307d304251a07f19a237c597a3",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 4"
@@ -7334,16 +7334,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-1.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "44201f9a4cf549c5571ca5c6cf4ab3e4a3d41dcbb9e457940f053870e526ba89",
+      "sourceSHA256" : "442b560e627ee3e7527647cf43eca01a0687b52c3fd64e950a7806e45cac0917",
       "uncompressedByteCount" : 1025680
     },
     {
       "blockCount" : 57,
-      "compressedByteCount" : 9761,
-      "compressedSHA256" : "f342a43abe6c802e381aeb16c0e1aec5539e207e88fb851042222d94f676cbef",
+      "compressedByteCount" : 9747,
+      "compressedSHA256" : "3333dd9a5dac306bba72435ef7df9617f6cdfe4ba9046dcb32ead0f6274a1e06",
       "documentID" : "e201b818620c7c1f18dd11e6adf510f18941f1f86daea1b8dd79a09b09687632",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/e201b818620c7c1f18dd11e6adf510f18941f1f86daea1b8dd79a09b09687632.json.lzfse",
-      "documentSHA256" : "6f55439130dfd6ca88606c4a896455bf0654218f922f98109fddb922f8591c68",
+      "documentSHA256" : "ebfdfd12107f2dca6b7255774f55312da6b72fcd0b7dedbad911ca1a026f800e",
       "eligibility" : {
         "reasons" : [
 
@@ -7353,16 +7353,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-2.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "338ff548ebc2c67ce8ac5494e6e786082f135234cc75caf4cd59e18df5813d83",
+      "sourceSHA256" : "c39c36e8b9160a95577cee7957a6d0204968f489db78ea9040300ad97b1bccef",
       "uncompressedByteCount" : 79694
     },
     {
       "blockCount" : 1651,
-      "compressedByteCount" : 259237,
-      "compressedSHA256" : "cd4aac7b5e5f0e249e3e364d37ccff9a62243665d83fd2800231b493e2be3f65",
+      "compressedByteCount" : 259160,
+      "compressedSHA256" : "025746f32bdabbfcdde419c778dea4d693232d00dd6fbc0efe174702cdee88af",
       "documentID" : "fa40b3f10b8564d744ae77293f835ad31f0611adb1287bf6372111e21e47f3ce",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/fa40b3f10b8564d744ae77293f835ad31f0611adb1287bf6372111e21e47f3ce.json.lzfse",
-      "documentSHA256" : "da7f515a2b94c767311ce90cb3b6174f9a362fbca857cc7ab559eab4bd75443c",
+      "documentSHA256" : "f651c3e185c0a6508a9379f93efaa85f4a17a5ff43443c41ffcd6b6c8c8a9b84",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 5"
@@ -7372,16 +7372,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-3.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "a264fdd4224df6441f75eb1bfba69ccbe63c273c86a25454b4cc4fec9428dd3c",
+      "sourceSHA256" : "88a8e627e7029311e525fd4ed1fa11c090be0daceb518b043fbcbff7aca89986",
       "uncompressedByteCount" : 2441436
     },
     {
       "blockCount" : 254,
-      "compressedByteCount" : 29793,
-      "compressedSHA256" : "9e8a799e07e2b05bc9a7f443d83a9ac31109fd88190d86b9908f1c7c0749b96d",
+      "compressedByteCount" : 29802,
+      "compressedSHA256" : "1e7b37c442a602557a4592c397423a31988af44dd7217ea6afcebe801c335d58",
       "documentID" : "9ac7a6ae020a62991d8dba6449a0ad1f62aee85639172fef4f759416d00625cf",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/9ac7a6ae020a62991d8dba6449a0ad1f62aee85639172fef4f759416d00625cf.json.lzfse",
-      "documentSHA256" : "7570bbb0d3cbac036b5cc38262a01cb2830216dcfdaa86c8cd804c174c2eacdc",
+      "documentSHA256" : "05e6d532ef873fb9b0a0a21cab99db4e6810589e50efade23bff4d5dd91a60dc",
       "eligibility" : {
         "reasons" : [
 
@@ -7391,16 +7391,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-4.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "0547f77db9f28d1c4fcf92a6e4bf3c1edb6bcd8fbda3a766cd979a52d268ad1a",
+      "sourceSHA256" : "0df3e05f572a463f088c64750437c725c0c0ef2d71e1c65b92c52b55685bee4d",
       "uncompressedByteCount" : 214519
     },
     {
       "blockCount" : 181,
-      "compressedByteCount" : 25832,
-      "compressedSHA256" : "260727d91ad0a2c93ce17fcd6e802de401d06df59506a8005d67bcd8b12a487f",
+      "compressedByteCount" : 25846,
+      "compressedSHA256" : "f3fc3b95e9b2ca2ffdfda3c825ee20e71690d36ab1269c7b148fb9b6a69f8a9f",
       "documentID" : "6d75f5be4ffe170ff13076910bbd0f0b2ef4942361d6d170ff395bbdc0ef9209",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/6d75f5be4ffe170ff13076910bbd0f0b2ef4942361d6d170ff395bbdc0ef9209.json.lzfse",
-      "documentSHA256" : "f962a2770d52a49dcb80410e58d63df0dd54801452b2418bd36e5ee9918e1d7e",
+      "documentSHA256" : "ccc820c83b9e628078b3b9c2e77a9da0c6825aa8b7cafb614a0612a44615b9d5",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 3"
@@ -7410,16 +7410,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-5.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "de2666640c14d70cdfc7e9b3ccf5bedb3f98dd28bce943f7d89660aaa0cf9e7b",
+      "sourceSHA256" : "9248434492f65da61da38791e4269c90e3789b261c2ba4ee4fe8224294a882fb",
       "uncompressedByteCount" : 356385
     },
     {
       "blockCount" : 330,
       "compressedByteCount" : 58813,
-      "compressedSHA256" : "f6d967288d6a2a660b8f591e64945d2f776e5e0a085a492ca5deb77e6fef0984",
+      "compressedSHA256" : "38b963f1067a64d1f76e3c6e46d8f9df868e2020c318fe42859ab3d87c80bba9",
       "documentID" : "3fba400740fa0146bf99169b8ad25d921635095213c37adb94196405b7d61503",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/3fba400740fa0146bf99169b8ad25d921635095213c37adb94196405b7d61503.json.lzfse",
-      "documentSHA256" : "85dcdf918ab75b35bb0ae29a4fd64807defe024c7b6a4e828dc6fc8ac23023ca",
+      "documentSHA256" : "dbbef2591308bd10be4382d8fc572f524fc35eeb16442cfd0270b8cd38870ee8",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -7429,16 +7429,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-6.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "46a14e4c97981b77487912c1dc229c2018b04d4feedff5d9570f8c3332fd1ce8",
+      "sourceSHA256" : "82f389e52e1fe3ff9dffe9ded02189067c75e9a4a8da41f0b935d94397667288",
       "uncompressedByteCount" : 498896
     },
     {
       "blockCount" : 252,
-      "compressedByteCount" : 51151,
-      "compressedSHA256" : "0adf0bea8f55995b51b8765aff365c6beb3d7b7abd5aa22c7be70ea4b6ff5f1f",
+      "compressedByteCount" : 51129,
+      "compressedSHA256" : "e72d91611b8f2accea213b785fb0ef262c97b4833c968ce7a35a9157d07e8f05",
       "documentID" : "4f2326af7705150ead6e46703d2547cb90e6d01c837b36cfde07350949a981d6",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/4f2326af7705150ead6e46703d2547cb90e6d01c837b36cfde07350949a981d6.json.lzfse",
-      "documentSHA256" : "88c5a609bfc3359af6fe78ace5ed65f34cc8777cb056cda740a005012aa24112",
+      "documentSHA256" : "4e7ee839219736e97cdbaf0fed301139143f98d44275cd1e4a45707c67252c03",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 5"
@@ -7448,16 +7448,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-7.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "693a095ae7a59392dd316fc3347d606bc64afa218948bc6a1690f372bf9ca3c1",
+      "sourceSHA256" : "8290b1b82cd0b5b7736bf3a1a2d1197627bfdf961631e3eb152d49e69cc1cd07",
       "uncompressedByteCount" : 536243
     },
     {
       "blockCount" : 444,
-      "compressedByteCount" : 71542,
-      "compressedSHA256" : "61258e02721cc3837ab69af95bde806b08a24d90f1ac4b7afce928839022b670",
+      "compressedByteCount" : 71370,
+      "compressedSHA256" : "fd00ab1f3f98ff337807e4aa179160f2d2c3a0d41157ca92e5e1c8210896d895",
       "documentID" : "7a9092ad7178eab736b30925bb0f5b95a0dfecd4f0158081bfa09d6b9539f123",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/7a9092ad7178eab736b30925bb0f5b95a0dfecd4f0158081bfa09d6b9539f123.json.lzfse",
-      "documentSHA256" : "5f33bd0f1c7c79b46dcddcf97f4b3f8f5a6cc14000c6912fbabb57f1eb300409",
+      "documentSHA256" : "3106e25468cd8fe1843c520a1065dc00f80355d9adf428a4f4cd54a5adb8959b",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 3"
@@ -7467,16 +7467,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-8.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "7a33afa8465542516c1d2ec1db4f0753d3388f8f11d8de882baaca386d581e33",
-      "uncompressedByteCount" : 743793
+      "sourceSHA256" : "427eb68e81caefb5097863ce0ff17e4f0e7f161e88d881f8e792416eb326552c",
+      "uncompressedByteCount" : 725173
     },
     {
       "blockCount" : 62,
-      "compressedByteCount" : 8423,
-      "compressedSHA256" : "9571c22a5e9b0e850b92cea6e520783e55bfd5c94a5864fb8966abb21197894a",
+      "compressedByteCount" : 8424,
+      "compressedSHA256" : "2db102a8360606181697fa72aa7bf6a23e83e76505a5d76a533aff00c2227b3f",
       "documentID" : "db72d1bca6c6f8f75fbee45ea0f091699a91577cb2ca65f3f262336a08641745",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/db72d1bca6c6f8f75fbee45ea0f091699a91577cb2ca65f3f262336a08641745.json.lzfse",
-      "documentSHA256" : "5b88d7c62d6f134863175e303b739af87ec6cc84ea85419b624ea602220235a6",
+      "documentSHA256" : "b12391afe9a1885a02c1f77c04244062a0fe68bdcbd762303f86933a236ef2a7",
       "eligibility" : {
         "reasons" : [
 
@@ -7486,16 +7486,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/IX-9.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "683a42f167dae1291542f7970e17e1f55935af765bad2dffa3fb4297932da6db",
+      "sourceSHA256" : "a0bf053d680a914a13e78b17132e47d736fb14a527d53948f0ef93d41296ef4f",
       "uncompressedByteCount" : 53790
     },
     {
       "blockCount" : 10,
-      "compressedByteCount" : 2602,
-      "compressedSHA256" : "a815a04d2668f8933e0ee1089724fafe6d740777e638f4544543a934db6adec9",
+      "compressedByteCount" : 2600,
+      "compressedSHA256" : "5ee7f1c1a4bef4c6bbdd438d3531079d0842273c716ce27734073392372669eb",
       "documentID" : "055424a68f9196dd914b0e04de04ba2b351bcfdb9b6398b00e960cf08eef617d",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/055424a68f9196dd914b0e04de04ba2b351bcfdb9b6398b00e960cf08eef617d.json.lzfse",
-      "documentSHA256" : "783f99a75044f50881419bf3e8afd4eb2c33f28c9843a25c2a5322d2410dba4a",
+      "documentSHA256" : "84efdb8643510553f707b2109012b4d9ebe85f43d436af55dff34c8b1cfbfae7",
       "eligibility" : {
         "reasons" : [
 
@@ -7505,16 +7505,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/V-1.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "c2980179ccd5548ebbc81d20a5aa278671dd60158a3976f0af25dd08456cf559",
+      "sourceSHA256" : "b00cb506ab40fdf29a1ec5e1d71a64dee3bda096e5da85beb396390f7e6c3221",
       "uncompressedByteCount" : 10276
     },
     {
       "blockCount" : 316,
-      "compressedByteCount" : 43289,
-      "compressedSHA256" : "eee6e02ea2525e9d082b037d812902fc33172973a3a5e04c72ffbbbf886872a9",
+      "compressedByteCount" : 43280,
+      "compressedSHA256" : "35cfbda43c9ecb54e3da4b7b654136c6093260bdb59a7b45e91c8585ad980bdb",
       "documentID" : "4f05b63b50d561ed2a18ff265d2ce294713c007b6ed8d3cfb9e6a3e7b11130e2",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/4f05b63b50d561ed2a18ff265d2ce294713c007b6ed8d3cfb9e6a3e7b11130e2.json.lzfse",
-      "documentSHA256" : "5686f56fdf604828d05789440b877503da9bf658dfec74ef93f0bfd3036c7ee1",
+      "documentSHA256" : "b86de3bfe07c59e3a0cd9219b786ece9edbefcd4dd1dc8fcfcddadf9ad330bb9",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 5"
@@ -7524,16 +7524,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/V-2.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "668561614e4c6257096841b153dc132464957a68dcd2f0bca81a9216027b54ad",
+      "sourceSHA256" : "cc21976c55e9673e575a8030ea7927d92276426117137541cd42ef79ddd52d2a",
       "uncompressedByteCount" : 511395
     },
     {
       "blockCount" : 19,
-      "compressedByteCount" : 2976,
-      "compressedSHA256" : "b73bbb6bc1dc2673289861ed310763989acf49dd83285dbd174e3fc175e244d8",
+      "compressedByteCount" : 2979,
+      "compressedSHA256" : "b72381ed7c3204ead04302fc24805f02d762f2a3c163a213cd7d31d9326cd383",
       "documentID" : "56409b5efd32e75d2d0f372c02ece945429fb3a33e9014e4be620b41d859e4ec",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/56409b5efd32e75d2d0f372c02ece945429fb3a33e9014e4be620b41d859e4ec.json.lzfse",
-      "documentSHA256" : "1ed2d61fe663cdd576df0eef51f89577b4e7d88caf15b45a1a77d1370f2bf0cb",
+      "documentSHA256" : "2e011c7c13877f7a93c530fc9a8886241de98c1a755b52fe160496883cab027e",
       "eligibility" : {
         "reasons" : [
 
@@ -7543,16 +7543,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/V-3.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "a62c30edebef3c391d31badc43e7539d3ff3b201e86033ee7746247e68b6c83c",
+      "sourceSHA256" : "3b5e213ceed4397977a09a6667fee9528ed4859395ca2166cbde72f5d3e5f225",
       "uncompressedByteCount" : 15534
     },
     {
       "blockCount" : 81,
-      "compressedByteCount" : 11660,
-      "compressedSHA256" : "2b0a101e67b27b1f85d8952e0c68c7ee83b55dd13b4a41d2660a8ec14fc96f6e",
+      "compressedByteCount" : 11658,
+      "compressedSHA256" : "fc421c5ba3b2b71466843b792b496481916081c76dd30481c34613bf81ea6609",
       "documentID" : "473ec3b20f0766d7c070d0eee5375fef6c797b7bb7e81083ca8ef94703e3e63c",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/473ec3b20f0766d7c070d0eee5375fef6c797b7bb7e81083ca8ef94703e3e63c.json.lzfse",
-      "documentSHA256" : "097488bff331cc51696f3cd688637e8c6190f482d73dfd60662f00af133fcda3",
+      "documentSHA256" : "8cb3552bf61e1db69bbaf7165afc13632914dc2f4e3fce59c7a1844f0cff5d49",
       "eligibility" : {
         "reasons" : [
 
@@ -7562,16 +7562,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/V-4.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "e5bd9f74844e088989e20fa5783d2daf7ca733bf882794f2c977305bb9fd644d",
+      "sourceSHA256" : "f8966fc6e2c63ace97e65f8709f25fe9a7b824332bb78daab16bbf7fbd4bfd44",
       "uncompressedByteCount" : 92803
     },
     {
       "blockCount" : 116,
-      "compressedByteCount" : 13844,
-      "compressedSHA256" : "3e016225b3afcbea3ec5092fa5546a2ba46801e03d5e60fd58c1b988ffc69a12",
+      "compressedByteCount" : 13834,
+      "compressedSHA256" : "8570746bef4db13ec46ea203e0009eb6195beccd94b2d9429f56f399c411aeb8",
       "documentID" : "673e1f41d3307493b7cd15e2027fda664967ec53e6ce2b356d09f3352aa638e1",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/673e1f41d3307493b7cd15e2027fda664967ec53e6ce2b356d09f3352aa638e1.json.lzfse",
-      "documentSHA256" : "89916a725066dab976fcae26fced1e1181d43ce42b5257ab2755d88ebe5e2554",
+      "documentSHA256" : "71b7d532851ef32ddf58bc92ac2d855f65ac942c89a5ed1e2cc46f741727eaf6",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -7581,16 +7581,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-1.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "1f4bf2da8dc6dd4709bcedb3cd1ce54bd480c9809d91582f114a505ea2de6909",
+      "sourceSHA256" : "89ee7ad08c17fafce2854d1936b959b59680d169a18338b99ed76f16e134c991",
       "uncompressedByteCount" : 151566
     },
     {
       "blockCount" : 1766,
-      "compressedByteCount" : 547189,
-      "compressedSHA256" : "028e2201332c122ccc45c49095a9c797c442213f40ebd713057188da417175a8",
+      "compressedByteCount" : 547122,
+      "compressedSHA256" : "9b1210da63d54285a33a44b94d95d455ed728514c2b9429ae0bf81c697a43007",
       "documentID" : "8a9d79ca37f844749b17b38e1cf2cfff337082e87d133ae9f5cffbb4dea586fc",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/8a9d79ca37f844749b17b38e1cf2cfff337082e87d133ae9f5cffbb4dea586fc.json.lzfse",
-      "documentSHA256" : "104dff024c2e89899716187d7c39ca6ae28821b614bd03e65f0d56398551b4c4",
+      "documentSHA256" : "956b4edcfc05ec277955c9331dc8bb55f0d260e600a4987a55840d8a9edba8e1",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 11"
@@ -7600,16 +7600,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-2.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "e67138b12bd498709980a6dcdec765840dacd3b5929b3b8f6e5be1be56d96f30",
-      "uncompressedByteCount" : 2747169
+      "sourceSHA256" : "bd6ba78602b347362a77087df104f2b6c0d405f3eb98678f0f7bb104a974aea4",
+      "uncompressedByteCount" : 2725707
     },
     {
       "blockCount" : 153,
-      "compressedByteCount" : 20844,
-      "compressedSHA256" : "9af9969e4a69bb1a462a25c0a983b8b1c1818afb70a3114d8dadf35f6c1873a6",
+      "compressedByteCount" : 20836,
+      "compressedSHA256" : "b310d566c6d4333860df8cd4c23d9645f9606f06117fec4ec2076fa4bd8373c5",
       "documentID" : "ae653ec92fb68078cd5e654d7323cd31c3e325c29ea4267f728777731c3bd3ee",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/ae653ec92fb68078cd5e654d7323cd31c3e325c29ea4267f728777731c3bd3ee.json.lzfse",
-      "documentSHA256" : "e8a818286680808405dd5c0bbd4fd6c3c4fcc5af0aef16c29a37f94c18bc94c5",
+      "documentSHA256" : "8bf090e4cfc1002ef66f8c2ad808be407765795bc3b4e17261e9ecfa9b73ae66",
       "eligibility" : {
         "reasons" : [
 
@@ -7619,16 +7619,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-3.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "e7940f08049bc0019eb6e8072cc4d5dffbf8e3b682cf0fc3454d12007ed7d9a8",
+      "sourceSHA256" : "1be1c2ddc768c8f365ac924be512602816c26ae29a5b354cf641fd6cb26ee58f",
       "uncompressedByteCount" : 146040
     },
     {
       "blockCount" : 325,
-      "compressedByteCount" : 63867,
-      "compressedSHA256" : "5e52e317e65e3536ffe346cc6209d71eb7a3f34098633cf617e09fb91ba8c29e",
+      "compressedByteCount" : 63868,
+      "compressedSHA256" : "ba6a34e2f4194818a242a3eab53e463d162cd64742f371dd19c64d0255d57d8b",
       "documentID" : "b9c3fa5dae397d1209b6bbc22d3528340be69d497d63ba3fea8a15e81194ed3c",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/b9c3fa5dae397d1209b6bbc22d3528340be69d497d63ba3fea8a15e81194ed3c.json.lzfse",
-      "documentSHA256" : "1d8c1086353868475af368872855c3b1edbcd6e3a54216716d8b853504c16819",
+      "documentSHA256" : "d08096cf22a3b00274f1718456265fa3dc54c723af34781c13353bd436661203",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -7638,16 +7638,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-4.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "2b91e184cda0ef651f548cfc5e0fdf06edd8b990e3f84055fc577fb557a22287",
+      "sourceSHA256" : "3355082957691675a352fe1d931b3de64866a80a190a4bee8c481995b8c93e83",
       "uncompressedByteCount" : 620872
     },
     {
       "blockCount" : 111,
-      "compressedByteCount" : 15623,
-      "compressedSHA256" : "d7205078c3ece97de47404ba1c388ab3c817e06f96abf2dc05f3becb04e1a9b5",
+      "compressedByteCount" : 15607,
+      "compressedSHA256" : "14f2e3dbef3ba323e49eae53add1afd2fa878da085f823a785c3354972b2f1cc",
       "documentID" : "ff37c902ca8dc93a444fd9a8ba9545d65f3b254ad479f458bb1cff49ca3aae7e",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/ff37c902ca8dc93a444fd9a8ba9545d65f3b254ad479f458bb1cff49ca3aae7e.json.lzfse",
-      "documentSHA256" : "2fd421af2e51951741cd1e281ff97cd472d938d744882400fa0ab0aa4b463fdc",
+      "documentSHA256" : "36a0856ed2d65d3e5e393f17189ba8dc20d7c3b358ce08f9ca6b4981ac94d9b6",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -7657,16 +7657,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-5.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "83ffbee5f17c136cf531774bcfabed5d025686361da1117c93a91c89934f8e0d",
+      "sourceSHA256" : "c65da88ec76dbd11ad1726fe111d9eafe7608b1484342f9997d52320e36b604e",
       "uncompressedByteCount" : 194402
     },
     {
       "blockCount" : 310,
-      "compressedByteCount" : 53246,
-      "compressedSHA256" : "d50d757a00a54735b491ff8ee802618821eae7512aac64dee22e391d240a413c",
+      "compressedByteCount" : 53218,
+      "compressedSHA256" : "445397ba05842cf56d2b08b6e1a8955a69db7e7ea17d28f1769d6df0c08146fe",
       "documentID" : "746190adaa9c20bba9da8d6e4376d7903989cc67698218442ced49f53fb99749",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/746190adaa9c20bba9da8d6e4376d7903989cc67698218442ced49f53fb99749.json.lzfse",
-      "documentSHA256" : "fc45e7637d60dd4fae00acee3c000b901d18a116241ffc1d9bb8ff00918acec0",
+      "documentSHA256" : "ec8725fd74e1f5172adede947f193835ee792b0cf8d3bc26b55929290ea00deb",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -7676,16 +7676,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VI-6.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "e92c05322d7d30361af8855d8ce9b214d41295711d4c46bd39f2a16a3be0c15d",
+      "sourceSHA256" : "2b03e6192d344504fbe4c8a4aaa4e0103d2224e056a4c2b92030db32d2710121",
       "uncompressedByteCount" : 477040
     },
     {
       "blockCount" : 11,
       "compressedByteCount" : 2226,
-      "compressedSHA256" : "3f5229a74d4fefb7f774e0cef3058099922106e52a953e62d33d0eb29782de13",
+      "compressedSHA256" : "83c6d9cece60e71896ef745ae0a3a69005fbbef9169d7a83a19c8139820c3064",
       "documentID" : "1a6675d4c91966bee5436b470a6f8816545c93c4fbc8f362a88463a4b40d10f8",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1a6675d4c91966bee5436b470a6f8816545c93c4fbc8f362a88463a4b40d10f8.json.lzfse",
-      "documentSHA256" : "8a70ba748ebf4499016eebb15ac0920d06ae29bcb7367e9ad3c7b41dfa1972f0",
+      "documentSHA256" : "b15d9c7a87dea5fabed8f2f105414fb72d888721ba079fcb0c087374d9240bac",
       "eligibility" : {
         "reasons" : [
 
@@ -7695,16 +7695,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-1.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "f77c5490bbe5676e097ef2ffbb751919f0575fbfdedcfc7e5e5b0364003f6fc6",
+      "sourceSHA256" : "8cdb763241f3af709412f5f60e8954beb3bee226ca07dfa4256122367d6d90d3",
       "uncompressedByteCount" : 8741
     },
     {
       "blockCount" : 84,
-      "compressedByteCount" : 12007,
-      "compressedSHA256" : "03926bbcbe17c850ea88b37e996f24e0914b653fcc55f65678c54dd5e47d48a3",
+      "compressedByteCount" : 12006,
+      "compressedSHA256" : "1c82cc28e8662442f998e16a1072b54dae1af3814b704cca5bbe415252ce717a",
       "documentID" : "0fe73739dc0b137f22292983dc10fe387f8193df19c2903c696a9e0678f062c7",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/0fe73739dc0b137f22292983dc10fe387f8193df19c2903c696a9e0678f062c7.json.lzfse",
-      "documentSHA256" : "1fcdbd8f87b02db40e33d64c6256448ec1d50c1330a98348e1109785d575c507",
+      "documentSHA256" : "fecfb2e4d8fdee01035d87305d03584780963652146555403ab9e1725ac7e265",
       "eligibility" : {
         "reasons" : [
 
@@ -7714,16 +7714,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-2.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "28b78cad060bc3ee4470308c00c5b4ec5786c16d4de74dfe44241623f0ed4cba",
+      "sourceSHA256" : "83130e471893608b905b72cc51172dc2bc5ba2d3717e06621aae38ed12cd259e",
       "uncompressedByteCount" : 78775
     },
     {
       "blockCount" : 590,
-      "compressedByteCount" : 106375,
-      "compressedSHA256" : "85bda03862262c6bf7c592acd9ed709b0ee7f756bb58b61a80a8886e2cd96bca",
+      "compressedByteCount" : 106408,
+      "compressedSHA256" : "cd9a6396394b852a1a3aa934578835ab85ffd9cce96a3f19c0684faf1029d3ee",
       "documentID" : "6574c13fafab526a66310491a25f407a1e50cfd843678a06d1a1c718159d81f5",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/6574c13fafab526a66310491a25f407a1e50cfd843678a06d1a1c718159d81f5.json.lzfse",
-      "documentSHA256" : "02b88b913210f2d468a003abf86b39d145c469342ea10ce3c3f321ccc86ad1ee",
+      "documentSHA256" : "cd1b65a39806d7a18d62204e228eeb4da91c81f7b3631c59f152d8a0844327ef",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -7733,16 +7733,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-3.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "c9ddedbcaa50271037efa45c00637ae96579d825d24f1dce36c45132b647c8f8",
+      "sourceSHA256" : "a6029b94c586bb9dfd93c2c490498816830e14c3a8947852c1879a84841a86d3",
       "uncompressedByteCount" : 882775
     },
     {
       "blockCount" : 868,
-      "compressedByteCount" : 191575,
-      "compressedSHA256" : "404a6fdbe22eefdd32379035b802f33ae6c27096908a03230d5f8d2281ba2a15",
+      "compressedByteCount" : 191488,
+      "compressedSHA256" : "fd53151d01e8232f8b7beb398401a5175c47296372458bddc0c9ed6546727a64",
       "documentID" : "13b32f4886d2d5a2a119f0164001c3b08911ee9d4095930ccceb1b085c3c020b",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/13b32f4886d2d5a2a119f0164001c3b08911ee9d4095930ccceb1b085c3c020b.json.lzfse",
-      "documentSHA256" : "9d7582f5e00a62bc582ba0f2f956aeea219a1a57fe3279b7312522a7bc6657c1",
+      "documentSHA256" : "5765474914af1fe01cf3e029b8885d5bad2424c4a97b6f607e04e8c84deab367",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 3"
@@ -7752,16 +7752,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-4.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "1476b5ff7774efa59e85d612482583cfe3c88df904d690670b6c693d1e6f0dc6",
+      "sourceSHA256" : "12d8f770bae69682eb1340f5d78b578e720f1520d520e2d79ce284956b26f62e",
       "uncompressedByteCount" : 1715065
     },
     {
       "blockCount" : 89,
-      "compressedByteCount" : 18493,
-      "compressedSHA256" : "1c3192983c15af2b326575cec1eda2580cee4509d3d59010b48801eb741dd9f2",
+      "compressedByteCount" : 18498,
+      "compressedSHA256" : "821eb0b7670162c061ed45da68fa668d8b14873e2f5ada7a41992181f2a35e86",
       "documentID" : "8de054f7ae5a8e567fbd479c48fc57fd7a2d59b9a56350a8cbd07a89b63a0940",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/8de054f7ae5a8e567fbd479c48fc57fd7a2d59b9a56350a8cbd07a89b63a0940.json.lzfse",
-      "documentSHA256" : "144bb4ca46ca18748de9b2ab5a7a29ab33603e9a2d7ec9366a3fde61113e2aad",
+      "documentSHA256" : "8e7a430c49ffda1aab9d6819c378a5f74b4a0191244de8da06c0440b5d18bfe7",
       "eligibility" : {
         "reasons" : [
 
@@ -7771,16 +7771,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-5.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "a5bfec6dcb352f5f9f30b0cedb6798c3c27dbcbc0dd61ac6e79f14bcf5e43d15",
+      "sourceSHA256" : "5fae9219c4d3872ad68850a052604242fa3534ce1e22b230de249c5e1cc1db95",
       "uncompressedByteCount" : 155271
     },
     {
       "blockCount" : 79,
-      "compressedByteCount" : 7750,
-      "compressedSHA256" : "2deec31d10651807e21106bd8813c9dbe66791102459f79d5de3e98dba81b3fd",
+      "compressedByteCount" : 7754,
+      "compressedSHA256" : "989152a2048eb972b69dc592cd0f1570f62c61fab79eee9993e44f0cb7c7fefa",
       "documentID" : "cb18c6bb1a522204fa1d407b02e2dd1080a26f23cbc566db6a49be05d38c6590",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/cb18c6bb1a522204fa1d407b02e2dd1080a26f23cbc566db6a49be05d38c6590.json.lzfse",
-      "documentSHA256" : "ad2a22ef2e96d3bab5721b65f948ad262a20c5c79f5cea3b4a5270ce89a8cfca",
+      "documentSHA256" : "aea9121cd20700c7672df0335832df8942c448b725d1838fdba91c0746c960e9",
       "eligibility" : {
         "reasons" : [
 
@@ -7790,16 +7790,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-6.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "40b1fd90f688c25325ce6f42d2f6e1fb1bfbb742500b72726f55d4c4af7b92b9",
+      "sourceSHA256" : "d27dd0dce74f749a4ede94b45a4952a24dc57f4a8ca30b80b1ff034708400111",
       "uncompressedByteCount" : 53227
     },
     {
       "blockCount" : 138,
-      "compressedByteCount" : 17562,
-      "compressedSHA256" : "de43412e7393e7fb04ce1afd47b103963746abe805e6f659a60a089403263ab6",
+      "compressedByteCount" : 17575,
+      "compressedSHA256" : "753e675313c6e0bcd54e62a43c8ed45a053b339a2f629de865fc68a7616c53c7",
       "documentID" : "e9215b0f8bb870fdf32d2cd1ee35f41d358fccd59d246bdf9a27fb390515cb62",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/e9215b0f8bb870fdf32d2cd1ee35f41d358fccd59d246bdf9a27fb390515cb62.json.lzfse",
-      "documentSHA256" : "b687d007cbc5e93982d79c611b715bc3efe7037e1e163295b14e563cc730d7ed",
+      "documentSHA256" : "8fe101e7ca9772e17419c1cee429c16c54b5667eea0bd17bd5f20cd3255fa7bf",
       "eligibility" : {
         "reasons" : [
 
@@ -7809,16 +7809,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-7.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "b710a40c930bfb6f738e9143acd17def26b6910d54cd802921ac212b67b0b431",
+      "sourceSHA256" : "70f49a2bd28e0b72d31f54bb4baa873e095b3171e6091aa83aafcb507f065763",
       "uncompressedByteCount" : 138384
     },
     {
       "blockCount" : 337,
       "compressedByteCount" : 49460,
-      "compressedSHA256" : "9c2332288ca2d4f66c476b382e03e61f7ceff75c851c373f41546352ed27d05f",
+      "compressedSHA256" : "3bc0e0e86684ccb6eab31da44d6d4afdf5c6eb1e301edc02302fe6fc8d2ad779",
       "documentID" : "4bad2d77d413192676242cd1b9961baf435bd9ae249706dfef48bcba1a67356c",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/4bad2d77d413192676242cd1b9961baf435bd9ae249706dfef48bcba1a67356c.json.lzfse",
-      "documentSHA256" : "187ec72866f8586cff9e9e7e291d429570dbeb71a3dea5387f6f80aef23d0500",
+      "documentSHA256" : "194902e6b14c092c013e2bd313b64b1c8e4a3f1905587cf7b741c0f4eef43a04",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 8"
@@ -7828,16 +7828,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-8.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "5b6986da797451307b42c6f234a254b49badda18dd810bf2155676db872d8a8e",
+      "sourceSHA256" : "fea2e1cdeb003abb1dfd762082888dc3d64aa2ed9b169a5828f8bd92bfa87fe5",
       "uncompressedByteCount" : 478601
     },
     {
       "blockCount" : 132,
-      "compressedByteCount" : 21454,
-      "compressedSHA256" : "53193949efcbd9ef85dc26ffacc65b60ce70065eb75329a64510f74336881ade",
+      "compressedByteCount" : 21442,
+      "compressedSHA256" : "5a53d2ad6096165631f558ecdddd9af574ffc6057f49173f48ffe4b477be0ae1",
       "documentID" : "3e045659fa4ff3d924a897ef50352fa97bc17c726e7ec87b0b48b07ee9d20c8f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/3e045659fa4ff3d924a897ef50352fa97bc17c726e7ec87b0b48b07ee9d20c8f.json.lzfse",
-      "documentSHA256" : "165a6e439c9ee07b4fe823517abfb738fe38b67397ddff93c21c9e1f2046346a",
+      "documentSHA256" : "59752f0b7bc8b4a58ce4656828b4f0b948178520d979326f5419c3e4482e89f3",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -7847,16 +7847,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VII-9.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "b17ef6baae572accdafebe6aa561962a388c3b4e2f8513d0f9e5c66b9e91d97c",
+      "sourceSHA256" : "931583834f042c4e567ef1c16506d0d58147933167ff4219aae4574f5829841f",
       "uncompressedByteCount" : 160586
     },
     {
       "blockCount" : 2228,
-      "compressedByteCount" : 359144,
-      "compressedSHA256" : "2b541bd1efeba38122bb66f6744e41306f226fbdb39dd7f340290468bcaf9120",
+      "compressedByteCount" : 359102,
+      "compressedSHA256" : "3a7d759d828e23a94e0b805845006341642ccef507fabda5c26f037b729264a2",
       "documentID" : "0ac89f3ef985a26c00db5ce5cccf2e929498d9691dd8825f85fccec105d0ecca",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/0ac89f3ef985a26c00db5ce5cccf2e929498d9691dd8825f85fccec105d0ecca.json.lzfse",
-      "documentSHA256" : "2b6bd4f848350a3760d134ee19406a711af47c491b08bc3866425cd0f0dbf15b",
+      "documentSHA256" : "6bed69bddb0bc61da6111cfed4a07234bec8eea1da27b105cc46b76465f4ba13",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 32"
@@ -7866,16 +7866,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-1.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "db87bf030b1f85a84099c3628e807ec63e3de4925f91dd6d13845f468983fcce",
+      "sourceSHA256" : "7f1fbebb6c59e7e638f2c7b93416a6b616e009e81ff7af84073fb86c8461815d",
       "uncompressedByteCount" : 5454829
     },
     {
       "blockCount" : 147,
-      "compressedByteCount" : 21348,
-      "compressedSHA256" : "f0706a7afcb02528576f69ea25803749a5602b5a0be1a6d6232374d71e3a0521",
+      "compressedByteCount" : 21354,
+      "compressedSHA256" : "cf13f71f9e21907ed85821bd9157be98cff9fc6591f71491b0788d36bd3fc5f8",
       "documentID" : "1d563a85d6f9c2b4bac34fc9f701b2d909b4c5550a93331d83eb5eb799d77283",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1d563a85d6f9c2b4bac34fc9f701b2d909b4c5550a93331d83eb5eb799d77283.json.lzfse",
-      "documentSHA256" : "e1d08ff513fc6aa1a8de17dbbc0d7102ff540eae4a8301ca6906710fdd40af55",
+      "documentSHA256" : "3afe0f0967faf9d3834a133c955c4450710cc3d4c744cf363b13f491cc4ab985",
       "eligibility" : {
         "reasons" : [
 
@@ -7885,16 +7885,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-2.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "930c910eb6d9f9b3276f4a463243052c7726660cef28382af8e9dc5473576ac6",
+      "sourceSHA256" : "0a67d6b82ad4806079d9b32f8ab11588a10aadef31c51b87c3f5c6efa2650f71",
       "uncompressedByteCount" : 153127
     },
     {
       "blockCount" : 25,
-      "compressedByteCount" : 4169,
-      "compressedSHA256" : "0f104f9fe2f4e3fc2c4d8e185f9e9447bfd223a1a88430d8569d1b80bc880f23",
+      "compressedByteCount" : 4176,
+      "compressedSHA256" : "a117fd4410147d89194aeb613b7417b518c13e901fb055df83a1f6a9999ad1df",
       "documentID" : "f7334d0b757c16f94717e359b11ddc3e636b1064cfa00c80845f1a96e22bab5d",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/f7334d0b757c16f94717e359b11ddc3e636b1064cfa00c80845f1a96e22bab5d.json.lzfse",
-      "documentSHA256" : "7d2224c6e298c81c4d14b9f17b8e03100e91ea9417bee6a998907c0c0e49b82d",
+      "documentSHA256" : "c6b339baa2d32a03828e22e134935dd99e734408987e5b408ec593a8865dda15",
       "eligibility" : {
         "reasons" : [
 
@@ -7904,16 +7904,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-3.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "49096041d1c00e40cacd290f5fa5cf101a73a50874d71c02bdc1268972a3286d",
+      "sourceSHA256" : "2e6774a8da69fa9371ec30d6266a32b77afd0c43710e2c34d56f005ca9a45e05",
       "uncompressedByteCount" : 21281
     },
     {
       "blockCount" : 248,
-      "compressedByteCount" : 31970,
-      "compressedSHA256" : "3cb476cd2828fa894a51a1b5fa4494eece99118bf0ea01e27528a8f072d8f0ce",
+      "compressedByteCount" : 31972,
+      "compressedSHA256" : "004ec264ad6f5aceb9fdc5cc4944e75937b7bc3a220f5d1318ce1f2edd704ffc",
       "documentID" : "87e9033a553cbc525c836d17f5882617461cf63d08f3586a6418c270d4969876",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/87e9033a553cbc525c836d17f5882617461cf63d08f3586a6418c270d4969876.json.lzfse",
-      "documentSHA256" : "38f76887636b7e42cbc87a53e9bc3571b2d880df29203db80e07dedf90abf63c",
+      "documentSHA256" : "b0c811a7c2b6c70a211d4ac7016d77e29b3b2b83e6e8f0e05a629b17844588af",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -7923,16 +7923,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-4.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "d6271c8b8d87abe6ba4f6140c3dd44d03140baf90fddfca26b0e504cd3e8d7d7",
+      "sourceSHA256" : "8c7007d18a823977eb1001e4a3664e5d26d014320db8e9a1950227091d4d957a",
       "uncompressedByteCount" : 265345
     },
     {
       "blockCount" : 53,
-      "compressedByteCount" : 8613,
-      "compressedSHA256" : "d388d0406422ccd97102234a9a14371b8bada11a1882d9ba86f0e9cdedbda2f5",
+      "compressedByteCount" : 8624,
+      "compressedSHA256" : "a1318e3df6cc7ab3c09ae285dd07c9a70a52180bc1e362b15be6dbb143a4d042",
       "documentID" : "9a1b07eb46c33ef66082d30d19b72e8940c30203eff7f8228735f7fa52ca8c1e",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/9a1b07eb46c33ef66082d30d19b72e8940c30203eff7f8228735f7fa52ca8c1e.json.lzfse",
-      "documentSHA256" : "cd03580879639c91657e5b2dfcd143d3e41bc6e7d3632d5c5d2fbd96339e164a",
+      "documentSHA256" : "fe9611c8b6496b9d8fac3ece01b80cdea27139389a4dc409989c9578f43277ea",
       "eligibility" : {
         "reasons" : [
 
@@ -7942,16 +7942,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-5.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "ad9b173485f98dacf8d8fb7c72edac1669133bc61a7aa10402b09f5e5cfab4c4",
+      "sourceSHA256" : "6eaad9831d8ef1738a44d9a7cfaf87b14654c9927abaef23be7938d776a8f5d4",
       "uncompressedByteCount" : 52334
     },
     {
       "blockCount" : 101,
-      "compressedByteCount" : 12084,
-      "compressedSHA256" : "7d236890799ed486d3766e1c763ac2ed4498056f7a96ede61319fe406bb28ae9",
+      "compressedByteCount" : 12063,
+      "compressedSHA256" : "b220daf25a93feb1196762a5ba6678c92fb3c681f1494a4ea3f9f074d5e417f1",
       "documentID" : "1eaf1ef3ab7c75ee5487915931a29685b3417ce3b064ed3d7b36a370dbbf09ab",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1eaf1ef3ab7c75ee5487915931a29685b3417ce3b064ed3d7b36a370dbbf09ab.json.lzfse",
-      "documentSHA256" : "2f46ebbc37dbab4d6f5c198ec58274c973e6f16cf859c2482ce8cb5fefd93271",
+      "documentSHA256" : "029434496a24054edcb2be52bbf67b382d16c7b94181199b32340a6cb99a1ab3",
       "eligibility" : {
         "reasons" : [
 
@@ -7961,16 +7961,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-6.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "3dcff2aeed2a35b26b303599795164fcbf081b62b04963ab0e72de4d9320cfc2",
+      "sourceSHA256" : "997c5dea0b3f54f5db19ecde03605f282a5313c0c3071a0fbd20143094d4c209",
       "uncompressedByteCount" : 79034
     },
     {
       "blockCount" : 400,
-      "compressedByteCount" : 57269,
-      "compressedSHA256" : "23bce21a1d31434cff25d8fa608745b65707b20ac31e9bb4b3c02758387ed162",
+      "compressedByteCount" : 57272,
+      "compressedSHA256" : "d534d595f893d9dafe24e6ac500fc615cca35b59b3950a914f538c1acf6a5d5d",
       "documentID" : "9de1c83ef3680fd6cb7fbbfb42544d50e1ac133f0bc13b97852d6f534432932f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/9de1c83ef3680fd6cb7fbbfb42544d50e1ac133f0bc13b97852d6f534432932f.json.lzfse",
-      "documentSHA256" : "2a68445c2064c96d3e19e176593071caef0877f63a9da91d8c5e924d3000ba70",
+      "documentSHA256" : "4d1e9b6e06f593afb2923182ee95070cc30e84988067bff94b2a9b927b052b99",
       "eligibility" : {
         "reasons" : [
 
@@ -7980,16 +7980,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-7.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "d652bd0cd8458f7fd789e8be40d99e7c0229442c47e50a02d24f87cedf388e9b",
+      "sourceSHA256" : "64360cae502e43161003feff6e74166dd882aeaa922cd5acc1b4219268cb8112",
       "uncompressedByteCount" : 443667
     },
     {
       "blockCount" : 131,
-      "compressedByteCount" : 16771,
-      "compressedSHA256" : "e2313fbb833860b904ccb8c5082a082023a0f514674f3ac41cfa0069dd627ff0",
+      "compressedByteCount" : 16764,
+      "compressedSHA256" : "a5b3b63a4cda0b893eea787f9e389ef3bd8b1dc202733375910ad4bba67c920c",
       "documentID" : "842f169033bf9e169c70bf2671822933c817be5f7c1175b18a6fd509d8796880",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/842f169033bf9e169c70bf2671822933c817be5f7c1175b18a6fd509d8796880.json.lzfse",
-      "documentSHA256" : "5d7f132348db8a73c4f08bcbdf07301794c11eaec9301b331148267a7331a986",
+      "documentSHA256" : "6f0be90150242d6153386d00dcc803bb2414e202224977fb01b84110559adc94",
       "eligibility" : {
         "reasons" : [
 
@@ -7999,16 +7999,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-8.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "38954f6a1155796fc6cf22df1a0e147f72176d9bfc3aaf4b89de02ab0e9ca804",
+      "sourceSHA256" : "00a7c647de8807303da1ed828a931a845173b52c2709e9d9ce5b2da0f031c139",
       "uncompressedByteCount" : 135061
     },
     {
       "blockCount" : 73,
-      "compressedByteCount" : 15074,
-      "compressedSHA256" : "0db18c03724837b756c8c6c4b9a3770269ccb3624f36d643e43a3490e343ab6e",
+      "compressedByteCount" : 15087,
+      "compressedSHA256" : "ee6998a91e4052dfaf4b273fefd120ea8f1edc93e413c70522d5dd4e267f695a",
       "documentID" : "daf025fe95366b266071008cd81da5c86176e10c55d1e4b2ee427798e43c4a17",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/daf025fe95366b266071008cd81da5c86176e10c55d1e4b2ee427798e43c4a17.json.lzfse",
-      "documentSHA256" : "fc0f2ceb4b34c36fb0c6083eddb856a408317036f4d8c43989b29f28c0f87dbd",
+      "documentSHA256" : "0a328aa83d338c55998461c324a6d5009e35f3d72648bbe512b5793cc76c6f6a",
       "eligibility" : {
         "reasons" : [
 
@@ -8018,16 +8018,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/VIII-9.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "ff2a0bf7296ce91a51d1d72c16df23182a9fa927ea9cecafed10469cf6e842b6",
+      "sourceSHA256" : "637cb11b03ddb37b507fa052260f773d6ebe60ef526b63aeb89634fc31505644",
       "uncompressedByteCount" : 125715
     },
     {
       "blockCount" : 473,
-      "compressedByteCount" : 68559,
-      "compressedSHA256" : "dddf5acdd155a5e3615b4bd78e7a1e7b516c4d8ce70254ce4d45a70e4bf36242",
+      "compressedByteCount" : 68583,
+      "compressedSHA256" : "c1ffe3619f3dbda68dfec656694a8bbe500c38e45db2b119e1e973c1e21310d5",
       "documentID" : "8964f73f35c9d3b27b6c453fb665e1f3ff7421e09f4264bbb44bda46ee771c51",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/8964f73f35c9d3b27b6c453fb665e1f3ff7421e09f4264bbb44bda46ee771c51.json.lzfse",
-      "documentSHA256" : "e3d02009d4d7aa9967915d8f425e02b4706f14a08a1d7fc9f2d04585d65815a8",
+      "documentSHA256" : "632cce5e251f3c5e5306e5264da965ed458a89b96a2d4b170f48102180b528aa",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -8037,16 +8037,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-1.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "0ae0e59cc0811aca9418bef4bc5d77743aeb37a41a0689055f91c1e2a15ffd0c",
+      "sourceSHA256" : "c478c873caca2512a353575be41e38b9e744b2a63d0e5f0a0de8bc0dc4f2cd58",
       "uncompressedByteCount" : 592898
     },
     {
       "blockCount" : 119,
-      "compressedByteCount" : 85724,
-      "compressedSHA256" : "4c62fedac3765fa308830c0df2ebe5cd098716c42a1acec1ddbaa7b13929552a",
+      "compressedByteCount" : 85717,
+      "compressedSHA256" : "86121159189bca7e508a6c4a8a354de7d19aedfbbdee091ea046dbce760c085a",
       "documentID" : "b85e39a36659d40e9766e559928e92a3382a827bd36648a18f16b4605a0b6018",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/b85e39a36659d40e9766e559928e92a3382a827bd36648a18f16b4605a0b6018.json.lzfse",
-      "documentSHA256" : "823083b9759c1d001bedc81da755906341d4df4a90133723059bb7739965677e",
+      "documentSHA256" : "e3d71b3da73c55e3b2b2aaa2429730a6c7b97ff59d5107528b1abb533f4c2782",
       "eligibility" : {
         "reasons" : [
 
@@ -8056,16 +8056,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-2.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "9f826fff1d6b9e696830a2a476b50cc34c4496008bd1191f7ef5817009694eb4",
+      "sourceSHA256" : "2b43ef9440f1085df8a8690d9d24b42f7b588bffdfc26572faee9e43111e3f5f",
       "uncompressedByteCount" : 184104
     },
     {
       "blockCount" : 69,
-      "compressedByteCount" : 11153,
-      "compressedSHA256" : "db67d4eaccd869f47bb37e191711315c957004a781cf291069a3ee9afbcf7cde",
+      "compressedByteCount" : 11154,
+      "compressedSHA256" : "8f7ec0fe9d09bae38c6de04965ce2d5f91fbb75f752b867379c055bdcbbcf7d7",
       "documentID" : "cd6d305f5a28aa3760f9c7bea785c9c1f40a653d204ce4459bd0ac77f207f3d0",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/cd6d305f5a28aa3760f9c7bea785c9c1f40a653d204ce4459bd0ac77f207f3d0.json.lzfse",
-      "documentSHA256" : "f610ae18e9637a4f8d38a06dd1ab15714a6e58e2a6940379d8b688f32f407a77",
+      "documentSHA256" : "e121783479c62c16df9f65f948f01322cba104d1e870263dc4cea82a8dff22df",
       "eligibility" : {
         "reasons" : [
 
@@ -8075,16 +8075,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-3.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "c004d6912210142d269bf1dde3eeadb0397e444d155ae9f1e2600646598d4b67",
+      "sourceSHA256" : "5d1f3605f431754e6973f0bce09604443563deb2d4608d3cc3e5175d6b222e0e",
       "uncompressedByteCount" : 78765
     },
     {
       "blockCount" : 483,
-      "compressedByteCount" : 58265,
-      "compressedSHA256" : "dd24c888070af1356730baf0fffcd6a57faa3173ba952d763f4a486b16731be5",
+      "compressedByteCount" : 58279,
+      "compressedSHA256" : "0b40b642ceeb1b3adbabe8e0d45d08e1f6854460727a768f2d9360c4d74e6741",
       "documentID" : "ca654ea9e332a271c1e383b3da4bd0be928335228ca134367df4e75db8980c73",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/ca654ea9e332a271c1e383b3da4bd0be928335228ca134367df4e75db8980c73.json.lzfse",
-      "documentSHA256" : "f3375b7ba6de2689e2cca926977762e69cb093667e09271616204387fabb27bb",
+      "documentSHA256" : "72f2539bcb2e9c37a016bd4f065e19ffef3893b8436d3ea1fa2708be1cc7ce7f",
       "eligibility" : {
         "reasons" : [
 
@@ -8094,16 +8094,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-4.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "5c592a96e85e3cb11f4761f57c45314a7f27714cb3b2ac932373bec6ed57e624",
+      "sourceSHA256" : "a96ddc04962adcf40434ef0d3bbbc13fe063d8efbf3da215545f231e89aa5ce7",
       "uncompressedByteCount" : 427842
     },
     {
       "blockCount" : 626,
-      "compressedByteCount" : 84569,
-      "compressedSHA256" : "139934a23c6673f85fac43048780d52f43d988de42f4b9435dfd6adf63a72b5c",
+      "compressedByteCount" : 84523,
+      "compressedSHA256" : "75506887b42cd36cad324d896e4fdc3654af5e1afadb217e0ef83b276e6f3814",
       "documentID" : "82bc1ad909e9127b6d9e200db7f2eb3bb94ae47a0444c31e31cc8b0d5443807f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/82bc1ad909e9127b6d9e200db7f2eb3bb94ae47a0444c31e31cc8b0d5443807f.json.lzfse",
-      "documentSHA256" : "ffbaf3d119ebbb892a2313afd2e8252f9c9638f89204c1710097dc2e2b1988d5",
+      "documentSHA256" : "cff401e38e9c4e5acf9c10828c6ec8c82a5df23917cfaec3604518b358894a09",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 4"
@@ -8113,16 +8113,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-5.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "d548d7d3bb1ee26528a1f0d816725215f67135c7d921ec9ad9acdf9d555a1b27",
+      "sourceSHA256" : "bbe7118465610e712918d6c94f5eef64de93bc62507444f8f523b3766c537221",
       "uncompressedByteCount" : 707203
     },
     {
       "blockCount" : 119,
-      "compressedByteCount" : 13586,
-      "compressedSHA256" : "144c30c944eb998017062106463717278ae41457d8c012ef4ac1c25b74c6186a",
+      "compressedByteCount" : 13587,
+      "compressedSHA256" : "08df6e823d29daa4b04a201b1e057d0ccec266be81a848354aebcf93dafe1595",
       "documentID" : "89f5f06ceb75f789b2f49978cfd4dcab50a844964b6bf9c0b7d0adb01172dc94",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/89f5f06ceb75f789b2f49978cfd4dcab50a844964b6bf9c0b7d0adb01172dc94.json.lzfse",
-      "documentSHA256" : "41d6f4d4640cd922ca9a4a45458abf4480a860babb7be1c6b44be0ed10bebc2f",
+      "documentSHA256" : "91dba6aa2fd465e9181673468e80fb3224faf8e05e16431f68abc308fea1772e",
       "eligibility" : {
         "reasons" : [
 
@@ -8132,16 +8132,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-6.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "7eea2893d017333d0485dc4294444f24fd7200539cb95e219ea021c4885703c0",
+      "sourceSHA256" : "537e0eba94b39486b89d5082cbd4bb1f0b8e9b3688af726fe92309cd8a64abf9",
       "uncompressedByteCount" : 95825
     },
     {
       "blockCount" : 542,
-      "compressedByteCount" : 78786,
-      "compressedSHA256" : "bdbdc07f566cebb16198385507042c28343b566071bfeeeb452539f6378bee48",
+      "compressedByteCount" : 78757,
+      "compressedSHA256" : "7cc1df72e85cc23b3f3804c9850caf88891440857863ce4bdd3d2e5dc573174a",
       "documentID" : "0927db9cbadecb7759050eece409c26f7637d03546035ee0fc80b1f1b8ab7185",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/0927db9cbadecb7759050eece409c26f7637d03546035ee0fc80b1f1b8ab7185.json.lzfse",
-      "documentSHA256" : "d1f489dcf2f97fb118046d6446ccd88df696430d9351eae2752432d6fddb2de5",
+      "documentSHA256" : "4c22aeaedbaf389c63b08caf39c9e2832114c895a0c8b3bf0f3aca4827aa876b",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -8151,16 +8151,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-7.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "78b0999a943dfb54124731594b6a59084a21fafa21a44770f1fbe7a2d2ceb17b",
+      "sourceSHA256" : "f32d7de9ab061d8fb33329d148287ef55e66f85f0e1aeec77ef5ff680a23ea52",
       "uncompressedByteCount" : 610049
     },
     {
       "blockCount" : 99,
-      "compressedByteCount" : 10616,
-      "compressedSHA256" : "fb87ea7b6d5ce229e1d22fa63fec3260c0355e8f63d5175616bc76e50a3327a0",
+      "compressedByteCount" : 10621,
+      "compressedSHA256" : "57522d4b877c28875482e20367f922db47f0e1015f87cfe9d0b44c88df7e3d41",
       "documentID" : "cd63cca80caa22948256bd6f24797da2162a94caf6c14ea6c057c48de74d93e6",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/cd63cca80caa22948256bd6f24797da2162a94caf6c14ea6c057c48de74d93e6.json.lzfse",
-      "documentSHA256" : "8f5f65a33b72fbac1b1ef99e898d684be8a817962db8152f105c4783ac13f846",
+      "documentSHA256" : "a561925bc0dc0a5a5929898844f930882593e2aa6f610ca85e20bac6aecd721b",
       "eligibility" : {
         "reasons" : [
 
@@ -8170,16 +8170,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-8.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "8e5ee12c8658b2601662cac5b139fe5913971e8629e3496916e1bf0e19994d5c",
+      "sourceSHA256" : "8bd8b12d84a5d0814b9c6681810eae21bbaa3166edd24a22a2a032eb94402522",
       "uncompressedByteCount" : 72473
     },
     {
       "blockCount" : 228,
-      "compressedByteCount" : 27180,
-      "compressedSHA256" : "9fc418b43170da993b6b5e994ab4e01c099b9976c43a69cafd284c3a39a57c0f",
+      "compressedByteCount" : 27148,
+      "compressedSHA256" : "2c470b7bc8e7b82bc88afdd7b9c99680e2441cb0712fbd91dc2f69f8f57d563e",
       "documentID" : "7bb908ec4a959a069c1d4bf76640077680485a8612a090d5da26355bede651ef",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/7bb908ec4a959a069c1d4bf76640077680485a8612a090d5da26355bede651ef.json.lzfse",
-      "documentSHA256" : "017cd59dd57f03a4e4ae25e852e6f27e2561a5cc5df34e65cfdf554024c78575",
+      "documentSHA256" : "76090d3758f4bc98e1d0e5b6e1bdd85acc3df12ed5086595dabf4de63b3139ff",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -8189,16 +8189,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/X-9.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "cb0805bcc229f41df404b5b795930f52c44143fd12a4fe6a1e8a65884d2488e9",
-      "uncompressedByteCount" : 218095
+      "sourceSHA256" : "3b0e94a77b51cc1426d1eedb07ad0aa83db5f66a60ff1be9a564ecb5e9c99c09",
+      "uncompressedByteCount" : 217151
     },
     {
       "blockCount" : 101,
-      "compressedByteCount" : 13297,
-      "compressedSHA256" : "3a53f38ab3364577e0df4a7cf7b0a6125fed117b2f17bbe65afcf2ebd2de842f",
+      "compressedByteCount" : 13299,
+      "compressedSHA256" : "c77c4f4cce200392a994a8f970e8ae72fbc74082b2f3855508b203b270ce8aef",
       "documentID" : "9eaa7e005e4f88bffacbfd4ad6dffdeee5e449af7cba2917f06828566cab3967",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/9eaa7e005e4f88bffacbfd4ad6dffdeee5e449af7cba2917f06828566cab3967.json.lzfse",
-      "documentSHA256" : "6017be32d928d6408fae33f484875fd58f765fe1575eb38c4ee815749565f57f",
+      "documentSHA256" : "ed47bd4e5cb8bb2ed2a3e57dad235f73dfb78c1996bdeaa8c7161b911ac02473",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -8208,16 +8208,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-1.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "9ddfb498806c200d26dfbc134b1fa4bb33eb1a02da7dcd4f047be261d6b03022",
+      "sourceSHA256" : "b1517e15dc04b10c62b810b2ad583babe669212e1e21489a76c3f086e55e4f7f",
       "uncompressedByteCount" : 89888
     },
     {
       "blockCount" : 132,
-      "compressedByteCount" : 17225,
-      "compressedSHA256" : "d445ef656b68c83897280878aacd92c92b0404f102b2fe97544dcc18893dd04a",
+      "compressedByteCount" : 17220,
+      "compressedSHA256" : "90f50a7d942c0d63be986400cfd33971ea9aa024b895323338fcad453e28ce34",
       "documentID" : "24f798e7e7e57f9ebe73ab50b75ad6eab02ea0981578b8d9dc7b0dc582414e92",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/24f798e7e7e57f9ebe73ab50b75ad6eab02ea0981578b8d9dc7b0dc582414e92.json.lzfse",
-      "documentSHA256" : "f16702e1426bb2cf80217301b175cfce05ec64123302ab2b73156c8d5e56c1fc",
+      "documentSHA256" : "625eda0f0c70d2b40ccf3a95d5075f99d83ff70ddf8defd7c3d40e65c2bc4be3",
       "eligibility" : {
         "reasons" : [
 
@@ -8227,16 +8227,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-2.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "36fbead84211045d101e6565ab28ca17051f9df2102a9f0a4c43858e11ca71a8",
+      "sourceSHA256" : "4ae200b6805874ea11339259de55e5a923278dfcfd5241062f7561b9d24890e3",
       "uncompressedByteCount" : 117868
     },
     {
       "blockCount" : 106,
-      "compressedByteCount" : 12440,
-      "compressedSHA256" : "6cfc8fd5f7aa0ca83b5b6eeb48be366e13060cf0eba3bc1742b39d7ec2b0c434",
+      "compressedByteCount" : 12434,
+      "compressedSHA256" : "9c42c31541003b8d5f20bd4c28d88ce6d275b9a9fe895d9f3960526e12f94e75",
       "documentID" : "27c260830ba49c75100ed73ab4c2f9a42f0e976242b6e9d9b1053ef72901c667",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/27c260830ba49c75100ed73ab4c2f9a42f0e976242b6e9d9b1053ef72901c667.json.lzfse",
-      "documentSHA256" : "aa3997b498516d65ee24ee6bfc3c770c42dceb1fe867cf7f0015e39a1704f2e1",
+      "documentSHA256" : "b0e1e0cc9b97fee058cacdbac4ea76ed963f89fb9b98a79272f4396c0d358785",
       "eligibility" : {
         "reasons" : [
 
@@ -8246,16 +8246,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-3.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "6b6d572a0817dcc41e7610138ef082b5684773f263ebc9fb96ff158393f4e19e",
+      "sourceSHA256" : "993a73b242228000bbc53fc15c62373b0d8016d1948162cc6bb1d3647a51420f",
       "uncompressedByteCount" : 83075
     },
     {
       "blockCount" : 46,
-      "compressedByteCount" : 6725,
-      "compressedSHA256" : "91a6d2b3eff2b1834f0f0728eccc235632b784a15d567352e0d830b9efd3dae9",
+      "compressedByteCount" : 6724,
+      "compressedSHA256" : "e3bc521149882e213f99495a607f2e6e08d198584c97db3d1fb22b4c6a37e784",
       "documentID" : "840f0a3445f9a8cfeb7daca94267c3d9a10547d02ad57dd26b612ca324ad2f49",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/840f0a3445f9a8cfeb7daca94267c3d9a10547d02ad57dd26b612ca324ad2f49.json.lzfse",
-      "documentSHA256" : "5245e3a00ff9795880606a8ed52cae2b9e75ae4338574a397faf85d1706c4317",
+      "documentSHA256" : "934152600819dd8201e5e219ef94100c03469e3b5a34950668fbf1ddad687f1a",
       "eligibility" : {
         "reasons" : [
 
@@ -8265,16 +8265,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-4.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "0e15dd449d30b7e98fe384688dbee536084eb6b0df1a9ee15e80f7e591fd8e6d",
+      "sourceSHA256" : "b39b8cdc3e47dbb7f8e8d0b102b397a77fe2bd4b5f11f1ec2d502f9555186cc9",
       "uncompressedByteCount" : 42665
     },
     {
       "blockCount" : 143,
-      "compressedByteCount" : 22079,
-      "compressedSHA256" : "b9b028f6ba8308ada2a04ec2a81d19c6126160fea746d2bd88856061fb9af43a",
+      "compressedByteCount" : 22072,
+      "compressedSHA256" : "15b558790f6d6dfbc0c67024fd7fc74970da8a3e862dba12af5d30de5a1eaefd",
       "documentID" : "c14e126db7ac09868929fa9e90dd6fd01cc218c7e98d2806e988f49c91c3e728",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/c14e126db7ac09868929fa9e90dd6fd01cc218c7e98d2806e988f49c91c3e728.json.lzfse",
-      "documentSHA256" : "7269a5a078df75975350dc795139a15c56fefb83c69688b1073ce14355e4380c",
+      "documentSHA256" : "f5858571fa9351af079e7e920180bdc2b2b3fc5e1acdecd4a0c21618a624f336",
       "eligibility" : {
         "reasons" : [
 
@@ -8284,16 +8284,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-5.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "70762c31de45beb090a7d1c17f44e193660643eae33515295db2fa78ecd4b0f4",
+      "sourceSHA256" : "19c92a9f1e51fe32c721016b87d42ff6b1d23f34534c885bab13c3291ef6cb1b",
       "uncompressedByteCount" : 164760
     },
     {
       "blockCount" : 278,
-      "compressedByteCount" : 36022,
-      "compressedSHA256" : "e9ea47fd461227cb763cfdbf63fa4d8ec715dd7af53fe443a05f6b1f7bdba0d7",
+      "compressedByteCount" : 36013,
+      "compressedSHA256" : "e3477eb11893a2882aa8b1bf92feeb09e42e125da09b59c6d48be5cb784deee2",
       "documentID" : "01facdbad52c6c182f6e7d29ed5bd68156da3016277801d9abb839540d21ad54",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/01facdbad52c6c182f6e7d29ed5bd68156da3016277801d9abb839540d21ad54.json.lzfse",
-      "documentSHA256" : "40f05e04191ef09ae356f21f4a94acec29b12af9156d63d97066b489b8e709c0",
+      "documentSHA256" : "5bd0990a4886e763426c980c9a7404b4af57b90cc87065d388bf67b674a96e9c",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -8303,16 +8303,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-6.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "85249aa26d2c95f2881e3c7cdaed25b0bc52fb8c101adc550dfe4fe48eb483aa",
+      "sourceSHA256" : "f6e11cc353fa593239edcb5033f41e7bcbb479f36f230cee9852733450f5c2e1",
       "uncompressedByteCount" : 289871
     },
     {
       "blockCount" : 596,
-      "compressedByteCount" : 114555,
-      "compressedSHA256" : "624c0f2eb64389a0b472a8da2de255262c204c50bfcc6ce2e1a981ff02e0f4bc",
+      "compressedByteCount" : 114564,
+      "compressedSHA256" : "6cc11aef90167168e9450a9447d7687ee45d38ccb5d73c612d9c98c14f64dc21",
       "documentID" : "3eea46c60acac9b0a0c7cf6472d8faf301250564d0e597252fc78595caa913c9",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/3eea46c60acac9b0a0c7cf6472d8faf301250564d0e597252fc78595caa913c9.json.lzfse",
-      "documentSHA256" : "f970f4b9cf48b88e64bae53025b4bf617207a33c38b1268dfaed994b3efce133",
+      "documentSHA256" : "ba52e30829e936c1801b0456ae20c34583a569da0671c0a1c50c3128f4b94317",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 7"
@@ -8322,16 +8322,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-7.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "f8fbcf99160f22c6639222aa2dd5f1b797eb6e797113c43b0d7f318882739a15",
+      "sourceSHA256" : "869948501aeac2c264edd5b886e9552431cacd05e5cbf96c47ef8520fbadb015",
       "uncompressedByteCount" : 976744
     },
     {
       "blockCount" : 68,
-      "compressedByteCount" : 11810,
-      "compressedSHA256" : "8f49e3dc39158211a48829c896117fa80016da9df927653d43c8b718a587832c",
+      "compressedByteCount" : 11812,
+      "compressedSHA256" : "e77648bbfe1ad7b64be2a19d4372585180e407b1ff159743f3a1193d161a6809",
       "documentID" : "7ef03a4734823a7578d40b21a10b71680b9d825da30cab744cd5f3fcb1b12cf2",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/7ef03a4734823a7578d40b21a10b71680b9d825da30cab744cd5f3fcb1b12cf2.json.lzfse",
-      "documentSHA256" : "8344a0ba315d56fd1cc40bac50b682c985b1430fc1704ef9be4c670d520dfa10",
+      "documentSHA256" : "42ba91a781550fc87b2a0ecaae662e7cfbf1ebeaef947a3a4a9aa1afae788351",
       "eligibility" : {
         "reasons" : [
 
@@ -8341,16 +8341,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-8.html",
       "rolloutTier" : "media",
-      "sourceSHA256" : "5e06173d405e62bf279cdd2cbeee0445d0a5f27cf7dcf6e04720553a28cd85f1",
+      "sourceSHA256" : "5a2f298b02ca2aff8e7b889bd09a6123ad18793bc5dbff7f8ee83e0b080895fc",
       "uncompressedByteCount" : 89784
     },
     {
       "blockCount" : 441,
-      "compressedByteCount" : 80643,
-      "compressedSHA256" : "abe15e82f54b835b3d16ae2c95a8c94ed2d3e4fefb4270f59f135ac081c85c5c",
+      "compressedByteCount" : 80634,
+      "compressedSHA256" : "c04b73ff9f705a3e010597a0f902b02f47fac82032635db5146839a1e881e10d",
       "documentID" : "eadddbd49271ad9cd2a615080be442fb64d2611667e89ad8c4658963c19cb34e",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/eadddbd49271ad9cd2a615080be442fb64d2611667e89ad8c4658963c19cb34e.json.lzfse",
-      "documentSHA256" : "d88d817a618a1778cd1d0f003f04e82fee046dbeeb3e5617b3570c743410abbd",
+      "documentSHA256" : "e33a2b4ea9860917cc0bca4eb4301c8e4b3e31f419bb5c07747c98510cc7f5f1",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 3"
@@ -8360,16 +8360,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XI-9.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "6f37add14a6d29b8ddc51d72837cf124671e66a7ed107abda4d0637641bb210c",
+      "sourceSHA256" : "8dc00483afa3845f00feb255e200ba3e1548a8acdb4a250d005c483ffa25e095",
       "uncompressedByteCount" : 518013
     },
     {
       "blockCount" : 95,
-      "compressedByteCount" : 12092,
-      "compressedSHA256" : "c44a6983795f6ca6868c4077dc9e0a623766cf0f80456c579504cf3a9e5551d2",
+      "compressedByteCount" : 12094,
+      "compressedSHA256" : "7b5459dec41cd2299d0dd58d2d0f50384e55c280ef24e17269f84078ced365c5",
       "documentID" : "b49baae901805021e9c181962c78950c695a8974bd959aaade452046a57cc7e5",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/b49baae901805021e9c181962c78950c695a8974bd959aaade452046a57cc7e5.json.lzfse",
-      "documentSHA256" : "979e9ee464d0816c51fe2cfc40d07206d71c3b61239d2e923a540766f046c1a1",
+      "documentSHA256" : "04867ef913583d73078cff94a7e1c2ad9192b56648169747f6bfa81b1f05e507",
       "eligibility" : {
         "reasons" : [
 
@@ -8379,16 +8379,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-1.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "3eeac684da827b3d9a24492233d54b8bbcdafa55e204ecbf286761b0c9596751",
+      "sourceSHA256" : "8cbe6b55331117cf2e2d9094d0c2ce782ea4465b71fc5fca22784d8de6cfd1a7",
       "uncompressedByteCount" : 80151
     },
     {
       "blockCount" : 102,
-      "compressedByteCount" : 15643,
-      "compressedSHA256" : "891a6df890457e3b43733b8ae949b51f1f3e16eb8d77aab22a2ca1449e7efdb7",
+      "compressedByteCount" : 15645,
+      "compressedSHA256" : "516819f740056e4af8352555b399879371a672d39580acdd044487965c646a3d",
       "documentID" : "70928050675843b01c26b3cd39fbdd63c968549ca519bef5ab1b135e66352bf3",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/70928050675843b01c26b3cd39fbdd63c968549ca519bef5ab1b135e66352bf3.json.lzfse",
-      "documentSHA256" : "b4f5dcaf92c464564537bbb3fe004ae33762383f0fedf4c4849e5ff2d19f78f6",
+      "documentSHA256" : "ccb10fc5f5f9f5238aad9052b01b96732e688bf512b6148de16eb2da18581589",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -8398,16 +8398,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-2.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "06098443111788474a217b8c1594257611ad06353588c2c9c359bdc7852dfe53",
+      "sourceSHA256" : "e47b9b4f30bc6caf040fed069b25f9cbc287d78f6c73243ace559c1359017c61",
       "uncompressedByteCount" : 249176
     },
     {
       "blockCount" : 305,
-      "compressedByteCount" : 44426,
-      "compressedSHA256" : "06937bd9fc61115ce32805d688785f0508a3c3bd85ca9a225a673ef465564b43",
+      "compressedByteCount" : 44432,
+      "compressedSHA256" : "0c949b10aa567c69b044ffda35c05686f05e3b4d9bcd8ee21f5d956af289bacb",
       "documentID" : "faff308ddaecbec57da3ff35c2cb020312ea681812d73c686d45319382230db0",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/faff308ddaecbec57da3ff35c2cb020312ea681812d73c686d45319382230db0.json.lzfse",
-      "documentSHA256" : "da78710b493c1f7df4b744d3bf7f59063e8661137ffcab75bc7959dc25dba0ea",
+      "documentSHA256" : "1a1ff52faeb2b5e1c339d49f19465d27b1d95ba12a7ac3601f9b5da0e8a4bc6d",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -8417,16 +8417,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-3.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "e47ecaae7114646c3de8220b4eaa3a66f22e49649be8e7bd1abe1b562231f972",
+      "sourceSHA256" : "97c51a89fe41acae9e53498a5b741cdc251ca07fc92cb5f67c4dc390af4132e5",
       "uncompressedByteCount" : 435755
     },
     {
       "blockCount" : 437,
-      "compressedByteCount" : 61149,
-      "compressedSHA256" : "bb89e216aa7c75ae5b7ace5c59292fa54b4a20349efd04edde5f380c3b375067",
+      "compressedByteCount" : 61146,
+      "compressedSHA256" : "08e307ae03c077e6e24fcce023c8ea3c1f99f14a31acd215dd2bdf424ed89716",
       "documentID" : "52c67815c55688b4b780531508bd0d669f1233617af0751a0a51109f58e8c2d8",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/52c67815c55688b4b780531508bd0d669f1233617af0751a0a51109f58e8c2d8.json.lzfse",
-      "documentSHA256" : "ee98ceb40df3b4e735d05f8dd0d7bd6fcc80f24bb007afdc59536468bceeb7e4",
+      "documentSHA256" : "a1acd1927fa235c6e7b705d9542fb1957a25f45e65486299ea8973c5d081420d",
       "eligibility" : {
         "reasons" : [
 
@@ -8436,16 +8436,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-4.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "d12f3f5e4e73c0130bf801a48c5f4e6465fcb0ce1c5cd1d9be370c469fa15360",
+      "sourceSHA256" : "1305a9e2a78eaef0eb18f69886668ccbd8a8a0265449238b5e2ba98d3a9371a2",
       "uncompressedByteCount" : 465211
     },
     {
       "blockCount" : 196,
-      "compressedByteCount" : 27162,
-      "compressedSHA256" : "aa235ebbf2b1830a6de6c0165a0ed7cc79efb89bdb292596e7e31955f061e2c1",
+      "compressedByteCount" : 27189,
+      "compressedSHA256" : "e53ee2ec845867c17aed0db00bca0d27704413f79dd064b65467dc9fa86c2c76",
       "documentID" : "e1f8a5d2ad123d888045603ce0eee49cbb1e196117e984e97c76e3a40bfa9d24",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/e1f8a5d2ad123d888045603ce0eee49cbb1e196117e984e97c76e3a40bfa9d24.json.lzfse",
-      "documentSHA256" : "21c921500453fd0e99d4d570e3c8fa5b8f6c70b2669328b63c0298f830d8dd90",
+      "documentSHA256" : "c350b0334b777c835a3f9c016ff87f0029f2aeb402a12e66f19dc75fd54e6e72",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -8455,16 +8455,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-5.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "12bc6e64a17d946bd260b610a101f544663a6ca7fbdf1911467d904a9007ff95",
+      "sourceSHA256" : "9da734f60467dc01268bffb2bd31e42fe830dbf2b0d689f197de0ef74e6b29d4",
       "uncompressedByteCount" : 240421
     },
     {
       "blockCount" : 214,
-      "compressedByteCount" : 24777,
-      "compressedSHA256" : "97f80437b0491d51a769be9ff82355b2efb502e1759a30cf0f8fff71e318c493",
+      "compressedByteCount" : 24789,
+      "compressedSHA256" : "013e14e7105ded32b559101b25668d783e8e97b91a4280550d4044d856532b6e",
       "documentID" : "1a5e698d99c228b873b875f70c88cb9438dacdd006933e30d39b5cb239c88bee",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1a5e698d99c228b873b875f70c88cb9438dacdd006933e30d39b5cb239c88bee.json.lzfse",
-      "documentSHA256" : "a51e4707d20b673f6e90946b8dd8dab2abba833295cfcba62f8a7a23a373ca92",
+      "documentSHA256" : "b1b5b7419983617996fd89fb9871fa15a00d45604b7ff334410dcd06cd6cdcfa",
       "eligibility" : {
         "reasons" : [
 
@@ -8474,16 +8474,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-6.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "68077827bf149e61298a3a3a335666cbd8f30e7d85e678dfb2a78967b6177f57",
+      "sourceSHA256" : "ff34d58bf10429c5d1dc22a952cb49dfed68d6c5b765d3c0de2081e7d2db9605",
       "uncompressedByteCount" : 177850
     },
     {
       "blockCount" : 385,
-      "compressedByteCount" : 59323,
-      "compressedSHA256" : "6932d77bd3ed8bb6d8ac84a3eefdf73cb43a1f8db572a7bf5b351b8a8e7ec945",
+      "compressedByteCount" : 59326,
+      "compressedSHA256" : "0a3e64a662ae5071a81275bb03873285bd70ac46c35dd422e00d6fce0822003d",
       "documentID" : "be9c18e86925f12a4357cd1bf8cbd59d9f9e9741b0a5496f7e8ebf459f9c2a22",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/be9c18e86925f12a4357cd1bf8cbd59d9f9e9741b0a5496f7e8ebf459f9c2a22.json.lzfse",
-      "documentSHA256" : "940550c89f6965654daee1535e74a4325ccf585c4b555489dd4e9becd450cbb5",
+      "documentSHA256" : "86d91b7264bae88fa71c9aeff51af4d846eb1d34353e82b17bd9e7a69808581e",
       "eligibility" : {
         "reasons" : [
 
@@ -8493,16 +8493,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-7.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "ae7306d1ce82e5c9d5ee7415d69a4c7fdc3088a78063289e316fccc5789b036d",
+      "sourceSHA256" : "3203d84748906c72e45a2e9885c4fd719ef27b7fda246416ebdd22be91ddcd65",
       "uncompressedByteCount" : 502699
     },
     {
       "blockCount" : 252,
-      "compressedByteCount" : 33914,
-      "compressedSHA256" : "4fac1b65e3bb2cafa5d437d7210ab0e508f08e744a03b9c3fb2d5de03d5bd3c3",
+      "compressedByteCount" : 33915,
+      "compressedSHA256" : "8f40c6f482d490c80f375dca4976859c40d894f305041b1d5fac24cd391a5880",
       "documentID" : "ab6d755b4f537d379fd2e014cfa692fac7a1d4eb91967f426526222f22e36b66",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/ab6d755b4f537d379fd2e014cfa692fac7a1d4eb91967f426526222f22e36b66.json.lzfse",
-      "documentSHA256" : "8520ac01d71568803fa8c67eb750743e882fd8eefe84844fc36dcbe33411e9ba",
+      "documentSHA256" : "e5abc0d0e57b9fbee115ac51f466ccb5a2d26e2afc26b36327ad0810709cc74b",
       "eligibility" : {
         "reasons" : [
 
@@ -8512,16 +8512,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XII-8.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "39d07fa713db1ecdefb3be29578411d774aea27c51b92a4afe6b4291038aff1f",
+      "sourceSHA256" : "9b91e39337eac7308c8138c5f3d1767e089b2e1614cffb2f218dca2fef43e659",
       "uncompressedByteCount" : 254048
     },
     {
       "blockCount" : 379,
-      "compressedByteCount" : 55276,
-      "compressedSHA256" : "16a9598df6d2b9d8a5e9df61123058a74cc44d7f1eb5d1a1deecb9a5b4d47a9c",
+      "compressedByteCount" : 55298,
+      "compressedSHA256" : "d6193035567d34bae25bd5488f611cd8860135a89435a5185a2209181f46ab04",
       "documentID" : "8af8be20c57c098cd31ef8604b5111be2f537bb23aa582f579b78cd1ce2ae5e0",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/8af8be20c57c098cd31ef8604b5111be2f537bb23aa582f579b78cd1ce2ae5e0.json.lzfse",
-      "documentSHA256" : "c42712f7c53c2ff2748b4c21f40cc21a2d0467b118a7d077a4352d0a5b6c79de",
+      "documentSHA256" : "40779d90c6080c415788f6f931c8ba87ebf28c18520aa6041ab333f1f4afecea",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -8531,16 +8531,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-1.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "aa9164755a2f91c963b6524479224a0e07834f63d6a1d32e3eba48b0a4a17142",
+      "sourceSHA256" : "59a57ccb0443123f9dccd3538ca0890a3fa8ffe75aa8dd9689c60bb805ebbac7",
       "uncompressedByteCount" : 493641
     },
     {
       "blockCount" : 95,
       "compressedByteCount" : 14934,
-      "compressedSHA256" : "56b5b8b83427aa905ebe1e1d4971cfc7063f7362a37a8378a0cb54a99a0bec83",
+      "compressedSHA256" : "bd6f60b348accc85aca6112cc0e2064fe9758e05d57ea5121b78ff78f8732356",
       "documentID" : "b7b80e8916d0cb77536936ec6e2983fe08081af177689946709afcdcd929dedb",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/b7b80e8916d0cb77536936ec6e2983fe08081af177689946709afcdcd929dedb.json.lzfse",
-      "documentSHA256" : "904a28fde86e25ed9b6bf03d3a5badb56620c3f2ce6867481f27ad63a00771ed",
+      "documentSHA256" : "13ab1512bc49b577143a8b5c11050c073cc5f47c50b2440a7ebee566140da91a",
       "eligibility" : {
         "reasons" : [
 
@@ -8550,16 +8550,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-2.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "4c55ec690f79a986502d91fc46d0ad55b3c231dc3e71d9583cbf5ed90d7d5e2e",
+      "sourceSHA256" : "c45f332f2c2c04a037ecfad050bf6b55a4a982bd9ad284db5ba28a967cdd33eb",
       "uncompressedByteCount" : 112670
     },
     {
       "blockCount" : 217,
-      "compressedByteCount" : 24346,
-      "compressedSHA256" : "b26ff49e5a446fbc71ac9b9bb05b3d4613d809a22a752f700319b06795da0671",
+      "compressedByteCount" : 24344,
+      "compressedSHA256" : "4c12708d38faba200650264624b7c3d8109e5340085ad02f85b44b507345473b",
       "documentID" : "ee658e3f7b0a8df21c085aa05b2082586b73066a0178ab7adaa8cfbb441963b0",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/ee658e3f7b0a8df21c085aa05b2082586b73066a0178ab7adaa8cfbb441963b0.json.lzfse",
-      "documentSHA256" : "01b84258f420d1e0d94441a06e4265791db0542ed9a7033dca2f57c449377051",
+      "documentSHA256" : "9386e09ebbe1af27aec7fc8132870fc050362b5c48b3dc693fd19e75c4e97d61",
       "eligibility" : {
         "reasons" : [
 
@@ -8569,16 +8569,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-3.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "ce62f878500c98f853a0e39cc16040f3f8fc0faf8e94f40eea4c6fff55fad5b1",
+      "sourceSHA256" : "87a7f9796f2e15a2de33180092004078174a420b0c6ad94be5a4c634cfc43629",
       "uncompressedByteCount" : 171911
     },
     {
       "blockCount" : 564,
-      "compressedByteCount" : 54516,
-      "compressedSHA256" : "2f1ce097fefaf7b0119835081a924542410149164c9d1234314020f470564f51",
+      "compressedByteCount" : 54488,
+      "compressedSHA256" : "7d9881527bb259a5346d0b2ccd364264d398cf4f6302d969e3664f96807a7055",
       "documentID" : "1525360d40c09dc787d8ad4150e8c3e4a7c2a72d5cf184b31532d9cdc4213466",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1525360d40c09dc787d8ad4150e8c3e4a7c2a72d5cf184b31532d9cdc4213466.json.lzfse",
-      "documentSHA256" : "b1c3dd445ca5fbab9e435ece1ace2fec3e1742c28a5442bf4e5b4722ace98407",
+      "documentSHA256" : "df659863a427330bd282595439333ea5327d9aa9817869f0d50dccb5dc72b27e",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 3"
@@ -8588,16 +8588,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-4.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "9b4d92ef7dd58cf5613b0dad878fbbe68d841d25d8365af869f80ab6e9a5becc",
+      "sourceSHA256" : "64580f6dae39f2c3676f0fd093f59578cd16e010c2b1445ae60bf28279f42816",
       "uncompressedByteCount" : 417359
     },
     {
       "blockCount" : 166,
-      "compressedByteCount" : 24336,
-      "compressedSHA256" : "056b4563c52d50f92ead6f4fe93132e8c76283e59eaece888894832e8f029524",
+      "compressedByteCount" : 24307,
+      "compressedSHA256" : "7550d3cf9163ff6c700ad19b5b411f6139e359dcb5bcc1db3091de34b330cecf",
       "documentID" : "1d75a632be701dd8fe2cac5ad4208bb489e47a0d36b6ce2797458d5c7936bd10",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/1d75a632be701dd8fe2cac5ad4208bb489e47a0d36b6ce2797458d5c7936bd10.json.lzfse",
-      "documentSHA256" : "3e1a95a0ec63e7bb01399aa2e39cc539b226bbf2a8641d0e6446b4993d24533d",
+      "documentSHA256" : "089b5140df32772309495ee7900a37720076b2f5d4ae66ae28095151c31bcf63",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -8607,16 +8607,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-5.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "a58c3db452336bd414fbc6b98f8802bb1f9b22359b87b86d3c933a0021b9f414",
+      "sourceSHA256" : "ea5fe9f846f06ce282c043ba1b982e37ef2412a5097f76aa6aa345474889c420",
       "uncompressedByteCount" : 284158
     },
     {
       "blockCount" : 265,
-      "compressedByteCount" : 37399,
-      "compressedSHA256" : "63727d3dc797355f5b363c0b04d679035b88fdc333f9be367ac51965387d5041",
+      "compressedByteCount" : 37403,
+      "compressedSHA256" : "737760fba4ba30410d1c96ad392c2f2e0f5cf7f8bcfb51112fd3d6053cf4ca43",
       "documentID" : "52b1a2201ec049e08d3837cd433095a6fde80a907ddbfba705ed261d5bb3c32b",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/52b1a2201ec049e08d3837cd433095a6fde80a907ddbfba705ed261d5bb3c32b.json.lzfse",
-      "documentSHA256" : "27b4cfee7549741d6c21d274cc09677f52d87e302db32dfe7673d0a8a58e531c",
+      "documentSHA256" : "f9d71aa36d63004332c58625cae6895f5826e6a80d6608b4acfa20e9efa99302",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -8626,16 +8626,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-6.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "779018603239e036c35f3cdb010f21b0954dfd007a5eb5d3bc94c9a2c233afe1",
+      "sourceSHA256" : "eea25c2087d7dc253b3abd0735771d1037b9f9fa96f5fe9898b4a20063e71c9a",
       "uncompressedByteCount" : 341313
     },
     {
       "blockCount" : 123,
-      "compressedByteCount" : 17011,
-      "compressedSHA256" : "ed07008881e935d9c55ef78808dcb430f11e40c58f44782c154138a3179f4d6c",
+      "compressedByteCount" : 17000,
+      "compressedSHA256" : "4f50084742d80d30fdd32236b662f385b58f78cff2a6871892b644c2e8925455",
       "documentID" : "5f9d51cfda9b974120b73d1a275f90f8df9ff0ddf4854a3ed57f04d5fb6cee03",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/5f9d51cfda9b974120b73d1a275f90f8df9ff0ddf4854a3ed57f04d5fb6cee03.json.lzfse",
-      "documentSHA256" : "112c9aa2716d97a90c8ae9d1eee7206ffeaf50b259afd5fb8dc558d8b7722909",
+      "documentSHA256" : "d5cb58d6171b657806ffced11efe4bb0bfb94ba4abfd30ac01337137e74d43a8",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -8645,16 +8645,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-7.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "825a4ee6e01b6465c82026c49ef464d7808f797ffbf74d4f115b0ecebdd918da",
+      "sourceSHA256" : "05b2d4997eaa5be3367e078df86d007de46abc4f8518cd54cdd814790c08b681",
       "uncompressedByteCount" : 183981
     },
     {
       "blockCount" : 131,
-      "compressedByteCount" : 22465,
-      "compressedSHA256" : "3c455a2391510bc3fcc685b2b0342e64bec77b5cdf58022c7bf033004522a5bd",
+      "compressedByteCount" : 22446,
+      "compressedSHA256" : "625ca0f3420507a065ef8badf4e4d86028cf41a63a7c1294799aee795d99949c",
       "documentID" : "5021bec1bfa9eab5d1ca8e719e73bc648caef8ce4e0c9b6c59b1103af2b4f324",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/5021bec1bfa9eab5d1ca8e719e73bc648caef8ce4e0c9b6c59b1103af2b4f324.json.lzfse",
-      "documentSHA256" : "9bad5ca761570a872d85d4093d173fb660593db880cfbd6f8d65551224bf1d32",
+      "documentSHA256" : "63cc01ba15aeffb387182db6cbf0922d834ab8e654210907364f1a393fa25660",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -8664,16 +8664,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-8.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "56ac8655053eaae70aca9e1fae452451aab2b765b50e5aed990bece78cc4e4e2",
+      "sourceSHA256" : "a5d4115cdad18023619d5bec2475be4c65b7e5ff6ab3ffb5dd4c4ce210811448",
       "uncompressedByteCount" : 197492
     },
     {
       "blockCount" : 663,
-      "compressedByteCount" : 90202,
-      "compressedSHA256" : "6dcc778af825b4d31179c52c7ba8507c47f5aa7b399a1d231c276cd26d0609d9",
+      "compressedByteCount" : 90156,
+      "compressedSHA256" : "945cf1281039c2315e72df34af27ef9a00043cec405daf154d5f39d3c3b27ec8",
       "documentID" : "0c21f0d352d34a55b87c5c73ec95f57c8c6f1ab52b0e86b6dd71bde19a14f7dc",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/0c21f0d352d34a55b87c5c73ec95f57c8c6f1ab52b0e86b6dd71bde19a14f7dc.json.lzfse",
-      "documentSHA256" : "cde62e9f8094f6659f809c4f25afaba553216353ebbf2e6a5c2f472e19b51c35",
+      "documentSHA256" : "4624adbebc39d920a5c1eefe51e087710e6bdc305522f89be021fdcb072bb667",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 6"
@@ -8683,16 +8683,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIII-9.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "3c4a636fb9f6b759117f932888fbf646394031290037e6ca15489bf42c833d07",
+      "sourceSHA256" : "8f6263a19be418cfb12b451194d9f62964fb1b82726b0bc2b34141996a54df3f",
       "uncompressedByteCount" : 855562
     },
     {
       "blockCount" : 104,
-      "compressedByteCount" : 17764,
-      "compressedSHA256" : "0e19e947ce1a4dc2abe356775d36a3222ff6aa161e8306ac47bbd3d190d48d03",
+      "compressedByteCount" : 17761,
+      "compressedSHA256" : "6c7e3cf636eb04d3d0a1f76cdd7ac0697a11bf27a2cb10ed5b98c838a1a5ea8b",
       "documentID" : "c4a4b928aadbbb58174105fa22877eb972de9f321bd8b7ada3231197052afe53",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/c4a4b928aadbbb58174105fa22877eb972de9f321bd8b7ada3231197052afe53.json.lzfse",
-      "documentSHA256" : "a1ef9dc80348fd47a1d1c69e6d3ac8c9618fb0ef2f653d4039b74a47317d4d2e",
+      "documentSHA256" : "f8fef8b60cd6698724f5448cce9484c794c5cbdbf1517c827da40fe84f8dae7d",
       "eligibility" : {
         "reasons" : [
 
@@ -8702,16 +8702,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-1.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "ae4914e78aedbb442cae91a0c2c10ae00a34a57242625ed28c0003ea9c885c7e",
+      "sourceSHA256" : "bd705ba1657eff32dc8a80b7c948b9ac11ac0c8b5c6c7610a8e2002b202f4479",
       "uncompressedByteCount" : 170078
     },
     {
       "blockCount" : 289,
-      "compressedByteCount" : 39048,
-      "compressedSHA256" : "75519daa092da108955913b7003525c90051b3185122a68809eb6e07599170aa",
+      "compressedByteCount" : 39061,
+      "compressedSHA256" : "984d5ecf804208b8d71cedac5bb7edbe775c159e3ee1d7a39c6a02a78f174298",
       "documentID" : "4328834a98b3d2760eac936919c91de8eb25fc5633208718d63de728d2261fe7",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/4328834a98b3d2760eac936919c91de8eb25fc5633208718d63de728d2261fe7.json.lzfse",
-      "documentSHA256" : "6e69b7919e9ece2fa26204968f6a3b94d2cfde13944f07ce0d9e9f27b6745fe5",
+      "documentSHA256" : "1fcd0aaa1e8b4fd8c616dc3ad15703b4ad2a6390d4471ed2862e753b8bfc55a6",
       "eligibility" : {
         "reasons" : [
 
@@ -8721,16 +8721,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-2.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "0dffa6162e36b6d0f6181e56ee0a8901de959cf31df586397e61d4ea9569940d",
+      "sourceSHA256" : "9c6eb2be50d8237284be1393a760dfd8e3802ed72589f5d66d949f61af4f517a",
       "uncompressedByteCount" : 305537
     },
     {
       "blockCount" : 146,
-      "compressedByteCount" : 24079,
-      "compressedSHA256" : "98044996484cae2fa93ec4a895c7581f742e16830ba28f945672787920e4f011",
+      "compressedByteCount" : 24084,
+      "compressedSHA256" : "358ea34052347d1847f4237335e8671993b44b4dd7567e59b540308ebbf0e1b1",
       "documentID" : "013b84547ec76d1e4b7b510ca97a4aebd25fd57ab66abfb584a47f9c7a9dc19f",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/013b84547ec76d1e4b7b510ca97a4aebd25fd57ab66abfb584a47f9c7a9dc19f.json.lzfse",
-      "documentSHA256" : "da5d5194c93c778233c9a9bb28a52ff607300da0eb223587c0b426cb0149f805",
+      "documentSHA256" : "8e49a7133aab7b5f04819ad5ad5755fd983cfcde2f546623cd903128f0c5d56a",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -8740,16 +8740,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-3.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "92c1064dc686840af5c4962a0a0b286152fcf3ed490f0380d86120d57403284c",
+      "sourceSHA256" : "09d40604279c352a3503d66987a01266694e3d6206f14acd858d1facfd0432e0",
       "uncompressedByteCount" : 218508
     },
     {
       "blockCount" : 390,
-      "compressedByteCount" : 44221,
-      "compressedSHA256" : "e077776b32c6f3376b067aa8d6d05d4f12fee6d99ddcc99d08f4ecb23bdf6886",
+      "compressedByteCount" : 44219,
+      "compressedSHA256" : "e62417362a13e2762b8354bcccb8a1766fb3d1e73232d2b0728059fb38b2782e",
       "documentID" : "49320b00317356427a1650a42e13629f83230868bfff96311ec8d0cb5a1ee669",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/49320b00317356427a1650a42e13629f83230868bfff96311ec8d0cb5a1ee669.json.lzfse",
-      "documentSHA256" : "8231206f9cc72e1c6a3d429ac6103e808b5cd5d9c34d1eeb781155a0edefd315",
+      "documentSHA256" : "916ccac0ad7fac2af2c383d9ffc275a70e808a888e14e68d4ff4472615b1cd30",
       "eligibility" : {
         "reasons" : [
 
@@ -8759,16 +8759,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-4.html",
       "rolloutTier" : "textOnly",
-      "sourceSHA256" : "3f83e2f773b0dd95a2ca644b9394f39e3bdcc197b3299c44b69a98226dbc8727",
+      "sourceSHA256" : "c74033bb3e125c62552e7ceeb285befe961b74315d221e919569382a1b76e3f4",
       "uncompressedByteCount" : 321459
     },
     {
       "blockCount" : 143,
-      "compressedByteCount" : 35179,
-      "compressedSHA256" : "81d94107926020cd4bd461a7dc6734a046c98d0fb0bf7529904984243c3bc50d",
+      "compressedByteCount" : 35139,
+      "compressedSHA256" : "54b97442af59c41c46a2659dd52365e882752bae6d2d281fe5f0bd3e026ad010",
       "documentID" : "516da1091652325b7de7243e2cfe346ffcf532b3dfb8a5c5364664502e018b6e",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/516da1091652325b7de7243e2cfe346ffcf532b3dfb8a5c5364664502e018b6e.json.lzfse",
-      "documentSHA256" : "9df46eb7ef4494b697424d93402dbdd8a21cbf5b20ef71b2913a470cc42e9c7b",
+      "documentSHA256" : "6de87bd4a86999c88e6a953e1767e381fd7d8464946d5d98d466d7944509780b",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 1"
@@ -8778,16 +8778,16 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-5.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "1f0e7d1081e76527379b809eadfa37e8f32648078dd6c1779d6caa8051dbba68",
-      "uncompressedByteCount" : 323541
+      "sourceSHA256" : "2595c646eea5950910a7fbb99b3142a46cea4b23c5354890e1b405cc6b27b179",
+      "uncompressedByteCount" : 322361
     },
     {
       "blockCount" : 107,
-      "compressedByteCount" : 18094,
-      "compressedSHA256" : "2d412785603f50d40705df5829cfe11e19ad79ca997e19c630f915809e58cda7",
+      "compressedByteCount" : 18086,
+      "compressedSHA256" : "f5cdd2d78b138610243cd91b0eff9fdf47677ea0de01c22ee00c1ed800ace293",
       "documentID" : "5f0c5234e14df90d877019365fff0007d5d9685775a5a8484d4c72d6943fba48",
       "documentPath" : "2026-zoning-resolution/prepared/native-reader-v1/chapters/5f0c5234e14df90d877019365fff0007d5d9685775a5a8484d4c72d6943fba48.json.lzfse",
-      "documentSHA256" : "c3c06deffb542c29ac06490bf7ecb8fbbb5cd7c0c9bcc702ab3c0b5c7cf9f0e2",
+      "documentSHA256" : "17b22c6680725e69ff9a3a12bd78efdf4a249507bd9c6be15c6aff6e4df2b56d",
       "eligibility" : {
         "reasons" : [
           "isolatedHTMLTableCount: 2"
@@ -8797,7 +8797,7 @@
       "passesStructuralValidation" : true,
       "relativePath" : "2026-zoning-resolution/chapters/XIV-6.html",
       "rolloutTier" : "isolatedTableFallback",
-      "sourceSHA256" : "7695da27ac1365ca3b601957c059cb126df95c500128dbd06a4d72a2c97a7f04",
+      "sourceSHA256" : "899c26391348ce6f633574245484e5734ca57f0b530a6862dda97c4539ffd6db",
       "uncompressedByteCount" : 135331
     }
   ],

@@ -58,11 +58,12 @@ const definitionFixture = parseZoningChapterHTML(`
 assert.match(definitionFixture.sections[0].plainText, /Definitions preamble/);
 assert.match(definitionFixture.sections[0].plainText, /Operative cellar definition/);
 
-const [bundle, sourceManifest, preparedManifest, searchIndex, sectionFileNames, chapterHTMLFileNames] =
+const [bundle, sourceManifest, preparedManifest, chapterCatalog, searchIndex, sectionFileNames, chapterHTMLFileNames] =
   await Promise.all([
     readJSON(join(contentRoot, "bundle.json")),
     readJSON(join(contentRoot, "source-manifest.json")),
     readJSON(join(preparedRoot, "manifest.json")),
+    readJSON(join(preparedRoot, "chapterCatalog.json")),
     readJSON(join(preparedRoot, "searchIndex.json")),
     readdir(sectionRoot),
     readdir(chapterHTMLRoot)
@@ -77,6 +78,7 @@ assert.equal(bundle.zoningContract.researchEligibility, false);
 assert.equal(bundle.codes[0].name, zoningResolutionContract.codeVersion);
 assert.equal(preparedManifest.codeVersion, zoningResolutionContract.codeVersion);
 assert.equal(preparedManifest.textChangesThrough, zoningResolutionContract.textChangesThrough);
+assert.equal(chapterCatalog.schemaVersion, 1);
 
 const summary = sourceManifest.validationSummary;
 assert.equal(summary.articles, 14);
@@ -88,6 +90,7 @@ assert(summary.mapReferences > 0);
 assert(summary.amendmentEvents > 0);
 assert(summary.assets > 0);
 assert.equal(preparedManifest.chapters.length, summary.chapters + summary.appendixPages);
+assert.equal(chapterCatalog.chapters.length, preparedManifest.chapters.length);
 assert.equal(sectionFileNames.length, summary.sections);
 assert.equal(chapterHTMLFileNames.filter((name) => name.endsWith(".html")).length, summary.chapters + summary.appendixPages);
 assert.equal(sourceManifest.documents.length, summary.chapters + summary.appendixPages + 15);
@@ -99,6 +102,17 @@ assert.deepEqual(
 
 const chapterIDs = bundle.chapters.map((chapter) => chapter.id);
 assert.equal(new Set(chapterIDs).size, chapterIDs.length);
+assert.deepEqual(
+  chapterCatalog.chapters.map(([chapterID]) => chapterID).sort((left, right) => left - right),
+  [...chapterIDs].sort((left, right) => left - right)
+);
+assert.equal(
+  chapterCatalog.chapters.reduce(
+    (count, [, groups]) => count + groups.reduce((groupCount, group) => groupCount + group[5].length, 0),
+    0
+  ),
+  summary.sections
+);
 assert.equal(stableZoningChapterID("I", "2"), 15_000_102);
 assert.equal(stableZoningSectionID(18_521), 20_018_521);
 assert(bundle.chapters.some((chapter) => chapter.chapterNumber === "I-2"));

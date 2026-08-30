@@ -23,7 +23,7 @@ const sourceManifest = await zoningSourceManifest();
 
 assert.equal(dataset.schemaVersion, 1);
 assert.equal(dataset.libraryID, "nyc-zoning-resolution");
-assert.equal(dataset.codeVersion, "NYC Zoning Resolution — text through 2026-07-16");
+assert.equal(dataset.codeVersion, "NYC Zoning Resolution — text through 2026-08-13");
 assert.equal(dataset.researchEligibility, false);
 assert.equal(dataset.governance.status, "draft");
 assert.equal(dataset.governance.humanReviewRequired, true);

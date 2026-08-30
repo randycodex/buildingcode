@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "libraryID": "nyc-zoning-resolution",
-  "codeVersion": "NYC Zoning Resolution — text through 2026-07-16",
-  "textChangesThrough": "2026-07-16",
+  "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+  "textChangesThrough": "2026-08-13",
   "chapters": [
     {
       "chapterID": 15000101,
@@ -890,7 +890,7 @@
       "codeSectionID": 1,
       "sectionCount": 1,
       "preparedSectionCount": 1,
-      "blockCount": 153
+      "blockCount": 160
     },
     {
       "chapterID": 16021769,

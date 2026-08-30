@@ -12,7 +12,7 @@
     {
       "id": 1,
       "jurisdictionID": 1,
-      "name": "NYC Zoning Resolution — text through 2026-07-16"
+      "name": "NYC Zoning Resolution — text through 2026-08-13"
     }
   ],
   "codeSections": [
@@ -854,7 +854,7 @@
     "schemaVersion": 1,
     "libraryID": "nyc-zoning-resolution",
     "sourceURL": "https://zr.planning.nyc.gov/",
-    "textChangesThrough": "2026-07-16",
+    "textChangesThrough": "2026-08-13",
     "researchEligibility": false
   }
 }

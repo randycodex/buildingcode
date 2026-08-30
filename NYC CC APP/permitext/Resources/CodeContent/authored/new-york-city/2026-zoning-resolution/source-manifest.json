@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-17T20:14:42.392Z",
+  "generatedAt": "2026-08-30T14:50:19.291Z",
   "libraryID": "nyc-zoning-resolution",
   "sourceAuthority": "New York City Department of City Planning",
   "sourceHomepageURL": "https://zr.planning.nyc.gov/",
   "sourceDownloadsURL": "https://zr.planning.nyc.gov/zr-downloads",
-  "textChangesThrough": "2026-07-16",
+  "textChangesThrough": "2026-08-13",
   "statedCounts": {
     "articles": 14,
     "appendices": 11,
@@ -15,662 +15,662 @@
     {
       "kind": "homepage",
       "sourceURL": "https://zr.planning.nyc.gov/",
-      "contentHash": "39fb792d9958c6790d4709c5d971411dc99c36d3655ee084c3d767a3bb986ad2"
+      "contentHash": "9496126eed3852f9521300043990099e0862b104c619e78c4e3d0a2c2d31a8e6"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-b-index-special-purpose-districts",
-      "contentHash": "75ae37f2bd933a56787ba86db7c994b25ae26a55a581312297326edee10bc7e4"
+      "contentHash": "838be49c96b7085ce1dda1bd5884418c377b730143eea61d66f61d8fd62aad2b"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-c-table-1-city-environmental-quality-review-ceqr-environmental-requirements-e-designations",
-      "contentHash": "b0a712430f4c186a2a886fcc71bb626205d7ce46956ad12f7d82798fcca5a939"
+      "contentHash": "d3609b15ce89534d7e4e2eb6bff114dc3953816ee00be2c6245b204dc84e1d2a"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-c-table-2-city-environmental-quality-review-ceqr-environmental-requirements-environmental",
-      "contentHash": "bbb1603f25fd58caa9adbffddcc73f467ef4da777ea91fde42693f98ebd3dd78"
+      "contentHash": "515d963becce4f44bbd0391aba41bab24c96b58516b1189b1c17f533ae8e4c7b"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-d-zoning-map-amendment-d-restrictive-declarations",
-      "contentHash": "e828036cf87c6f3ede3e6659083beef228d2d09d19756f151e216eb44db6f9b0"
+      "contentHash": "2a8fe3fdb65b3041e470e9e651d2166752e668455353385181250784da3bcc3c"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-e-design-requirements-plazas-residential-plazas-and-urban-plazas-developed-prior-october",
-      "contentHash": "548003893706ab23a80c5ba5ab07d3f6df27efcc1261e2cb5f45146c0a2a1bb4"
+      "contentHash": "9d324dfe2c45be1a397c0b157fd82c580e72f12d0bc946bb22ca616ac2902e0e"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-f-inclusionary-housing-designated-areas-and-mandatory-inclusionary-housing-areas-0",
-      "contentHash": "fbd8d6ff8520b0df8421a3304db8d61ef3e12dab8c0f558c519526fe2700915a"
+      "contentHash": "16bea2d345828514bbeb13bbf651a66d346f4b589fa704af970ae0b1df72fe00"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas",
-      "contentHash": "a8962c7e7338d4f2ad33e66cd730673026ff779b7919ee94064166d4d4d7d3ba"
+      "contentHash": "94ff559d30a485e131bdaf46c218b409857ac0914fa6d5f15c86e41b930412a9"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas-0",
-      "contentHash": "cb3a80906ce329f7387de1a12bd58d5d3a444b666b6c2c6a8d61c4d30d2dbb7d"
+      "contentHash": "4e95737dde2c759042096becbc81a9101f3622ebc7bc5e1c797f2ef066171e38"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas-1",
-      "contentHash": "9fa29b136b3ba50714f5ba0aedfbe9ee4621fc807925b4d4cba3ffec1eaa61ea"
+      "contentHash": "a38728b353525414922c61ad97eda7a7f0bfbd0e14ddd04cded0aaa3272c498f"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas-2",
-      "contentHash": "71204de2f0fade14efdb33b7456aa95215d7ca5ae59bd8889ba7f37a25d36f8d"
+      "contentHash": "378be9c31e2ee9ac808a70356292d84ae25754ba2a999cc3139356bb4c81993e"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas-3",
-      "contentHash": "369fcd80d628ccbc77639b6a02c119232bdd4539a0ffab8bf93e584ff2d15147"
+      "contentHash": "2a7f8fcedfe542c99c97e8bb3010d1632ddac545bb0b97c67376396b54c53bb7"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-g-radioactive-materials",
-      "contentHash": "5db73617dc7cef9bb24633a36c66621f194901b7bc1f6eba1485ff547c26ceeb"
+      "contentHash": "9c61004e9689a31d52be0c1c9f78139dfb574c7288ee96d5cf9d30007d7b32ef"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-h-arterial-highways",
-      "contentHash": "3abaa21ba05ff1adb54df7c758c34e04ce754ecbc39369e114098b4891e69a90"
+      "contentHash": "253d5825005dd07cfafbb254bc271f4b459b46af58254283a0eec0f9284feddc"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-i",
-      "contentHash": "d912b81fd524fdc89e80679048510027d9a8dff11c0dc9430a15056672d538c1"
+      "contentHash": "707d1492543be86d36875df842c497c59d5cd93cbcc05ba5182fc5441de61a46"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-j-designated-areas-within-manufacturing-districts",
-      "contentHash": "a9bf776e36b1db2f86ac4ab30d60d167cc893dcec1dee5d0e0544f713172cf7c"
+      "contentHash": "d6df1a0fa8539772a8d2527c7b138f6981cd9039087d63ed0e79c9f87bafe6c5"
     },
     {
       "kind": "appendix",
       "sourceURL": "https://zr.planning.nyc.gov/appendix-k-areas-nursing-home-restrictions",
-      "contentHash": "f13194957f9305694ebae5047bd62d4c1b456433502c099773d7d5d989914ef5"
+      "contentHash": "a7b7ff64e805e53f311689be61b5eb932ff47c102e71cf4291a17c39ead032e8"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-i",
-      "contentHash": "07f1e5b8365276bd67155b7676c7f2e589970c06e1f254c163c4a0bca9cb2708"
+      "contentHash": "83f972b06b023a15ff8f4f87523289b771924e12e3b404671fa10623ef210689"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-1",
-      "contentHash": "25b5e3f8483f141baf8fa44d84c20e55d3c83a6ab4d57d56a3b18a387a8e8d5c"
+      "contentHash": "1895d3b319f3ab0f473f64804b97ba6398bc9e13344b6e38af0f316d121d736d"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-2",
-      "contentHash": "e555df2237e667f20f5bed533b17758f33ca6c86778046dfd443ce53cd6ce9a4"
+      "contentHash": "d16ee7a141cb1d59c3b697bd9986ef576bf1f99e85d25c82c9cfbb5e58a3881a"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-3",
-      "contentHash": "81b0fb76f8ea78b177766398f748c37b921d6407db648c0cf76ba779251b32da"
+      "contentHash": "92d61f90c021137c5e32291c2c0212385fc39136ba7a1eaf7819c517d53dd477"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-5",
-      "contentHash": "767ada684f3b6c77dbbe017ff9d82e34d26d078f32333e8d4b905ac4e1327460"
+      "contentHash": "b26a404c04bdc599d028ed6edc3a7accb3cecb0c35cd49871701eab7724d2011"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-6",
-      "contentHash": "82579264cdc3bfb120b5eae167098fab88d2d3e5369c6141eb5be78735555cad"
+      "contentHash": "a40e58619217c3e1dd88b8bee8e9335fb0e87b51d8c66882a30d1c42de507563"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-ii",
-      "contentHash": "fbcf5d9bb775acd1b43d40d63791f2bd03ffb14ec63b1c80adf20e090975dbb2"
+      "contentHash": "ffd1948e8ebfc093c233c8183f36aedde9c5488995609ef067712c3444eab6be"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-1",
-      "contentHash": "ff344e77406e04e13f9500f6a060db06bfd5a00bfa39d91b0c03bd0b36cc0f1a"
+      "contentHash": "0da3c666f8bc06a2f288eef09c88b2db17c3772d1f56847c2ae086304da12059"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-2",
-      "contentHash": "534d1976dabf8fce25d7c893a3648c751dfec3f70ab08246f754f5996c056693"
+      "contentHash": "7169cd6c4e2a3518554cddebb3bb4a49b136e61eb1e967f66cbfb031c526445e"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-3",
-      "contentHash": "bb33304b8659dfe7afd955548d162ad6f0f56e35f985284acb83f385ac59410c"
+      "contentHash": "464cb0747f4dc2097d1184a9c2b8be79c68509836ed7673324379c3728ed36c6"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-4",
-      "contentHash": "03caad2cfa865a959c2237588a039bd11110c606ed96a82fbd00baf3bb966b0b"
+      "contentHash": "7f649445b8fe9645ca62dd763ae924fc641981e9c3fcc30da86f32a2c0aad0f7"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-5",
-      "contentHash": "1d485643c26aa0351def2fcb94e45998a1c584ee45155156b73a2096f1fe96d7"
+      "contentHash": "39ccdc94205d52d93dbdee1d0b78f10b9a6011cc8d82be10277cecde6658c14e"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-6",
-      "contentHash": "96f74d91f3dadec41f6abdcd7e42e46f7bf91806e2ee7daf381e433a7291c2ef"
+      "contentHash": "1ed4125ad705eb2c7526551a9e88325adfee1c97f37a032914bd7c9719f45cf7"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-7",
-      "contentHash": "326e1e82ed3bd24f9e410bf7b2bda72a2f13948e2f7912277175dfc382dea800"
+      "contentHash": "2348d1741fcff965891742e7b047469d854a68495acee0c830e4a5504e709b87"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-iii",
-      "contentHash": "5e298e6c4e154d42ced224d25c9f013eb471aa19f11811cce0cd98b4f0e6aed0"
+      "contentHash": "4a74c91a8b2987c334e601a20e67c295a70e101c81a43270f6d7eaec9b07e58d"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-1",
-      "contentHash": "eb8e445516cbc78f2196186282a16f1584def6dda21d0c704e4e71ba725cd741"
+      "contentHash": "5d66690b0ed5b67aa41c5bbb82cbcb79e71d2fa674151aed218e94127e888945"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-2",
-      "contentHash": "7f1666aea42bd728baa364fa1bd72194fadf18ba4b6f4154979e3409f229a5ba"
+      "contentHash": "5f7945e2974297e3ca76424fb5d54e9ccdf987592c455e1dd17f3dbb55ed113d"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-3",
-      "contentHash": "6e25b91821e4afb5c0202bb9fdee1dfb0b50427a97df0b85d3ab857be10877ef"
+      "contentHash": "e313baa75f115ced06fa1cf17b66a30a9a06f47694a1f93e8be6787401d09046"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-4",
-      "contentHash": "0af2640eed326887cfa375216684fef6b34dc25a9f123a4f354a314048276116"
+      "contentHash": "94733d9f038ff6801d852aeb506107be34aac8b2ee8ebead2627504a0fefd78e"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-5",
-      "contentHash": "775f1baa672640d20046503d02c7ee92585d14e7aafc22e4f4b2495297cb9507"
+      "contentHash": "71e729057a58cb2cb300e83ddb4b13aa6b18a4811cac324b6f8616d010a35a16"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-6",
-      "contentHash": "f4c62386c6499a0291d131c5276dbb5ff996bdb1455a0d42f343e2f0fc9b8d52"
+      "contentHash": "5ef18d7a30b67891cf981586989ba2cc1b515ae13c91ecbf2841040295629a8f"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-7",
-      "contentHash": "6319c0af745759012b2b7784c393fe8a4516e7b857bdf79c1c8b8d1438d72cbb"
+      "contentHash": "52405a8ca88a7f7b64791dc43265cb9c0cd9263bb6304d17fd81c25b1a832412"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-iv",
-      "contentHash": "57dbd869cb38f39f39777ce4a7a62830e6c2499844ef01e2f96db5288c827938"
+      "contentHash": "dec13dbcc473b3328c415cd99e6366a45740b38fbc9666578dab412e24b5aef3"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iv/chapter-1",
-      "contentHash": "76c40daca80300653f57dffe14ce4af9f65615997ba376788120275f625345d1"
+      "contentHash": "f0f0acb255e62de0f53e04a3cfec5b79c8784e0eeb5a1a65e05d43a989a506ce"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iv/chapter-2",
-      "contentHash": "740893042c3cbebe3f78ecb4f0e7ede88e08ff900aa137357786164bef63bec5"
+      "contentHash": "a05018e0b63ca3556e902d4a53f0ceb06a56e36dbbd5b41440aac4e3c5630c79"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iv/chapter-3",
-      "contentHash": "dcb71c59298d92fe8327a321ac4092dec586b32a80a743d3f9d12ae17c2fc336"
+      "contentHash": "351792f67e750937a493db820b8d3102d7da4f7cb2eeb152ea65ad4eb2353c78"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-iv/chapter-4",
-      "contentHash": "b4b4f4563f9070adda1f36adfb12240267d34ef587ab74efce305111d7bf9cfe"
+      "contentHash": "6809d45b99a5817d5ab712348800ff059ec92785d97dcf6eafdce5be39150b6a"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix",
-      "contentHash": "f766a9f0451d051985a23a567dc0d948ded84a3ee8ea29fd391160912fd5cbaf"
+      "contentHash": "7dbc7e9e7dd03172fa0a37a3d99ae694564b5334ade8f1f7de611297041d000a"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-1",
-      "contentHash": "05def1eb17d71cb614fb78275398b13bfb6c5ed17e2d02db2bd53df8ccc88550"
+      "contentHash": "a9cdfb18cbc5ae5e7d73e5e52ce7fb5fd534a5131242b2519a2254cd91e45d64"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-2",
-      "contentHash": "0f0b2a2f6cd42713cd50d70ff64deab80a606b08ffb9d8acb436443a0e676783"
+      "contentHash": "c44bd40e6c19c68776c042e827653b6c5946f3066001d150d2d488ab7d2a37ec"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-3",
-      "contentHash": "576e0cba6144d4b0ac185b81a68468275cdecf45bd53ca9cd2936faf59373d06"
+      "contentHash": "cf71ce6f3b879f4bed6bf1ff2f2a84dbd9589a4a21e7640e964e46a6d107672a"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-4",
-      "contentHash": "e394f9d63576b407a8abe0a4090a785891b24a538437a8328a8643adbf2069d9"
+      "contentHash": "b257e0324a1aec08f18fe7f46a107a954da2acc113f000fb9260973ffdc1fec6"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-5",
-      "contentHash": "a92c613954f4f1754f3e415bd611cc80f00c52bbdee165fab5bd02f8b1874aab"
+      "contentHash": "54290387e89a5c1116d8943b4e036056aa956146546a3b2944e021f583f4ebd0"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-6",
-      "contentHash": "601b0626c6d24fff6606bd5cbf9648110cd68c8bacfb8b8bb1a358c60caafba9"
+      "contentHash": "ca5777012794bacd958fe83e249da603202bfdc27d6b6d0fd1f612df402ff481"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-7",
-      "contentHash": "da14bf6fd8df13e7ae1365cbeb70e5ac8216ae9a6b5ab7ad9a0d9113f96e10fb"
+      "contentHash": "ba583bff6413adedb199d407e477eb9be705ef48782f7a98632693c440f45d7e"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-8",
-      "contentHash": "82bc4cf31fc3b01be50b1f32a0c6c3816770118a9e62d24f25aa76b4cddca8f1"
+      "contentHash": "bd9ad007255f5fde27efb7e767b0c381c5926d14be3cb329979dddc53f9b5016"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-9",
-      "contentHash": "6b1b0365748cb0e94c229f0d393e8ddc3e06653dcb563bfcd99d6c82a9dc97cc"
+      "contentHash": "4bf5acca6b4154c2e8f6726771c5347c7be7231094db1a738c57e7f11858ed69"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-v",
-      "contentHash": "a6e8acc69ef95340bc1d209feb5edba08dbf2e0088e5ea71b70f21a5b762ba62"
+      "contentHash": "43b92c5da3e3d5fbc712b183ae4e0f34e76dd528a4fbb091d1562d1f3336a5e0"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-v/chapter-1",
-      "contentHash": "3a1bb52c6754777d4d2e3bc11f54a2a83f9bc5b7cef65291e0d8d5357d4c3c7d"
+      "contentHash": "8f5a7ed64421674954fdd9ee58160e1b122cea74608647cab120c369b919b3e5"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-v/chapter-2",
-      "contentHash": "4704324fe1155c407385697db96f2023d6b2314c93ab45c6567fd9a1f592512e"
+      "contentHash": "8a9a01aca96f730e5f7158f70e7365e64c92352088d76329ec1588f7071997aa"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-v/chapter-3",
-      "contentHash": "958179ebf90be8ee6b3fc89ea356e8b23b48acff6c842747f9b6b754e282ebce"
+      "contentHash": "6e44d9aea45a39b4eef148ae8ed160a6d4bde188ff05fe4ff6962d2f9fd153db"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-v/chapter-4",
-      "contentHash": "5693be1e6e23e52f877d21e4a1b7f4ac7a264f2a54bf04cfbfb7630af0e29160"
+      "contentHash": "5392704e4552a6d2ad0c207dd2a9a9afb92a82ab00709aa5a6207166223dc8cc"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-vi",
-      "contentHash": "accd3b75a0e733e43a8fb9033b7f18a81cb5934640f8199c431ea8374f0b0582"
+      "contentHash": "5bcddf18badcb818ce5554c6650d5568fb5495da32f5bc00182b2a1a9c6766e3"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-1",
-      "contentHash": "5ddb30784f65a3d3604048e688ffc3d71f4d2ba3db487c612f56beb3d48e0fe6"
+      "contentHash": "eaf2ae178d568fd873bb09cd5bc93077c58c4d2ef54c98fd2cf7dabd4a9a6916"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-2",
-      "contentHash": "4b6c5c77c8339ecee5939a4c995c8d939302b01626c15dda1faaad57221833f1"
+      "contentHash": "1fca912a50a63fe47cec395af3d803a985dea05ca2629e3171a9fa9365130064"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-3",
-      "contentHash": "50e368060ce192234b0ce66887f0d2449859425843fe5a7b763910cdd7102523"
+      "contentHash": "75335d97690f29eaf09020034f7c59cddc8ed2a4fc75947c90353bf178a119cf"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-4",
-      "contentHash": "0c3e8c240422473aa876128e20ee70816a7849c9bad08f5f1ddd369dd77f2426"
+      "contentHash": "67f24e45b69c228fc22cf91fc095a6900d59de06a972f5d5f5e4f0d43a5aa40e"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-5",
-      "contentHash": "4f888c450af1c8d9dac01b588a0b1a11600141234273d684c6b2410a1ffccd1d"
+      "contentHash": "c84d5798aac0ab73d7226f8c3fdfc2c16f6c1ebfb872d35b1bcd1f6ba66aa9d2"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-6",
-      "contentHash": "5c767d6fc3cbdfa47055c8c922aed14a7198657a30baed8b643eca2d08a2f8b8"
+      "contentHash": "6f41db7030875408117d7f1a2dd6f72da81f9473a324a205013b53017badcbe6"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii",
-      "contentHash": "98dc893a53c20f0cc150eaca273c5e4cf8fa41899200ef845cc45b490de93a04"
+      "contentHash": "09a1077e3f12e5e08322b9343b275eb7898c45c52357bc531fb4c73d365d6c39"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-1",
-      "contentHash": "2f27a2dd9b1897fc357198e116999ae488c84fd3d694340136fe16b45e5611f0"
+      "contentHash": "fdce0f161c0ba965e4b702c2521b36e725eee01830846265bf2d5972522fc127"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-2",
-      "contentHash": "ef4ad31cbc60a7479321d0de31c2756771ea6e95d9e9f63e2c2a2f899ea6925c"
+      "contentHash": "1c36e9c0183de55d072965d617b41c936cc707322b829f4a4041b39197d19a4a"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-3",
-      "contentHash": "3c68b27e42a7aa9445c904b6482694e47f1b59305900d850fbfd7ef98db8bb72"
+      "contentHash": "05fd13c6ae94288f3e83edb902ab4956666f464930aba458c828d0245220da83"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-4",
-      "contentHash": "b68d31eb2ad9900e30c38cd5ad91dfcccff95a9cca05ba5428ca726856c90601"
+      "contentHash": "7bce7c2590311efc3436e34636333e7f1bddc7141975ebefdc0728eb6844735b"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-5",
-      "contentHash": "2b046544059144978ce932b6e40fc9547a0009563bbc48a5007a070bd8970b7e"
+      "contentHash": "54f1ee3a8d6e1283b53f012a534364fb44eae78e2b90a2467887658b02e4445b"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-6",
-      "contentHash": "f954bb676f826dfb91e893e30335682aab16f819df19e40c09381be2f85ffa9e"
+      "contentHash": "69539424e1c5ee737d715ee0907b2be19ec79cd863f06d19146932cde0f33a25"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-7",
-      "contentHash": "1724bcbe3cfddbd64b58e11fb3023da8026079ccb099eb116f009a3e8b5b95d4"
+      "contentHash": "0158069019691980b5e90dc725536ccb061ed56436b07ccc1c989c39b9cb3b18"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-8",
-      "contentHash": "b7700c2a4905f060350ebf5e2a25e521542221627ef4b4d4a9a1c64ee3783c20"
+      "contentHash": "350da8174916c64b6d842c2444297be853b7bfe5118d2e5dd17c17aa19148e9c"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-9",
-      "contentHash": "31e11d819587bafabec9e6d48c8a858e0c34e999f8c55203ee5fbed410efce77"
+      "contentHash": "c461a994e31a6ba1b794bf2180d0981a1e50943ae95b425b2a12474dd18f352e"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii",
-      "contentHash": "a99900024f2a31be7ee3abef83137b59357061a86f9a9c055ddc422b3115e4bd"
+      "contentHash": "be7d83c56a513f6fe983619f013e7f39a48e3e65f4724f36bd73c16cd55d0969"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-1",
-      "contentHash": "8062978fe62ae0bdcb7476ef4d703238931d42cf8754d65eb2e26fbdb8f92991"
+      "contentHash": "d1bbbd190d972d59e03bb59c166252007e698a2d8d92e01acaedab06786a5dd0"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-2",
-      "contentHash": "dca512f5b579ac71fdf89dab05ab286b29afbb1ddfbd3e382e3f0a8ff9dff70d"
+      "contentHash": "c873a15fa93e9114eac4dc5c3d926abf745c6b9d86e2f9231a1a4c37d52bd01f"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-3",
-      "contentHash": "4c1696c345f6a8798eb16aa01ac3f7498e3814f4ed790d5f8f0d15e323c6739c"
+      "contentHash": "43cc96e0db37f9b9bf87e5ce1fd0224f58de2affbd541ced4b0df91fdc2f27b4"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-4",
-      "contentHash": "15367967c29cf317bcbc61bebaf586314cc52c5d5b3e426d68f245c4ac00ee3f"
+      "contentHash": "e731975d8fec1838bf7e78ec6632c81248ba41c1c63899246c6e6e816924ce92"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-5",
-      "contentHash": "8a76a0b7a30e6bed78f4030de0ee64113d291bdcfbf73a13b9954734339e9375"
+      "contentHash": "8e3c1ef6ca6544c50b88b299c8dc91f5c8706ac31f0f22ae7fee1b5a26c1899b"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-6",
-      "contentHash": "77f1d95c5e86dcc9f9fd42610a15ad19ef5fb59b043299f0b59ecdad7a09529b"
+      "contentHash": "4e89017d4fc20da7adeffd1f86d30eed71b5d7af94ffa438a22c33d691e9a6b8"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-7",
-      "contentHash": "2b7f78639ae54b75ebf78d16197a0acada5bc04bf7d27c54292efc69f3e3d774"
+      "contentHash": "33e749b3c2d38d48d961da46d83b429403ea2b6d6cde9340ee01e1fef57e1cdb"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-8",
-      "contentHash": "7e0993afdd582fc24838dfdb48d3c05be6c2e6b18cf76bff49cb47c66fd71996"
+      "contentHash": "9ccbfcc014145ba81e8ebc4f453a43a1c23f8f0f99dcbd11ed858a515c3835cc"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-9",
-      "contentHash": "9d1f7eb1f1070adb956f6cd236491412e0da5a22feef43e86db78335559e870f"
+      "contentHash": "f09c0a099d2f0f6f093dd48e6d802dfff60dc779b01ca3cd4da310eb2e0f11d1"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-x",
-      "contentHash": "a385cb09554a6d073c40d1eb57ef74fc9d3a20b5c312d59df9bc40cdceaa6e9d"
+      "contentHash": "fdb5a0c865ed74fafd5995a4719d11dbb7aab26696c49571005476cedaeefd7f"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-1",
-      "contentHash": "db5e15a6cc4897b4970736a786ebf48ab0265abeb8d8bd746027ed6b502c2980"
+      "contentHash": "6584fa7a2ba5f5c0b945976713f1f8b0bbd026e286d8543cdebffcd455c51f75"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-2",
-      "contentHash": "942bf40d17bad87a72c3b1ea4924bcb58d6f8d79e43db10799d2e23521632631"
+      "contentHash": "1bcc6655cefe0fa4cf3321e7e5f4e51cb99b27d338ba13d67034447d42314594"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-3",
-      "contentHash": "f2463cc37795663b90048829e3c0a1083920732197effc2b1283f74ecfff0809"
+      "contentHash": "b9883e8f9d82087ce011695d650ab2b59c1b557eb8f54504d18488fd73217685"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-4",
-      "contentHash": "0eed3871a3c68ef99392bd4d3667fd3976f8614abcfe52c9ef8fe382404c6273"
+      "contentHash": "1465af7b7c7d4287532bf334bef31cfd43eece26cd4bc6f154de8448b46a9571"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-5",
-      "contentHash": "70b9011e012ab94f160cb3cd0d329e6f1e46732241ec132300d6beb045eba192"
+      "contentHash": "e43c36f881006adae1542f244edbb061ae8bef5e127913bb4d946f54ba97175f"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-6",
-      "contentHash": "419a8ff8fa8ae0236edded2628dd2623d93acac4b755f3e2d58edb57bbdd45f6"
+      "contentHash": "b1d9c186b61ffb9858ea326de45b22e146707d9e97ff4d920494ee3dfb216896"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-7",
-      "contentHash": "1f337b3cde9776b0dec65bcf066a891f6d144420343e016faaf2a61973ca681f"
+      "contentHash": "20348e022a12985679c55e1b0742c59d283d406e2ec7c167ce37fa59bff53ba2"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-8",
-      "contentHash": "0b314f6099534e380623dc8a8a25f6439ba7687272a4ce9e7fdcdff75b3714ca"
+      "contentHash": "fcef458da591d3474ba193ca8f12083532deccec89b3f406bab221af76a7bf7f"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-9",
-      "contentHash": "c9c2b05b987a13b3b20fdc4cbbf12bf2a6861235ab7abf75e0ac695f7d6b7276"
+      "contentHash": "00df09705c544a671e66ee31806fdb460c65c2cbc5594002b6e071095e810685"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi",
-      "contentHash": "d99be3977cfe99b32565c71440edcbdf65d4da437c72719def5c96654c267fed"
+      "contentHash": "1fed13b9887c646e8636f8f40e66544b57fa1939ef8aa56fba27557a288bffce"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-1",
-      "contentHash": "3c4751b0a69c07fca3a34de936b5eb6b5b70b5f1263c6ae61810a6b374e5a8cf"
+      "contentHash": "57a99da38988be14ff9e9ac5ddcced5645f118e1cb0fb156876666ed8c349d5a"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-2",
-      "contentHash": "e7620660346e206a8319997630f8a6e371eb28a099e1eaae396d4fe514caf4ac"
+      "contentHash": "cb0de917c05531d567cd93ac487924ec4898ce97d0dec26566d8c56366b6c72e"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-3",
-      "contentHash": "754a309b7f4b10f6e8a8d09146c6cb9ffc08d4729adf1ad47ad0b07811bf2664"
+      "contentHash": "9f43ddc01ead7de0650ed4c00631c95dfbeef656976362920359d31fa9e4daac"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-4",
-      "contentHash": "4e52eb148cc42b9e189980a2a0a7b4cb37b7805ff09b56f2f9af71145f799ec5"
+      "contentHash": "3d8b4041f44f2446ef1e3a3f4da3f93bea762d68683ff130619c66460858bd84"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-5",
-      "contentHash": "c4ba16e117805552e874e8fe6dd5602a8df62383801c4283b64e9e84a00de59b"
+      "contentHash": "bbbae4d1a97c6bdd6fdbeca0551e3ed67243a33e00eb57272ffda9435ea1c47a"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-6",
-      "contentHash": "9a49e881da8db89af7807009e481215637900fc9cf36485c9314bc11e6ac21b6"
+      "contentHash": "b076ab9eabeca0ad5b850af5869bcdc05c1aa8c4c31d3d0c1101c98406531c63"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-7",
-      "contentHash": "836ecf5dad0d2d726dd01912274ea99824f4e366c122983a1fc06a8b8a0110b0"
+      "contentHash": "0f6c1656f50b618f3af0ef2ce8ba15f0fa2fccc6a8297a7752235a20d719e567"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-8",
-      "contentHash": "3262ac960b16745751f4d09a57fa8958867f5646457328d570d297eafa87e915"
+      "contentHash": "510dd5ac50701c528d1cf2190d389c3c917693f68c774d7a2a43e59189ab73c1"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-9",
-      "contentHash": "55fe11097c99b89a99bde74bafbdfd449067848f1fce7ac203ac58e4faa2e55f"
+      "contentHash": "fb47ac7e02674c594a23e776948cfe39f9d16ab7ee6f35f0a69a1c7314c57ae2"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-xii",
-      "contentHash": "020697a78f06c9aa159286af0f4ad40eaecef1d1b0943e5cd3444823116bffb0"
+      "contentHash": "d23b4902c04ed20d1d80a2a87c8addbc71af3b1f037258ec81c9445af91a0fe3"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-1",
-      "contentHash": "69a35565b4828f976fd6977f05430cfa88c8d20a53d22de08ac39a24e6c1b33e"
+      "contentHash": "79be1bd870bae8b16e6853040df44a518135e181bd839b5b5a9928b50cf719ac"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-2",
-      "contentHash": "8901477f639503441e5358538cd9d118a0c4800110e73cd6a89535335c4cc21d"
+      "contentHash": "937fed8e45e8e9a9b4eb5b0a9a7ad71b5ac6027e1f9ada221fc62d509177e91e"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-3",
-      "contentHash": "98ee953c7a89165c9b8f06daf3c36a18cecabd257d36cb2dadcfbee588690626"
+      "contentHash": "fa152f28918afc005feb487aa9c044a78f2cb4d16355b87c293c17b624bab8bd"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-4",
-      "contentHash": "d5685eb2c370199af60ef4aa10862995272179b7cd57ee60a7ba008377aa2a8f"
+      "contentHash": "e7a1addb0a3d32c33367d5b05758bae2314d3a73b8c764b0ec4c97036aec2585"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-5",
-      "contentHash": "60cd20a8f5e6e1f009063e803c381587add41ec0b2c0950cf2c5a73f56721b47"
+      "contentHash": "244cc66e26f4c7adde83c08310c3f7d3bb9f9c5e40d692881dc555af850f8340"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-6",
-      "contentHash": "f5fa7ab222d7b2ef887152bb3c789a79346e36bda7c600beb4f8439eabe6d089"
+      "contentHash": "64e841fc289f7feed7b81b9e633a35865d9729dde10d0dffb32d5ac97d13fe38"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-7",
-      "contentHash": "2040737c5c958d42f346da1fc258f53bd6f52de7b06a2d1e6aaefb35222d8821"
+      "contentHash": "f4e684c9efb8f677f09c3e750011fb8abffb135429ac04ac0ab33265c10208a2"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-8",
-      "contentHash": "15301576563bf5be9193bbde82485802d9dbbbfa19ae1f01e5d6e71e3a17bb80"
+      "contentHash": "e5d92fe97a91f87fb9722ce1f32a7ce64f5493d93843054b1665f75af2123b59"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii",
-      "contentHash": "4515c1c886ce0d5ff73508894885e38d58d7fe057e22d2daef6c4e3c77a57bfb"
+      "contentHash": "dd298410954c5089a664eeed51ac9a68e43615049a126297ec05263eeec9ab58"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-1",
-      "contentHash": "a26a5aa232ac14a41efde6031839f521e4e158aa8b5e55cff363a9d9e48f5955"
+      "contentHash": "b74bc9e0451fa242f21e54b6cf8102e8798a023333a54f7f61383b33fe8cacdc"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-2",
-      "contentHash": "33f13388dbfdd85aa4de21a0a01544e7b69c343d6e38c4fe833b17175453b0e1"
+      "contentHash": "caaaea863f1d4b5fd80d450fde25d3b0eb10ac3298c243175296bb7645cdf1b1"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-3",
-      "contentHash": "44c62923926a27186bf4b86dd3259a52ec08a16198b83414e55c50c64ad0726f"
+      "contentHash": "cc155d41bc740559d6d22b61da2dc1ad9f642ce667ff08213beafd01bc3f91be"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-4",
-      "contentHash": "50393c4d509ebd86fb8d5ad347c44b43fbb73b60c19f81286a9f31590603cb1b"
+      "contentHash": "8dea5723c6e40932c2147c5f879ab643a8f49c2a5fbbfd3e81509596b7016caa"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-5",
-      "contentHash": "d64481aa472b555f772c937244f5ca976de6abcc893c0d07f9fb099f6761da8a"
+      "contentHash": "c7efdba2dfd764f2a0e677172bdbadf9c1f10975263b693cd1f8f4db720f32e1"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-6",
-      "contentHash": "302599895cbae8246692a025e97e7bcd8c3689ff3bea223e452b53ecd689e48e"
+      "contentHash": "1fba5c2e519822c7d31faf5c7281be3ca481be534aae4893e026b1d0001d5896"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-7",
-      "contentHash": "0cab63b9675625449f5833847b72b5a1d16a2872159c97f433e3529122ae51e7"
+      "contentHash": "f94d17b19a7b73526b4fc2eb1c5948e0b2f8e08068be65f0288094e7d5257444"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-8",
-      "contentHash": "b1d550dbe5f1237dc52c4c6458cbf49c30809e99e99f15cb673f930c12717fb9"
+      "contentHash": "6d550bed219fa6ee133a92b2f4e08d7f625e7338e8e5c8c613474e851a337456"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-9",
-      "contentHash": "fd36a646350a98ea2a1a3bb10a1c7eabaa3021b399d2a56219ee1c3e66feaa27"
+      "contentHash": "938b8c9daa23e3e809495c6000adcd10979a8a8cfb909aa4e7fa7ba2b723b888"
     },
     {
       "kind": "article",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiv",
-      "contentHash": "0d6928054fedbea1ca9c2c9c75960ca3c9e6a1a9060eda03f6e29d8be82f8f7c"
+      "contentHash": "600291f7ebd64ed89d6dcf64ed91e95bd014d591c100afadbce0fe2320d3353a"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-1",
-      "contentHash": "6fa9e026acb4efc144c26d2b858faaf9eda3a544fbc5a2d6fa3cda2549329e74"
+      "contentHash": "2587bf5e1bcf10f569a7ee2dedfd26168af16124a9fbc562313a6f23a840f799"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-2",
-      "contentHash": "f36be75fc127349836b1b98e77dd44b7357c2b941a819c4c674bb2e6da2e9de8"
+      "contentHash": "a3e0ba4acb0dd34bfa4c0fdc324afa1e6fd429b23759314c6f93d8af9fc714a7"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-3",
-      "contentHash": "e5492f30ac0754a69986fb90bcf714e684a91de85254a1c5988b5d2e1d365ca4"
+      "contentHash": "cd7806682dcd0688120bc22a3e57d918984b4e5514e77134fec6a29a2e5f2e5d"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-4",
-      "contentHash": "4cd30f3ca9fefeae367369feb1b73703d12001cd621da6eaaefcfb7f00c31ece"
+      "contentHash": "e5d4dfd1b991271456b0f4f702f1880a3e3138170c4ac84c34f4312988a64467"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-5",
-      "contentHash": "59f8ecdd93930dcd69d98f92f99e515bdecff480734079e2a1e462b4addac98e"
+      "contentHash": "0bb724ecf35f7b4346d7c2b765017cf7cf3a361db06bd9eb59c99fbe4a918094"
     },
     {
       "kind": "chapter",
       "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-6",
-      "contentHash": "52c5e8079183b2a17e7876d886f893d023a401d68997b3801ba73d157ce1ce31"
+      "contentHash": "9b198fb990f11d22d99c5d6efed99fb83894072b6d4ce8e8080f633544022b14"
     }
   ],
   "assets": [
@@ -1009,6 +1009,13 @@
       "contentType": "image/jpeg",
       "byteCount": 297761,
       "contentHash": "be364d1078d247d9ec26248eec99ccae6b25fc54add3baa7840bda7f24a78946"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD5_M1_MIHa1-01.jpg",
+      "fileName": "zr-702c7346a8dfd090-APPENDIX-F_BK_CD5_M1_MIHa1-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 440034,
+      "contentHash": "702c7346a8dfd0901ff7688b6a6ab3cdf34684e163635f7a2143326a03e56974"
     },
     {
       "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD5_Map%208_MIHa10-01.jpg",
@@ -1359,6 +1366,13 @@
       "contentType": "image/jpeg",
       "byteCount": 197927,
       "contentHash": "e2e7a61cde0cd914367416b0843c7de913b0e7cec808f64d14af8181e2de39e5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD4_M3_MIHa4-01.jpg",
+      "fileName": "zr-18901e8f52b72386-APPENDIX-F_QN_CD4_M3_MIHa4-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 503588,
+      "contentHash": "18901e8f52b72386e86e9cb8d2a711b846810b2e03032e724322e668d40e52fd"
     },
     {
       "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD4_Map1_MIHa1_0.jpg",
@@ -3711,21 +3725,21 @@
     "chapters": 101,
     "appendixPages": 16,
     "sections": 4068,
-    "subsections": 7296,
+    "subsections": 7297,
     "tables": 313,
-    "mapReferences": 209,
-    "amendmentEvents": 13141,
-    "assets": 433
+    "mapReferences": 211,
+    "amendmentEvents": 13152,
+    "assets": 435
   },
-  "researchEligibility": false,
-  "researchBlockedReason": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
   "sectionCompletenessRepairs": [
     {
       "sectionID": 20018523,
       "sectionNumber": "12-10",
       "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-2/12-10",
-      "capturedAt": "2026-08-17T20:14:42.392Z",
+      "capturedAt": "2026-08-30T14:50:19.291Z",
       "reason": "Preserve defined-term records stored outside the nested body field."
     }
-  ]
+  ],
+  "researchEligibility": false,
+  "researchBlockedReason": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass."
 }

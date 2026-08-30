@@ -13,22 +13,23 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 - One submitted question consumes one turn only after Permitext completes and durably saves the answer. Internal model calls, retries, verification failures, cancellations, and provider failures do not consume extra turns.
 - Additional turn packs remain disabled and unpublished until measured hybrid costs and the complete purchase/refund lifecycle are acceptable.
 - Research is an unofficial professional research aid, not an agency ruling or professional determination.
-- Zoning Research is not part of the Beta 1 public Research scope yet.
+- Zoning Research is now planned for Beta 1, but public access remains disabled until the official corpus is current and its citation, table, map, amendment, applicability, evaluation, cost, and cross-platform gates pass.
 
 ## Current position
 
 The product foundation is substantially built, but Beta 1 is **not ready for public paid release**. The immutable V6 Research cohort passed 20/20 fatal gates, and the completed subscriber economics model places a fully used 100-turn month at $5.74 p50 and $6.06 p90 in model cost. At the confirmed 15% App Store commission and the accepted planning reserves, the modeled p90 contribution is $4.16 on web and $2.14 on iOS at 25 subscribers; the owner retained 100 turns for Beta with a later $4–$6 target. Local Stripe and Apple lifecycle simulations and the provider-backed Stripe sandbox lifecycle pass. Apple-created Sandbox/TestFlight evidence now also passes purchase, account ownership, Restore, cancellation retention and expiration, refund submission and revocation, renewal, billing failure/recovery, delayed notification recovery, and strict duplicate write-inertness. The final duplicate proof used exact commit `b83194446a6ed8178f597d8bb9a81475b0d52a0b` on only the isolated `apple-sandbox` custom-environment deployment: an exact Apple-signed `DID_RENEW` replay returned HTTP 200 with `changed: false`, and both hashed database timestamps remained identical to the microsecond. The public isolated-staging alias now serves that repaired deployment; Production remained unchanged. Isolated recovery acceptance also passes: the exact serving Production commit ran against a point-in-time Neon child branch from an SSO-protected Preview, and all 124 private Blob objects were restored byte-for-byte into a separate private namespace. The read-only Production Clerk provider/configuration audit passes and is now protected by a permanent fail-closed aggregate-only guard, while fresh/existing provider sign-ins and the account export/deletion lifecycle correctly remain open until the final deployment. Web and iOS purchase-consent controls are implemented but remain dormant until the approved policy versions are configured. The canonical Production policy URLs are reachable, but the August 30 exact-content audit proves that all three still serve older/different bytes; a permanent strict verifier now keeps publication open until the approved files are deployed exactly. Controlled Production billing, New York sales-tax completion/configuration, actual refund/infrastructure incidence, remaining monitoring, manual Production authentication acceptance, and the final Production/TestFlight release sequence remain open. Additional-turn sales stay disabled.
 
-Current development branch: `codex/research-commercialization`
+Current development branch: `codex/zoning-research-beta1`
 
 ## Status dashboard
 
-Checklist snapshot: **75 completed, 23 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
+Checklist snapshot: **80 completed, 28 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
 | Core product and cross-platform foundation | Mostly complete | Shared web/iOS contracts and Research presentation are complete. Final production-web and physical-iPhone verification remains. |
 | Research quality and subscriber economics | Current Beta gate passed | Immutable V6 passed 20/20, and the no-cost 100-turn/full-service economics model is complete. Actual tax, refund, and infrastructure results must be reviewed after the first 25–50 customers. |
+| Zoning Research Beta 1 expansion | Current corpus; safely disabled | The complete corpus is refreshed through the official August 13 edition, including both new Queens Appendix F maps, and all 21 revised evidence cases retrieve their selected authority. Six owner case decisions, Zoning-specific Research contracts, capped validation, economics, and web/iOS acceptance remain. |
 | Billing and paid continuation | Partially complete | Server billing contracts, local Stripe/Apple exercises, the provider-backed Stripe sandbox lifecycle, isolated Apple staging, and Apple-created purchase/account-restore/cancellation/expiration/refund/renewal/billing-recovery/delayed-delivery evidence pass. The atomic duplicate repair is deployed only to the isolated custom environment, where an exact Apple-signed replay returned `changed: false` and left both database timestamps identical to the microsecond. The public isolated-staging alias now serves that repaired deployment. Controlled Production billing and final serving-release verification remain; Production was unchanged, and additional-turn sales stay disabled. |
 | Authentication and account lifecycle | Configuration ready; acceptance open | Product contracts, exact Production Clerk provider/domain/portal/native configuration, public AASA, and a permanent aggregate-only audit pass. Final fresh/existing Production sign-in plus account export/deletion verification remain. |
 | Legal, privacy, and customer promises | Owner approval complete; publication stale | Official-source owner review, final customer-document approval, stable local version identifiers, age/data rules, versioned acceptance, purchase consent, server enforcement, and a retainable web post-purchase acknowledgment are prepared. The canonical URLs respond, but the strict live audit proves they do not yet contain the exact approved files. The New York registration application was submitted and its confirmation saved; exact policy publication, the Certificate, Stripe tax configuration, and Production activation remain open. No attorney approval is claimed. |
@@ -41,7 +42,8 @@ Checklist snapshot: **75 completed, 23 open**. Eleven of the open items are the 
 2. Reverify Production authentication and the account export/deletion lifecycle.
 3. Publish the approved policy versions at stable URLs, receive/save/print the issued New York Certificate of Authority, approve and record the specific Stripe tax classification and provider registration, and activate the implemented policy-version acceptance flow.
 4. Finish monitoring coverage and delivered-alert/hard-stop exercises.
-5. Complete the separately authorized merge, deployment, Production, TestFlight, and physical-iPhone release sequence.
+5. Complete the governed Zoning Research Beta 1 sequence while leaving public Zoning access disabled until every recorded gate passes.
+6. Complete the separately authorized merge, deployment, Production, TestFlight, and physical-iPhone release sequence.
 
 ## 1. Core product and cross-platform foundation
 
@@ -82,6 +84,21 @@ Checklist snapshot: **75 completed, 23 open**. Eleven of the open items are the 
 - [x] Prepare a dormant Stripe automatic-tax Checkout path, a fail-closed Production guard that matches an explicit owner decision to the resolved live Price behavior, and a [Stripe tax decision record](./BETA1_STRIPE_TAX_DECISION_RECORD.md). Record the August 30 owner approval of `automatic` + `exclusive` and the exact local web disclosure `$20/month plus applicable taxes shown by Stripe.` Record the August 28 official New York `Issued` status and the no-change recommendation to replace Stripe's generic Product code with `Website Information Services - Business Use`. Leave actual-certificate receipt/display, owner approval and live tax-code/registration changes, filing frequency, Production activation, deployment, and real taxed Checkout open.
 - [x] Record the separate [Apple tax-handling boundary](./BETA1_APPLE_TAX_HANDLING_RECORD.md): App Store customer price includes taxes Apple collects and remits, Apple proceeds are net of applicable taxes and commission, and Stripe automatic tax must remain web-only. Verify read-only that the parent app displays `App Store software` and the subscription displays `Match to parent app`, and record owner approval to leave that classification unchanged; leave the first real financial report open.
 - [ ] Verify tax, refund, and infrastructure-allocation inputs and review actual economics after the first 25–50 customers.
+
+### Zoning Research expansion — planned for Beta 1, not enabled
+
+- [x] Retain the official Zoning Resolution corpus in Reader and Search with public Research eligibility explicitly disabled.
+- [x] Establish 21 evidence-ready Zoning evaluation cases; 15 have owner approval for Terra answer-key testing only and six revised cases remain draft.
+- [x] Add a permanent no-cost official-source freshness audit that fails closed when the imported edition is not current.
+- [x] Refresh the complete corpus from July 16 through the official August 13, 2026 text state in staging and review every changed section, Appendix F map, asset, amendment record, stable identifier, and index effect.
+- [x] Regenerate the Zoning evaluation packet against the refreshed corpus and current official source review.
+- [ ] Obtain explicit owner dispositions for the six draft/revised Zoning cases.
+- [ ] Pass Zoning-specific citation, stable-passage, table, map, amendment, effective-date, special-district, mapped-applicability, and explicit-uncertainty contracts while public Research remains disabled.
+- [ ] Run a frozen paid Zoning hybrid benchmark only under separate authorization and a written spend cap.
+- [ ] Add the measured Zoning cost distribution to the 100-turn subscriber model without changing price or allowance from assumptions.
+- [ ] Verify enabled Zoning Research on web and iOS against the exact approved corpus and release commit before any public release.
+
+Detailed Zoning plan: [PERMITEXT_ZONING_RESEARCH_BETA1_PLAN_2026-08-30.md](./PERMITEXT_ZONING_RESEARCH_BETA1_PLAN_2026-08-30.md)
 
 Detailed plan: [PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md](./PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md)
 
@@ -191,7 +208,6 @@ The current Research quality and no-cost subscriber-economics gate has passed. B
 
 ## Not part of this immediate Beta 1 gate
 
-- Public Zoning Research.
 - Team/firm collaboration expansion.
 - Annual subscriptions.
 - Publishing turn-pack prices before the current measurement and lifecycle gates pass.

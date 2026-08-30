@@ -2,7 +2,7 @@
 
 Last updated: August 30, 2026
 
-Working branch: `codex/research-commercialization`
+Working branch: `codex/zoning-research-beta1`
 
 This is the current source of truth for the Research workstream. The parent Beta 1 plan is [PERMITEXT_BETA1_MASTER_PLAN.md](./PERMITEXT_BETA1_MASTER_PLAN.md).
 
@@ -16,6 +16,7 @@ Ship a Research system that:
 - charges one user turn only for a successfully completed and saved answer;
 - behaves consistently on web and iOS through the shared backend;
 - keeps enacted text, Project facts, uncertainty, citations, and the non-official interpretation boundary visible.
+- includes Zoning Resolution Research only after its separate freshness, citation, map, amendment, applicability, evaluation, cost, and cross-platform gates pass.
 
 ## Completed
 
@@ -379,12 +380,24 @@ If quality requires too many Terra calls to meet the cost target, reduce the inc
 - [ ] Verify Stripe fulfillment, App Store consumables, restore/reconciliation, exhausted-allowance screens, and cross-platform balances end to end.
 - [ ] Deploy the compatible backend first, verify production, then prepare and test the next iOS build.
 
+## Zoning Research Beta 1 expansion
+
+The owner elected to include governed Zoning Resolution Research in the Beta 1 target. This is a scope decision, not an enablement decision. Public Zoning Research remains disabled, the current Reader/Search package remains separate, and no price, allowance, deployment, provider configuration, or paid evaluation changed.
+
+The first new no-cost gate found and then closed a real freshness blocker. Permitext's prior package represented text through July 16, 2026, while the official NYC Planning homepage reported text through August 13, 2026. A full official-source staging import and exact semantic diff identified the two intervening adoptions—`N 260156 ZRQ` and `N 250254 ZRQ`—as Appendix F map changes in Queens. The checked-in package is now refreshed through August 13 with 4,068 stable sections, 313 tables, 211 map references, 13,152 amendment events, and 435 local assets. The two new image assets and the Appendix F text/amendment changes were retained; stable section identities and table grids did not regress. The permanent `audit:zoning-freshness` command now passes while keeping `publicResearchEnabled: false` and `researchEnablementReady: false`.
+
+The current 21-case Zoning set remains useful preparation: all 21 retrieve evidence, 15 are owner-approved for Terra answer-key testing only, and six revised cases await explicit owner review. The six cases and their review packet have been regenerated against the refreshed corpus; automation will not record owner approval. The complete ordered gate and the compact six-case review summary are in [PERMITEXT_ZONING_RESEARCH_BETA1_PLAN_2026-08-30.md](./PERMITEXT_ZONING_RESEARCH_BETA1_PLAN_2026-08-30.md).
+
+Next sequence: complete the Zoning-specific no-cost Research contracts, obtain the six owner decisions on the externally revised cases, and only then use the owner's available API balance under a written cap for a frozen Zoning benchmark. Its measured routing and cost must be added to the subscriber economics model before enablement.
+
 ## Deliberately deferred
 
-- Zoning Research remains outside public Research until its citations, tables, maps, amendments, applicability, and evaluation gates are trustworthy.
+- Zoning Research remains publicly disabled until its refreshed corpus, citations, tables, maps, amendments, applicability, evaluations, measured cost, and web/iOS acceptance gates are trustworthy.
 - No Production deployment, merge to `main`, App Review submission, or public pricing change is part of the current remediation step. The explicitly authorized isolated-staging TestFlight builds do not change that boundary.
 - A larger AI-assisted blind evaluation set can be discussed after the current 20-case remediation is complete.
 
 ## Immediate next action
+
+For the newly added Zoning Beta 1 workstream, finish the Zoning-specific no-cost Research contracts against the verified August 13 corpus and bring the six externally revised cases to the owner for explicit decisions. Then propose a written cap for the first frozen paid Zoning benchmark using the available API balance. Do not enable public Zoning Research during this step.
 
 The owner completed final approval of the exact customer policies and the dormant identifiers and approved-file hashes are recorded. New York Business Express now confirms that the Certificate of Authority registration was issued on August 28, 2026, but its download link returns the DTF-17 application rather than the certificate; do not accept a taxable New York web sale until the actual Certificate is received/saved/printed, the filing frequency is recorded, and the specific Stripe Product tax code and provider registration are approved and documented. The current generic Stripe code remains unchanged; official Stripe guidance supports `Website Information Services - Business Use` as the closest specific Beta 1 classification. The canonical policy URLs respond, but the new strict audit proves they still serve older/different content; deploy the approved files and require `publicationReady: true` before configuring their exact current versions or activating the consent flow. Local readiness also requires the exact $7 per-user monthly Research ceiling; Production configuration and deployed verification remain open. The isolated Apple Sandbox lifecycle now passes purchase, the no-charge Sandbox sheet, local Pro activation, 100-turn allowance, authenticated account ownership, Restore, notification delivery, cancellation retention and expiration, refund submission and revocation, renewal, billing failure/recovery, build 48 identity continuity, Apple-created delayed recovery, and strict duplicate write-inertness. The failed-delivery retry claim remains withdrawn because Apple documents that Sandbox sends a notification only once. The repaired custom-environment deployment is protected, and the public isolated-staging alias now serves that same repaired deployment; Production remains unchanged. The isolated Neon/Blob recovery acceptance is also complete. The no-cost monitoring path now has live included anomaly rules, verified generic web delivery, checked owner web/email subscriptions, a tested aggregate-only Production-log auditor, and an active daily privacy-bounded guard. A fail-closed spend-control record now separates delivered notification, isolated 503/recovery, and automatic-threshold evidence and forbids buying usage or lowering the budget merely to trigger the test. Anomaly-specific delivery and actual spend-notification/hard-stop execution remain open, and the Production deploy verifier now fails closed rather than merely warning while external monitoring is unconfigured. The read-only Production Clerk provider/configuration audit now passes, but fresh/existing sign-ins and a dedicated account export/deletion lifecycle remain manual post-deployment acceptance gates. A separate fail-closed public-Beta activation audit now binds every retained manual result to the exact selected release commit; its prepared JSON and human operator record correctly remain red and are intentionally separate from the deploy-time gate. The requested 70-commit range also has a passing no-input interim branch-integrity checkpoint, but the final semantic full-diff review remains open until the exact release commit is selected. No other backend upgrade is currently required; Neon Free capacity/recovery and OpenAI credit are the first prelaunch checks. The next public-Beta billing gate remains the separately approved controlled Production Stripe exercise with a dedicated account and real charge. Replace the refund and infrastructure planning reserves only when actual customer and Vercel billing data exist. Before Production deployment, set the per-user monthly Research spend cap to $7 and rerun readiness so the live guardrail supports the retained 100-turn allowance. Production web and the final Production-targeted TestFlight build must then confirm the shared response contract; additional-turn prices and public paid Research remain disabled.

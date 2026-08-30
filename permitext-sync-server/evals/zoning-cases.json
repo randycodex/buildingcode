@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "libraryID": "nyc-zoning-resolution",
-  "codeVersion": "NYC Zoning Resolution — text through 2026-07-16",
+  "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
   "researchEligibility": false,
   "governance": {
     "status": "draft",
@@ -88,19 +88,29 @@
       "id": "zr-special-district-demolition",
       "category": "special-purpose-district",
       "status": "draft",
-      "question": "What prerequisites does Section 101-75 state before a demolition permit may be issued in the identified Subdistrict, and what exception does it recognize?",
+      "question": "Within the Atlantic Avenue Subdistrict of the Special Downtown Brooklyn District, what two prerequisites does Section 101-75 state before a demolition permit may be issued, and what unsafe-building exception does it recognize?",
       "selectedEvidenceSectionIDs": [20020818, 20020889],
+      "evidenceReviewTermsBySection": {
+        "20020818": [
+          "Atlantic Avenue Subdistrict"
+        ],
+        "20020889": [
+          "building application approval",
+          "letter trust"
+        ]
+      },
       "requiredConcepts": [
-        "The answer identifies the Special Downtown Brooklyn District context.",
-        "The answer describes building-application approval and the stated construction-financing evidence.",
-        "The answer recognizes the unsafe-building exception stated in the selected provision."
+        "Section 101-04 establishes that Sections 101-70 through 101-75 apply to the Atlantic Avenue Subdistrict within the Special Downtown Brooklyn District.",
+        "Section 101-75 requires building-application approval for the new development or enlargement.",
+        "Section 101-75 also requires evidence of a construction-financing commitment from a domestic bank, insurance company, or real estate investment company, in the source's stated form of a letter trust.",
+        "The exception is limited to unsafe buildings whose demolition is required under the cited Administrative Code provision or its successor."
       ],
       "forbiddenClaims": [
         "The rule is described as citywide.",
         "The answer invents a demolition prerequisite not present in the selected evidence."
       ],
-      "revisionNotes": "Added Section 101-04 to establish that Sections 101-70 through 101-75 apply to the Atlantic Avenue Subdistrict within the Special Downtown Brooklyn District.",
-      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
+      "revisionNotes": "Re-reviewed Sections 101-04 and 101-75 against the current official NYC Planning pages; named the Atlantic Avenue Subdistrict in the question and made both prerequisites, the source's exact letter-trust wording, and the narrow unsafe-building exception explicit.",
+      "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
@@ -108,7 +118,7 @@
       "id": "zr-amendment-history",
       "category": "amendment-history",
       "status": "draft",
-      "question": "What does the imported amendment history show about Section 42-00, and what should a professional verify before relying on a historical version for a particular date?",
+      "question": "What does NYC Planning's official amendment-history metadata currently identify for Section 42-00, and what must a professional still verify before reconstructing the text in force on a particular date?",
       "selectedEvidenceSectionIDs": [20017271],
       "evidenceReviewAmendmentEvents": [
         {
@@ -129,15 +139,16 @@
       ],
       "requiredConcepts": [
         "The answer distinguishes current text from amendment-history metadata.",
-        "The answer identifies multiple amendment events.",
-        "The answer recommends verifying the effective date and official report for the date at issue."
+        "The answer identifies the December 5, 2024 N240290ZRY event and the two June 6, 2024 events N240011ZRY and N240010ZRY.",
+        "The answer recommends verifying each effective date, official CPC report, and the authoritative archived text or enactment applicable on the date at issue.",
+        "The answer explains that amendment notes identify changes but do not themselves reproduce every prior version of the section."
       ],
       "forbiddenClaims": [
         "The current text is represented as unchanged since 1961.",
         "An amendment note is treated as a complete historical reconstruction of prior enacted text."
       ],
-      "revisionNotes": "Surfaced three explicit amendment-history records, including effective dates and official report identifiers, from the already imported Section 42-00 metadata.",
-      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
+      "revisionNotes": "Rechecked the live NYC Planning amendment-history endpoint; retained the three explicit current events and revised the question and rubric to require official CPC-report and archived-text verification rather than treating metadata as a historical-text reconstruction.",
+      "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
@@ -145,19 +156,39 @@
       "id": "zr-missing-location-facts",
       "category": "explicit-uncertainty",
       "status": "draft",
-      "question": "Is a proposed self-storage use permitted as-of-right on a specific property when no address, zoning district, special district, or mapped subarea has been provided?",
+      "question": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
       "selectedEvidenceSectionIDs": [20022472, 20022473, 20022474, 20019206, 20021237],
+      "evidenceReviewTermsBySection": {
+        "20022472": [
+          "Self-service storage facility"
+        ],
+        "20022473": [
+          "Subarea 1",
+          "December 19, 2017"
+        ],
+        "20022474": [
+          "performance standards"
+        ],
+        "20019206": [
+          "Subarea 2"
+        ],
+        "20021237": [
+          "SUBAREA 1",
+          "SUBAREA 2"
+        ]
+      },
       "requiredConcepts": [
         "The answer declines to make a parcel-specific determination.",
-        "The answer identifies the missing location, zoning-district, special-district, and mapped-subarea facts.",
-        "The answer separates the general Use Group IX table, limited-applicability and additional-condition provisions, the Subarea 2 special-permit path, and Appendix J map applicability."
+        "The answer identifies the missing address, mapped zoning district, special-district status, Appendix J map/subarea, lot area, and existing-facility/date facts.",
+        "The answer separates the general Use Group IX table, the Subarea 1 limited-applicability conditions, the additional performance-standard conditions, the Subarea 2 special-permit path, and authoritative Appendix J map applicability.",
+        "The answer explains that a December 19, 2017 facility may follow separate conforming-use documentation, enlargement, reconstruction, or nonconforming-use rules that cannot be assumed from the question."
       ],
       "forbiddenClaims": [
         "The proposed use is approved or prohibited for the unidentified property.",
         "The answer silently retrieves evidence outside the selected sections."
       ],
-      "revisionNotes": "Replaced the unrelated Use Group I evidence with the governing self-service-storage provisions in Sections 42-191 through 42-193, added the Subarea 2 special-permit provision in Section 74-192, and retained Appendix J.",
-      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
+      "revisionNotes": "Re-reviewed Sections 42-191 through 42-193, 74-192, and Appendix J against the current official pages; added lot-area and December 19, 2017 facility facts, distinguished Subarea 1 conditions from the Subarea 2 special-permit path, and kept the parcel conclusion fail-closed without the governing map.",
+      "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
@@ -184,7 +215,7 @@
       "id": "zr-r7a-standard-far",
       "category": "arithmetic",
       "status": "draft",
-      "question": "A 10,000-square-foot R7A zoning lot will contain standard residences and 42,000 square feet of residential floor area. Does the proposal comply with the basic maximum residential FAR?",
+      "question": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
       "selectedEvidenceSectionIDs": [20018017, 20018523],
       "evidenceReviewTermsBySection": {
         "20018523": [
@@ -196,14 +227,15 @@
         "Section 23-22 sets the R7A maximum residential FAR for standard residences at 4.00.",
         "A 4.00 FAR applied to the stated 10,000-square-foot zoning lot permits 40,000 square feet of residential floor area.",
         "The proposed 42,000 square feet exceeds that basic limit by 2,000 square feet.",
-        "The answer distinguishes zoning floor area from an unsupported claim about gross building area."
+        "The answer distinguishes zoning floor area from an unsupported claim about gross building area.",
+        "The answer limits the conclusion to the basic table and does not claim complete zoning compliance without mapped overlays, special-district rules, deductions, exemptions, or other applicable provisions."
       ],
       "forbiddenClaims": [
         "The 42,000-square-foot proposal complies with the basic 4.00 FAR limit.",
         "The answer states that the building can contain exactly 40,000 gross square feet."
       ],
-      "revisionNotes": "Added Section 12-10 definitions for floor area and floor area ratio so the arithmetic uses the Zoning Resolution's defined quantities.",
-      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
+      "revisionNotes": "Rechecked the current official Section 23-22 R7A row and Section 12-10 FAR definition; retained the 4.00 calculation and added an explicit boundary against turning a basic-table arithmetic result into complete zoning compliance.",
+      "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
@@ -211,9 +243,19 @@
       "id": "zr-r7a-affordable-far-qualification",
       "category": "conditional-qualification",
       "status": "draft",
-      "question": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area, and the project is described as containing qualifying affordable housing. Is the proposed FAR within the R7A limit?",
+      "question": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area and is merely described as containing qualifying affordable housing. What does the Section 23-22 table establish numerically, and what qualification and affordable-floor-area facts are still needed before concluding that the higher FAR is available?",
       "selectedEvidenceSectionIDs": [20018017, 20022699, 20022711, 20018523],
       "evidenceReviewTermsBySection": {
+        "20018017": [
+          "R7A"
+        ],
+        "20022699": [
+          "UAP development",
+          "only by the amount of affordable housing provided"
+        ],
+        "20022711": [
+          "entire regulatory period"
+        ],
         "20018523": [
           "qualifying affordable housing"
         ]
@@ -221,15 +263,16 @@
       "requiredConcepts": [
         "Section 23-22 sets an R7A maximum FAR of 5.01 for qualifying affordable housing or qualifying senior housing.",
         "A 5.01 FAR applied to 10,000 square feet permits 50,100 square feet, so the stated 48,000 square feet is below that table ceiling.",
-        "Being below the table ceiling does not establish entitlement to the higher FAR; the applicable qualifying-affordable-housing path and required amount of affordable housing must be established under Article II, Chapter 7.",
+        "Being below the table ceiling does not establish entitlement to the higher FAR; the applicable MIH, UAP, or regulatory-agreement path and its required amount of affordable floor area must be established under Article II, Chapter 7.",
+        "For a UAP path, Section 27-111 limits the increase above the standard-residence FAR to the amount of affordable housing provided, so the project description alone cannot establish that the full proposed 4.80 FAR is available.",
         "The user's label alone is not treated as proof that the development qualifies for the higher FAR."
       ],
       "forbiddenClaims": [
         "Any project containing affordable units automatically receives 5.01 FAR.",
         "The answer gives an unconditional compliance conclusion without establishing the qualifying-affordable-housing path."
       ],
-      "revisionNotes": "Added the Section 12-10 qualifying-affordable-housing definition and narrowed the expected conclusion to distinguish the numerical table ceiling from entitlement to the higher FAR.",
-      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
+      "revisionNotes": "Re-reviewed current Sections 23-22, 12-10, 27-111, and 27-16; reframed the question so 5.01 is only a numerical ceiling and added the UAP rule that any FAR increase above the standard-residence limit is limited by the amount of affordable housing actually provided.",
+      "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
@@ -367,12 +410,24 @@
       "id": "zr-inner-transit-zone-new-unit-parking",
       "category": "effective-date",
       "status": "draft",
-      "question": "An 80-unit residential development in an R7A district is within the Inner Transit Zone, all dwelling units will be created after December 5, 2024, and no timely application or vested right preserves the pre-December 5, 2024 regulations. How many accessory residential parking spaces are required?",
+      "question": "An 80-unit R7A residential development is within the Inner Transit Zone; every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333. How many accessory off-street residential parking spaces does Section 25-211 require for those units?",
       "selectedEvidenceSectionIDs": [20018444, 20017540, 20017541],
+      "evidenceReviewTermsBySection": {
+        "20018444": [
+          "Building permit applications approved before December 5, 2025"
+        ],
+        "20017540": [
+          "Inner Transit Zone"
+        ],
+        "20017541": [
+          "created after December 5, 2024",
+          "temporary certificate of occupancy"
+        ]
+      },
       "requiredConcepts": [
         "Section 25-211 requires no accessory off-street parking spaces for dwelling units or rooming units created after December 5, 2024 within the Inner Transit Zone.",
         "The answer states that zero spaces are required under that provision for the stated new units.",
-        "The answer checks Section 11-333 and relies on the stated absence of a timely application or vested right under the pre-December 5, 2024 regulations.",
+        "The answer checks Section 11-333 and relies on the stated absence of the filing and approval facts needed to continue under the pre-December 5, 2024 regulations.",
         "The answer distinguishes units created after December 5, 2024 from existing units and parking governed by the separate maintenance provisions.",
         "The answer uses the section's certificate-of-occupancy definition of when a unit is created rather than assuming a colloquial construction date."
       ],
@@ -381,8 +436,8 @@
         "Existing required parking is said to be removable automatically.",
         "The December 5, 2024 transition and Section 11-333 vesting path are ignored."
       ],
-      "revisionNotes": "Added Section 11-333 and an explicit no-vesting project fact so the zero-space conclusion tests the current rule without silently ignoring the transition path.",
-      "revisionAppliedAt": "2026-08-17T21:17:41.000Z",
+      "revisionNotes": "Re-reviewed current Sections 11-333, 25-20, and 25-211; replaced the ambiguous word created with the section's temporary/final certificate-of-occupancy test and tied the transition assumption to the actual Section 11-333 filing-and-approval path.",
+      "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
       "reviewer": null,
       "reviewedAt": null
     },
