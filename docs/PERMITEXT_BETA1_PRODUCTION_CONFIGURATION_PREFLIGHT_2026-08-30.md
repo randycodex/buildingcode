@@ -29,7 +29,7 @@ The missing activation keys are:
 - `PERMITEXT_PRIVACY_VERSION`;
 - `PERMITEXT_SUBSCRIPTION_POLICY_VERSION`.
 
-The owner approved the prepared automatic/exclusive decision on August 30, 2026, but the missing Stripe tax keys are expected to remain absent until the New York Certificate, Product tax-code, and provider registration facts are available and activation is separately authorized. The three policy-version keys must remain absent until Production serves the exact approved document bytes and the strict publication audit passes.
+The owner approved the prepared automatic/exclusive decision on August 30, 2026, and New York Business Express shows the registration as issued. The missing Stripe tax keys are expected to remain absent until the actual Certificate is received, the recommended specific Product tax code and New York provider registration are owner-approved and verified, and activation is separately authorized. The three policy-version keys must remain absent until Production serves the exact approved document bytes and the strict publication audit passes.
 
 Production metadata does contain the required groups for durable PostgreSQL, private Blob storage, Stripe secret/Price/webhook identifiers, canonical public URL, Apple bundle/Pro/root-pin configuration, Clerk Production configuration, and the Research cap and price inputs. Presence does **not** prove any hidden value is correct.
 
@@ -69,8 +69,8 @@ It exits nonzero while any required key group is absent. Its contract also prove
 ## Next authorized sequence
 
 1. Publish and verify the exact approved policy files before adding their three version identifiers.
-2. Receive and verify the New York Certificate and provider registration facts.
-3. Review the Stripe Product tax classification; the automatic/exclusive presentation and exact web disclosure are owner-approved.
+2. Receive, save, and print/display the actual New York Certificate and record the assigned filing frequency; the official registration status is already `Issued`.
+3. Approve and verify the recommended specific Stripe Product tax classification and New York provider registration; the automatic/exclusive presentation and exact web disclosure are already owner-approved.
 4. Add the five activation keys only with explicit authorization; do not deploy merely because names are present.
 5. Run the value-level readiness verifier with real protected values and retain aggregate evidence.
 6. Continue to the separately approved deployment and controlled Production billing gates.

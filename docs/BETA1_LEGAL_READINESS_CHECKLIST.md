@@ -46,7 +46,7 @@ Permitext's owner may report net business profit on a personal return as a sole 
 The conservative no-professional launch path is therefore:
 
 1. Treat New York web subscriptions as taxable unless the New York Tax Department provides a different written answer for Permitext.
-2. Obtain the New York Certificate of Authority before the first taxable New York web subscription.
+2. Obtain the New York Certificate of Authority before the first taxable New York web subscription. The registration is issued, but the actual certificate still must be received, saved, and printed/displayed.
 3. Configure Stripe's product tax code, customer-location collection, registrations, and inclusive/exclusive presentation only after the registration facts are known.
 4. Keep Apple tax reporting separate because Apple controls the App Store transaction and remittance behavior; Stripe automatic tax is web-only.
 5. Monitor other states' nexus thresholds and digital-product rules as sales grow.
@@ -60,7 +60,7 @@ The final owner review and version record are complete. Before opening public pa
 
 1. Stable public URLs serve the exact approved files, and web/iOS purchase screens match them.
 2. The exact policy version variables are configured only after step 1.
-3. The newly requested New York Certificate of Authority is received and the Stripe tax configuration decision is recorded before the first taxable New York web sale. The application was submitted and its confirmation was saved on August 28, 2026.
+3. The actual New York Certificate of Authority is received, saved, and printed/displayed and the Stripe tax configuration decision is recorded before the first taxable New York web sale. Business Express shows the registration as issued on August 28, 2026, but the portal currently returns the DTF-17 application instead of the certificate and the assigned filing frequency remains open.
 4. Apple App Store metadata and the in-app subscription screen use the same price, duration, renewal, cancellation, and professional-use language.
 5. A no-charge local verification and the separately authorized production lifecycle confirm signup, purchase acknowledgment, entitlement, cancellation, refund, account export, and account deletion.
 
