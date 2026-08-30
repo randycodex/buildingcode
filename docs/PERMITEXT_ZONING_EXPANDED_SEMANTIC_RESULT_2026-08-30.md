@@ -74,6 +74,8 @@ The proposed revisions are isolated for owner disposition in [PERMITEXT_ZONING_B
 
 The remaining failed answers identify useful engineering targets. They include omitted project-location and mapped-applicability facts, incomplete pre/post-December 5, 2024 parking analysis, incomplete zoning-lot and cellar definition consequences, omitted calculation steps and margins, and incomplete effective-date or historical-map distinctions. Some rubrics also contain collateral concepts beyond the question and need scope review before another paid run.
 
+The six-case no-cost scope review is now complete without changing the frozen result. It removes an unrelated rules-of-construction concept, two duplicate arithmetic checks, two unused threshold margins, and an over-specific historical-record formulation; it merges overlapping transition-history concepts and preserves the real 6.00 FAR, verified historical-text, and historical-map/lot omissions. Proposed dispositions: [PERMITEXT_ZONING_EXPANDED_RUBRIC_SCOPE_AUDIT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_RUBRIC_SCOPE_AUDIT_2026-08-30.md).
+
 ## Boundary and next gate
 
 - Public Zoning Research remains disabled.

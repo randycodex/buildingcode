@@ -66,3 +66,5 @@ The following items do not require immediate product behavior changes, but their
 - `zr-candidate-b1-city-of-yes-transition` and `zr-candidate-b1-mih-historical-zoning-lot`: keep adoption/effective-date and historical/current-map distinctions, but remove any concept that cannot be proven from the selected enacted or official historical evidence.
 
 No frozen data changes should be made until the two recommended dispositions above are explicitly approved or revised by the owner.
+
+The exact no-cost scope dispositions are now recorded separately in [PERMITEXT_ZONING_EXPANDED_RUBRIC_SCOPE_AUDIT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_RUBRIC_SCOPE_AUDIT_2026-08-30.md). That audit proposes removing collateral or duplicate requirements in five cases while preserving a real 6.00 FAR omission in the office-conversion case. It does not modify the frozen cohort.
